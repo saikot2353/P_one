@@ -14,7 +14,6 @@ import {
   UserCheck,
   ArrowUpDown,
   X,
-  Plus,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -25,7 +24,7 @@ export const Route = createFileRoute("/bulk-leave")({
       {
         name: "description",
         content:
-          "Enterprise bulk leave processing console for searching employees, selecting candidates, and allocating leaves via submission modal.",
+          "Enterprise bulk leave allocation console for filtering employees, selecting candidates, and submitting bulk leaves.",
       },
     ],
   }),
@@ -289,41 +288,49 @@ const mockEmployees: EmployeeRecord[] = [
 ];
 
 function BulkLeavePage() {
-  // Search Filter Console State
+  // Top Filter Console State
   const [year, setYear] = useState("2026");
   const [employeeIdQuery, setEmployeeIdQuery] = useState("");
-  const [empType, setEmpType] = useState("ALL");
+  const [employeeTypes, setEmployeeTypes] = useState<string[]>(["Worker"]);
   const [department, setDepartment] = useState("All Departments");
   const [section, setSection] = useState("ALL");
   const [designation, setDesignation] = useState("ALL");
   const [unit, setUnit] = useState("ALL");
   const [line, setLine] = useState("ALL");
   const [shift, setShift] = useState("");
+  const [fromDate, setFromDate] = useState("2026-09-14");
+  const [toDate, setToDate] = useState("2026-09-15");
+  const [leaveType, setLeaveType] = useState("CL");
+  const [reason, setReason] = useState("");
 
-  // Table Search & Selection
+  // Table Search & Selection State
   const [tableSearch, setTableSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    new Set(["1", "2"]) // Default selection matching reference UI
+    new Set(["1", "2"]) // Default selection matching screenshot
   );
   const [rowRemarks, setRowRemarks] = useState<Record<string, string>>({});
-
-  // SUBMIT MODAL STATE
-  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
-  const [modalLeaveType, setModalLeaveType] = useState("CL");
-  const [modalFromDate, setModalFromDate] = useState("2026-09-14");
-  const [modalToDate, setModalToDate] = useState("2026-09-15");
-  const [modalReason, setModalReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Compute Days in Modal
-  const modalCalculatedDays = useMemo(() => {
-    if (!modalFromDate || !modalToDate) return 1;
-    const start = new Date(modalFromDate);
-    const end = new Date(modalToDate);
+  // Employee Type Handler
+  const handleRemoveEmpType = (typeToRemove: string) => {
+    setEmployeeTypes(employeeTypes.filter((t) => t !== typeToRemove));
+  };
+
+  const handleAddEmpType = (typeToAdd: string) => {
+    if (typeToAdd && !employeeTypes.includes(typeToAdd)) {
+      setEmployeeTypes([...employeeTypes, typeToAdd]);
+    }
+  };
+
+  // Compute Days
+  const calculatedDays = useMemo(() => {
+    if (!fromDate || !toDate) return 1;
+    const start = new Date(fromDate);
+    const end = new Date(toDate);
     const diffTime = end.getTime() - start.getTime();
     if (diffTime < 0) return 0;
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-  }, [modalFromDate, modalToDate]);
+  }, [fromDate, toDate]);
 
   // Filter Logic
   const filteredData = useMemo(() => {
@@ -359,8 +366,10 @@ function BulkLeavePage() {
       // Line filter
       if (line !== "ALL" && emp.line !== line) return false;
 
-      // Emp Type filter
-      if (empType !== "ALL" && emp.empType !== empType) return false;
+      // Employee Type tag filter
+      if (employeeTypes.length > 0 && !employeeTypes.includes(emp.empType)) {
+        return false;
+      }
 
       // Comma-separated Employee ID Search
       if (employeeIdQuery.trim()) {
@@ -387,14 +396,9 @@ function BulkLeavePage() {
     designation,
     unit,
     line,
-    empType,
+    employeeTypes,
     employeeIdQuery,
   ]);
-
-  // Selected Employee Objects
-  const selectedEmployeeObjects = useMemo(() => {
-    return mockEmployees.filter((emp) => selectedIds.has(emp.id));
-  }, [selectedIds]);
 
   // Checkbox helpers
   const isAllSelected =
@@ -423,33 +427,32 @@ function BulkLeavePage() {
   const handleResetFilters = () => {
     setYear("2026");
     setEmployeeIdQuery("");
-    setEmpType("ALL");
+    setEmployeeTypes(["Worker"]);
     setDepartment("All Departments");
     setSection("ALL");
     setDesignation("ALL");
     setUnit("ALL");
     setLine("ALL");
     setShift("");
+    setFromDate("2026-09-14");
+    setToDate("2026-09-15");
+    setLeaveType("CL");
+    setReason("");
     setTableSearch("");
-    toast.info("Reset filter options to default.");
+    toast.info("Reset filter parameters to default.");
   };
 
-  // Open Modal Handler
-  const handleOpenSubmitModal = () => {
+  // Direct Submit Action Handler (NO MODAL!)
+  const handleSubmitBulkLeaveDirect = () => {
     if (selectedIds.size === 0) {
-      toast.error("Please select at least one employee from the table first!");
+      toast.error("Please select at least one employee from the table!");
       return;
     }
-    setIsSubmitModalOpen(true);
-  };
-
-  // Confirm Submission inside Modal
-  const handleConfirmBulkLeave = () => {
-    if (!modalFromDate || !modalToDate) {
+    if (!fromDate || !toDate) {
       toast.error("Please select valid From Date and To Date!");
       return;
     }
-    if (modalCalculatedDays <= 0) {
+    if (calculatedDays <= 0) {
       toast.error("To Date must be equal to or after From Date!");
       return;
     }
@@ -457,12 +460,11 @@ function BulkLeavePage() {
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
-      setIsSubmitModalOpen(false);
       toast.success(
-        `Bulk Leave (${modalLeaveType}) successfully granted for ${selectedIds.size} selected employee(s)!`,
+        `Bulk Leave (${leaveType}) successfully granted for ${selectedIds.size} selected employee(s)!`,
         {
-          description: `Duration: ${modalFromDate} to ${modalToDate} (${modalCalculatedDays} Days)${
-            modalReason ? ` | Reason: ${modalReason}` : ""
+          description: `Period: ${fromDate} to ${toDate} (${calculatedDays} Days)${
+            reason ? ` | Reason: ${reason}` : ""
           }`,
         }
       );
@@ -483,6 +485,10 @@ function BulkLeavePage() {
       "Line",
       "Grade",
       "Joining Date",
+      "Leave Type",
+      "From Date",
+      "To Date",
+      "Days",
       "Remarks",
     ];
 
@@ -500,7 +506,11 @@ function BulkLeavePage() {
         e.line,
         e.grade,
         e.joiningDate,
-        rowRemarks[e.id] || "",
+        leaveType,
+        fromDate,
+        toDate,
+        calculatedDays.toString(),
+        rowRemarks[e.id] || reason || "",
       ]);
 
     if (rows.length === 0) {
@@ -519,7 +529,7 @@ function BulkLeavePage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `bulk_leave_selected_list_${new Date()
+    link.download = `bulk_leave_${leaveType}_${new Date()
       .toISOString()
       .slice(0, 10)}.csv`;
     link.click();
@@ -566,7 +576,7 @@ function BulkLeavePage() {
                 Bulk Leave Allocation Console
               </h1>
               <p className="text-xs text-slate-500 mt-0.5">
-                Search and select employees from the grid, then click Submit to grant bulk leaves.
+                Configure leave parameters in the top panel, select employees in the table, and click Submit at the bottom left.
               </p>
             </div>
 
@@ -591,12 +601,12 @@ function BulkLeavePage() {
             </div>
           </div>
 
-          {/* FILTER CONSOLE CARD */}
+          {/* TOP FILTER & LEAVE PARAMETERS CONSOLE CARD */}
           <div className="bg-white rounded-lg border border-slate-200 shadow-2xs p-4 sm:p-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-700">
                 <Filter className="w-4 h-4 text-slate-500" />
-                <span>Search & Filter Criteria</span>
+                <span>Search Filters & Leave Allocation Controls</span>
               </div>
               <button
                 type="button"
@@ -604,12 +614,12 @@ function BulkLeavePage() {
                 className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                Reset Filters
+                Reset Controls
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 text-xs">
-              {/* Year */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 text-xs">
+              {/* Row 1: Year */}
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
                   Year
@@ -617,7 +627,7 @@ function BulkLeavePage() {
                 <select
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
-                  className="w-full h-8.5 px-2.5 border border-slate-300 rounded bg-white text-slate-800 font-medium focus:ring-1 focus:ring-slate-400"
+                  className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-800 font-medium focus:ring-1 focus:ring-slate-400"
                 >
                   <option value="2026">2026</option>
                   <option value="2025">2025</option>
@@ -626,38 +636,60 @@ function BulkLeavePage() {
               </div>
 
               {/* Employee ID (Comma Separated) */}
-              <div className="xl:col-span-2">
+              <div>
                 <label className="block font-semibold text-slate-700 mb-1">
-                  Employee ID <span className="text-slate-400 font-normal">(Comma Separated)</span>
+                  Employee Id <span className="text-blue-600 font-normal">(Comma Separator)</span>
                 </label>
                 <input
                   type="text"
                   value={employeeIdQuery}
                   onChange={(e) => setEmployeeIdQuery(e.target.value)}
-                  placeholder="e.g. 1074, 1088, 11441..."
-                  className="w-full h-8.5 px-2.5 border border-slate-300 rounded text-slate-800 focus:ring-1 focus:ring-slate-400 placeholder-slate-400"
+                  placeholder="use comma as separator"
+                  className="w-full h-9 px-3 border border-slate-300 rounded text-slate-800 focus:ring-1 focus:ring-slate-400 placeholder-slate-400"
                 />
               </div>
 
               {/* Employee Type */}
-              <div>
+              <div className="xl:col-span-2">
                 <label className="block font-semibold text-slate-700 mb-1">
                   Employee Type
                 </label>
-                <select
-                  value={empType}
-                  onChange={(e) => setEmpType(e.target.value)}
-                  className="w-full h-8.5 px-2.5 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
-                >
-                  <option value="ALL">All Types</option>
-                  <option value="Worker">Worker</option>
-                  <option value="Staff">Staff</option>
-                  <option value="Management">Management</option>
-                  <option value="Executive">Executive</option>
-                </select>
+                <div className="min-h-9 p-1 border border-slate-300 rounded bg-white flex flex-wrap items-center gap-1.5">
+                  {employeeTypes.map((type) => (
+                    <span
+                      key={type}
+                      className="inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-xs border border-slate-300 font-medium"
+                    >
+                      {type}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveEmpType(type)}
+                        className="text-slate-400 hover:text-red-500 font-bold"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                  <select
+                    onChange={(e) => {
+                      handleAddEmpType(e.target.value);
+                      e.target.value = "";
+                    }}
+                    defaultValue=""
+                    className="h-7 text-xs bg-transparent border-none focus:ring-0 text-slate-500 cursor-pointer"
+                  >
+                    <option value="" disabled>
+                      + Add Type...
+                    </option>
+                    <option value="Worker">Worker</option>
+                    <option value="Staff">Staff</option>
+                    <option value="Management">Management</option>
+                    <option value="Executive">Executive</option>
+                  </select>
+                </div>
               </div>
 
-              {/* Department */}
+              {/* Row 2: Department */}
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
                   Department
@@ -665,7 +697,7 @@ function BulkLeavePage() {
                 <select
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full h-8.5 px-2.5 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
+                  className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
                 >
                   <option value="All Departments">All Departments</option>
                   <option value="Production">Production</option>
@@ -684,7 +716,7 @@ function BulkLeavePage() {
                 <select
                   value={section}
                   onChange={(e) => setSection(e.target.value)}
-                  className="w-full h-8.5 px-2.5 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
+                  className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
                 >
                   <option value="ALL">ALL</option>
                   <option value="Sewing">Sewing</option>
@@ -705,7 +737,7 @@ function BulkLeavePage() {
                 <select
                   value={designation}
                   onChange={(e) => setDesignation(e.target.value)}
-                  className="w-full h-8.5 px-2.5 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
+                  className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
                 >
                   <option value="ALL">ALL</option>
                   <option value="Operator">Operator</option>
@@ -724,7 +756,7 @@ function BulkLeavePage() {
                 <select
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  className="w-full h-8.5 px-2.5 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
+                  className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
                 >
                   <option value="ALL">ALL</option>
                   <option value="Aleya Apparels Ltd. (Shirt)">Aleya Apparels Ltd. (Shirt)</option>
@@ -734,7 +766,7 @@ function BulkLeavePage() {
                 </select>
               </div>
 
-              {/* Line */}
+              {/* Row 3: Line */}
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
                   Line
@@ -742,7 +774,7 @@ function BulkLeavePage() {
                 <select
                   value={line}
                   onChange={(e) => setLine(e.target.value)}
-                  className="w-full h-8.5 px-2.5 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
+                  className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-800 focus:ring-1 focus:ring-slate-400"
                 >
                   <option value="ALL">ALL</option>
                   <option value="02.Line-B">02.Line-B</option>
@@ -761,24 +793,83 @@ function BulkLeavePage() {
                   type="text"
                   value={shift}
                   onChange={(e) => setShift(e.target.value)}
-                  placeholder="Shift..."
-                  className="w-full h-8.5 px-2.5 border border-slate-300 rounded text-slate-800 focus:ring-1 focus:ring-slate-400"
+                  placeholder=""
+                  className="w-full h-9 px-3 border border-slate-300 rounded text-slate-800 focus:ring-1 focus:ring-slate-400"
                 />
               </div>
-            </div>
 
-            {/* Search Button Bar */}
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  toast.info(`Found ${filteredData.length} matching employee record(s).`);
-                }}
-                className="h-9 px-6 bg-[#3b82f6] hover:bg-blue-600 text-white font-bold text-xs uppercase tracking-wider rounded shadow-2xs transition-colors flex items-center gap-2"
-              >
-                <Search className="w-3.5 h-3.5" />
-                SEARCH EMPLOYEES
-              </button>
+              {/* From Date * */}
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">
+                  From Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-900 font-semibold focus:ring-1 focus:ring-slate-400"
+                />
+              </div>
+
+              {/* To Date * */}
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">
+                  To Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-900 font-semibold focus:ring-1 focus:ring-slate-400"
+                />
+              </div>
+
+              {/* Leave Type * */}
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">
+                  Leave Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={leaveType}
+                  onChange={(e) => setLeaveType(e.target.value)}
+                  className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-900 font-bold focus:ring-1 focus:ring-slate-400"
+                >
+                  <option value="CL">CL (Casual Leave)</option>
+                  <option value="SL">SL (Sick Leave)</option>
+                  <option value="AL">AL (Earned Leave / Annual Leave)</option>
+                  <option value="CPL">CPL (Compensatory Leave)</option>
+                  <option value="LWP">LWP (Leave Without Pay)</option>
+                  <option value="ML">ML (Maternity Leave)</option>
+                </select>
+              </div>
+
+              {/* Row 4: Reason */}
+              <div className="sm:col-span-2 lg:col-span-2">
+                <label className="block font-semibold text-slate-700 mb-1">
+                  Reason
+                </label>
+                <input
+                  type="text"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Input Reason"
+                  className="w-full h-9 px-3 border border-slate-300 rounded text-slate-800 focus:ring-1 focus:ring-slate-400 placeholder-slate-400"
+                />
+              </div>
+
+              {/* Search Button */}
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast.info(`Found ${filteredData.length} matching employee record(s).`);
+                  }}
+                  className="h-9 px-6 bg-[#3b82f6] hover:bg-blue-600 text-white font-bold text-xs uppercase tracking-wider rounded shadow-2xs transition-colors flex items-center justify-center gap-2"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  SEARCH
+                </button>
+              </div>
             </div>
           </div>
 
@@ -811,12 +902,12 @@ function BulkLeavePage() {
               </div>
 
               <div className="flex items-center gap-2 text-xs">
-                <label className="text-slate-600 font-medium">Search Table:</label>
+                <label className="text-slate-600 font-medium">Search:</label>
                 <input
                   type="text"
                   value={tableSearch}
                   onChange={(e) => setTableSearch(e.target.value)}
-                  placeholder="Filter grid..."
+                  placeholder=""
                   className="h-8 px-2.5 border border-slate-300 rounded focus:ring-1 focus:ring-slate-400 text-slate-800 w-48 sm:w-64"
                 />
               </div>
@@ -835,6 +926,12 @@ function BulkLeavePage() {
                         className="rounded border-slate-400 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
                       />
                     </th>
+                    <th className="py-2.5 px-3 border-r border-slate-300 min-w-[140px]">
+                      <div className="flex items-center gap-1 text-slate-600">
+                        <Filter className="w-3.5 h-3.5" />
+                        <span>Remarks</span>
+                      </div>
+                    </th>
                     <th className="py-2.5 px-3 border-r border-slate-300">
                       <div className="flex items-center justify-between">
                         <span>Emp ID</span>
@@ -843,50 +940,75 @@ function BulkLeavePage() {
                     </th>
                     <th className="py-2.5 px-3 border-r border-slate-300">
                       <div className="flex items-center justify-between">
-                        <span>Emp ID (Offc)</span>
+                        <span>Emp ID(Offc)</span>
                         <ArrowUpDown className="w-3 h-3 text-slate-400" />
                       </div>
                     </th>
                     <th className="py-2.5 px-3 border-r border-slate-300">
                       <div className="flex items-center justify-between">
-                        <span>Employee Name</span>
+                        <span>Name</span>
                         <ArrowUpDown className="w-3 h-3 text-slate-400" />
                       </div>
                     </th>
                     <th className="py-2.5 px-3 border-r border-slate-300">
-                      <span>Type</span>
+                      <div className="flex items-center justify-between">
+                        <span>Employee Type</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      </div>
                     </th>
                     <th className="py-2.5 px-3 border-r border-slate-300">
-                      <span>Department</span>
+                      <div className="flex items-center justify-between">
+                        <span>Department</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      </div>
                     </th>
                     <th className="py-2.5 px-3 border-r border-slate-300">
-                      <span>Section</span>
+                      <div className="flex items-center justify-between">
+                        <span>Section</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      </div>
                     </th>
                     <th className="py-2.5 px-3 border-r border-slate-300">
-                      <span>Designation</span>
+                      <div className="flex items-center justify-between">
+                        <span>Job Title</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      </div>
                     </th>
                     <th className="py-2.5 px-3 border-r border-slate-300">
-                      <span>Unit</span>
+                      <div className="flex items-center justify-between">
+                        <span>Unit</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      </div>
                     </th>
                     <th className="py-2.5 px-3 border-r border-slate-300">
-                      <span>Line</span>
+                      <div className="flex items-center justify-between">
+                        <span>Line</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      </div>
                     </th>
-                    <th className="py-2.5 px-3 border-r border-slate-300 text-center">
-                      <span>Balances (CL / SL / EL)</span>
+                    <th className="py-2.5 px-3 border-r border-slate-300">
+                      <div className="flex items-center justify-between">
+                        <span>Grade</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      </div>
                     </th>
-                    <th className="py-2.5 px-3 min-w-[150px]">
-                      <span>Remarks / Note</span>
+                    <th className="py-2.5 px-3 border-r border-slate-300">
+                      <div className="flex items-center justify-between">
+                        <span>Joining Date</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      </div>
                     </th>
+                    <th className="py-2.5 px-3">Default</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white">
                   {filteredData.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={12}
+                        colSpan={14}
                         className="py-8 text-center text-slate-500 italic"
                       >
-                        No employee records found matching current search parameters.
+                        No employee records found matching search parameters.
                       </td>
                     </tr>
                   ) : (
@@ -898,7 +1020,7 @@ function BulkLeavePage() {
                           onClick={() => handleToggleRow(emp.id)}
                           className={`cursor-pointer transition-colors ${
                             isSelected
-                              ? "bg-slate-100/90 font-medium"
+                              ? "bg-[#eff6ff] font-medium"
                               : "hover:bg-slate-50"
                           }`}
                         >
@@ -913,13 +1035,30 @@ function BulkLeavePage() {
                               className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
                             />
                           </td>
+                          <td
+                            className="py-1.5 px-3 border-r border-slate-200"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <input
+                              type="text"
+                              value={rowRemarks[emp.id] ?? emp.remarks ?? ""}
+                              onChange={(e) =>
+                                setRowRemarks({
+                                  ...rowRemarks,
+                                  [emp.id]: e.target.value,
+                                })
+                              }
+                              className="w-full h-7 px-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-blue-500"
+                              placeholder=""
+                            />
+                          </td>
                           <td className="py-2 px-3 border-r border-slate-200 font-mono text-slate-700">
                             {emp.empId}
                           </td>
                           <td className="py-2 px-3 border-r border-slate-200 font-mono text-slate-700">
                             {emp.empIdOffc}
                           </td>
-                          <td className="py-2 px-3 border-r border-slate-200 font-semibold text-slate-900">
+                          <td className="py-2 px-3 border-r border-slate-200 font-medium text-slate-900">
                             {emp.name}
                           </td>
                           <td className="py-2 px-3 border-r border-slate-200 text-slate-700">
@@ -940,29 +1079,14 @@ function BulkLeavePage() {
                           <td className="py-2 px-3 border-r border-slate-200 text-slate-700">
                             {emp.line}
                           </td>
-                          <td className="py-2 px-3 border-r border-slate-200 text-center">
-                            <span className="text-[11px] font-mono text-slate-600">
-                              CL: <strong>{emp.clBalance}</strong> | SL:{" "}
-                              <strong>{emp.slBalance}</strong> | EL:{" "}
-                              <strong>{emp.elBalance}</strong>
-                            </span>
+                          <td className="py-2 px-3 border-r border-slate-200 text-slate-700">
+                            {emp.grade}
                           </td>
-                          <td
-                            className="py-1.5 px-3"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <input
-                              type="text"
-                              value={rowRemarks[emp.id] ?? ""}
-                              onChange={(e) =>
-                                setRowRemarks({
-                                  ...rowRemarks,
-                                  [emp.id]: e.target.value,
-                                })
-                              }
-                              placeholder="Remarks..."
-                              className="w-full h-7 px-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-slate-400"
-                            />
+                          <td className="py-2 px-3 border-r border-slate-200 text-slate-700 whitespace-nowrap">
+                            {emp.joiningDate}
+                          </td>
+                          <td className="py-2 px-3 text-slate-400 text-center">
+                            —
                           </td>
                         </tr>
                       );
@@ -972,27 +1096,38 @@ function BulkLeavePage() {
               </table>
             </div>
 
-            {/* Pagination & SUBMIT Button Bar (Bottom Left) */}
+            {/* Pagination & DIRECT SUBMIT BUTTON (Bottom Left) */}
             <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="text-xs text-slate-600 font-medium">
                   Showing 1 to {filteredData.length} of 2,375 entries
                   {selectedIds.size > 0 && (
-                    <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 font-bold rounded text-[11px]">
+                    <span className="ml-2 px-2.5 py-0.5 bg-blue-100 text-blue-800 font-bold rounded text-[11px]">
                       {selectedIds.size} Selected
                     </span>
                   )}
                 </div>
 
-                {/* SUBMIT BUTTON ON BOTTOM LEFT */}
+                {/* SUBMIT BUTTON ON BOTTOM LEFT - DIRECT APPLICATION (NO MODAL) */}
                 <div>
                   <button
                     type="button"
-                    onClick={handleOpenSubmitModal}
-                    className="px-6 py-2 bg-[#f97316] hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-wider rounded shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                    disabled={isSubmitting || selectedIds.size === 0}
+                    onClick={handleSubmitBulkLeaveDirect}
+                    className={`px-6 py-2 rounded font-bold text-xs uppercase tracking-wider shadow-md transition-all flex items-center gap-2 cursor-pointer ${
+                      selectedIds.size === 0
+                        ? "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
+                        : "bg-[#f97316] hover:bg-orange-600 text-white active:scale-95"
+                    }`}
                   >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>SUBMIT ({selectedIds.size})</span>
+                    {isSubmitting ? (
+                      <span>Processing...</span>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>SUBMIT</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -1020,175 +1155,6 @@ function BulkLeavePage() {
             </div>
           </div>
         </div>
-
-        {/* SUBMIT BULK LEAVE PARAMETERS MODAL */}
-        {isSubmitModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
-            <div className="bg-white rounded-lg border border-slate-300 shadow-2xl max-w-3xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-              {/* Modal Header */}
-              <div className="bg-[#1e293b] text-white px-6 py-3.5 flex items-center justify-between border-b border-slate-700">
-                <div className="flex items-center gap-2.5">
-                  <UserCheck className="w-5 h-5 text-blue-400" />
-                  <h3 className="font-bold text-sm tracking-wide text-white">
-                    Bulk Leave Application Parameters
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setIsSubmitModalOpen(false)}
-                  className="text-slate-400 hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Modal Body - 2 Column Wide Enterprise Layout */}
-              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-                {/* Left Column: Selected Employees Table List */}
-                <div className="space-y-2 flex flex-col min-h-0">
-                  <div className="flex items-center justify-between">
-                    <label className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
-                      Selected Candidates ({selectedIds.size})
-                    </label>
-                    <span className="px-2 py-0.5 bg-blue-100 text-blue-800 font-bold rounded text-[11px] border border-blue-200">
-                      {selectedIds.size} Staff Selected
-                    </span>
-                  </div>
-
-                  <div className="flex-1 max-h-[260px] overflow-y-auto border border-slate-200 rounded bg-slate-50">
-                    <table className="w-full text-left text-xs border-collapse">
-                      <thead className="bg-slate-200 text-slate-700 font-semibold sticky top-0 border-b border-slate-300">
-                        <tr>
-                          <th className="py-2 px-2.5 border-r border-slate-300">#</th>
-                          <th className="py-2 px-2.5 border-r border-slate-300">Emp ID</th>
-                          <th className="py-2 px-2.5 border-r border-slate-300">Name</th>
-                          <th className="py-2 px-2.5">Dept</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-200 bg-white">
-                        {selectedEmployeeObjects.map((emp, index) => (
-                          <tr key={emp.id} className="hover:bg-slate-50">
-                            <td className="py-1.5 px-2.5 text-slate-500 font-mono border-r border-slate-200">
-                              {index + 1}
-                            </td>
-                            <td className="py-1.5 px-2.5 font-mono text-slate-700 font-medium border-r border-slate-200">
-                              {emp.empId}
-                            </td>
-                            <td className="py-1.5 px-2.5 font-semibold text-slate-900 border-r border-slate-200">
-                              {emp.name}
-                            </td>
-                            <td className="py-1.5 px-2.5 text-slate-600">
-                              {emp.department}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                {/* Right Column: Leave Parameters Form */}
-                <div className="space-y-4">
-                  {/* Leave Type * */}
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1">
-                      Leave Type <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={modalLeaveType}
-                      onChange={(e) => setModalLeaveType(e.target.value)}
-                      className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-900 font-bold text-xs focus:ring-1 focus:ring-slate-400"
-                    >
-                      <option value="CL">CL (Casual Leave)</option>
-                      <option value="SL">SL (Sick Leave)</option>
-                      <option value="EL">EL (Earned Leave / Annual Leave)</option>
-                      <option value="CPL">CPL (Compensatory Leave)</option>
-                      <option value="LWP">LWP (Leave Without Pay)</option>
-                      <option value="ML">ML (Maternity Leave)</option>
-                    </select>
-                  </div>
-
-                  {/* From Date * & To Date * */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-semibold text-slate-700 mb-1">
-                        From Date <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="date"
-                        value={modalFromDate}
-                        onChange={(e) => setModalFromDate(e.target.value)}
-                        className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-900 font-semibold text-xs focus:ring-1 focus:ring-slate-400"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-semibold text-slate-700 mb-1">
-                        To Date <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="date"
-                        value={modalToDate}
-                        onChange={(e) => setModalToDate(e.target.value)}
-                        className="w-full h-9 px-3 border border-slate-300 rounded bg-white text-slate-900 font-semibold text-xs focus:ring-1 focus:ring-slate-400"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Duration Calculation Banner */}
-                  <div className="p-3 bg-blue-50/80 border border-blue-200 rounded flex items-center justify-between text-xs text-blue-900 font-medium">
-                    <span>
-                      Duration: <strong className="text-slate-900">{modalCalculatedDays} Day(s)</strong>
-                    </span>
-                    <span>
-                      Total Man-Days: <strong className="text-slate-900">{selectedIds.size * modalCalculatedDays} Days</strong>
-                    </span>
-                  </div>
-
-                  {/* Reason / Purpose Note */}
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1">
-                      Reason / Purpose Note <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={modalReason}
-                      onChange={(e) => setModalReason(e.target.value)}
-                      placeholder="Enter reason for bulk leave application..."
-                      className="w-full p-2.5 border border-slate-300 rounded text-slate-800 text-xs focus:ring-1 focus:ring-slate-400 placeholder-slate-400 resize-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Footer Actions */}
-              <div className="bg-slate-100 border-t border-slate-200 px-6 py-3.5 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsSubmitModalOpen(false)}
-                  className="px-5 py-2 border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded transition-colors"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="button"
-                  disabled={isSubmitting}
-                  onClick={handleConfirmBulkLeave}
-                  className="px-6 py-2 bg-[#f97316] hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-wider rounded shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
-                >
-                  {isSubmitting ? (
-                    <span>Processing...</span>
-                  ) : (
-                    <>
-                      <Send className="w-3.5 h-3.5" />
-                      <span>CONFIRM & APPLY BULK LEAVE</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

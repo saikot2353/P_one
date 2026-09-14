@@ -36,6 +36,7 @@ import {
   MessageSquare,
   BookUser,
   Megaphone,
+  DoorOpen,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -203,6 +204,15 @@ export const nav: NavItem[] = [
     label: "Notice",
     to: "/notice",
     icon: Megaphone,
+  },
+  {
+    label: "Conference Room",
+    icon: DoorOpen,
+    subitems: [
+      { label: "Conference Room Booking", to: "/conference-room-booking" },
+      { label: "Booking List", to: "/conference-room-booking-list" },
+      { label: "Approval", to: "/conference-room-approval" },
+    ],
   },
   {
     label: "KPI Performance",

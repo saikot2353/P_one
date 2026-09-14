@@ -227,6 +227,9 @@ import { Route as ConfigureLetterRouteImport } from './routes/configure-letter'
 import { Route as ConfigureEmploymentRouteImport } from './routes/configure-employment'
 import { Route as ConfigureEducationRouteImport } from './routes/configure-education'
 import { Route as ConfigureCompensationRouteImport } from './routes/configure-compensation'
+import { Route as ConferenceRoomBookingListRouteImport } from './routes/conference-room-booking-list'
+import { Route as ConferenceRoomBookingRouteImport } from './routes/conference-room-booking'
+import { Route as ConferenceRoomApprovalRouteImport } from './routes/conference-room-approval'
 import { Route as CompanySetupRouteImport } from './routes/company-setup'
 import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
 import { Route as CheckApproveSalaryRouteImport } from './routes/check-approve-salary'
@@ -1410,6 +1413,22 @@ const ConfigureCompensationRoute = ConfigureCompensationRouteImport.update({
   path: '/configure-compensation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConferenceRoomBookingListRoute =
+  ConferenceRoomBookingListRouteImport.update({
+    id: '/conference-room-booking-list',
+    path: '/conference-room-booking-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ConferenceRoomBookingRoute = ConferenceRoomBookingRouteImport.update({
+  id: '/conference-room-booking',
+  path: '/conference-room-booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConferenceRoomApprovalRoute = ConferenceRoomApprovalRouteImport.update({
+  id: '/conference-room-approval',
+  path: '/conference-room-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompanySetupRoute = CompanySetupRouteImport.update({
   id: '/company-setup',
   path: '/company-setup',
@@ -1567,6 +1586,9 @@ export interface FileRoutesByFullPath {
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/company-setup': typeof CompanySetupRoute
+  '/conference-room-approval': typeof ConferenceRoomApprovalRoute
+  '/conference-room-booking': typeof ConferenceRoomBookingRoute
+  '/conference-room-booking-list': typeof ConferenceRoomBookingListRoute
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
   '/configure-employment': typeof ConfigureEmploymentRoute
@@ -1813,6 +1835,9 @@ export interface FileRoutesByTo {
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/company-setup': typeof CompanySetupRoute
+  '/conference-room-approval': typeof ConferenceRoomApprovalRoute
+  '/conference-room-booking': typeof ConferenceRoomBookingRoute
+  '/conference-room-booking-list': typeof ConferenceRoomBookingListRoute
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
   '/configure-employment': typeof ConfigureEmploymentRoute
@@ -2060,6 +2085,9 @@ export interface FileRoutesById {
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/company-setup': typeof CompanySetupRoute
+  '/conference-room-approval': typeof ConferenceRoomApprovalRoute
+  '/conference-room-booking': typeof ConferenceRoomBookingRoute
+  '/conference-room-booking-list': typeof ConferenceRoomBookingListRoute
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
   '/configure-employment': typeof ConfigureEmploymentRoute
@@ -2308,6 +2336,9 @@ export interface FileRouteTypes {
     | '/check-approve-salary'
     | '/company-holiday'
     | '/company-setup'
+    | '/conference-room-approval'
+    | '/conference-room-booking'
+    | '/conference-room-booking-list'
     | '/configure-compensation'
     | '/configure-education'
     | '/configure-employment'
@@ -2554,6 +2585,9 @@ export interface FileRouteTypes {
     | '/check-approve-salary'
     | '/company-holiday'
     | '/company-setup'
+    | '/conference-room-approval'
+    | '/conference-room-booking'
+    | '/conference-room-booking-list'
     | '/configure-compensation'
     | '/configure-education'
     | '/configure-employment'
@@ -2800,6 +2834,9 @@ export interface FileRouteTypes {
     | '/check-approve-salary'
     | '/company-holiday'
     | '/company-setup'
+    | '/conference-room-approval'
+    | '/conference-room-booking'
+    | '/conference-room-booking-list'
     | '/configure-compensation'
     | '/configure-education'
     | '/configure-employment'
@@ -3047,6 +3084,9 @@ export interface RootRouteChildren {
   CheckApproveSalaryRoute: typeof CheckApproveSalaryRoute
   CompanyHolidayRoute: typeof CompanyHolidayRoute
   CompanySetupRoute: typeof CompanySetupRoute
+  ConferenceRoomApprovalRoute: typeof ConferenceRoomApprovalRoute
+  ConferenceRoomBookingRoute: typeof ConferenceRoomBookingRoute
+  ConferenceRoomBookingListRoute: typeof ConferenceRoomBookingListRoute
   ConfigureCompensationRoute: typeof ConfigureCompensationRoute
   ConfigureEducationRoute: typeof ConfigureEducationRoute
   ConfigureEmploymentRoute: typeof ConfigureEmploymentRoute
@@ -4799,6 +4839,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConfigureCompensationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/conference-room-booking-list': {
+      id: '/conference-room-booking-list'
+      path: '/conference-room-booking-list'
+      fullPath: '/conference-room-booking-list'
+      preLoaderRoute: typeof ConferenceRoomBookingListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conference-room-booking': {
+      id: '/conference-room-booking'
+      path: '/conference-room-booking'
+      fullPath: '/conference-room-booking'
+      preLoaderRoute: typeof ConferenceRoomBookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conference-room-approval': {
+      id: '/conference-room-approval'
+      path: '/conference-room-approval'
+      fullPath: '/conference-room-approval'
+      preLoaderRoute: typeof ConferenceRoomApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/company-setup': {
       id: '/company-setup'
       path: '/company-setup'
@@ -5007,6 +5068,9 @@ const rootRouteChildren: RootRouteChildren = {
   CheckApproveSalaryRoute: CheckApproveSalaryRoute,
   CompanyHolidayRoute: CompanyHolidayRoute,
   CompanySetupRoute: CompanySetupRoute,
+  ConferenceRoomApprovalRoute: ConferenceRoomApprovalRoute,
+  ConferenceRoomBookingRoute: ConferenceRoomBookingRoute,
+  ConferenceRoomBookingListRoute: ConferenceRoomBookingListRoute,
   ConfigureCompensationRoute: ConfigureCompensationRoute,
   ConfigureEducationRoute: ConfigureEducationRoute,
   ConfigureEmploymentRoute: ConfigureEmploymentRoute,

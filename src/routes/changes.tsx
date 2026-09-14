@@ -10,7 +10,7 @@ export const Route = createFileRoute("/changes")({
 export type ChangeRecord = {
   id: string;
   date: string;
-  type: "Modify" | "New Addition" | "Feature" | "Feature Update" | "UI Update" | "UX Optimization" | "New" | "New Feature" | "UI / UX" | "Business Logic" | "Bug Fix" | "";
+  type: string;
   module: string;
   link?: string;
   descriptionEn: string;
@@ -21,12 +21,12 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v427");
+    const saved = localStorage.getItem("system_changes_v432");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
       setRecords(DEFAULT_CHANGE_RECORDS);
-      localStorage.setItem("system_changes_v427", JSON.stringify(DEFAULT_CHANGE_RECORDS));
+      localStorage.setItem("system_changes_v432", JSON.stringify(DEFAULT_CHANGE_RECORDS));
     }
   }, []);
 
