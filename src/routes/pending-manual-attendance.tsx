@@ -2,131 +2,325 @@ import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { SearchableSelect } from "@/components/ui/searchable-select";
-import { Badge } from "@/components/ui/badge";
 import {
   ChevronRight,
   Search,
   Printer,
-  Table as TableIcon,
-  X,
+  FileSpreadsheet,
+  FileText,
   CheckCircle2,
-  Clock,
-  Fingerprint,
   XCircle,
-  FolderOpen,
   Pencil,
+  Clock,
+  Filter,
+  Calendar,
+  User,
+  Building2,
+  SlidersHorizontal,
 } from "lucide-react";
 
 export const Route = createFileRoute("/pending-manual-attendance")({
   component: PendingManualAttendancePage,
 });
 
-// Authentic pending requests dataset
-const initialPendingList = [
+const EMPLOYEE_TYPES = [
+  "ALL",
+  "Management",
+  "Office Executive",
+  "Production Executive",
+  "Office Staff",
+  "Production Staff",
+  "Worker",
+  "Pcs Rate Worker",
+  "Intern",
+];
+
+const SUB_DEPARTMENTS = [
+  "ALL",
+  "Accounts",
+  "Accounts & Finance",
+  "Accounts & Vat",
+  "Admin",
+  "APPS Team",
+  "Audit",
+  "Blockchain",
+  "Business Analysis",
+  "Business Development",
+  "Business Innovation",
+  "Business Intelligence",
+  "Compliance",
+  "Core Development",
+  "Core Development (HR)",
+  "Core Sales",
+  "DBA",
+  "Digital Marketing",
+  "EMS",
+  "ERP",
+  "ERP Team",
+  "General ERP (Com, A/C, Fixed Asset, Vat)",
+  "House Keeping",
+  "HR & Admin",
+  "HR & Compliance",
+  "HR Team",
+  "Human Resources",
+  "ICT",
+  "Implementation & Support (HR)",
+  "Management",
+  "Medical",
+  "Merchandising-Purchase-MCD",
+  "MIS",
+  "Project Resource & Strategy",
+  "RMG-Production-IE & Planning",
+  "Security",
+  "TAX",
+  "Textile Team",
+  "Transport/ Logistic support",
+  "Utility",
+  "VAT & TAX",
+  "WEB-Team",
+];
+
+const JOB_TITLES = [
+  "ALL",
+  "Sr. Welder",
+  "A.Q.C",
+  "AC Helper",
+  "Accounts Officer",
+  "Admin Executive",
+  "Admin Officer",
+  "Advisor",
+  "AGM",
+  "APM",
+  "Assistant Manager",
+  "Assistant Officer",
+  "Asst. Batch Man",
+  "Asst. Care Giver",
+  "Asst. Color Master",
+  "Asst. Manager",
+  "Asst. Officer",
+  "Auditor",
+  "Batch Man",
+  "Business Development Manager",
+  "Business Intelligence Manager",
+  "CEO",
+  "Chairman",
+  "Chief Operating Officer",
+  "Chief Technical Officer",
+  "Commercial Assistant",
+  "Computer Operator",
+  "Deputy Manager",
+  "Designer",
+  "Digital Marketing Executive",
+  "Director",
+  "Doctor",
+  "Driver",
+  "Executive",
+  "Executive Director",
+  "General Manager",
+  "Graphics Designer",
+  "Head of Accounts & Finance",
+  "Head of Administration",
+  "Head of HR",
+  "HR Officer",
+  "IE Officer",
+  "In-charge",
+  "Jr. Executive",
+  "Junior Officer",
+  "Manager",
+  "Managing Director",
+  "Medical Officer",
+  "Merchandiser",
+  "MIS Officer",
+  "Office Assistant",
+  "Officer",
+  "Operator",
+  "Planning Manager",
+  "Production Manager",
+  "Quality Controller",
+  "Receptionist",
+  "Sales Executive",
+  "Security Officer",
+  "Senior Officer",
+  "Software Developer",
+  "Store Keeper",
+  "Supervisor",
+  "Supply Chain Manager",
+  "Technician",
+  "Trainee Officer",
+  "Welfare Officer",
+];
+
+const UNITS = ["ALL", "N/A", "PSL"];
+const LINES = ["ALL", "N/A"];
+const STATUS_OPTIONS = ["ALL", "Request Approved", "Pending"];
+
+interface AttendanceRequest {
+  id: string;
+  name: string;
+  empType: string;
+  subDept: string;
+  team: string;
+  title: string;
+  unit: string;
+  line: string;
+  date: string;
+  inTime: string;
+  outDate: string;
+  outTime: string;
+  reason: string;
+  systemBy: string;
+  systemDate: string;
+  systemInfoIn: string;
+  systemInfoOut: string;
+  hodStatus: string;
+  hrdStatus: string;
+  hodName: string;
+  status: string;
+}
+
+const INITIAL_REQUESTS: AttendanceRequest[] = [
   {
-    id: "2016001055",
-    name: "Md. Zahidul Islam",
-    dept1: "Management",
-    dept2: "Management",
-    title: "Chief Operating Officer",
-    date: "16/05/2026",
-    inTime: "09:02:45",
-    outDate: "16/05/2026",
-    outTime: "17:59:58",
-    reason: "",
-    systemBy: "Naim Hasan Roky",
-    systemDate: "17/05/2026",
-    systemInfo: "In Time Request\nOut Time RequestOut Date Changed.(16/05/2026)",
-    hodStatus: "Approve",
+    id: "2024051509",
+    name: "Irfan Hossain",
+    empType: "Office Executive",
+    subDept: "Implementation & Support (HR)",
+    team: "ERP Team",
+    title: "Jr. Executive",
+    unit: "PSL",
+    line: "N/A",
+    date: "14/09/2026",
+    inTime: "08:55:00",
+    outDate: "14/09/2026",
+    outTime: "18:01:00",
+    reason: "Movement to Narayanganj",
+    systemBy: "Irfan Hossain",
+    systemDate: "14/09/2026",
+    systemInfoIn: "In Time Request",
+    systemInfoOut: "Out Time Request",
+    hodStatus: "Pending",
     hrdStatus: "Pending",
-    mdStatus: "Pending",
-    hodName: "Rakibul Islam Khan",
+    hodName: "Mazharul Haque",
+    status: "Pending",
+  },
+  {
+    id: "2025054315",
+    name: "Md. Shahinur Alahi Khan",
+    empType: "Office Executive",
+    subDept: "Business Development",
+    team: "Core Sales",
+    title: "Asst. Manager",
+    unit: "PSL",
+    line: "N/A",
+    date: "14/09/2026",
+    inTime: "09:00:00",
+    outDate: "14/09/2026",
+    outTime: "18:00:00",
+    reason: "Movement",
+    systemBy: "Md. Shahinur Alahi Khan",
+    systemDate: "14/09/2026",
+    systemInfoIn: "In Time Request",
+    systemInfoOut: "Out Time Request",
+    hodStatus: "Pending",
+    hrdStatus: "Pending",
+    hodName: "Rajebul Hasan Rajon",
+    status: "Pending",
   },
   {
     id: "2022035599",
     name: "Dipon Saha",
-    dept1: "Core Development (HR)",
-    dept2: "Development Team",
+    empType: "Management",
+    subDept: "Core Development (HR)",
+    team: "Development Team",
     title: "Manager",
+    unit: "PSL",
+    line: "N/A",
     date: "15/05/2026",
     inTime: "09:15:30",
     outDate: "15/05/2026",
     outTime: "18:05:12",
-    reason: "Severe Traffic Jam",
-    systemBy: "Self Service",
+    reason: "Late In Approval Request - Severe Traffic Jam",
+    systemBy: "Dipon Saha",
     systemDate: "15/05/2026",
-    systemInfo: "Late In Approval Request",
+    systemInfoIn: "Late In Approval Request",
+    systemInfoOut: "Out Time Request",
     hodStatus: "Pending",
     hrdStatus: "Pending",
-    mdStatus: "Pending",
     hodName: "Zakir Hossain",
-  },
-  {
-    id: "2023043910",
-    name: "Tahmid Afsar Shapno",
-    dept1: "Business Innovation",
-    dept2: "Project Resource & Strategy",
-    title: "Asst. Manager",
-    date: "14/05/2026",
-    inTime: "10:30:00",
-    outDate: "14/05/2026",
-    outTime: "19:30:00",
-    reason: "Audit Visit Support",
-    systemBy: "Naim Hasan Roky",
-    systemDate: "15/05/2026",
-    systemInfo: "In/Out Punch Missing Correction",
-    hodStatus: "Approve",
-    hrdStatus: "Approve",
-    mdStatus: "Pending",
-    hodName: "Rakibul Islam Khan",
+    status: "Pending",
   },
   {
     id: "2021032646",
     name: "Sadiqul Islam",
-    dept1: "Core Sales",
-    dept2: "Retail Sales",
+    empType: "Office Executive",
+    subDept: "Core Sales",
+    team: "Retail Sales",
     title: "Deputy Manager",
+    unit: "PSL",
+    line: "N/A",
     date: "15/05/2026",
     inTime: "08:55:00",
     outDate: "15/05/2026",
     outTime: "18:30:00",
-    reason: "Early morning Client Meeting",
-    systemBy: "Self Service",
+    reason: "Punch In Correction Request - Early morning Client Meeting",
+    systemBy: "Sadiqul Islam",
     systemDate: "15/05/2026",
-    systemInfo: "Punch In Correction Request",
+    systemInfoIn: "Punch In Correction Request",
+    systemInfoOut: "Out Time Request",
     hodStatus: "Pending",
     hrdStatus: "Pending",
-    mdStatus: "Pending",
-    hodName: "Zakir Hossain",
+    hodName: "Rajebul Hasan Rajon",
+    status: "Pending",
+  },
+  {
+    id: "2016001055",
+    name: "Md. Zahidul Islam",
+    empType: "Management",
+    subDept: "Management",
+    team: "Executive Office",
+    title: "Chief Operating Officer",
+    unit: "PSL",
+    line: "N/A",
+    date: "16/05/2026",
+    inTime: "09:02:45",
+    outDate: "16/05/2026",
+    outTime: "17:59:58",
+    reason: "Out Date Changed",
+    systemBy: "Naim Hasan Roky",
+    systemDate: "17/05/2026",
+    systemInfoIn: "In Time Request",
+    systemInfoOut: "Out Date Changed (16/05/2026)",
+    hodStatus: "Request Approved",
+    hrdStatus: "Pending",
+    hodName: "Rakibul Islam Khan",
+    status: "Request Approved",
   },
 ];
 
 function PendingManualAttendancePage() {
-  const [requests, setRequests] = useState(initialPendingList);
+  const [requests, setRequests] = useState<AttendanceRequest[]>(INITIAL_REQUESTS);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  // Filters
-  const [startDate, setStartDate] = useState("2026-05-14");
-  const [endDate, setEndDate] = useState("2026-05-17");
-  const [department, setDepartment] = useState("All Departments");
-  const [statusFilter, setStatusFilter] = useState<string>("Pending");
-  const [globalSearch, setGlobalSearch] = useState("");
+  // Top Filter Console State
+  const [startDate, setStartDate] = useState("2026-09-14");
+  const [endDate, setEndDate] = useState("2026-09-14");
+  const [selectedEmpType, setSelectedEmpType] = useState("ALL");
+  const [selectedSubDept, setSelectedSubDept] = useState("ALL");
+  const [selectedJobTitle, setSelectedJobTitle] = useState("ALL");
+  const [selectedUnit, setSelectedUnit] = useState("ALL");
+  const [selectedLine, setSelectedLine] = useState("ALL");
+  const [employeeIdSearch, setEmployeeIdSearch] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("ALL");
+  const [tableSearch, setTableSearch] = useState("");
 
-  const departmentOptions = [
-    { value: "All Departments", label: "All Departments" },
-    { value: "Management", label: "Management" },
-    { value: "Core Development (HR)", label: "Core Development (HR)" },
-    { value: "Business Innovation", label: "Business Innovation" },
-    { value: "Core Sales", label: "Core Sales" },
-  ];
+  // Toast feedback
+  const [toastMessage, setToastMessage] = useState("");
 
-  // Inline dynamic edit modal states
-  const [editingRequest, setEditingRequest] = useState<any | null>(null);
-  const [editInTime, setEditInTime] = useState("");
-  const [editOutTime, setEditOutTime] = useState("");
-  const [editReason, setEditReason] = useState("");
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(""), 4000);
+  };
 
+  // Selection handlers
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
       setSelectedIds(new Set(filteredRequests.map((r) => r.id)));
@@ -144,381 +338,476 @@ function PendingManualAttendancePage() {
     });
   };
 
-  const handleBulkApprove = () => {
-    if (selectedIds.size === 0) return;
+  const handleApproveSelected = () => {
+    if (selectedIds.size === 0) {
+      showToast("Please select at least one request to approve!");
+      return;
+    }
     setRequests((prev) =>
-      prev.map((r) => (selectedIds.has(r.id) ? { ...r, hodStatus: "Approve" } : r)),
+      prev.map((r) =>
+        selectedIds.has(r.id)
+          ? { ...r, hodStatus: "Request Approved", status: "Request Approved" }
+          : r
+      )
     );
+    showToast(`Successfully Approved ${selectedIds.size} manual attendance request(s)!`);
     setSelectedIds(new Set());
   };
 
-  const handleBulkReject = () => {
-    if (selectedIds.size === 0) return;
-    setRequests((prev) =>
-      prev.map((r) => (selectedIds.has(r.id) ? { ...r, hodStatus: "Reject" } : r)),
-    );
-    setSelectedIds(new Set());
-  };
-
-  const handleStartEdit = (req: any) => {
-    setEditingRequest(req);
-    setEditInTime(req.inTime);
-    setEditOutTime(req.outTime);
-    setEditReason(req.reason);
-  };
-
-  const handleSaveEdit = () => {
-    if (!editingRequest) return;
-    setRequests((prev) =>
-      prev.map((r) => {
-        if (r.id !== editingRequest.id) return r;
-        return { ...r, inTime: editInTime, outTime: editOutTime, reason: editReason };
-      }),
-    );
-    setEditingRequest(null);
-  };
-
-  // Stats & Filtering
+  // Filtered dataset
   const filteredRequests = useMemo(() => {
     return requests.filter((r) => {
-      if (statusFilter !== "All") {
-        if (statusFilter === "Pending" && r.hodStatus !== "Pending") return false;
-        if (statusFilter === "Approved" && r.hodStatus !== "Approve") return false;
-        if (statusFilter === "Rejected" && r.hodStatus !== "Reject") return false;
+      if (selectedEmpType !== "ALL" && r.empType !== selectedEmpType) return false;
+      if (selectedSubDept !== "ALL" && r.subDept !== selectedSubDept) return false;
+      if (selectedJobTitle !== "ALL" && r.title !== selectedJobTitle) return false;
+      if (selectedUnit !== "ALL" && r.unit !== selectedUnit) return false;
+      if (selectedLine !== "ALL" && r.line !== selectedLine) return false;
+      if (selectedStatus !== "ALL" && r.status !== selectedStatus) return false;
+      if (employeeIdSearch && !r.id.toLowerCase().includes(employeeIdSearch.toLowerCase())) {
+        return false;
       }
-      if (department !== "All Departments" && r.dept1 !== department) return false;
-      if (globalSearch) {
-        const q = globalSearch.toLowerCase();
+      if (tableSearch) {
+        const q = tableSearch.toLowerCase();
         return (
-          r.name.toLowerCase().includes(q) || r.id.includes(q) || r.title.toLowerCase().includes(q)
+          r.name.toLowerCase().includes(q) ||
+          r.id.toLowerCase().includes(q) ||
+          r.reason.toLowerCase().includes(q) ||
+          r.subDept.toLowerCase().includes(q)
         );
       }
       return true;
     });
-  }, [requests, statusFilter, department, globalSearch]);
-
-  const totalCount = requests.length;
-  const pendingCount = requests.filter((r) => r.hodStatus === "Pending").length;
-  const approvedCount = requests.filter((r) => r.hodStatus === "Approve").length;
-  const rejectedCount = requests.filter((r) => r.hodStatus === "Reject").length;
+  }, [
+    requests,
+    selectedEmpType,
+    selectedSubDept,
+    selectedJobTitle,
+    selectedUnit,
+    selectedLine,
+    selectedStatus,
+    employeeIdSearch,
+    tableSearch,
+  ]);
 
   return (
-    <div className="h-screen flex bg-[#f1f5f9] dark:bg-[#0b0f19] text-[#334155] dark:text-slate-200 overflow-hidden font-sans antialiased tracking-tight">
+    <div className="h-screen flex bg-background text-foreground overflow-hidden font-sans antialiased">
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
         <Topbar />
 
-        <div className="flex-1 flex flex-col p-4 xl:p-6 gap-3.5 overflow-hidden bg-slate-50/50 dark:bg-slate-950/10">
-          {/* Header Block */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-lg px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                <Link to="/" className="hover:text-[#2563eb] transition-colors">
-                  Home
-                </Link>
-                <ChevronRight className="size-2" />
-                <span className="hover:text-[#2563eb] transition-colors">Human Resource</span>
-                <ChevronRight className="size-2" />
-                <span className="text-slate-600 dark:text-slate-300 font-semibold">
-                  Attendance Approvals
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="size-1.5 rounded-full bg-[#2563eb]" />
-                <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100">
-                  Manual Attendance Approvals
-                </h1>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#2563eb] bg-[#2563eb]/5 border border-[#2563eb]/15 px-3 py-1.5 rounded-full select-none">
-                HR Audit Registry
-              </span>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-muted/20 font-sans">
+          {/* Breadcrumb Navigation */}
+          <div className="flex items-center justify-between font-sans">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-sans">
+              <Link to="/" className="hover:text-foreground transition-colors font-sans">
+                Home
+              </Link>
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span className="text-foreground font-semibold font-sans">Human Resource</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span className="text-foreground font-bold font-sans">Approve Manual Attendance</span>
             </div>
           </div>
 
-          {/* KPI Dashboard Summary Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0">
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0 border border-slate-100 dark:border-slate-700">
-                <FolderOpen className="size-4" />
-              </div>
-              <div>
-                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Total Queue
-                </p>
-                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">
-                  {totalCount} Requests
-                </h3>
-              </div>
+          {/* Toast Notification */}
+          {toastMessage && (
+            <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-2 shadow-md animate-in fade-in slide-in-from-top-2 font-sans">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{toastMessage}</span>
             </div>
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 border border-emerald-100 dark:border-emerald-800">
-                <CheckCircle2 className="size-4" />
-              </div>
-              <div>
-                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Approved
-                </p>
-                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">
-                  {approvedCount} Requests
-                </h3>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 border border-amber-100 dark:border-amber-800">
-                <Clock className="size-4" />
-              </div>
-              <div>
-                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Pending
-                </p>
-                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">
-                  {pendingCount} Requests
-                </h3>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0 border border-rose-100 dark:border-rose-800">
-                <XCircle className="size-4" />
-              </div>
-              <div>
-                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Rejected
-                </p>
-                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">
-                  {rejectedCount} Requests
-                </h3>
-              </div>
-            </div>
-          </div>
+          )}
 
-          {/* Smart Filters */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 shadow-sm shrink-0 space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3.5 gap-y-2.5">
-              <div className="space-y-0.5">
-                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Start Date
+          {/* TOP FILTER CONSOLE (FULL REFERENCE ERP SPECIFICATION) */}
+          <div className="p-5 rounded-2xl border border-border bg-card shadow-sm space-y-4 font-sans">
+            <div className="flex items-center gap-2 border-b border-border/60 pb-3">
+              <Filter className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <h2 className="text-xs font-extrabold uppercase tracking-wider text-foreground">
+                Attendance Application Search & Filter Console
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 font-sans">
+              {/* Start Date */}
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold text-muted-foreground font-sans">
+                  Start Date *
                 </label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2 text-[11px] font-semibold text-slate-800 dark:text-slate-200 outline-none focus:border-[#2563eb]"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 shadow-sm font-sans"
                 />
               </div>
-              <div className="space-y-0.5">
-                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  End Date
+
+              {/* End Date */}
+              <div className="space-y-1 font-sans">
+                <label className="block text-[11px] font-bold text-muted-foreground font-sans">
+                  End Date *
                 </label>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2 text-[11px] font-semibold text-slate-800 dark:text-slate-200 outline-none focus:border-[#2563eb]"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 shadow-sm font-sans"
                 />
               </div>
-              <div className="space-y-0.5">
-                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Department
-                </label>
-                <SearchableSelect
-                  value={department}
-                  onChange={setDepartment}
-                  options={departmentOptions}
-                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-semibold text-slate-800 dark:text-slate-200"
-                />
-              </div>
-            </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
-              <div className="flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 shadow-inner">
-                {(["All", "Approved", "Pending", "Rejected"] as const).map((filter) => {
-                  const isActive = statusFilter === filter;
-                  return (
-                    <button
-                      key={filter}
-                      onClick={() => setStatusFilter(filter)}
-                      className={`px-2.5 py-1 text-[9px] font-bold rounded transition-all uppercase tracking-wider ${
-                        isActive
-                          ? "bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm"
-                          : "text-slate-500 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200"
-                      }`}
-                    >
-                      {filter}
-                    </button>
-                  );
-                })}
+              {/* Employee Type */}
+              <div className="space-y-1 font-sans">
+                <label className="block text-[11px] font-bold text-muted-foreground font-sans">
+                  Employee Type
+                </label>
+                <select
+                  value={selectedEmpType}
+                  onChange={(e) => setSelectedEmpType(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 shadow-sm font-sans"
+                >
+                  {EMPLOYEE_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="relative w-64">
-                <Search className="absolute left-2.5 top-2 size-3 text-slate-400 dark:text-slate-500" />
+
+              {/* Sub Department */}
+              <div className="space-y-1 font-sans">
+                <label className="block text-[11px] font-bold text-muted-foreground font-sans">
+                  Sub Department
+                </label>
+                <select
+                  value={selectedSubDept}
+                  onChange={(e) => setSelectedSubDept(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 shadow-sm font-sans"
+                >
+                  {SUB_DEPARTMENTS.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Job Title */}
+              <div className="space-y-1 font-sans">
+                <label className="block text-[11px] font-bold text-muted-foreground font-sans">
+                  Job Title
+                </label>
+                <select
+                  value={selectedJobTitle}
+                  onChange={(e) => setSelectedJobTitle(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 shadow-sm font-sans"
+                >
+                  {JOB_TITLES.map((j) => (
+                    <option key={j} value={j}>
+                      {j}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Unit */}
+              <div className="space-y-1 font-sans">
+                <label className="block text-[11px] font-bold text-muted-foreground font-sans">
+                  Unit
+                </label>
+                <select
+                  value={selectedUnit}
+                  onChange={(e) => setSelectedUnit(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 shadow-sm font-sans"
+                >
+                  {UNITS.map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Line */}
+              <div className="space-y-1 font-sans">
+                <label className="block text-[11px] font-bold text-muted-foreground font-sans">
+                  Line
+                </label>
+                <select
+                  value={selectedLine}
+                  onChange={(e) => setSelectedLine(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 shadow-sm font-sans"
+                >
+                  {LINES.map((l) => (
+                    <option key={l} value={l}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Employee Id */}
+              <div className="space-y-1 font-sans">
+                <label className="block text-[11px] font-bold text-muted-foreground font-sans">
+                  Employee Id
+                </label>
                 <input
                   type="text"
-                  value={globalSearch}
-                  onChange={(e) => setGlobalSearch(e.target.value)}
-                  placeholder="Quick Search ID, Name..."
-                  className="h-7.5 pl-8 pr-3 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none text-slate-800 dark:text-slate-200"
+                  placeholder="Enter Emp ID..."
+                  value={employeeIdSearch}
+                  onChange={(e) => setEmployeeIdSearch(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 shadow-sm font-sans"
                 />
+              </div>
+
+              {/* Status */}
+              <div className="space-y-1 font-sans">
+                <label className="block text-[11px] font-bold text-muted-foreground font-sans">
+                  Status
+                </label>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 shadow-sm font-sans"
+                >
+                  {STATUS_OPTIONS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* SEARCH Action Button */}
+              <div className="flex items-end font-sans">
+                <button
+                  type="button"
+                  onClick={() => showToast(`Filtered manual attendance requests!`)}
+                  className="w-full h-[38px] text-xs font-extrabold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md flex items-center justify-center gap-2 font-sans"
+                >
+                  <Search className="w-4 h-4" />
+                  Search
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Action Toolbar & Data Table */}
-          <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-lg overflow-hidden flex flex-col min-h-0">
-            {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 shrink-0">
-              <div className="flex items-center gap-1.5">
-                <button className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 bg-white dark:bg-slate-900 cursor-pointer shadow-sm">
-                  <TableIcon className="size-3.5 text-emerald-600 dark:text-emerald-400" /> EXCEL
+          {/* DATA TABLE CARD & EXPORT TOOLBAR */}
+          <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden space-y-0 font-sans">
+            {/* Action Bar / Toolbar */}
+            <div className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-muted/20 font-sans">
+              <div className="flex items-center gap-2 font-sans">
+                <button
+                  type="button"
+                  onClick={() => showToast("Exported Manual Attendance requests to Excel!")}
+                  className="px-3.5 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-500/20 transition-all font-sans"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                  Excel
                 </button>
-                <button className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 bg-white dark:bg-slate-900 cursor-pointer shadow-sm">
-                  <Printer className="size-3.5 text-slate-500 dark:text-slate-400" /> PRINT
+
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-3.5 py-1.5 rounded-lg border border-border bg-background text-xs font-bold flex items-center gap-1.5 hover:bg-accent transition-all font-sans"
+                >
+                  <Printer className="w-4 h-4 text-muted-foreground" />
+                  Print
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => showToast("Generated PDF report for Manual Attendance!")}
+                  className="px-3.5 py-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300 text-xs font-bold flex items-center gap-1.5 hover:bg-rose-500/20 transition-all font-sans"
+                >
+                  <FileText className="w-4 h-4 text-rose-600" />
+                  PDF
+                </button>
+              </div>
+
+              {/* Table Quick Search Input */}
+              <div className="relative w-full sm:w-64 font-sans">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Quick search table..."
+                  value={tableSearch}
+                  onChange={(e) => setTableSearch(e.target.value)}
+                  className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-border bg-background font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/40 shadow-sm font-sans"
+                />
               </div>
             </div>
 
-            {/* Bulk Action Bar - Sticky */}
-            {selectedIds.size > 0 && (
-              <div className="p-3 bg-[#2563eb]/5 border-b border-[#2563eb]/10 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="bg-[#2563eb]/20 text-[#2563eb] hover:bg-[#2563eb]/20"
-                  >
-                    {selectedIds.size} Selected
-                  </Badge>
-                  <span className="text-[11px] font-medium text-slate-500">
-                    entries ready for action
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleBulkReject}
-                    className="h-7.5 px-3 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
-                  >
-                    <XCircle className="size-3.5" /> Reject Selected
-                  </button>
-                  <button
-                    onClick={handleBulkApprove}
-                    className="h-7.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
-                  >
-                    <CheckCircle2 className="size-3.5" /> Approve Selected
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Data Table */}
-            <div className="flex-1 overflow-auto">
-              <table className="w-full min-w-[1200px] border-collapse text-left">
-                <thead className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10">
-                  <tr className="bg-slate-50 dark:bg-slate-950">
-                    <th className="px-4 py-3 w-[60px] text-center border-r border-slate-200 dark:border-slate-800">
+            {/* HIGH-DENSITY MANUAL ATTENDANCE TABLE */}
+            <div className="overflow-x-auto font-sans">
+              <table className="w-full text-left border-collapse font-sans text-xs">
+                <thead className="bg-muted/70 text-muted-foreground font-bold border-b border-border uppercase tracking-wider text-[11px] font-sans">
+                  <tr>
+                    <th className="p-3 text-center w-10 font-sans">#</th>
+                    <th className="p-3 text-center w-10 font-sans">
                       <input
                         type="checkbox"
-                        className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]"
                         onChange={handleSelectAll}
                         checked={
                           selectedIds.size === filteredRequests.length &&
                           filteredRequests.length > 0
                         }
+                        className="rounded border-border"
                       />
                     </th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[80px]">
-                      Action
-                    </th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[100px]">
-                      Emp ID
-                    </th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[180px]">
-                      Employee Name
-                    </th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[140px]">
-                      Department
-                    </th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[90px]">
-                      Date
-                    </th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[80px]">
-                      In Time
-                    </th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[80px]">
-                      Out Time
-                    </th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[120px]">
-                      HOD Status
-                    </th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest min-w-[200px]">
-                      System Notes
-                    </th>
+                    <th className="p-3 text-center w-14 font-sans">ACTION</th>
+                    <th className="p-3 min-w-[160px] font-sans">Reason</th>
+                    <th className="p-3 font-sans">Emp ID</th>
+                    <th className="p-3 font-sans">Name</th>
+                    <th className="p-3 font-sans">Department</th>
+                    <th className="p-3 font-sans">Designation</th>
+                    <th className="p-3 text-center font-sans">Date</th>
+                    <th className="p-3 text-center font-sans">In Time</th>
+                    <th className="p-3 text-center font-sans">Out Date</th>
+                    <th className="p-3 text-center font-sans">Out Time</th>
+                    <th className="p-3 min-w-[220px] font-sans">System Data</th>
+                    <th className="p-3 min-w-[140px] font-sans">HOD</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  {filteredRequests.map((row) => (
+
+                <tbody className="divide-y divide-border/60 text-xs font-sans">
+                  {filteredRequests.map((row, idx) => (
                     <tr
                       key={row.id}
-                      className={`hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${selectedIds.has(row.id) ? "bg-[#2563eb]/5 dark:bg-[#2563eb]/10" : ""}`}
+                      className={`hover:bg-accent/40 transition-colors font-sans ${
+                        selectedIds.has(row.id) ? "bg-emerald-500/5 dark:bg-emerald-500/10" : ""
+                      }`}
                     >
-                      <td className="px-4 py-2 text-center border-r border-slate-200 dark:border-slate-800">
+                      <td className="p-3 text-center font-bold text-muted-foreground font-sans">
+                        {idx + 1}
+                      </td>
+
+                      <td className="p-3 text-center font-sans">
                         <input
                           type="checkbox"
-                          className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]"
                           checked={selectedIds.has(row.id)}
                           onChange={() => handleSelectRow(row.id)}
+                          className="rounded border-border"
                         />
                       </td>
-                      <td className="px-4 py-2 text-center">
+
+                      <td className="p-3 text-center font-sans">
                         <button
-                          onClick={() => handleStartEdit(row)}
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition cursor-pointer"
-                          title="Edit Correction"
+                          type="button"
+                          onClick={() => showToast(`Edit request for ${row.name}`)}
+                          className="p-1.5 rounded-lg border border-border bg-background hover:bg-accent text-muted-foreground hover:text-foreground transition-all font-sans"
+                          title="Edit Request"
                         >
-                          <Pencil className="size-3.5" />
+                          <Pencil className="w-3.5 h-3.5" />
                         </button>
                       </td>
-                      <td className="px-4 py-2 font-mono text-slate-500">{row.id}</td>
-                      <td className="px-4 py-2 font-bold text-slate-800 dark:text-slate-100">
+
+                      <td className="p-3 font-bold text-foreground font-sans max-w-[180px]">
+                        <div className="line-clamp-2">{row.reason}</div>
+                      </td>
+
+                      <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400 font-sans">
+                        {row.id}
+                      </td>
+
+                      <td className="p-3 font-extrabold text-foreground whitespace-nowrap font-sans">
                         {row.name}
                       </td>
-                      <td className="px-4 py-2 text-slate-500 text-[10.5px]">
-                        <div className="truncate">{row.dept1}</div>
-                        <div className="font-normal text-slate-400">{row.title}</div>
+
+                      <td className="p-3 font-sans whitespace-nowrap">
+                        <div className="font-bold text-foreground">{row.subDept}</div>
+                        <div className="text-[11px] text-muted-foreground font-semibold">
+                          {row.team}
+                        </div>
                       </td>
-                      <td className="px-4 py-2 text-center font-mono text-slate-600">{row.date}</td>
-                      <td className="px-4 py-2 text-center font-mono font-bold text-[#2563eb]">
+
+                      <td className="p-3 font-semibold text-muted-foreground whitespace-nowrap font-sans">
+                        {row.title}
+                      </td>
+
+                      <td className="p-3 text-center font-mono font-bold text-foreground whitespace-nowrap font-sans">
+                        {row.date}
+                      </td>
+
+                      <td className="p-3 text-center font-mono font-extrabold text-emerald-600 dark:text-emerald-400 whitespace-nowrap font-sans">
                         {row.inTime}
                       </td>
-                      <td className="px-4 py-2 text-center font-mono font-bold text-[#2563eb]">
+
+                      <td className="p-3 text-center font-mono font-bold text-foreground whitespace-nowrap font-sans">
+                        {row.outDate}
+                      </td>
+
+                      <td className="p-3 text-center font-mono font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap font-sans">
                         {row.outTime}
                       </td>
-                      <td className="px-4 py-2 text-center">
+
+                      {/* SYSTEM DATA MULTI-LINE CARD (REFERENCE MATCHING SCREENSHOT 2) */}
+                      <td className="p-3 font-sans">
+                        <div className="p-2.5 rounded-xl border border-border/80 bg-muted/30 text-[11px] font-sans space-y-0.5 leading-snug">
+                          <div>
+                            <span className="font-bold text-foreground">By:</span>{" "}
+                            <span className="text-foreground">{row.systemBy}</span>
+                          </div>
+                          <div>
+                            <span className="font-bold text-foreground">Date:</span>{" "}
+                            <span className="text-foreground">{row.systemDate}</span>
+                          </div>
+                          <div>
+                            <span className="font-bold text-foreground">Info:</span>{" "}
+                            <span className="text-foreground">{row.systemInfoIn}</span>
+                          </div>
+                          {row.systemInfoOut && (
+                            <div className="text-muted-foreground pl-7">
+                              {row.systemInfoOut}
+                            </div>
+                          )}
+                          <div>
+                            <span className="font-bold text-foreground">HOD:</span>{" "}
+                            <span
+                              className={
+                                row.hodStatus === "Request Approved"
+                                  ? "text-emerald-600 dark:text-emerald-400 font-bold"
+                                  : "text-amber-600 dark:text-amber-400 font-bold"
+                              }
+                            >
+                              {row.hodStatus}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="font-bold text-foreground">HRD:</span>{" "}
+                            <span
+                              className={
+                                row.hrdStatus === "Request Approved"
+                                  ? "text-emerald-600 dark:text-emerald-400 font-bold"
+                                  : "text-amber-600 dark:text-amber-400 font-bold"
+                              }
+                            >
+                              {row.hrdStatus}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* HOD APPROVER COLUMN */}
+                      <td className="p-3 font-sans whitespace-nowrap">
+                        <div className="font-bold text-foreground">{row.hodName}</div>
                         <span
-                          className={`px-2 py-0.5 rounded-xl text-[8.5px] font-extrabold uppercase border ${
-                            row.hodStatus === "Approve"
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                              : row.hodStatus === "Reject"
-                                ? "bg-rose-50 text-rose-700 border-rose-200"
-                                : "bg-amber-50 text-amber-700 border-amber-200"
+                          className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase mt-1 font-sans ${
+                            row.hodStatus === "Request Approved"
+                              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
+                              : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20"
                           }`}
                         >
-                          {row.hodStatus === "Approve" ? "Approved" : row.hodStatus}
+                          {row.hodStatus}
                         </span>
-                      </td>
-                      <td className="px-4 py-2 text-[10px] text-slate-500">
-                        <div className="line-clamp-2" title={row.systemInfo}>
-                          {row.systemInfo.replace(/\n/g, " ")}
-                        </div>
-                        {row.reason && <div className="text-slate-400 italic">"{row.reason}"</div>}
                       </td>
                     </tr>
                   ))}
+
                   {filteredRequests.length === 0 && (
                     <tr>
                       <td
-                        colSpan={10}
-                        className="py-8 text-center text-slate-400 dark:text-slate-500 font-bold"
+                        colSpan={14}
+                        className="p-8 text-center text-muted-foreground font-bold font-sans"
                       >
-                        No attendance correction requests found.
+                        No manual attendance requests match the selected search criteria.
                       </td>
                     </tr>
                   )}
@@ -526,22 +815,36 @@ function PendingManualAttendancePage() {
               </table>
             </div>
 
-            {/* Pagination footer */}
-            <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 dark:text-slate-500 px-5 py-2.5 border-t border-slate-100 dark:border-slate-800 shrink-0">
-              <div>Showing 1 to {filteredRequests.length} entries</div>
-              <div className="flex items-center gap-1.5">
+            {/* TABLE FOOTER WITH APPROVE BUTTON & PAGINATION */}
+            <div className="p-4 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-muted/20 font-sans">
+              <div className="flex items-center gap-3">
                 <button
-                  className="text-slate-400 dark:text-slate-500 hover:text-slate-700 transition-colors"
+                  type="button"
+                  onClick={handleApproveSelected}
+                  className="px-5 py-2 text-xs font-extrabold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition-all shadow-md flex items-center gap-2 font-sans"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Approve
+                </button>
+                <span className="text-xs font-bold text-muted-foreground font-sans">
+                  Showing 1 to {filteredRequests.length} of {filteredRequests.length} entries
+                </span>
+              </div>
+
+              {/* Pagination Controls */}
+              <div className="flex items-center gap-1.5 font-sans">
+                <button
                   disabled
+                  className="px-3 py-1.5 text-xs font-bold rounded-lg border border-border text-muted-foreground opacity-50 cursor-not-allowed font-sans"
                 >
                   Previous
                 </button>
-                <button className="size-5.5 rounded bg-slate-700 dark:bg-slate-200 text-white dark:text-slate-900 flex items-center justify-center shadow-sm text-[9.5px]">
+                <button className="px-3 py-1.5 text-xs font-extrabold rounded-lg bg-emerald-600 text-white font-sans">
                   1
                 </button>
                 <button
-                  className="text-slate-400 dark:text-slate-500 hover:text-slate-700 transition-colors"
                   disabled
+                  className="px-3 py-1.5 text-xs font-bold rounded-lg border border-border text-muted-foreground opacity-50 cursor-not-allowed font-sans"
                 >
                   Next
                 </button>
@@ -549,90 +852,6 @@ function PendingManualAttendancePage() {
             </div>
           </div>
         </div>
-
-        {/* Dynamic Inline Edit Modal (Simplified for Design System) */}
-        {editingRequest && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200">
-              <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950/50">
-                <h2 className="text-sm font-black flex items-center gap-2 uppercase tracking-wider text-slate-700 dark:text-slate-200">
-                  <Fingerprint className="size-4.5 text-[#2563eb]" />
-                  <span>Manual Correction Form</span>
-                </h2>
-                <button
-                  onClick={() => setEditingRequest(null)}
-                  className="text-slate-400 hover:text-slate-600 transition"
-                >
-                  <X className="size-4" />
-                </button>
-              </div>
-
-              <div className="p-5 space-y-4">
-                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
-                  <div className="text-xs font-black">{editingRequest.name}</div>
-                  <div className="text-[10px] text-slate-500 font-mono mt-0.5">
-                    {editingRequest.id} — {editingRequest.dept1}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                      In Time
-                    </label>
-                    <input
-                      type="time"
-                      step="1"
-                      value={editInTime}
-                      onChange={(e) => setEditInTime(e.target.value)}
-                      className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-mono outline-none focus:border-[#2563eb]"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                      Out Time
-                    </label>
-                    <input
-                      type="time"
-                      step="1"
-                      value={editOutTime}
-                      onChange={(e) => setEditOutTime(e.target.value)}
-                      className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-mono outline-none focus:border-[#2563eb]"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                    Correction Reason
-                  </label>
-                  <input
-                    type="text"
-                    value={editReason}
-                    onChange={(e) => setEditReason(e.target.value)}
-                    placeholder="Provide reason for correction..."
-                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs outline-none focus:border-[#2563eb]"
-                  />
-                </div>
-              </div>
-
-              <div className="px-5 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2 bg-slate-50 dark:bg-slate-950/50">
-                <button
-                  onClick={() => setEditingRequest(null)}
-                  className="h-8.5 px-4 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 transition uppercase tracking-wider cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveEdit}
-                  className="h-8.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm transition cursor-pointer"
-                >
-                  Save Adjustments
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );

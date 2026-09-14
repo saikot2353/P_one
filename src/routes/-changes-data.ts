@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "456",
+    "date": "2026-09-14T18:03",
+    "type": "UI Update",
+    "module": "Attendance",
+    "link": "/pending-manual-attendance",
+    "descriptionEn": "Redesigned Approve Manual Attendance page (/pending-manual-attendance) matching reference ERP layout: top filter console with Start Date *, End Date *, Employee Type, Sub Department, Job Title, Unit, Line, Employee Id, Status, and SEARCH button; export toolbar with EXCEL, PRINT, and PDF buttons; high-density data table with Action (Pencil), Reason, Emp ID, Name, Department, Designation, Date, In Time, Out Date, Out Time, System Data (formatted multi-line card), and HOD status; and bottom-left APPROVE action button.",
+    "descriptionBn": "রেফারেন্স ERP লেআউট অনুযায়ী অ্যাপ্রুভ ম্যানুয়াল অ্যাটেনডেন্স পেজটি (/pending-manual-attendance) পুনর্নির্মাণ করা হয়েছে: টপ ফিল্টার কনসোলে Start Date *, End Date *, Employee Type, Sub Department, Job Title, Unit, Line, Employee Id, Status এবং SEARCH বাটন; টেবিল কার্ডে EXCEL, PRINT, PDF এক্সপোর্ট বাটন; হাই-ডেনসিটি ডাটা টেবিল (Action, Reason, Emp ID, Name, Department, Designation, Date, In Time, Out Date, Out Time, System Data কার্ড, HOD); এবং নিচে বটম-লেফটে APPROVE বাটন।"
+  },
+  {
     "id": "455",
     "date": "2026-09-14T17:00",
     "type": "UI Update",
