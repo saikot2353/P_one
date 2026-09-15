@@ -5,12 +5,9 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import {
   Timer,
   Search,
-  ArrowLeft,
+  ChevronRight,
   FileSpreadsheet,
   Save,
-  Filter,
-  CheckCircle2,
-  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -189,7 +186,7 @@ function BudgetOvertimePage() {
     localStorage.setItem("cripton_ot_dept_budgets", JSON.stringify(budgetItems));
   }, [budgetItems]);
 
-  // Filter States (Matching Screenshot)
+  // Filter States
   const [selectedYear, setSelectedYear] = useState("2026");
   const [selectedMonth, setSelectedMonth] = useState("Sep");
   const [selectedDept, setSelectedDept] = useState("ALL");
@@ -281,52 +278,61 @@ function BudgetOvertimePage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans font-['Inter'] overflow-hidden">
+    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
       <Sidebar />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+      <main className="flex-1 min-w-0 flex flex-col relative">
         <Topbar />
 
-        {/* Top Header Bar Matching Screenshot */}
-        <div className="bg-[#2196f3] text-white px-5 py-3 flex items-center justify-between shrink-0 shadow-md">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate({ to: "/" })}
-              className="p-1 hover:bg-white/20 rounded-md transition"
-              title="Go Back"
-            >
-              <ArrowLeft className="size-5 text-white" />
-            </button>
-            <h1 className="text-base font-extrabold tracking-wide flex items-center gap-2">
-              <span>OT Limit</span>
-            </h1>
+        <div className="p-4 md:p-6 space-y-5">
+          {/* Header */}
+          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-3xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
+                <ChevronRight className="size-2.5" />
+                <span className="text-muted-foreground/75">Human Resource</span>
+                <ChevronRight className="size-2.5" />
+                <span className="text-primary font-extrabold">OT Limit</span>
+              </div>
+              <h1 className="text-xl md:text-2xl font-black text-foreground flex items-center gap-2">
+                <div className="p-1.5 bg-primary/10 rounded-lg border border-primary/20 text-primary">
+                  <Timer className="size-5.5 text-primary" />
+                </div>
+                <span>Department Overtime Limit & Budget</span>
+              </h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleExportExcel}
+                className="h-10 px-4 bg-muted hover:bg-muted/80 active:scale-[0.98] text-foreground font-extrabold text-xs rounded-xl shadow-xs transition duration-150 flex items-center gap-1.5 uppercase border border-border"
+              >
+                <FileSpreadsheet className="size-4 text-emerald-500" />
+                <span>Export</span>
+              </button>
+              <button
+                onClick={handleSaveBudgets}
+                className="h-10 px-4 bg-primary hover:bg-primary-glow hover:shadow-primary/15 active:scale-[0.98] text-white font-extrabold text-xs rounded-xl shadow-xs transition duration-150 flex items-center gap-1.5 uppercase"
+              >
+                <Save className="size-4" />
+                <span>Save Changes</span>
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-semibold text-white/90">
-            <Link to="/" className="hover:underline">
-              Home
-            </Link>
-            <span>&gt;</span>
-            <span>Human Resource</span>
-            <span>&gt;</span>
-            <span className="font-bold text-white">OT Limit</span>
-          </div>
-        </div>
-
-        {/* Body Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
-          {/* Top Filter Console Card (Exact Match to Screenshot) */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 items-end text-xs">
-              {/* Year Dropdown */}
+          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4 animate-in fade-in slide-in-from-bottom-2">
+            {/* Filters Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
               <div>
-                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5 block">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block mb-1.5">
                   Year
                 </label>
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
-                  className="w-full h-9 px-3 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
+                  className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none cursor-pointer focus:border-primary transition"
                 >
                   <option value="2024">2024</option>
                   <option value="2025">2025</option>
@@ -335,15 +341,14 @@ function BudgetOvertimePage() {
                 </select>
               </div>
 
-              {/* Month Dropdown */}
               <div>
-                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5 block">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block mb-1.5">
                   Month
                 </label>
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="w-full h-9 px-3 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
+                  className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none cursor-pointer focus:border-primary transition"
                 >
                   {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
                     (m) => (
@@ -355,15 +360,14 @@ function BudgetOvertimePage() {
                 </select>
               </div>
 
-              {/* Department Dropdown */}
-              <div className="lg:col-span-2">
-                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5 block">
+              <div>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block mb-1.5">
                   Department
                 </label>
                 <select
                   value={selectedDept}
                   onChange={(e) => setSelectedDept(e.target.value)}
-                  className="w-full h-9 px-3 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs truncate"
+                  className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none cursor-pointer focus:border-primary transition truncate"
                 >
                   <option value="ALL">All Departments</option>
                   {SECTIONS_LIST.map((sec) => (
@@ -374,57 +378,38 @@ function BudgetOvertimePage() {
                 </select>
               </div>
 
-              {/* SHOW Button (Red outline highlighted in screenshot) */}
               <div>
                 <button
                   type="button"
                   onClick={() => toast.success(`Loaded OT limit records for ${selectedMonth} ${selectedYear}.`)}
-                  className="w-full h-9 px-5 bg-[#2196f3] hover:bg-[#1976d2] text-white font-extrabold text-xs rounded shadow-xs uppercase tracking-wider transition border-2 border-red-500 flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full h-9 bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs rounded-lg transition duration-200"
                 >
-                  SHOW
-                </button>
-              </div>
-
-              {/* EXPORT EXCEL Button (Red styling matching screenshot) */}
-              <div>
-                <button
-                  type="button"
-                  onClick={handleExportExcel}
-                  className="w-full h-9 px-4 bg-[#f44336] hover:bg-[#d32f2f] text-white font-extrabold text-xs rounded shadow-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <FileSpreadsheet className="size-3.5" /> EXPORT EXCEL
+                  Load Records
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* Table Container Card */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-            {/* Live Table Search Header Bar */}
-            <div className="p-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
-              <div className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                <Timer className="size-4 text-blue-600" />
-                <span>Department Overtime Budget &amp; Hour Limits ({filteredBudgetItems.length} Sections)</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-500">Search:</span>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-border/40">
+              <span className="text-[10px] font-black uppercase text-primary tracking-wider">
+                Department Overtime Limits ({filteredBudgetItems.length} records)
+              </span>
+              <div className="relative w-full sm:w-72">
+                <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
                 <input
                   type="text"
                   value={tableSearch}
                   onChange={(e) => setTableSearch(e.target.value)}
-                  className="h-8 px-3 w-48 sm:w-64 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs outline-none focus:border-blue-500 shadow-2xs"
-                  placeholder="Filter section..."
+                  placeholder="Search department..."
+                  className="w-full h-8.5 pl-9 pr-3 rounded-lg bg-muted border border-border/40 focus:border-primary outline-none text-xs font-bold transition duration-200"
                 />
               </div>
             </div>
 
-            {/* Data Grid Table Matching ERP Screenshot Layout */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left border-collapse min-w-[900px]">
+            <div className="overflow-x-auto border border-border/50 rounded-xl shadow-3xs max-h-[50vh]">
+              <table className="min-w-[900px] w-full border-collapse text-[10.5px] text-left">
                 <thead>
-                  <tr className="bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold border-b border-slate-300 dark:border-slate-700 text-[11px] whitespace-nowrap">
-                    <th className="px-3 py-2.5 text-center border-r border-slate-300 dark:border-slate-700 w-12">
+                  <tr className="bg-[#f8fafc] dark:bg-slate-800/20 text-slate-800 dark:text-slate-250 font-black border-b border-slate-200 dark:border-slate-800/80">
+                    <th className="px-4 py-3 font-extrabold w-12 text-center">
                       <input
                         type="checkbox"
                         checked={
@@ -432,17 +417,17 @@ function BudgetOvertimePage() {
                           selectedIds.size === filteredBudgetItems.length
                         }
                         onChange={handleSelectAll}
-                        className="rounded border-slate-400"
+                        className="rounded border-slate-400 accent-primary"
                       />
                     </th>
-                    <th className="px-3 py-2.5 border-r border-slate-300 dark:border-slate-700 w-20">Year</th>
-                    <th className="px-3 py-2.5 border-r border-slate-300 dark:border-slate-700 w-20">Month</th>
-                    <th className="px-4 py-2.5 border-r border-slate-300 dark:border-slate-700">Sections</th>
-                    <th className="px-4 py-2.5 border-r border-slate-300 dark:border-slate-700 w-48 text-center">OT Hours</th>
-                    <th className="px-4 py-2.5 text-right w-52">OT Amount</th>
+                    <th className="px-4 py-3 font-extrabold w-20">Year</th>
+                    <th className="px-4 py-3 font-extrabold w-20">Month</th>
+                    <th className="px-4 py-3 font-extrabold">Sections</th>
+                    <th className="px-4 py-3 font-extrabold text-center w-48">OT Hours</th>
+                    <th className="px-4 py-3 font-extrabold text-right w-52">OT Amount</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-sans text-xs">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                   {filteredBudgetItems.map((row, index) => {
                     const isChecked = selectedIds.has(row.id);
                     return (
@@ -450,35 +435,32 @@ function BudgetOvertimePage() {
                         key={row.id}
                         className={`transition ${
                           isChecked
-                            ? "bg-blue-50/60 dark:bg-blue-950/30"
-                            : "hover:bg-slate-50 dark:hover:bg-slate-800/40"
+                            ? "bg-primary/5"
+                            : "hover:bg-slate-50/50 dark:hover:bg-slate-900/40"
                         }`}
                       >
-                        <td className="px-3 py-2 text-center border-r border-slate-200 dark:border-slate-800">
-                          <div className="flex items-center justify-center gap-1 font-mono">
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              onChange={() => toggleSelectRow(row.id)}
-                              className="rounded border-slate-400"
-                            />
-                            <span className="text-[10px] text-slate-400 font-bold">{index + 1}</span>
-                          </div>
+                        <td className="px-4 py-2.5 text-center">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => toggleSelectRow(row.id)}
+                            className="rounded border-slate-400 accent-primary"
+                          />
                         </td>
 
-                        <td className="px-3 py-2 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">
+                        <td className="px-4 py-2.5 font-mono font-bold text-slate-700 dark:text-slate-300">
                           {row.year}
                         </td>
 
-                        <td className="px-3 py-2 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">
+                        <td className="px-4 py-2.5 font-mono font-bold text-slate-700 dark:text-slate-300">
                           {row.month}
                         </td>
 
-                        <td className="px-4 py-2 font-extrabold text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-800">
+                        <td className="px-4 py-2.5 font-extrabold text-foreground">
                           {row.section}
                         </td>
 
-                        <td className="px-4 py-2 text-center border-r border-slate-200 dark:border-slate-800">
+                        <td className="px-4 py-2 text-center">
                           <input
                             type="number"
                             step="0.5"
@@ -486,7 +468,7 @@ function BudgetOvertimePage() {
                             onChange={(e) =>
                               handleValueChange(row.id, "otHours", parseFloat(e.target.value) || 0)
                             }
-                            className="w-36 h-8 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono font-bold text-xs text-center outline-none focus:border-blue-500 shadow-2xs"
+                            className="w-36 h-8 px-2.5 rounded-lg bg-muted border border-border/40 font-mono font-bold text-xs text-center outline-none focus:border-primary transition"
                           />
                         </td>
 
@@ -498,7 +480,7 @@ function BudgetOvertimePage() {
                             onChange={(e) =>
                               handleValueChange(row.id, "otAmount", parseFloat(e.target.value) || 0)
                             }
-                            className="w-44 h-8 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono font-bold text-xs text-right text-emerald-600 dark:text-emerald-400 outline-none focus:border-blue-500 shadow-2xs"
+                            className="w-44 h-8 px-2.5 rounded-lg bg-muted border border-border/40 font-mono font-bold text-xs text-right text-emerald-600 dark:text-emerald-400 outline-none focus:border-primary transition"
                           />
                         </td>
                       </tr>
@@ -509,7 +491,7 @@ function BudgetOvertimePage() {
                     <tr>
                       <td
                         colSpan={6}
-                        className="px-4 py-12 text-center text-slate-400 italic font-medium"
+                        className="px-4 py-16 text-center text-muted-foreground font-bold"
                       >
                         No department OT budget records found.
                       </td>
@@ -520,11 +502,11 @@ function BudgetOvertimePage() {
             </div>
 
             {/* Bottom Action Footer */}
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-slate-600 dark:text-slate-400 font-bold flex flex-wrap items-center gap-4">
+            <div className="pt-4 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-xs text-muted-foreground font-bold flex flex-wrap items-center gap-4">
                 <span>
                   Total OT Hours:{" "}
-                  <strong className="text-blue-600 dark:text-blue-400 font-mono text-sm">
+                  <strong className="text-primary font-mono text-sm">
                     {totals.totalHours.toFixed(2)} hrs
                   </strong>
                 </span>
@@ -536,18 +518,10 @@ function BudgetOvertimePage() {
                   </strong>
                 </span>
               </div>
-
-              <button
-                type="button"
-                onClick={handleSaveBudgets}
-                className="h-9 px-6 bg-[#2196f3] hover:bg-[#1976d2] text-white font-extrabold text-xs rounded shadow-xs uppercase tracking-wider flex items-center gap-2 transition cursor-pointer"
-              >
-                <Save className="size-4" /> SAVE OVERTIME BUDGET LIMITS
-              </button>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

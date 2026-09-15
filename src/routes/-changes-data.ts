@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "467",
+    "date": "2026-09-15T12:25",
+    "type": "UI Update",
+    "module": "Budget",
+    "link": "/budget-overtime",
+    "descriptionEn": "Redesigned the Overtime Budget & OT Limit page (/budget-overtime) to match the standard ERP design layout found in My Requisitions. Added a clean, unified top header, refined the filter console elements (Year, Month, Department) inside a modern card, and implemented the standard high-density soft-accent data table for editing OT hours and amounts.",
+    "descriptionBn": "ওভারটাইম বাজেট ও ওটি লিমিট পেজটি (/budget-overtime) রিডিজাইন করে 'My Requisitions' এর স্ট্যান্ডার্ড ইআরপি লেআউটের সাথে সামঞ্জস্যপূর্ণ করা হয়েছে। উপরে একটি ক্লিন ও ইউনিফাইড হেডার যুক্ত করা হয়েছে, ফিল্টার কনসোল (বছর, মাস, ডিপার্টমেন্ট) একটি আধুনিক কার্ডে সাজানো হয়েছে এবং ওটি আওয়ারস ও অ্যামাউন্ট এডিটের জন্য স্ট্যান্ডার্ড হাই-ডেনসিটি ডাটা টেবিল ইমপ্লিমেন্ট করা হয়েছে।"
+  },
+  {
+    "id": "466",
+    "date": "2026-09-15T11:55",
+    "type": "New Feature / Refactor",
+    "module": "SSP Requisition",
+    "link": "/ssp-product-budget-request",
+    "descriptionEn": "Merged 'General Product Budget Request' and 'ICT Product Budget Request' into a single unified 'Product Budget Request' portal (/ssp-product-budget-request) and card in the Requisition Hub. Added an in-form Product Requisition Type selector toggle (General vs ICT) that dynamically updates categories and product catalog options.",
+    "descriptionBn": "আলাদা থাকা 'General Product Budget Request' এবং 'ICT Product Budget Request' পেজ দুটিকে একত্রিত করে একটি একক 'Product Budget Request' পোর্টালে (/ssp-product-budget-request) রূপান্তরিত করা হয়েছে। ফর্মের ভেতরে 'Product Requisition Type' সিলেকশন অপশন (General ও ICT) যুক্ত করা হয়েছে যা সিলেক্ট করার উপর নির্ভর করে ডাইনামিকালি ক্যাটাগরি ও প্রোডাক্ট ক্যাটালগ আপডেট করে।"
+  },
+  {
     "id": "456",
     "date": "2026-09-14T18:03",
     "type": "UI Update",

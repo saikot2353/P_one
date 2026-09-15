@@ -35,26 +35,15 @@ export const Route = createFileRoute("/ssp-new-requisition")({
 function NewRequisitionPage() {
   const categories = [
     {
-      title: "General Product Budget Request",
+      title: "Product Budget Request",
       icon: ShoppingBag,
-      desc: "Submit monthly purchase & budget requests for general stationary, pantry, cleaning, and consumable supplies.",
-      to: "/ssp-general-product-budget-request",
-      color: "from-blue-500/10 via-blue-500/5 to-transparent hover:border-blue-500/40",
+      desc: "Submit monthly purchase & budget requests for general stationery, pantry, cleaning, ICT hardware, monitors, toner, and IT accessories.",
+      to: "/ssp-product-budget-request",
+      color: "from-blue-500/10 via-cyan-500/5 to-transparent hover:border-blue-500/40",
       iconColor: "text-blue-500",
       iconBg: "bg-blue-500/10 border-blue-500/20",
-      badge: "Available",
+      badge: "Active",
       badgeColor: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-    },
-    {
-      title: "ICT Product Budget Request",
-      icon: Monitor,
-      desc: "Submit monthly purchase & budget requests for IT hardware, monitors, toner, network parts, and accessories.",
-      to: "/ssp-ict-product-budget-request",
-      color: "from-cyan-500/10 via-cyan-500/5 to-transparent hover:border-cyan-500/40",
-      iconColor: "text-cyan-500",
-      iconBg: "bg-cyan-500/10 border-cyan-500/20",
-      badge: "Available",
-      badgeColor: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20",
     },
     {
       title: "Leave Application",
@@ -126,15 +115,15 @@ function NewRequisitionPage() {
 
   const recentRequisitions = [
     {
-      id: "REQ-2026-GP-001",
-      type: "General Product Budget Request",
+      id: "REQ-2026-PBR-001",
+      type: "Product Budget Request (General)",
       date: "08/09/2026",
       details: "Monthly Stationery (A4 Paper, Pens)",
       status: "Pending",
     },
     {
-      id: "REQ-2026-ICT-001",
-      type: "ICT Product Budget Request",
+      id: "REQ-2026-PBR-002",
+      type: "Product Budget Request (ICT)",
       date: "08/09/2026",
       details: 'Dell 24" IPS Monitor (1 unit)',
       status: "Approved",

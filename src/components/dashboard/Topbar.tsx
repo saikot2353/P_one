@@ -492,16 +492,10 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Create a new SSP requisition",
   },
   {
-    label: "General Product Budget Request",
+    label: "Product Budget Request",
     parent: "SSP",
-    to: "/ssp-general-product-budget-request",
-    description: "General product & stationary budget request form",
-  },
-  {
-    label: "ICT Product Budget Request",
-    parent: "SSP",
-    to: "/ssp-ict-product-budget-request",
-    description: "ICT hardware, monitors & IT accessories budget request form",
+    to: "/ssp-product-budget-request",
+    description: "General stationery, consumables & ICT hardware budget request form",
   },
   {
     label: "My Requisition",

@@ -15,6 +15,7 @@ import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-pr
 import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
 import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
+import { Route as SspProductBudgetRequestRouteImport } from './routes/ssp-product-budget-request'
 import { Route as SspNewRequisitionRouteImport } from './routes/ssp-new-requisition'
 import { Route as SspMyRequisitionRouteImport } from './routes/ssp-my-requisition'
 import { Route as SspMyAttendanceRouteImport } from './routes/ssp-my-attendance'
@@ -289,6 +290,11 @@ const SspRequestManualAttendanceRoute =
     path: '/ssp-request-manual-attendance',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SspProductBudgetRequestRoute = SspProductBudgetRequestRouteImport.update({
+  id: '/ssp-product-budget-request',
+  path: '/ssp-product-budget-request',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SspNewRequisitionRoute = SspNewRequisitionRouteImport.update({
   id: '/ssp-new-requisition',
   path: '/ssp-new-requisition',
@@ -1801,6 +1807,7 @@ export interface FileRoutesByFullPath {
   '/ssp-my-attendance': typeof SspMyAttendanceRoute
   '/ssp-my-requisition': typeof SspMyRequisitionRoute
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
+  '/ssp-product-budget-request': typeof SspProductBudgetRequestRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
@@ -2050,6 +2057,7 @@ export interface FileRoutesByTo {
   '/ssp-my-attendance': typeof SspMyAttendanceRoute
   '/ssp-my-requisition': typeof SspMyRequisitionRoute
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
+  '/ssp-product-budget-request': typeof SspProductBudgetRequestRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
@@ -2300,6 +2308,7 @@ export interface FileRoutesById {
   '/ssp-my-attendance': typeof SspMyAttendanceRoute
   '/ssp-my-requisition': typeof SspMyRequisitionRoute
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
+  '/ssp-product-budget-request': typeof SspProductBudgetRequestRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
@@ -2551,6 +2560,7 @@ export interface FileRouteTypes {
     | '/ssp-my-attendance'
     | '/ssp-my-requisition'
     | '/ssp-new-requisition'
+    | '/ssp-product-budget-request'
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
     | '/user-management'
@@ -2800,6 +2810,7 @@ export interface FileRouteTypes {
     | '/ssp-my-attendance'
     | '/ssp-my-requisition'
     | '/ssp-new-requisition'
+    | '/ssp-product-budget-request'
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
     | '/user-management'
@@ -3049,6 +3060,7 @@ export interface FileRouteTypes {
     | '/ssp-my-attendance'
     | '/ssp-my-requisition'
     | '/ssp-new-requisition'
+    | '/ssp-product-budget-request'
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
     | '/user-management'
@@ -3299,6 +3311,7 @@ export interface RootRouteChildren {
   SspMyAttendanceRoute: typeof SspMyAttendanceRoute
   SspMyRequisitionRoute: typeof SspMyRequisitionRoute
   SspNewRequisitionRoute: typeof SspNewRequisitionRoute
+  SspProductBudgetRequestRoute: typeof SspProductBudgetRequestRoute
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   TransferControlCenterRoute: typeof TransferControlCenterRoute
   UserManagementRoute: typeof UserManagementRoute
@@ -3353,6 +3366,13 @@ declare module '@tanstack/react-router' {
       path: '/ssp-request-manual-attendance'
       fullPath: '/ssp-request-manual-attendance'
       preLoaderRoute: typeof SspRequestManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-product-budget-request': {
+      id: '/ssp-product-budget-request'
+      path: '/ssp-product-budget-request'
+      fullPath: '/ssp-product-budget-request'
+      preLoaderRoute: typeof SspProductBudgetRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ssp-new-requisition': {
@@ -5287,6 +5307,7 @@ const rootRouteChildren: RootRouteChildren = {
   SspMyAttendanceRoute: SspMyAttendanceRoute,
   SspMyRequisitionRoute: SspMyRequisitionRoute,
   SspNewRequisitionRoute: SspNewRequisitionRoute,
+  SspProductBudgetRequestRoute: SspProductBudgetRequestRoute,
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   TransferControlCenterRoute: TransferControlCenterRoute,
   UserManagementRoute: UserManagementRoute,
