@@ -15,6 +15,8 @@ import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-pr
 import { Route as WelfareVerificationRouteImport } from './routes/welfare-verification'
 import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
+import { Route as SspSimRequisitionViewRouteImport } from './routes/ssp-sim-requisition-view'
+import { Route as SspSimRequisitionRouteImport } from './routes/ssp-sim-requisition'
 import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
 import { Route as SspProductBudgetRequestRouteImport } from './routes/ssp-product-budget-request'
 import { Route as SspNewRequisitionRouteImport } from './routes/ssp-new-requisition'
@@ -289,6 +291,16 @@ const UserManagementRoute = UserManagementRouteImport.update({
 const TransferControlCenterRoute = TransferControlCenterRouteImport.update({
   id: '/transfer-control-center',
   path: '/transfer-control-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspSimRequisitionViewRoute = SspSimRequisitionViewRouteImport.update({
+  id: '/ssp-sim-requisition-view',
+  path: '/ssp-sim-requisition-view',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspSimRequisitionRoute = SspSimRequisitionRouteImport.update({
+  id: '/ssp-sim-requisition',
+  path: '/ssp-sim-requisition',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SspRequestManualAttendanceRoute =
@@ -1822,6 +1834,8 @@ export interface FileRoutesByFullPath {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-product-budget-request': typeof SspProductBudgetRequestRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
+  '/ssp-sim-requisition': typeof SspSimRequisitionRoute
+  '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
@@ -2074,6 +2088,8 @@ export interface FileRoutesByTo {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-product-budget-request': typeof SspProductBudgetRequestRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
+  '/ssp-sim-requisition': typeof SspSimRequisitionRoute
+  '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
@@ -2327,6 +2343,8 @@ export interface FileRoutesById {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-product-budget-request': typeof SspProductBudgetRequestRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
+  '/ssp-sim-requisition': typeof SspSimRequisitionRoute
+  '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
@@ -2581,6 +2599,8 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-product-budget-request'
     | '/ssp-request-manual-attendance'
+    | '/ssp-sim-requisition'
+    | '/ssp-sim-requisition-view'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
@@ -2833,6 +2853,8 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-product-budget-request'
     | '/ssp-request-manual-attendance'
+    | '/ssp-sim-requisition'
+    | '/ssp-sim-requisition-view'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
@@ -3085,6 +3107,8 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-product-budget-request'
     | '/ssp-request-manual-attendance'
+    | '/ssp-sim-requisition'
+    | '/ssp-sim-requisition-view'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
@@ -3338,6 +3362,8 @@ export interface RootRouteChildren {
   SspNewRequisitionRoute: typeof SspNewRequisitionRoute
   SspProductBudgetRequestRoute: typeof SspProductBudgetRequestRoute
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
+  SspSimRequisitionRoute: typeof SspSimRequisitionRoute
+  SspSimRequisitionViewRoute: typeof SspSimRequisitionViewRoute
   TransferControlCenterRoute: typeof TransferControlCenterRoute
   UserManagementRoute: typeof UserManagementRoute
   WelfareVerificationRoute: typeof WelfareVerificationRoute
@@ -3392,6 +3418,20 @@ declare module '@tanstack/react-router' {
       path: '/transfer-control-center'
       fullPath: '/transfer-control-center'
       preLoaderRoute: typeof TransferControlCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-sim-requisition-view': {
+      id: '/ssp-sim-requisition-view'
+      path: '/ssp-sim-requisition-view'
+      fullPath: '/ssp-sim-requisition-view'
+      preLoaderRoute: typeof SspSimRequisitionViewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-sim-requisition': {
+      id: '/ssp-sim-requisition'
+      path: '/ssp-sim-requisition'
+      fullPath: '/ssp-sim-requisition'
+      preLoaderRoute: typeof SspSimRequisitionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ssp-request-manual-attendance': {
@@ -5350,6 +5390,8 @@ const rootRouteChildren: RootRouteChildren = {
   SspNewRequisitionRoute: SspNewRequisitionRoute,
   SspProductBudgetRequestRoute: SspProductBudgetRequestRoute,
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
+  SspSimRequisitionRoute: SspSimRequisitionRoute,
+  SspSimRequisitionViewRoute: SspSimRequisitionViewRoute,
   TransferControlCenterRoute: TransferControlCenterRoute,
   UserManagementRoute: UserManagementRoute,
   WelfareVerificationRoute: WelfareVerificationRoute,

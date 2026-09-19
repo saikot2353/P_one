@@ -2,6 +2,87 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "483",
+    "date": "2026-09-19T16:33",
+    "type": "UI / Design Update",
+    "module": "Separation & All Approvals",
+    "link": "/ssp-approval",
+    "descriptionEn": "Redesigned Resignation Approval Modal to match exact official letter layout with editable Intended Last Working Day, live body updates, and integrated a new entry in All Approvals Queue.",
+    "descriptionBn": "অফিশিয়াল রিজাইন লেটার ডিজাইনের সাথে হুবহু মিলিয়ে মডাল রিডিজাইন করা হয়েছে, সংশোধনযোগ্য Intended Last Working Day অপশন এবং অল অ্যাপ্রুভালস পেজে নতুন এন্ট্রি যুক্ত করা হয়েছে।"
+  },
+  {
+    "id": "482",
+    "date": "2026-09-19T16:07",
+    "type": "New Feature / Workflow",
+    "module": "Separation",
+    "link": "/separation-resignation-request",
+    "descriptionEn": "Added interactive Approval and Rejection actions to the Resignation Approval Modal with real-time signature clearance updates, remarks, and status tracking.",
+    "descriptionBn": "রিজাইন অপশন মডালে নতুন ইন্টারঅ্যাক্টিভ Approve ও Reject বাটন, সিগনেচার স্ট্যাটাস আপডেট এবং মন্তব্য যোগের ব্যবস্থা করা হয়েছে।"
+  },
+  {
+    "id": "481",
+    "date": "2026-09-19T15:53",
+    "type": "UI / Workflow Update",
+    "module": "SSP Requisition",
+    "link": "/ssp-sim-requisition",
+    "descriptionEn": "Refactored SIM Requisition dropdown to 3 options (New SIM, SIM Balance Limit, SIM Replacement) with dynamic conditional fields (SIM Number, Existing/Expected Limit).",
+    "descriptionBn": "সিম রিকুইজিশন ড্রপডাউন পরিবর্তন করে ৩টি অপশন (New SIM, SIM Balance Limit, SIM Replacement) এবং প্রতিটি অপশনের জন্য ডায়নামিক ফিল্ড যুক্ত করা হয়েছে।"
+  },
+  {
+    "id": "480",
+    "date": "2026-09-19T15:09",
+    "type": "New Feature / UI",
+    "module": "Separation",
+    "link": "/separation-resignation-request",
+    "descriptionEn": "Designed and integrated a unified Resignation Approval View Modal for better readability of resignation details, clearance statuses, and signatures.",
+    "descriptionBn": "রিজাইন ডিটেইলস, ক্লিয়ারেন্স স্ট্যাটাস এবং সিগনেচার সহজে পড়ার জন্য একটি নতুন Resignation Approval View Modal ডিজাইন ও যুক্ত করা হয়েছে।"
+  },
+  {
+    "id": "479",
+    "date": "2026-09-19T14:49",
+    "type": "UI Update",
+    "module": "SSP Requisition",
+    "link": "/ssp-sim-requisition",
+    "descriptionEn": "Removed the Corporate SIM Policy Notice section from the SIM Requisition application form for a cleaner user interface.",
+    "descriptionBn": "সিম রিকুইজিশন অ্যাপ্লিকেশন ফর্ম থেকে 'Corporate SIM Policy Notice' সেকশনটি সরিয়ে ফেলা হয়েছে যাতে ইন্টারফেসটি আরও পরিষ্কার ও সহজবোধ্য হয়।"
+  },
+  {
+    "id": "478",
+    "date": "2026-09-19T14:15",
+    "type": "UI / UX Update",
+    "module": "SSP Requisition",
+    "link": "/ssp-my-requisition",
+    "descriptionEn": "Converted the SIM Requisition view into an interactive modal dialog matching the exact layout and design standards of the Leave Application view modal. Features structured employee details, full requisition particulars table, 3-tier approval signatures workflow, and comments history.",
+    "descriptionBn": "সিম রিকুইজিশন ভিউটিকে পৃথক পেজের পরিবর্তে লিভ অ্যাপ্লিকেশন ভিউ মোডালের মতো একটি ইন্টারেক্টিভ মোডালে রূপান্তর করা হয়েছে। এতে রয়েছে সুন্দর এমপ্লয়ী ডিটেইলস, রিকুইজিশন টেবিল, ৩-স্তরের অনুমোদন সিগনেচার ফ্লো এবং কমেন্টস হিস্ট্রি।"
+  },
+  {
+    "id": "477",
+    "date": "2026-09-19T14:06",
+    "type": "UI Update",
+    "module": "SSP Requisition",
+    "link": "/ssp-sim-requisition-view",
+    "descriptionEn": "Redesigned the SIM Requisition Slip view to exactly match the standard official requisition table layout with a header, request details block, 8-row data table, 3 approval signature blocks, and comments history.",
+    "descriptionBn": "অফিসিয়াল রিকুইজিশন টেবিল লেআউটের সাথে মিল রেখে সিম রিকুইজিশন স্লিপ ভিউটি নতুন করে ডিজাইন করা হয়েছে। এতে রয়েছে হেডার, বিস্তারিত রিকুয়েস্ট ব্লক, ৮-সারি বিশিষ্ট ডাটা টেবিল, ৩টি অ্যাপ্রুভাল সিগনেচার ব্লক এবং কমেন্টস হিস্ট্রি।"
+  },
+  {
+    "id": "476",
+    "date": "2026-09-19T14:15",
+    "type": "UI Update",
+    "module": "SSP Requisition",
+    "link": "/ssp-sim-requisition",
+    "descriptionEn": "Simplified the SIM Requisition form by removing the Preferred Operator field, Quick Justification Templates, and the suggestions list from the Requisition For field.",
+    "descriptionBn": "সিম রিকুইজিশন ফর্মটি আরও সহজ করার জন্য Preferred Operator ফিল্ড, Quick Justification Templates এবং Requisition For ফিল্ডের সাজেশন লিস্ট রিমুভ করা হয়েছে।"
+  },
+  {
+    "id": "475",
+    "date": "2026-09-19T14:10",
+    "type": "New Feature",
+    "module": "SSP Requisition",
+    "link": "/ssp-sim-requisition",
+    "descriptionEn": "Designed and deployed the SIM Requisition system (/ssp-sim-requisition) and official slip view (/ssp-sim-requisition-view). Features Request For dropdown, preferred operator picker, justification input with quick templates, document attachments, and an On Behalf toggle revealing Section and Requisition For fields. Submitting instantly registers the requisition into the My Requisitions table with full slip view access.",
+    "descriptionBn": "সিম রিকুইজিশন সিস্টেম (/ssp-sim-requisition) এবং অফিশিয়াল স্লিপ ভিউ (/ssp-sim-requisition-view) ডিজাইন ও চালু করা হয়েছে। এতে রয়েছে Request For ড্রপডাউন, অপারেটর নির্বাচন, কুইক টেমপ্লেটসহ Justification ইনপুট, ফাইল অ্যাটাচমেন্ট এবং On Behalf অপশন যা সচল করলে Section ড্রপডাউন ও Requisition For ইনপুট ফিল্ড দৃশ্যমান হয়। সাবমিট করার সাথে সাথে তা My Requisition টেবিলে যুক্ত হয়ে যায় এবং সম্পূর্ণ স্লিপ ভিউ দেখা যায়।"
+  },
+  {
     "id": "474",
     "date": "2026-09-15T16:50",
     "type": "Bug Fix / Improvement",

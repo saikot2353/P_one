@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { ResignationApprovalModal, ResignationItem } from "@/components/ssp/ResignationApprovalModal";
 import {
   ChevronRight,
   ChevronLeft,
@@ -45,6 +46,7 @@ interface Requisition {
   document: string;
   note: string;
   status: RequisitionStatus;
+  resignationData?: ResignationItem;
   details: {
     empId: string;
     doj: string;
@@ -79,6 +81,65 @@ interface Requisition {
 
 // Dummy Requisitions matching screenshots
 const dummyRequisitions: Requisition[] = [
+  {
+    id: "RES-00002",
+    reqNum: "RES-00002",
+    date: "2026-09-19",
+    requestor: "Md. Rejaul Karim",
+    reqFrom: "PSL-Operation",
+    department: "Support & Business Automation",
+    document: "Resignation Request Application",
+    note: "Formal Resignation Letter - Md. Rejaul Karim (2023044017)",
+    status: "Pending",
+    resignationData: {
+      id: "RES-00002",
+      empId: "2023044017",
+      empName: "Md. Rejaul Karim (Aonkon)",
+      department: "Support & Business Automation | Pakiza Software Limited",
+      designation: "Deputy Manager",
+      joiningDate: "01/06/2021",
+      subject: "Formal Resignation Letter - Md. Rejaul Karim (2023044017)",
+      noticeDate: "01/09/2026",
+      intendedLastWorkingDate: "30/09/2026",
+      noticePeriodDays: 30,
+      reason: "Personal & Family Responsibilities",
+      letterBody: "",
+      attachedFileName: "1789799952_984e3614.png",
+      status: "Pending",
+      submittedDate: "19/09/2026 12:39 PM",
+    },
+    details: {
+      empId: "2023044017",
+      doj: "01/06/2021",
+      designation: "Deputy Manager",
+      section: "Support & Business Automation",
+      location: "Pakiza Software Limited, PSL-Operation",
+      type: "Resignation Request",
+      category: "Employee Resignation",
+      dates: "01/09/2026 to 30/09/2026",
+      duration: "30 Days",
+      contact: "01324726844",
+      responsible: "Rajebul Hasan Rajon",
+      purpose: "Personal & Family Responsibilities",
+      balances: [],
+      signatures: [
+        {
+          role: "Head of HR",
+          name: "Rajebul Hasan Rajon",
+          title: "Deputy Manager",
+          date: "19/09/2026 12:39:00",
+          status: "Approved",
+        },
+        {
+          role: "Managing Director",
+          name: "Pending Signature",
+          title: "MD",
+          date: "N/A · N/A",
+          status: "Pending",
+        },
+      ],
+    },
+  },
   {
     id: "382650",
     reqNum: "382650",
@@ -301,14 +362,41 @@ function SSPApprovalPage() {
     { value: "All Document", label: "All Document" },
     { value: "Leave Application", label: "Leave Application" },
     { value: "ICT Product Store Requisition", label: "ICT Product Store Requisition" },
+    { value: "Resignation Request Application", label: "Resignation Request Application" },
   ];
   const dateTypeOptions = [
     { value: "Requisition Date", label: "Requisition Date" },
     { value: "Effective Date", label: "Effective Date" },
   ];
 
+  const [resignationModalOpen, setResignationModalOpen] = useState(false);
+  const [resignationModalData, setResignationModalData] = useState<ResignationItem | null>(null);
+
   const handleOpenModal = (req: Requisition) => {
     setSelectedReq(req);
+    if (req.document.includes("Resignation")) {
+      setResignationModalData(
+        req.resignationData || {
+          id: req.id,
+          empId: req.details.empId,
+          empName: req.requestor,
+          department: req.department,
+          designation: req.details.designation,
+          joiningDate: req.details.doj,
+          subject: req.note || `Formal Resignation Letter - ${req.requestor}`,
+          noticeDate: "01/09/2026",
+          intendedLastWorkingDate: "30/09/2026",
+          noticePeriodDays: 30,
+          reason: req.details.purpose || "Personal & Family Responsibilities",
+          letterBody: "",
+          attachedFileName: "1789799952_984e3614.png",
+          status: req.status,
+          submittedDate: "19/09/2026 12:39 PM",
+        }
+      );
+      setResignationModalOpen(true);
+      return;
+    }
     setCommentText("");
     setModalOpen(true);
   };
@@ -1097,6 +1185,26 @@ function SSPApprovalPage() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Resignation Approval Modal */}
+      <ResignationApprovalModal
+        open={resignationModalOpen}
+        onOpenChange={setResignationModalOpen}
+        data={resignationModalData}
+        onApprove={(id, remark, newLwd) => {
+          if (selectedReq) {
+            selectedReq.status = "Approved";
+            if (newLwd && selectedReq.resignationData) {
+              selectedReq.resignationData.intendedLastWorkingDate = newLwd;
+            }
+          }
+        }}
+        onReject={(id) => {
+          if (selectedReq) {
+            selectedReq.status = "Rejected";
+          }
+        }}
+      />
     </div>
   );
 }
