@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ZakatListRouteImport } from './routes/zakat-list'
 import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
 import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
+import { Route as WelfareVerificationRouteImport } from './routes/welfare-verification'
 import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
 import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
@@ -252,6 +253,7 @@ import { Route as AllowanceRateRouteImport } from './routes/allowance-rate'
 import { Route as AllApprovalsRouteImport } from './routes/all-approvals'
 import { Route as AdvanceSalaryProcessRouteImport } from './routes/advance-salary-process'
 import { Route as AddEmployeeRouteImport } from './routes/add-employee'
+import { Route as AbsentCounselingRouteImport } from './routes/absent-counseling'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecruitmentIeAssessmentIdRouteImport } from './routes/recruitment-ie-assessment.$id'
 import { Route as RecruitmentHrAssessmentIdRouteImport } from './routes/recruitment-hr-assessment.$id'
@@ -272,6 +274,11 @@ const ZakatBudgetConfigurationRoute =
 const YearlyBonusProcessRoute = YearlyBonusProcessRouteImport.update({
   id: '/yearly-bonus-process',
   path: '/yearly-bonus-process',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelfareVerificationRoute = WelfareVerificationRouteImport.update({
+  id: '/welfare-verification',
+  path: '/welfare-verification',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UserManagementRoute = UserManagementRouteImport.update({
@@ -1541,6 +1548,11 @@ const AddEmployeeRoute = AddEmployeeRouteImport.update({
   path: '/add-employee',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AbsentCounselingRoute = AbsentCounselingRouteImport.update({
+  id: '/absent-counseling',
+  path: '/absent-counseling',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -1571,6 +1583,7 @@ const EmployeeDetailIdRoute = EmployeeDetailIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/absent-counseling': typeof AbsentCounselingRoute
   '/add-employee': typeof AddEmployeeRoute
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
   '/all-approvals': typeof AllApprovalsRoute
@@ -1811,6 +1824,7 @@ export interface FileRoutesByFullPath {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
+  '/welfare-verification': typeof WelfareVerificationRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
@@ -1821,6 +1835,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/absent-counseling': typeof AbsentCounselingRoute
   '/add-employee': typeof AddEmployeeRoute
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
   '/all-approvals': typeof AllApprovalsRoute
@@ -2061,6 +2076,7 @@ export interface FileRoutesByTo {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
+  '/welfare-verification': typeof WelfareVerificationRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
@@ -2072,6 +2088,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/absent-counseling': typeof AbsentCounselingRoute
   '/add-employee': typeof AddEmployeeRoute
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
   '/all-approvals': typeof AllApprovalsRoute
@@ -2312,6 +2329,7 @@ export interface FileRoutesById {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
+  '/welfare-verification': typeof WelfareVerificationRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
@@ -2324,6 +2342,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/absent-counseling'
     | '/add-employee'
     | '/advance-salary-process'
     | '/all-approvals'
@@ -2564,6 +2583,7 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
     | '/user-management'
+    | '/welfare-verification'
     | '/yearly-bonus-process'
     | '/zakat-budget-configuration'
     | '/zakat-list'
@@ -2574,6 +2594,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/absent-counseling'
     | '/add-employee'
     | '/advance-salary-process'
     | '/all-approvals'
@@ -2814,6 +2835,7 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
     | '/user-management'
+    | '/welfare-verification'
     | '/yearly-bonus-process'
     | '/zakat-budget-configuration'
     | '/zakat-list'
@@ -2824,6 +2846,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/absent-counseling'
     | '/add-employee'
     | '/advance-salary-process'
     | '/all-approvals'
@@ -3064,6 +3087,7 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
     | '/user-management'
+    | '/welfare-verification'
     | '/yearly-bonus-process'
     | '/zakat-budget-configuration'
     | '/zakat-list'
@@ -3075,6 +3099,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AbsentCounselingRoute: typeof AbsentCounselingRoute
   AddEmployeeRoute: typeof AddEmployeeRoute
   AdvanceSalaryProcessRoute: typeof AdvanceSalaryProcessRoute
   AllApprovalsRoute: typeof AllApprovalsRoute
@@ -3315,6 +3340,7 @@ export interface RootRouteChildren {
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   TransferControlCenterRoute: typeof TransferControlCenterRoute
   UserManagementRoute: typeof UserManagementRoute
+  WelfareVerificationRoute: typeof WelfareVerificationRoute
   YearlyBonusProcessRoute: typeof YearlyBonusProcessRoute
   ZakatBudgetConfigurationRoute: typeof ZakatBudgetConfigurationRoute
   ZakatListRoute: typeof ZakatListRoute
@@ -3345,6 +3371,13 @@ declare module '@tanstack/react-router' {
       path: '/yearly-bonus-process'
       fullPath: '/yearly-bonus-process'
       preLoaderRoute: typeof YearlyBonusProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welfare-verification': {
+      id: '/welfare-verification'
+      path: '/welfare-verification'
+      fullPath: '/welfare-verification'
+      preLoaderRoute: typeof WelfareVerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/user-management': {
@@ -5027,6 +5060,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AddEmployeeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/absent-counseling': {
+      id: '/absent-counseling'
+      path: '/absent-counseling'
+      fullPath: '/absent-counseling'
+      preLoaderRoute: typeof AbsentCounselingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -5067,6 +5107,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AbsentCounselingRoute: AbsentCounselingRoute,
   AddEmployeeRoute: AddEmployeeRoute,
   AdvanceSalaryProcessRoute: AdvanceSalaryProcessRoute,
   AllApprovalsRoute: AllApprovalsRoute,
@@ -5311,6 +5352,7 @@ const rootRouteChildren: RootRouteChildren = {
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   TransferControlCenterRoute: TransferControlCenterRoute,
   UserManagementRoute: UserManagementRoute,
+  WelfareVerificationRoute: WelfareVerificationRoute,
   YearlyBonusProcessRoute: YearlyBonusProcessRoute,
   ZakatBudgetConfigurationRoute: ZakatBudgetConfigurationRoute,
   ZakatListRoute: ZakatListRoute,

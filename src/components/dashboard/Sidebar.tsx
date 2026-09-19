@@ -339,6 +339,14 @@ export const nav: NavItem[] = [
     ],
   },
   {
+    label: "Counseling",
+    icon: LifeBuoy,
+    subitems: [
+      { label: "Absent Counseling", to: "/absent-counseling" },
+      { label: "Welfare Verification", to: "/welfare-verification" },
+    ],
+  },
+  {
     label: "Disciplinary Action",
     icon: ShieldAlert,
     subitems: [

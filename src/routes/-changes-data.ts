@@ -2,6 +2,59 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "473",
+    "date": "2026-09-15T12:45",
+    "type": "UI Update",
+    "module": "Counseling",
+    "link": "/welfare-verification",
+    "descriptionEn": "Redesigned the 'Welfare Verification' page layout to match the premium Show Cause Notices style. Applied consistent dark mode compatibility, card-based filter console, refined iconography, updated the data table aesthetics, and enhanced the 'View Action Details' modal with premium styling.",
+    "descriptionBn": "'Welfare Verification' পেজের লেআউটটি প্রিমিয়াম 'Show Cause Notices' স্টাইলের সাথে সামঞ্জস্যপূর্ণ করে রিডিজাইন করা হয়েছে। ডার্ক মোড সাপোর্ট, কার্ড-ভিত্তিক ফিল্টার কনসোল, চমৎকার আইকনোগ্রাফি, নতুন ডাটা টেবিল ডিজাইন এবং 'View Action Details' মোডালটিতে প্রিমিয়াম লুক যুক্ত করা হয়েছে।"
+  },
+  {
+    "id": "472",
+    "date": "2026-09-15T12:40",
+    "type": "UI Update",
+    "module": "Counseling",
+    "link": "/welfare-verification",
+    "descriptionEn": "Fixed the 'Welfare Verification' data table to correctly map inline editable fields (Absent Reason, Reporting Boss, Hr Remarks, Action Remarks dropdown, Verification Phone No., Welfare Action Status dropdown, Welfare Remarks) according to the reference design. Also updated the 'View Action Details' modal to correctly display the historical counselling data for each employee.",
+    "descriptionBn": "রেফারেন্স ডিজাইন অনুযায়ী 'Welfare Verification' ডাটা টেবিলের ইনলাইন এডিটেবল ফিল্ডস (Absent Reason, Reporting Boss, Hr Remarks, Action Remarks dropdown, Verification Phone No., Welfare Action Status dropdown, Welfare Remarks) সঠিকভাবে ম্যাপ করে ফিক্স করা হয়েছে। এছাড়াও প্রতিটি কর্মচারীর ঐতিহাসিক কাউন্সেলিং ডাটা সঠিকভাবে প্রদর্শনের জন্য 'View Action Details' মোডালটি আপডেট করা হয়েছে।"
+  },
+  {
+    "id": "471",
+    "date": "2026-09-15T12:38",
+    "type": "UI Update",
+    "module": "Counseling",
+    "link": "/absent-counseling",
+    "descriptionEn": "Upgraded the 'Absent Counseling' data table to include detailed absentee metrics (Total Absent, Total Absent Monthly, Total Absent Yearly, Last Present Date) and interactive inline editable fields (Absent Reason, Reporting Boss, Hr Remarks, Action Remarks dropdown, Verification Phone No.). The mock data was also updated with 6 new realistic records to showcase the layout.",
+    "descriptionBn": "'Absent Counseling' ডাটা টেবিল আপডেট করে বিস্তারিত অ্যাবসেন্ট মেট্রিক্স (Total Absent, Total Absent Monthly, Total Absent Yearly, Last Present Date) এবং ইন্টারেক্টিভ ইনলাইন এডিটেবল ফিল্ডস (Absent Reason, Reporting Boss, Hr Remarks, Action Remarks dropdown, Verification Phone No.) যুক্ত করা হয়েছে। লেআউট প্রদর্শনের জন্য ৬টি নতুন বাস্তবসম্মত রেকর্ড মক ডাটায় যুক্ত করা হয়েছে।"
+  },
+  {
+    "id": "470",
+    "date": "2026-09-15T12:37",
+    "type": "New Feature",
+    "module": "Counseling",
+    "link": "/welfare-verification",
+    "descriptionEn": "Created the 'Welfare Verification' page (/welfare-verification). It utilizes the same consistent ERP filter console layout (Date, Employee Type, Department, Section, etc.) and 'Reporting Boss' edit section. The data table has been extended to include new welfare-specific columns (Last Present Date, Absent Reason, HR Remarks, Action Remarks, Verification Phone No, Welfare Action Status, Welfare Remarks, and Status) populated with realistic data.",
+    "descriptionBn": "নতুন 'Welfare Verification' পেজ (/welfare-verification) তৈরি করা হয়েছে। এতে একই রকম ইআরপি ফিল্টার কনসোল লেআউট এবং 'Reporting Boss' এডিট সেকশন ব্যবহার করা হয়েছে। ডাটা টেবিলে নতুন ওয়েলফেয়ার সংক্রান্ত কলাম (Last Present Date, Absent Reason, HR Remarks, Action Remarks, Verification Phone No, Welfare Action Status, Welfare Remarks, এবং Status) যুক্ত করা হয়েছে এবং বাস্তবসম্মত ডাটা দ্বারা পূর্ণ করা হয়েছে।"
+  },
+  {
+    "id": "469",
+    "date": "2026-09-15T12:35",
+    "type": "New Feature",
+    "module": "Counseling",
+    "link": "/absent-counseling",
+    "descriptionEn": "Created the 'Absent Counseling' page (/absent-counseling) matching the reference UI. It features a comprehensive filter console (Date, Employee Type, Department, Section, Designation, Unit, Line, Shift, Current Shift, Job Nature, Employee Id, and System/Office toggle). Included a 'Reporting Boss' inline edit section, Export toolbar (Excel, Print, PDF), and a high-density data table with a 'View Action Details' modal that displays complete counseling history.",
+    "descriptionBn": "রেফারেন্স ইউআই অনুযায়ী নতুন 'Absent Counseling' পেজ (/absent-counseling) তৈরি করা হয়েছে। এতে রয়েছে বিস্তারিত ফিল্টার কনসোল (Date, Employee Type, Department, Section, Designation, Unit, Line, Shift, Current Shift, Job Nature, Employee Id, এবং System/Office টগল)। এছাড়াও রয়েছে 'Reporting Boss' ইনলাইন এডিট সেকশন, এক্সপোর্ট টুলবার (Excel, Print, PDF), এবং একটি হাই-ডেনসিটি ডাটা টেবিল যার 'View Action Details' মোডালের মাধ্যমে সম্পূর্ণ কাউন্সেলিং হিস্ট্রি দেখা যায়।"
+  },
+  {
+    "id": "468",
+    "date": "2026-09-15T12:30",
+    "type": "New Addition",
+    "module": "Navigation",
+    "descriptionEn": "Added a new 'Counseling' menu to the sidebar navigation with two sub-menus: 'Absent Counseling' and 'Welfare Verification'.",
+    "descriptionBn": "সাইডবার নেভিগেশনে নতুন 'Counseling' মেনু যোগ করা হয়েছে এবং এর অধীনে 'Absent Counseling' ও 'Welfare Verification' সাব-মেনু যুক্ত করা হয়েছে।"
+  },
+  {
     "id": "467",
     "date": "2026-09-15T12:25",
     "type": "UI Update",
