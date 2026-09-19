@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "474",
+    "date": "2026-09-15T16:50",
+    "type": "Bug Fix / Improvement",
+    "module": "Leave",
+    "link": "/bulk-leave",
+    "descriptionEn": "Restored the missing 'Leave Count' column in the Bulk Leave allocation data table (/bulk-leave). The column displays high-density badges for Casual Leave (CL), Sick Leave (SL), and Earned Leave (EL) balances for each employee, complete with sort headers, responsive colSpan handling, and updated CSV export support.",
+    "descriptionBn": "Bulk Leave পেজের (/bulk-leave) ডাটা টেবিলে পূর্বে বাদ পড়ে যাওয়া 'Leave Count' কলামটি পুনরায় যুক্ত করা হয়েছে। প্রতিটি কর্মীর জন্য Casual Leave (CL), Sick Leave (SL), এবং Earned Leave (EL) ব্যালেন্স পরিষ্কার ব্যাজের মাধ্যমে প্রদর্শিত হচ্ছে, সাথে সর্ট হেডার এবং CSV এক্সপোর্ট সুবিধার সাথেও সমন্বয় করা হয়েছে।"
+  },
+  {
     "id": "473",
     "date": "2026-09-15T12:45",
     "type": "UI Update",
