@@ -28,12 +28,14 @@ import {
   LayersIcon,
   CalendarDays,
   MapPin,
-  Check
+  Check,
+  Smartphone
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { LoanApprovalViewModal, LoanApprovalModalData } from "@/components/modals/LoanApprovalViewModal";
+import { SimApprovalViewModal, SimApprovalModalData } from "@/components/modals/SimApprovalViewModal";
 
 
 export const Route = createFileRoute("/all-approvals")({
@@ -48,7 +50,8 @@ type ModuleType =
   | "Budget"
   | "Personnel"
   | "Loan"
-  | "Attendance";
+  | "Attendance"
+  | "SIM";
 type StatusType = "Pending" | "Approved" | "Rejected";
 
 interface ApprovalRequest {
@@ -65,6 +68,7 @@ interface ApprovalRequest {
   amount?: number;
   date: string;
   status: StatusType;
+  simData?: SimApprovalModalData;
 }
 
 const mockApprovals: ApprovalRequest[] = [
@@ -272,6 +276,134 @@ const mockApprovals: ApprovalRequest[] = [
     date: "2026-05-27",
     status: "Pending",
   },
+
+  // SIM Requisitions (New SIM, SIM Balance Limit, SIM Replacement)
+  {
+    id: "SIM-2026-001",
+    module: "SIM",
+    reqNo: "SIM-2026-001",
+    employee: {
+      name: "Mahmudul Hasan",
+      id: "2024091001",
+      designation: "Senior Software Engineer",
+      department: "IT & Software",
+    },
+    details: "New SIM Requisition - Grameenphone Corporate Postpaid (BDT 1,000/mo)",
+    amount: 1000,
+    date: "2026-09-20",
+    status: "Pending",
+    simData: {
+      id: "SIM-2026-001",
+      reqNo: "SIM-2026-001",
+      applicationDate: "20 Sep 2026",
+      submittedTime: "10:15 AM",
+      status: "Pending",
+      requestType: "New SIM",
+      employee: {
+        name: "Mahmudul Hasan",
+        id: "2024091001",
+        designation: "Senior Software Engineer",
+        department: "IT & Software",
+        section: "Software Engineering & Solutions",
+        location: "Head Office, Dhaka",
+        joiningDate: "01 Feb 2024",
+        businessUnit: "Pakiza Software Limited",
+      },
+      simDetails: {
+        operator: "Grameenphone",
+        packageType: "Corporate Postpaid Premier 1000",
+        expectedLimit: 1000,
+        justification: "Required for daily client coordination, system production incident alerts, and 24/7 on-call engineering support.",
+        onBehalf: false,
+      },
+    },
+  },
+  {
+    id: "SIM-2026-002",
+    module: "SIM",
+    reqNo: "SIM-2026-002",
+    employee: {
+      name: "Nusrat Jahan Tanha",
+      id: "2023051512",
+      designation: "Key Account Manager",
+      department: "Sales & Business Development",
+    },
+    details: "SIM Balance Limit Enhancement - 01711-987654 (BDT 1,200 → BDT 2,500)",
+    amount: 2500,
+    date: "2026-09-22",
+    status: "Pending",
+    simData: {
+      id: "SIM-2026-002",
+      reqNo: "SIM-2026-002",
+      applicationDate: "22 Sep 2026",
+      submittedTime: "11:45 AM",
+      status: "Pending",
+      requestType: "SIM Balance Limit",
+      employee: {
+        name: "Nusrat Jahan Tanha",
+        id: "2023051512",
+        designation: "Key Account Manager",
+        department: "Sales & Business Development",
+        section: "Sales, Business Development & CRM",
+        location: "Head Office, Dhaka",
+        joiningDate: "15 May 2023",
+        businessUnit: "Pakiza Software Limited",
+      },
+      simDetails: {
+        simNumber: "01711-987654",
+        operator: "Grameenphone",
+        existingLimit: 1200,
+        expectedLimit: 2500,
+        justification: "Monthly limit cap reached due to increased international business calls and extensive data usage during field client visits.",
+        onBehalf: false,
+      },
+    },
+  },
+  {
+    id: "SIM-2026-003",
+    module: "SIM",
+    reqNo: "SIM-2026-003",
+    employee: {
+      name: "Tariqul Islam",
+      id: "2021084490",
+      designation: "Assistant Logistics Manager",
+      department: "Supply Chain & Procurement",
+    },
+    details: "SIM Replacement - 01844-556677 (Lost Physical SIM Replacement to USIM 5G)",
+    amount: 200,
+    date: "2026-09-23",
+    status: "Pending",
+    simData: {
+      id: "SIM-2026-003",
+      reqNo: "SIM-2026-003",
+      applicationDate: "23 Sep 2026",
+      submittedTime: "03:30 PM",
+      status: "Pending",
+      requestType: "SIM Replacement",
+      employee: {
+        name: "Tariqul Islam",
+        id: "2021084490",
+        designation: "Assistant Logistics Manager",
+        department: "Supply Chain & Procurement",
+        section: "Supply Chain & Procurement",
+        location: "Factory Operations, Savar",
+        joiningDate: "10 Aug 2021",
+        businessUnit: "Pakiza Knit Group",
+      },
+      simDetails: {
+        simNumber: "01844-556677",
+        operator: "Robi Axiata",
+        replacementReason: "Physical SIM Card Lost / Damaged during field dispatch",
+        replacementCharge: 200,
+        justification: "Physical SIM card damaged during field survey at factory site. Urgent replacement needed for logistics tracking.",
+        onBehalf: true,
+        onBehalfPerson: "Rafiqul Islam (Senior Logistics Officer)",
+        section: "Supply Chain & Procurement",
+        attachmentName: "GD_Copy_SIM_Loss.pdf",
+        attachmentSize: "1.4 MB",
+      },
+    },
+  },
 ];
 
 const moduleConfig: Record<ModuleType, { icon: React.ElementType; color: string; bg: string }> = {
@@ -315,6 +447,11 @@ const moduleConfig: Record<ModuleType, { icon: React.ElementType; color: string;
     color: "text-fuchsia-600 dark:text-fuchsia-400",
     bg: "bg-fuchsia-50 dark:bg-fuchsia-500/10",
   },
+  SIM: {
+    icon: Smartphone,
+    color: "text-teal-600 dark:text-teal-400",
+    bg: "bg-teal-50 dark:bg-teal-500/10",
+  },
 };
 
 function AllApprovalsPage() {
@@ -325,6 +462,10 @@ function AllApprovalsPage() {
 
   const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
   const [selectedLoanData, setSelectedLoanData] = useState<LoanApprovalModalData | null>(null);
+
+  const [isSimModalOpen, setIsSimModalOpen] = useState(false);
+  const [selectedSimData, setSelectedSimData] = useState<SimApprovalModalData | null>(null);
+
   const [selectedReq, setSelectedReq] = useState<any>(null);
   const [approvalComment, setApprovalComment] = useState("");
 
@@ -345,6 +486,32 @@ function AllApprovalsPage() {
 
 
   const handleOpenDetailsModal = (item: ApprovalRequest) => {
+    if (item.module === "SIM") {
+      if (item.simData) {
+        setSelectedSimData(item.simData);
+      } else {
+        setSelectedSimData({
+          id: item.id,
+          reqNo: item.reqNo,
+          applicationDate: format(new Date(item.date), "dd MMM yyyy"),
+          submittedTime: "10:00 AM",
+          status: item.status,
+          requestType: "New SIM",
+          employee: {
+            name: item.employee.name,
+            id: item.employee.id,
+            designation: item.employee.designation,
+            department: item.employee.department,
+          },
+          simDetails: {
+            operator: "Grameenphone",
+            justification: item.details,
+          },
+        });
+      }
+      setIsSimModalOpen(true);
+      return;
+    }
     if (item.module === "Advance") {
       setSelectedReq({
         ...item,
@@ -1124,6 +1291,36 @@ function AllApprovalsPage() {
         isOpen={isLoanModalOpen}
         onClose={() => setIsLoanModalOpen(false)}
         data={selectedLoanData}
+      />
+      {/* SIM Requisition Approval View Modal */}
+      <SimApprovalViewModal
+        isOpen={isSimModalOpen}
+        onClose={() => setIsSimModalOpen(false)}
+        data={selectedSimData}
+        onStatusChange={(id, newStatus, updatedDetails) => {
+          if (selectedSimData && selectedSimData.id === id) {
+            const updatedSimData = {
+              ...selectedSimData,
+              status: newStatus,
+              simDetails: {
+                ...selectedSimData.simDetails,
+                ...updatedDetails,
+              },
+            };
+            setSelectedSimData(updatedSimData);
+
+            const itemIdx = mockApprovals.findIndex((m) => m.id === id);
+            if (itemIdx !== -1) {
+              mockApprovals[itemIdx].status = newStatus;
+              if (updatedDetails?.simNumber) {
+                mockApprovals[itemIdx].details = `[${selectedSimData.requestType}] Assigned SIM: ${updatedDetails.simNumber}`;
+              }
+              if (updatedDetails?.expectedLimit) {
+                mockApprovals[itemIdx].amount = updatedDetails.expectedLimit;
+              }
+            }
+          }
+        }}
       />
     </div>
   );

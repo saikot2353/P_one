@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "486",
+    "date": "2026-09-24T20:01",
+    "type": "UI Layout & Sticky Action Footer",
+    "module": "All Approvals - SIM Requisition",
+    "link": "/all-approvals",
+    "descriptionEn": "Moved Multi-Stage Approval Hierarchy & Signatures section under Comments & Approver Controls, and converted Approve/Reject buttons into a sticky modal footer.",
+    "descriptionBn": "সিম অ্যাপ্রুভাল মডালে মাল্টি-স্টেজ সিগনেচার সেকশনটি কমেন্টস ও অ্যাকশন প্যানেলের নিচে চালনা করা হয়েছে এবং Approve ও Reject বাটন দুটিকে স্টিকি ফুটার করা হয়েছে।"
+  },
+  {
+    "id": "485",
+    "date": "2026-09-24T19:52",
+    "type": "Interactive Workflow / Approver Inputs",
+    "module": "All Approvals - SIM Requisition",
+    "link": "/all-approvals",
+    "descriptionEn": "Added dynamic approver input controls to SIM Approval Modal: Assigned SIM & Balance for New SIM, Approved Limit for SIM Balance Limit, and New Issued SIM Number for SIM Replacement.",
+    "descriptionBn": "সিম অ্যাপ্রুভাল মডালে ডায়নামিক অ্যাপ্রুভার ইনপুট ফিল্ড যুক্ত করা হয়েছে: New SIM-এর জন্য SIM Number ও Balance, Balance Limit-এর জন্য Approved Limit এবং Replacement-এর জন্য New SIM Number।"
+  },
+  {
+    "id": "484",
+    "date": "2026-09-24T19:35",
+    "type": "New Feature / UI",
+    "module": "All Approvals",
+    "link": "/all-approvals",
+    "descriptionEn": "Added 3 separate SIM requisition approval entries for New SIM, SIM Balance Limit, and SIM Replacement in Central Approvals with dedicated detailed approval modal.",
+    "descriptionBn": "সেন্ট্রাল অল অ্যাপ্রুভালস পেজে New SIM, SIM Balance Limit এবং SIM Replacement-এর জন্য ৩টি আলাদা অ্যাপ্রুভাল এন্ট্রি ও বিষদ অ্যাপ্রুভাল মডাল যুক্ত করা হয়েছে।"
+  },
+  {
     "id": "483",
     "date": "2026-09-19T16:33",
     "type": "UI / Design Update",
