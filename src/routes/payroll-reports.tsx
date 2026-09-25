@@ -95,7 +95,7 @@ function PayrollReportsPage() {
           title: "Final Settlement Report",
           icon: FileText,
           desc: "Comprehensive report on processed employee final settlements.",
-          to: "#",
+          to: "/final-settlement-report",
         },
       ],
     },

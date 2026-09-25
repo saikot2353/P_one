@@ -210,6 +210,7 @@ import { Route as HrPolicyRouteImport } from './routes/hr-policy'
 import { Route as HolidaySummarySheetRouteImport } from './routes/holiday-summary-sheet'
 import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
 import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/financial-aid-budget-configuration'
+import { Route as FinalSettlementReportRouteImport } from './routes/final-settlement-report'
 import { Route as FinalSettlementConfigurationRouteImport } from './routes/final-settlement-configuration'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
@@ -1340,6 +1341,11 @@ const FinancialAidBudgetConfigurationRoute =
     path: '/financial-aid-budget-configuration',
     getParentRoute: () => rootRouteImport,
   } as any)
+const FinalSettlementReportRoute = FinalSettlementReportRouteImport.update({
+  id: '/final-settlement-report',
+  path: '/final-settlement-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FinalSettlementConfigurationRoute =
   FinalSettlementConfigurationRouteImport.update({
     id: '/final-settlement-configuration',
@@ -1706,6 +1712,7 @@ export interface FileRoutesByFullPath {
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
+  '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
@@ -1969,6 +1976,7 @@ export interface FileRoutesByTo {
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
+  '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
@@ -2233,6 +2241,7 @@ export interface FileRoutesById {
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
+  '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
@@ -2498,6 +2507,7 @@ export interface FileRouteTypes {
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
+    | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
     | '/holiday-summary-sheet'
@@ -2761,6 +2771,7 @@ export interface FileRouteTypes {
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
+    | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
     | '/holiday-summary-sheet'
@@ -3024,6 +3035,7 @@ export interface FileRouteTypes {
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
+    | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
     | '/holiday-summary-sheet'
@@ -3288,6 +3300,7 @@ export interface RootRouteChildren {
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
   FinalSettlementRoute: typeof FinalSettlementRoute
   FinalSettlementConfigurationRoute: typeof FinalSettlementConfigurationRoute
+  FinalSettlementReportRoute: typeof FinalSettlementReportRoute
   FinancialAidBudgetConfigurationRoute: typeof FinancialAidBudgetConfigurationRoute
   FinancialAidListRoute: typeof FinancialAidListRoute
   HolidaySummarySheetRoute: typeof HolidaySummarySheetRoute
@@ -4904,6 +4917,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinancialAidBudgetConfigurationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/final-settlement-report': {
+      id: '/final-settlement-report'
+      path: '/final-settlement-report'
+      fullPath: '/final-settlement-report'
+      preLoaderRoute: typeof FinalSettlementReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/final-settlement-configuration': {
       id: '/final-settlement-configuration'
       path: '/final-settlement-configuration'
@@ -5384,6 +5404,7 @@ const rootRouteChildren: RootRouteChildren = {
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
   FinalSettlementRoute: FinalSettlementRoute,
   FinalSettlementConfigurationRoute: FinalSettlementConfigurationRoute,
+  FinalSettlementReportRoute: FinalSettlementReportRoute,
   FinancialAidBudgetConfigurationRoute: FinancialAidBudgetConfigurationRoute,
   FinancialAidListRoute: FinancialAidListRoute,
   HolidaySummarySheetRoute: HolidaySummarySheetRoute,

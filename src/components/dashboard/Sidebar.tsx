@@ -455,7 +455,7 @@ export const nav: NavItem[] = [
           { label: "Yearly Bonus Report", to: "/yearly-bonus-report" },
           { label: "Earn Leave Pay Report", to: "/earn-leave-pay-report" },
           { label: "Festival Allowance Payment Sheet", to: "/festival-allowance-payment-sheet" },
-          { label: "Final Settlement Report", to: "#" },
+          { label: "Final Settlement Report", to: "/final-settlement-report" },
         ],
       },
     ],

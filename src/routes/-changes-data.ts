@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "499",
+    "date": "2026-09-25T18:30",
+    "type": "New Feature / Report Page",
+    "module": "Payroll - Final Settlement Report",
+    "link": "/final-settlement-report",
+    "descriptionEn": "Implemented the full 'Final Settlement Report' page featuring 12 real separated employee settlement records, 67 columns (Service Length, SB, Pay Salary, OT, Absent Deduction, EL Amt, Service Benefit, Notice Shortage Deduction, Net Payment, Bank details), date and settle type filters, print slip actions, CSV export, live search, and sticky grand total footer.",
+    "descriptionBn": "১২টি রিয়েল সেপারেটেড এমপ্লয়ী সেটেলমেন্ট রেকর্ড সহ 'Final Settlement Report' পেজ তৈরি করা হয়েছে, যাতে রয়েছে ৬৭টি কলাম, ডেট ফিল্টার, প্রিন্ট সিঙ্গল স্লিপ অ্যাকশন, সিএসভি এক্সপোর্ট, লাইভ সার্চ এবং গ্র্যান্ড টোটাল রো।"
+  },
+  {
     "id": "498",
     "date": "2026-09-25T18:25",
     "type": "New Feature / Report Page",
