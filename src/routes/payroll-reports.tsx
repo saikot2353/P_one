@@ -77,19 +77,19 @@ function PayrollReportsPage() {
           title: "Yearly Bonus Report",
           icon: Gift,
           desc: "Comprehensive report on yearly festival and performance bonuses.",
-          to: "#",
+          to: "/yearly-bonus-report",
         },
         {
           title: "Earn Leave Pay Report",
           icon: FileText,
           desc: "Report on earned leave encashment and payments.",
-          to: "#",
+          to: "/earn-leave-pay-report",
         },
         {
           title: "Festival Allowance Payment Sheet",
           icon: Gift,
           desc: "Detailed payment sheet for festival allowances.",
-          to: "#",
+          to: "/festival-allowance-payment-sheet",
         },
         {
           title: "Final Settlement Report",

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ZakatListRouteImport } from './routes/zakat-list'
 import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
+import { Route as YearlyBonusReportRouteImport } from './routes/yearly-bonus-report'
 import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
 import { Route as WelfareVerificationRouteImport } from './routes/welfare-verification'
 import { Route as UserManagementRouteImport } from './routes/user-management'
@@ -212,6 +213,7 @@ import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/fi
 import { Route as FinalSettlementConfigurationRouteImport } from './routes/final-settlement-configuration'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
+import { Route as FestivalAllowancePaymentSheetRouteImport } from './routes/festival-allowance-payment-sheet'
 import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
 import { Route as EmployeeTaxPayRouteImport } from './routes/employee-tax-pay'
 import { Route as EmployeeSalaryHistoryRouteImport } from './routes/employee-salary-history'
@@ -280,6 +282,11 @@ const ZakatBudgetConfigurationRoute =
     path: '/zakat-budget-configuration',
     getParentRoute: () => rootRouteImport,
   } as any)
+const YearlyBonusReportRoute = YearlyBonusReportRouteImport.update({
+  id: '/yearly-bonus-report',
+  path: '/yearly-bonus-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const YearlyBonusProcessRoute = YearlyBonusProcessRouteImport.update({
   id: '/yearly-bonus-process',
   path: '/yearly-bonus-process',
@@ -1349,6 +1356,12 @@ const FinalApproveIncrementRoute = FinalApproveIncrementRouteImport.update({
   path: '/final-approve-increment',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FestivalAllowancePaymentSheetRoute =
+  FestivalAllowancePaymentSheetRouteImport.update({
+    id: '/festival-allowance-payment-sheet',
+    path: '/festival-allowance-payment-sheet',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EnrollFingerprintRoute = EnrollFingerprintRouteImport.update({
   id: '/enroll-fingerprint',
   path: '/enroll-fingerprint',
@@ -1689,6 +1702,7 @@ export interface FileRoutesByFullPath {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -1890,6 +1904,7 @@ export interface FileRoutesByFullPath {
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
+  '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -1950,6 +1965,7 @@ export interface FileRoutesByTo {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -2151,6 +2167,7 @@ export interface FileRoutesByTo {
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
+  '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -2212,6 +2229,7 @@ export interface FileRoutesById {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -2413,6 +2431,7 @@ export interface FileRoutesById {
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
+  '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -2475,6 +2494,7 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -2676,6 +2696,7 @@ export interface FileRouteTypes {
     | '/user-management'
     | '/welfare-verification'
     | '/yearly-bonus-process'
+    | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
     | '/zakat-list'
     | '/employee-detail/$id'
@@ -2736,6 +2757,7 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -2937,6 +2959,7 @@ export interface FileRouteTypes {
     | '/user-management'
     | '/welfare-verification'
     | '/yearly-bonus-process'
+    | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
     | '/zakat-list'
     | '/employee-detail/$id'
@@ -2997,6 +3020,7 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -3198,6 +3222,7 @@ export interface FileRouteTypes {
     | '/user-management'
     | '/welfare-verification'
     | '/yearly-bonus-process'
+    | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
     | '/zakat-list'
     | '/employee-detail/$id'
@@ -3259,6 +3284,7 @@ export interface RootRouteChildren {
   EmployeeSalaryHistoryRoute: typeof EmployeeSalaryHistoryRoute
   EmployeeTaxPayRoute: typeof EmployeeTaxPayRoute
   EnrollFingerprintRoute: typeof EnrollFingerprintRoute
+  FestivalAllowancePaymentSheetRoute: typeof FestivalAllowancePaymentSheetRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
   FinalSettlementRoute: typeof FinalSettlementRoute
   FinalSettlementConfigurationRoute: typeof FinalSettlementConfigurationRoute
@@ -3460,6 +3486,7 @@ export interface RootRouteChildren {
   UserManagementRoute: typeof UserManagementRoute
   WelfareVerificationRoute: typeof WelfareVerificationRoute
   YearlyBonusProcessRoute: typeof YearlyBonusProcessRoute
+  YearlyBonusReportRoute: typeof YearlyBonusReportRoute
   ZakatBudgetConfigurationRoute: typeof ZakatBudgetConfigurationRoute
   ZakatListRoute: typeof ZakatListRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
@@ -3482,6 +3509,13 @@ declare module '@tanstack/react-router' {
       path: '/zakat-budget-configuration'
       fullPath: '/zakat-budget-configuration'
       preLoaderRoute: typeof ZakatBudgetConfigurationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/yearly-bonus-report': {
+      id: '/yearly-bonus-report'
+      path: '/yearly-bonus-report'
+      fullPath: '/yearly-bonus-report'
+      preLoaderRoute: typeof YearlyBonusReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/yearly-bonus-process': {
@@ -4891,6 +4925,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinalApproveIncrementRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/festival-allowance-payment-sheet': {
+      id: '/festival-allowance-payment-sheet'
+      path: '/festival-allowance-payment-sheet'
+      fullPath: '/festival-allowance-payment-sheet'
+      preLoaderRoute: typeof FestivalAllowancePaymentSheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/enroll-fingerprint': {
       id: '/enroll-fingerprint'
       path: '/enroll-fingerprint'
@@ -5339,6 +5380,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmployeeSalaryHistoryRoute: EmployeeSalaryHistoryRoute,
   EmployeeTaxPayRoute: EmployeeTaxPayRoute,
   EnrollFingerprintRoute: EnrollFingerprintRoute,
+  FestivalAllowancePaymentSheetRoute: FestivalAllowancePaymentSheetRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
   FinalSettlementRoute: FinalSettlementRoute,
   FinalSettlementConfigurationRoute: FinalSettlementConfigurationRoute,
@@ -5544,6 +5586,7 @@ const rootRouteChildren: RootRouteChildren = {
   UserManagementRoute: UserManagementRoute,
   WelfareVerificationRoute: WelfareVerificationRoute,
   YearlyBonusProcessRoute: YearlyBonusProcessRoute,
+  YearlyBonusReportRoute: YearlyBonusReportRoute,
   ZakatBudgetConfigurationRoute: ZakatBudgetConfigurationRoute,
   ZakatListRoute: ZakatListRoute,
   EmployeeDetailIdRoute: EmployeeDetailIdRoute,

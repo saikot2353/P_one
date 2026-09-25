@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "497",
+    "date": "2026-09-25T18:17",
+    "type": "New Feature / Report Page",
+    "module": "Payroll - Festival Allowance Payment Sheet",
+    "link": "/festival-allowance-payment-sheet",
+    "descriptionEn": "Implemented the full 'Festival Allowance Payment Sheet' page featuring 149 real employee festival allowance records, 20 data columns (Gross, Basic, Days Count, Per Day Rate, Payable Amt, OT, Lunch Bill, Net Payable Amt), filter card (From/To Date, Emp ID, Emp Type, Dept, Designation, Line), toolbar CSV export, live search, and grand totals footer.",
+    "descriptionBn": "১৪৯টি রিয়েল এমপ্লয়ী রেকর্ড সহ 'Festival Allowance Payment Sheet' পেজ তৈরি করা হয়েছে, যাতে রয়েছে ২০টি কলাম, তারিখ ও বিভাগীয় ফিল্টার, সিএসভি এক্সপোর্ট, লাইভ সার্চ এবং গ্র্যান্ড টোটাল রো।"
+  },
+  {
+    "id": "496",
+    "date": "2026-09-25T18:14",
+    "type": "New Feature / Report Page",
+    "module": "Payroll - Earn Leave Pay Report",
+    "link": "/earn-leave-pay-report",
+    "descriptionEn": "Implemented the full 'Earn Leave Pay Report' page featuring 13 real employee earned leave encashment records, 22 columns (Gross, Earn Days, Per Day Rate, Total Amt, Net Pay, Bank details), filters (Year, Duration, Dept, Sub Dept, Job Title, Bank, Status), live toolbar search, CSV export, and grand total footer.",
+    "descriptionBn": "১৩টি রিয়েল এমপ্লয়ী আর্ন লিভ এনক্যাশমেন্ট রেকর্ড সহ 'Earn Leave Pay Report' পেজ তৈরি করা হয়েছে, যাতে রয়েছে ২২টি কলাম, বিস্তৃত ফিল্টার, সিএসভি এক্সপোর্ট, লাইভ সার্চ এবং গ্র্যান্ড টোটাল রো।"
+  },
+  {
     "id": "495",
     "date": "2026-09-25T16:41",
     "type": "New Feature / Report Page",
