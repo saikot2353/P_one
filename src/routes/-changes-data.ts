@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "495",
+    "date": "2026-09-25T16:41",
+    "type": "New Feature / Report Page",
+    "module": "Payroll - Holiday Summary Sheet",
+    "link": "/holiday-summary-sheet",
+    "descriptionEn": "Implemented the full 'Holiday Summary Sheet' report page featuring 83 real line/department holiday overtime records, filter controls (Year, Month, Department, Unit, Line), export toolbar (Excel CSV, Print, PDF), live search, and grand total footer.",
+    "descriptionBn": "৮৩টি রিয়েল লাইন রেকর্ড সহ 'Holiday Summary Sheet' পেজ তৈরি করা হয়েছে, যাতে রয়েছে ফিল্টার, সিএসভি এক্সপোর্ট, লাইভ সার্চ এবং গ্র্যান্ড টোটাল রো।"
+  },
+  {
     "id": "494",
     "date": "2026-09-25T16:35",
     "type": "New Feature / Report Page",

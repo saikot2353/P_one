@@ -60,6 +60,12 @@ function PayrollReportsPage() {
           desc: "Summarized overview of the monthly department/unit salary.",
           to: "/summary-salary-sheet",
         },
+        {
+          title: "Holiday Summary Sheet",
+          icon: CalendarDays,
+          desc: "Summary report on holiday overtime and compensation.",
+          to: "/holiday-summary-sheet",
+        },
       ],
     },
     {

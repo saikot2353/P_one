@@ -206,6 +206,7 @@ import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allow
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
 import { Route as HrReportsRouteImport } from './routes/hr-reports'
 import { Route as HrPolicyRouteImport } from './routes/hr-policy'
+import { Route as HolidaySummarySheetRouteImport } from './routes/holiday-summary-sheet'
 import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
 import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/financial-aid-budget-configuration'
 import { Route as FinalSettlementConfigurationRouteImport } from './routes/final-settlement-configuration'
@@ -220,6 +221,7 @@ import { Route as EmployeeDocIssueRouteImport } from './routes/employee-doc-issu
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
 import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
 import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
+import { Route as EarnLeavePayReportRouteImport } from './routes/earn-leave-pay-report'
 import { Route as ERecruitmentFormRouteImport } from './routes/e-recruitment-form'
 import { Route as DisciplinaryWarningLettersRouteImport } from './routes/disciplinary-warning-letters'
 import { Route as DisciplinaryShowcauseNoticesRouteImport } from './routes/disciplinary-showcause-notices'
@@ -1315,6 +1317,11 @@ const HrPolicyRoute = HrPolicyRouteImport.update({
   path: '/hr-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HolidaySummarySheetRoute = HolidaySummarySheetRouteImport.update({
+  id: '/holiday-summary-sheet',
+  path: '/holiday-summary-sheet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FinancialAidListRoute = FinancialAidListRouteImport.update({
   id: '/financial-aid-list',
   path: '/financial-aid-list',
@@ -1385,6 +1392,11 @@ const EarnLeaveSubmitRoute = EarnLeaveSubmitRouteImport.update({
 const EarnLeaveProcessRoute = EarnLeaveProcessRouteImport.update({
   id: '/earn-leave-process',
   path: '/earn-leave-process',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EarnLeavePayReportRoute = EarnLeavePayReportRouteImport.update({
+  id: '/earn-leave-pay-report',
+  path: '/earn-leave-pay-report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ERecruitmentFormRoute = ERecruitmentFormRouteImport.update({
@@ -1667,6 +1679,7 @@ export interface FileRoutesByFullPath {
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
+  '/earn-leave-pay-report': typeof EarnLeavePayReportRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
@@ -1681,6 +1694,7 @@ export interface FileRoutesByFullPath {
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
@@ -1926,6 +1940,7 @@ export interface FileRoutesByTo {
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
+  '/earn-leave-pay-report': typeof EarnLeavePayReportRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
@@ -1940,6 +1955,7 @@ export interface FileRoutesByTo {
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
@@ -2186,6 +2202,7 @@ export interface FileRoutesById {
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
+  '/earn-leave-pay-report': typeof EarnLeavePayReportRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
@@ -2200,6 +2217,7 @@ export interface FileRoutesById {
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
@@ -2447,6 +2465,7 @@ export interface FileRouteTypes {
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
+    | '/earn-leave-pay-report'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
@@ -2461,6 +2480,7 @@ export interface FileRouteTypes {
     | '/final-settlement-configuration'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-reports'
     | '/id-card-setup'
@@ -2706,6 +2726,7 @@ export interface FileRouteTypes {
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
+    | '/earn-leave-pay-report'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
@@ -2720,6 +2741,7 @@ export interface FileRouteTypes {
     | '/final-settlement-configuration'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-reports'
     | '/id-card-setup'
@@ -2965,6 +2987,7 @@ export interface FileRouteTypes {
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
+    | '/earn-leave-pay-report'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
@@ -2979,6 +3002,7 @@ export interface FileRouteTypes {
     | '/final-settlement-configuration'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-reports'
     | '/id-card-setup'
@@ -3225,6 +3249,7 @@ export interface RootRouteChildren {
   DisciplinaryShowcauseNoticesRoute: typeof DisciplinaryShowcauseNoticesRoute
   DisciplinaryWarningLettersRoute: typeof DisciplinaryWarningLettersRoute
   ERecruitmentFormRoute: typeof ERecruitmentFormRoute
+  EarnLeavePayReportRoute: typeof EarnLeavePayReportRoute
   EarnLeaveProcessRoute: typeof EarnLeaveProcessRoute
   EarnLeaveSubmitRoute: typeof EarnLeaveSubmitRoute
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
@@ -3239,6 +3264,7 @@ export interface RootRouteChildren {
   FinalSettlementConfigurationRoute: typeof FinalSettlementConfigurationRoute
   FinancialAidBudgetConfigurationRoute: typeof FinancialAidBudgetConfigurationRoute
   FinancialAidListRoute: typeof FinancialAidListRoute
+  HolidaySummarySheetRoute: typeof HolidaySummarySheetRoute
   HrPolicyRoute: typeof HrPolicyRoute
   HrReportsRoute: typeof HrReportsRoute
   IdCardSetupRoute: typeof IdCardSetupRoute
@@ -4823,6 +4849,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/holiday-summary-sheet': {
+      id: '/holiday-summary-sheet'
+      path: '/holiday-summary-sheet'
+      fullPath: '/holiday-summary-sheet'
+      preLoaderRoute: typeof HolidaySummarySheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/financial-aid-list': {
       id: '/financial-aid-list'
       path: '/financial-aid-list'
@@ -4919,6 +4952,13 @@ declare module '@tanstack/react-router' {
       path: '/earn-leave-process'
       fullPath: '/earn-leave-process'
       preLoaderRoute: typeof EarnLeaveProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/earn-leave-pay-report': {
+      id: '/earn-leave-pay-report'
+      path: '/earn-leave-pay-report'
+      fullPath: '/earn-leave-pay-report'
+      preLoaderRoute: typeof EarnLeavePayReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/e-recruitment-form': {
@@ -5289,6 +5329,7 @@ const rootRouteChildren: RootRouteChildren = {
   DisciplinaryShowcauseNoticesRoute: DisciplinaryShowcauseNoticesRoute,
   DisciplinaryWarningLettersRoute: DisciplinaryWarningLettersRoute,
   ERecruitmentFormRoute: ERecruitmentFormRoute,
+  EarnLeavePayReportRoute: EarnLeavePayReportRoute,
   EarnLeaveProcessRoute: EarnLeaveProcessRoute,
   EarnLeaveSubmitRoute: EarnLeaveSubmitRoute,
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
@@ -5303,6 +5344,7 @@ const rootRouteChildren: RootRouteChildren = {
   FinalSettlementConfigurationRoute: FinalSettlementConfigurationRoute,
   FinancialAidBudgetConfigurationRoute: FinancialAidBudgetConfigurationRoute,
   FinancialAidListRoute: FinancialAidListRoute,
+  HolidaySummarySheetRoute: HolidaySummarySheetRoute,
   HrPolicyRoute: HrPolicyRoute,
   HrReportsRoute: HrReportsRoute,
   IdCardSetupRoute: IdCardSetupRoute,

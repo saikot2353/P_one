@@ -451,6 +451,7 @@ export const nav: NavItem[] = [
           { label: "Employee Salary History", to: "/employee-salary-history" },
           {label: "Monthly Advance Salary Sheet", to: "/monthly-advance-salary-sheet" },
           { label: "Summary Salary Sheet", to: "/summary-salary-sheet" },
+          { label: "Holiday Summary Sheet", to: "/holiday-summary-sheet" },
           { label: "Yearly Bonus Report", to: "#" },
           { label: "Earn Leave Pay Report", to: "#" },
           { label: "Festival Allowance Payment Sheet", to: "#" },
