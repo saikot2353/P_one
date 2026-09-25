@@ -201,6 +201,7 @@ import { Route as IncrementHistoryRouteImport } from './routes/increment-history
 import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
+import { Route as HrReportsRouteImport } from './routes/hr-reports'
 import { Route as HrPolicyRouteImport } from './routes/hr-policy'
 import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
 import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/financial-aid-budget-configuration'
@@ -1284,6 +1285,11 @@ const IdCardSetupRoute = IdCardSetupRouteImport.update({
   path: '/id-card-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HrReportsRoute = HrReportsRouteImport.update({
+  id: '/hr-reports',
+  path: '/hr-reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HrPolicyRoute = HrPolicyRouteImport.update({
   id: '/hr-policy',
   path: '/hr-policy',
@@ -1650,6 +1656,7 @@ export interface FileRoutesByFullPath {
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
@@ -1904,6 +1911,7 @@ export interface FileRoutesByTo {
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
@@ -2159,6 +2167,7 @@ export interface FileRoutesById {
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
@@ -2415,6 +2424,7 @@ export interface FileRouteTypes {
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
     | '/hr-policy'
+    | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
@@ -2669,6 +2679,7 @@ export interface FileRouteTypes {
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
     | '/hr-policy'
+    | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
@@ -2923,6 +2934,7 @@ export interface FileRouteTypes {
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
     | '/hr-policy'
+    | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
@@ -3178,6 +3190,7 @@ export interface RootRouteChildren {
   FinancialAidBudgetConfigurationRoute: typeof FinancialAidBudgetConfigurationRoute
   FinancialAidListRoute: typeof FinancialAidListRoute
   HrPolicyRoute: typeof HrPolicyRoute
+  HrReportsRoute: typeof HrReportsRoute
   IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
   IncrementRoute: typeof IncrementRoute
@@ -4722,6 +4735,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IdCardSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr-reports': {
+      id: '/hr-reports'
+      path: '/hr-reports'
+      fullPath: '/hr-reports'
+      preLoaderRoute: typeof HrReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hr-policy': {
       id: '/hr-policy'
       path: '/hr-policy'
@@ -5202,6 +5222,7 @@ const rootRouteChildren: RootRouteChildren = {
   FinancialAidBudgetConfigurationRoute: FinancialAidBudgetConfigurationRoute,
   FinancialAidListRoute: FinancialAidListRoute,
   HrPolicyRoute: HrPolicyRoute,
+  HrReportsRoute: HrReportsRoute,
   IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,
   IncrementRoute: IncrementRoute,

@@ -27,7 +27,7 @@ function PayrollReportsPage() {
   const sections = [
     {
       title: "Salary Reports",
-      description: "Generate comprehensive salary sheets and history.",
+      description: "Generate comprehensive salary sheets and employee history.",
       icon: FileText,
       items: [
         {
@@ -37,71 +37,40 @@ function PayrollReportsPage() {
           to: "/monthly-salary-details",
         },
         {
-          title: "Monthly Left Salary Sheet",
+          title: "Monthly Lefty Salary Sheet",
           icon: FileText,
-          desc: "Salary sheet for resigned/left employees.",
+          desc: "Salary sheet for resigned/separated employees.",
           to: "#",
         },
         {
           title: "Employee Salary History",
           icon: History,
-          desc: "Historical salary data for employees.",
+          desc: "Historical salary data and increment records for employees.",
           to: "#",
         },
         {
           title: "Monthly Advance Salary Sheet",
           icon: FileText,
-          desc: "Report on monthly advance salary payments.",
+          desc: "Report on monthly advance salary disbursements.",
           to: "#",
         },
         {
           title: "Summary Salary Sheet",
           icon: List,
-          desc: "Summarized overview of the monthly salary.",
+          desc: "Summarized overview of the monthly department/unit salary.",
           to: "#",
         },
       ],
     },
     {
-      title: "Bonus & Tax Reports",
-      description: "Review tax calculations and bonus distributions.",
+      title: "Bonus, Allowance & Settlement Reports",
+      description: "Review yearly bonus, festival allowance, earn leave pay, and final settlements.",
       icon: Calculator,
       items: [
         {
-          title: "Employee Tax",
-          icon: Calculator,
-          desc: "Report on employee tax deductions and calculations.",
-          to: "#",
-        },
-        {
           title: "Yearly Bonus Report",
           icon: Gift,
-          desc: "Comprehensive report on yearly bonuses.",
-          to: "#",
-        },
-        {
-          title: "Bonus Summary Report",
-          icon: PieChart,
-          desc: "Summarized overview of distributed bonuses.",
-          to: "#",
-        },
-        {
-          title: "Bonus Summary Report(Unit Wise)",
-          icon: PieChart,
-          desc: "Bonus summary breakdown by organizational unit.",
-          to: "#",
-        },
-      ],
-    },
-    {
-      title: "Other Payroll Reports",
-      description: "Access holiday, leave, allowance, and settlement reports.",
-      icon: BarChart3,
-      items: [
-        {
-          title: "Holiday Summary Sheet",
-          icon: CalendarDays,
-          desc: "Summary of holidays and related pay.",
+          desc: "Comprehensive report on yearly festival and performance bonuses.",
           to: "#",
         },
         {
@@ -111,15 +80,15 @@ function PayrollReportsPage() {
           to: "#",
         },
         {
-          title: "Allowance Payment",
-          icon: FileText,
-          desc: "Detailed report on allowance distributions.",
+          title: "Festival Allowance Payment Sheet",
+          icon: Gift,
+          desc: "Detailed payment sheet for festival allowances.",
           to: "#",
         },
         {
-          title: "Final Settlement",
+          title: "Final Settlement Report",
           icon: FileText,
-          desc: "Report on processed final settlements.",
+          desc: "Comprehensive report on processed employee final settlements.",
           to: "#",
         },
       ],

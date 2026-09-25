@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "489",
+    "date": "2026-09-25T15:30",
+    "type": "New Module / UI Navigation",
+    "module": "HR - HR Reports",
+    "link": "/hr-reports",
+    "descriptionEn": "Added new top-level 'HR Reports' menu after Event menu with 11 sub-menus (New Joining Info, Employee Count, Leave Summary, Leave, Daily Attendance Report, Monthly Attendance Report, Overtime Summary, Absenteeism Summary, Print OT Requisition, Continuous Absent, SIM Requisition Report) and created dedicated HR Reports Hub page.",
+    "descriptionBn": "Event মেনুর পরে নতুন 'HR Reports' মেনু এবং ১১টি সাব-মেনু যুক্ত করা হয়েছে এবং একটি নতুন HR Reports Hub পেজ তৈরি করা হয়েছে।"
+  },
+  {
+    "id": "488",
+    "date": "2026-09-25T15:27",
+    "type": "New Feature / UI Navigation",
+    "module": "Payroll - Payroll Reports",
+    "link": "/payroll-reports",
+    "descriptionEn": "Added 'Festival Allowance Payment Sheet' and 'Final Settlement Report' to the Payroll Reports sub-menu and reports page.",
+    "descriptionBn": "Payroll Reports সাব-মেনু ও রিপোর্টস পেজে 'Festival Allowance Payment Sheet' এবং 'Final Settlement Report' যুক্ত করা হয়েছে।"
+  },
+  {
+    "id": "487",
+    "date": "2026-09-25T15:14",
+    "type": "New Submenu & UI Navigation",
+    "module": "Payroll - Payroll Reports",
+    "link": "/payroll-reports",
+    "descriptionEn": "Added new 'Payroll Reports' sub-menu under Payroll section containing Monthly Salary Details, Monthly Lefty Salary Sheet, Employee Salary History, Monthly Advance Salary Sheet, Summary Salary Sheet, Yearly Bonus Report, and Earn Leave Pay Report.",
+    "descriptionBn": "পে-রোলের অধীনে নতুন 'Payroll Reports' সাব-মেনু যুক্ত করা হয়েছে যেখানে Monthly Salary Details, Monthly Lefty Salary Sheet, Employee Salary History, Monthly Advance Salary Sheet, Summary Salary Sheet, Yearly Bonus Report এবং Earn Leave Pay Report রয়েছে।"
+  },
+  {
     "id": "486",
     "date": "2026-09-24T20:01",
     "type": "UI Layout & Sticky Action Footer",
