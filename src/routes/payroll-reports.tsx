@@ -40,13 +40,13 @@ function PayrollReportsPage() {
           title: "Monthly Lefty Salary Sheet",
           icon: FileText,
           desc: "Salary sheet for resigned/separated employees.",
-          to: "#",
+          to: "/monthly-lefty-salary-sheet",
         },
         {
           title: "Employee Salary History",
           icon: History,
           desc: "Historical salary data and increment records for employees.",
-          to: "#",
+          to: "/employee-salary-history",
         },
         {
           title: "Monthly Advance Salary Sheet",

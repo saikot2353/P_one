@@ -447,8 +447,8 @@ export const nav: NavItem[] = [
         to: "/payroll-reports",
         subitems: [
           { label: "Monthly Salary Details", to: "/monthly-salary-details" },
-          { label: "Monthly Lefty Salary Sheet", to: "#" },
-          { label: "Employee Salary History", to: "#" },
+          { label: "Monthly Lefty Salary Sheet", to: "/monthly-lefty-salary-sheet" },
+          { label: "Employee Salary History", to: "/employee-salary-history" },
           { label: "Monthly Advance Salary Sheet", to: "#" },
           { label: "Summary Salary Sheet", to: "#" },
           { label: "Yearly Bonus Report", to: "#" },

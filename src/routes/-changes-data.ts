@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "491",
+    "date": "2026-09-25T16:06",
+    "type": "New Feature / Report Page",
+    "module": "Payroll - Employee Salary History",
+    "link": "/employee-salary-history",
+    "descriptionEn": "Implemented the full 'Employee Salary History' report page featuring 181 employee records, 12-month salary disbursement matrix (Jan 2026 - Dec 2026), filter panel, summary cards, CSV/PDF/Print export toolbar, live search, and grand total footer row.",
+    "descriptionBn": "১৮১টি এমপ্লয়ী রেকর্ড এবং ১২ মাসের স্যালারি হিস্ট্রি ম্যাট্রিক্স সহ 'Employee Salary History' রিপোর্ট পেজ তৈরি করা হয়েছে, যাতে রয়েছে ফিল্টার প্যানেল, কাস্টম সার্চ এবং মান্থলি গ্র্যান্ড টোটাল রো।"
+  },
+  {
+    "id": "490",
+    "date": "2026-09-25T16:03",
+    "type": "New Feature / Report Page",
+    "module": "Payroll - Monthly Lefty Salary Sheet",
+    "link": "/monthly-lefty-salary-sheet",
+    "descriptionEn": "Implemented the complete 'Monthly Lefty Salary Sheet' report page with 121 real employee records, full filter parameters (Year, Month, Company, Employee Type, Sub Department, Job Title, Unit, Line, Employee ID search), summary metrics cards, CSV/PDF/Print export capabilities, and summary totals row.",
+    "descriptionBn": "১২১টি রিয়েল এমপ্লয়ী রেকর্ড সহ সম্পুর্ণ 'Monthly Lefty Salary Sheet' রিপোর্ট পেজ তৈরি করা হয়েছে, যাতে রয়েছে ফিল্টার, সামারি কার্ড, ফিল্টারড ডাটা এক্সপোর্ট এবং গ্র্যান্ড টোটাল রো।"
+  },
+  {
     "id": "489",
     "date": "2026-09-25T15:30",
     "type": "New Module / UI Navigation",

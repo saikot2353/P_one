@@ -135,6 +135,7 @@ import { Route as NoticeRouteImport } from './routes/notice'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salary-details'
+import { Route as MonthlyLeftySalarySheetRouteImport } from './routes/monthly-lefty-salary-sheet'
 import { Route as ModuleSelectionRouteImport } from './routes/module-selection'
 import { Route as MessengerRouteImport } from './routes/messenger'
 import { Route as MerchandisingWorkOrdersRouteImport } from './routes/merchandising-work-orders'
@@ -210,6 +211,7 @@ import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
 import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
 import { Route as EmployeeTaxPayRouteImport } from './routes/employee-tax-pay'
+import { Route as EmployeeSalaryHistoryRouteImport } from './routes/employee-salary-history'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EmployeeDocVerificationRouteImport } from './routes/employee-doc-verification'
 import { Route as EmployeeDocIssueRouteImport } from './routes/employee-doc-issue'
@@ -946,6 +948,11 @@ const MonthlySalaryDetailsRoute = MonthlySalaryDetailsRouteImport.update({
   path: '/monthly-salary-details',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MonthlyLeftySalarySheetRoute = MonthlyLeftySalarySheetRouteImport.update({
+  id: '/monthly-lefty-salary-sheet',
+  path: '/monthly-lefty-salary-sheet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ModuleSelectionRoute = ModuleSelectionRouteImport.update({
   id: '/module-selection',
   path: '/module-selection',
@@ -1332,6 +1339,11 @@ const EmployeeTaxPayRoute = EmployeeTaxPayRouteImport.update({
   path: '/employee-tax-pay',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployeeSalaryHistoryRoute = EmployeeSalaryHistoryRouteImport.update({
+  id: '/employee-salary-history',
+  path: '/employee-salary-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmployeeJobCardRoute = EmployeeJobCardRouteImport.update({
   id: '/employee-job-card',
   path: '/employee-job-card',
@@ -1648,6 +1660,7 @@ export interface FileRoutesByFullPath {
   '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
@@ -1723,6 +1736,7 @@ export interface FileRoutesByFullPath {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
@@ -1903,6 +1917,7 @@ export interface FileRoutesByTo {
   '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
@@ -1978,6 +1993,7 @@ export interface FileRoutesByTo {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
@@ -2159,6 +2175,7 @@ export interface FileRoutesById {
   '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
@@ -2234,6 +2251,7 @@ export interface FileRoutesById {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
@@ -2416,6 +2434,7 @@ export interface FileRouteTypes {
     | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
     | '/final-approve-increment'
@@ -2491,6 +2510,7 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-lefty-salary-sheet'
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
@@ -2671,6 +2691,7 @@ export interface FileRouteTypes {
     | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
     | '/final-approve-increment'
@@ -2746,6 +2767,7 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-lefty-salary-sheet'
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
@@ -2926,6 +2948,7 @@ export interface FileRouteTypes {
     | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
     | '/final-approve-increment'
@@ -3001,6 +3024,7 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-lefty-salary-sheet'
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
@@ -3182,6 +3206,7 @@ export interface RootRouteChildren {
   EmployeeDocIssueRoute: typeof EmployeeDocIssueRoute
   EmployeeDocVerificationRoute: typeof EmployeeDocVerificationRoute
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
+  EmployeeSalaryHistoryRoute: typeof EmployeeSalaryHistoryRoute
   EmployeeTaxPayRoute: typeof EmployeeTaxPayRoute
   EnrollFingerprintRoute: typeof EnrollFingerprintRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
@@ -3257,6 +3282,7 @@ export interface RootRouteChildren {
   MerchandisingWorkOrdersRoute: typeof MerchandisingWorkOrdersRoute
   MessengerRoute: typeof MessengerRoute
   ModuleSelectionRoute: typeof ModuleSelectionRoute
+  MonthlyLeftySalarySheetRoute: typeof MonthlyLeftySalarySheetRoute
   MonthlySalaryDetailsRoute: typeof MonthlySalaryDetailsRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
@@ -4273,6 +4299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MonthlySalaryDetailsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/monthly-lefty-salary-sheet': {
+      id: '/monthly-lefty-salary-sheet'
+      path: '/monthly-lefty-salary-sheet'
+      fullPath: '/monthly-lefty-salary-sheet'
+      preLoaderRoute: typeof MonthlyLeftySalarySheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/module-selection': {
       id: '/module-selection'
       path: '/module-selection'
@@ -4798,6 +4831,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmployeeTaxPayRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/employee-salary-history': {
+      id: '/employee-salary-history'
+      path: '/employee-salary-history'
+      fullPath: '/employee-salary-history'
+      preLoaderRoute: typeof EmployeeSalaryHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/employee-job-card': {
       id: '/employee-job-card'
       path: '/employee-job-card'
@@ -5214,6 +5254,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmployeeDocIssueRoute: EmployeeDocIssueRoute,
   EmployeeDocVerificationRoute: EmployeeDocVerificationRoute,
   EmployeeJobCardRoute: EmployeeJobCardRoute,
+  EmployeeSalaryHistoryRoute: EmployeeSalaryHistoryRoute,
   EmployeeTaxPayRoute: EmployeeTaxPayRoute,
   EnrollFingerprintRoute: EnrollFingerprintRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
@@ -5290,6 +5331,7 @@ const rootRouteChildren: RootRouteChildren = {
   MerchandisingWorkOrdersRoute: MerchandisingWorkOrdersRoute,
   MessengerRoute: MessengerRoute,
   ModuleSelectionRoute: ModuleSelectionRoute,
+  MonthlyLeftySalarySheetRoute: MonthlyLeftySalarySheetRoute,
   MonthlySalaryDetailsRoute: MonthlySalaryDetailsRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,
