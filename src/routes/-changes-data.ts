@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "500",
+    "date": "2026-09-25T18:46",
+    "type": "UI Enhancement / Report View",
+    "module": "Payroll - Final Settlement Report Modal View",
+    "link": "/final-settlement-report",
+    "descriptionEn": "Added the full 'Final Settlement Sheet' modal view dialog to the Final Settlement Report page. Clicking any employee row or printer icon opens an interactive preview statement detailing Employee Info, Settlement Info, Earning & Deduction Sectors, Earn Leave, Service Benefit, and Compensation Details matching the /final-settlement template.",
+    "descriptionBn": "Final Settlement Report পেজে 'Final Settlement Sheet' পপআপ ভিউ মোডাল যোগ করা হয়েছে। প্রিন্টার বা যে কোনো রো ক্লিক করলে /final-settlement ফরম্যাটের পূর্ণাঙ্গ স্টেটমেন্ট দেখা যাবে এবং প্রিন্ট করা যাবে।"
+  },
+  {
     "id": "499",
     "date": "2026-09-25T18:30",
     "type": "New Feature / Report Page",
