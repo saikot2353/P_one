@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "494",
+    "date": "2026-09-25T16:35",
+    "type": "New Feature / Report Page",
+    "module": "Payroll - Monthly Salary Summary",
+    "link": "/summary-salary-sheet",
+    "descriptionEn": "Implemented the complete 'Monthly Salary Summary' (Summary Salary Sheet) report page featuring 147 department/particular salary summary records, 22 data columns (Gross, Basic, Pay Salary, OT, Bonuses, Allowances, Advances, Tax, Cash Pay, Bank Pay), filters, live toolbar search, CSV export, and grand totals footer.",
+    "descriptionBn": "১৪৭টি বিভাগীয় রেকর্ড সহ 'Monthly Salary Summary' (Summary Salary Sheet) পেজ তৈরি করা হয়েছে, যাতে ২২টি কলাম, ফিল্টার, ইনস্ট্যান্ট সার্চ, সিএসভি এক্সপোর্ট এবং গ্র্যান্ড টোটাল রো রয়েছে।"
+  },
+  {
+    "id": "493",
+    "date": "2026-09-25T16:18",
+    "type": "New Feature / Report Page",
+    "module": "Payroll - Monthly Advance Salary Sheet",
+    "link": "/monthly-advance-salary-sheet",
+    "descriptionEn": "Implemented the full 'Monthly Advance Salary Sheet' report page featuring 1,699 real employee advance salary records, Mode selection (Percentage Wise / Partial Salary), full filter panel, toolbar export (Excel, Print, PDF), bank/cash export buttons, live search, and grand totals footer.",
+    "descriptionBn": "১,৬৯৯টি রিয়েল এমপ্লয়ী এডভান্স স্যালারি রেকর্ড সহ 'Monthly Advance Salary Sheet' রিপোর্ট পেজ তৈরি করা হয়েছে, যাতে রয়েছে মোড নির্বাচন, বিস্তারিত ফিল্টার, ব্যাংক/ক্যাশ এক্সপোর্ট বাটন এবং গ্র্যান্ড টোটাল রো।"
+  },
+  {
+    "id": "492",
+    "date": "2026-09-25T16:10",
+    "type": "UI Layout Cleanup",
+    "module": "Payroll - Payroll Reports",
+    "link": "/employee-salary-history",
+    "descriptionEn": "Removed the top summary KPI metrics cards from both 'Employee Salary History' and 'Monthly Lefty Salary Sheet' report pages based on user design preference.",
+    "descriptionBn": "ইউজার পছন্দ অনুযায়ী 'Employee Salary History' এবং 'Monthly Lefty Salary Sheet' রিপোর্ট পেজ থেকে উপরের সামারি কার্ডগুলো সরিয়ে দেওয়া হয়েছে।"
+  },
+  {
     "id": "491",
     "date": "2026-09-25T16:06",
     "type": "New Feature / Report Page",

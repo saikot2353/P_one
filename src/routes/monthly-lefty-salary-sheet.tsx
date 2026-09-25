@@ -337,62 +337,7 @@ function MonthlyLeftySalarySheetPage() {
             </div>
           </div>
 
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-card border border-border/60 p-4 rounded-2xl shadow-sm flex items-center gap-3">
-              <div className="p-3 bg-blue-500/10 rounded-xl text-blue-600 border border-blue-500/20">
-                <Users className="size-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  Total Left Employees
-                </p>
-                <p className="text-xl font-bold text-foreground">{filteredData.length}</p>
-              </div>
-            </div>
 
-            <div className="bg-card border border-border/60 p-4 rounded-2xl shadow-sm flex items-center gap-3">
-              <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-600 border border-emerald-500/20">
-                <Banknote className="size-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  Total Gross Salary
-                </p>
-                <p className="text-xl font-bold text-emerald-600">
-                  ৳ {formatCurrency(totals.gross)}
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border/60 p-4 rounded-2xl shadow-sm flex items-center gap-3">
-              <div className="p-3 bg-purple-500/10 rounded-xl text-purple-600 border border-purple-500/20">
-                <CalendarDays className="size-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  Total Basic Salary
-                </p>
-                <p className="text-xl font-bold text-purple-600">
-                  ৳ {formatCurrency(totals.basic)}
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border/60 p-4 rounded-2xl shadow-sm flex items-center gap-3">
-              <div className="p-3 bg-amber-500/10 rounded-xl text-amber-600 border border-amber-500/20">
-                <Building2 className="size-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  Total Net Payable
-                </p>
-                <p className="text-xl font-bold text-amber-600">
-                  ৳ {formatCurrency(totals.netPayment)}
-                </p>
-              </div>
-            </div>
-          </div>
 
           {/* Filters Section (Matching Reference Screenshot Layout & Controls) */}
           <div className="bg-card rounded-2xl border border-border/60 p-5 shadow-sm space-y-4">

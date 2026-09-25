@@ -15,6 +15,7 @@ import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-pr
 import { Route as WelfareVerificationRouteImport } from './routes/welfare-verification'
 import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
+import { Route as SummarySalarySheetRouteImport } from './routes/summary-salary-sheet'
 import { Route as SspSimRequisitionViewRouteImport } from './routes/ssp-sim-requisition-view'
 import { Route as SspSimRequisitionRouteImport } from './routes/ssp-sim-requisition'
 import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
@@ -136,6 +137,7 @@ import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salary-details'
 import { Route as MonthlyLeftySalarySheetRouteImport } from './routes/monthly-lefty-salary-sheet'
+import { Route as MonthlyAdvanceSalarySheetRouteImport } from './routes/monthly-advance-salary-sheet'
 import { Route as ModuleSelectionRouteImport } from './routes/module-selection'
 import { Route as MessengerRouteImport } from './routes/messenger'
 import { Route as MerchandisingWorkOrdersRouteImport } from './routes/merchandising-work-orders'
@@ -294,6 +296,11 @@ const UserManagementRoute = UserManagementRouteImport.update({
 const TransferControlCenterRoute = TransferControlCenterRouteImport.update({
   id: '/transfer-control-center',
   path: '/transfer-control-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SummarySalarySheetRoute = SummarySalarySheetRouteImport.update({
+  id: '/summary-salary-sheet',
+  path: '/summary-salary-sheet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SspSimRequisitionViewRoute = SspSimRequisitionViewRouteImport.update({
@@ -953,6 +960,12 @@ const MonthlyLeftySalarySheetRoute = MonthlyLeftySalarySheetRouteImport.update({
   path: '/monthly-lefty-salary-sheet',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MonthlyAdvanceSalarySheetRoute =
+  MonthlyAdvanceSalarySheetRouteImport.update({
+    id: '/monthly-advance-salary-sheet',
+    path: '/monthly-advance-salary-sheet',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ModuleSelectionRoute = ModuleSelectionRouteImport.update({
   id: '/module-selection',
   path: '/module-selection',
@@ -1736,6 +1749,7 @@ export interface FileRoutesByFullPath {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-advance-salary-sheet': typeof MonthlyAdvanceSalarySheetRoute
   '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
@@ -1857,6 +1871,7 @@ export interface FileRoutesByFullPath {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
@@ -1993,6 +2008,7 @@ export interface FileRoutesByTo {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-advance-salary-sheet': typeof MonthlyAdvanceSalarySheetRoute
   '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
@@ -2114,6 +2130,7 @@ export interface FileRoutesByTo {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
@@ -2251,6 +2268,7 @@ export interface FileRoutesById {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-advance-salary-sheet': typeof MonthlyAdvanceSalarySheetRoute
   '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
@@ -2372,6 +2390,7 @@ export interface FileRoutesById {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
@@ -2510,6 +2529,7 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-advance-salary-sheet'
     | '/monthly-lefty-salary-sheet'
     | '/monthly-salary-details'
     | '/monthly-salary-process'
@@ -2631,6 +2651,7 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/summary-salary-sheet'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
@@ -2767,6 +2788,7 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-advance-salary-sheet'
     | '/monthly-lefty-salary-sheet'
     | '/monthly-salary-details'
     | '/monthly-salary-process'
@@ -2888,6 +2910,7 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/summary-salary-sheet'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
@@ -3024,6 +3047,7 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-advance-salary-sheet'
     | '/monthly-lefty-salary-sheet'
     | '/monthly-salary-details'
     | '/monthly-salary-process'
@@ -3145,6 +3169,7 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/summary-salary-sheet'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
@@ -3282,6 +3307,7 @@ export interface RootRouteChildren {
   MerchandisingWorkOrdersRoute: typeof MerchandisingWorkOrdersRoute
   MessengerRoute: typeof MessengerRoute
   ModuleSelectionRoute: typeof ModuleSelectionRoute
+  MonthlyAdvanceSalarySheetRoute: typeof MonthlyAdvanceSalarySheetRoute
   MonthlyLeftySalarySheetRoute: typeof MonthlyLeftySalarySheetRoute
   MonthlySalaryDetailsRoute: typeof MonthlySalaryDetailsRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
@@ -3403,6 +3429,7 @@ export interface RootRouteChildren {
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   SspSimRequisitionRoute: typeof SspSimRequisitionRoute
   SspSimRequisitionViewRoute: typeof SspSimRequisitionViewRoute
+  SummarySalarySheetRoute: typeof SummarySalarySheetRoute
   TransferControlCenterRoute: typeof TransferControlCenterRoute
   UserManagementRoute: typeof UserManagementRoute
   WelfareVerificationRoute: typeof WelfareVerificationRoute
@@ -3457,6 +3484,13 @@ declare module '@tanstack/react-router' {
       path: '/transfer-control-center'
       fullPath: '/transfer-control-center'
       preLoaderRoute: typeof TransferControlCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/summary-salary-sheet': {
+      id: '/summary-salary-sheet'
+      path: '/summary-salary-sheet'
+      fullPath: '/summary-salary-sheet'
+      preLoaderRoute: typeof SummarySalarySheetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ssp-sim-requisition-view': {
@@ -4304,6 +4338,13 @@ declare module '@tanstack/react-router' {
       path: '/monthly-lefty-salary-sheet'
       fullPath: '/monthly-lefty-salary-sheet'
       preLoaderRoute: typeof MonthlyLeftySalarySheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/monthly-advance-salary-sheet': {
+      id: '/monthly-advance-salary-sheet'
+      path: '/monthly-advance-salary-sheet'
+      fullPath: '/monthly-advance-salary-sheet'
+      preLoaderRoute: typeof MonthlyAdvanceSalarySheetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/module-selection': {
@@ -5331,6 +5372,7 @@ const rootRouteChildren: RootRouteChildren = {
   MerchandisingWorkOrdersRoute: MerchandisingWorkOrdersRoute,
   MessengerRoute: MessengerRoute,
   ModuleSelectionRoute: ModuleSelectionRoute,
+  MonthlyAdvanceSalarySheetRoute: MonthlyAdvanceSalarySheetRoute,
   MonthlyLeftySalarySheetRoute: MonthlyLeftySalarySheetRoute,
   MonthlySalaryDetailsRoute: MonthlySalaryDetailsRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
@@ -5455,6 +5497,7 @@ const rootRouteChildren: RootRouteChildren = {
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   SspSimRequisitionRoute: SspSimRequisitionRoute,
   SspSimRequisitionViewRoute: SspSimRequisitionViewRoute,
+  SummarySalarySheetRoute: SummarySalarySheetRoute,
   TransferControlCenterRoute: TransferControlCenterRoute,
   UserManagementRoute: UserManagementRoute,
   WelfareVerificationRoute: WelfareVerificationRoute,
