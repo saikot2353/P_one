@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "498",
+    "date": "2026-09-25T18:25",
+    "type": "New Feature / Report Page",
+    "module": "Payroll - Yearly Bonus Report",
+    "link": "/yearly-bonus-report",
+    "descriptionEn": "Implemented the full 'Yearly Bonus Report' page featuring 804 real employee bonus records, 23 data columns (Gross, Basic, Bonus %, Bonus Amount, Bank Bonus, Misc Bonus, Bank Set Amt, Account No, Bank Name, Bonus For), comprehensive filter card (Year, Month, Bonus For, Pay Option, Bank Name, Emp Type, Dept, Section, Unit, Shift, Line, Status, Emp ID, System/Office radio), toolbar CSV export, live search, and sticky grand totals footer.",
+    "descriptionBn": "৮০৪টি রিয়েল এমপ্লয়ী বোনাস রেকর্ড সহ 'Yearly Bonus Report' পেজ তৈরি করা হয়েছে, যাতে রয়েছে ২৩টি কলাম, বিস্তৃত ফিল্টার কার্ড, এক্সপোর্টেবল সিএসভি, লাইভ সার্চ এবং গ্র্যান্ড টোটাল রো।"
+  },
+  {
     "id": "497",
     "date": "2026-09-25T18:17",
     "type": "New Feature / Report Page",
