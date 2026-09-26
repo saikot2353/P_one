@@ -11,10 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ZakatListRouteImport } from './routes/zakat-list'
 import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
+import { Route as YearlyBonusReportRouteImport } from './routes/yearly-bonus-report'
 import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
 import { Route as WelfareVerificationRouteImport } from './routes/welfare-verification'
 import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
+import { Route as SummarySalarySheetRouteImport } from './routes/summary-salary-sheet'
 import { Route as SspSimRequisitionViewRouteImport } from './routes/ssp-sim-requisition-view'
 import { Route as SspSimRequisitionRouteImport } from './routes/ssp-sim-requisition'
 import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
@@ -136,6 +138,8 @@ import { Route as MyProfileRouteImport } from './routes/my-profile'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salary-details'
+import { Route as MonthlyLeftySalarySheetRouteImport } from './routes/monthly-lefty-salary-sheet'
+import { Route as MonthlyAdvanceSalarySheetRouteImport } from './routes/monthly-advance-salary-sheet'
 import { Route as ModuleSelectionRouteImport } from './routes/module-selection'
 import { Route as MessengerRouteImport } from './routes/messenger'
 import { Route as MerchandisingWorkOrdersRouteImport } from './routes/merchandising-work-orders'
@@ -202,20 +206,26 @@ import { Route as IncrementHistoryRouteImport } from './routes/increment-history
 import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
+import { Route as HrReportsRouteImport } from './routes/hr-reports'
 import { Route as HrPolicyRouteImport } from './routes/hr-policy'
+import { Route as HolidaySummarySheetRouteImport } from './routes/holiday-summary-sheet'
 import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
 import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/financial-aid-budget-configuration'
+import { Route as FinalSettlementReportRouteImport } from './routes/final-settlement-report'
 import { Route as FinalSettlementConfigurationRouteImport } from './routes/final-settlement-configuration'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
+import { Route as FestivalAllowancePaymentSheetRouteImport } from './routes/festival-allowance-payment-sheet'
 import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
 import { Route as EmployeeTaxPayRouteImport } from './routes/employee-tax-pay'
+import { Route as EmployeeSalaryHistoryRouteImport } from './routes/employee-salary-history'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EmployeeDocVerificationRouteImport } from './routes/employee-doc-verification'
 import { Route as EmployeeDocIssueRouteImport } from './routes/employee-doc-issue'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
 import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
 import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
+import { Route as EarnLeavePayReportRouteImport } from './routes/earn-leave-pay-report'
 import { Route as ERecruitmentFormRouteImport } from './routes/e-recruitment-form'
 import { Route as DisciplinaryWarningLettersRouteImport } from './routes/disciplinary-warning-letters'
 import { Route as DisciplinaryShowcauseNoticesRouteImport } from './routes/disciplinary-showcause-notices'
@@ -274,6 +284,11 @@ const ZakatBudgetConfigurationRoute =
     path: '/zakat-budget-configuration',
     getParentRoute: () => rootRouteImport,
   } as any)
+const YearlyBonusReportRoute = YearlyBonusReportRouteImport.update({
+  id: '/yearly-bonus-report',
+  path: '/yearly-bonus-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const YearlyBonusProcessRoute = YearlyBonusProcessRouteImport.update({
   id: '/yearly-bonus-process',
   path: '/yearly-bonus-process',
@@ -292,6 +307,11 @@ const UserManagementRoute = UserManagementRouteImport.update({
 const TransferControlCenterRoute = TransferControlCenterRouteImport.update({
   id: '/transfer-control-center',
   path: '/transfer-control-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SummarySalarySheetRoute = SummarySalarySheetRouteImport.update({
+  id: '/summary-salary-sheet',
+  path: '/summary-salary-sheet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SspSimRequisitionViewRoute = SspSimRequisitionViewRouteImport.update({
@@ -951,6 +971,17 @@ const MonthlySalaryDetailsRoute = MonthlySalaryDetailsRouteImport.update({
   path: '/monthly-salary-details',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MonthlyLeftySalarySheetRoute = MonthlyLeftySalarySheetRouteImport.update({
+  id: '/monthly-lefty-salary-sheet',
+  path: '/monthly-lefty-salary-sheet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MonthlyAdvanceSalarySheetRoute =
+  MonthlyAdvanceSalarySheetRouteImport.update({
+    id: '/monthly-advance-salary-sheet',
+    path: '/monthly-advance-salary-sheet',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ModuleSelectionRoute = ModuleSelectionRouteImport.update({
   id: '/module-selection',
   path: '/module-selection',
@@ -1290,9 +1321,19 @@ const IdCardSetupRoute = IdCardSetupRouteImport.update({
   path: '/id-card-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HrReportsRoute = HrReportsRouteImport.update({
+  id: '/hr-reports',
+  path: '/hr-reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HrPolicyRoute = HrPolicyRouteImport.update({
   id: '/hr-policy',
   path: '/hr-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HolidaySummarySheetRoute = HolidaySummarySheetRouteImport.update({
+  id: '/holiday-summary-sheet',
+  path: '/holiday-summary-sheet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinancialAidListRoute = FinancialAidListRouteImport.update({
@@ -1306,6 +1347,11 @@ const FinancialAidBudgetConfigurationRoute =
     path: '/financial-aid-budget-configuration',
     getParentRoute: () => rootRouteImport,
   } as any)
+const FinalSettlementReportRoute = FinalSettlementReportRouteImport.update({
+  id: '/final-settlement-report',
+  path: '/final-settlement-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FinalSettlementConfigurationRoute =
   FinalSettlementConfigurationRouteImport.update({
     id: '/final-settlement-configuration',
@@ -1322,6 +1368,12 @@ const FinalApproveIncrementRoute = FinalApproveIncrementRouteImport.update({
   path: '/final-approve-increment',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FestivalAllowancePaymentSheetRoute =
+  FestivalAllowancePaymentSheetRouteImport.update({
+    id: '/festival-allowance-payment-sheet',
+    path: '/festival-allowance-payment-sheet',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EnrollFingerprintRoute = EnrollFingerprintRouteImport.update({
   id: '/enroll-fingerprint',
   path: '/enroll-fingerprint',
@@ -1330,6 +1382,11 @@ const EnrollFingerprintRoute = EnrollFingerprintRouteImport.update({
 const EmployeeTaxPayRoute = EmployeeTaxPayRouteImport.update({
   id: '/employee-tax-pay',
   path: '/employee-tax-pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmployeeSalaryHistoryRoute = EmployeeSalaryHistoryRouteImport.update({
+  id: '/employee-salary-history',
+  path: '/employee-salary-history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmployeeJobCardRoute = EmployeeJobCardRouteImport.update({
@@ -1360,6 +1417,11 @@ const EarnLeaveSubmitRoute = EarnLeaveSubmitRouteImport.update({
 const EarnLeaveProcessRoute = EarnLeaveProcessRouteImport.update({
   id: '/earn-leave-process',
   path: '/earn-leave-process',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EarnLeavePayReportRoute = EarnLeavePayReportRouteImport.update({
+  id: '/earn-leave-pay-report',
+  path: '/earn-leave-pay-report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ERecruitmentFormRoute = ERecruitmentFormRouteImport.update({
@@ -1642,20 +1704,26 @@ export interface FileRoutesByFullPath {
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
+  '/earn-leave-pay-report': typeof EarnLeavePayReportRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
+  '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
@@ -1722,6 +1790,8 @@ export interface FileRoutesByFullPath {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-advance-salary-sheet': typeof MonthlyAdvanceSalarySheetRoute
+  '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
@@ -1843,10 +1913,12 @@ export interface FileRoutesByFullPath {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
+  '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -1897,20 +1969,26 @@ export interface FileRoutesByTo {
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
+  '/earn-leave-pay-report': typeof EarnLeavePayReportRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
+  '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
@@ -1977,6 +2055,8 @@ export interface FileRoutesByTo {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-advance-salary-sheet': typeof MonthlyAdvanceSalarySheetRoute
+  '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
@@ -2098,10 +2178,12 @@ export interface FileRoutesByTo {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
+  '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -2153,20 +2235,26 @@ export interface FileRoutesById {
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
+  '/earn-leave-pay-report': typeof EarnLeavePayReportRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
+  '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
@@ -2233,6 +2321,8 @@ export interface FileRoutesById {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-advance-salary-sheet': typeof MonthlyAdvanceSalarySheetRoute
+  '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
@@ -2354,10 +2444,12 @@ export interface FileRoutesById {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
+  '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -2410,20 +2502,26 @@ export interface FileRouteTypes {
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
+    | '/earn-leave-pay-report'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
     | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
+    | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/holiday-summary-sheet'
     | '/hr-policy'
+    | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
@@ -2490,6 +2588,8 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-advance-salary-sheet'
+    | '/monthly-lefty-salary-sheet'
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
@@ -2611,10 +2711,12 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/summary-salary-sheet'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
     | '/yearly-bonus-process'
+    | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
     | '/zakat-list'
     | '/employee-detail/$id'
@@ -2665,20 +2767,26 @@ export interface FileRouteTypes {
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
+    | '/earn-leave-pay-report'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
     | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
+    | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/holiday-summary-sheet'
     | '/hr-policy'
+    | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
@@ -2745,6 +2853,8 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-advance-salary-sheet'
+    | '/monthly-lefty-salary-sheet'
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
@@ -2866,10 +2976,12 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/summary-salary-sheet'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
     | '/yearly-bonus-process'
+    | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
     | '/zakat-list'
     | '/employee-detail/$id'
@@ -2920,20 +3032,26 @@ export interface FileRouteTypes {
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
+    | '/earn-leave-pay-report'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
     | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
+    | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/holiday-summary-sheet'
     | '/hr-policy'
+    | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
@@ -3000,6 +3118,8 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-advance-salary-sheet'
+    | '/monthly-lefty-salary-sheet'
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
@@ -3121,10 +3241,12 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/summary-salary-sheet'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
     | '/yearly-bonus-process'
+    | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
     | '/zakat-list'
     | '/employee-detail/$id'
@@ -3176,20 +3298,26 @@ export interface RootRouteChildren {
   DisciplinaryShowcauseNoticesRoute: typeof DisciplinaryShowcauseNoticesRoute
   DisciplinaryWarningLettersRoute: typeof DisciplinaryWarningLettersRoute
   ERecruitmentFormRoute: typeof ERecruitmentFormRoute
+  EarnLeavePayReportRoute: typeof EarnLeavePayReportRoute
   EarnLeaveProcessRoute: typeof EarnLeaveProcessRoute
   EarnLeaveSubmitRoute: typeof EarnLeaveSubmitRoute
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
   EmployeeDocIssueRoute: typeof EmployeeDocIssueRoute
   EmployeeDocVerificationRoute: typeof EmployeeDocVerificationRoute
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
+  EmployeeSalaryHistoryRoute: typeof EmployeeSalaryHistoryRoute
   EmployeeTaxPayRoute: typeof EmployeeTaxPayRoute
   EnrollFingerprintRoute: typeof EnrollFingerprintRoute
+  FestivalAllowancePaymentSheetRoute: typeof FestivalAllowancePaymentSheetRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
   FinalSettlementRoute: typeof FinalSettlementRoute
   FinalSettlementConfigurationRoute: typeof FinalSettlementConfigurationRoute
+  FinalSettlementReportRoute: typeof FinalSettlementReportRoute
   FinancialAidBudgetConfigurationRoute: typeof FinancialAidBudgetConfigurationRoute
   FinancialAidListRoute: typeof FinancialAidListRoute
+  HolidaySummarySheetRoute: typeof HolidaySummarySheetRoute
   HrPolicyRoute: typeof HrPolicyRoute
+  HrReportsRoute: typeof HrReportsRoute
   IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
   IncrementRoute: typeof IncrementRoute
@@ -3256,6 +3384,8 @@ export interface RootRouteChildren {
   MerchandisingWorkOrdersRoute: typeof MerchandisingWorkOrdersRoute
   MessengerRoute: typeof MessengerRoute
   ModuleSelectionRoute: typeof ModuleSelectionRoute
+  MonthlyAdvanceSalarySheetRoute: typeof MonthlyAdvanceSalarySheetRoute
+  MonthlyLeftySalarySheetRoute: typeof MonthlyLeftySalarySheetRoute
   MonthlySalaryDetailsRoute: typeof MonthlySalaryDetailsRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
@@ -3377,10 +3507,12 @@ export interface RootRouteChildren {
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   SspSimRequisitionRoute: typeof SspSimRequisitionRoute
   SspSimRequisitionViewRoute: typeof SspSimRequisitionViewRoute
+  SummarySalarySheetRoute: typeof SummarySalarySheetRoute
   TransferControlCenterRoute: typeof TransferControlCenterRoute
   UserManagementRoute: typeof UserManagementRoute
   WelfareVerificationRoute: typeof WelfareVerificationRoute
   YearlyBonusProcessRoute: typeof YearlyBonusProcessRoute
+  YearlyBonusReportRoute: typeof YearlyBonusReportRoute
   ZakatBudgetConfigurationRoute: typeof ZakatBudgetConfigurationRoute
   ZakatListRoute: typeof ZakatListRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
@@ -3403,6 +3535,13 @@ declare module '@tanstack/react-router' {
       path: '/zakat-budget-configuration'
       fullPath: '/zakat-budget-configuration'
       preLoaderRoute: typeof ZakatBudgetConfigurationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/yearly-bonus-report': {
+      id: '/yearly-bonus-report'
+      path: '/yearly-bonus-report'
+      fullPath: '/yearly-bonus-report'
+      preLoaderRoute: typeof YearlyBonusReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/yearly-bonus-process': {
@@ -3431,6 +3570,13 @@ declare module '@tanstack/react-router' {
       path: '/transfer-control-center'
       fullPath: '/transfer-control-center'
       preLoaderRoute: typeof TransferControlCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/summary-salary-sheet': {
+      id: '/summary-salary-sheet'
+      path: '/summary-salary-sheet'
+      fullPath: '/summary-salary-sheet'
+      preLoaderRoute: typeof SummarySalarySheetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ssp-sim-requisition-view': {
@@ -4280,6 +4426,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MonthlySalaryDetailsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/monthly-lefty-salary-sheet': {
+      id: '/monthly-lefty-salary-sheet'
+      path: '/monthly-lefty-salary-sheet'
+      fullPath: '/monthly-lefty-salary-sheet'
+      preLoaderRoute: typeof MonthlyLeftySalarySheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/monthly-advance-salary-sheet': {
+      id: '/monthly-advance-salary-sheet'
+      path: '/monthly-advance-salary-sheet'
+      fullPath: '/monthly-advance-salary-sheet'
+      preLoaderRoute: typeof MonthlyAdvanceSalarySheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/module-selection': {
       id: '/module-selection'
       path: '/module-selection'
@@ -4742,11 +4902,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IdCardSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr-reports': {
+      id: '/hr-reports'
+      path: '/hr-reports'
+      fullPath: '/hr-reports'
+      preLoaderRoute: typeof HrReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hr-policy': {
       id: '/hr-policy'
       path: '/hr-policy'
       fullPath: '/hr-policy'
       preLoaderRoute: typeof HrPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/holiday-summary-sheet': {
+      id: '/holiday-summary-sheet'
+      path: '/holiday-summary-sheet'
+      fullPath: '/holiday-summary-sheet'
+      preLoaderRoute: typeof HolidaySummarySheetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/financial-aid-list': {
@@ -4761,6 +4935,13 @@ declare module '@tanstack/react-router' {
       path: '/financial-aid-budget-configuration'
       fullPath: '/financial-aid-budget-configuration'
       preLoaderRoute: typeof FinancialAidBudgetConfigurationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/final-settlement-report': {
+      id: '/final-settlement-report'
+      path: '/final-settlement-report'
+      fullPath: '/final-settlement-report'
+      preLoaderRoute: typeof FinalSettlementReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/final-settlement-configuration': {
@@ -4784,6 +4965,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinalApproveIncrementRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/festival-allowance-payment-sheet': {
+      id: '/festival-allowance-payment-sheet'
+      path: '/festival-allowance-payment-sheet'
+      fullPath: '/festival-allowance-payment-sheet'
+      preLoaderRoute: typeof FestivalAllowancePaymentSheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/enroll-fingerprint': {
       id: '/enroll-fingerprint'
       path: '/enroll-fingerprint'
@@ -4796,6 +4984,13 @@ declare module '@tanstack/react-router' {
       path: '/employee-tax-pay'
       fullPath: '/employee-tax-pay'
       preLoaderRoute: typeof EmployeeTaxPayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/employee-salary-history': {
+      id: '/employee-salary-history'
+      path: '/employee-salary-history'
+      fullPath: '/employee-salary-history'
+      preLoaderRoute: typeof EmployeeSalaryHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/employee-job-card': {
@@ -4838,6 +5033,13 @@ declare module '@tanstack/react-router' {
       path: '/earn-leave-process'
       fullPath: '/earn-leave-process'
       preLoaderRoute: typeof EarnLeaveProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/earn-leave-pay-report': {
+      id: '/earn-leave-pay-report'
+      path: '/earn-leave-pay-report'
+      fullPath: '/earn-leave-pay-report'
+      preLoaderRoute: typeof EarnLeavePayReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/e-recruitment-form': {
@@ -5208,20 +5410,26 @@ const rootRouteChildren: RootRouteChildren = {
   DisciplinaryShowcauseNoticesRoute: DisciplinaryShowcauseNoticesRoute,
   DisciplinaryWarningLettersRoute: DisciplinaryWarningLettersRoute,
   ERecruitmentFormRoute: ERecruitmentFormRoute,
+  EarnLeavePayReportRoute: EarnLeavePayReportRoute,
   EarnLeaveProcessRoute: EarnLeaveProcessRoute,
   EarnLeaveSubmitRoute: EarnLeaveSubmitRoute,
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
   EmployeeDocIssueRoute: EmployeeDocIssueRoute,
   EmployeeDocVerificationRoute: EmployeeDocVerificationRoute,
   EmployeeJobCardRoute: EmployeeJobCardRoute,
+  EmployeeSalaryHistoryRoute: EmployeeSalaryHistoryRoute,
   EmployeeTaxPayRoute: EmployeeTaxPayRoute,
   EnrollFingerprintRoute: EnrollFingerprintRoute,
+  FestivalAllowancePaymentSheetRoute: FestivalAllowancePaymentSheetRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
   FinalSettlementRoute: FinalSettlementRoute,
   FinalSettlementConfigurationRoute: FinalSettlementConfigurationRoute,
+  FinalSettlementReportRoute: FinalSettlementReportRoute,
   FinancialAidBudgetConfigurationRoute: FinancialAidBudgetConfigurationRoute,
   FinancialAidListRoute: FinancialAidListRoute,
+  HolidaySummarySheetRoute: HolidaySummarySheetRoute,
   HrPolicyRoute: HrPolicyRoute,
+  HrReportsRoute: HrReportsRoute,
   IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,
   IncrementRoute: IncrementRoute,
@@ -5289,6 +5497,8 @@ const rootRouteChildren: RootRouteChildren = {
   MerchandisingWorkOrdersRoute: MerchandisingWorkOrdersRoute,
   MessengerRoute: MessengerRoute,
   ModuleSelectionRoute: ModuleSelectionRoute,
+  MonthlyAdvanceSalarySheetRoute: MonthlyAdvanceSalarySheetRoute,
+  MonthlyLeftySalarySheetRoute: MonthlyLeftySalarySheetRoute,
   MonthlySalaryDetailsRoute: MonthlySalaryDetailsRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,
@@ -5413,10 +5623,12 @@ const rootRouteChildren: RootRouteChildren = {
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   SspSimRequisitionRoute: SspSimRequisitionRoute,
   SspSimRequisitionViewRoute: SspSimRequisitionViewRoute,
+  SummarySalarySheetRoute: SummarySalarySheetRoute,
   TransferControlCenterRoute: TransferControlCenterRoute,
   UserManagementRoute: UserManagementRoute,
   WelfareVerificationRoute: WelfareVerificationRoute,
   YearlyBonusProcessRoute: YearlyBonusProcessRoute,
+  YearlyBonusReportRoute: YearlyBonusReportRoute,
   ZakatBudgetConfigurationRoute: ZakatBudgetConfigurationRoute,
   ZakatListRoute: ZakatListRoute,
   EmployeeDetailIdRoute: EmployeeDetailIdRoute,
