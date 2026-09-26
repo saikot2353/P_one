@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "489",
+    "date": "2026-09-26T14:47",
+    "type": "UI Optimization & De-duplication",
+    "module": "My Profile",
+    "link": "/my-profile",
+    "descriptionEn": "Removed duplicate header badge elements (EMP ID, Salary, Manager, Bangla Name) to ensure each piece of information is displayed uniquely without repetition.",
+    "descriptionBn": "মাই প্রোফাইল হেডার থেকে পুনরাবৃত্ত তথ্যসমূহ (EMP ID, বেতন, ম্যানেজার ইত্যাদি) সরিয়ে পেজটিকে আরও পরিষ্কার ও ইউনিক করা হয়েছে।"
+  },
+  {
+    "id": "488",
+    "date": "2026-09-26T14:42",
+    "type": "UI Layout & Overlap Fix",
+    "module": "My Profile",
+    "link": "/my-profile",
+    "descriptionEn": "Fixed text positioning and banner overlap issue in My Profile hero section, perfectly aligning employee name, badges, and card grid heights.",
+    "descriptionBn": "মাই প্রোফাইল হেডার ব্যানারে টেক্সট ওভারল্যাপ সমস্যা সমাধান করা হয়েছে এবং প্রোফাইল নেম, ব্যাজ ও কার্ড লেআউট পারফেক্ট করা হয়েছে।"
+  },
+  {
+    "id": "487",
+    "date": "2026-09-26T14:40",
+    "type": "UI Simplification & Redesign",
+    "module": "My Profile",
+    "link": "/my-profile",
+    "descriptionEn": "Redesigned and simplified My Profile page to focus exclusively on essential employee details including personal info, corporate details, salary, parental info, addresses, and emergency contacts.",
+    "descriptionBn": "মাই প্রোফাইল পেজটি সম্পূর্ণ রিডিজাইন করে সহজ ও সুবিন্যস্ত করা হয়েছে এবং ১৭টি প্রয়োজনীয় মূল তথ্যে সাজানো হয়েছে।"
+  },
+  {
     "id": "486",
     "date": "2026-09-24T20:01",
     "type": "UI Layout & Sticky Action Footer",
