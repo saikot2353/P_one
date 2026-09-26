@@ -18,6 +18,7 @@ import {
   FileDown,
 } from "lucide-react";
 import { toast } from "sonner";
+import { HRReportPdfModal, ColumnDef } from "@/components/hr-reports/HRReportPdfModal";
 
 export const Route = createFileRoute("/hr-report-absenteeism-summary")({
   head: () => ({
@@ -143,6 +144,21 @@ function AbsenteeismSummaryReportPage() {
   const [unit, setUnit] = useState("ALL");
   const [line, setLine] = useState("ALL");
   const [tableSearch, setTableSearch] = useState("");
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+
+  const pdfColumns: ColumnDef<AbsenteeismRecord>[] = [
+    { header: "SL", accessor: (_, idx) => idx + 1, align: "center", width: "40px" },
+    { header: "ID", accessor: (r) => r.empId, align: "center" },
+    { header: "Name", accessor: (r) => r.empName },
+    { header: "Employee Type", accessor: (r) => r.employeeType },
+    { header: "Department", accessor: (r) => r.department },
+    { header: "Designation", accessor: (r) => r.designation },
+    { header: "Working Days", accessor: (r) => r.workingDay, align: "center" },
+    { header: "Present", accessor: (r) => r.present, align: "center" },
+    { header: "Absent", accessor: (r) => r.absent, align: "center" },
+    { header: "Leave", accessor: (r) => r.leave, align: "center" },
+    { header: "Holiday", accessor: (r) => r.holiday, align: "center" },
+  ];
 
   const filteredData = useMemo(() => {
     return SAMPLE_ABSENTEEISM_DATA.filter((item) => {
@@ -307,14 +323,14 @@ function AbsenteeismSummaryReportPage() {
                 <span>EXCEL</span>
               </button>
               <button
-                onClick={handlePrint}
+                onClick={() => setIsPdfModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
               >
                 <Printer className="size-4" />
                 <span>PRINT</span>
               </button>
               <button
-                onClick={() => toast.success("PDF summary generated!")}
+                onClick={() => setIsPdfModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
               >
                 <FileText className="size-4" />
@@ -726,7 +742,7 @@ function AbsenteeismSummaryReportPage() {
                   Showing 1 to {filteredData.length} of {filteredData.length} entries
                 </span>
                 <button
-                  onClick={() => toast.success("Downloading Absenteeism PDF Report...")}
+                  onClick={() => setIsPdfModalOpen(true)}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs uppercase tracking-wider"
                 >
                   <FileDown className="size-3.5" />
@@ -749,6 +765,17 @@ function AbsenteeismSummaryReportPage() {
           </div>
         </main>
       </div>
+
+      {/* Official PDF / Print View Modal */}
+      <HRReportPdfModal
+        isOpen={isPdfModalOpen}
+        onClose={() => setIsPdfModalOpen(false)}
+        reportTitle="Absenteeism Summary Report"
+        companyName="Pakiza Knit Composite Ltd"
+        dateRange={`Year: ${selectedYear} (${startMonth}/${selectedYear} - ${endMonth}/${selectedYear})`}
+        columns={pdfColumns}
+        data={filteredData}
+      />
     </div>
   );
 }

@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "503",
+    "date": "2026-09-26T17:08",
+    "type": "New Feature / HR Report",
+    "module": "HR Reports - Continuous Absent Report",
+    "link": "/hr-report-continuous-absent",
+    "descriptionEn": "Created Continuous Absent Report page with From Date, Company, Area, Type, Department, Job Title, Unit, Line, Min Days, and Employee ID filters, 15-column continuous absent log table with soft red row highlights, KPI metric cards, Excel export, and PDF print features.",
+    "descriptionBn": "এইচআর রিপোর্টস মডিউলে Continuous Absent Report পেজ তৈরি করা হয়েছে, যাতে তারিখ, কোম্পানি, টাইপ, ডিপার্টমেন্ট, ডিজাইনেশন ফিল্টার, সফট রেড হাইলাইট সহ ১৫ কলামের টেবিল, কেপিআই মেট্রিক কার্ডস, এক্সেল এক্সপোর্ট ও প্রিন্ট পিডিএফ সংযুক্ত।"
+  },
+  {
     "id": "502",
     "date": "2026-09-26T17:02",
     "type": "New Feature / HR Report",

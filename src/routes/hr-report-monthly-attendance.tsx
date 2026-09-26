@@ -21,6 +21,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { toast } from "sonner";
+import { HRReportPdfModal, ColumnDef } from "@/components/hr-reports/HRReportPdfModal";
 
 export const Route = createFileRoute("/hr-report-monthly-attendance")({
   head: () => ({
@@ -324,6 +325,22 @@ function MonthlyAttendanceReportPage() {
   const [unit, setUnit] = useState("ALL");
   const [searchEmpId, setSearchEmpId] = useState("");
   const [activeTab, setActiveTab] = useState<"summary" | "grid" | "deptSummary">("summary");
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+
+  const pdfColumns: ColumnDef<MonthlyAttendanceRecord>[] = [
+    { header: "SL", accessor: (_, idx) => idx + 1, align: "center", width: "40px" },
+    { header: "ID", accessor: (r) => r.empId, align: "center" },
+    { header: "Name", accessor: (r) => r.name },
+    { header: "Employee Type", accessor: (r) => r.employeeType },
+    { header: "Department", accessor: (r) => r.department },
+    { header: "Designation", accessor: (r) => r.designation },
+    { header: "Working", accessor: (r) => r.workingDays, align: "center" },
+    { header: "Present", accessor: (r) => r.presentDays, align: "center" },
+    { header: "Absent", accessor: (r) => r.absentDays, align: "center" },
+    { header: "Leave", accessor: (r) => r.leaveDays, align: "center" },
+    { header: "OT (Hrs)", accessor: (r) => r.otHours, align: "center" },
+    { header: "Payable", accessor: (r) => r.payableDays, align: "center" },
+  ];
 
   const filteredData = useMemo(() => {
     return SAMPLE_MONTHLY_DATA.filter((item) => {
@@ -483,14 +500,14 @@ function MonthlyAttendanceReportPage() {
                 <span>Excel</span>
               </button>
               <button
-                onClick={handlePrint}
+                onClick={() => setIsPdfModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
               >
                 <Printer className="size-4" />
                 <span>Print</span>
               </button>
               <button
-                onClick={() => toast.success("PDF report generated!")}
+                onClick={() => setIsPdfModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
               >
                 <FileText className="size-4" />
@@ -971,7 +988,7 @@ function MonthlyAttendanceReportPage() {
 
               <div className="flex items-center gap-2 flex-wrap text-xs font-bold">
                 <button
-                  onClick={() => toast.success("Downloading Monthly PDF Summary...")}
+                  onClick={() => setIsPdfModalOpen(true)}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs cursor-pointer"
                 >
                   <FileDown className="size-3.5" />
@@ -993,6 +1010,17 @@ function MonthlyAttendanceReportPage() {
           </div>
         </main>
       </div>
+
+      {/* Official PDF / Print View Modal */}
+      <HRReportPdfModal
+        isOpen={isPdfModalOpen}
+        onClose={() => setIsPdfModalOpen(false)}
+        reportTitle="Monthly Attendance Details Report"
+        companyName="Pakiza Knit Composite Ltd"
+        dateRange={`${selectedMonth} ${selectedYear}`}
+        columns={pdfColumns}
+        data={filteredData}
+      />
     </div>
   );
 }

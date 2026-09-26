@@ -18,6 +18,7 @@ import {
   Building2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { HRReportPdfModal, ColumnDef } from "@/components/hr-reports/HRReportPdfModal";
 
 export const Route = createFileRoute("/hr-report-sim-requisition")({
   head: () => ({
@@ -322,6 +323,20 @@ const DEPARTMENTS = [
 function SimRequisitionReportPage() {
   const [selectedDept, setSelectedDept] = useState("-- All Department --");
   const [tableSearch, setTableSearch] = useState("");
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+
+  const pdfColumns: ColumnDef<SimRequisitionRecord>[] = [
+    { header: "SL", accessor: (_, idx) => idx + 1, align: "center", width: "40px" },
+    { header: "ID", accessor: (r) => r.empId, align: "center" },
+    { header: "Name", accessor: (r) => r.name },
+    { header: "Department", accessor: (r) => r.department },
+    { header: "Designation", accessor: (r) => r.designation },
+    { header: "SIM No", accessor: (r) => r.simNo, align: "center" },
+    { header: "Limit (৳)", accessor: (r) => r.appLimit, align: "right" },
+    { header: "Request For", accessor: (r) => r.requestFor, align: "center" },
+    { header: "Status", accessor: (r) => r.reqStatus, align: "center" },
+    { header: "Justification", accessor: (r) => r.justification },
+  ];
 
   const filteredData = useMemo(() => {
     return SAMPLE_SIM_REQS.filter((item) => {
@@ -462,14 +477,14 @@ function SimRequisitionReportPage() {
                 <span>EXCEL</span>
               </button>
               <button
-                onClick={handlePrint}
+                onClick={() => setIsPdfModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
               >
                 <Printer className="size-4" />
                 <span>PRINT</span>
               </button>
               <button
-                onClick={() => toast.success("PDF summary generated!")}
+                onClick={() => setIsPdfModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
               >
                 <FileText className="size-4" />
@@ -685,7 +700,7 @@ function SimRequisitionReportPage() {
                   Showing 1 to {filteredData.length} of {filteredData.length} entries
                 </span>
                 <button
-                  onClick={() => toast.success("Downloading SIM Requisition PDF Report...")}
+                  onClick={() => setIsPdfModalOpen(true)}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs uppercase tracking-wider"
                 >
                   <FileDown className="size-3.5" />
@@ -708,6 +723,17 @@ function SimRequisitionReportPage() {
           </div>
         </main>
       </div>
+
+      {/* Official PDF / Print View Modal */}
+      <HRReportPdfModal
+        isOpen={isPdfModalOpen}
+        onClose={() => setIsPdfModalOpen(false)}
+        reportTitle="SIM Requisition & Allowance Report"
+        companyName="Pakiza Knit Composite Ltd"
+        dateRange={`Department: ${selectedDept}`}
+        columns={pdfColumns}
+        data={filteredData}
+      />
     </div>
   );
 }

@@ -80,7 +80,7 @@ function HRReportsPage() {
           title: "Continuous Absent",
           icon: UserX,
           desc: "Report on employees absent continuously beyond policy limits.",
-          to: "#",
+          to: "/hr-report-continuous-absent",
         },
       ],
     },

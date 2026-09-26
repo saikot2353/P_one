@@ -509,7 +509,7 @@ export const nav: NavItem[] = [
       { label: "Overtime Summary", to: "/hr-report-overtime-summary" },
       { label: "Absenteeism Summary", to: "/hr-report-absenteeism-summary" },
       { label: "Print OT Requisition", to: "#" },
-      { label: "Continuous Absent", to: "#" },
+      { label: "Continuous Absent", to: "/hr-report-continuous-absent" },
       { label: "SIM Requisition Report", to: "/hr-report-sim-requisition" },
     ],
   },

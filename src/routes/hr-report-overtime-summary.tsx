@@ -17,6 +17,7 @@ import {
   FileDown,
 } from "lucide-react";
 import { toast } from "sonner";
+import { HRReportPdfModal, ColumnDef } from "@/components/hr-reports/HRReportPdfModal";
 
 export const Route = createFileRoute("/hr-report-overtime-summary")({
   head: () => ({
@@ -127,6 +128,20 @@ function OvertimeSummaryReportPage() {
   const [endDate, setEndDate] = useState("2026-09-26");
   const [sectionName, setSectionName] = useState("ALL");
   const [tableSearch, setTableSearch] = useState("");
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+
+  const pdfColumns: ColumnDef<OvertimeSummaryRecord>[] = [
+    { header: "SL", accessor: (_, idx) => idx + 1, align: "center", width: "40px" },
+    { header: "Department", accessor: (r) => r.department },
+    { header: "Emp. Type", accessor: (r) => r.empType },
+    { header: "Manpower", accessor: (r) => r.manpower, align: "center" },
+    { header: "OT Hour", accessor: (r) => r.otHour, align: "center" },
+    { header: "OT Amount", accessor: (r) => r.otAmount, align: "right" },
+    { header: "Tiffin", accessor: (r) => r.tiffin, align: "right" },
+    { header: "Night Bill", accessor: (r) => r.nightBill, align: "right" },
+    { header: "Total Expenses", accessor: (r) => r.totalExpenses, align: "right" },
+    { header: "Remarks", accessor: (r) => r.remarks },
+  ];
 
   const filteredData = useMemo(() => {
     return SAMPLE_OT_SUMMARY_DATA.filter((item) => {
@@ -309,14 +324,14 @@ function OvertimeSummaryReportPage() {
                 <span>EXCEL</span>
               </button>
               <button
-                onClick={handlePrint}
+                onClick={() => setIsPdfModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
               >
                 <Printer className="size-4" />
                 <span>PRINT</span>
               </button>
               <button
-                onClick={() => toast.success("PDF summary generated!")}
+                onClick={() => setIsPdfModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
               >
                 <FileText className="size-4" />
@@ -615,7 +630,7 @@ function OvertimeSummaryReportPage() {
                   Showing 1 to {filteredData.length} of {filteredData.length} entries
                 </span>
                 <button
-                  onClick={() => toast.success("Generating PDF report...")}
+                  onClick={() => setIsPdfModalOpen(true)}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-lime-600 hover:bg-lime-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs uppercase tracking-wider"
                 >
                   <FileDown className="size-3.5" />
@@ -638,6 +653,17 @@ function OvertimeSummaryReportPage() {
           </div>
         </main>
       </div>
+
+      {/* Official PDF / Print View Modal */}
+      <HRReportPdfModal
+        isOpen={isPdfModalOpen}
+        onClose={() => setIsPdfModalOpen(false)}
+        reportTitle="Overtime Summary & Costing Report"
+        companyName="Pakiza Knit Composite Ltd"
+        dateRange={`${startDate} - ${endDate}`}
+        columns={pdfColumns}
+        data={filteredData}
+      />
     </div>
   );
 }

@@ -215,6 +215,7 @@ import { Route as HrReportLeaveSummaryRouteImport } from './routes/hr-report-lea
 import { Route as HrReportLeaveDetailsRouteImport } from './routes/hr-report-leave-details'
 import { Route as HrReportEmployeeCountRouteImport } from './routes/hr-report-employee-count'
 import { Route as HrReportDailyAttendanceRouteImport } from './routes/hr-report-daily-attendance'
+import { Route as HrReportContinuousAbsentRouteImport } from './routes/hr-report-continuous-absent'
 import { Route as HrReportAbsenteeismSummaryRouteImport } from './routes/hr-report-absenteeism-summary'
 import { Route as HrPolicyRouteImport } from './routes/hr-policy'
 import { Route as HolidaySummarySheetRouteImport } from './routes/holiday-summary-sheet'
@@ -1376,6 +1377,12 @@ const HrReportDailyAttendanceRoute = HrReportDailyAttendanceRouteImport.update({
   path: '/hr-report-daily-attendance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HrReportContinuousAbsentRoute =
+  HrReportContinuousAbsentRouteImport.update({
+    id: '/hr-report-continuous-absent',
+    path: '/hr-report-continuous-absent',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HrReportAbsenteeismSummaryRoute =
   HrReportAbsenteeismSummaryRouteImport.update({
     id: '/hr-report-absenteeism-summary',
@@ -1780,6 +1787,7 @@ export interface FileRoutesByFullPath {
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-report-absenteeism-summary': typeof HrReportAbsenteeismSummaryRoute
+  '/hr-report-continuous-absent': typeof HrReportContinuousAbsentRoute
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
   '/hr-report-leave-details': typeof HrReportLeaveDetailsRoute
@@ -2054,6 +2062,7 @@ export interface FileRoutesByTo {
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-report-absenteeism-summary': typeof HrReportAbsenteeismSummaryRoute
+  '/hr-report-continuous-absent': typeof HrReportContinuousAbsentRoute
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
   '/hr-report-leave-details': typeof HrReportLeaveDetailsRoute
@@ -2329,6 +2338,7 @@ export interface FileRoutesById {
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-report-absenteeism-summary': typeof HrReportAbsenteeismSummaryRoute
+  '/hr-report-continuous-absent': typeof HrReportContinuousAbsentRoute
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
   '/hr-report-leave-details': typeof HrReportLeaveDetailsRoute
@@ -2605,6 +2615,7 @@ export interface FileRouteTypes {
     | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-report-absenteeism-summary'
+    | '/hr-report-continuous-absent'
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
     | '/hr-report-leave-details'
@@ -2879,6 +2890,7 @@ export interface FileRouteTypes {
     | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-report-absenteeism-summary'
+    | '/hr-report-continuous-absent'
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
     | '/hr-report-leave-details'
@@ -3153,6 +3165,7 @@ export interface FileRouteTypes {
     | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-report-absenteeism-summary'
+    | '/hr-report-continuous-absent'
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
     | '/hr-report-leave-details'
@@ -3428,6 +3441,7 @@ export interface RootRouteChildren {
   HolidaySummarySheetRoute: typeof HolidaySummarySheetRoute
   HrPolicyRoute: typeof HrPolicyRoute
   HrReportAbsenteeismSummaryRoute: typeof HrReportAbsenteeismSummaryRoute
+  HrReportContinuousAbsentRoute: typeof HrReportContinuousAbsentRoute
   HrReportDailyAttendanceRoute: typeof HrReportDailyAttendanceRoute
   HrReportEmployeeCountRoute: typeof HrReportEmployeeCountRoute
   HrReportLeaveDetailsRoute: typeof HrReportLeaveDetailsRoute
@@ -5084,6 +5098,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrReportDailyAttendanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr-report-continuous-absent': {
+      id: '/hr-report-continuous-absent'
+      path: '/hr-report-continuous-absent'
+      fullPath: '/hr-report-continuous-absent'
+      preLoaderRoute: typeof HrReportContinuousAbsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hr-report-absenteeism-summary': {
       id: '/hr-report-absenteeism-summary'
       path: '/hr-report-absenteeism-summary'
@@ -5612,6 +5633,7 @@ const rootRouteChildren: RootRouteChildren = {
   HolidaySummarySheetRoute: HolidaySummarySheetRoute,
   HrPolicyRoute: HrPolicyRoute,
   HrReportAbsenteeismSummaryRoute: HrReportAbsenteeismSummaryRoute,
+  HrReportContinuousAbsentRoute: HrReportContinuousAbsentRoute,
   HrReportDailyAttendanceRoute: HrReportDailyAttendanceRoute,
   HrReportEmployeeCountRoute: HrReportEmployeeCountRoute,
   HrReportLeaveDetailsRoute: HrReportLeaveDetailsRoute,
