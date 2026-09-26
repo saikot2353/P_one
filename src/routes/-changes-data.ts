@@ -2,6 +2,60 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "492",
+    "date": "2026-09-26T13:50",
+    "type": "UI / Design Update",
+    "module": "My Profile Header Card",
+    "link": "/my-profile",
+    "descriptionEn": "Changed the text color of the employee's name in the My Profile header card to white for maximum contrast.",
+    "descriptionBn": "মাই প্রোফাইল হেডার কার্ডে এমপ্লয়ীর নামের টেক্সট কালার পরিবর্তন করে সাদা করা হয়েছে।"
+  },
+  {
+    "id": "491",
+    "date": "2026-09-26T13:30",
+    "type": "UI / Contrast & Sizing Fix",
+    "module": "My Profile Header Card",
+    "link": "/my-profile",
+    "descriptionEn": "Increased employee avatar picture size (up to size-32) and repositioned text below the ambient banner on clean high-contrast white card background for crisp readability in light and dark modes.",
+    "descriptionBn": "প্রোফাইল পিকচারের আকার বড় করা হয়েছে এবং লেখার ক্লারিটি ও কালার কনট্রাস্ট ঠিক রাখতে লেখাসমূহ ব্যানার থেকে নিচে নিয়ে আসা হয়েছে।"
+  },
+  {
+    "id": "490",
+    "date": "2026-09-26T13:24",
+    "type": "UI / Design Redesign",
+    "module": "My Profile Header Card",
+    "link": "/my-profile",
+    "descriptionEn": "Redesigned the top employee profile header card with an ambient gradient cover banner, overlapping avatar frame, active status ring indicator, styled parameter badges for Employee ID, Phone, Joined Date, and an accent Download PDF action button.",
+    "descriptionBn": "মাই প্রোফাইল পেজের টপ হেডার কার্ডটি রিডিজাইন করে গ্রেডিয়েন্ট ব্যানার, এভাটার ফ্রেম, আইডি-ফোন-জয়েনিং ডেট ব্যাজ এবং ডাউনলোড বাটন দিয়ে সাজানো হয়েছে।"
+  },
+  {
+    "id": "489",
+    "date": "2026-09-26T13:16",
+    "type": "UI / Clean Up",
+    "module": "My Profile",
+    "link": "/my-profile",
+    "descriptionEn": "Removed the tab navigation bar section from My Profile to present a clean, continuous view of all Personnel & Identity information.",
+    "descriptionBn": "মাই প্রোফাইল পেজ থেকে ট্যাব নেভিগেশন বার সেকশনটি সরিয়ে ফেলা হয়েছে যাতে সব তথ্য সরাসরি দেখা যায়।"
+  },
+  {
+    "id": "488",
+    "date": "2026-09-26T13:12",
+    "type": "UI / Design Update",
+    "module": "My Profile - Personnel Details",
+    "link": "/my-profile",
+    "descriptionEn": "Redesigned My Profile to show the exact read-only Personal & Identity layout with fixed text color combinations, Primary Info, Corporate Info, Legal Info, Parental Info, Residential Address, Contact Info, Document Vault, Emergency Contacts, and Corporate References.",
+    "descriptionBn": "মাই প্রোফাইল পেজটিকে সম্পূর্ণ রিডিজাইন করে রিড-অনলি মোডে Personnel Details লেআউটে সাজানো হয়েছে এবং কালার কম্বিনেশন ঠিক করা হয়েছে।"
+  },
+  {
+    "id": "487",
+    "date": "2026-09-26T13:03",
+    "type": "New Feature / UI Page",
+    "module": "My Profile Dashboard",
+    "link": "/my-profile",
+    "descriptionEn": "Created a comprehensive My Profile dashboard (/my-profile) accessible via header profile dropdown with multi-tab layout for personal details, employment history, confidential salary structure, documents, and biometric fingerprint settings.",
+    "descriptionBn": "হেডার প্রোফাইল ড্রপডাউন থেকে অ্যাক্সেসযোগ্য একটি পূর্ণাঙ্গ মাই প্রোফাইল ড্যাশবোর্ড (/my-profile) তৈরি করা হয়েছে, যাতে রয়েছে পার্সোনাল ইনফো, চাকরির বিবরণী, গোপনীয় বেতন কাঠামো, ডকুমেন্ট আর্কাইভ এবং বায়োমেট্রিক ফিঙ্গারপ্রিন্ট সেটিংস।"
+  },
+  {
     "id": "486",
     "date": "2026-09-24T20:01",
     "type": "UI Layout & Sticky Action Footer",

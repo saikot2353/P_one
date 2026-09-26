@@ -132,6 +132,7 @@ import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
 import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
 import { Route as OtSheetHolidayRouteImport } from './routes/ot-sheet-holiday'
 import { Route as NoticeRouteImport } from './routes/notice'
+import { Route as MyProfileRouteImport } from './routes/my-profile'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salary-details'
@@ -930,6 +931,11 @@ const NoticeRoute = NoticeRouteImport.update({
   path: '/notice',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyProfileRoute = MyProfileRouteImport.update({
+  id: '/my-profile',
+  path: '/my-profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MyDashboardRoute = MyDashboardRouteImport.update({
   id: '/my-dashboard',
   path: '/my-dashboard',
@@ -1719,6 +1725,7 @@ export interface FileRoutesByFullPath {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/my-profile': typeof MyProfileRoute
   '/notice': typeof NoticeRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
@@ -1973,6 +1980,7 @@ export interface FileRoutesByTo {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/my-profile': typeof MyProfileRoute
   '/notice': typeof NoticeRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
@@ -2228,6 +2236,7 @@ export interface FileRoutesById {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/my-profile': typeof MyProfileRoute
   '/notice': typeof NoticeRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
@@ -2484,6 +2493,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/my-profile'
     | '/notice'
     | '/ot-sheet-holiday'
     | '/payroll-advance'
@@ -2738,6 +2748,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/my-profile'
     | '/notice'
     | '/ot-sheet-holiday'
     | '/payroll-advance'
@@ -2992,6 +3003,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/my-profile'
     | '/notice'
     | '/ot-sheet-holiday'
     | '/payroll-advance'
@@ -3247,6 +3259,7 @@ export interface RootRouteChildren {
   MonthlySalaryDetailsRoute: typeof MonthlySalaryDetailsRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
+  MyProfileRoute: typeof MyProfileRoute
   NoticeRoute: typeof NoticeRoute
   OtSheetHolidayRoute: typeof OtSheetHolidayRoute
   PayrollAdvanceRoute: typeof PayrollAdvanceRoute
@@ -4237,6 +4250,13 @@ declare module '@tanstack/react-router' {
       path: '/notice'
       fullPath: '/notice'
       preLoaderRoute: typeof NoticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-profile': {
+      id: '/my-profile'
+      path: '/my-profile'
+      fullPath: '/my-profile'
+      preLoaderRoute: typeof MyProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-dashboard': {
@@ -5272,6 +5292,7 @@ const rootRouteChildren: RootRouteChildren = {
   MonthlySalaryDetailsRoute: MonthlySalaryDetailsRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,
+  MyProfileRoute: MyProfileRoute,
   NoticeRoute: NoticeRoute,
   OtSheetHolidayRoute: OtSheetHolidayRoute,
   PayrollAdvanceRoute: PayrollAdvanceRoute,
