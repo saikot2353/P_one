@@ -207,6 +207,7 @@ import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
 import { Route as HrReportsRouteImport } from './routes/hr-reports'
+import { Route as HrReportSimRequisitionRouteImport } from './routes/hr-report-sim-requisition'
 import { Route as HrReportOvertimeSummaryRouteImport } from './routes/hr-report-overtime-summary'
 import { Route as HrReportNewJoiningInfoRouteImport } from './routes/hr-report-new-joining-info'
 import { Route as HrReportMonthlyAttendanceRouteImport } from './routes/hr-report-monthly-attendance'
@@ -214,6 +215,7 @@ import { Route as HrReportLeaveSummaryRouteImport } from './routes/hr-report-lea
 import { Route as HrReportLeaveDetailsRouteImport } from './routes/hr-report-leave-details'
 import { Route as HrReportEmployeeCountRouteImport } from './routes/hr-report-employee-count'
 import { Route as HrReportDailyAttendanceRouteImport } from './routes/hr-report-daily-attendance'
+import { Route as HrReportAbsenteeismSummaryRouteImport } from './routes/hr-report-absenteeism-summary'
 import { Route as HrPolicyRouteImport } from './routes/hr-policy'
 import { Route as HolidaySummarySheetRouteImport } from './routes/holiday-summary-sheet'
 import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
@@ -1333,6 +1335,11 @@ const HrReportsRoute = HrReportsRouteImport.update({
   path: '/hr-reports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HrReportSimRequisitionRoute = HrReportSimRequisitionRouteImport.update({
+  id: '/hr-report-sim-requisition',
+  path: '/hr-report-sim-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HrReportOvertimeSummaryRoute = HrReportOvertimeSummaryRouteImport.update({
   id: '/hr-report-overtime-summary',
   path: '/hr-report-overtime-summary',
@@ -1369,6 +1376,12 @@ const HrReportDailyAttendanceRoute = HrReportDailyAttendanceRouteImport.update({
   path: '/hr-report-daily-attendance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HrReportAbsenteeismSummaryRoute =
+  HrReportAbsenteeismSummaryRouteImport.update({
+    id: '/hr-report-absenteeism-summary',
+    path: '/hr-report-absenteeism-summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HrPolicyRoute = HrPolicyRouteImport.update({
   id: '/hr-policy',
   path: '/hr-policy',
@@ -1766,6 +1779,7 @@ export interface FileRoutesByFullPath {
   '/financial-aid-list': typeof FinancialAidListRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-report-absenteeism-summary': typeof HrReportAbsenteeismSummaryRoute
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
   '/hr-report-leave-details': typeof HrReportLeaveDetailsRoute
@@ -1773,6 +1787,7 @@ export interface FileRoutesByFullPath {
   '/hr-report-monthly-attendance': typeof HrReportMonthlyAttendanceRoute
   '/hr-report-new-joining-info': typeof HrReportNewJoiningInfoRoute
   '/hr-report-overtime-summary': typeof HrReportOvertimeSummaryRoute
+  '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -2038,6 +2053,7 @@ export interface FileRoutesByTo {
   '/financial-aid-list': typeof FinancialAidListRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-report-absenteeism-summary': typeof HrReportAbsenteeismSummaryRoute
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
   '/hr-report-leave-details': typeof HrReportLeaveDetailsRoute
@@ -2045,6 +2061,7 @@ export interface FileRoutesByTo {
   '/hr-report-monthly-attendance': typeof HrReportMonthlyAttendanceRoute
   '/hr-report-new-joining-info': typeof HrReportNewJoiningInfoRoute
   '/hr-report-overtime-summary': typeof HrReportOvertimeSummaryRoute
+  '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -2311,6 +2328,7 @@ export interface FileRoutesById {
   '/financial-aid-list': typeof FinancialAidListRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-report-absenteeism-summary': typeof HrReportAbsenteeismSummaryRoute
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
   '/hr-report-leave-details': typeof HrReportLeaveDetailsRoute
@@ -2318,6 +2336,7 @@ export interface FileRoutesById {
   '/hr-report-monthly-attendance': typeof HrReportMonthlyAttendanceRoute
   '/hr-report-new-joining-info': typeof HrReportNewJoiningInfoRoute
   '/hr-report-overtime-summary': typeof HrReportOvertimeSummaryRoute
+  '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -2585,6 +2604,7 @@ export interface FileRouteTypes {
     | '/financial-aid-list'
     | '/holiday-summary-sheet'
     | '/hr-policy'
+    | '/hr-report-absenteeism-summary'
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
     | '/hr-report-leave-details'
@@ -2592,6 +2612,7 @@ export interface FileRouteTypes {
     | '/hr-report-monthly-attendance'
     | '/hr-report-new-joining-info'
     | '/hr-report-overtime-summary'
+    | '/hr-report-sim-requisition'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -2857,6 +2878,7 @@ export interface FileRouteTypes {
     | '/financial-aid-list'
     | '/holiday-summary-sheet'
     | '/hr-policy'
+    | '/hr-report-absenteeism-summary'
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
     | '/hr-report-leave-details'
@@ -2864,6 +2886,7 @@ export interface FileRouteTypes {
     | '/hr-report-monthly-attendance'
     | '/hr-report-new-joining-info'
     | '/hr-report-overtime-summary'
+    | '/hr-report-sim-requisition'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -3129,6 +3152,7 @@ export interface FileRouteTypes {
     | '/financial-aid-list'
     | '/holiday-summary-sheet'
     | '/hr-policy'
+    | '/hr-report-absenteeism-summary'
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
     | '/hr-report-leave-details'
@@ -3136,6 +3160,7 @@ export interface FileRouteTypes {
     | '/hr-report-monthly-attendance'
     | '/hr-report-new-joining-info'
     | '/hr-report-overtime-summary'
+    | '/hr-report-sim-requisition'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -3402,6 +3427,7 @@ export interface RootRouteChildren {
   FinancialAidListRoute: typeof FinancialAidListRoute
   HolidaySummarySheetRoute: typeof HolidaySummarySheetRoute
   HrPolicyRoute: typeof HrPolicyRoute
+  HrReportAbsenteeismSummaryRoute: typeof HrReportAbsenteeismSummaryRoute
   HrReportDailyAttendanceRoute: typeof HrReportDailyAttendanceRoute
   HrReportEmployeeCountRoute: typeof HrReportEmployeeCountRoute
   HrReportLeaveDetailsRoute: typeof HrReportLeaveDetailsRoute
@@ -3409,6 +3435,7 @@ export interface RootRouteChildren {
   HrReportMonthlyAttendanceRoute: typeof HrReportMonthlyAttendanceRoute
   HrReportNewJoiningInfoRoute: typeof HrReportNewJoiningInfoRoute
   HrReportOvertimeSummaryRoute: typeof HrReportOvertimeSummaryRoute
+  HrReportSimRequisitionRoute: typeof HrReportSimRequisitionRoute
   HrReportsRoute: typeof HrReportsRoute
   IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
@@ -5001,6 +5028,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr-report-sim-requisition': {
+      id: '/hr-report-sim-requisition'
+      path: '/hr-report-sim-requisition'
+      fullPath: '/hr-report-sim-requisition'
+      preLoaderRoute: typeof HrReportSimRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hr-report-overtime-summary': {
       id: '/hr-report-overtime-summary'
       path: '/hr-report-overtime-summary'
@@ -5048,6 +5082,13 @@ declare module '@tanstack/react-router' {
       path: '/hr-report-daily-attendance'
       fullPath: '/hr-report-daily-attendance'
       preLoaderRoute: typeof HrReportDailyAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr-report-absenteeism-summary': {
+      id: '/hr-report-absenteeism-summary'
+      path: '/hr-report-absenteeism-summary'
+      fullPath: '/hr-report-absenteeism-summary'
+      preLoaderRoute: typeof HrReportAbsenteeismSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hr-policy': {
@@ -5570,6 +5611,7 @@ const rootRouteChildren: RootRouteChildren = {
   FinancialAidListRoute: FinancialAidListRoute,
   HolidaySummarySheetRoute: HolidaySummarySheetRoute,
   HrPolicyRoute: HrPolicyRoute,
+  HrReportAbsenteeismSummaryRoute: HrReportAbsenteeismSummaryRoute,
   HrReportDailyAttendanceRoute: HrReportDailyAttendanceRoute,
   HrReportEmployeeCountRoute: HrReportEmployeeCountRoute,
   HrReportLeaveDetailsRoute: HrReportLeaveDetailsRoute,
@@ -5577,6 +5619,7 @@ const rootRouteChildren: RootRouteChildren = {
   HrReportMonthlyAttendanceRoute: HrReportMonthlyAttendanceRoute,
   HrReportNewJoiningInfoRoute: HrReportNewJoiningInfoRoute,
   HrReportOvertimeSummaryRoute: HrReportOvertimeSummaryRoute,
+  HrReportSimRequisitionRoute: HrReportSimRequisitionRoute,
   HrReportsRoute: HrReportsRoute,
   IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,

@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "502",
+    "date": "2026-09-26T17:02",
+    "type": "New Feature / HR Report",
+    "module": "HR Reports - SIM Requisition Report",
+    "link": "/hr-report-sim-requisition",
+    "descriptionEn": "Created SIM Requisition Report page with Department dropdown filter, 13-column requisition table with light-pink header styling, status badges (Issue Status, Req Status, Request For), KPI metric cards, Excel export, and PDF print features.",
+    "descriptionBn": "এইচআর রিপোর্টস মডিউলে SIM Requisition Report পেজ তৈরি করা হয়েছে, যাতে ডিপার্টমেন্ট ফিল্টার, হালকা পিংক হেডার সহ ১৩ কলামের রিকুইজিশন টেবিল, স্ট্যাটাস ব্যাজ, কেপিআই মেট্রিক কার্ডস, এক্সেল এক্সপোর্ট ও প্রিন্ট পিডিএফ সংযুক্ত।"
+  },
+  {
+    "id": "501",
+    "date": "2026-09-26T16:58",
+    "type": "New Feature / HR Report",
+    "module": "HR Reports - Absenteeism Summary Report",
+    "link": "/hr-report-absenteeism-summary",
+    "descriptionEn": "Created Absenteeism Summary Report page with Employee ID, System/Office radio, Year, Start/End Month, Status, Employee Type, Section, Designation, Unit, and Line filters, 12-column log table with light-blue header styling, Excel export, and PDF print features.",
+    "descriptionBn": "এইচআর রিপোর্টস মডিউলে Absenteeism Summary Report পেজ তৈরি করা হয়েছে, যাতে এমপ্লয়ি আইডি ফিল্টার, বছর, মাস রেঞ্জ, সেকশন ও ডেজিগনেশন ফিল্টার, হালকা নীল হেডার সহ ১২ কলামের লগ টেবিল, এক্সেল এক্সপোর্ট ও প্রিন্ট ভিউ সংযুক্ত।"
+  },
+  {
     "id": "500",
     "date": "2026-09-26T16:38",
     "type": "Bug Fix / Navigation",

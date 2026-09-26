@@ -49,7 +49,7 @@ function HRReportsPage() {
           title: "SIM Requisition Report",
           icon: Smartphone,
           desc: "Status and history of company SIM card requisitions.",
-          to: "#",
+          to: "/hr-report-sim-requisition",
         },
       ],
     },
@@ -74,7 +74,7 @@ function HRReportsPage() {
           title: "Absenteeism Summary",
           icon: UserX,
           desc: "Overview of unexcused absences and attendance compliance.",
-          to: "#",
+          to: "/hr-report-absenteeism-summary",
         },
         {
           title: "Continuous Absent",

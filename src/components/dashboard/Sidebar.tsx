@@ -507,10 +507,10 @@ export const nav: NavItem[] = [
       { label: "Daily Attendance Report", to: "/hr-report-daily-attendance" },
       { label: "Monthly Attendance Report", to: "/hr-report-monthly-attendance" },
       { label: "Overtime Summary", to: "/hr-report-overtime-summary" },
-      { label: "Absenteeism Summary", to: "#" },
+      { label: "Absenteeism Summary", to: "/hr-report-absenteeism-summary" },
       { label: "Print OT Requisition", to: "#" },
       { label: "Continuous Absent", to: "#" },
-      { label: "SIM Requisition Report", to: "#" },
+      { label: "SIM Requisition Report", to: "/hr-report-sim-requisition" },
     ],
   },
 ];
