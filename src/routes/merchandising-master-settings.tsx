@@ -398,6 +398,8 @@ interface YarnTypeSpec {
   id: string;
   yarnType: string;
   createDate: string;
+  rate?: number;
+  rateConstraint?: RateConstraint | string;
   status: "Active" | "Inactive";
 }
 
@@ -432,6 +434,8 @@ interface YarnCountSpec {
   id: string;
   name: string;
   createdDate: string;
+  rate?: number;
+  rateConstraint?: RateConstraint | string;
   status: "Active" | "Inactive";
 }
 
@@ -914,11 +918,11 @@ const initialProcessLoss: ProcessLoss[] = [
 ];
 
 export const initialTrims: TrimsMaster[] = [
-  { id: "t-1", itemCode: "TRM-THD-01", itemName: "100% Spun Polyester Thread 40/2", category: "Sewing Trims", subCategory: "Sewing Thread", uom: "Cone (4000m)", unitPriceUsd: 1.45, rateConstraint: "Increase Only" },
-  { id: "t-2", itemCode: "TRM-LBL-02", itemName: "Woven Main Label (Damask HD)", category: "Sewing Trims", subCategory: "Labels", uom: "Pcs", unitPriceUsd: 0.035, rateConstraint: "Decrease Only" },
-  { id: "t-3", itemCode: "TRM-PLY-03", itemName: "Self-Seal Polybag (12x18 inch)", category: "Packing Trims", subCategory: "Polybags", uom: "Pcs", unitPriceUsd: 0.042, rateConstraint: "No Restriction" },
-  { id: "t-4", itemCode: "TRM-CTN-04", itemName: "7-Ply Master Shipping Carton", category: "Packing Trims", subCategory: "Cartons", uom: "Pcs", unitPriceUsd: 0.85, rateConstraint: "Fixed" },
-  { id: "t-5", itemCode: "TRM-ZIP-05", itemName: "#5 Nylon Open-End Metal Zipper", category: "Sewing Trims", subCategory: "Zippers", uom: "Pcs", unitPriceUsd: 0.28, rateConstraint: "Increase Only" },
+  { id: "t-1", itemCode: "TRM-THD-01", itemName: "100% Spun Polyester Thread 40/2", category: "Sewing Trims", subCategory: "Sewing Thread", uom: "Cone (4000m)", unitPriceUsd: 1.45, rateConstraint: "Increase Only", nominatedSupplier: "Supplier A" },
+  { id: "t-2", itemCode: "TRM-LBL-02", itemName: "Woven Main Label (Damask HD)", category: "Sewing Trims", subCategory: "Labels", uom: "Pcs", unitPriceUsd: 0.035, rateConstraint: "Decrease Only", nominatedSupplier: "Supplier B" },
+  { id: "t-3", itemCode: "TRM-PLY-03", itemName: "Self-Seal Polybag (12x18 inch)", category: "Packing Trims", subCategory: "Polybags", uom: "Pcs", unitPriceUsd: 0.042, rateConstraint: "No Restriction", nominatedSupplier: "Supplier C" },
+  { id: "t-4", itemCode: "TRM-CTN-04", itemName: "7-Ply Master Shipping Carton", category: "Packing Trims", subCategory: "Cartons", uom: "Pcs", unitPriceUsd: 0.85, rateConstraint: "Fixed", nominatedSupplier: "Supplier D" },
+  { id: "t-5", itemCode: "TRM-ZIP-05", itemName: "#5 Nylon Open-End Metal Zipper", category: "Sewing Trims", subCategory: "Zippers", uom: "Pcs", unitPriceUsd: 0.28, rateConstraint: "Increase Only", nominatedSupplier: "Supplier E" },
 ];
 
 const initialSpecs: SpecParameter[] = [
@@ -3473,6 +3477,7 @@ function MerchandisingMasterSettingsPage() {
         uom: trimsForm.uom || "Pcs",
         unitPriceUsd: Number(trimsForm.unitPriceUsd) || 0.05,
         nominatedSupplier: trimsForm.nominatedSupplier || "Local Nominated",
+        rateConstraint: trimsForm.rateConstraint || "No Restriction",
       };
       setTrims([newT, ...trims]);
       toast.success("New Trims item added to catalog!");

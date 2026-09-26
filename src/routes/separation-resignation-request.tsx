@@ -669,7 +669,7 @@ Employee ID: ${loggedInEmployee.empId}`;
             )
           );
           if (viewItem && viewItem.id === id) {
-            setViewItem({ ...viewItem, status: "Rejected" });
+            setViewItem({ ...viewItem, status: "Rejected" as any });
           }
         }}
       />
