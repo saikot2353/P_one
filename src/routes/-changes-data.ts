@@ -2,6 +2,105 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "500",
+    "date": "2026-09-26T16:38",
+    "type": "Bug Fix / Navigation",
+    "module": "Sidebar Navigation - HR Reports",
+    "link": "/hr-reports",
+    "descriptionEn": "Fixed left sidebar navigation links for Monthly Attendance Report (/hr-report-monthly-attendance) and Overtime Summary (/hr-report-overtime-summary) so clicking them navigates directly to the report pages.",
+    "descriptionBn": "লেফট সাইডবার নেভিগেশনে Monthly Attendance Report এবং Overtime Summary এর লিংক আপডেট করে পেজগুলোতে সরাসরি নেভিগেশন ঠিক করা হয়েছে।"
+  },
+  {
+    "id": "499",
+    "date": "2026-09-26T16:34",
+    "type": "New Feature / HR Report",
+    "module": "HR Reports - Overtime Summary",
+    "link": "/hr-report-overtime-summary",
+    "descriptionEn": "Created Overtime Summary & Costing Report page with Start/End date, Section filters, 15-column costing log table (Manpower, OT Hour, OT Amount, Tiffin, Night Bill, Total Expenses, Production & Net CM Income), metric KPI cards, Excel export, and PDF print options.",
+    "descriptionBn": "এইচআর রিপোর্টস মডিউলে Overtime Summary Costing পেজ তৈরি করা হয়েছে, যাতে তারিখ ফিল্টার, সেকশন ড্রপডাউন, ১৫ কলামের কস্টিং টেবিল, টোটাল রো সামারি, এক্সেল এক্সপোর্ট ও প্রিন্ট পিডিএফ অপশন সংযুক্ত।"
+  },
+  {
+    "id": "498",
+    "date": "2026-09-26T16:31",
+    "type": "New Feature / HR Report",
+    "module": "HR Reports - Monthly Attendance Report",
+    "link": "/hr-report-monthly-attendance",
+    "descriptionEn": "Created Monthly Attendance Details Report page with Month/Year, Employee Type, Department, Unit, Search filters, 3 view modes (Monthly Summary, Day-by-Day 1-30 Grid Matrix, Department Breakdown), metric KPI widgets, Excel export, and PDF print features.",
+    "descriptionBn": "এইচআর রিপোর্টস মডিউলে Monthly Attendance Details Report পেজ তৈরি করা হয়েছে, যাতে মাস/বছর ফিল্টার, ৩টি ভিউ মোড (Monthly Summary, Day-by-Day Grid Matrix, Department Breakdown), মেট্রিক কার্ডস, এক্সেল এক্সপোর্ট ও প্রিন্ট ভিউ সংযুক্ত।"
+  },
+  {
+    "id": "497",
+    "date": "2026-09-26T16:26",
+    "type": "UI / Design Enhancement",
+    "module": "HR Reports - Daily Attendance Report",
+    "link": "/hr-report-daily-attendance",
+    "descriptionEn": "Styled absent employee records with soft red background tint, red text, and solid red status badges in Daily Attendance Report.",
+    "descriptionBn": "ডেইলি এটেন্ডেন্স রিপোর্টে অনুপস্থিত (Absent) কর্মচারীদের রেকর্ড সম্পূর্ণ লাল রঙ (হালকা লাল ব্যাকগ্রাউন্ড ও লাল টেক্সট) দিয়ে হাইলাইট করা হয়েছে।"
+  },
+  {
+    "id": "496",
+    "date": "2026-09-26T16:24",
+    "type": "New Feature / HR Report",
+    "module": "HR Reports - Daily Attendance Report",
+    "link": "/hr-report-daily-attendance",
+    "descriptionEn": "Created Daily Attendance Report page with Employee Type, Department, Section, Unit, Line, Status, Date, and Option radio filters, 19-column attendance log table, Excel export, print view, and custom PDF export buttons.",
+    "descriptionBn": "এইচআর রিপোর্টস মডিউলে Daily Attendance Report পেজ তৈরি করা হয়েছে, যাতে অপশন রেডিও ফিল্টার (Regular, Lunch, OT), ১৯ কলামের টেবিল এবং কাস্টম পিডিএফ ও এক্সেল এক্সপোর্ট সংযুক্ত।"
+  },
+  {
+    "id": "495",
+    "date": "2026-09-26T16:22",
+    "type": "New Feature / HR Report",
+    "module": "HR Reports - Leave Report",
+    "link": "/hr-report-leave-details",
+    "descriptionEn": "Created Leave Report page with Date From/To, Type, Department, Section, Unit, Line, Designation, and Report Type filters, detailed 13-column leave log table, Excel export, and print view.",
+    "descriptionBn": "এইচআর রিপোর্টস মডিউলে Leave Report পেজ তৈরি করা হয়েছে, যাতে তারিখ ফিল্টার, ডিপার্টমেন্ট, সেকশন, ডেজিগনেশন সহ ১০টি ফিল্টারিং অপশন, ১৩ কলামের লিভ লগ টেবিল, এক্সেল এক্সপোর্ট ও প্রিন্ট সুবিধা সংযুক্ত।"
+  },
+  {
+    "id": "494",
+    "date": "2026-09-26T16:20",
+    "type": "New Feature / HR Report",
+    "module": "HR Reports - Employee Count",
+    "link": "/hr-report-employee-count",
+    "descriptionEn": "Created Employee Count report page with Organization, Region, Employee Type, Section, Designation, Gender, Grade, Component, Unit, Line, and Status filters, Excel export, print view, and total headcount summary.",
+    "descriptionBn": "এইচআর রিপোর্টস মডিউলে Employee Count রিপোর্ট পেজ তৈরি করা হয়েছে, যাতে অর্গানাইজেশন, রিজিয়ন, সেকশন, গ্রেড, ইউনিট সহ ১১টি ফিল্টার, হেডকাউন্ট সামারি ও এক্সেল এক্সপোর্ট সংযুক্ত।"
+  },
+  {
+    "id": "493",
+    "date": "2026-09-26T16:19",
+    "type": "UI Standardization & Consistency",
+    "module": "HR Reports - Leave Summary",
+    "link": "/hr-report-leave-summary",
+    "descriptionEn": "Standardized Leave Summary report layout to match exact visual hierarchy, card wrappers, and button designs of the New Joining Info report page.",
+    "descriptionBn": "New Joining Info রিপোর্ট পেজের লেআউটের সাথে ১০০% হুবহু মিলিয়ে Leave Summary রিপোর্ট পেজের ডিজাইন স্ট্যান্ডার্ডাইজড করা হয়েছে।"
+  },
+  {
+    "id": "492",
+    "date": "2026-09-26T16:17",
+    "type": "New Feature / HR Report",
+    "module": "HR Reports - Leave Summary",
+    "link": "/hr-report-leave-summary",
+    "descriptionEn": "Created Leave Summary report page with Year, Employee Type, Section, Unit, Line, and Option filters (Details, Gender Wise CL/SL, Gender Wise Zero Leave), Excel export, and print view.",
+    "descriptionBn": "এইচআর রিপোর্টস মডিউলে Leave Summary পেজ তৈরি করা হয়েছে, যাতে বছর, সেকশন, ইউনিট, অপশন ড্রপডাউন (Details, Gender Wise CL/SL, Gender Wise NO Leave), এক্সেল এক্সপোর্ট ও প্রিন্ট ভিউ সংযুক্ত।"
+  },
+  {
+    "id": "491",
+    "date": "2026-09-26T16:12",
+    "type": "Bug Fix / Navigation",
+    "module": "Sidebar & HR Reports",
+    "link": "/hr-report-new-joining-info",
+    "descriptionEn": "Fixed sidebar navigation link for New Joining Info under HR Reports menu so clicking it correctly opens the New Joining Info report page.",
+    "descriptionBn": "সাইডবারের 'HR Reports -> New Joining Info' লিংকের ডায়রেকশন ঠিক করা হয়েছে যাতে ক্লিকেই রিপোর্ট পেজটি ওপেন হয়।"
+  },
+  {
+    "id": "490",
+    "date": "2026-09-26T16:10",
+    "type": "New Feature / HR Report",
+    "module": "HR Reports - New Joining Info",
+    "link": "/hr-report-new-joining-info",
+    "descriptionEn": "Created the HR Report page for New Joining Info featuring comprehensive multi-criteria filters, instant search, Excel export, print view, and interactive 33-column tabular display.",
+    "descriptionBn": "এইচআর রিপোর্টস মডিউলে New Joining Info পেজটি নতুন করে যুক্ত করা হয়েছে, যাতে ১৮টি ফিল্টারিং ফিল্ড, ৩০+ কলামের টেবিল, এক্সেল এক্সপোর্ট ও প্রিন্ট/পিডিএফ ভিউ সুবিধা রয়েছে।"
+  },
+  {
     "id": "489",
     "date": "2026-09-26T14:47",
     "type": "UI Optimization & De-duplication",
