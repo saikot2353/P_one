@@ -96,7 +96,7 @@ export function MyProfilePage() {
                     </div>
 
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                      <span className="font-bold text-slate-800 dark:text-slate-200">Jr. Executive</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-200">Deputy Manager</span>
                       <span className="text-slate-300 dark:text-slate-700">•</span>
                       <span>Business Innovation</span>
                     </p>
