@@ -58,7 +58,7 @@ export function MyProfilePage() {
             <div className="h-28 sm:h-32 w-full bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 relative p-4 flex items-start justify-end">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.25),transparent)] pointer-events-none" />
               <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:20px_20px] opacity-30 pointer-events-none" />
-              
+
               <div className="relative z-10">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-white/20 backdrop-blur-md text-white border border-white/30 shadow-2xs">
                   <Building2 className="size-3.5 text-blue-200" />
@@ -70,14 +70,14 @@ export function MyProfilePage() {
             {/* Profile Info Row */}
             <div className="px-6 pb-6 pt-0 relative">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                
+
                 {/* Avatar + Main Title */}
                 <div className="flex items-center gap-4 sm:gap-5 min-w-0">
                   <div className="relative shrink-0 -mt-12 sm:-mt-14 z-10">
                     <div className="size-24 sm:size-28 rounded-2xl overflow-hidden border-4 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 shadow-md">
                       <img
                         src="https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
-                        alt="Md Mahir Shahriyar"
+                        alt="Tahmid Afsar"
                         className="size-full object-cover"
                       />
                     </div>
@@ -87,7 +87,7 @@ export function MyProfilePage() {
                   <div className="pt-2 sm:pt-3 space-y-1 min-w-0">
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                        Md Mahir Shahriyar
+                        Tahmid Afsar
                       </h1>
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
                         <ShieldCheck className="size-3.5" />
@@ -120,7 +120,7 @@ export function MyProfilePage() {
 
           {/* NON-REPETITIVE 17-FIELD PROFILE DETAILS GRID */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
-            
+
             {/* 1. CORPORATE DETAILS CARD */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
               <div className="space-y-4">
@@ -133,14 +133,14 @@ export function MyProfilePage() {
                   <div className="py-2.5 flex justify-between items-center gap-2">
                     <span className="text-slate-500 dark:text-slate-400 font-medium">EMP ID (COMPANY)</span>
                     <span className="font-mono font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-[11px]">
-                      2025054609
+                      2023043910
                     </span>
                   </div>
 
                   <div className="py-2.5 flex justify-between items-center gap-2">
                     <span className="text-slate-500 dark:text-slate-400 font-medium">DESIGNATION</span>
                     <span className="font-bold text-slate-900 dark:text-slate-100 text-right">
-                      Jr. Executive
+                      Deputy Manager
                     </span>
                   </div>
 
@@ -203,14 +203,14 @@ export function MyProfilePage() {
                   <div className="py-2.5 flex justify-between items-center gap-2">
                     <span className="text-slate-500 dark:text-slate-400 font-medium">NAME (ENGLISH)</span>
                     <span className="font-bold text-slate-900 dark:text-slate-100 text-right">
-                      Md Mahir Shahriyar
+                      Tahmid Afsar
                     </span>
                   </div>
 
                   <div className="py-2.5 flex justify-between items-center gap-2">
                     <span className="text-slate-500 dark:text-slate-400 font-medium">NAME (BENGALI)</span>
                     <span className="font-bold text-slate-800 dark:text-slate-200 text-right">
-                      মো: মাহির শাহরিয়ার
+                      তাহমিদ আফসার
                     </span>
                   </div>
 
@@ -218,21 +218,21 @@ export function MyProfilePage() {
                     <span className="text-slate-500 dark:text-slate-400 font-medium">DATE OF BIRTH</span>
                     <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                       <Calendar className="size-3.5 text-slate-400" />
-                      Oct 21, 1996
+                      Jul 12, 1999
                     </span>
                   </div>
 
                   <div className="py-2.5 flex justify-between items-center gap-2">
                     <span className="text-slate-500 dark:text-slate-400 font-medium">FATHER NAME (ENGLISH)</span>
                     <span className="font-bold text-slate-900 dark:text-slate-100 text-right">
-                      Md Abdur Rouf
+                      Afsar Uddin Babul
                     </span>
                   </div>
 
                   <div className="py-2.5 flex justify-between items-center gap-2">
                     <span className="text-slate-500 dark:text-slate-400 font-medium">MOTHER NAME (ENGLISH)</span>
                     <span className="font-bold text-slate-900 dark:text-slate-100 text-right">
-                      Mst. Khadiza Begum
+                      Shaheen Afsar
                     </span>
                   </div>
                 </div>
@@ -255,7 +255,7 @@ export function MyProfilePage() {
                       PRESENT ADDRESS
                     </span>
                     <p className="font-bold text-slate-800 dark:text-slate-200 leading-snug">
-                      H#44/23, Jigatala TSO, Dhanmondi, Dhaka
+                      Rayer Bazar, Dhanmondi, Dhaka, Bangladesh
                     </p>
                   </div>
 
@@ -266,7 +266,7 @@ export function MyProfilePage() {
                       PERMANENT ADDRESS
                     </span>
                     <p className="font-bold text-slate-800 dark:text-slate-200 leading-snug">
-                      262 Purandapur Parbazar, Jhikargachha, Khulna
+                      Bhola, Sadar Road, Bhola Sadar, Barishal, Bangladesh
                     </p>
                   </div>
 
@@ -276,17 +276,17 @@ export function MyProfilePage() {
                       <HeartHandshake className="size-3.5 text-rose-500" />
                       EMERGENCY CONTACT PERSON
                     </span>
-                    
+
                     <div className="space-y-1">
                       <div className="flex justify-between items-center">
                         <span className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">Name:</span>
-                        <span className="font-bold text-slate-900 dark:text-slate-100">Md Abdur Rouf</span>
+                        <span className="font-bold text-slate-900 dark:text-slate-100">Shaheen Afsar</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">Contact Number:</span>
                         <span className="font-mono font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1">
                           <Phone className="size-3" />
-                          01740820000
+                          01875055501
                         </span>
                       </div>
                     </div>
