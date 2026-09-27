@@ -16,6 +16,7 @@ import {
   Download,
 } from "lucide-react";
 import { toast } from "sonner";
+import { HRReportPdfModal, ColumnDef } from "@/components/hr-reports/HRReportPdfModal";
 
 export const Route = createFileRoute("/hr-report-employee-count")({
   head: () => ({
@@ -237,6 +238,20 @@ export function EmployeeCountReportPage() {
   // Modal State
   const [selectedRecord, setSelectedRecord] = useState<EmployeeCountRecord | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+
+  const pdfColumns: ColumnDef<EmployeeCountRecord>[] = [
+    { header: "SL", accessor: (_, idx) => idx + 1, align: "center", width: "40px" },
+    { header: "Employee Type", accessor: (r) => r.empType },
+    { header: "Department", accessor: (r) => r.department },
+    { header: "Designation", accessor: (r) => r.designation },
+    { header: "Gender", accessor: (r) => r.gender, align: "center" },
+    { header: "Unit", accessor: (r) => r.unit, align: "center" },
+    { header: "Line", accessor: (r) => r.line, align: "center" },
+    { header: "Grade", accessor: (r) => r.grade, align: "center" },
+    { header: "Status", accessor: (r) => r.status, align: "center" },
+    { header: "Count", accessor: (r) => r.count, align: "center" },
+  ];
 
   // Applied Filter Trigger
   const [appliedFilters, setAppliedFilters] = useState({
@@ -659,7 +674,7 @@ export function EmployeeCountReportPage() {
                 </button>
 
                 <button
-                  onClick={handlePrint}
+                  onClick={() => setIsPdfModalOpen(true)}
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all shadow-2xs cursor-pointer"
                 >
                   <Printer className="size-4" />
@@ -667,10 +682,7 @@ export function EmployeeCountReportPage() {
                 </button>
 
                 <button
-                  onClick={() => {
-                    setSelectedRecord(filteredData[0] || null);
-                    setIsPreviewOpen(true);
-                  }}
+                  onClick={() => setIsPdfModalOpen(true)}
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-rose-300 dark:border-rose-800/80 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 text-xs font-bold transition-all shadow-2xs cursor-pointer"
                 >
                   <FileText className="size-4" />
@@ -873,6 +885,17 @@ export function EmployeeCountReportPage() {
           </div>
         </div>
       )}
+
+      {/* Official PDF / Print View Modal */}
+      <HRReportPdfModal
+        isOpen={isPdfModalOpen}
+        onClose={() => setIsPdfModalOpen(false)}
+        reportTitle="Employee Count & Headcount Distribution Report"
+        companyName={appliedFilters.organization || "Pakiza Knit Composite Ltd"}
+        dateRange={`Region: ${appliedFilters.region}`}
+        columns={pdfColumns}
+        data={filteredData}
+      />
     </div>
   );
 }

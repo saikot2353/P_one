@@ -19,6 +19,7 @@ import {
   Download,
 } from "lucide-react";
 import { toast } from "sonner";
+import { HRReportPdfModal, ColumnDef } from "@/components/hr-reports/HRReportPdfModal";
 
 export const Route = createFileRoute("/hr-report-new-joining-info")({
   head: () => ({
@@ -322,6 +323,20 @@ export function NewJoiningInfoReportPage() {
   // Modal / Preview state
   const [selectedRecord, setSelectedRecord] = useState<JoiningRecord | null>(null);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+  const [isReportPdfModalOpen, setIsReportPdfModalOpen] = useState(false);
+
+  const pdfColumns: ColumnDef<JoiningRecord>[] = [
+    { header: "SL", accessor: (_, idx) => idx + 1, align: "center", width: "40px" },
+    { header: "ID", accessor: (r) => r.id, align: "center" },
+    { header: "Name", accessor: (r) => r.name },
+    { header: "Employee Type", accessor: (r) => r.type },
+    { header: "Department", accessor: (r) => r.department },
+    { header: "Designation", accessor: (r) => r.designation },
+    { header: "Join Date", accessor: (r) => r.joiningDate, align: "center" },
+    { header: "Gross Salary (৳)", accessor: (r) => r.grossSalary, align: "right" },
+    { header: "Emergency Contact", accessor: (r) => r.emergencyContact, align: "center" },
+    { header: "Status", accessor: (r) => r.status, align: "center" },
+  ];
 
   // Applied filter trigger
   const [appliedFilters, setAppliedFilters] = useState({
@@ -956,7 +971,7 @@ export function NewJoiningInfoReportPage() {
                 </button>
 
                 <button
-                  onClick={handlePrint}
+                  onClick={() => setIsReportPdfModalOpen(true)}
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all shadow-2xs cursor-pointer"
                 >
                   <Printer className="size-4" />
@@ -964,7 +979,7 @@ export function NewJoiningInfoReportPage() {
                 </button>
 
                 <button
-                  onClick={() => handleViewPdf()}
+                  onClick={() => setIsReportPdfModalOpen(true)}
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-rose-300 dark:border-rose-800/80 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 text-xs font-bold transition-all shadow-2xs cursor-pointer"
                 >
                   <FileText className="size-4" />
@@ -1289,6 +1304,17 @@ export function NewJoiningInfoReportPage() {
           </div>
         </div>
       )}
+
+      {/* Official PDF / Print View Modal */}
+      <HRReportPdfModal
+        isOpen={isReportPdfModalOpen}
+        onClose={() => setIsReportPdfModalOpen(false)}
+        reportTitle="New Joining Info Report"
+        companyName={appliedFilters.company || "Pakiza Knit Composite Ltd"}
+        dateRange={`${appliedFilters.joiningDateFrom} - ${appliedFilters.joiningDateTo}`}
+        columns={pdfColumns}
+        data={filteredData}
+      />
     </div>
   );
 }
