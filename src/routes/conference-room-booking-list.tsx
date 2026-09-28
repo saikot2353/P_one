@@ -36,6 +36,19 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+export const Route = createFileRoute("/conference-room-booking-list")({
+  head: () => ({
+    meta: [
+      { title: "Conference Room Booking List — CRIPTON" },
+      {
+        name: "description",
+        content: "View, search, edit, and track corporate conference room bookings.",
+      },
+    ],
+  }),
+  component: ConferenceRoomBookingListPage,
+});
+
 export interface ScheduleHistory {
   changed: boolean;
   changedBy?: string;

@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "511",
+    "date": "2026-09-28T15:35",
+    "type": "Bug Fix / Routing",
+    "module": "Conference Room Booking List",
+    "link": "/conference-room-booking-list",
+    "descriptionEn": "Fixed TanStack Router Route export in conference-room-booking-list.tsx enabling the route to compile and render properly at http://localhost:3000/conference-room-booking-list.",
+    "descriptionBn": "conference-room-booking-list.tsx ফাইলে TanStack রুট এক্সপোর্ট পুনঃসংযোজন করে রাউটিং ফিক্স করা হয়েছে, যার ফলে http://localhost:3000/conference-room-booking-list পেজটি যথাযথভাবে লোড হচ্ছে।"
+  },
+  {
     "id": "510",
     "date": "2026-09-28T13:05",
     "type": "New Feature / History Tracking",
