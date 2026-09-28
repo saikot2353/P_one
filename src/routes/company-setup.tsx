@@ -27,6 +27,18 @@ import {
   Save,
   ArrowLeft,
   LayoutTemplate,
+  Network,
+  GitFork,
+  ArrowDown,
+  ArrowUp,
+  ArrowRight,
+  ListTree,
+  RefreshCw,
+  Copy,
+  CheckCircle2,
+  Power,
+  Sparkles,
+  Eye,
 } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -55,7 +67,7 @@ export const Route = createFileRoute("/company-setup")({
   component: CompanySetupPage,
 });
 
-type TabType = "company" | "area" | "mapping" | "department" | "section" | "unit" | "line" | "holiday" | "payslip";
+type TabType = "company" | "area" | "mapping" | "department" | "section" | "unit" | "line" | "holiday" | "payslip" | "organogram";
 
 interface PayslipField {
   key: string;
@@ -149,6 +161,162 @@ interface DefaultHoliday {
   days: string[];
   remarks: string;
 }
+
+interface OrganogramDesignationItem {
+  id: string;
+  code: string;
+  name: string;
+  shortName?: string;
+  nameBng?: string;
+  levelRank: number; // 1 = Board of Directors, 2 = CEO, 3 = CXO (COO, CFO, CTO, CMO, CHRO), 4 = GM, etc.
+  sortOrder: number; // 1, 2, 3... horizontal order inside same levelRank
+  reportsTo?: string;
+  status: "Active" | "Inactive";
+}
+
+interface OrganogramTemplate {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+  createdAt: string;
+  designations: OrganogramDesignationItem[];
+}
+
+const DEFAULT_ORGANOGRAM_TEMPLATES: OrganogramTemplate[] = [
+  {
+    id: "tpl-standard",
+    code: "TPL-STD-01",
+    name: "Corporate Standard Hierarchy (Board to Officer)",
+    description: "Standard corporate organogram with Board of Directors, CEO, side-by-side CXO executive suite (COO, CFO, CTO, CMO, CHRO), and tiered management down to Officer.",
+    isActive: true,
+    createdAt: "2026-09-28",
+    designations: [
+      { id: "des-bod", code: "BOD", name: "BOARD OF DIRECTORS", shortName: "BOD", nameBng: "পরিচালনা পর্ষদ", levelRank: 1, sortOrder: 1, status: "Active" },
+      { id: "des-ceo", code: "CEO", name: "CHIEF EXECUTIVE OFFICER (CEO)", shortName: "CEO", nameBng: "প্রধান নির্বাহী কর্মকর্তা", levelRank: 2, sortOrder: 1, reportsTo: "Board of Directors", status: "Active" },
+      // Level 3 - Side by Side CXO tier
+      { id: "des-coo", code: "COO", name: "COO", shortName: "COO", nameBng: "প্রধান পরিচালন কর্মকর্তা", levelRank: 3, sortOrder: 1, reportsTo: "CEO", status: "Active" },
+      { id: "des-cfo", code: "CFO", name: "CFO", shortName: "CFO", nameBng: "প্রধান অর্থ কর্মকর্তা", levelRank: 3, sortOrder: 2, reportsTo: "CEO", status: "Active" },
+      { id: "des-cto", code: "CTO", name: "CTO", shortName: "CTO", nameBng: "প্রধান প্রযুক্তি কর্মকর্তা", levelRank: 3, sortOrder: 3, reportsTo: "CEO", status: "Active" },
+      { id: "des-cmo", code: "CMO", name: "CMO", shortName: "CMO", nameBng: "প্রধান বিপণন কর্মকর্তা", levelRank: 3, sortOrder: 4, reportsTo: "CEO", status: "Active" },
+      { id: "des-chro", code: "CHRO", name: "CHRO", shortName: "CHRO", nameBng: "প্রধান মানবসম্পদ কর্মকর্তা", levelRank: 3, sortOrder: 5, reportsTo: "CEO", status: "Active" },
+      // Level 4
+      { id: "des-gm", code: "GM", name: "GENERAL MANAGER (GM)", shortName: "GM", nameBng: "মহাব্যবস্থাপক", levelRank: 4, sortOrder: 1, reportsTo: "C-Suite", status: "Active" },
+      // Level 5
+      { id: "des-dgm", code: "DGM", name: "DEPUTY GENERAL MANAGER (DGM)", shortName: "DGM", nameBng: "উপ-মহাব্যবস্থাপক", levelRank: 5, sortOrder: 1, reportsTo: "GM", status: "Active" },
+      // Level 6
+      { id: "des-agm", code: "AGM", name: "ASSISTANT GENERAL MANAGER (AGM)", shortName: "AGM", nameBng: "সহকারী মহাব্যবস্থাপক", levelRank: 6, sortOrder: 1, reportsTo: "DGM", status: "Active" },
+      // Level 7
+      { id: "des-srmgr", code: "SR-MGR", name: "SENIOR MANAGER", shortName: "Sr. Mgr", nameBng: "সিনিয়র ম্যানেজার", levelRank: 7, sortOrder: 1, reportsTo: "AGM", status: "Active" },
+      // Level 8
+      { id: "des-mgr", code: "MGR", name: "MANAGER", shortName: "Manager", nameBng: "ম্যানেজার", levelRank: 8, sortOrder: 1, reportsTo: "Senior Manager", status: "Active" },
+      // Level 9
+      { id: "des-depmgr", code: "DEP-MGR", name: "DEPUTY MANAGER", shortName: "Dep. Mgr", nameBng: "উপ-ম্যানেজার", levelRank: 9, sortOrder: 1, reportsTo: "Manager", status: "Active" },
+      // Level 10
+      { id: "des-asstmgr", code: "ASST-MGR", name: "ASSISTANT MANAGER", shortName: "Asst. Mgr", nameBng: "সহকারী ম্যানেজার", levelRank: 10, sortOrder: 1, reportsTo: "Deputy Manager", status: "Active" },
+      // Level 11
+      { id: "des-exec", code: "EXEC", name: "EXECUTIVE", shortName: "Executive", nameBng: "নির্বাহী", levelRank: 11, sortOrder: 1, reportsTo: "Assistant Manager", status: "Active" },
+      // Level 12
+      { id: "des-off", code: "OFF", name: "OFFICER", shortName: "Officer", nameBng: "কর্মকর্তা", levelRank: 12, sortOrder: 1, reportsTo: "Executive", status: "Active" },
+    ],
+  },
+  {
+    id: "tpl-manufacturing",
+    code: "TPL-MFG-02",
+    name: "Industrial & Plant Manufacturing Structure",
+    description: "Operational manufacturing template featuring Plant GM, Production, Quality, and Engineering parallel branches.",
+    isActive: false,
+    createdAt: "2026-09-28",
+    designations: [
+      { id: "mfg-bod", code: "BOD", name: "BOARD OF DIRECTORS", shortName: "BOD", nameBng: "পরিচালনা পর্ষদ", levelRank: 1, sortOrder: 1, status: "Active" },
+      { id: "mfg-md", code: "MD", name: "MANAGING DIRECTOR (MD)", shortName: "MD", nameBng: "ব্যবস্থাপনা পরিচালক", levelRank: 2, sortOrder: 1, reportsTo: "Board of Directors", status: "Active" },
+      { id: "mfg-ed-ops", code: "ED-OPS", name: "EXECUTIVE DIRECTOR (OPERATIONS)", shortName: "ED-Ops", nameBng: "নির্বাহী পরিচালক (অপারেশনস)", levelRank: 3, sortOrder: 1, reportsTo: "MD", status: "Active" },
+      { id: "mfg-ed-fin", code: "ED-FIN", name: "EXECUTIVE DIRECTOR (FINANCE)", shortName: "ED-Fin", nameBng: "নির্বাহী পরিচালক (অর্থ ও বাণিজ্যিক)", levelRank: 3, sortOrder: 2, reportsTo: "MD", status: "Active" },
+      { id: "mfg-ed-tech", code: "ED-TECH", name: "EXECUTIVE DIRECTOR (TECHNICAL)", shortName: "ED-Tech", nameBng: "নির্বাহী পরিচালক (প্রকৌশল)", levelRank: 3, sortOrder: 3, reportsTo: "MD", status: "Active" },
+      { id: "mfg-gm", code: "GM-PLANT", name: "GENERAL MANAGER (PLANT)", shortName: "Plant GM", nameBng: "মহাব্যবস্থাপক (কারখানা)", levelRank: 4, sortOrder: 1, reportsTo: "Executive Directors", status: "Active" },
+      { id: "mfg-dgm", code: "DGM", name: "DEPUTY GENERAL MANAGER (DGM)", shortName: "DGM", nameBng: "উপ-মহাব্যবস্থাপক", levelRank: 5, sortOrder: 1, reportsTo: "Plant GM", status: "Active" },
+      { id: "mfg-mgr", code: "MGR", name: "PRODUCTION MANAGER", shortName: "Prod Mgr", nameBng: "উৎপাদন ব্যবস্থাপক", levelRank: 6, sortOrder: 1, reportsTo: "DGM", status: "Active" },
+      { id: "mfg-exec", code: "SR-EXEC", name: "SENIOR ENGINEER", shortName: "Sr. Engr", nameBng: "সিনিয়র প্রকৌশলী", levelRank: 7, sortOrder: 1, reportsTo: "Prod Mgr", status: "Active" },
+      { id: "mfg-sup", code: "SUPV", name: "SHIFT SUPERVISOR", shortName: "Supervisor", nameBng: "সুপারভাইজার", levelRank: 8, sortOrder: 1, reportsTo: "Sr. Engr", status: "Active" },
+    ],
+  },
+  {
+    id: "tpl-flat",
+    code: "TPL-FLAT-03",
+    name: "Agile & Tech Organization Hierarchy",
+    description: "Lean, streamlined hierarchy for software lab and tech business units.",
+    isActive: false,
+    createdAt: "2026-09-28",
+    designations: [
+      { id: "flt-bod", code: "BOD", name: "BOARD OF DIRECTORS / ADVISORY", shortName: "Board", nameBng: "পরিচালনা পর্ষদ", levelRank: 1, sortOrder: 1, status: "Active" },
+      { id: "flt-ceo", code: "CEO", name: "CHIEF EXECUTIVE OFFICER (CEO)", shortName: "CEO", nameBng: "প্রধান নির্বাহী কর্মকর্তা", levelRank: 2, sortOrder: 1, reportsTo: "Board", status: "Active" },
+      { id: "flt-cto", code: "CTO", name: "CTO", shortName: "CTO", nameBng: "প্রধান প্রযুক্তি কর্মকর্তা", levelRank: 3, sortOrder: 1, reportsTo: "CEO", status: "Active" },
+      { id: "flt-cpo", code: "CPO", name: "CPO", shortName: "CPO", nameBng: "প্রধান পণ্য কর্মকর্তা", levelRank: 3, sortOrder: 2, reportsTo: "CEO", status: "Active" },
+      { id: "flt-cmo", code: "CMO", name: "CMO", shortName: "CMO", nameBng: "প্রধান গ্রোথ কর্মকর্তা", levelRank: 3, sortOrder: 3, reportsTo: "CEO", status: "Active" },
+      { id: "flt-lead", code: "LEAD", name: "PRINCIPAL ARCHITECT / LEAD", shortName: "Tech Lead", nameBng: "টেক লিড", levelRank: 4, sortOrder: 1, reportsTo: "CTO", status: "Active" },
+      { id: "flt-sr", code: "SR-DEV", name: "SENIOR SOFTWARE ENGINEER", shortName: "Sr. Dev", nameBng: "সিনিয়র ডেভেলপার", levelRank: 5, sortOrder: 1, reportsTo: "Tech Lead", status: "Active" },
+      { id: "flt-mid", code: "MID-DEV", name: "SOFTWARE ENGINEER", shortName: "Dev", nameBng: "সফটওয়্যার ডেভেলপার", levelRank: 6, sortOrder: 1, reportsTo: "Sr. Dev", status: "Active" },
+    ],
+  },
+];
+
+interface MasterDesignationItem {
+  name: string;
+  shortName: string;
+  nameBng: string;
+  category?: string;
+}
+
+const MASTER_DESIGNATION_POOL: MasterDesignationItem[] = [
+  { name: "BOARD OF DIRECTORS", shortName: "BOD", nameBng: "পরিচালনা পর্ষদ", category: "Governance" },
+  { name: "CHAIRMAN", shortName: "CHM", nameBng: "চেয়ারম্যান", category: "Governance" },
+  { name: "VICE CHAIRMAN", shortName: "V-CHM", nameBng: "ভাইস চেয়ারম্যান", category: "Governance" },
+  { name: "MANAGING DIRECTOR", shortName: "MD", nameBng: "ব্যবস্থাপনা পরিচালক", category: "Executive" },
+  { name: "CHIEF EXECUTIVE OFFICER", shortName: "CEO", nameBng: "প্রধান নির্বাহী কর্মকর্তা", category: "Executive" },
+  { name: "CHIEF OPERATING OFFICER", shortName: "COO", nameBng: "প্রধান পরিচালন কর্মকর্তা", category: "Executive" },
+  { name: "CHIEF FINANCIAL OFFICER", shortName: "CFO", nameBng: "প্রধান অর্থ কর্মকর্তা", category: "Executive" },
+  { name: "CHIEF TECHNOLOGY OFFICER", shortName: "CTO", nameBng: "প্রধান প্রযুক্তি কর্মকর্তা", category: "Executive" },
+  { name: "CHIEF MARKETING OFFICER", shortName: "CMO", nameBng: "প্রধান বিপণন কর্মকর্তা", category: "Executive" },
+  { name: "CHIEF HUMAN RESOURCES OFFICER", shortName: "CHRO", nameBng: "প্রধান মানবসম্পদ কর্মকর্তা", category: "Executive" },
+  { name: "CHIEF INFORMATION OFFICER", shortName: "CIO", nameBng: "প্রধান তথ্য কর্মকর্তা", category: "Executive" },
+  { name: "CHIEF PRODUCT OFFICER", shortName: "CPO", nameBng: "প্রধান পণ্য কর্মকর্তা", category: "Executive" },
+  { name: "EXECUTIVE DIRECTOR", shortName: "ED", nameBng: "নির্বাহী পরিচালক", category: "Executive" },
+  { name: "DIRECTOR", shortName: "DIR", nameBng: "পরিচালক", category: "Executive" },
+  { name: "GENERAL MANAGER", shortName: "GM", nameBng: "মহাব্যবস্থাপক", category: "Management" },
+  { name: "DEPUTY GENERAL MANAGER", shortName: "DGM", nameBng: "উপ-মহাব্যবস্থাপক", category: "Management" },
+  { name: "ASSISTANT GENERAL MANAGER", shortName: "AGM", nameBng: "সহকারী মহাব্যবস্থাপক", category: "Management" },
+  { name: "SENIOR MANAGER", shortName: "Sr. Mgr", nameBng: "সিনিয়র ম্যানেজার", category: "Management" },
+  { name: "MANAGER", shortName: "Manager", nameBng: "ম্যানেজার", category: "Management" },
+  { name: "DEPUTY MANAGER", shortName: "Dep. Mgr", nameBng: "উপ-ম্যানেজার", category: "Management" },
+  { name: "ASSISTANT MANAGER", shortName: "Asst. Mgr", nameBng: "সহকারী ম্যানেজার", category: "Management" },
+  { name: "SENIOR EXECUTIVE", shortName: "Sr. Exec", nameBng: "সিনিয়র এক্সিকিউটিভ", category: "Executive Staff" },
+  { name: "EXECUTIVE", shortName: "Executive", nameBng: "নির্বাহী", category: "Executive Staff" },
+  { name: "JUNIOR EXECUTIVE", shortName: "Jr. Exec", nameBng: "জুনিয়র এক্সিকিউটিভ", category: "Executive Staff" },
+  { name: "SENIOR OFFICER", shortName: "Sr. Officer", nameBng: "সিনিয়র অফিসার", category: "Officer Staff" },
+  { name: "OFFICER", shortName: "Officer", nameBng: "কর্মকর্তা", category: "Officer Staff" },
+  { name: "JUNIOR OFFICER", shortName: "Jr. Officer", nameBng: "জুনিয়র অফিসার", category: "Officer Staff" },
+  { name: "SENIOR SUPERVISOR", shortName: "Sr. Sup", nameBng: "সিনিয়র সুপারভাইজার", category: "Supervision" },
+  { name: "SUPERVISOR", shortName: "Supervisor", nameBng: "সুপারভাইজার", category: "Supervision" },
+  { name: "ASSISTANT SUPERVISOR", shortName: "Asst. Sup", nameBng: "সহকারী সুপারভাইজার", category: "Supervision" },
+  { name: "LINE LEADER", shortName: "Line Leader", nameBng: "লাইন লিডার", category: "Production" },
+  { name: "OPERATOR", shortName: "Operator", nameBng: "অপারেটর", category: "Production" },
+  { name: "ASSISTANT OPERATOR", shortName: "Asst. Op", nameBng: "সহকারী অপারেটর", category: "Production" },
+  { name: "HELPER", shortName: "Helper", nameBng: "হেলপার", category: "Production" },
+  { name: "HR EXECUTIVE", shortName: "HR Exec", nameBng: "এইচআর এক্সিকিউটিভ", category: "Human Resources" },
+  { name: "HR MANAGER", shortName: "HR Mgr", nameBng: "এইচআর ম্যানেজার", category: "Human Resources" },
+  { name: "HR DIRECTOR", shortName: "HR Dir", nameBng: "এইচআর ডিরেক্টর", category: "Human Resources" },
+  { name: "ACCOUNTANT", shortName: "Accountant", nameBng: "হিসাবরক্ষক", category: "Finance" },
+  { name: "FINANCE MANAGER", shortName: "Finance Mgr", nameBng: "ফাইন্যান্স ম্যানেজার", category: "Finance" },
+  { name: "SOFTWARE ENGINEER", shortName: "Software Eng", nameBng: "সফটওয়্যার ইঞ্জিনিয়ার", category: "Engineering" },
+  { name: "SENIOR SOFTWARE ENGINEER", shortName: "Sr. SWE", nameBng: "সিনিয়র সফটওয়্যার ইঞ্জিনিয়ার", category: "Engineering" },
+  { name: "LEAD ENGINEER", shortName: "Lead Eng", nameBng: "লিড ইঞ্জিনিয়ার", category: "Engineering" },
+  { name: "QA ENGINEER", shortName: "QA Eng", nameBng: "কিউএ ইঞ্জিনিয়ার", category: "Engineering" },
+  { name: "UI/UX DESIGNER", shortName: "UI/UX", nameBng: "ইউআই/ইউএক্স ডিজাইনার", category: "Engineering" },
+  { name: "PRODUCT MANAGER", shortName: "PM", nameBng: "প্রোডাক্ট ম্যানেজার", category: "Engineering" },
+  { name: "OFFICE ASSISTANT", shortName: "Office Asst", nameBng: "অফিস সহকারী", category: "Administration" },
+  { name: "RECEPTIONIST", shortName: "Receptionist", nameBng: "অভ্যর্থনাকারী", category: "Administration" }
+];
 // ----------------------------------------------------
 interface Organization {
   sl: number;
@@ -1624,6 +1792,40 @@ function CompanySetupPage() {
   const [settingsTab, setSettingsTab] = useState("all");
   const [companySettings, setCompanySettings] = useState<Record<number, CompanyBasicSettings>>({});
 
+  // Designation Organogram & Template state
+  const [organogramTemplates, setOrganogramTemplates] = useState<OrganogramTemplate[]>([]);
+  const [activeTemplateId, setActiveTemplateId] = useState<string>("tpl-standard");
+  const [organogramSubTab, setOrganogramSubTab] = useState<"templates" | "builder">("builder");
+  const [organogramViewMode, setOrganogramViewMode] = useState<"chart" | "table">("chart");
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
+  const [templateModalName, setTemplateModalName] = useState("");
+  const [templateModalCode, setTemplateModalCode] = useState("");
+  const [templateModalDesc, setTemplateModalDesc] = useState("");
+  const [templateModalClone, setTemplateModalClone] = useState(true);
+
+  // Directional Add Modal states (Add Above, Below, Left, Right)
+  const [isDirectionalPickerOpen, setIsDirectionalPickerOpen] = useState(false);
+  const [directionalTarget, setDirectionalTarget] = useState<OrganogramDesignationItem | null>(null);
+  const [directionalSide, setDirectionalSide] = useState<"above" | "below" | "left" | "right">("right");
+  const [directionalSearch, setDirectionalSearch] = useState("");
+  const [directionalActiveTab, setDirectionalActiveTab] = useState<"remaining" | "all" | "custom">("remaining");
+  const [customDesigTitle, setCustomDesigTitle] = useState("");
+  const [customDesigShortName, setCustomDesigShortName] = useState("");
+  const [customDesigTitleBng, setCustomDesigTitleBng] = useState("");
+
+  // Form states - Designation Modal
+  const [isDesigModalOpen, setIsDesigModalOpen] = useState(false);
+  const [editingDesig, setEditingDesig] = useState<OrganogramDesignationItem | null>(null);
+  const [modalDesigCode, setModalDesigCode] = useState("");
+  const [modalDesigName, setModalDesigName] = useState("");
+  const [modalDesigShortName, setModalDesigShortName] = useState("");
+  const [modalDesigNameBng, setModalDesigNameBng] = useState("");
+  const [modalDesigLevel, setModalDesigLevel] = useState(3);
+  const [modalDesigSortOrder, setModalDesigSortOrder] = useState(1);
+  const [modalDesigReportsTo, setModalDesigReportsTo] = useState("");
+  const [modalDesigStatus, setModalDesigStatus] = useState<"Active" | "Inactive">("Active");
+
   // Load from LocalStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -1631,7 +1833,7 @@ function CompanySetupPage() {
       const tabParam = params.get("tab") as TabType;
       if (
         tabParam &&
-        ["company", "area", "mapping", "department", "section", "unit", "line", "holiday"].includes(tabParam)
+        ["company", "area", "mapping", "department", "section", "unit", "line", "holiday", "payslip", "organogram"].includes(tabParam)
       ) {
         setActiveTab(tabParam);
       }
@@ -1717,7 +1919,405 @@ function CompanySetupPage() {
       setDeptDesignations(initial);
       localStorage.setItem("hris_dept_designations", JSON.stringify(initial));
     }
+
+    // Load Organogram Templates
+    const savedTemplates = localStorage.getItem("hris_organogram_templates_v2");
+    if (savedTemplates) {
+      try {
+        const parsed = JSON.parse(savedTemplates);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setOrganogramTemplates(parsed);
+        } else {
+          setOrganogramTemplates(DEFAULT_ORGANOGRAM_TEMPLATES);
+          localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(DEFAULT_ORGANOGRAM_TEMPLATES));
+        }
+      } catch (e) {
+        setOrganogramTemplates(DEFAULT_ORGANOGRAM_TEMPLATES);
+        localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(DEFAULT_ORGANOGRAM_TEMPLATES));
+      }
+    } else {
+      setOrganogramTemplates(DEFAULT_ORGANOGRAM_TEMPLATES);
+      localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(DEFAULT_ORGANOGRAM_TEMPLATES));
+    }
+
+    const savedActiveTplId = localStorage.getItem("hris_organogram_active_template_id");
+    if (savedActiveTplId) {
+      setActiveTemplateId(savedActiveTplId);
+    }
   }, []);
+
+  // Organogram Template & Designation Handlers
+  const activeTemplate =
+    organogramTemplates.find((t) => t.id === activeTemplateId) ||
+    organogramTemplates.find((t) => t.isActive) ||
+    organogramTemplates[0] ||
+    DEFAULT_ORGANOGRAM_TEMPLATES[0];
+
+  const assignedDesignationNames = new Set(
+    (activeTemplate?.designations || []).map((d) => d.name.trim().toLowerCase())
+  );
+  const remainingMasterDesignations = MASTER_DESIGNATION_POOL.filter(
+    (m) => !assignedDesignationNames.has(m.name.trim().toLowerCase())
+  );
+
+  const handleSelectTemplate = (tplId: string) => {
+    setActiveTemplateId(tplId);
+    localStorage.setItem("hris_organogram_active_template_id", tplId);
+  };
+
+  const handleToggleTemplateActive = (tplId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    const updated = organogramTemplates.map((t) =>
+      t.id === tplId ? { ...t, isActive: !t.isActive } : t
+    );
+    setOrganogramTemplates(updated);
+    localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updated));
+    const target = updated.find((t) => t.id === tplId);
+    toast.success(`Template "${target?.name}" is now ${target?.isActive ? "ACTIVE" : "INACTIVE"}`);
+  };
+
+  const openCreateTemplateModal = () => {
+    setEditingTemplateId(null);
+    setTemplateModalName("");
+    setTemplateModalCode(`TPL-${String(organogramTemplates.length + 1).padStart(2, "0")}`);
+    setTemplateModalDesc("");
+    setTemplateModalClone(true);
+    setIsTemplateModalOpen(true);
+  };
+
+  const openEditTemplateModal = (tpl: OrganogramTemplate, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setEditingTemplateId(tpl.id);
+    setTemplateModalName(tpl.name);
+    setTemplateModalCode(tpl.code);
+    setTemplateModalDesc(tpl.description || "");
+    setTemplateModalClone(false);
+    setIsTemplateModalOpen(true);
+  };
+
+  const handleSaveTemplate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!templateModalName.trim()) {
+      toast.error("Please enter a template name");
+      return;
+    }
+
+    let updated: OrganogramTemplate[];
+    if (editingTemplateId) {
+      updated = organogramTemplates.map((t) =>
+        t.id === editingTemplateId
+          ? {
+              ...t,
+              name: templateModalName,
+              code: templateModalCode || t.code,
+              description: templateModalDesc,
+            }
+          : t
+      );
+      toast.success(`Template updated: ${templateModalName}`);
+    } else {
+      const newId = `tpl-${Date.now()}`;
+      const baseDesignations = templateModalClone && activeTemplate ? [...activeTemplate.designations] : [];
+      const newTpl: OrganogramTemplate = {
+        id: newId,
+        code: templateModalCode || `TPL-${String(organogramTemplates.length + 1).padStart(2, "0")}`,
+        name: templateModalName,
+        description: templateModalDesc,
+        isActive: true,
+        createdAt: new Date().toISOString().slice(0, 10),
+        designations: baseDesignations,
+      };
+      updated = [...organogramTemplates, newTpl];
+      setActiveTemplateId(newId);
+      localStorage.setItem("hris_organogram_active_template_id", newId);
+      toast.success(`New template created: ${templateModalName}`);
+    }
+
+    setOrganogramTemplates(updated);
+    localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updated));
+    setIsTemplateModalOpen(false);
+  };
+
+  const handleDuplicateTemplate = (tplId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    const target = organogramTemplates.find((t) => t.id === tplId);
+    if (!target) return;
+    const newId = `tpl-${Date.now()}`;
+    const cloned: OrganogramTemplate = {
+      ...target,
+      id: newId,
+      code: `${target.code}-COPY`,
+      name: `${target.name} (Copy)`,
+      isActive: false,
+      createdAt: new Date().toISOString().slice(0, 10),
+      designations: target.designations.map((d) => ({
+        ...d,
+        id: `des-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      })),
+    };
+    const updated = [...organogramTemplates, cloned];
+    setOrganogramTemplates(updated);
+    localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updated));
+    setActiveTemplateId(newId);
+    localStorage.setItem("hris_organogram_active_template_id", newId);
+    toast.success(`Duplicated template "${target.name}"`);
+  };
+
+  const handleDeleteOrganogramTemplate = (tplId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (organogramTemplates.length <= 1) {
+      toast.error("At least one template must remain.");
+      return;
+    }
+    if (confirm("Are you sure you want to delete this organogram template?")) {
+      const updated = organogramTemplates.filter((t) => t.id !== tplId);
+      setOrganogramTemplates(updated);
+      localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updated));
+      if (activeTemplateId === tplId) {
+        setActiveTemplateId(updated[0].id);
+        localStorage.setItem("hris_organogram_active_template_id", updated[0].id);
+      }
+      toast.success("Template deleted");
+    }
+  };
+
+  const handleResetTemplates = () => {
+    if (confirm("Reset all templates back to default system templates?")) {
+      setOrganogramTemplates(DEFAULT_ORGANOGRAM_TEMPLATES);
+      localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(DEFAULT_ORGANOGRAM_TEMPLATES));
+      setActiveTemplateId("tpl-standard");
+      localStorage.setItem("hris_organogram_active_template_id", "tpl-standard");
+      toast.success("Templates reset to defaults");
+    }
+  };
+
+  const openDesigModal = (
+    item: OrganogramDesignationItem | null,
+    defaultLevel?: number,
+    defaultOrder?: number
+  ) => {
+    if (item) {
+      setEditingDesig(item);
+      setModalDesigCode(item.code);
+      setModalDesigName(item.name);
+      setModalDesigShortName(item.shortName || "");
+      setModalDesigNameBng(item.nameBng || "");
+      setModalDesigLevel(item.levelRank);
+      setModalDesigSortOrder(item.sortOrder);
+      setModalDesigReportsTo(item.reportsTo || "");
+      setModalDesigStatus(item.status);
+    } else {
+      setEditingDesig(null);
+      const currentDesigs = activeTemplate?.designations || [];
+      const currentLevel = defaultLevel !== undefined ? defaultLevel : 3;
+      const countAtLevel = currentDesigs.filter((d) => d.levelRank === currentLevel).length;
+      setModalDesigCode(`DESIG-${String(currentDesigs.length + 1).padStart(3, "0")}`);
+      setModalDesigName("");
+      setModalDesigShortName("");
+      setModalDesigNameBng("");
+      setModalDesigLevel(currentLevel);
+      setModalDesigSortOrder(defaultOrder !== undefined ? defaultOrder : countAtLevel + 1);
+      setModalDesigReportsTo("");
+      setModalDesigStatus("Active");
+    }
+    setIsDesigModalOpen(true);
+  };
+
+  const handleSaveDesignation = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modalDesigName.trim()) {
+      toast.error("Please enter designation title");
+      return;
+    }
+
+    const currentDesigs = activeTemplate?.designations || [];
+    let updatedDesigs: OrganogramDesignationItem[];
+
+    if (editingDesig) {
+      updatedDesigs = currentDesigs.map((d) =>
+        d.id === editingDesig.id
+          ? {
+              ...d,
+              code: modalDesigCode || d.code,
+              name: modalDesigName,
+              shortName: modalDesigShortName || modalDesigName,
+              nameBng: modalDesigNameBng,
+              levelRank: Number(modalDesigLevel),
+              sortOrder: Number(modalDesigSortOrder),
+              reportsTo: modalDesigReportsTo,
+              status: modalDesigStatus,
+            }
+          : d
+      );
+      toast.success(`Updated designation: ${modalDesigName}`);
+    } else {
+      const newId = `des-${Date.now()}`;
+      const newItem: OrganogramDesignationItem = {
+        id: newId,
+        code: modalDesigCode || `DESIG-${String(currentDesigs.length + 1).padStart(3, "0")}`,
+        name: modalDesigName,
+        shortName: modalDesigShortName || modalDesigName,
+        nameBng: modalDesigNameBng,
+        levelRank: Number(modalDesigLevel),
+        sortOrder: Number(modalDesigSortOrder),
+        reportsTo: modalDesigReportsTo,
+        status: modalDesigStatus,
+      };
+      updatedDesigs = [...currentDesigs, newItem];
+      toast.success(`Created designation: ${modalDesigName}`);
+    }
+
+    const updatedTemplates = organogramTemplates.map((t) =>
+      t.id === activeTemplate.id ? { ...t, designations: updatedDesigs } : t
+    );
+    setOrganogramTemplates(updatedTemplates);
+    localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updatedTemplates));
+    setIsDesigModalOpen(false);
+  };
+
+  const handleMoveLevel = (id: string, delta: number) => {
+    const currentDesigs = activeTemplate?.designations || [];
+    const updatedDesigs = currentDesigs.map((d) => {
+      if (d.id === id) {
+        const newLevel = Math.max(1, d.levelRank + delta);
+        return { ...d, levelRank: newLevel };
+      }
+      return d;
+    });
+
+    const updatedTemplates = organogramTemplates.map((t) =>
+      t.id === activeTemplate.id ? { ...t, designations: updatedDesigs } : t
+    );
+    setOrganogramTemplates(updatedTemplates);
+    localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updatedTemplates));
+  };
+
+  const handleMoveSortOrder = (id: string, delta: number) => {
+    const currentDesigs = activeTemplate?.designations || [];
+    const updatedDesigs = currentDesigs.map((d) => {
+      if (d.id === id) {
+        const newOrder = Math.max(1, d.sortOrder + delta);
+        return { ...d, sortOrder: newOrder };
+      }
+      return d;
+    });
+
+    const updatedTemplates = organogramTemplates.map((t) =>
+      t.id === activeTemplate.id ? { ...t, designations: updatedDesigs } : t
+    );
+    setOrganogramTemplates(updatedTemplates);
+    localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updatedTemplates));
+  };
+
+  const handleDeleteDesignation = (id: string) => {
+    if (confirm("Are you sure you want to delete this designation from the organogram?")) {
+      const currentDesigs = activeTemplate?.designations || [];
+      const updatedDesigs = currentDesigs.filter((d) => d.id !== id);
+      const updatedTemplates = organogramTemplates.map((t) =>
+        t.id === activeTemplate.id ? { ...t, designations: updatedDesigs } : t
+      );
+      setOrganogramTemplates(updatedTemplates);
+      localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updatedTemplates));
+      toast.success("Designation removed");
+    }
+  };
+
+  const handleToggleDesigStatus = (id: string) => {
+    const currentDesigs = activeTemplate?.designations || [];
+    const updatedDesigs = currentDesigs.map((d) =>
+      d.id === id
+        ? { ...d, status: d.status === "Active" ? ("Inactive" as const) : ("Active" as const) }
+        : d
+    );
+    const updatedTemplates = organogramTemplates.map((t) =>
+      t.id === activeTemplate.id ? { ...t, designations: updatedDesigs } : t
+    );
+    setOrganogramTemplates(updatedTemplates);
+    localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updatedTemplates));
+  };
+
+  const openDirectionalAdd = (
+    item: OrganogramDesignationItem,
+    side: "above" | "below" | "left" | "right"
+  ) => {
+    setDirectionalTarget(item);
+    setDirectionalSide(side);
+    setDirectionalSearch("");
+    setDirectionalActiveTab("remaining");
+    setCustomDesigTitle("");
+    setCustomDesigShortName("");
+    setCustomDesigTitleBng("");
+    setIsDirectionalPickerOpen(true);
+  };
+
+  const handlePickAndPlaceDesignation = (
+    chosenName: string,
+    chosenShortName?: string,
+    chosenNameBng?: string
+  ) => {
+    if (!directionalTarget) return;
+    const currentDesigs = [...(activeTemplate?.designations || [])];
+
+    let targetLevel = directionalTarget.levelRank;
+    let targetOrder = directionalTarget.sortOrder;
+    let updatedDesigs = [...currentDesigs];
+
+    if (directionalSide === "left") {
+      targetLevel = directionalTarget.levelRank;
+      targetOrder = directionalTarget.sortOrder;
+      // Shift any designation at same level with sortOrder >= targetOrder
+      updatedDesigs = updatedDesigs.map((d) =>
+        d.levelRank === targetLevel && d.sortOrder >= targetOrder
+          ? { ...d, sortOrder: d.sortOrder + 1 }
+          : d
+      );
+    } else if (directionalSide === "right") {
+      targetLevel = directionalTarget.levelRank;
+      targetOrder = directionalTarget.sortOrder + 1;
+      // Shift any designation at same level with sortOrder > targetOrder
+      updatedDesigs = updatedDesigs.map((d) =>
+        d.levelRank === targetLevel && d.sortOrder >= targetOrder
+          ? { ...d, sortOrder: d.sortOrder + 1 }
+          : d
+      );
+    } else if (directionalSide === "above") {
+      targetLevel = directionalTarget.levelRank;
+      targetOrder = 1;
+      // Shift all levels >= targetLevel down by 1 to make room
+      updatedDesigs = updatedDesigs.map((d) =>
+        d.levelRank >= targetLevel ? { ...d, levelRank: d.levelRank + 1 } : d
+      );
+    } else if (directionalSide === "below") {
+      targetLevel = directionalTarget.levelRank + 1;
+      targetOrder = 1;
+      // Shift all levels >= targetLevel down by 1 to make room
+      updatedDesigs = updatedDesigs.map((d) =>
+        d.levelRank >= targetLevel ? { ...d, levelRank: d.levelRank + 1 } : d
+      );
+    }
+
+    const newItem: OrganogramDesignationItem = {
+      id: `des-${Date.now()}`,
+      code: chosenShortName?.toUpperCase().replace(/\s+/g, "") || `DES-${Date.now().toString().slice(-4)}`,
+      name: chosenName,
+      shortName: chosenShortName || chosenName,
+      nameBng: chosenNameBng || "",
+      levelRank: targetLevel,
+      sortOrder: targetOrder,
+      reportsTo: directionalSide === "below" ? directionalTarget.name : (directionalTarget.reportsTo || ""),
+      status: "Active",
+    };
+
+    updatedDesigs.push(newItem);
+
+    const updatedTemplates = organogramTemplates.map((t) =>
+      t.id === activeTemplate.id ? { ...t, designations: updatedDesigs } : t
+    );
+    setOrganogramTemplates(updatedTemplates);
+    localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updatedTemplates));
+    setIsDirectionalPickerOpen(false);
+    toast.success(`Placed "${chosenName}" ${directionalSide.toUpperCase()} of ${directionalTarget.name}`);
+  };
 
   // Shared Modal controls
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -2324,6 +2924,7 @@ function CompanySetupPage() {
     { type: "section", label: "Section", icon: Grid },
     { type: "unit", label: "Unit", icon: Building2 },
     { type: "line", label: "Line", icon: Grid },
+    { type: "organogram", label: "Designation & Organogram", icon: Network },
     { type: "holiday", label: "Default Holiday Setup", icon: Calendar },
     { type: "payslip", label: "Payslip Configuration", icon: Settings },
   ];
@@ -2373,6 +2974,8 @@ function CompanySetupPage() {
                       setTplEmpType("Worker");
                       setTplOtType("2hrs OT");
                       setIsCreateTplOpen(true);
+                    } else if (activeTab === "organogram") {
+                      openDesigModal(null);
                     } else {
                       openForm(null);
                     }
@@ -3632,6 +4235,914 @@ function CompanySetupPage() {
                     })()}
                   </tbody>
                 </table>
+              )}
+
+              {activeTab === "organogram" && (
+                <div className="p-4 sm:p-6 space-y-6">
+                  {/* Top Organogram & Template Control Header */}
+                  <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-2xl p-5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 shadow-sm">
+                    <div className="flex items-center gap-3.5">
+                      <div className="p-3 bg-primary text-primary-foreground rounded-xl shadow-md">
+                        <Network className="size-6" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h2 className="text-base font-bold text-foreground">
+                            Designation Organogram & Hierarchy
+                          </h2>
+                          <span
+                            className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold border ${
+                              activeTemplate?.isActive
+                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                : "bg-slate-500/10 text-slate-500 border-slate-500/20"
+                            }`}
+                          >
+                            {activeTemplate?.isActive ? "ACTIVE TEMPLATE" : "INACTIVE TEMPLATE"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5 max-w-2xl">
+                          Pure designation organogram with flexible templates. Top leadership branches into parallel executive roles (COO, CFO, CTO, CMO, CHRO) and converges down to General Manager through Officer.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 self-stretch lg:self-auto justify-end">
+                      <button
+                        type="button"
+                        onClick={openCreateTemplateModal}
+                        className="h-9 px-3.5 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-xs transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                      >
+                        <LayoutTemplate className="size-3.5" /> + New Template
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => openDesigModal(null)}
+                        className="h-9 px-4 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-xs hover:bg-primary/90 transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Plus className="size-3.5" /> Add Designation
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleResetTemplates}
+                        className="h-9 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-muted-foreground hover:text-foreground font-medium text-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                        title="Reset all templates back to default system templates"
+                      >
+                        <RefreshCw className="size-3.5" /> Reset Defaults
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Sub-Tab Navigation: Templates List (Table View) vs Organogram Diagram Builder */}
+                  <div className="flex items-center justify-between border-b border-border/60 pb-3 flex-wrap gap-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setOrganogramSubTab("templates")}
+                        className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
+                          organogramSubTab === "templates"
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/40"
+                        }`}
+                      >
+                        <ListTree className="size-4" />
+                        <span>Templates List (Table View)</span>
+                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                          organogramSubTab === "templates" ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
+                        }`}>
+                          {organogramTemplates.length}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setOrganogramSubTab("builder")}
+                        className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
+                          organogramSubTab === "builder"
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/40"
+                        }`}
+                      >
+                        <Network className="size-4" />
+                        <span>Organogram Diagram Builder</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                          activeTemplate.isActive
+                            ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                            : "bg-amber-500/20 text-amber-600 dark:text-amber-400"
+                        }`}>
+                          {activeTemplate.name.split(" ")[0]} ({activeTemplate.isActive ? "Active" : "Inactive"})
+                        </span>
+                      </button>
+                    </div>
+
+                    {/* Builder Controls when viewing Organogram */}
+                    {organogramSubTab === "builder" && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {/* Template Switcher Dropdown */}
+                        <div className="flex items-center gap-1.5 bg-card border border-border/60 rounded-xl px-2.5 py-1 text-xs">
+                          <span className="text-[11px] text-muted-foreground font-semibold">Template:</span>
+                          <select
+                            value={activeTemplateId}
+                            onChange={(e) => handleSelectTemplate(e.target.value)}
+                            className="bg-transparent font-bold text-foreground outline-none cursor-pointer max-w-[200px] truncate text-xs"
+                          >
+                            {organogramTemplates.map((tpl) => (
+                              <option key={tpl.id} value={tpl.id}>
+                                {tpl.name} ({tpl.isActive ? "Active" : "Inactive"})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Interactive Active / Inactive Toggle for Selected Template */}
+                        <button
+                          type="button"
+                          onClick={(e) => handleToggleTemplateActive(activeTemplate.id, e)}
+                          className={`px-2.5 py-1 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+                            activeTemplate.isActive
+                              ? "bg-emerald-500/15 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/25"
+                              : "bg-slate-500/10 text-slate-500 border-slate-500/25 hover:bg-slate-500/20"
+                          }`}
+                          title="Click to toggle template Active/Inactive status"
+                        >
+                          <Power className="size-3" />
+                          <span>{activeTemplate.isActive ? "ACTIVE" : "INACTIVE"}</span>
+                        </button>
+
+                        {/* View Mode Toggle: Diagram vs Table */}
+                        <div className="bg-muted p-1 rounded-xl border border-border/60 flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setOrganogramViewMode("chart")}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer ${
+                              organogramViewMode === "chart"
+                                ? "bg-card text-primary shadow-xs font-bold"
+                                : "text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            <Network className="size-3" /> Tree Diagram
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setOrganogramViewMode("table")}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer ${
+                              organogramViewMode === "table"
+                                ? "bg-card text-primary shadow-xs font-bold"
+                                : "text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            <ListTree className="size-3" /> Roles Table
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 1. TEMPLATES LIST (TABLE VIEW) */}
+                  {organogramSubTab === "templates" && (
+                    <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+                      <div className="p-4 border-b border-border/60 bg-muted/20 flex items-center justify-between flex-wrap gap-3">
+                        <div>
+                          <h3 className="text-sm font-extrabold text-foreground flex items-center gap-2">
+                            <LayoutTemplate className="size-4 text-primary" />
+                            Organogram Templates Directory
+                          </h3>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Manage multiple organogram hierarchy structures. Active templates take effect across the HRIS.
+                          </p>
+                        </div>
+                        <span className="text-xs font-mono font-bold text-muted-foreground bg-muted px-2.5 py-1 rounded-lg border border-border/40">
+                          {organogramTemplates.length} Templates Configured
+                        </span>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
+                          <thead className="bg-muted/40 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                            <tr>
+                              <th className="px-4 py-3.5 w-[90px]">Code</th>
+                              <th className="px-4 py-3.5">Template Name & Description</th>
+                              <th className="px-4 py-3.5 text-center">Depth</th>
+                              <th className="px-4 py-3.5 text-center">Total Roles</th>
+                              <th className="px-4 py-3.5 text-center">Active Status</th>
+                              <th className="px-4 py-3.5 text-center">Selection</th>
+                              <th className="px-4 py-3.5 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/30">
+                            {organogramTemplates.map((tpl) => {
+                              const isSelected = tpl.id === activeTemplate.id;
+                              const distinctLevelsCount = new Set(tpl.designations.map((d) => d.levelRank)).size;
+
+                              return (
+                                <tr
+                                  key={tpl.id}
+                                  className={`hover:bg-muted/20 transition-colors ${
+                                    isSelected ? "bg-primary/5 font-medium" : ""
+                                  }`}
+                                >
+                                  <td className="px-4 py-3.5 font-mono font-bold text-primary">{tpl.code}</td>
+                                  <td className="px-4 py-3.5">
+                                    <div className="font-extrabold text-foreground text-xs">{tpl.name}</div>
+                                    <div className="text-[11px] text-muted-foreground line-clamp-1 max-w-md mt-0.5">
+                                      {tpl.description}
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3.5 text-center">
+                                    <span className="inline-block px-2.5 py-0.5 rounded-full bg-muted font-mono font-bold text-[10px] text-muted-foreground border border-border/40">
+                                      {distinctLevelsCount} Levels
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3.5 text-center font-mono font-bold text-foreground">
+                                    <span className="px-2.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                                      {tpl.designations.length} Roles
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3.5 text-center">
+                                    {/* Interactive Active / Inactive Switch Button */}
+                                    <button
+                                      type="button"
+                                      onClick={(e) => handleToggleTemplateActive(tpl.id, e)}
+                                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer shadow-2xs ${
+                                        tpl.isActive
+                                          ? "bg-emerald-500/15 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/25"
+                                          : "bg-slate-500/10 text-slate-500 border-slate-500/25 hover:bg-slate-500/20"
+                                      }`}
+                                      title="Click to toggle Active / Inactive"
+                                    >
+                                      <Power className="size-3" />
+                                      <span>{tpl.isActive ? "ACTIVE" : "INACTIVE"}</span>
+                                    </button>
+                                  </td>
+                                  <td className="px-4 py-3.5 text-center">
+                                    {isSelected ? (
+                                      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground shadow-2xs">
+                                        <CheckCircle2 className="size-3" /> Selected
+                                      </span>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleSelectTemplate(tpl.id)}
+                                        className="text-[10px] font-bold text-muted-foreground hover:text-primary transition-colors underline cursor-pointer"
+                                      >
+                                        Select Template
+                                      </button>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3.5 text-right">
+                                    <div className="flex items-center justify-end gap-1.5">
+                                      {/* View & Edit Organogram Diagram */}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          handleSelectTemplate(tpl.id);
+                                          setOrganogramSubTab("builder");
+                                        }}
+                                        className="px-2.5 py-1.5 rounded-lg bg-primary text-primary-foreground font-bold text-[11px] flex items-center gap-1 hover:bg-primary/95 transition-all shadow-2xs cursor-pointer"
+                                        title="View and edit organogram diagram"
+                                      >
+                                        <Eye className="size-3.5" /> View Diagram
+                                      </button>
+
+                                      {/* Edit Details */}
+                                      <button
+                                        type="button"
+                                        onClick={(e) => openEditTemplateModal(tpl, e)}
+                                        className="p-1.5 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors cursor-pointer"
+                                        title="Edit Template Details"
+                                      >
+                                        <Pencil className="size-3.5" />
+                                      </button>
+
+                                      {/* Duplicate */}
+                                      <button
+                                        type="button"
+                                        onClick={(e) => handleDuplicateTemplate(tpl.id, e)}
+                                        className="p-1.5 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors cursor-pointer"
+                                        title="Duplicate Template"
+                                      >
+                                        <Copy className="size-3.5" />
+                                      </button>
+
+                                      {/* Delete */}
+                                      {organogramTemplates.length > 1 && (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => handleDeleteOrganogramTemplate(tpl.id, e)}
+                                          className="p-1.5 rounded-lg bg-muted hover:bg-red-500/10 hover:text-red-500 text-muted-foreground transition-colors cursor-pointer"
+                                          title="Delete Template"
+                                        >
+                                          <Trash2 className="size-3.5" />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. ORGANOGRAM BUILDER / DIAGRAM VIEW */}
+                  {organogramSubTab === "builder" && (
+                    <>
+                      {/* ORGANOGRAM PURE DESIGNATION DIAGRAM VIEW */}
+                      {organogramViewMode === "chart" && (
+                        <div className="space-y-6 py-6 overflow-x-auto">
+                          {/* Inactive template alert banner if inactive */}
+                          {!activeTemplate.isActive && (
+                            <div className="max-w-3xl mx-auto p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between text-xs text-amber-700 dark:text-amber-300">
+                              <div className="flex items-center gap-2">
+                                <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
+                                <span>
+                                  <strong>Template Inactive:</strong> This template is currently marked as inactive.
+                                  You can customize it or click the <strong>Active Toggle</strong> to enable it.
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={(e) => handleToggleTemplateActive(activeTemplate.id, e)}
+                                className="px-2.5 py-1 rounded bg-amber-500 text-white font-bold hover:bg-amber-600 transition-colors shrink-0 cursor-pointer"
+                              >
+                                Activate Now
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Tree Render: Level by Level */}
+                          {(() => {
+                            const desigs = activeTemplate?.designations || [];
+                            if (desigs.length === 0) {
+                              return (
+                                <div className="p-16 text-center text-muted-foreground border-2 border-dashed border-border/60 rounded-2xl max-w-xl mx-auto">
+                                  <Network className="size-10 mx-auto text-muted-foreground/40 mb-3" />
+                                  <p className="font-semibold text-foreground">No designations in this template</p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Click "Add Designation" above to begin building the organogram.
+                                  </p>
+                                </div>
+                              );
+                            }
+
+                            // Group designations by levelRank
+                            const levelMap: Record<number, OrganogramDesignationItem[]> = {};
+                            desigs.forEach((d) => {
+                              if (!levelMap[d.levelRank]) levelMap[d.levelRank] = [];
+                              levelMap[d.levelRank].push(d);
+                            });
+
+                            const sortedLevels = Object.keys(levelMap)
+                              .map(Number)
+                              .sort((a, b) => a - b);
+
+                            return (
+                              <div className="flex flex-col items-center min-w-max px-12 py-4">
+                                {sortedLevels.map((level, lIndex) => {
+                                  const items = levelMap[level].sort((a, b) => a.sortOrder - b.sortOrder);
+                                  const isMulti = items.length > 1;
+                                  const hasNextLevel = lIndex < sortedLevels.length - 1;
+                                  const nextLevelItems = hasNextLevel ? levelMap[sortedLevels[lIndex + 1]] || [] : [];
+                                  const nextIsMulti = nextLevelItems.length > 1;
+
+                                  return (
+                                    <div key={level} className="flex flex-col items-center w-full my-1">
+                                      {/* LEVEL BADGE / TITLE */}
+                                      <div className="mb-3 flex items-center gap-2">
+                                        <span className="text-[10px] font-black uppercase font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                                          Level {level} {isMulti ? `· ${items.length} Parallel Roles (Side-by-Side)` : ""}
+                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={() => openDesigModal(null, level, items.length + 1)}
+                                          className="text-[10px] text-muted-foreground hover:text-primary font-bold flex items-center gap-0.5 hover:underline cursor-pointer"
+                                          title="Add another designation at this level"
+                                        >
+                                          <Plus className="size-3" /> Add at Level {level}
+                                        </button>
+                                      </div>
+
+                                      {/* LEVEL CARDS CONTAINER */}
+                                      {isMulti ? (
+                                        /* MULTI-ROLE CONTAINER (SIDE-BY-SIDE) */
+                                        <div className="flex flex-col items-center w-full">
+                                          {/* Incoming Branching Fork (Rail ┌───┬───┬───┐) */}
+                                          <div className="w-full flex items-center justify-center">
+                                            <div className="relative flex justify-around w-full max-w-4xl px-8">
+                                              {/* Horizontal Top Rail */}
+                                              <div className="absolute top-0 left-12 right-12 h-0.5 bg-slate-300 dark:bg-slate-700" />
+                                              {items.map((it) => (
+                                                <div key={it.id} className="flex flex-col items-center z-10">
+                                                  <div className="w-0.5 h-4 bg-slate-300 dark:bg-slate-700" />
+                                                  <span className="text-[9px] text-slate-400 -mt-1 select-none">▼</span>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          </div>
+
+                                          {/* Parallel Cards Row */}
+                                          <div className="flex flex-wrap items-stretch justify-center gap-5 py-2 max-w-6xl">
+                                            {items.map((item) => (
+                                              <div
+                                                key={item.id}
+                                                className={`w-[230px] rounded-2xl border-2 transition-all p-4 flex flex-col justify-between group shadow-sm hover:shadow-lg relative bg-card ${
+                                                  item.status === "Active"
+                                                    ? "border-primary/40 hover:border-primary"
+                                                    : "border-border/60 opacity-60 bg-muted/20"
+                                                }`}
+                                              >
+                                                {/* 4 DIRECTIONAL ADD BUTTONS (ALL SIDES: ABOVE, BELOW, LEFT, RIGHT) */}
+                                                {/* 1. TOP / ABOVE (UPORE) */}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => openDirectionalAdd(item, "above")}
+                                                  className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center gap-0.5 text-[8px] font-black uppercase tracking-wider transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  title={`Add Designation Above ${item.name} (Upore)`}
+                                                >
+                                                  <Plus className="size-2.5" />▲ Above
+                                                </button>
+
+                                                {/* 2. BOTTOM / BELOW (NICHE) */}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => openDirectionalAdd(item, "below")}
+                                                  className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center gap-0.5 text-[8px] font-black uppercase tracking-wider transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  title={`Add Designation Below ${item.name} (Niche)`}
+                                                >
+                                                  <Plus className="size-2.5" />▼ Below
+                                                </button>
+
+                                                {/* 3. LEFT (BAME) */}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => openDirectionalAdd(item, "left")}
+                                                  className="absolute top-1/2 -left-3.5 -translate-y-1/2 size-6 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  title={`Add Designation to Left Side-by-Side (Bame)`}
+                                                >
+                                                  ◄+
+                                                </button>
+
+                                                {/* 4. RIGHT (DANE) */}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => openDirectionalAdd(item, "right")}
+                                                  className="absolute top-1/2 -right-3.5 -translate-y-1/2 size-6 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  title={`Add Designation to Right Side-by-Side (Dane)`}
+                                                >
+                                                  +►
+                                                </button>
+
+                                                <div>
+                                                  <div className="flex items-center justify-between gap-1 mb-2">
+                                                    <span className="text-[9px] font-bold font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                                                      Pos #{item.sortOrder}
+                                                    </span>
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleToggleDesigStatus(item.id)}
+                                                      className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full border transition-colors cursor-pointer ${
+                                                        item.status === "Active"
+                                                          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                                          : "bg-red-500/10 text-red-600 border-red-500/20"
+                                                      }`}
+                                                      title="Click to toggle status"
+                                                    >
+                                                      {item.status}
+                                                    </button>
+                                                  </div>
+
+                                                  {/* Prominent Short Name */}
+                                                  {item.shortName && (
+                                                    <div className="mb-1">
+                                                      <span className="text-xs font-black px-2 py-0.5 rounded bg-primary text-primary-foreground tracking-wide font-mono inline-block shadow-2xs">
+                                                        {item.shortName}
+                                                      </span>
+                                                    </div>
+                                                  )}
+
+                                                  {/* Full Designation Name */}
+                                                  <h4 className="text-xs font-extrabold text-foreground leading-snug group-hover:text-primary transition-colors">
+                                                    {item.name}
+                                                  </h4>
+
+                                                  {item.nameBng && (
+                                                    <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
+                                                      {item.nameBng}
+                                                    </p>
+                                                  )}
+
+                                                  {item.reportsTo && (
+                                                    <p className="text-[9px] text-muted-foreground/80 mt-1.5 font-medium truncate">
+                                                      ↳ Reports to: {item.reportsTo}
+                                                    </p>
+                                                  )}
+                                                </div>
+
+                                                {/* Action Toolbar on Card */}
+                                                <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between -mx-4 -mb-4 p-1.5 bg-muted/20 rounded-b-2xl">
+                                                  <div className="flex items-center gap-0.5">
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleMoveSortOrder(item.id, -1)}
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] font-bold cursor-pointer"
+                                                      title="Shift Left ◄"
+                                                    >
+                                                      ◄
+                                                    </button>
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleMoveSortOrder(item.id, 1)}
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] font-bold cursor-pointer"
+                                                      title="Shift Right ►"
+                                                    >
+                                                      ►
+                                                    </button>
+                                                    <div className="h-2.5 w-px bg-border/60 mx-0.5" />
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleMoveLevel(item.id, -1)}
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] cursor-pointer"
+                                                      title="Move Up Level ▲"
+                                                    >
+                                                      ▲
+                                                    </button>
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleMoveLevel(item.id, 1)}
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] cursor-pointer"
+                                                      title="Move Down Level ▼"
+                                                    >
+                                                      ▼
+                                                    </button>
+                                                  </div>
+
+                                                  <div className="flex items-center gap-0.5">
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => openDesigModal(item)}
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-blue-500 transition-colors cursor-pointer"
+                                                      title="Edit designation"
+                                                    >
+                                                      <Pencil className="size-3" />
+                                                    </button>
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleDeleteDesignation(item.id)}
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-red-500 transition-colors cursor-pointer"
+                                                      title="Delete designation"
+                                                    >
+                                                      <Trash2 className="size-3" />
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+
+                                          {/* Outgoing Converging Fork (Rail └───┴───┴───┘) */}
+                                          {hasNextLevel && (
+                                            <div className="w-full flex flex-col items-center">
+                                              <div className="relative flex justify-around w-full max-w-4xl px-8">
+                                                {items.map((it) => (
+                                                  <div key={it.id} className="flex flex-col items-center z-10">
+                                                    <div className="w-0.5 h-3.5 bg-slate-300 dark:bg-slate-700" />
+                                                  </div>
+                                                ))}
+                                                {/* Horizontal Bottom Rail */}
+                                                <div className="absolute bottom-0 left-12 right-12 h-0.5 bg-slate-300 dark:bg-slate-700" />
+                                              </div>
+                                              {/* Center Vertical Down Arrow to next level */}
+                                              <div className="w-0.5 h-5 bg-slate-300 dark:bg-slate-700" />
+                                              <span className="text-[10px] text-slate-400 -mt-1 select-none">▼</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        /* SINGLE-ROLE CONTAINER (CENTERED) */
+                                        <div className="flex flex-col items-center">
+                                          {(() => {
+                                            const item = items[0];
+                                            return (
+                                              <div
+                                                className={`rounded-2xl border-2 transition-all p-4 shadow-sm hover:shadow-lg min-w-[280px] max-w-[340px] text-center relative group bg-card ${
+                                                  level === 1
+                                                    ? "border-primary/60 bg-gradient-to-b from-primary/10 via-card to-card"
+                                                    : level === 2
+                                                    ? "border-blue-500/50 bg-gradient-to-b from-blue-500/10 via-card to-card"
+                                                    : "border-border/80 hover:border-primary"
+                                                } ${item.status === "Inactive" ? "opacity-60 bg-muted/20" : ""}`}
+                                              >
+                                                {/* 4 DIRECTIONAL ADD BUTTONS (ALL SIDES: ABOVE, BELOW, LEFT, RIGHT) */}
+                                                {/* 1. TOP / ABOVE (UPORE) */}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => openDirectionalAdd(item, "above")}
+                                                  className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center gap-0.5 text-[8px] font-black uppercase tracking-wider transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  title={`Add Designation Above ${item.name} (Upore)`}
+                                                >
+                                                  <Plus className="size-2.5" />▲ Above
+                                                </button>
+
+                                                {/* 2. BOTTOM / BELOW (NICHE) */}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => openDirectionalAdd(item, "below")}
+                                                  className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center gap-0.5 text-[8px] font-black uppercase tracking-wider transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  title={`Add Designation Below ${item.name} (Niche)`}
+                                                >
+                                                  <Plus className="size-2.5" />▼ Below
+                                                </button>
+
+                                                {/* 3. LEFT (BAME) */}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => openDirectionalAdd(item, "left")}
+                                                  className="absolute top-1/2 -left-3.5 -translate-y-1/2 size-6 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  title={`Add Designation to Left Side-by-Side (Bame)`}
+                                                >
+                                                  ◄+
+                                                </button>
+
+                                                {/* 4. RIGHT (DANE) */}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => openDirectionalAdd(item, "right")}
+                                                  className="absolute top-1/2 -right-3.5 -translate-y-1/2 size-6 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  title={`Add Designation to Right Side-by-Side (Dane)`}
+                                                >
+                                                  +►
+                                                </button>
+
+                                                <div className="flex items-center justify-between gap-1 mb-1.5">
+                                                  <span className="text-[9px] font-mono font-bold text-muted-foreground">
+                                                    {item.code}
+                                                  </span>
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => handleToggleDesigStatus(item.id)}
+                                                    className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full border transition-colors cursor-pointer ${
+                                                      item.status === "Active"
+                                                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                                        : "bg-red-500/10 text-red-600 border-red-500/20"
+                                                    }`}
+                                                    title="Toggle status"
+                                                  >
+                                                    {item.status}
+                                                  </button>
+                                                </div>
+
+                                                {/* Short Name Badge */}
+                                                {item.shortName && (
+                                                  <div className="mb-1">
+                                                    <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/20 tracking-wider font-mono inline-block">
+                                                      {item.shortName}
+                                                    </span>
+                                                  </div>
+                                                )}
+
+                                                {/* Full Name */}
+                                                <h3 className="text-sm font-extrabold text-foreground leading-tight group-hover:text-primary transition-colors">
+                                                  {item.name}
+                                                </h3>
+
+                                                {item.nameBng && (
+                                                  <p className="text-xs text-muted-foreground font-medium mt-0.5">
+                                                    {item.nameBng}
+                                                  </p>
+                                                )}
+
+                                                {item.reportsTo && (
+                                                  <p className="text-[10px] text-muted-foreground/80 mt-1 font-medium">
+                                                    ↳ Reports to: {item.reportsTo}
+                                                  </p>
+                                                )}
+
+                                                {/* Hover Actions Toolbar */}
+                                                <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between -mx-4 -mb-4 p-2 bg-muted/20 rounded-b-2xl">
+                                                  <div className="flex items-center gap-1">
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleMoveLevel(item.id, -1)}
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] cursor-pointer"
+                                                      title="Move Up Level ▲"
+                                                    >
+                                                      ▲
+                                                    </button>
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleMoveLevel(item.id, 1)}
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] cursor-pointer"
+                                                      title="Move Down Level ▼"
+                                                    >
+                                                      ▼
+                                                    </button>
+                                                  </div>
+
+                                                  <div className="flex items-center gap-1">
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => openDesigModal(item)}
+                                                      className="p-1.5 rounded hover:bg-card text-muted-foreground hover:text-blue-500 transition-colors cursor-pointer"
+                                                      title="Edit designation"
+                                                    >
+                                                      <Pencil className="size-3" />
+                                                    </button>
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleDeleteDesignation(item.id)}
+                                                      className="p-1.5 rounded hover:bg-card text-muted-foreground hover:text-red-500 transition-colors cursor-pointer"
+                                                      title="Delete designation"
+                                                    >
+                                                      <Trash2 className="size-3" />
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+
+                                          {/* Vertical Line to Next Level (if next is single) */}
+                                          {hasNextLevel && !nextIsMulti && (
+                                            <div className="flex flex-col items-center my-1">
+                                              <div className="w-0.5 h-6 bg-slate-300 dark:bg-slate-700" />
+                                              <span className="text-[10px] text-slate-400 -mt-1 select-none">▼</span>
+                                            </div>
+                                          )}
+
+                                          {/* Vertical Line to Next Level (if next is multi) */}
+                                          {hasNextLevel && nextIsMulti && (
+                                            <div className="flex flex-col items-center mt-1">
+                                              <div className="w-0.5 h-4 bg-slate-300 dark:bg-slate-700" />
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+
+                                {/* Bottom Add Next Level Button */}
+                                <div className="mt-6 pt-4 border-t border-dashed border-border/60 flex items-center justify-center">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      openDesigModal(null, sortedLevels[sortedLevels.length - 1] + 1, 1)
+                                    }
+                                    className="px-4 py-2 rounded-xl border border-dashed border-primary/50 text-primary hover:bg-primary/10 font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                                  >
+                                    <Plus className="size-3.5" /> Add Next Hierarchy Level (Level{" "}
+                                    {sortedLevels[sortedLevels.length - 1] + 1})
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      )}
+
+                      {/* ORGANOGRAM ROLES TABLE VIEW */}
+                      {organogramViewMode === "table" && (
+                        <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
+                              <thead className="bg-muted/40 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                                <tr>
+                                  <th className="px-4 py-3.5 w-[90px]">Code</th>
+                                  <th className="px-4 py-3.5 w-[100px]">Short Name</th>
+                                  <th className="px-4 py-3.5">Designation Title</th>
+                                  <th className="px-4 py-3.5 text-center">Hierarchy Level</th>
+                                  <th className="px-4 py-3.5 text-center">Side-by-Side Position</th>
+                                  <th className="px-4 py-3.5">Reports To</th>
+                                  <th className="px-4 py-3.5 text-center">Status</th>
+                                  <th className="px-4 py-3.5 text-right">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-border/30">
+                                {(!activeTemplate?.designations || activeTemplate.designations.length === 0) ? (
+                                  <tr>
+                                    <td colSpan={8} className="p-8 text-center text-muted-foreground">
+                                      No designations in this template.
+                                    </td>
+                                  </tr>
+                                ) : (
+                                  [...activeTemplate.designations]
+                                    .sort((a, b) => a.levelRank - b.levelRank || a.sortOrder - b.sortOrder)
+                                    .map((item) => (
+                                      <tr key={item.id} className="hover:bg-muted/20 transition-colors">
+                                        <td className="px-4 py-3 font-mono font-bold text-primary">{item.code}</td>
+                                        <td className="px-4 py-3 font-mono font-extrabold text-foreground">
+                                          {item.shortName ? (
+                                            <span className="px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                                              {item.shortName}
+                                            </span>
+                                          ) : (
+                                            <span className="text-muted-foreground">—</span>
+                                          )}
+                                        </td>
+                                        <td className="px-4 py-3 font-bold text-foreground">
+                                          {item.name}
+                                          {item.nameBng && (
+                                            <div className="text-[10px] text-muted-foreground font-normal">
+                                              {item.nameBng}
+                                            </div>
+                                          )}
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                          <div className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 text-primary px-2.5 py-1 rounded-lg font-extrabold font-mono text-[11px]">
+                                            Level {item.levelRank}
+                                            <div className="flex flex-col gap-0.5">
+                                              <button
+                                                type="button"
+                                                onClick={() => handleMoveLevel(item.id, -1)}
+                                                className="hover:text-foreground text-[8px] cursor-pointer"
+                                                title="Level Up ▲"
+                                              >
+                                                ▲
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={() => handleMoveLevel(item.id, 1)}
+                                                className="hover:text-foreground text-[8px] cursor-pointer"
+                                                title="Level Down ▼"
+                                              >
+                                                ▼
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                          <div className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 border border-border/60 px-2.5 py-1 rounded-lg font-bold font-mono text-[11px]">
+                                            Position #{item.sortOrder}
+                                            <div className="flex gap-1 ml-1">
+                                              <button
+                                                type="button"
+                                                onClick={() => handleMoveSortOrder(item.id, -1)}
+                                                className="hover:text-primary text-[10px] cursor-pointer"
+                                                title="Shift Left ◄"
+                                              >
+                                                ◄
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={() => handleMoveSortOrder(item.id, 1)}
+                                                className="hover:text-primary text-[10px] cursor-pointer"
+                                                title="Shift Right ►"
+                                              >
+                                                ►
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-muted-foreground font-medium">
+                                          {item.reportsTo || "—"}
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                          <button
+                                            type="button"
+                                            onClick={() => handleToggleDesigStatus(item.id)}
+                                            className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer hover:opacity-80 transition-all ${
+                                              item.status === "Active"
+                                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                                : "bg-red-500/10 text-red-600 border-red-500/20"
+                                            }`}
+                                          >
+                                            {item.status}
+                                          </button>
+                                        </td>
+                                        <td className="px-4 py-3 text-right">
+                                          <div className="flex items-center justify-end gap-1">
+                                            <button
+                                              type="button"
+                                              onClick={() => openDesigModal(item)}
+                                              className="p-1.5 rounded bg-muted hover:bg-primary hover:text-primary-foreground transition-colors text-muted-foreground cursor-pointer"
+                                              title="Edit"
+                                            >
+                                              <Pencil className="size-3.5" />
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => handleDeleteDesignation(item.id)}
+                                              className="p-1.5 rounded bg-muted hover:bg-red-500 hover:text-white transition-colors text-muted-foreground cursor-pointer"
+                                              title="Delete"
+                                            >
+                                              <Trash2 className="size-3.5" />
+                                            </button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    ))
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -5277,6 +6788,557 @@ function CompanySetupPage() {
               </div>
             );
           })()}
+      {/* Designation Hierarchy Modal */}
+      {isDesigModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-lg rounded-2xl shadow-2xl border border-border/60 flex flex-col animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+              <h2 className="text-lg font-bold flex items-center gap-2 text-foreground">
+                <Network className="size-5 text-primary" />
+                {editingDesig ? "Edit Designation Hierarchy" : "Add New Designation"}
+              </h2>
+              <button
+                onClick={() => setIsDesigModalOpen(false)}
+                className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveDesignation} className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground/80 block">Code</label>
+                  <input
+                    type="text"
+                    value={modalDesigCode}
+                    onChange={(e) => setModalDesigCode(e.target.value)}
+                    placeholder="e.g. DESIG-001"
+                    className="w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 text-sm font-mono outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground/80 block">
+                    Short Name / Acronym
+                  </label>
+                  <input
+                    type="text"
+                    value={modalDesigShortName}
+                    onChange={(e) => setModalDesigShortName(e.target.value)}
+                    placeholder="e.g. CEO, CTO, COO, GM"
+                    className="w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 text-sm font-bold font-mono outline-none focus:border-primary uppercase"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground/80 block">Designation Title (English) *</label>
+                <input
+                  type="text"
+                  required
+                  value={modalDesigName}
+                  onChange={(e) => setModalDesigName(e.target.value)}
+                  placeholder="e.g. Chief Executive Officer"
+                  className="w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 text-sm font-bold text-foreground outline-none focus:border-primary"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground/80 block">Designation Title (Bengali)</label>
+                <input
+                  type="text"
+                  value={modalDesigNameBng}
+                  onChange={(e) => setModalDesigNameBng(e.target.value)}
+                  placeholder="e.g. প্রধান নির্বাহী কর্মকর্তা"
+                  className="w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 text-sm outline-none focus:border-primary"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 bg-muted/20 p-3.5 rounded-xl border border-border/40">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-primary block flex items-center justify-between">
+                    <span>Hierarchy Level</span>
+                    <span className="text-[10px] text-muted-foreground font-normal">(Top to Bottom)</span>
+                  </label>
+                  <select
+                    value={modalDesigLevel}
+                    onChange={(e) => setModalDesigLevel(Number(e.target.value))}
+                    className="w-full h-10 px-3 rounded-lg border border-border/60 bg-card text-sm font-bold outline-none focus:border-primary cursor-pointer"
+                  >
+                    <option value={1}>Level 1 (e.g. Board of Directors)</option>
+                    <option value={2}>Level 2 (e.g. CEO / Managing Director)</option>
+                    <option value={3}>Level 3 (e.g. COO, CFO, CTO, CMO, CHRO)</option>
+                    <option value={4}>Level 4 (e.g. General Manager - GM)</option>
+                    <option value={5}>Level 5 (e.g. Deputy General Manager - DGM)</option>
+                    <option value={6}>Level 6 (e.g. Assistant General Manager - AGM)</option>
+                    <option value={7}>Level 7 (e.g. Senior Manager)</option>
+                    <option value={8}>Level 8 (e.g. Manager)</option>
+                    <option value={9}>Level 9 (e.g. Deputy Manager)</option>
+                    <option value={10}>Level 10 (e.g. Assistant Manager)</option>
+                    <option value={11}>Level 11 (e.g. Executive)</option>
+                    <option value={12}>Level 12 (e.g. Officer)</option>
+                    <option value={13}>Level 13 (Staff / Associate)</option>
+                    <option value={14}>Level 14 (Support)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-primary block flex items-center justify-between">
+                    <span>Side-by-Side Position</span>
+                    <span className="text-[10px] text-muted-foreground font-normal">(Left to Right)</span>
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={modalDesigSortOrder}
+                    onChange={(e) => setModalDesigSortOrder(Number(e.target.value))}
+                    className="w-full h-10 px-3.5 rounded-lg border border-border/60 bg-card text-sm font-extrabold font-mono outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground/80 block">Reports To</label>
+                  <select
+                    value={modalDesigReportsTo}
+                    onChange={(e) => setModalDesigReportsTo(e.target.value)}
+                    className="w-full h-10 px-3 rounded-lg border border-border/60 bg-muted/10 text-sm outline-none focus:border-primary cursor-pointer"
+                  >
+                    <option value="">None (Top Level)</option>
+                    {(activeTemplate?.designations || []).map((d) => (
+                      <option key={d.id} value={d.name}>
+                        {d.shortName ? `[${d.shortName}] ` : ""}{d.name} (Level {d.levelRank})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground/80 block">Status</label>
+                  <select
+                    value={modalDesigStatus}
+                    onChange={(e) => setModalDesigStatus(e.target.value as "Active" | "Inactive")}
+                    className="w-full h-10 px-3 rounded-lg border border-border/60 bg-muted/10 text-sm outline-none focus:border-primary cursor-pointer font-medium"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="p-4 border-t border-border/50 bg-muted/10 flex items-center justify-end gap-3 rounded-b-2xl -mx-6 -mb-6 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsDesigModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-muted transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Save className="size-4" /> Save Designation
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Organogram Template Modal (Create / Edit) */}
+      {isTemplateModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-md rounded-2xl shadow-2xl border border-border/60 flex flex-col animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+              <h2 className="text-lg font-bold flex items-center gap-2 text-foreground">
+                <LayoutTemplate className="size-5 text-primary" />
+                {editingTemplateId ? "Edit Organogram Template" : "New Organogram Template"}
+              </h2>
+              <button
+                onClick={() => setIsTemplateModalOpen(false)}
+                className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveTemplate} className="p-6 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground/80 block">Template Code *</label>
+                <input
+                  type="text"
+                  required
+                  value={templateModalCode}
+                  onChange={(e) => setTemplateModalCode(e.target.value)}
+                  placeholder="e.g. TPL-CORP"
+                  className="w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 text-sm font-mono outline-none focus:border-primary"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground/80 block">Template Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={templateModalName}
+                  onChange={(e) => setTemplateModalName(e.target.value)}
+                  placeholder="e.g. Corporate Standard Structure"
+                  className="w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 text-sm font-bold text-foreground outline-none focus:border-primary"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground/80 block">Description</label>
+                <textarea
+                  rows={3}
+                  value={templateModalDesc}
+                  onChange={(e) => setTemplateModalDesc(e.target.value)}
+                  placeholder="e.g. Standard corporate hierarchy with parallel C-Level executives."
+                  className="w-full p-3 rounded-lg border border-border/60 bg-muted/10 text-xs outline-none focus:border-primary resize-none"
+                />
+              </div>
+
+              {!editingTemplateId && (
+                <div className="p-3 bg-muted/20 border border-border/40 rounded-xl flex items-start gap-2.5">
+                  <input
+                    type="checkbox"
+                    id="cloneCheckbox"
+                    checked={templateModalClone}
+                    onChange={(e) => setTemplateModalClone(e.target.checked)}
+                    className="mt-0.5 size-4 rounded accent-primary cursor-pointer"
+                  />
+                  <label htmlFor="cloneCheckbox" className="text-xs cursor-pointer select-none">
+                    <span className="font-bold text-foreground block">
+                      Clone designations from active template
+                    </span>
+                    <span className="text-[11px] text-muted-foreground block mt-0.5">
+                      Copies all {activeTemplate?.designations?.length || 0} designations so you don't have to start from scratch.
+                    </span>
+                  </label>
+                </div>
+              )}
+
+              <div className="p-4 border-t border-border/50 bg-muted/10 flex items-center justify-end gap-3 rounded-b-2xl -mx-6 -mb-6 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsTemplateModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-muted transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Save className="size-4" /> Save Template
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Directional Add Designation Modal (Remaining / Master Pool / Custom) */}
+      {isDirectionalPickerOpen && directionalTarget && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-2xl rounded-2xl shadow-2xl border border-border/60 flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200 overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-muted/20">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`size-10 rounded-xl flex items-center justify-center font-bold text-white shadow-sm ${
+                    directionalSide === "above"
+                      ? "bg-amber-600"
+                      : directionalSide === "below"
+                      ? "bg-emerald-600"
+                      : directionalSide === "left"
+                      ? "bg-blue-600"
+                      : "bg-indigo-600"
+                  }`}
+                >
+                  {directionalSide === "above" && <ArrowUp className="size-5" />}
+                  {directionalSide === "below" && <ArrowDown className="size-5" />}
+                  {directionalSide === "left" && <ArrowLeft className="size-5" />}
+                  {directionalSide === "right" && <ArrowRight className="size-5" />}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-bold text-foreground">
+                      Add Designation {directionalSide.toUpperCase()}
+                    </h2>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                        directionalSide === "above"
+                          ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                          : directionalSide === "below"
+                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                          : directionalSide === "left"
+                          ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
+                          : "bg-indigo-500/15 text-indigo-600 dark:text-indigo-400"
+                      }`}
+                    >
+                      {directionalSide === "above"
+                        ? "New Parent Level (উপরে)"
+                        : directionalSide === "below"
+                        ? "New Child Level (নিচে)"
+                        : directionalSide === "left"
+                        ? "Parallel Role (বামে)"
+                        : "Parallel Role (ডানে)"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Relative to: <strong className="text-foreground">{directionalTarget.name}</strong> ({directionalTarget.shortName || directionalTarget.code}) • Level {directionalTarget.levelRank}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsDirectionalPickerOpen(false)}
+                className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Filter & Search Bar */}
+            <div className="p-4 border-b border-border/40 bg-muted/10 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                {/* Tabs */}
+                <div className="flex items-center gap-1.5 p-1 bg-muted/60 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setDirectionalActiveTab("remaining")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      directionalActiveTab === "remaining"
+                        ? "bg-card text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Sparkles className="size-3.5 text-primary" />
+                    Remaining Designations ({remainingMasterDesignations.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDirectionalActiveTab("all")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      directionalActiveTab === "all"
+                        ? "bg-card text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Briefcase className="size-3.5" />
+                    All Master Pool ({MASTER_DESIGNATION_POOL.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDirectionalActiveTab("custom")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      directionalActiveTab === "custom"
+                        ? "bg-card text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Plus className="size-3.5" />
+                    Custom Title
+                  </button>
+                </div>
+              </div>
+
+              {directionalActiveTab !== "custom" && (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={directionalSearch}
+                    onChange={(e) => setDirectionalSearch(e.target.value)}
+                    placeholder="Search designation by English name, Bengali name, or acronym (e.g. COO, Manager, নির্বাহী)..."
+                    className="w-full h-10 pl-9 pr-4 rounded-xl border border-border/60 bg-card text-xs outline-none focus:border-primary shadow-sm"
+                    autoFocus
+                  />
+                  {directionalSearch && (
+                    <button
+                      onClick={() => setDirectionalSearch("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-xs"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* List / Selection Area */}
+            <div className="p-4 overflow-y-auto flex-1 max-h-[50vh]">
+              {directionalActiveTab === "custom" ? (
+                <div className="p-4 bg-muted/20 border border-border/60 rounded-xl space-y-4 max-w-lg mx-auto">
+                  <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                    <Plus className="size-4 text-primary" />
+                    Create Custom Designation
+                  </h3>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground/80 block">
+                      Designation Title (English) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={customDesigTitle}
+                      onChange={(e) => setCustomDesigTitle(e.target.value)}
+                      placeholder="e.g. VP OF ARTIFICIAL INTELLIGENCE"
+                      className="w-full h-10 px-3.5 rounded-lg border border-border/60 bg-card text-xs font-bold uppercase outline-none focus:border-primary"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground/80 block">
+                        Short Name / Code
+                      </label>
+                      <input
+                        type="text"
+                        value={customDesigShortName}
+                        onChange={(e) => setCustomDesigShortName(e.target.value)}
+                        placeholder="e.g. VP-AI"
+                        className="w-full h-9 px-3 rounded-lg border border-border/60 bg-card text-xs uppercase outline-none focus:border-primary font-mono"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground/80 block">
+                        Title in Bengali (বাংলা নাম)
+                      </label>
+                      <input
+                        type="text"
+                        value={customDesigTitleBng}
+                        onChange={(e) => setCustomDesigTitleBng(e.target.value)}
+                        placeholder="e.g. ভিপি অফ এআই"
+                        className="w-full h-9 px-3 rounded-lg border border-border/60 bg-card text-xs outline-none focus:border-primary"
+                      />
+                    </div>
+                  </div>
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      type="button"
+                      disabled={!customDesigTitle.trim()}
+                      onClick={() => {
+                        if (!customDesigTitle.trim()) return;
+                        handlePickAndPlaceDesignation(
+                          customDesigTitle.trim(),
+                          customDesigShortName.trim() || undefined,
+                          customDesigTitleBng.trim() || undefined
+                        );
+                      }}
+                      className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-sm hover:bg-primary/95 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      <Plus className="size-4" />
+                      Add {directionalSide.toUpperCase()} of {directionalTarget.shortName || directionalTarget.name}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                (() => {
+                  const pool = directionalActiveTab === "remaining" ? remainingMasterDesignations : MASTER_DESIGNATION_POOL;
+                  const filtered = pool.filter((item) => {
+                    if (!directionalSearch.trim()) return true;
+                    const q = directionalSearch.toLowerCase();
+                    return (
+                      item.name.toLowerCase().includes(q) ||
+                      item.shortName.toLowerCase().includes(q) ||
+                      item.nameBng.toLowerCase().includes(q) ||
+                      (item.category && item.category.toLowerCase().includes(q))
+                    );
+                  });
+
+                  if (filtered.length === 0) {
+                    return (
+                      <div className="py-12 text-center text-muted-foreground flex flex-col items-center justify-center">
+                        <Briefcase className="size-10 stroke-[1.5] text-muted-foreground/40 mb-3" />
+                        <p className="text-sm font-semibold text-foreground">No matching designations found</p>
+                        <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+                          {directionalActiveTab === "remaining"
+                            ? "All remaining standard designations have either been added or don't match your search."
+                            : "No designations match your search criteria."}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setDirectionalActiveTab("custom")}
+                          className="mt-4 px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                        >
+                          <Plus className="size-3.5" />
+                          Create as Custom Designation instead
+                        </button>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                      {filtered.map((item, idx) => {
+                        const isAlreadyAssigned = assignedDesignationNames.has(item.name.trim().toLowerCase());
+                        return (
+                          <div
+                            key={`${item.name}-${idx}`}
+                            onClick={() => handlePickAndPlaceDesignation(item.name, item.shortName, item.nameBng)}
+                            className="p-3 rounded-xl border border-border/60 hover:border-primary/60 bg-card hover:bg-primary/5 transition-all cursor-pointer group flex flex-col justify-between shadow-xs hover:shadow-md text-left"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground group-hover:bg-primary/15 group-hover:text-primary transition-colors">
+                                  {item.shortName}
+                                </span>
+                                {item.category && (
+                                  <span className="text-[9px] text-muted-foreground/80 ml-1.5">
+                                    • {item.category}
+                                  </span>
+                                )}
+                              </div>
+                              {isAlreadyAssigned && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium">
+                                  In Chart
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="mt-2">
+                              <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                                {item.name}
+                              </p>
+                              {item.nameBng && (
+                                <p className="text-[11px] text-muted-foreground mt-0.5 font-medium line-clamp-1">
+                                  {item.nameBng}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="mt-2.5 pt-2 border-t border-border/40 flex items-center justify-between text-[10px] text-primary font-semibold opacity-80 group-hover:opacity-100">
+                              <span>Click to place {directionalSide}</span>
+                              <Plus className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-3.5 border-t border-border/50 bg-muted/20 flex items-center justify-between text-xs text-muted-foreground">
+              <span>
+                Tip: Click any designation card to instantly insert it {directionalSide.toUpperCase()} of {directionalTarget.shortName || directionalTarget.name}.
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsDirectionalPickerOpen(false)}
+                className="px-4 py-1.5 rounded-lg border border-border/60 hover:bg-muted font-medium text-xs text-foreground transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </main>
     </div>
   );

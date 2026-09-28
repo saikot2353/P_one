@@ -2,6 +2,42 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "525",
+    "date": "2026-09-28T17:48",
+    "type": "Feature Enhancement & Interactive Builder",
+    "module": "Configure - Company Setup (Organogram Templates & Directional Builder)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Implemented interactive Template Table View and 4-way Directional Add (+) buttons for the Designation Organogram. Templates can now be managed in a list view with quick active/inactive toggles, direct diagram view & edit, clone, and deletion. In the diagram builder, every designation card features directional add options (+ Above, + Below, + Left, + Right). Clicking any direction opens a remaining designations picker modal to quickly select and place unassigned designations or create custom ones directly into the hierarchy.",
+    "descriptionBn": "অর্গ্যানোগ্রাম টেমপ্লেটগুলোর জন্য লিস্ট/টেবিল ভিউ এবং প্রতিটি পদবি কার্ডের ৪ দিকেই (উপরে, নিচে, ডানে, বামে) ডিরেকশনাল যোগ (+) অপশন যুক্ত করা হয়েছে। টেবিল ভিউ থেকে টেমপ্লেট সহজে এক ক্লিকে একটিভ/ইন-একটিভ করা এবং সরাসরি ডায়াগ্রাম দেখে এডিট করা যায়। ডায়াগ্রামে যেকোনো পদবির চারপাশে থাকা (+▲ উপরে, +▼ নিচে, ◄+ বামে, +► ডানে) বাটনে ক্লিক করলেই বাকি থাকা পদবিগুলোর লিস্ট চলে আসে, যেখান থেকে পছন্দমতো পদবি নির্বাচন করে সাথে সাথে কাঙ্ক্ষিত স্থানে যুক্ত করা যায়।"
+  },
+  {
+    "id": "524",
+    "date": "2026-09-28T17:35",
+    "type": "Feature Enhancement & Architecture",
+    "module": "Configure - Company Setup (Designation Organogram & Templates)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Replaced department-dependent organograms with a pure designation-based organogram system powered by dynamic templates. Features the exact corporate hierarchy (Board of Directors -> CEO -> parallel side-by-side CXOs [COO, CFO, CTO, CMO, CHRO] with branching and converging connector rails -> GM -> DGM -> AGM -> Senior Manager -> Manager -> Deputy Manager -> Assistant Manager -> Executive -> Officer), template active/inactive toggling, template duplication, custom template creation, and full persistent storage.",
+    "descriptionBn": "ডিপার্টমেন্টের প্রয়োজনীয়তা বাদ দিয়ে পুরোপুরি পদবি (Designation) ভিত্তিক ডায়নামিক অর্গ্যানোগ্রাম ব্যবস্থা চালু করা হয়েছে, যা টেমপ্লেট আকারে কাজ করে। ব্যবহারকারীর চাহিদা অনুযায়ী হুবহু হায়ারার্কি (Board of Directors -> CEO -> পাশাপাশি CXO [COO, CFO, CTO, CMO, CHRO] ব্রাঞ্চিং ও কনভার্জিং কানেক্টরসহ -> GM -> DGM -> AGM -> Senior Manager -> Manager -> Deputy Manager -> Assistant Manager -> Executive -> Officer) তৈরি করা হয়েছে। যেকোনো টেমপ্লেট একটি ক্লিকেই একটিভ বা ইন-একটিভ করা যায়, নতুন টেমপ্লেট তৈরি ও ক্লোন করা যায়।"
+  },
+  {
+    "id": "523",
+    "date": "2026-09-28T17:05",
+    "type": "Feature Enhancement",
+    "module": "Configure - Company Setup (Designation & Organogram)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Enhanced the Organogram with a dynamic multi-department side-by-side branch structure: root CEO/MD leadership trunk with horizontal distribution rail, side-by-side department column cards with ◄ ► horizontal reorder controls, multi-select department filter pills, department-specific color themes, and within-department side-by-side role positioning.",
+    "descriptionBn": "অর্গ্যানোগ্রাম ব্যবস্থাকে ডায়নামিক মাল্টি-ডিপার্টমেন্ট সাইড-বাই-সাইড ব্রাঞ্চ কাঠামোর সাথে আরও উন্নত করা হয়েছে: শীর্ষ সিইও/এমডি নোডের নিচে অনুভূমিক ডিস্ট্রিবিউশন রেল, পাশাপাশি সাজানো ডিপার্টমেন্ট কলাম কার্ড, ◄ ► বাটন দিয়ে ডিপার্টমেন্টগুলোর অবস্থান পরিবর্তন, মাল্টি-ডিপার্টমেন্ট ফিল্টার পিলস এবং প্রতিটি ডিপার্টমেন্টের নির্দিষ্ট কালার থিম যুক্ত করা হয়েছে।"
+  },
+  {
+    "id": "522",
+    "date": "2026-09-28T17:00",
+    "type": "New Feature & UI Component",
+    "module": "Configure - Company Setup (Designation & Organogram)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Added a dedicated 'Designation & Organogram' tab under Company Setup. Introduced multi-level hierarchy rank and side-by-side horizontal position controls for designations sharing the same level (e.g. CMO, CTO, CFO at Level 2). Included interactive Organogram Chart View, List View, department filtering, quick level/position controls, and full persistent storage.",
+    "descriptionBn": "কোম্পানি সেটিংসে 'Designation & Organogram' নামে একটি নতুন ট্যাব যুক্ত করা হয়েছে। একই লেভেলের পদবিগুলোকে (যেমন CMO, CTO, CFO) পাশাপাশি প্রদর্শন করার জন্য মাল্টি-লেভেল র্যাংক ও সাইড-বাই-সাইড পজিশন কন্ট্রোল সুবিধা তৈরি করা হয়েছে, যার সাথে ইন্টারঅ্যাক্টিভ অর্গ্যানোগ্রাম চার্ট ভিউ, লিস্ট ভিউ এবং ডিপার্টমেন্ট ফিল্টারিং যুক্ত রয়েছে।"
+  },
+  {
     "id": "521",
     "date": "2026-09-28T15:58",
     "type": "Print Fix",
