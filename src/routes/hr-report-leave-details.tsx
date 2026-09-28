@@ -16,6 +16,7 @@ import {
   CalendarDays,
 } from "lucide-react";
 import { toast } from "sonner";
+import { HRReportPdfModal, ColumnDef } from "@/components/hr-reports/HRReportPdfModal";
 
 export const Route = createFileRoute("/hr-report-leave-details")({
   head: () => ({
@@ -393,6 +394,20 @@ export function LeaveReportDetailsPage() {
   // Modal State
   const [selectedRecord, setSelectedRecord] = useState<LeaveReportItem | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+
+  const pdfColumns: ColumnDef<LeaveReportItem>[] = [
+    { header: "SL", accessor: (_, idx) => idx + 1, align: "center", width: "40px" },
+    { header: "ID", accessor: (r) => r.id, align: "center" },
+    { header: "Name", accessor: (r) => r.name },
+    { header: "Department", accessor: (r) => r.department },
+    { header: "Designation", accessor: (r) => r.designation },
+    { header: "Start Date", accessor: (r) => r.startDate, align: "center" },
+    { header: "End Date", accessor: (r) => r.endDate, align: "center" },
+    { header: "Leave Count", accessor: (r) => r.leaveCount, align: "center" },
+    { header: "Leave Type", accessor: (r) => r.leaveType, align: "center" },
+    { header: "Status", accessor: (r) => r.leaveStatus, align: "center" },
+  ];
 
   // Active Applied Filters
   const [appliedFilters, setAppliedFilters] = useState({
@@ -822,7 +837,7 @@ export function LeaveReportDetailsPage() {
                 </button>
 
                 <button
-                  onClick={handlePrint}
+                  onClick={() => setIsPdfModalOpen(true)}
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all shadow-2xs cursor-pointer"
                 >
                   <Printer className="size-4" />
@@ -830,10 +845,7 @@ export function LeaveReportDetailsPage() {
                 </button>
 
                 <button
-                  onClick={() => {
-                    setSelectedRecord(filteredData[0] || null);
-                    setIsPreviewOpen(true);
-                  }}
+                  onClick={() => setIsPdfModalOpen(true)}
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-rose-300 dark:border-rose-800/80 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 text-xs font-bold transition-all shadow-2xs cursor-pointer"
                 >
                   <FileText className="size-4" />
@@ -1067,6 +1079,17 @@ export function LeaveReportDetailsPage() {
           </div>
         </div>
       )}
+
+      {/* Official PDF / Print View Modal */}
+      <HRReportPdfModal
+        isOpen={isPdfModalOpen}
+        onClose={() => setIsPdfModalOpen(false)}
+        reportTitle="Leave Details Report"
+        companyName="Pakiza Knit Composite Ltd"
+        dateRange={`${appliedFilters.dateFrom} - ${appliedFilters.dateTo}`}
+        columns={pdfColumns}
+        data={filteredData}
+      />
     </div>
   );
 }

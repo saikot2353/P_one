@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "504",
+    "date": "2026-09-27T10:18",
+    "type": "UI / PDF Standard Layout Update",
+    "module": "HR Reports - All PDF & Print Views",
+    "link": "/hr-reports",
+    "descriptionEn": "Standardized official PDF print preview formatting across all 10 HR report pages (Continuous Absent, Daily Attendance, Monthly Attendance, Overtime Summary, Absenteeism Summary, SIM Requisition, New Joining Info, Leave Summary, Leave Details, Employee Count) featuring official Pakiza Knit Composite Ltd company logo, centered header, underlined report title, date range, and crisp border table grid layout matching reference screenshot.",
+    "descriptionBn": "সকল ১০টি এইচআর রিপোর্ট পেজের প্রিন্ট/পিডিএফ ভিউ আনুষ্ঠানিকভাবে আপডেট করা হয়েছে। এতে অফিসিয়াল পাকীজা নিট কম্পোজিট লিমিটেড লোগো, সেন্টার্ড হেডার টাইটেল, ডেট রেঞ্জ এবং ক্লিয়ার গ্রিড বর্ডার টেবিল লেআউট যুক্ত করা হয়েছে।"
+  },
+  {
     "id": "503",
     "date": "2026-09-26T17:08",
     "type": "New Feature / HR Report",
