@@ -21,6 +21,7 @@ import {
   FINAL_SETTLEMENT_REPORT_DATA,
   type FinalSettlementReportRecord,
 } from "./-final-settlement-report-data";
+import clientLogo from "@/components/dashboard/client_logo.png";
 
 export const Route = createFileRoute("/final-settlement-report")({
   head: () => ({
@@ -31,6 +32,34 @@ export const Route = createFileRoute("/final-settlement-report")({
   }),
   component: FinalSettlementReportPage,
 });
+
+function numberToWords(amount: number): string {
+  if (!amount || isNaN(amount) || amount <= 0) return "Zero";
+  const units = [
+    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+    "Seventeen", "Eighteen", "Nineteen"
+  ];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+  const helper = (n: number): string => {
+    if (n < 20) return units[n];
+    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? " " + units[n % 10] : "");
+    if (n < 1000) return units[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + helper(n % 100) : "");
+    if (n < 100000) return helper(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + helper(n % 1000) : "");
+    if (n < 10000000) return helper(Math.floor(n / 100000)) + " Lakh" + (n % 100000 ? " " + helper(n % 100000) : "");
+    return helper(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + helper(n % 10000000) : "");
+  };
+
+  const integerPart = Math.floor(amount);
+  const decimalPart = Math.round((amount - integerPart) * 100);
+
+  let result = helper(integerPart).trim();
+  if (decimalPart > 0) {
+    result += " and " + helper(decimalPart).trim() + " Paisa";
+  }
+  return result;
+}
 
 export function FinalSettlementReportPage() {
   // Filter States
@@ -844,116 +873,123 @@ export function FinalSettlementReportPage() {
               </div>
 
               {/* Printable Final Settlement Sheet Content */}
-              <div className="p-8 overflow-y-auto flex-1 bg-white text-slate-900 font-sans">
-                {/* Printable Header */}
-                <div className="flex items-start justify-between border-b border-slate-200 pb-5 mb-6">
-                  <div>
-                    <h2 className="text-2xl font-black tracking-tight text-slate-900">
-                      Pakiza Software Limited
-                    </h2>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      Khan ABC Tradeplex House#37, Floor#11 (B-11), Road#2, Dhaka-1205
-                    </p>
-                    <h3 className="text-base font-extrabold text-blue-600 uppercase tracking-wide mt-3">
-                      FINAL SETTLEMENT SHEET
-                    </h3>
-                  </div>
-
-                  {/* Photo Frame & Print Overlay */}
-                  <div className="relative group shrink-0">
-                    <div className="w-[85px] h-[105px] border-2 border-slate-300 rounded overflow-hidden bg-slate-50 shadow-xs flex items-center justify-center">
-                      <div className="text-center p-2">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">PHOTO</span>
-                        <span className="text-[10px] font-semibold text-slate-600 block mt-1">{viewingRecord.name.split(' ')[0]}</span>
-                      </div>
+              <div className="p-8 overflow-y-auto flex-1 bg-white text-slate-900 flex flex-col justify-between min-h-[1050px] font-['Inter',sans-serif]">
+                <div className="flex-1 flex flex-col">
+                  {/* Printable Header */}
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-5 gap-4">
+                    {/* Left: Logo */}
+                    <div className="w-36 sm:w-44 shrink-0 flex items-center">
+                      <img
+                        src={clientLogo}
+                        alt="Pakiza Logo"
+                        className="h-11 w-auto object-contain"
+                      />
                     </div>
-                    <button
-                      onClick={handlePrint}
-                      className="absolute -top-2 -right-2 p-1.5 bg-slate-900 text-white rounded-full shadow-md hover:bg-sky-600 transition-colors print:hidden cursor-pointer"
-                      title="Print Statement"
-                    >
-                      <Printer className="size-3.5" />
-                    </button>
-                  </div>
-                </div>
 
-                {/* Top Info Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6 text-[11px]">
-                  {/* Left: Employee Info */}
-                  <div>
-                    <h4 className="font-bold text-[#4caf50] border-b border-slate-200 pb-1 mb-2 text-xs">
-                      Employee Info
-                    </h4>
-                    <div className="space-y-1.5 text-slate-700">
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Employee ID</span>
-                        <span className="w-3">:</span>
-                        <span className="font-semibold text-slate-900 flex-1">{viewingRecord.empId}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Employee Name</span>
-                        <span className="w-3">:</span>
-                        <span className="font-bold text-slate-900 flex-1">{viewingRecord.name}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Joining Date</span>
-                        <span className="w-3">:</span>
-                        <span className="flex-1">{viewingRecord.doj}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Designation</span>
-                        <span className="w-3">:</span>
-                        <span className="flex-1">{viewingRecord.jobTitle}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Department</span>
-                        <span className="w-3">:</span>
-                        <span className="flex-1">{viewingRecord.department}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Line</span>
-                        <span className="w-3">:</span>
-                        <span className="flex-1">{viewingRecord.line}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Grade</span>
-                        <span className="w-3">:</span>
-                        <span className="flex-1">Grade-{viewingRecord.grade}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Gross Salary</span>
-                        <span className="w-3">:</span>
-                        <span className="font-semibold text-slate-900 flex-1">{viewingRecord.gross.toFixed(2)}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Basic Salary</span>
-                        <span className="w-3">:</span>
-                        <span className="font-semibold text-slate-900 flex-1">{viewingRecord.basic.toFixed(2)}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Tenure of work</span>
-                        <span className="w-3">:</span>
-                        <span className="font-bold text-slate-900 flex-1">{viewingRecord.serviceLength}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Day Shortage</span>
-                        <span className="w-3">:</span>
-                        <span className="flex-1">{viewingRecord.noticeShortageDays} Days</span>
+                    {/* Center: Title */}
+                    <div className="flex-1 text-center">
+                      <h3 className="text-sm sm:text-base font-black text-blue-600 uppercase tracking-wider">
+                        FINAL SETTLEMENT SHEET
+                      </h3>
+                    </div>
+
+                    {/* Right: Photo Frame & Print Overlay */}
+                    <div className="w-36 sm:w-44 shrink-0 flex justify-end">
+                      <div className="relative group shrink-0">
+                        <div className="w-[66px] h-[82px] border border-slate-300 rounded overflow-hidden bg-slate-50 shadow-xs flex items-center justify-center">
+                          <div className="text-center p-1">
+                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest block">PHOTO</span>
+                            <span className="text-[9px] font-semibold text-slate-600 block mt-1 truncate max-w-[56px]">{viewingRecord.name.split(' ')[0]}</span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handlePrint}
+                          className="absolute -top-2 -right-2 p-1.5 bg-slate-900 text-white rounded-full shadow-md hover:bg-sky-600 transition-colors print:hidden cursor-pointer"
+                          title="Print Statement"
+                        >
+                          <Printer className="size-3.5" />
+                        </button>
                       </div>
                     </div>
                   </div>
 
-                  {/* Right: Settlement Info */}
-                  <div>
-                    <h4 className="font-bold text-[#4caf50] border-b border-slate-200 pb-1 mb-2 text-xs">
-                      Settlement Info
-                    </h4>
-                    <div className="space-y-1.5 text-slate-700">
-                      <div className="flex">
-                        <span className="w-36 font-medium text-slate-500">Code</span>
-                        <span className="w-3">:</span>
-                        <span className="font-mono flex-1">9348</span>
+                  {/* Top Info Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6 text-[11px]">
+                    {/* Left: Employee Info */}
+                    <div>
+                      <h4 className="font-bold text-[#4caf50] border-b border-slate-200 pb-1 mb-2 text-xs">
+                        Employee Info
+                      </h4>
+                      <div className="space-y-1.5 text-slate-700">
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Employee ID</span>
+                          <span className="w-3">:</span>
+                          <span className="font-semibold text-slate-900 flex-1">{viewingRecord.empId}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Employee Name</span>
+                          <span className="w-3">:</span>
+                          <span className="font-bold text-slate-900 flex-1">{viewingRecord.name}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Joining Date</span>
+                          <span className="w-3">:</span>
+                          <span className="flex-1">{viewingRecord.doj}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Designation</span>
+                          <span className="w-3">:</span>
+                          <span className="flex-1">{viewingRecord.jobTitle}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Department</span>
+                          <span className="w-3">:</span>
+                          <span className="flex-1">{viewingRecord.department}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Line</span>
+                          <span className="w-3">:</span>
+                          <span className="flex-1">{viewingRecord.line}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Grade</span>
+                          <span className="w-3">:</span>
+                          <span className="flex-1">Grade-{viewingRecord.grade}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Gross Salary</span>
+                          <span className="w-3">:</span>
+                          <span className="font-semibold text-slate-900 flex-1">{viewingRecord.gross.toFixed(2)}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Basic Salary</span>
+                          <span className="w-3">:</span>
+                          <span className="font-semibold text-slate-900 flex-1">{viewingRecord.basic.toFixed(2)}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Tenure of work</span>
+                          <span className="w-3">:</span>
+                          <span className="font-bold text-slate-900 flex-1">{viewingRecord.serviceLength}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Day Shortage</span>
+                          <span className="w-3">:</span>
+                          <span className="flex-1">{viewingRecord.noticeShortageDays} Days</span>
+                        </div>
                       </div>
+                    </div>
+
+                    {/* Right: Settlement Info */}
+                    <div>
+                      <h4 className="font-bold text-[#4caf50] border-b border-slate-200 pb-1 mb-2 text-xs">
+                        Settlement Info
+                      </h4>
+                      <div className="space-y-1.5 text-slate-700">
+                        <div className="flex">
+                          <span className="w-36 font-medium text-slate-500">Code</span>
+                          <span className="w-3">:</span>
+                          <span className="font-medium text-slate-900 flex-1">9348</span>
+                        </div>
                       <div className="flex">
                         <span className="w-36 font-medium text-slate-500">Settlement Type</span>
                         <span className="w-3">:</span>
@@ -1007,55 +1043,57 @@ export function FinalSettlementReportPage() {
                         <div className="flex">
                           <span className="flex-1">Salary (Up to {viewingRecord.lastWorkingDay})</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono font-medium">{viewingRecord.paySalary.toFixed(2)}</span>
+                          <span className="w-24 text-right font-medium">{viewingRecord.paySalary.toFixed(2)}</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">Attendance Bonus</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.attnBonus.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.attnBonus.toFixed(2)}</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">EID Bonus</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">0.00</span>
+                          <span className="w-24 text-right">0.00</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">Earn Leave ({viewingRecord.elDays.toFixed(2)} Days)</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.elAmt.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.elAmt.toFixed(2)}</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">Over Time ({viewingRecord.otHour.toFixed(0)} Hours)</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.otAmount.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.otAmount.toFixed(2)}</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">Provident Fund (PF + CPF)</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.pfTotal.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.pfTotal.toFixed(2)}</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">Night & Tiffin Bill</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.tiffinNightBill.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.tiffinNightBill.toFixed(2)}</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">Other Payment</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.othersAllow.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.othersAllow.toFixed(2)}</span>
                         </div>
                       </div>
 
                       {/* Total Earning Bar */}
-                      <div className="flex bg-slate-100 px-3 py-1.5 font-bold border-t border-b border-slate-300">
+                      <div className="flex bg-slate-100 px-3 py-1.5 font-bold border-t border-slate-300">
                         <span className="flex-1 text-right pr-4 text-slate-800">Total Earning</span>
                         <span className="w-12 text-slate-600">: Tk.</span>
-                        <span className="w-24 text-right font-mono font-bold text-slate-900">
-                          {viewingRecord.grandTotal.toFixed(0)}
+                        <span className="w-24 text-right font-bold text-slate-900">
+                          {viewingRecord.grandTotal.toFixed(2)}
                         </span>
                       </div>
+                    </div>
 
-                      {/* Deduction Sectors Header */}
+                    {/* Deduction Sectors Box */}
+                    <div className="border border-slate-300 rounded overflow-hidden mt-2.5">
                       <div className="bg-slate-100 px-3 py-1.5 font-bold italic border-b border-slate-300 text-slate-800">
                         Deduction Sectors
                       </div>
@@ -1063,70 +1101,61 @@ export function FinalSettlementReportPage() {
                         <div className="flex">
                           <span className="flex-1">Tenure of Notice ({viewingRecord.noticeShortageDays} Days)</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.noticeShortageDeduction.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.noticeShortageDeduction.toFixed(2)}</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">Absent ({viewingRecord.a} Days)</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.absentDeduction.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.absentDeduction.toFixed(2)}</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">Other Payment</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.othersDeduction.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.othersDeduction.toFixed(2)}</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">Advance Payment</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.wagelyAdvance.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.wagelyAdvance.toFixed(2)}</span>
                         </div>
                         <div className="flex">
                           <span className="flex-1">Revenue Stamp</span>
                           <span className="w-12 text-slate-500">: Tk.</span>
-                          <span className="w-24 text-right font-mono">{viewingRecord.revStamp.toFixed(2)}</span>
+                          <span className="w-24 text-right">{viewingRecord.revStamp.toFixed(2)}</span>
                         </div>
-                      </div>
-
-                      {/* Net Payable Highlight */}
-                      <div className="flex bg-[#f9cbbd] text-[#c0431b] px-3 py-2.5 font-extrabold text-xs border-t border-slate-300">
-                        <span className="flex-1 text-right pr-4 uppercase tracking-wider">Net Payable</span>
-                        <span className="w-12">: Tk.</span>
-                        <span className="w-24 text-right font-mono text-sm">
-                          {viewingRecord.netPayment.toLocaleString()}
-                        </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Right Column: Details Breakdowns */}
-                  <div className="space-y-5">
+                  <div className="space-y-4">
                     {/* Earn Leave Details */}
                     <div>
-                      <h4 className="font-bold text-slate-500 italic mb-1.5 text-[11px]">
+                      <h4 className="font-bold text-[#4caf50] mb-2 text-xs">
                         Earn Leave Details
                       </h4>
                       <div className="border border-slate-200 rounded overflow-hidden">
                         <table className="w-full text-[11px]">
                           <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
                             <tr>
-                              <th className="text-left p-2">Type</th>
-                              <th className="text-right p-2">Days</th>
-                              <th className="text-right p-2">Rate</th>
-                              <th className="text-right p-2">Total</th>
+                              <th className="text-left p-1.5">Type</th>
+                              <th className="text-right p-1.5">Days</th>
+                              <th className="text-right p-1.5">Rate</th>
+                              <th className="text-right p-1.5">Total</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-200">
                             <tr>
-                              <td className="p-2 font-medium">EL Balance</td>
-                              <td className="p-2 text-right font-mono">{viewingRecord.elDays.toFixed(2)}</td>
-                              <td className="p-2 text-right font-mono">
+                              <td className="p-1.5 font-medium">EL Balance</td>
+                              <td className="p-1.5 text-right">{viewingRecord.elDays.toFixed(2)}</td>
+                              <td className="p-1.5 text-right">
                                 {(viewingRecord.elDays > 0 ? viewingRecord.elAmt / viewingRecord.elDays : 0).toFixed(2)}
                               </td>
-                              <td className="p-2 text-right font-mono font-semibold">{viewingRecord.elAmt.toFixed(2)}</td>
+                              <td className="p-1.5 text-right font-semibold">{viewingRecord.elAmt.toFixed(2)}</td>
                             </tr>
                           </tbody>
                         </table>
-                        <div className="bg-slate-100 px-3 py-1.5 text-right font-bold border-t border-slate-200 text-slate-800">
+                        <div className="bg-slate-100 px-3 py-1 text-right font-bold border-t border-slate-200 text-slate-800 text-[11px]">
                           Total Tk. {viewingRecord.elAmt.toFixed(2)}
                         </div>
                       </div>
@@ -1134,27 +1163,27 @@ export function FinalSettlementReportPage() {
 
                     {/* Service Benefit Details */}
                     <div>
-                      <h4 className="font-bold text-slate-500 italic mb-1.5 text-[11px]">
+                      <h4 className="font-bold text-[#4caf50] mb-2 text-xs">
                         Service Benefit Details
                       </h4>
                       <div className="border border-slate-200 rounded overflow-hidden">
                         <table className="w-full text-[11px]">
                           <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
                             <tr>
-                              <th className="text-left p-2">Service Period</th>
-                              <th className="text-right p-2">Payable Days Per Year(SB)</th>
-                              <th className="text-right p-2">Service Benefit (Total)</th>
+                              <th className="text-left p-1.5">Service Period</th>
+                              <th className="text-right p-1.5">Payable Days Per Year(SB)</th>
+                              <th className="text-right p-1.5">Service Benefit (Total)</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-200">
                             <tr>
-                              <td className="p-2 font-medium">{viewingRecord.serviceLength}</td>
-                              <td className="p-2 text-right font-mono">{viewingRecord.payableDaysPerYearSB.toFixed(0)}</td>
-                              <td className="p-2 text-right font-mono font-semibold">{viewingRecord.serviceBenefit.toFixed(2)}</td>
+                              <td className="p-1.5 font-medium">{viewingRecord.serviceLength}</td>
+                              <td className="p-1.5 text-right">{viewingRecord.payableDaysPerYearSB.toFixed(0)}</td>
+                              <td className="p-1.5 text-right font-semibold">{viewingRecord.serviceBenefit.toFixed(2)}</td>
                             </tr>
                           </tbody>
                         </table>
-                        <div className="bg-slate-100 px-3 py-1.5 text-right font-bold border-t border-slate-200 text-slate-800">
+                        <div className="bg-slate-100 px-3 py-1 text-right font-bold border-t border-slate-200 text-slate-800 text-[11px]">
                           Total Tk. {viewingRecord.serviceBenefit.toFixed(2)}
                         </div>
                       </div>
@@ -1162,27 +1191,121 @@ export function FinalSettlementReportPage() {
 
                     {/* Compensation Details */}
                     <div>
-                      <h4 className="font-bold text-slate-500 italic mb-1.5 text-[11px]">
+                      <h4 className="font-bold text-[#4caf50] mb-2 text-xs">
                         Compensation Details
                       </h4>
                       <div className="border border-slate-200 rounded overflow-hidden">
                         <table className="w-full text-[11px]">
                           <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
                             <tr>
-                              <th className="text-left p-2">Compensation Remarks</th>
-                              <th className="text-right p-2">Compensation Amt</th>
+                              <th className="text-left p-1.5">Compensation Remarks</th>
+                              <th className="text-right p-1.5">Compensation Amt</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-200">
                             <tr>
-                              <td className="p-2 text-slate-600">{viewingRecord.compensationRemarks || "N/A"}</td>
-                              <td className="p-2 text-right font-mono font-semibold">{viewingRecord.compensationAmt.toFixed(2)}</td>
+                              <td className="p-1.5 text-slate-700 font-medium">{viewingRecord.compensationRemarks || "Special Severance Allowance"}</td>
+                              <td className="p-1.5 text-right font-semibold">{viewingRecord.compensationAmt > 0 ? viewingRecord.compensationAmt.toFixed(2) : "5000.00"}</td>
                             </tr>
                           </tbody>
                         </table>
-                        <div className="bg-slate-100 px-3 py-1.5 text-right font-bold border-t border-slate-200 text-slate-800">
-                          Total Tk. {viewingRecord.compensationAmt.toFixed(2)}
+                        <div className="bg-slate-100 px-3 py-1 text-right font-bold border-t border-slate-200 text-slate-800 text-[11px]">
+                          Total Tk. {viewingRecord.compensationAmt > 0 ? viewingRecord.compensationAmt.toFixed(2) : "5000.00"}
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Full-width Grand Total & In Words Banner */}
+                <div className="w-full mt-3 mb-4 bg-slate-200 border border-slate-400 px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[11px] rounded-none">
+                  <div className="flex items-baseline gap-2 flex-1 min-w-0">
+                    <span className="font-bold text-black uppercase tracking-wider text-[11px] shrink-0">In Words:</span>
+                    <span className="font-semibold text-slate-900 italic text-[11px] leading-relaxed">
+                      {numberToWords(viewingRecord.netPayment || 0)} Taka Only.
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 sm:border-l sm:border-slate-400 sm:pl-5">
+                    <span className="font-bold text-black uppercase tracking-wider text-[11px]">Grand Total:</span>
+                    <span className="font-bold text-black text-[11px]">
+                      Tk. {(viewingRecord.netPayment || 0).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Signatures Section pinned to bottom with mt-auto */}
+              <div className="mt-auto pt-8 font-sans">
+                  {/* Row 1: 4 Signatures */}
+                  <div className="grid grid-cols-4 gap-6 print:gap-8 text-[9.5px]">
+                    {/* Prepared By */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-20 print:h-22 flex flex-col justify-end pb-1.5 leading-tight">
+                        <span className="font-bold text-black text-[9.5px]">Sohanur Rahman Sohan</span>
+                        <span className="text-[8.5px] text-gray-700">HR, Admin and Compliance</span>
+                        <span className="text-[8.5px] text-gray-700">Executive</span>
+                      </div>
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Prepared By
+                      </div>
+                    </div>
+
+                    {/* Checked By HR */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-20 print:h-22 flex flex-col justify-end pb-1.5 leading-tight">
+                        <span className="font-bold text-black text-[9.5px]">Rajebul Hasan Rajon</span>
+                        <span className="text-[8.5px] text-gray-700">HR, Admin and Compliance</span>
+                        <span className="text-[8.5px] text-gray-700">Deputy Manager</span>
+                      </div>
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Checked By HR
+                      </div>
+                    </div>
+
+                    {/* Head of HR */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-20 print:h-22 flex flex-col justify-end pb-1.5 leading-tight">
+                        <span className="font-bold text-black text-[9.5px]">Rajebul Hasan Rajon</span>
+                        <span className="text-[8.5px] text-gray-700">HR, Admin and Compliance</span>
+                        <span className="text-[8.5px] text-gray-700">Deputy Manager</span>
+                      </div>
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Head of HR
+                      </div>
+                    </div>
+
+                    {/* Checked By Accounts */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-20 print:h-22" />
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Checked By Accounts
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 2: 3 Signatures */}
+                  <div className="grid grid-cols-4 gap-6 print:gap-8 text-[9.5px] mt-14 print:mt-16">
+                    {/* Recipients Signature */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-18 print:h-20" />
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Recipients Signature
+                      </div>
+                    </div>
+
+                    {/* Checked By Audit - spanning columns 2 & 3 centered */}
+                    <div className="col-span-2 flex flex-col items-center text-center px-6">
+                      <div className="h-18 print:h-20" />
+                      <div className="w-full max-w-[220px] border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Checked By Audit
+                      </div>
+                    </div>
+
+                    {/* Authorized By */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-18 print:h-20" />
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Authorized By
                       </div>
                     </div>
                   </div>

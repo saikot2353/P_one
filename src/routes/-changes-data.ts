@@ -2,6 +2,105 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "521",
+    "date": "2026-09-28T15:58",
+    "type": "Print Fix",
+    "module": "Global & Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Fixed floating AI Chatbot widget appearing on printed pages by applying print:hidden to the root chatbot container, adding global @media print display: none rules, and explicitly excluding fixed bottom-right floating widgets from print outputs.",
+    "descriptionBn": "প্রিন্ট করার সময় পাতার নিচের ডান কোনায় ভেসে থাকা এআই চ্যাটবট আইকন চলে আসার সমস্যাটি সমাধান করা হয়েছে: চ্যাটবটের রুট এলিমেন্টে print:hidden যুক্ত করা হয়েছে এবং গ্লোবাল প্রিন্ট সিএসএস-এ এটি পুরোপুরি হাইড করা হয়েছে।"
+  },
+  {
+    "id": "520",
+    "date": "2026-09-28T15:56",
+    "type": "UI & Typography Standardization",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Standardized and harmonized all font sizes across the Final Settlement Sheet: aligned section titles uniformly to 11px, box and table headers to 10px bold, data rows and values to 10px, subtotals to 10px with consistent 2-decimal formatting, and balanced Grand Total banner elements at 11px to eliminate disproportionate text.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের সমস্ত ফন্ট সাইজ সামঞ্জস্যপূর্ণ ও সুষম করা হয়েছে: প্রতিটি সেকশন টাইটেল ১১ পিক্সেল, টেবিল ও বক্সের হেডার ১০ পিক্সেল বোল্ড, সকল রো ও টাকার মান ১০ পিক্সেল এবং গ্র্যান্ড টোটাল ব্যানারকে সমান ১১ পিক্সেলে সুবিন্যস্ত করা হয়েছে যাতে কোনো লেখা অসঙ্গতভাবে বড় বা ছোট না দেখায়।"
+  },
+  {
+    "id": "519",
+    "date": "2026-09-28T15:52",
+    "type": "UI & Typography Update",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Enforced Inter font across the entire Final Settlement Sheet, ensuring all numbers, currency values, codes, and figures use Inter instead of monospace. Pinned the signatures block strictly to the bottom of the sheet across all screen heights and single-page print outputs.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের সমস্ত ফন্ট (সব নম্বর, টাকার পরিমাণ ও কোডসহ) 'Inter' ফন্টে রূপান্তর করা হয়েছে এবং স্বাক্ষরের অংশটি পাতার একেবারে নিচে পিন করে রাখা হয়েছে যাতে মাঝখানে ফাঁকা জায়গা থাকলেও স্বাক্ষর সবসময় নিচে অবস্থান করে।"
+  },
+  {
+    "id": "518",
+    "date": "2026-09-28T15:43",
+    "type": "Print Optimization",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Optimized single A4 print layout for Final Settlement Sheet: expanded top margin above management signatures (mt-14/print:mt-16), increased signature clearance height (h-20/print:h-22 and h-18/print:h-20), and widened inter-tier row spacing (mt-14/print:mt-16) to eliminate bottom whitespace while ensuring single-page print-to-fit compliance.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের সিঙ্গেল A4 প্রিন্ট লেআউট নিখুঁত করা হয়েছে: সিগনেচারের উপরের মার্জিন, সিগনেচার করার স্পেস হাইট এবং প্রথম ও দ্বিতীয় সারির মাঝের ফাঁকা জায়গা বৃদ্ধি করা হয়েছে, যার ফলে পাতার নিচের ফাঁকা জায়গা সুষমভাবে পূরণ হয়েছে এবং সিঙ্গেল A4 পেজে প্রিন্টও নিখুঁত বজায় রয়েছে।"
+  },
+  {
+    "id": "517",
+    "date": "2026-09-28T15:42",
+    "type": "UI Layout Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Separated 'Earning Sectors' and 'Deduction Sectors' into independent bordered boxes with a clean margin gap, resolving the cramped layout where the Total Earning summary was directly attached to the Deduction Sectors header.",
+    "descriptionBn": "'Payment Info' এর ভেতরে 'Earning Sectors' এবং 'Deduction Sectors'-কে দুটি পৃথক বর্ডার্ড বক্সে ভাগ করে মাঝে মার্জিন গ্যাপ দেওয়া হয়েছে, ফলে Total Earning এবং Deduction Sectors একে অপরের সাথে লেগে না থেকে পরিষ্কারভাবে আলাদা প্রদর্শিত হচ্ছে।"
+  },
+  {
+    "id": "516",
+    "date": "2026-09-28T15:40",
+    "type": "UI Layout Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Re-architected Final Settlement Sheet header: removed company address, aligned 'FINAL SETTLEMENT SHEET' title to the exact center between the logo and portrait, and resized the employee photo frame (66px × 82px) for a balanced professional appearance.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের হেডার সেকশন থেকে কোম্পানির ঠিকানা সম্পূর্ণ বাদ দেওয়া হয়েছে, 'FINAL SETTLEMENT SHEET' টাইটেলটি লোগো ও ছবির মাঝখানে সেন্টার অ্যালাইন করা হয়েছে এবং এমপ্লয়ির ছবির ফ্রেমের সাইজ প্রয়োজন অনুযায়ী কিছুটা বড় (66px × 82px) করে ভারসাম্যপূর্ণ করা হয়েছে।"
+  },
+  {
+    "id": "515",
+    "date": "2026-09-28T15:39",
+    "type": "UI Consistency",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Updated section heading colors for 'Earn Leave Details', 'Service Benefit Details', and 'Compensation Details' to match 'Payment Info' theme green (#4caf50), ensuring uniform visual branding across all settlement breakdown quadrants.",
+    "descriptionBn": "'Earn Leave Details', 'Service Benefit Details' এবং 'Compensation Details' সেকশন হেডারগুলোর কালার 'Payment Info' এর মতো একই ব্র্যান্ড থিম গ্রিন (#4caf50) কালারে পরিবর্তন করা হয়েছে।"
+  },
+  {
+    "id": "514",
+    "date": "2026-09-28T15:37",
+    "type": "UI Layout Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Reformatted Final Settlement Sheet header: removed duplicate 'Pakiza Software Limited' text header, placed the official logo directly on top followed vertically by the company address and 'FINAL SETTLEMENT SHEET' title, and reduced employee portrait photo frame dimensions for a cleaner compact layout.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের হেডার সেকশন রিফরম্যাট করা হয়েছে: অতিরিক্ত 'Pakiza Software Limited' টেক্সট সরিয়ে শুধুমাত্র লোগো রাখা হয়েছে এবং লোগোর ঠিক নিচে ক্রমান্বয়ে ঠিকানা ও 'FINAL SETTLEMENT SHEET' শিরোনাম সাজানো হয়েছে। পাশাপাশি এমপ্লয়ির ছবির সাইজ আরও ছোট ও পরিপাটি করা হয়েছে।"
+  },
+  {
+    "id": "513",
+    "date": "2026-09-28T15:36",
+    "type": "UI / Print Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Enhanced the Grand Total section in Final Settlement Sheet into a full-width colored banner containing Bangladeshi Taka In Words on the left and Grand Total amount on the right. Increased vertical spacing and height for management signature rows to provide proper clearance while maintaining single A4 page print-to-fit layout.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটে গ্র্যান্ড টোটাল সেকশনটিকে পুরো উইডথ জুড়ে একক কালারের ব্যানারে রূপান্তর করা হয়েছে, যার বাম পাশে টাকায় কথায় (In Words) এবং ডান পাশে গ্র্যান্ড টোটাল অ্যামাউন্ট প্রদর্শিত হচ্ছে। এছাড়া ম্যানেজমেন্ট সিগনেচার সেকশনের উপর-নিচ মার্জিন ও হাইট বাড়িয়ে পর্যাপ্ত ফাঁকা জায়গা (proper gap) নিশ্চিত করা হয়েছে যাতে সিঙ্গেল A4 পেজে প্রিন্টও নিখুঁত থাকে।"
+  },
+  {
+    "id": "512",
+    "date": "2026-09-28T15:32",
+    "type": "UI Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Integrated official Pakiza client logo (client_logo.png) into the Final Settlement Sheet header for both the detailed settlement view (/final-settlement) and settlement report printable statement modal (/final-settlement-report).",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের হেডার সেকশনে অফিসিয়াল পাকিজা ক্লায়েন্ট লোগো (client_logo.png) যুক্ত করা হয়েছে, যা ডিটেইল সেটেলমেন্ট ভিউ (/final-settlement) এবং সেটেলমেন্ট রিপোর্ট স্টেটমেন্ট প্রিভিউ মোডাল (/final-settlement-report) উভয় স্থানে প্রদর্শিত হবে।"
+  },
+  {
+    "id": "511",
+    "date": "2026-09-28T15:28",
+    "type": "UI / Print Optimization",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Updated Final Settlement Sheet (/final-settlement): added formal management signature blocks (Prepared By, Checked By HR, Head of HR, Checked By Accounts, Recipients Signature, Checked By Audit, Authorized By), populated realistic demo compensation data with remarks, separated Net Payable into a standalone right-aligned Grand Total box matching company layout, reduced vertical spacing, and optimized print styles to perfectly fit a single A4 page as-is.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটে (/final-settlement) অফিসিয়াল ফরম্যাট অনুযায়ী ৭টি সিগনেচার ব্লক যুক্ত করা হয়েছে (প্রিপেয়ার্ড বাই, চেকড বাই এইচআর, হেড অব এইচআর, চেকড বাই অ্যাকাউন্টস, রিসিভেন্টস সিগনেচার, চেকড বাই অডিট ও অথরাইজড বাই)। কম্পেনসেশন ডিটেইলসে রিমার্কস সহ ডেমো ডাটা যুক্ত করা হয়েছে, পেমেন্ট ইনফো থেকে নেট পেয়াবল আলাদা করে ডানে গ্র্যান্ড টোটাল হিসেবে অ্যালাইন করা হয়েছে, সেকশনগুলোর গ্যাপ কমিয়ে কম্প্যাক্ট করা হয়েছে এবং সিঙ্গেল A4 পেজে ফিট হওয়ার মতো প্রিন্ট অপটিমাইজেশন নিশ্চিত করা হয়েছে।"
+  },
+  {
     "id": "510",
     "date": "2026-09-28T13:05",
     "type": "New Feature / History Tracking",

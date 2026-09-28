@@ -207,7 +207,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
-      <Chatbot />
+      <div className="print:hidden">
+        <Chatbot />
+      </div>
     </QueryClientProvider>
   );
 }

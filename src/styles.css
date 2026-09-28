@@ -202,3 +202,11 @@
   scrollbar-width: none;
   /* Firefox */
 }
+
+@media print {
+  .print\:hidden,
+  [data-sidebar],
+  .fixed.bottom-6.right-6 {
+    display: none !important;
+  }
+}

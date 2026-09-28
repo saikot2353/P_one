@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { SettlementTypePolicy } from "./final-settlement-configuration";
+import clientLogo from "@/components/dashboard/client_logo.png";
 
 export const Route = createFileRoute("/final-settlement")({
   head: () => ({
@@ -471,6 +472,8 @@ interface MockEmployee {
   transport: string;
   food: string;
   photo: string;
+  compensationRemarks?: string;
+  compensationAmt?: string;
 }
 
 const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
@@ -533,7 +536,9 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     medical: "2790.00",
     transport: "1860.00",
     food: "0.00",
-    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg",
+    compensationRemarks: "Special Severance Allowance",
+    compensationAmt: "5000.00"
   },
   "2015051511": {
     company: "Pakiza Software Limited (PSL-Operation)",
@@ -594,7 +599,9 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     medical: "4500.00",
     transport: "3000.00",
     food: "0.00",
-    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg",
+    compensationRemarks: "Gratuity & Special Recognition",
+    compensationAmt: "15000.00"
   },
   "2025090122": {
     company: "Pakiza Software Limited (PSL-Operation)",
@@ -655,7 +662,9 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     medical: "1800.00",
     transport: "1200.00",
     food: "0.00",
-    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg",
+    compensationRemarks: "Separation Allowance",
+    compensationAmt: "2500.00"
   },
   "2023044865": {
     company: "Pakiza Software Limited (PSL-Operation)",
@@ -716,7 +725,9 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     medical: "2790.00",
     transport: "1860.00",
     food: "0.00",
-    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg",
+    compensationRemarks: "Service Compensation",
+    compensationAmt: "3000.00"
   },
   "2018091204": {
     company: "Pakiza Software Limited (PSL-Operation)",
@@ -777,7 +788,9 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     medical: "3480.00",
     transport: "2320.00",
     food: "0.00",
-    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg",
+    compensationRemarks: "Retirement Bonus",
+    compensationAmt: "20000.00"
   },
   "2024021811": {
     company: "Pakiza Software Limited (PSL-Operation)",
@@ -838,7 +851,9 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     medical: "1800.00",
     transport: "1200.00",
     food: "0.00",
-    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg",
+    compensationRemarks: "Ex-gratia Benefit",
+    compensationAmt: "10000.00"
   }
 };
 
@@ -876,6 +891,34 @@ function getCompDaysFromTiers(
     }
     return 0;
   }
+}
+
+function numberToWords(amount: number): string {
+  if (!amount || isNaN(amount) || amount <= 0) return "Zero";
+  const units = [
+    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+    "Seventeen", "Eighteen", "Nineteen"
+  ];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+  const helper = (n: number): string => {
+    if (n < 20) return units[n];
+    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? " " + units[n % 10] : "");
+    if (n < 1000) return units[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + helper(n % 100) : "");
+    if (n < 100000) return helper(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + helper(n % 1000) : "");
+    if (n < 10000000) return helper(Math.floor(n / 100000)) + " Lakh" + (n % 100000 ? " " + helper(n % 100000) : "");
+    return helper(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + helper(n % 10000000) : "");
+  };
+
+  const integerPart = Math.floor(amount);
+  const decimalPart = Math.round((amount - integerPart) * 100);
+
+  let result = helper(integerPart).trim();
+  if (decimalPart > 0) {
+    result += " and " + helper(decimalPart).trim() + " Paisa";
+  }
+  return result;
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────────
@@ -969,8 +1012,8 @@ function FinalSettlementPage() {
   const [pfAmount, setPfAmount] = useState("");
   const [cpfAmount, setCpfAmount] = useState("");
   const [grandTotal, setGrandTotal] = useState("");
-  const [compensationAmt, setCompensationAmt] = useState("");
-  const [compensationRemarks, setCompensationRemarks] = useState("");
+  const [compensationAmt, setCompensationAmt] = useState("5000.00");
+  const [compensationRemarks, setCompensationRemarks] = useState("Special Severance Allowance");
   const [netPayment, setNetPayment] = useState("");
   const [comments, setComments] = useState("");
 
@@ -1096,8 +1139,11 @@ function FinalSettlementPage() {
     const pfAmtVal = Number(targetEmp.pfAmount);
     const cpfAmtVal = Number(targetEmp.cpfAmount);
     
+    const demoCompAmt = targetEmp.compensationAmt || "5000.00";
+    const demoCompRemarks = targetEmp.compensationRemarks || "Special Severance Allowance";
+    
     // Sum of compensations
-    const compensationSum = elPay + sbPay + pfAmtVal + cpfAmtVal;
+    const compensationSum = elPay + sbPay + pfAmtVal + cpfAmtVal + (Number(demoCompAmt) || 0);
     
     // Sum of earnings
     const earningsSum = netSalaryVal + Number(targetEmp.tiffinNightBill) + compensationSum;
@@ -1108,13 +1154,13 @@ function FinalSettlementPage() {
     const calculatedGrandTotal = earningsSum - deductionsSum;
     
     setGrandTotal(calculatedGrandTotal.toFixed(2));
-    setCompensationAmt("0.00");
-    setCompensationRemarks("");
+    setCompensationAmt(demoCompAmt);
+    setCompensationRemarks(demoCompRemarks);
     setNetPayment(calculatedGrandTotal.toFixed(2));
     setComments("Verified by HR. Cleared all assets.");
     
     setCompensations([
-      { for: "Special Performance Bonus", amount: "0.00" },
+      { for: demoCompRemarks, amount: demoCompAmt },
       { for: "", amount: "" }
     ]);
     setDeductions([
@@ -1323,54 +1369,106 @@ function FinalSettlementPage() {
   }, [showSalaryInfo, showEarnLeaveInfo, showServiceBenefitInfo, showCompensationInfo, showDeductionInfo, settlementType, calculationBasis, countPresentDay]);
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground">
-      <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative overflow-y-auto bg-muted/20">
-        <Topbar />
+    <div className="min-h-screen flex bg-background text-foreground print:bg-white print:block">
+      <style>{`
+        .final-settlement-sheet, .final-settlement-sheet * {
+          font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        @page {
+          size: A4 portrait;
+          margin: 6mm 8mm;
+        }
+        @media print {
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            font-size: 10px !important;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          }
+          aside, nav, header, [data-sidebar], .print\:hidden, [class*="z-[9999]"], .fixed.bottom-6.right-6 {
+            display: none !important;
+          }
+          .final-settlement-sheet {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 284mm !important;
+            min-height: 284mm !important;
+            max-height: 284mm !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          }
+        }
+      `}</style>
+      <div className="print:hidden">
+        <Sidebar />
+      </div>
+      <main className="flex-1 min-w-0 flex flex-col relative overflow-y-auto bg-muted/20 print:bg-white print:p-0 print:m-0 print:overflow-visible print:block">
+        <div className="print:hidden">
+          <Topbar />
+        </div>
 
-        <div className="p-4 md:p-5 space-y-4 w-full">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <Link to="/" className="hover:text-foreground transition-colors">
-              Home
-            </Link>
-            <ChevronRight className="size-3.5" />
-            <span>Payroll</span>
-            <ChevronRight className="size-3.5" />
-            <span>Benefits</span>
-            <ChevronRight className="size-3.5" />
-            <span className="text-foreground font-semibold">Final Settlement</span>
-          </div>
+        <div className="p-4 md:p-5 space-y-4 w-full print:p-0 print:m-0 print:space-y-0">
+          {/* Breadcrumb and Page Header */}
+          <div className="print:hidden space-y-4">
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <Link to="/" className="hover:text-foreground transition-colors">
+                Home
+              </Link>
+              <ChevronRight className="size-3.5" />
+              <span>Payroll</span>
+              <ChevronRight className="size-3.5" />
+              <span>Benefits</span>
+              <ChevronRight className="size-3.5" />
+              <span className="text-foreground font-semibold">Final Settlement</span>
+            </div>
 
-          {/* Page Header */}
-          <div className="bg-card border border-border/60 rounded-lg p-4 shadow-sm flex items-center justify-between gap-4">
-            <h1 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2.5">
-              <div className="p-1.5 bg-primary/10 rounded border border-primary/20 text-primary">
-                <FileText className="size-4" />
+            {/* Page Header */}
+            <div className="bg-card border border-border/60 rounded-lg p-4 shadow-sm flex items-center justify-between gap-4">
+              <h1 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2.5">
+                <div className="p-1.5 bg-primary/10 rounded border border-primary/20 text-primary">
+                  <FileText className="size-4" />
+                </div>
+                Final Settlement
+              </h1>
+              <div className="flex items-center gap-2">
+                {view !== "list" ? (
+                  <button
+                    onClick={() => {
+                      setView("list");
+                      setEmpLoaded(false);
+                      setEmployeeId("");
+                      setCalculated(false);
+                    }}
+                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border border-border hover:bg-muted transition-colors"
+                  >
+                    <X className="size-3.5" /> Back to List
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setView("create")}
+                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    <Plus className="size-3.5" /> New Settlement
+                  </button>
+                )}
               </div>
-              Final Settlement
-            </h1>
-            <div className="flex items-center gap-2">
-              {view === "create" ? (
-                <button
-                  onClick={() => {
-                    setView("list");
-                    setEmpLoaded(false);
-                    setEmployeeId("");
-                    setCalculated(false);
-                  }}
-                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border border-border hover:bg-muted transition-colors"
-                >
-                  <X className="size-3.5" /> Back to List
-                </button>
-              ) : (
-                <button
-                  onClick={() => setView("create")}
-                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
-                  <Plus className="size-3.5" /> New Settlement
-                </button>
-              )}
             </div>
           </div>
 
@@ -2164,370 +2262,488 @@ function FinalSettlementPage() {
 
           {/* ─── DETAIL / PRINT VIEW ────────────────────────────────────────── */}
           {view === "detail" && (
-            <div className="bg-white text-black border border-border/60 rounded-lg shadow-sm p-8 max-w-5xl mx-auto w-full relative">
-              <button
-                onClick={() => window.print()}
-                className="absolute top-4 right-4 p-2 bg-muted/20 text-muted-foreground hover:bg-primary/10 hover:text-primary rounded transition-colors print:hidden"
-              >
-                <Printer className="size-4" />
-              </button>
+            <div className="space-y-3">
+              {/* Action Bar for Detail View */}
+              <div className="flex items-center justify-between bg-card border border-border/60 rounded-lg p-3 shadow-sm print:hidden">
+                <button
+                  onClick={() => setView("list")}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border border-border hover:bg-muted transition-colors text-foreground"
+                >
+                  <ChevronRight className="size-3.5 rotate-180" /> Back to Settlement Records
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="flex items-center gap-2 text-xs font-bold px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded shadow-sm transition-colors cursor-pointer"
+                >
+                  <Printer className="size-3.5" /> Print Settlement Sheet
+                </button>
+              </div>
 
-              {/* Header */}
-              <div className="flex flex-col md:flex-row items-center justify-between border-b-2 border-gray-150 pb-6 mb-8 gap-4">
-                <div className="text-center md:text-left">
-                  <h2 className="text-xl font-extrabold text-gray-800 tracking-tight">{emp.company.replace(" (PSL-Operation)", "")}</h2>
-                  <p className="text-[11px] text-gray-500 mt-1 font-medium">
-                    Khan ABC Tradeplex House#37, Floor#11 (B-11), Road#2, Dhaka-1205
-                  </p>
-                  <h3 className="text-base font-bold text-blue-600 mt-2.5 uppercase tracking-wider">Final Settlement Sheet</h3>
-                </div>
-                
-                {/* ID-style employee portrait on details sheet */}
-                <div className="shrink-0 border-2 border-gray-300 p-0.5 bg-white shadow-sm rounded overflow-hidden w-[80px] h-[100px]">
-                  {emp.photo ? (
-                    <img 
-                      src={emp.photo} 
-                      alt={emp.name} 
-                      className="size-full object-cover object-top rounded-sm" 
+              {/* Printable Settlement Sheet Content */}
+              <div className="final-settlement-sheet bg-white text-black border border-gray-300 rounded-lg shadow-sm p-5 md:p-6 max-w-4xl mx-auto w-full relative print:p-0 print:border-none print:shadow-none print:max-w-none flex flex-col min-h-[1050px] justify-between font-['Inter',sans-serif]">
+                <div className="flex-1 flex flex-col">
+                  {/* Printable Header */}
+                <div className="flex items-center justify-between border-b border-gray-300 pb-2 mb-2.5 gap-4">
+                  {/* Left: Logo */}
+                  <div className="w-36 sm:w-44 shrink-0 flex items-center">
+                    <img
+                      src={clientLogo}
+                      alt="Pakiza Logo"
+                      className="h-11 w-auto object-contain"
                     />
-                  ) : (
-                    <div className="size-full bg-gray-50 flex items-center justify-center border border-dashed border-gray-300 rounded-sm">
-                      <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest text-center">No Photo</span>
+                  </div>
+
+                  {/* Center: Title */}
+                  <div className="flex-1 text-center">
+                    <h3 className="text-sm sm:text-base font-black text-blue-600 uppercase tracking-wider">
+                      FINAL SETTLEMENT SHEET
+                    </h3>
+                  </div>
+
+                  {/* Right: Employee Portrait */}
+                  <div className="w-36 sm:w-44 shrink-0 flex justify-end">
+                    <div className="border border-gray-300 p-0.5 bg-white shadow-xs rounded overflow-hidden w-[66px] h-[82px]">
+                      {emp.photo ? (
+                        <img 
+                          src={emp.photo} 
+                          alt={emp.name} 
+                          className="size-full object-cover object-top rounded-xs" 
+                        />
+                      ) : (
+                        <div className="size-full bg-gray-50 flex items-center justify-center border border-dashed border-gray-300 rounded-xs">
+                          <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest text-center">No Photo</span>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
+                </div>
+
+                {/* Top Info Grid */}
+                <div className="grid grid-cols-2 gap-x-8 mb-2.5 text-[10px]">
+                  {/* Employee Info */}
+                  <div>
+                    <h4 className="font-bold text-[#4caf50] mb-1 border-b border-gray-300 pb-0.5 text-[11px]">
+                      Employee Info
+                    </h4>
+                    <div className="space-y-0.5 leading-tight">
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Employee ID</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 font-semibold text-gray-900">{employeeId}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Employee Name</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 font-semibold text-gray-900">{emp.name}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Joining Date</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{emp.joiningDate}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Designation</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{emp.designation}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Department</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{emp.department}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Line</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{emp.line}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Grade</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{emp.grade}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Gross Salary</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 font-semibold text-gray-900">{emp.grossSalary}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Basic Salary</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 font-semibold text-gray-900">{emp.basicSalary}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Tenure of work</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 font-bold text-gray-900">{emp.tenure}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Day Shortage</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{emp.dayShortage}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Settlement Info */}
+                  <div>
+                    <h4 className="font-bold text-[#4caf50] mb-1 border-b border-gray-300 pb-0.5 text-[11px]">
+                      Settlement Info
+                    </h4>
+                    <div className="space-y-0.5 leading-tight">
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Code</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 font-medium text-gray-900">9348</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Settlement Type</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 font-semibold text-gray-900">{settlementType}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Settlement Date</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{settlementDate}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Resign Apply Date</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{resignApplyDate}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Resign Date</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{resignDate}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Last Working Date</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{lastWorkingDate}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Notice Period</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{noticePeriod} Days</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-28 font-medium text-gray-600">Comments</span>
+                        <span className="w-3 text-gray-500">:</span>
+                        <span className="flex-1 text-gray-800">{comments}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Details Grid */}
+                <div className="grid grid-cols-2 gap-x-8 items-start text-[10px]">
+                  {/* Left Column: Payment Info (Earnings + Deductions) */}
+                  <div>
+                    <h4 className="font-bold text-[#4caf50] mb-1 text-[11px]">Payment Info</h4>
+                    <div className="border border-gray-300 rounded overflow-hidden">
+                      <div className="bg-gray-100 px-2.5 py-1 font-bold border-b border-gray-300 text-gray-800 text-[10px]">
+                        Earning Sectors
+                      </div>
+                      <div className="px-2.5 py-1.5 space-y-0.5">
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">
+                            Salary (Up to {lastWorkingDate})
+                          </span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right font-medium">{paySalary}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">Attendance Bonus</span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">{attendanceBonus}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">EID Bonus</span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">0.00</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">
+                            Earn Leave ({elBalanceDays} Days)
+                          </span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">{elPayment}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">Over Time ({otHour} Hours)</span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">{otPayment}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">Provident Fund (PF + CPF)</span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">0.00</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">Night & Tiffin Bill</span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">{tiffinNightBill}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">Other Payment</span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">0.00</span>
+                        </div>
+                      </div>
+                      <div className="flex bg-gray-100 px-2.5 py-1 font-bold border-t border-gray-300 text-[10px]">
+                        <span className="flex-1 text-right pr-3 text-gray-800">Total Earning</span>
+                        <span className="w-12 text-gray-600">: Tk.</span>
+                        <span className="w-16 text-right font-bold text-gray-900">
+                          {((parseFloat(paySalary) || 0) +
+                            (parseFloat(attendanceBonus) || 0) +
+                            (parseFloat(elPayment) || 0) +
+                            (parseFloat(otPayment) || 0) +
+                            (parseFloat(tiffinNightBill) || 0)).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Deduction Sectors Box */}
+                    <div className="border border-gray-300 rounded overflow-hidden mt-2">
+                      <div className="bg-gray-100 px-2.5 py-1 font-bold border-b border-gray-300 text-gray-800 text-[10px]">
+                        Deduction Sectors
+                      </div>
+                      <div className="px-2.5 py-1.5 space-y-0.5">
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">
+                            Tenure of Notice ({noticeShortage} Days)
+                          </span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">0.00</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">Absent ({absentDays} Days)</span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">{absentDeduction}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">Other Payment</span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">{othersDeduction}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">Advance Payment</span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">{advanceDeduction}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="flex-1 text-gray-600">Revenue Stamp</span>
+                          <span className="w-12 text-gray-500">: Tk.</span>
+                          <span className="w-16 text-right">{revStamp}</span>
+                        </div>
+                      </div>
+                      <div className="flex bg-gray-100 px-2.5 py-1 font-bold border-t border-gray-300 text-[10px]">
+                        <span className="flex-1 text-right pr-3 text-gray-800">Total Deduction</span>
+                        <span className="w-12 text-gray-600">: Tk.</span>
+                        <span className="w-16 text-right font-bold text-gray-900">
+                          {((parseFloat(absentDeduction) || 0) +
+                            (parseFloat(othersDeduction) || 0) +
+                            (parseFloat(advanceDeduction) || 0) +
+                            (parseFloat(revStamp) || 0)).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Other Details */}
+                  <div className="space-y-2.5 pt-0">
+                    {/* Earn Leave */}
+                    <div>
+                      <h4 className="font-bold text-[#4caf50] mb-1 text-[11px]">
+                        Earn Leave Details
+                      </h4>
+                      <table className="w-full border border-gray-300 text-[10px]">
+                        <thead className="border-b border-gray-300 bg-gray-100">
+                          <tr>
+                            <th className="text-left px-2 py-1 font-bold text-gray-800">Type</th>
+                            <th className="text-right px-2 py-1 font-bold text-gray-800">Days</th>
+                            <th className="text-right px-2 py-1 font-bold text-gray-800">Rate</th>
+                            <th className="text-right px-2 py-1 font-bold text-gray-800">Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="px-2 py-1 font-medium">EL Balance</td>
+                            <td className="text-right px-2 py-1">{elBalanceDays}</td>
+                            <td className="text-right px-2 py-1">
+                              {(
+                                (parseFloat(elPayment) || 0) / (parseFloat(elBalanceDays) || 1)
+                              ).toFixed(2)}
+                            </td>
+                            <td className="text-right px-2 py-1 font-semibold">{elPayment}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <div className="bg-gray-100 px-2 py-1 text-right font-bold border-x border-b border-gray-300 text-gray-900 text-[10px]">
+                        Total Tk. {parseFloat(elPayment || "0").toFixed(2)}
+                      </div>
+                    </div>
+
+                    {/* Service Benefit */}
+                    <div>
+                      <h4 className="font-bold text-[#4caf50] mb-1 text-[11px]">
+                        Service Benefit Details
+                      </h4>
+                      <table className="w-full border border-gray-300 text-[10px]">
+                        <thead className="border-b border-gray-300 bg-gray-100">
+                          <tr>
+                            <th className="text-left px-2 py-1 font-bold text-gray-800">
+                              Service Period
+                            </th>
+                            <th className="text-right px-2 py-1 font-bold text-gray-800">
+                              Payable Days Per Year(SB)
+                            </th>
+                            <th className="text-right px-2 py-1 font-bold text-gray-800">
+                              Service Benefit (Total)
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="px-2 py-1 font-medium">
+                              {calculationBasis === "year" 
+                                ? `${serviceBenefitYear}Y ${serviceBenefitMonth}M ${serviceBenefitDay}D`
+                                : `${(Number(serviceBenefitYear) * 365 + Number(serviceBenefitMonth) * 30 + Number(serviceBenefitDay) + (countPresentDay ? 1 : 0))} Days`
+                              }
+                            </td>
+                            <td className="text-right px-2 py-1">{payableDaysPerYear}</td>
+                            <td className="text-right px-2 py-1 font-semibold">{serviceBenefitTotal}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <div className="bg-gray-100 px-2 py-1 text-right font-bold border-x border-b border-gray-300 text-gray-900 text-[10px]">
+                        Total Tk. {parseFloat(serviceBenefitTotal || "0").toFixed(2)}
+                      </div>
+                    </div>
+
+                    {/* Compensation Details */}
+                    <div>
+                      <h4 className="font-bold text-[#4caf50] mb-1 text-[11px]">
+                        Compensation Details
+                      </h4>
+                      <table className="w-full border border-gray-300 text-[10px]">
+                        <thead className="border-b border-gray-300 bg-gray-100">
+                          <tr>
+                            <th className="text-left px-2 py-1 font-bold text-gray-800">
+                              Compensation Remarks
+                            </th>
+                            <th className="text-right px-2 py-1 font-bold text-gray-800">
+                              Compensation Amt
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="px-2 py-1 font-medium text-gray-800">
+                              {compensationRemarks || "Special Severance Allowance"}
+                            </td>
+                            <td className="text-right px-2 py-1 font-semibold text-gray-900">
+                              {parseFloat(compensationAmt || "5000").toFixed(2)}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <div className="bg-gray-100 px-2 py-1 text-right font-bold border-x border-b border-gray-300 text-gray-900 text-[10px]">
+                        Total Tk. {parseFloat(compensationAmt || "5000").toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Full-width Grand Total & In Words Banner */}
+                <div className="w-full mt-3 mb-4 bg-slate-200 border border-slate-400 px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[11px] rounded-none">
+                  <div className="flex items-baseline gap-2 flex-1 min-w-0">
+                    <span className="font-bold text-black uppercase tracking-wider text-[11px] shrink-0">In Words:</span>
+                    <span className="font-semibold text-slate-900 italic text-[11px] leading-relaxed">
+                      {numberToWords(parseFloat(netPayment) || 0)} Taka Only.
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 sm:border-l sm:border-slate-400 sm:pl-5">
+                    <span className="font-bold text-black uppercase tracking-wider text-[11px]">Grand Total:</span>
+                    <span className="font-bold text-black text-[11px]">
+                      Tk. {(parseFloat(netPayment) || 0).toFixed(2)}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* Top Info Grid */}
-              <div className="grid grid-cols-2 gap-x-12 gap-y-8 mb-8 text-[11px]">
-                {/* Employee Info */}
-                <div>
-                  <h4 className="font-bold text-[#4caf50] mb-2 border-b border-gray-300 pb-1">
-                    Employee Info
-                  </h4>
-                  <div className="space-y-1.5">
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Employee ID</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{employeeId}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Employee Name</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{emp.name}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Joining Date</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{emp.joiningDate}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Designation</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{emp.designation}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Department</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{emp.department}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Line</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{emp.line}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Grade</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{emp.grade}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Gross Salary</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{emp.grossSalary}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Basic Salary</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{emp.basicSalary}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Tenure of work</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1 font-bold">{emp.tenure}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Day Shortage</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{emp.dayShortage}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Settlement Info */}
-                <div>
-                  <h4 className="font-bold text-[#4caf50] mb-2 border-b border-gray-300 pb-1">
-                    Settlement Info
-                  </h4>
-                  <div className="space-y-1.5">
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Code</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">9348</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Settlement Type</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{settlementType}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Settlement Date</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{settlementDate}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Resign Apply Date</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{resignApplyDate}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Resign Date</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{resignDate}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Last Working Date</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{lastWorkingDate}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Notice Period</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{noticePeriod} Days</span>
-                    </div>
-                    <div className="flex">
-                      <span className="w-1/3 font-semibold text-gray-600">Comments</span>
-                      <span className="w-4">:</span>
-                      <span className="flex-1">{comments}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Area Grid */}
-              <div className="grid grid-cols-2 gap-x-12 items-start text-[10px]">
-                {/* Left Column: Payment Info (Earnings + Deductions) */}
-                <div>
-                  <h4 className="font-bold text-[#4caf50] mb-2 text-[11px]">Payment Info</h4>
-                  <div className="border border-gray-300">
-                    <div className="bg-gray-100 px-3 py-1.5 italic font-bold border-b border-gray-300">
-                      Earning Sectors
-                    </div>
-                    <div className="px-3 py-2 space-y-2">
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">
-                          Salary (Up to {lastWorkingDate})
-                        </span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">{paySalary}</span>
+              {/* Signatures Section pinned to bottom with mt-auto */}
+              <div className="mt-auto pt-8 font-sans">
+                  {/* Row 1: 4 Signatures */}
+                  <div className="grid grid-cols-4 gap-6 print:gap-8 text-[9.5px]">
+                    {/* Prepared By */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-20 print:h-22 flex flex-col justify-end pb-1.5 leading-tight">
+                        <span className="font-bold text-black text-[9.5px]">Sohanur Rahman Sohan</span>
+                        <span className="text-[8.5px] text-gray-700">HR, Admin and Compliance</span>
+                        <span className="text-[8.5px] text-gray-700">Executive</span>
                       </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">Attendance Bonus</span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">{attendanceBonus}</span>
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Prepared By
                       </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">EID Bonus</span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">0.00</span>
-                      </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">
-                          Earn Leave ({elBalanceDays} Days)
-                        </span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">{elPayment}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">Over Time ({otHour} Hours)</span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">{otPayment}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">Provident Fund (PF + CPF)</span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">0.00</span>
-                      </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">Night & Tiffin Bill</span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">{tiffinNightBill}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">Other Payment</span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">0.00</span>
-                      </div>
-                    </div>
-                    <div className="flex bg-gray-100 p-2 font-bold mt-1">
-                      <span className="flex-1 text-right pr-4">Total Earning</span>
-                      <span className="w-16">: Tk.</span>
-                      <span className="w-20 text-right">
-                        {(parseFloat(paySalary) || 0) +
-                          (parseFloat(attendanceBonus) || 0) +
-                          (parseFloat(elPayment) || 0) +
-                          (parseFloat(otPayment) || 0) +
-                          (parseFloat(tiffinNightBill) || 0)}
-                      </span>
                     </div>
 
-                    <div className="bg-gray-100 px-3 py-1.5 italic font-bold border-b border-t border-gray-300">
-                      Deduction Sectors
-                    </div>
-                    <div className="px-3 py-2 space-y-2">
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">
-                          Tenure of Notice ({noticeShortage} Days)
-                        </span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">0.00</span>
+                    {/* Checked By HR */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-20 print:h-22 flex flex-col justify-end pb-1.5 leading-tight">
+                        <span className="font-bold text-black text-[9.5px]">Rajebul Hasan Rajon</span>
+                        <span className="text-[8.5px] text-gray-700">HR, Admin and Compliance</span>
+                        <span className="text-[8.5px] text-gray-700">Deputy Manager</span>
                       </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">Absent ({absentDays} Days)</span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">{absentDeduction}</span>
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Checked By HR
                       </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">Other Payment</span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">{othersDeduction}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">Advance Payment</span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">{advanceDeduction}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="flex-1 text-gray-600">Revenue Stamp</span>
-                        <span className="w-16">: Tk.</span>
-                        <span className="w-20 text-right">{revStamp}</span>
-                      </div>
-                    </div>
-                    <div className="flex bg-gray-100 p-2 font-bold mt-1">
-                      <span className="flex-1 text-right pr-4">Total Deduction</span>
-                      <span className="w-16">: Tk.</span>
-                      <span className="w-20 text-right">
-                        {(parseFloat(absentDeduction) || 0) +
-                          (parseFloat(othersDeduction) || 0) +
-                          (parseFloat(advanceDeduction) || 0) +
-                          (parseFloat(revStamp) || 0)}
-                      </span>
                     </div>
 
-                    <div className="flex bg-[#f9cbbd] text-[#c0431b] p-3 font-bold mt-1 text-[11px]">
-                      <span className="flex-1 text-right pr-4">Net Payable</span>
-                      <span className="w-16">: Tk.</span>
-                      <span className="w-20 text-right">{netPayment}</span>
+                    {/* Head of HR */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-20 print:h-22 flex flex-col justify-end pb-1.5 leading-tight">
+                        <span className="font-bold text-black text-[9.5px]">Rajebul Hasan Rajon</span>
+                        <span className="text-[8.5px] text-gray-700">HR, Admin and Compliance</span>
+                        <span className="text-[8.5px] text-gray-700">Deputy Manager</span>
+                      </div>
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Head of HR
+                      </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* Right Column: Other Details */}
-                <div className="space-y-6 pt-6">
-                  {/* Earn Leave */}
-                  <div>
-                    <h4 className="font-bold text-gray-500 italic mb-2 text-[10px]">
-                      Earn Leave Details
-                    </h4>
-                    <table className="w-full">
-                      <thead className="border-b border-gray-300">
-                        <tr>
-                          <th className="text-left pb-1 font-semibold text-gray-600">Type</th>
-                          <th className="text-right pb-1 font-semibold text-gray-600">Days</th>
-                          <th className="text-right pb-1 font-semibold text-gray-600">Rate</th>
-                          <th className="text-right pb-1 font-semibold text-gray-600">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="pt-2">EL Balance</td>
-                          <td className="text-right pt-2">{elBalanceDays}</td>
-                          <td className="text-right pt-2">
-                            {(
-                              (parseFloat(elPayment) || 0) / (parseFloat(elBalanceDays) || 1)
-                            ).toFixed(2)}
-                          </td>
-                          <td className="text-right pt-2">{elPayment}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div className="bg-gray-100 px-3 py-1.5 text-right font-bold mt-2">
-                      Total Tk. {elPayment}
+                    {/* Checked By Accounts */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-20 print:h-22" />
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Checked By Accounts
+                      </div>
                     </div>
                   </div>
 
-                  {/* Service Benefit */}
-                  <div>
-                    <h4 className="font-bold text-gray-500 italic mb-2 text-[10px]">
-                      Service Benefit Details
-                    </h4>
-                    <table className="w-full">
-                      <thead className="border-b border-gray-300">
-                        <tr>
-                          <th className="text-left pb-1 font-semibold text-gray-600">
-                            Service Period
-                          </th>
-                          <th className="text-right pb-1 font-semibold text-gray-600">
-                            Payable Days Per Year(SB)
-                          </th>
-                          <th className="text-right pb-1 font-semibold text-gray-600">
-                            Service Benefit (Total)
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="pt-2">
-                            {calculationBasis === "year" 
-                              ? `${serviceBenefitYear}Y ${serviceBenefitMonth}M ${serviceBenefitDay}D`
-                              : `${(Number(serviceBenefitYear) * 365 + Number(serviceBenefitMonth) * 30 + Number(serviceBenefitDay) + (countPresentDay ? 1 : 0))} Days`
-                            }
-                          </td>
-                          <td className="text-right pt-2">{payableDaysPerYear}</td>
-                          <td className="text-right pt-2">{serviceBenefitTotal}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div className="bg-gray-100 px-3 py-1.5 text-right font-bold mt-2">
-                      Total Tk. {serviceBenefitTotal}
+                  {/* Row 2: 3 Signatures */}
+                  <div className="grid grid-cols-4 gap-6 print:gap-8 text-[9.5px] mt-14 print:mt-16">
+                    {/* Recipients Signature */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-18 print:h-20" />
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Recipients Signature
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Compensation Details */}
-                  <div>
-                    <h4 className="font-bold text-gray-500 italic mb-2 text-[10px]">
-                      Compensation Details
-                    </h4>
-                    <table className="w-full">
-                      <thead className="border-b border-gray-300">
-                        <tr>
-                          <th className="text-left pb-1 font-semibold text-gray-600">
-                            Compensation Remarks
-                          </th>
-                          <th className="text-right pb-1 font-semibold text-gray-600">
-                            Compensation Amt
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="pt-2">{compensationRemarks || "N/A"}</td>
-                          <td className="text-right pt-2">{compensationAmt}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div className="bg-gray-100 px-3 py-1.5 text-right font-bold mt-2">
-                      Total Tk. {compensationAmt}
+                    {/* Checked By Audit - spanning columns 2 & 3 centered */}
+                    <div className="col-span-2 flex flex-col items-center text-center px-6">
+                      <div className="h-18 print:h-20" />
+                      <div className="w-full max-w-[220px] border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Checked By Audit
+                      </div>
+                    </div>
+
+                    {/* Authorized By */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="h-18 print:h-20" />
+                      <div className="w-full border-t border-black pt-1.5 text-center font-bold text-black text-[9.5px]">
+                        Authorized By
+                      </div>
                     </div>
                   </div>
                 </div>
