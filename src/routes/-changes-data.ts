@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "528",
+    "date": "2026-09-28T18:22",
+    "type": "UI/UX & Card Simplification",
+    "module": "Configure - Company Setup (Organogram Card Simplification)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Removed redundant 'Reports To' label and selector across the Designation Organogram: cards now cleanly focus directly on the designation name and title without cluttering reporting lines, and the 'Reports To' input was removed from the designation modal and table view.",
+    "descriptionBn": "পদবি ভিত্তিক অর্গ্যানোগ্রাম কার্ড থেকে অপ্রয়োজনীয় 'Reports To' লেখা ও অপশন সম্পূর্ণ বাদ দেওয়া হয়েছে: এখন কার্ডে সরাসরি পদবির নাম (Designation Name) পরিষ্কার ও সুন্দরভাবে প্রদর্শিত হয়, এবং ডেসিগনেশন মডাল ও টেবিল ভিউ থেকেও 'Reports To' ফিল্ডটি অপসারণ করা হয়েছে।"
+  },
+  {
+    "id": "527",
+    "date": "2026-09-28T18:10",
+    "type": "UI/UX & Builder Ergonomics",
+    "module": "Configure - Company Setup (Organogram Decluttering, Blank Canvas & Clear All)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Decluttered the Designation Organogram and introduced flexible blank canvas controls: 4-way directional add buttons and card toolbars are now cleanly hidden by default and revealed smoothly on hover (with a toolbar toggle to show all controls if desired), added a '+ Blank Canvas' action to initiate completely empty templates, added a dedicated 'Remove All' button to wipe/reset the active template's designations with confirmation, and provided an interactive Root Designation picker to place the starting role on an empty canvas.",
+    "descriptionBn": "পদবি ভিত্তিক অর্গ্যানোগ্রাম ডায়াগ্রামের অপ্রয়োজনীয় জটলা দূর করে পরিচ্ছন্ন ভিউ এবং শূন্য থেকে নতুন চার্ট তৈরির সুবিধা যুক্ত করা হয়েছে: কার্ডের চারপাশের ৪টি ডিরেকশনাল (+) বাটন এবং নিচের টুলবার এখন সাধারণ অবস্থায় লুকিয়ে থাকবে এবং মাউস হোভার করলেই মসৃণভাবে ভেসে উঠবে (প্রয়োজনে সব বাটন দৃশ্যমান রাখার টগল অপশনও রয়েছে), সম্পূর্ণ খালি টেমপ্লেট তৈরির জন্য '+ Blank Canvas' বোতাম এবং টেমপ্লেট মডালে স্পষ্ট চয়েস কার্ড যুক্ত করা হয়েছে, বর্তমান টেমপ্লেটের সব পদবি একসাথে মুছে ফেলার জন্য 'Remove All' অপশন যুক্ত করা হয়েছে, এবং শূন্য ক্যানভাসে প্রথম শীর্ষ পদবি (Level 1 Root) যুক্ত করার উপযোগী পিকার সিস্টেম চালু করা হয়েছে।"
+  },
+  {
+    "id": "526",
+    "date": "2026-09-28T17:52",
+    "type": "UI/UX & Design Beautification",
+    "module": "Configure - Company Setup (Organogram Beautification & Compact Layout)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Refined and beautified the Designation Organogram with an ultra-compact, high-density executive aesthetic: tightened card padding, streamlined card dimensions (185-195px multi-role, 210-260px single-role), subtle level badges, sleek 4-way micro directional add buttons (+ Above, + Below, ◄+, +►), compact branching & converging connection rails, modernized template directory table, and a space-efficient directional picker modal.",
+    "descriptionBn": "পদবি ভিত্তিক অর্গ্যানোগ্রাম ব্যবস্থাকে আরও আকর্ষণীয়, স্লিক এবং আল্ট্রা-কম্প্যাক্ট ডিজাইনে রূপান্তর করা হয়েছে: কার্ডের সাইজ ও প্যাডিং সুষম করা হয়েছে, প্রতিটি কার্ডের চারপাশের ৪টি ডিরেকশনাল (+) বাটনকে আধুনিক মাইক্রো-পিল আকারে নিখুঁত করা হয়েছে, কানেক্টিং রেল ও অ্যারোগুলোকে পরিমিত উচ্চতায় সাজানো হয়েছে, টেমপ্লেট ডিরেক্টরি টেবিলকে কম্প্যাক্ট করা হয়েছে এবং পদবি সিলেক্টর পপআপ মডালটিকে আরও দৃষ্টিনন্দন ও ব্যবহারবান্ধব করা হয়েছে।"
+  },
+  {
     "id": "525",
     "date": "2026-09-28T17:48",
     "type": "Feature Enhancement & Interactive Builder",

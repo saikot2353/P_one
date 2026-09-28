@@ -1813,6 +1813,7 @@ function CompanySetupPage() {
   const [customDesigTitle, setCustomDesigTitle] = useState("");
   const [customDesigShortName, setCustomDesigShortName] = useState("");
   const [customDesigTitleBng, setCustomDesigTitleBng] = useState("");
+  const [showAllAddControls, setShowAllAddControls] = useState(false);
 
   // Form states - Designation Modal
   const [isDesigModalOpen, setIsDesigModalOpen] = useState(false);
@@ -1976,13 +1977,45 @@ function CompanySetupPage() {
     toast.success(`Template "${target?.name}" is now ${target?.isActive ? "ACTIVE" : "INACTIVE"}`);
   };
 
-  const openCreateTemplateModal = () => {
+  const openCreateTemplateModal = (isBlank: boolean = false) => {
     setEditingTemplateId(null);
-    setTemplateModalName("");
+    setTemplateModalName(isBlank ? "Blank Organogram Structure" : "");
     setTemplateModalCode(`TPL-${String(organogramTemplates.length + 1).padStart(2, "0")}`);
-    setTemplateModalDesc("");
-    setTemplateModalClone(true);
+    setTemplateModalDesc(isBlank ? "Blank canvas hierarchy built from scratch." : "");
+    setTemplateModalClone(!isBlank);
     setIsTemplateModalOpen(true);
+  };
+
+  const handleClearAllDesignations = () => {
+    if (!activeTemplate) return;
+    if ((activeTemplate.designations || []).length === 0) {
+      toast.info("This template is already blank.");
+      return;
+    }
+    if (
+      !window.confirm(
+        `Are you sure you want to remove all ${activeTemplate.designations.length} designations from "${activeTemplate.name}"? This template will become a blank canvas.`
+      )
+    ) {
+      return;
+    }
+    const updated = organogramTemplates.map((t) =>
+      t.id === activeTemplate.id ? { ...t, designations: [] } : t
+    );
+    setOrganogramTemplates(updated);
+    localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updated));
+    toast.success(`Removed all designations from "${activeTemplate.name}". Template is now blank.`);
+  };
+
+  const openRootDesignationAdd = () => {
+    setDirectionalTarget(null);
+    setDirectionalSide("below");
+    setDirectionalSearch("");
+    setDirectionalActiveTab("all");
+    setCustomDesigTitle("");
+    setCustomDesigShortName("");
+    setCustomDesigTitleBng("");
+    setIsDirectionalPickerOpen(true);
   };
 
   const openEditTemplateModal = (tpl: OrganogramTemplate, e?: React.MouseEvent) => {
@@ -2255,8 +2288,31 @@ function CompanySetupPage() {
     chosenShortName?: string,
     chosenNameBng?: string
   ) => {
-    if (!directionalTarget) return;
     const currentDesigs = [...(activeTemplate?.designations || [])];
+
+    if (!directionalTarget) {
+      // Adding as first/root designation in a blank template
+      const newItem: OrganogramDesignationItem = {
+        id: `des-${Date.now()}`,
+        code: chosenShortName?.toUpperCase().replace(/\s+/g, "") || `DES-${Date.now().toString().slice(-4)}`,
+        name: chosenName,
+        shortName: chosenShortName || chosenName,
+        nameBng: chosenNameBng || "",
+        levelRank: 1,
+        sortOrder: 1,
+        reportsTo: "",
+        status: "Active",
+      };
+      const updatedDesigs = [newItem];
+      const updatedTemplates = organogramTemplates.map((t) =>
+        t.id === activeTemplate.id ? { ...t, designations: updatedDesigs } : t
+      );
+      setOrganogramTemplates(updatedTemplates);
+      localStorage.setItem("hris_organogram_templates_v2", JSON.stringify(updatedTemplates));
+      setIsDirectionalPickerOpen(false);
+      toast.success(`Placed "${chosenName}" as Root Designation (Level 1)`);
+      return;
+    }
 
     let targetLevel = directionalTarget.levelRank;
     let targetOrder = directionalTarget.sortOrder;
@@ -4238,20 +4294,20 @@ function CompanySetupPage() {
               )}
 
               {activeTab === "organogram" && (
-                <div className="p-4 sm:p-6 space-y-6">
+                <div className="p-3 sm:p-5 space-y-4">
                   {/* Top Organogram & Template Control Header */}
-                  <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-2xl p-5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 shadow-sm">
-                    <div className="flex items-center gap-3.5">
-                      <div className="p-3 bg-primary text-primary-foreground rounded-xl shadow-md">
-                        <Network className="size-6" />
+                  <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-xl p-3 sm:p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 bg-primary text-primary-foreground rounded-lg shadow-xs">
+                        <Network className="size-4.5" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h2 className="text-base font-bold text-foreground">
+                          <h2 className="text-sm font-bold text-foreground">
                             Designation Organogram & Hierarchy
                           </h2>
                           <span
-                            className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold border ${
+                            className={`text-[9px] font-mono px-2 py-0.5 rounded-full font-bold border ${
                               activeTemplate?.isActive
                                 ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
                                 : "bg-slate-500/10 text-slate-500 border-slate-500/20"
@@ -4260,55 +4316,64 @@ function CompanySetupPage() {
                             {activeTemplate?.isActive ? "ACTIVE TEMPLATE" : "INACTIVE TEMPLATE"}
                           </span>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-0.5 max-w-2xl">
-                          Pure designation organogram with flexible templates. Top leadership branches into parallel executive roles (COO, CFO, CTO, CMO, CHRO) and converges down to General Manager through Officer.
+                        <p className="text-[11px] text-muted-foreground mt-0.5 max-w-2xl">
+                          Pure designation organogram with flexible templates. Top leadership branches into parallel executive roles and converges down through management.
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 self-stretch lg:self-auto justify-end">
+                    <div className="flex flex-wrap items-center gap-1.5 self-stretch sm:self-auto justify-end">
                       <button
                         type="button"
-                        onClick={openCreateTemplateModal}
-                        className="h-9 px-3.5 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-xs transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                        onClick={() => openCreateTemplateModal(false)}
+                        className="h-8 px-3 rounded-lg border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-xs transition-all flex items-center gap-1 cursor-pointer"
                       >
-                        <LayoutTemplate className="size-3.5" /> + New Template
+                        <LayoutTemplate className="size-3" /> + New Template
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => openCreateTemplateModal(true)}
+                        className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-foreground font-semibold text-xs transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
+                        title="Create an empty blank template from scratch"
+                      >
+                        <Sparkles className="size-3 text-primary" /> + Blank Canvas
                       </button>
 
                       <button
                         type="button"
                         onClick={() => openDesigModal(null)}
-                        className="h-9 px-4 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-xs hover:bg-primary/90 transition-all flex items-center gap-1.5 cursor-pointer"
+                        className="h-8 px-3 rounded-lg bg-primary text-primary-foreground font-semibold text-xs shadow-xs hover:bg-primary/90 transition-all flex items-center gap-1 cursor-pointer"
                       >
-                        <Plus className="size-3.5" /> Add Designation
+                        <Plus className="size-3" /> Add Designation
                       </button>
 
                       <button
                         type="button"
                         onClick={handleResetTemplates}
-                        className="h-9 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-muted-foreground hover:text-foreground font-medium text-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                        className="h-8 px-2.5 rounded-lg border border-border/60 bg-card hover:bg-muted text-muted-foreground hover:text-foreground font-medium text-xs transition-all flex items-center gap-1 cursor-pointer"
                         title="Reset all templates back to default system templates"
                       >
-                        <RefreshCw className="size-3.5" /> Reset Defaults
+                        <RefreshCw className="size-3" /> Reset Defaults
                       </button>
                     </div>
                   </div>
 
                   {/* Sub-Tab Navigation: Templates List (Table View) vs Organogram Diagram Builder */}
-                  <div className="flex items-center justify-between border-b border-border/60 pb-3 flex-wrap gap-3">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between border-b border-border/60 pb-2.5 flex-wrap gap-2.5">
+                    <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => setOrganogramSubTab("templates")}
-                        className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
                           organogramSubTab === "templates"
-                            ? "bg-primary text-primary-foreground shadow-sm"
+                            ? "bg-primary text-primary-foreground shadow-2xs"
                             : "bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/40"
                         }`}
                       >
-                        <ListTree className="size-4" />
+                        <ListTree className="size-3.5" />
                         <span>Templates List (Table View)</span>
-                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                        <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-mono ${
                           organogramSubTab === "templates" ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
                         }`}>
                           {organogramTemplates.length}
@@ -4318,15 +4383,15 @@ function CompanySetupPage() {
                       <button
                         type="button"
                         onClick={() => setOrganogramSubTab("builder")}
-                        className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
                           organogramSubTab === "builder"
-                            ? "bg-primary text-primary-foreground shadow-sm"
+                            ? "bg-primary text-primary-foreground shadow-2xs"
                             : "bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/40"
                         }`}
                       >
-                        <Network className="size-4" />
+                        <Network className="size-3.5" />
                         <span>Organogram Diagram Builder</span>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${
                           activeTemplate.isActive
                             ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                             : "bg-amber-500/20 text-amber-600 dark:text-amber-400"
@@ -4338,14 +4403,14 @@ function CompanySetupPage() {
 
                     {/* Builder Controls when viewing Organogram */}
                     {organogramSubTab === "builder" && (
-                      <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         {/* Template Switcher Dropdown */}
-                        <div className="flex items-center gap-1.5 bg-card border border-border/60 rounded-xl px-2.5 py-1 text-xs">
-                          <span className="text-[11px] text-muted-foreground font-semibold">Template:</span>
+                        <div className="flex items-center gap-1 bg-card border border-border/60 rounded-lg px-2 py-1 text-xs">
+                          <span className="text-[10px] text-muted-foreground font-semibold">Tpl:</span>
                           <select
                             value={activeTemplateId}
                             onChange={(e) => handleSelectTemplate(e.target.value)}
-                            className="bg-transparent font-bold text-foreground outline-none cursor-pointer max-w-[200px] truncate text-xs"
+                            className="bg-transparent font-bold text-foreground outline-none cursor-pointer max-w-[170px] truncate text-xs"
                           >
                             {organogramTemplates.map((tpl) => (
                               <option key={tpl.id} value={tpl.id}>
@@ -4359,40 +4424,67 @@ function CompanySetupPage() {
                         <button
                           type="button"
                           onClick={(e) => handleToggleTemplateActive(activeTemplate.id, e)}
-                          className={`px-2.5 py-1 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+                          className={`px-2 py-1 rounded-lg text-[11px] font-bold border transition-all flex items-center gap-1 cursor-pointer shadow-2xs ${
                             activeTemplate.isActive
                               ? "bg-emerald-500/15 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/25"
                               : "bg-slate-500/10 text-slate-500 border-slate-500/25 hover:bg-slate-500/20"
                           }`}
                           title="Click to toggle template Active/Inactive status"
                         >
-                          <Power className="size-3" />
+                          <Power className="size-2.5" />
                           <span>{activeTemplate.isActive ? "ACTIVE" : "INACTIVE"}</span>
                         </button>
 
+                        {/* Remove All Designations button */}
+                        <button
+                          type="button"
+                          onClick={handleClearAllDesignations}
+                          disabled={(activeTemplate.designations || []).length === 0}
+                          className="h-7 px-2.5 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 font-bold text-[11px] transition-all flex items-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs"
+                          title="Remove all designations from this template to start blank"
+                        >
+                          <Trash2 className="size-3" />
+                          <span>Remove All ({activeTemplate.designations?.length || 0})</span>
+                        </button>
+
+                        {/* Clean View vs Always Show Add Buttons */}
+                        <button
+                          type="button"
+                          onClick={() => setShowAllAddControls(!showAllAddControls)}
+                          className={`h-7 px-2 rounded-lg text-[10px] font-semibold border transition-all flex items-center gap-1 cursor-pointer ${
+                            showAllAddControls
+                              ? "bg-primary text-primary-foreground border-primary shadow-2xs"
+                              : "bg-muted/40 text-muted-foreground border-border/60 hover:text-foreground"
+                          }`}
+                          title="Toggle clean view (add buttons on hover) vs always visible"
+                        >
+                          <Eye className="size-2.5" />
+                          <span>{showAllAddControls ? "All Visible" : "Clean View"}</span>
+                        </button>
+
                         {/* View Mode Toggle: Diagram vs Table */}
-                        <div className="bg-muted p-1 rounded-xl border border-border/60 flex items-center gap-1">
+                        <div className="bg-muted p-0.5 rounded-lg border border-border/60 flex items-center gap-0.5">
                           <button
                             type="button"
                             onClick={() => setOrganogramViewMode("chart")}
-                            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer ${
+                            className={`px-2 py-0.5 rounded-md text-[11px] font-semibold flex items-center gap-1 transition-all cursor-pointer ${
                               organogramViewMode === "chart"
-                                ? "bg-card text-primary shadow-xs font-bold"
+                                ? "bg-card text-primary shadow-2xs font-bold"
                                 : "text-muted-foreground hover:text-foreground"
                             }`}
                           >
-                            <Network className="size-3" /> Tree Diagram
+                            <Network className="size-3" /> Diagram
                           </button>
                           <button
                             type="button"
                             onClick={() => setOrganogramViewMode("table")}
-                            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer ${
+                            className={`px-2 py-0.5 rounded-md text-[11px] font-semibold flex items-center gap-1 transition-all cursor-pointer ${
                               organogramViewMode === "table"
-                                ? "bg-card text-primary shadow-xs font-bold"
+                                ? "bg-card text-primary shadow-2xs font-bold"
                                 : "text-muted-foreground hover:text-foreground"
                             }`}
                           >
-                            <ListTree className="size-3" /> Roles Table
+                            <ListTree className="size-3" /> Table
                           </button>
                         </div>
                       </div>
@@ -4401,33 +4493,42 @@ function CompanySetupPage() {
 
                   {/* 1. TEMPLATES LIST (TABLE VIEW) */}
                   {organogramSubTab === "templates" && (
-                    <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
-                      <div className="p-4 border-b border-border/60 bg-muted/20 flex items-center justify-between flex-wrap gap-3">
+                    <div className="bg-card rounded-xl border border-border/80 shadow-2xs overflow-hidden">
+                      <div className="p-3 border-b border-border/60 bg-muted/20 flex items-center justify-between flex-wrap gap-2">
                         <div>
-                          <h3 className="text-sm font-extrabold text-foreground flex items-center gap-2">
-                            <LayoutTemplate className="size-4 text-primary" />
+                          <h3 className="text-xs font-extrabold text-foreground flex items-center gap-1.5">
+                            <LayoutTemplate className="size-3.5 text-primary" />
                             Organogram Templates Directory
                           </h3>
-                          <p className="text-xs text-muted-foreground mt-0.5">
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
                             Manage multiple organogram hierarchy structures. Active templates take effect across the HRIS.
                           </p>
                         </div>
-                        <span className="text-xs font-mono font-bold text-muted-foreground bg-muted px-2.5 py-1 rounded-lg border border-border/40">
-                          {organogramTemplates.length} Templates Configured
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openCreateTemplateModal(true)}
+                            className="px-2.5 py-1 rounded-lg border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                          >
+                            <Sparkles className="size-3" /> + Create Blank Template
+                          </button>
+                          <span className="text-[10px] font-mono font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-md border border-border/40">
+                            {organogramTemplates.length} Templates Configured
+                          </span>
+                        </div>
                       </div>
 
                       <div className="overflow-x-auto">
                         <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
-                          <thead className="bg-muted/40 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                          <thead className="bg-muted/40 text-muted-foreground uppercase font-semibold tracking-wider text-[11px] border-b border-border/40">
                             <tr>
-                              <th className="px-4 py-3.5 w-[90px]">Code</th>
-                              <th className="px-4 py-3.5">Template Name & Description</th>
-                              <th className="px-4 py-3.5 text-center">Depth</th>
-                              <th className="px-4 py-3.5 text-center">Total Roles</th>
-                              <th className="px-4 py-3.5 text-center">Active Status</th>
-                              <th className="px-4 py-3.5 text-center">Selection</th>
-                              <th className="px-4 py-3.5 text-right">Actions</th>
+                              <th className="px-3.5 py-2.5 w-[80px]">Code</th>
+                              <th className="px-3.5 py-2.5">Template Name & Description</th>
+                              <th className="px-3.5 py-2.5 text-center">Depth</th>
+                              <th className="px-3.5 py-2.5 text-center">Total Roles</th>
+                              <th className="px-3.5 py-2.5 text-center">Active Status</th>
+                              <th className="px-3.5 py-2.5 text-center">Selection</th>
+                              <th className="px-3.5 py-2.5 text-right">Actions</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-border/30">
@@ -4442,43 +4543,43 @@ function CompanySetupPage() {
                                     isSelected ? "bg-primary/5 font-medium" : ""
                                   }`}
                                 >
-                                  <td className="px-4 py-3.5 font-mono font-bold text-primary">{tpl.code}</td>
-                                  <td className="px-4 py-3.5">
+                                  <td className="px-3.5 py-2.5 font-mono font-bold text-primary text-xs">{tpl.code}</td>
+                                  <td className="px-3.5 py-2.5">
                                     <div className="font-extrabold text-foreground text-xs">{tpl.name}</div>
-                                    <div className="text-[11px] text-muted-foreground line-clamp-1 max-w-md mt-0.5">
+                                    <div className="text-[10px] text-muted-foreground line-clamp-1 max-w-md mt-0.5">
                                       {tpl.description}
                                     </div>
                                   </td>
-                                  <td className="px-4 py-3.5 text-center">
-                                    <span className="inline-block px-2.5 py-0.5 rounded-full bg-muted font-mono font-bold text-[10px] text-muted-foreground border border-border/40">
+                                  <td className="px-3.5 py-2.5 text-center">
+                                    <span className="inline-block px-2 py-0.5 rounded-full bg-muted font-mono font-bold text-[9px] text-muted-foreground border border-border/40">
                                       {distinctLevelsCount} Levels
                                     </span>
                                   </td>
-                                  <td className="px-4 py-3.5 text-center font-mono font-bold text-foreground">
-                                    <span className="px-2.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                                  <td className="px-3.5 py-2.5 text-center font-mono font-bold text-foreground">
+                                    <span className="px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-[10px]">
                                       {tpl.designations.length} Roles
                                     </span>
                                   </td>
-                                  <td className="px-4 py-3.5 text-center">
+                                  <td className="px-3.5 py-2.5 text-center">
                                     {/* Interactive Active / Inactive Switch Button */}
                                     <button
                                       type="button"
                                       onClick={(e) => handleToggleTemplateActive(tpl.id, e)}
-                                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer shadow-2xs ${
+                                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all cursor-pointer shadow-2xs ${
                                         tpl.isActive
                                           ? "bg-emerald-500/15 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/25"
                                           : "bg-slate-500/10 text-slate-500 border-slate-500/25 hover:bg-slate-500/20"
                                       }`}
                                       title="Click to toggle Active / Inactive"
                                     >
-                                      <Power className="size-3" />
+                                      <Power className="size-2.5" />
                                       <span>{tpl.isActive ? "ACTIVE" : "INACTIVE"}</span>
                                     </button>
                                   </td>
-                                  <td className="px-4 py-3.5 text-center">
+                                  <td className="px-3.5 py-2.5 text-center">
                                     {isSelected ? (
-                                      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground shadow-2xs">
-                                        <CheckCircle2 className="size-3" /> Selected
+                                      <span className="inline-flex items-center gap-1 text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-primary text-primary-foreground shadow-2xs">
+                                        <CheckCircle2 className="size-2.5" /> Selected
                                       </span>
                                     ) : (
                                       <button
@@ -4490,8 +4591,8 @@ function CompanySetupPage() {
                                       </button>
                                     )}
                                   </td>
-                                  <td className="px-4 py-3.5 text-right">
-                                    <div className="flex items-center justify-end gap-1.5">
+                                  <td className="px-3.5 py-2.5 text-right">
+                                    <div className="flex items-center justify-end gap-1">
                                       {/* View & Edit Organogram Diagram */}
                                       <button
                                         type="button"
@@ -4499,30 +4600,30 @@ function CompanySetupPage() {
                                           handleSelectTemplate(tpl.id);
                                           setOrganogramSubTab("builder");
                                         }}
-                                        className="px-2.5 py-1.5 rounded-lg bg-primary text-primary-foreground font-bold text-[11px] flex items-center gap-1 hover:bg-primary/95 transition-all shadow-2xs cursor-pointer"
+                                        className="px-2 py-1 rounded-md bg-primary text-primary-foreground font-bold text-[10px] flex items-center gap-1 hover:bg-primary/95 transition-all shadow-2xs cursor-pointer"
                                         title="View and edit organogram diagram"
                                       >
-                                        <Eye className="size-3.5" /> View Diagram
+                                        <Eye className="size-3" /> View Diagram
                                       </button>
 
                                       {/* Edit Details */}
                                       <button
                                         type="button"
                                         onClick={(e) => openEditTemplateModal(tpl, e)}
-                                        className="p-1.5 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors cursor-pointer"
+                                        className="p-1 rounded-md bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors cursor-pointer"
                                         title="Edit Template Details"
                                       >
-                                        <Pencil className="size-3.5" />
+                                        <Pencil className="size-3" />
                                       </button>
 
                                       {/* Duplicate */}
                                       <button
                                         type="button"
                                         onClick={(e) => handleDuplicateTemplate(tpl.id, e)}
-                                        className="p-1.5 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors cursor-pointer"
+                                        className="p-1 rounded-md bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors cursor-pointer"
                                         title="Duplicate Template"
                                       >
-                                        <Copy className="size-3.5" />
+                                        <Copy className="size-3" />
                                       </button>
 
                                       {/* Delete */}
@@ -4530,10 +4631,10 @@ function CompanySetupPage() {
                                         <button
                                           type="button"
                                           onClick={(e) => handleDeleteOrganogramTemplate(tpl.id, e)}
-                                          className="p-1.5 rounded-lg bg-muted hover:bg-red-500/10 hover:text-red-500 text-muted-foreground transition-colors cursor-pointer"
+                                          className="p-1 rounded-md bg-muted hover:bg-red-500/10 hover:text-red-500 text-muted-foreground transition-colors cursor-pointer"
                                           title="Delete Template"
                                         >
-                                          <Trash2 className="size-3.5" />
+                                          <Trash2 className="size-3" />
                                         </button>
                                       )}
                                     </div>
@@ -4552,21 +4653,20 @@ function CompanySetupPage() {
                     <>
                       {/* ORGANOGRAM PURE DESIGNATION DIAGRAM VIEW */}
                       {organogramViewMode === "chart" && (
-                        <div className="space-y-6 py-6 overflow-x-auto">
+                        <div className="space-y-3 py-3 overflow-x-auto">
                           {/* Inactive template alert banner if inactive */}
                           {!activeTemplate.isActive && (
-                            <div className="max-w-3xl mx-auto p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between text-xs text-amber-700 dark:text-amber-300">
+                            <div className="max-w-2xl mx-auto p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center justify-between text-xs text-amber-700 dark:text-amber-300">
                               <div className="flex items-center gap-2">
                                 <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
                                 <span>
-                                  <strong>Template Inactive:</strong> This template is currently marked as inactive.
-                                  You can customize it or click the <strong>Active Toggle</strong> to enable it.
+                                  <strong>Template Inactive:</strong> This template is currently inactive.
                                 </span>
                               </div>
                               <button
                                 type="button"
                                 onClick={(e) => handleToggleTemplateActive(activeTemplate.id, e)}
-                                className="px-2.5 py-1 rounded bg-amber-500 text-white font-bold hover:bg-amber-600 transition-colors shrink-0 cursor-pointer"
+                                className="px-2 py-0.5 rounded bg-amber-500 text-white font-bold hover:bg-amber-600 transition-colors shrink-0 text-[10px] cursor-pointer"
                               >
                                 Activate Now
                               </button>
@@ -4578,12 +4678,30 @@ function CompanySetupPage() {
                             const desigs = activeTemplate?.designations || [];
                             if (desigs.length === 0) {
                               return (
-                                <div className="p-16 text-center text-muted-foreground border-2 border-dashed border-border/60 rounded-2xl max-w-xl mx-auto">
-                                  <Network className="size-10 mx-auto text-muted-foreground/40 mb-3" />
-                                  <p className="font-semibold text-foreground">No designations in this template</p>
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    Click "Add Designation" above to begin building the organogram.
+                                <div className="p-10 text-center text-muted-foreground border-2 border-dashed border-border/70 rounded-2xl max-w-lg mx-auto bg-card/60 backdrop-blur-xs shadow-2xs my-6">
+                                  <div className="size-14 mx-auto rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-3.5 shadow-2xs">
+                                    <Sparkles className="size-7" />
+                                  </div>
+                                  <h3 className="font-extrabold text-foreground text-sm">Blank Organogram Canvas</h3>
+                                  <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                                    This template is currently empty. Start building your custom designation hierarchy by adding the top root role (e.g. Managing Director, Chairman, or CEO).
                                   </p>
+                                  <div className="mt-5 flex items-center justify-center gap-2.5 flex-wrap">
+                                    <button
+                                      type="button"
+                                      onClick={openRootDesignationAdd}
+                                      className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/95 transition-all flex items-center gap-1.5 cursor-pointer"
+                                    >
+                                      <Plus className="size-4" /> + Add Root Designation (Level 1)
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => openDesigModal(null, 1, 1)}
+                                      className="px-3.5 py-2 rounded-xl border border-border/80 hover:bg-muted font-semibold text-xs text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
+                                    >
+                                      <Pencil className="size-3.5 text-muted-foreground" /> Custom Role Form
+                                    </button>
+                                  </div>
                                 </div>
                               );
                             }
@@ -4600,7 +4718,7 @@ function CompanySetupPage() {
                               .sort((a, b) => a - b);
 
                             return (
-                              <div className="flex flex-col items-center min-w-max px-12 py-4">
+                              <div className="flex flex-col items-center min-w-max px-6 py-2">
                                 {sortedLevels.map((level, lIndex) => {
                                   const items = levelMap[level].sort((a, b) => a.sortOrder - b.sortOrder);
                                   const isMulti = items.length > 1;
@@ -4609,19 +4727,19 @@ function CompanySetupPage() {
                                   const nextIsMulti = nextLevelItems.length > 1;
 
                                   return (
-                                    <div key={level} className="flex flex-col items-center w-full my-1">
+                                    <div key={level} className="flex flex-col items-center w-full my-0.5">
                                       {/* LEVEL BADGE / TITLE */}
-                                      <div className="mb-3 flex items-center gap-2">
-                                        <span className="text-[10px] font-black uppercase font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                                          Level {level} {isMulti ? `· ${items.length} Parallel Roles (Side-by-Side)` : ""}
+                                      <div className="mb-1.5 flex items-center gap-1.5">
+                                        <span className="text-[9px] font-black uppercase font-mono tracking-wider px-2 py-0.5 rounded-full bg-muted/80 text-foreground/80 border border-border/60">
+                                          Level {level} {isMulti ? `· ${items.length} Parallel Roles` : ""}
                                         </span>
                                         <button
                                           type="button"
                                           onClick={() => openDesigModal(null, level, items.length + 1)}
-                                          className="text-[10px] text-muted-foreground hover:text-primary font-bold flex items-center gap-0.5 hover:underline cursor-pointer"
+                                          className="text-[9px] text-muted-foreground hover:text-primary font-semibold flex items-center gap-0.5 cursor-pointer"
                                           title="Add another designation at this level"
                                         >
-                                          <Plus className="size-3" /> Add at Level {level}
+                                          <Plus className="size-2.5" /> Add at L{level}
                                         </button>
                                       </div>
 
@@ -4633,53 +4751,65 @@ function CompanySetupPage() {
                                           <div className="w-full flex items-center justify-center">
                                             <div className="relative flex justify-around w-full max-w-4xl px-8">
                                               {/* Horizontal Top Rail */}
-                                              <div className="absolute top-0 left-12 right-12 h-0.5 bg-slate-300 dark:bg-slate-700" />
+                                              <div className="absolute top-0 left-10 right-10 h-0.5 bg-slate-300 dark:bg-slate-700" />
                                               {items.map((it) => (
                                                 <div key={it.id} className="flex flex-col items-center z-10">
-                                                  <div className="w-0.5 h-4 bg-slate-300 dark:bg-slate-700" />
-                                                  <span className="text-[9px] text-slate-400 -mt-1 select-none">▼</span>
+                                                  <div className="w-0.5 h-3 bg-slate-300 dark:bg-slate-700" />
+                                                  <span className="text-[8px] text-slate-400 -mt-1 select-none">▼</span>
                                                 </div>
                                               ))}
                                             </div>
                                           </div>
 
                                           {/* Parallel Cards Row */}
-                                          <div className="flex flex-wrap items-stretch justify-center gap-5 py-2 max-w-6xl">
+                                          <div className="flex flex-wrap items-stretch justify-center gap-3 py-1.5 max-w-6xl">
                                             {items.map((item) => (
                                               <div
                                                 key={item.id}
-                                                className={`w-[230px] rounded-2xl border-2 transition-all p-4 flex flex-col justify-between group shadow-sm hover:shadow-lg relative bg-card ${
+                                                className={`w-[185px] sm:w-[195px] rounded-xl border transition-all p-3 flex flex-col justify-between group shadow-2xs hover:shadow-md relative bg-card ${
                                                   item.status === "Active"
                                                     ? "border-primary/40 hover:border-primary"
                                                     : "border-border/60 opacity-60 bg-muted/20"
                                                 }`}
                                               >
-                                                {/* 4 DIRECTIONAL ADD BUTTONS (ALL SIDES: ABOVE, BELOW, LEFT, RIGHT) */}
+                                                {/* 4 DIRECTIONAL ADD BUTTONS (ALL SIDES: ABOVE, BELOW, LEFT, RIGHT) - HOVER REVEALED */}
                                                 {/* 1. TOP / ABOVE (UPORE) */}
                                                 <button
                                                   type="button"
                                                   onClick={() => openDirectionalAdd(item, "above")}
-                                                  className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center gap-0.5 text-[8px] font-black uppercase tracking-wider transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  className={`absolute -top-2.5 left-1/2 -translate-x-1/2 h-5 px-1.5 rounded-full bg-card/95 border border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-2xs hover:shadow-xs flex items-center gap-0.5 text-[8px] font-bold uppercase tracking-wider transition-all hover:scale-105 z-20 cursor-pointer backdrop-blur-xs ${
+                                                    showAllAddControls
+                                                      ? "opacity-100 pointer-events-auto"
+                                                      : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                                                  }`}
                                                   title={`Add Designation Above ${item.name} (Upore)`}
                                                 >
-                                                  <Plus className="size-2.5" />▲ Above
+                                                  <Plus className="size-2" />▲ Above
                                                 </button>
 
                                                 {/* 2. BOTTOM / BELOW (NICHE) */}
                                                 <button
                                                   type="button"
                                                   onClick={() => openDirectionalAdd(item, "below")}
-                                                  className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center gap-0.5 text-[8px] font-black uppercase tracking-wider transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  className={`absolute -bottom-2.5 left-1/2 -translate-x-1/2 h-5 px-1.5 rounded-full bg-card/95 border border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-2xs hover:shadow-xs flex items-center gap-0.5 text-[8px] font-bold uppercase tracking-wider transition-all hover:scale-105 z-20 cursor-pointer backdrop-blur-xs ${
+                                                    showAllAddControls
+                                                      ? "opacity-100 pointer-events-auto"
+                                                      : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                                                  }`}
                                                   title={`Add Designation Below ${item.name} (Niche)`}
                                                 >
-                                                  <Plus className="size-2.5" />▼ Below
+                                                  <Plus className="size-2" />▼ Below
                                                 </button>
 
                                                 {/* 3. LEFT (BAME) */}
                                                 <button
                                                   type="button"
                                                   onClick={() => openDirectionalAdd(item, "left")}
-                                                  className="absolute top-1/2 -left-3.5 -translate-y-1/2 size-6 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  className={`absolute top-1/2 -left-2.5 -translate-y-1/2 size-5 rounded-full bg-card/95 border border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-2xs hover:shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-105 z-20 cursor-pointer backdrop-blur-xs ${
+                                                    showAllAddControls
+                                                      ? "opacity-100 pointer-events-auto"
+                                                      : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                                                  }`}
                                                   title={`Add Designation to Left Side-by-Side (Bame)`}
                                                 >
                                                   ◄+
@@ -4689,21 +4819,25 @@ function CompanySetupPage() {
                                                 <button
                                                   type="button"
                                                   onClick={() => openDirectionalAdd(item, "right")}
-                                                  className="absolute top-1/2 -right-3.5 -translate-y-1/2 size-6 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  className={`absolute top-1/2 -right-2.5 -translate-y-1/2 size-5 rounded-full bg-card/95 border border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-2xs hover:shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-105 z-20 cursor-pointer backdrop-blur-xs ${
+                                                    showAllAddControls
+                                                      ? "opacity-100 pointer-events-auto"
+                                                      : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                                                  }`}
                                                   title={`Add Designation to Right Side-by-Side (Dane)`}
                                                 >
                                                   +►
                                                 </button>
 
                                                 <div>
-                                                  <div className="flex items-center justify-between gap-1 mb-2">
-                                                    <span className="text-[9px] font-bold font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                                                  <div className="flex items-center justify-between gap-1 mb-1.5">
+                                                    <span className="text-[9px] font-bold font-mono px-1 py-0.2 rounded bg-muted text-muted-foreground border border-border/40">
                                                       Pos #{item.sortOrder}
                                                     </span>
                                                     <button
                                                       type="button"
                                                       onClick={() => handleToggleDesigStatus(item.id)}
-                                                      className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full border transition-colors cursor-pointer ${
+                                                      className={`text-[8px] font-bold px-1.5 py-0.2 rounded-full border transition-colors cursor-pointer ${
                                                         item.status === "Active"
                                                           ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
                                                           : "bg-red-500/10 text-red-600 border-red-500/20"
@@ -4717,37 +4851,35 @@ function CompanySetupPage() {
                                                   {/* Prominent Short Name */}
                                                   {item.shortName && (
                                                     <div className="mb-1">
-                                                      <span className="text-xs font-black px-2 py-0.5 rounded bg-primary text-primary-foreground tracking-wide font-mono inline-block shadow-2xs">
+                                                      <span className="text-[10px] font-black px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20 tracking-wide font-mono inline-block shadow-2xs">
                                                         {item.shortName}
                                                       </span>
                                                     </div>
                                                   )}
 
                                                   {/* Full Designation Name */}
-                                                  <h4 className="text-xs font-extrabold text-foreground leading-snug group-hover:text-primary transition-colors">
+                                                  <h4 className="text-[11px] font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
                                                     {item.name}
                                                   </h4>
 
                                                   {item.nameBng && (
-                                                    <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
+                                                    <p className="text-[10px] text-muted-foreground font-medium mt-0.5 line-clamp-1">
                                                       {item.nameBng}
-                                                    </p>
-                                                  )}
-
-                                                  {item.reportsTo && (
-                                                    <p className="text-[9px] text-muted-foreground/80 mt-1.5 font-medium truncate">
-                                                      ↳ Reports to: {item.reportsTo}
                                                     </p>
                                                   )}
                                                 </div>
 
-                                                {/* Action Toolbar on Card */}
-                                                <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between -mx-4 -mb-4 p-1.5 bg-muted/20 rounded-b-2xl">
+                                                {/* Action Toolbar on Card (Hover Revealed for Clean Appearance) */}
+                                                <div
+                                                  className={`mt-2.5 pt-1.5 border-t border-border/40 flex items-center justify-between -mx-3 -mb-3 p-1 bg-muted/20 rounded-b-xl transition-opacity duration-150 ${
+                                                    showAllAddControls ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                                                  }`}
+                                                >
                                                   <div className="flex items-center gap-0.5">
                                                     <button
                                                       type="button"
                                                       onClick={() => handleMoveSortOrder(item.id, -1)}
-                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] font-bold cursor-pointer"
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[8px] font-bold cursor-pointer"
                                                       title="Shift Left ◄"
                                                     >
                                                       ◄
@@ -4755,7 +4887,7 @@ function CompanySetupPage() {
                                                     <button
                                                       type="button"
                                                       onClick={() => handleMoveSortOrder(item.id, 1)}
-                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] font-bold cursor-pointer"
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[8px] font-bold cursor-pointer"
                                                       title="Shift Right ►"
                                                     >
                                                       ►
@@ -4764,7 +4896,7 @@ function CompanySetupPage() {
                                                     <button
                                                       type="button"
                                                       onClick={() => handleMoveLevel(item.id, -1)}
-                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] cursor-pointer"
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[8px] cursor-pointer"
                                                       title="Move Up Level ▲"
                                                     >
                                                       ▲
@@ -4772,7 +4904,7 @@ function CompanySetupPage() {
                                                     <button
                                                       type="button"
                                                       onClick={() => handleMoveLevel(item.id, 1)}
-                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] cursor-pointer"
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[8px] cursor-pointer"
                                                       title="Move Down Level ▼"
                                                     >
                                                       ▼
@@ -4786,7 +4918,7 @@ function CompanySetupPage() {
                                                       className="p-1 rounded hover:bg-card text-muted-foreground hover:text-blue-500 transition-colors cursor-pointer"
                                                       title="Edit designation"
                                                     >
-                                                      <Pencil className="size-3" />
+                                                      <Pencil className="size-2.5" />
                                                     </button>
                                                     <button
                                                       type="button"
@@ -4794,7 +4926,7 @@ function CompanySetupPage() {
                                                       className="p-1 rounded hover:bg-card text-muted-foreground hover:text-red-500 transition-colors cursor-pointer"
                                                       title="Delete designation"
                                                     >
-                                                      <Trash2 className="size-3" />
+                                                      <Trash2 className="size-2.5" />
                                                     </button>
                                                   </div>
                                                 </div>
@@ -4808,15 +4940,15 @@ function CompanySetupPage() {
                                               <div className="relative flex justify-around w-full max-w-4xl px-8">
                                                 {items.map((it) => (
                                                   <div key={it.id} className="flex flex-col items-center z-10">
-                                                    <div className="w-0.5 h-3.5 bg-slate-300 dark:bg-slate-700" />
+                                                    <div className="w-0.5 h-2.5 bg-slate-300 dark:bg-slate-700" />
                                                   </div>
                                                 ))}
                                                 {/* Horizontal Bottom Rail */}
-                                                <div className="absolute bottom-0 left-12 right-12 h-0.5 bg-slate-300 dark:bg-slate-700" />
+                                                <div className="absolute bottom-0 left-10 right-10 h-0.5 bg-slate-300 dark:bg-slate-700" />
                                               </div>
                                               {/* Center Vertical Down Arrow to next level */}
-                                              <div className="w-0.5 h-5 bg-slate-300 dark:bg-slate-700" />
-                                              <span className="text-[10px] text-slate-400 -mt-1 select-none">▼</span>
+                                              <div className="w-0.5 h-3.5 bg-slate-300 dark:bg-slate-700" />
+                                              <span className="text-[8px] text-slate-400 -mt-1 select-none">▼</span>
                                             </div>
                                           )}
                                         </div>
@@ -4827,40 +4959,52 @@ function CompanySetupPage() {
                                             const item = items[0];
                                             return (
                                               <div
-                                                className={`rounded-2xl border-2 transition-all p-4 shadow-sm hover:shadow-lg min-w-[280px] max-w-[340px] text-center relative group bg-card ${
+                                                className={`rounded-xl border transition-all p-3 shadow-2xs hover:shadow-md min-w-[210px] max-w-[260px] text-center relative group bg-card ${
                                                   level === 1
-                                                    ? "border-primary/60 bg-gradient-to-b from-primary/10 via-card to-card"
+                                                    ? "border-amber-500/50 bg-gradient-to-b from-amber-500/10 via-card to-card"
                                                     : level === 2
-                                                    ? "border-blue-500/50 bg-gradient-to-b from-blue-500/10 via-card to-card"
+                                                    ? "border-primary/50 bg-gradient-to-b from-primary/10 via-card to-card"
                                                     : "border-border/80 hover:border-primary"
                                                 } ${item.status === "Inactive" ? "opacity-60 bg-muted/20" : ""}`}
                                               >
-                                                {/* 4 DIRECTIONAL ADD BUTTONS (ALL SIDES: ABOVE, BELOW, LEFT, RIGHT) */}
+                                                {/* 4 DIRECTIONAL ADD BUTTONS (ALL SIDES: ABOVE, BELOW, LEFT, RIGHT) - HOVER REVEALED */}
                                                 {/* 1. TOP / ABOVE (UPORE) */}
                                                 <button
                                                   type="button"
                                                   onClick={() => openDirectionalAdd(item, "above")}
-                                                  className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center gap-0.5 text-[8px] font-black uppercase tracking-wider transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  className={`absolute -top-2.5 left-1/2 -translate-x-1/2 h-5 px-1.5 rounded-full bg-card/95 border border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-2xs hover:shadow-xs flex items-center gap-0.5 text-[8px] font-bold uppercase tracking-wider transition-all hover:scale-105 z-20 cursor-pointer backdrop-blur-xs ${
+                                                    showAllAddControls
+                                                      ? "opacity-100 pointer-events-auto"
+                                                      : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                                                  }`}
                                                   title={`Add Designation Above ${item.name} (Upore)`}
                                                 >
-                                                  <Plus className="size-2.5" />▲ Above
+                                                  <Plus className="size-2" />▲ Above
                                                 </button>
 
                                                 {/* 2. BOTTOM / BELOW (NICHE) */}
                                                 <button
                                                   type="button"
                                                   onClick={() => openDirectionalAdd(item, "below")}
-                                                  className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center gap-0.5 text-[8px] font-black uppercase tracking-wider transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  className={`absolute -bottom-2.5 left-1/2 -translate-x-1/2 h-5 px-1.5 rounded-full bg-card/95 border border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-2xs hover:shadow-xs flex items-center gap-0.5 text-[8px] font-bold uppercase tracking-wider transition-all hover:scale-105 z-20 cursor-pointer backdrop-blur-xs ${
+                                                    showAllAddControls
+                                                      ? "opacity-100 pointer-events-auto"
+                                                      : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                                                  }`}
                                                   title={`Add Designation Below ${item.name} (Niche)`}
                                                 >
-                                                  <Plus className="size-2.5" />▼ Below
+                                                  <Plus className="size-2" />▼ Below
                                                 </button>
 
                                                 {/* 3. LEFT (BAME) */}
                                                 <button
                                                   type="button"
                                                   onClick={() => openDirectionalAdd(item, "left")}
-                                                  className="absolute top-1/2 -left-3.5 -translate-y-1/2 size-6 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  className={`absolute top-1/2 -left-2.5 -translate-y-1/2 size-5 rounded-full bg-card/95 border border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-2xs hover:shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-105 z-20 cursor-pointer backdrop-blur-xs ${
+                                                    showAllAddControls
+                                                      ? "opacity-100 pointer-events-auto"
+                                                      : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                                                  }`}
                                                   title={`Add Designation to Left Side-by-Side (Bame)`}
                                                 >
                                                   ◄+
@@ -4870,20 +5014,24 @@ function CompanySetupPage() {
                                                 <button
                                                   type="button"
                                                   onClick={() => openDirectionalAdd(item, "right")}
-                                                  className="absolute top-1/2 -right-3.5 -translate-y-1/2 size-6 rounded-full bg-card border-2 border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-110 z-30 cursor-pointer"
+                                                  className={`absolute top-1/2 -right-2.5 -translate-y-1/2 size-5 rounded-full bg-card/95 border border-primary/50 hover:border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-2xs hover:shadow-xs flex items-center justify-center text-[9px] font-black transition-all hover:scale-105 z-20 cursor-pointer backdrop-blur-xs ${
+                                                    showAllAddControls
+                                                      ? "opacity-100 pointer-events-auto"
+                                                      : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                                                  }`}
                                                   title={`Add Designation to Right Side-by-Side (Dane)`}
                                                 >
                                                   +►
                                                 </button>
 
-                                                <div className="flex items-center justify-between gap-1 mb-1.5">
+                                                <div className="flex items-center justify-between gap-1 mb-1">
                                                   <span className="text-[9px] font-mono font-bold text-muted-foreground">
                                                     {item.code}
                                                   </span>
                                                   <button
                                                     type="button"
                                                     onClick={() => handleToggleDesigStatus(item.id)}
-                                                    className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full border transition-colors cursor-pointer ${
+                                                    className={`text-[8px] font-bold px-1.5 py-0.2 rounded-full border transition-colors cursor-pointer ${
                                                       item.status === "Active"
                                                         ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
                                                         : "bg-red-500/10 text-red-600 border-red-500/20"
@@ -4896,37 +5044,35 @@ function CompanySetupPage() {
 
                                                 {/* Short Name Badge */}
                                                 {item.shortName && (
-                                                  <div className="mb-1">
-                                                    <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/20 tracking-wider font-mono inline-block">
+                                                  <div className="mb-0.5">
+                                                    <span className="text-[10px] font-black px-2 py-0.2 rounded bg-primary/10 text-primary border border-primary/20 tracking-wider font-mono inline-block shadow-2xs">
                                                       {item.shortName}
                                                     </span>
                                                   </div>
                                                 )}
 
                                                 {/* Full Name */}
-                                                <h3 className="text-sm font-extrabold text-foreground leading-tight group-hover:text-primary transition-colors">
+                                                <h3 className="text-xs font-black text-foreground leading-snug group-hover:text-primary transition-colors">
                                                   {item.name}
                                                 </h3>
 
                                                 {item.nameBng && (
-                                                  <p className="text-xs text-muted-foreground font-medium mt-0.5">
+                                                  <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
                                                     {item.nameBng}
                                                   </p>
                                                 )}
 
-                                                {item.reportsTo && (
-                                                  <p className="text-[10px] text-muted-foreground/80 mt-1 font-medium">
-                                                    ↳ Reports to: {item.reportsTo}
-                                                  </p>
-                                                )}
-
-                                                {/* Hover Actions Toolbar */}
-                                                <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between -mx-4 -mb-4 p-2 bg-muted/20 rounded-b-2xl">
-                                                  <div className="flex items-center gap-1">
+                                                {/* Actions Toolbar (Hover Revealed for Clean Appearance) */}
+                                                <div
+                                                  className={`mt-2.5 pt-1.5 border-t border-border/40 flex items-center justify-between -mx-3 -mb-3 p-1 bg-muted/20 rounded-b-xl transition-opacity duration-150 ${
+                                                    showAllAddControls ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                                                  }`}
+                                                >
+                                                  <div className="flex items-center gap-0.5">
                                                     <button
                                                       type="button"
                                                       onClick={() => handleMoveLevel(item.id, -1)}
-                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] cursor-pointer"
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[8px] cursor-pointer"
                                                       title="Move Up Level ▲"
                                                     >
                                                       ▲
@@ -4934,29 +5080,29 @@ function CompanySetupPage() {
                                                     <button
                                                       type="button"
                                                       onClick={() => handleMoveLevel(item.id, 1)}
-                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[9px] cursor-pointer"
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-primary transition-colors text-[8px] cursor-pointer"
                                                       title="Move Down Level ▼"
                                                     >
                                                       ▼
                                                     </button>
                                                   </div>
 
-                                                  <div className="flex items-center gap-1">
+                                                  <div className="flex items-center gap-0.5">
                                                     <button
                                                       type="button"
                                                       onClick={() => openDesigModal(item)}
-                                                      className="p-1.5 rounded hover:bg-card text-muted-foreground hover:text-blue-500 transition-colors cursor-pointer"
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-blue-500 transition-colors cursor-pointer"
                                                       title="Edit designation"
                                                     >
-                                                      <Pencil className="size-3" />
+                                                      <Pencil className="size-2.5" />
                                                     </button>
                                                     <button
                                                       type="button"
                                                       onClick={() => handleDeleteDesignation(item.id)}
-                                                      className="p-1.5 rounded hover:bg-card text-muted-foreground hover:text-red-500 transition-colors cursor-pointer"
+                                                      className="p-1 rounded hover:bg-card text-muted-foreground hover:text-red-500 transition-colors cursor-pointer"
                                                       title="Delete designation"
                                                     >
-                                                      <Trash2 className="size-3" />
+                                                      <Trash2 className="size-2.5" />
                                                     </button>
                                                   </div>
                                                 </div>
@@ -4966,16 +5112,16 @@ function CompanySetupPage() {
 
                                           {/* Vertical Line to Next Level (if next is single) */}
                                           {hasNextLevel && !nextIsMulti && (
-                                            <div className="flex flex-col items-center my-1">
-                                              <div className="w-0.5 h-6 bg-slate-300 dark:bg-slate-700" />
-                                              <span className="text-[10px] text-slate-400 -mt-1 select-none">▼</span>
+                                            <div className="flex flex-col items-center my-0.5">
+                                              <div className="w-0.5 h-3.5 bg-slate-300 dark:bg-slate-700" />
+                                              <span className="text-[8px] text-slate-400 -mt-1 select-none">▼</span>
                                             </div>
                                           )}
 
                                           {/* Vertical Line to Next Level (if next is multi) */}
                                           {hasNextLevel && nextIsMulti && (
-                                            <div className="flex flex-col items-center mt-1">
-                                              <div className="w-0.5 h-4 bg-slate-300 dark:bg-slate-700" />
+                                            <div className="flex flex-col items-center mt-0.5">
+                                              <div className="w-0.5 h-3 bg-slate-300 dark:bg-slate-700" />
                                             </div>
                                           )}
                                         </div>
@@ -4985,15 +5131,15 @@ function CompanySetupPage() {
                                 })}
 
                                 {/* Bottom Add Next Level Button */}
-                                <div className="mt-6 pt-4 border-t border-dashed border-border/60 flex items-center justify-center">
+                                <div className="mt-4 pt-3 border-t border-dashed border-border/60 flex items-center justify-center">
                                   <button
                                     type="button"
                                     onClick={() =>
                                       openDesigModal(null, sortedLevels[sortedLevels.length - 1] + 1, 1)
                                     }
-                                    className="px-4 py-2 rounded-xl border border-dashed border-primary/50 text-primary hover:bg-primary/10 font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                                    className="px-3 py-1.5 rounded-lg border border-dashed border-primary/50 text-primary hover:bg-primary/10 font-bold text-xs flex items-center gap-1 transition-all shadow-2xs cursor-pointer"
                                   >
-                                    <Plus className="size-3.5" /> Add Next Hierarchy Level (Level{" "}
+                                    <Plus className="size-3" /> Add Next Hierarchy Level (Level{" "}
                                     {sortedLevels[sortedLevels.length - 1] + 1})
                                   </button>
                                 </div>
@@ -5015,7 +5161,6 @@ function CompanySetupPage() {
                                   <th className="px-4 py-3.5">Designation Title</th>
                                   <th className="px-4 py-3.5 text-center">Hierarchy Level</th>
                                   <th className="px-4 py-3.5 text-center">Side-by-Side Position</th>
-                                  <th className="px-4 py-3.5">Reports To</th>
                                   <th className="px-4 py-3.5 text-center">Status</th>
                                   <th className="px-4 py-3.5 text-right">Actions</th>
                                 </tr>
@@ -5023,7 +5168,7 @@ function CompanySetupPage() {
                               <tbody className="divide-y divide-border/30">
                                 {(!activeTemplate?.designations || activeTemplate.designations.length === 0) ? (
                                   <tr>
-                                    <td colSpan={8} className="p-8 text-center text-muted-foreground">
+                                    <td colSpan={7} className="p-8 text-center text-muted-foreground">
                                       No designations in this template.
                                     </td>
                                   </tr>
@@ -5095,9 +5240,6 @@ function CompanySetupPage() {
                                               </button>
                                             </div>
                                           </div>
-                                        </td>
-                                        <td className="px-4 py-3 text-muted-foreground font-medium">
-                                          {item.reportsTo || "—"}
                                         </td>
                                         <td className="px-4 py-3 text-center">
                                           <button
@@ -6898,34 +7040,16 @@ function CompanySetupPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground/80 block">Reports To</label>
-                  <select
-                    value={modalDesigReportsTo}
-                    onChange={(e) => setModalDesigReportsTo(e.target.value)}
-                    className="w-full h-10 px-3 rounded-lg border border-border/60 bg-muted/10 text-sm outline-none focus:border-primary cursor-pointer"
-                  >
-                    <option value="">None (Top Level)</option>
-                    {(activeTemplate?.designations || []).map((d) => (
-                      <option key={d.id} value={d.name}>
-                        {d.shortName ? `[${d.shortName}] ` : ""}{d.name} (Level {d.levelRank})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground/80 block">Status</label>
-                  <select
-                    value={modalDesigStatus}
-                    onChange={(e) => setModalDesigStatus(e.target.value as "Active" | "Inactive")}
-                    className="w-full h-10 px-3 rounded-lg border border-border/60 bg-muted/10 text-sm outline-none focus:border-primary cursor-pointer font-medium"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground/80 block">Status</label>
+                <select
+                  value={modalDesigStatus}
+                  onChange={(e) => setModalDesigStatus(e.target.value as "Active" | "Inactive")}
+                  className="w-full h-10 px-3 rounded-lg border border-border/60 bg-muted/10 text-sm outline-none focus:border-primary cursor-pointer font-medium"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
               </div>
 
               <div className="p-4 border-t border-border/50 bg-muted/10 flex items-center justify-end gap-3 rounded-b-2xl -mx-6 -mb-6 mt-4">
@@ -7002,22 +7126,51 @@ function CompanySetupPage() {
               </div>
 
               {!editingTemplateId && (
-                <div className="p-3 bg-muted/20 border border-border/40 rounded-xl flex items-start gap-2.5">
-                  <input
-                    type="checkbox"
-                    id="cloneCheckbox"
-                    checked={templateModalClone}
-                    onChange={(e) => setTemplateModalClone(e.target.checked)}
-                    className="mt-0.5 size-4 rounded accent-primary cursor-pointer"
-                  />
-                  <label htmlFor="cloneCheckbox" className="text-xs cursor-pointer select-none">
-                    <span className="font-bold text-foreground block">
-                      Clone designations from active template
-                    </span>
-                    <span className="text-[11px] text-muted-foreground block mt-0.5">
-                      Copies all {activeTemplate?.designations?.length || 0} designations so you don't have to start from scratch.
-                    </span>
-                  </label>
+                <div className="space-y-2 pt-1">
+                  <label className="text-xs font-semibold text-foreground/80 block">Initial Structure Choice</label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setTemplateModalClone(false)}
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                        !templateModalClone
+                          ? "border-primary bg-primary/10 ring-1 ring-primary shadow-xs"
+                          : "border-border/60 hover:border-border hover:bg-muted/30"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold text-[10px]">
+                          Blank Canvas
+                        </span>
+                        {!templateModalClone && <CheckCircle2 className="size-4 text-primary" />}
+                      </div>
+                      <p className="text-xs font-bold text-foreground">Clean Slate (0 Roles)</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
+                        Completely empty organogram ready for custom hierarchy.
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setTemplateModalClone(true)}
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                        templateModalClone
+                          ? "border-primary bg-primary/10 ring-1 ring-primary shadow-xs"
+                          : "border-border/60 hover:border-border hover:bg-muted/30"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="px-1.5 py-0.5 rounded-md bg-primary/15 text-primary font-bold text-[10px]">
+                          Clone Active
+                        </span>
+                        {templateModalClone && <CheckCircle2 className="size-4 text-primary" />}
+                      </div>
+                      <p className="text-xs font-bold text-foreground">Clone Current Tree</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
+                        Pre-populates with current {activeTemplate?.designations?.length || 0} designations.
+                      </p>
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -7041,16 +7194,18 @@ function CompanySetupPage() {
         </div>
       )}
 
-      {/* Directional Add Designation Modal (Remaining / Master Pool / Custom) */}
-      {isDirectionalPickerOpen && directionalTarget && (
+      {/* Directional Add Designation Modal (Remaining / Master Pool / Custom / Root) */}
+      {isDirectionalPickerOpen && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-2xl rounded-2xl shadow-2xl border border-border/60 flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200 overflow-hidden">
+          <div className="bg-card w-full max-w-xl rounded-xl shadow-2xl border border-border/60 flex flex-col max-h-[82vh] animate-in zoom-in-95 duration-200 overflow-hidden">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-muted/20">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-muted/20">
+              <div className="flex items-center gap-2.5">
                 <div
-                  className={`size-10 rounded-xl flex items-center justify-center font-bold text-white shadow-sm ${
-                    directionalSide === "above"
+                  className={`size-8 rounded-lg flex items-center justify-center font-bold text-white shadow-2xs ${
+                    !directionalTarget
+                      ? "bg-primary"
+                      : directionalSide === "above"
                       ? "bg-amber-600"
                       : directionalSide === "below"
                       ? "bg-emerald-600"
@@ -7059,19 +7214,24 @@ function CompanySetupPage() {
                       : "bg-indigo-600"
                   }`}
                 >
-                  {directionalSide === "above" && <ArrowUp className="size-5" />}
-                  {directionalSide === "below" && <ArrowDown className="size-5" />}
-                  {directionalSide === "left" && <ArrowLeft className="size-5" />}
-                  {directionalSide === "right" && <ArrowRight className="size-5" />}
+                  {!directionalTarget && <Sparkles className="size-4" />}
+                  {directionalTarget && directionalSide === "above" && <ArrowUp className="size-4" />}
+                  {directionalTarget && directionalSide === "below" && <ArrowDown className="size-4" />}
+                  {directionalTarget && directionalSide === "left" && <ArrowLeft className="size-4" />}
+                  {directionalTarget && directionalSide === "right" && <ArrowRight className="size-4" />}
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-base font-bold text-foreground">
-                      Add Designation {directionalSide.toUpperCase()}
+                  <div className="flex items-center gap-1.5">
+                    <h2 className="text-sm font-bold text-foreground">
+                      {directionalTarget
+                        ? `Add Designation ${directionalSide.toUpperCase()}`
+                        : "Add Root Designation (Level 1)"}
                     </h2>
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                        directionalSide === "above"
+                      className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider ${
+                        !directionalTarget
+                          ? "bg-primary/15 text-primary"
+                          : directionalSide === "above"
                           ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
                           : directionalSide === "below"
                           ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
@@ -7080,67 +7240,75 @@ function CompanySetupPage() {
                           : "bg-indigo-500/15 text-indigo-600 dark:text-indigo-400"
                       }`}
                     >
-                      {directionalSide === "above"
-                        ? "New Parent Level (উপরে)"
+                      {!directionalTarget
+                        ? "Top Hierarchy Root (শীর্ষ পদবী)"
+                        : directionalSide === "above"
+                        ? "Parent Level (উপরে)"
                         : directionalSide === "below"
-                        ? "New Child Level (নিচে)"
+                        ? "Child Level (নিচে)"
                         : directionalSide === "left"
                         ? "Parallel Role (বামে)"
                         : "Parallel Role (ডানে)"}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Relative to: <strong className="text-foreground">{directionalTarget.name}</strong> ({directionalTarget.shortName || directionalTarget.code}) • Level {directionalTarget.levelRank}
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {directionalTarget ? (
+                      <>
+                        Relative to: <strong className="text-foreground">{directionalTarget.name}</strong> ({directionalTarget.shortName || directionalTarget.code}) • L{directionalTarget.levelRank}
+                      </>
+                    ) : (
+                      "Starting new organogram hierarchy from a clean canvas."
+                    )}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsDirectionalPickerOpen(false)}
-                className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
               >
-                <X className="size-5" />
+                <X className="size-4" />
               </button>
             </div>
 
             {/* Filter & Search Bar */}
-            <div className="p-4 border-b border-border/40 bg-muted/10 space-y-3">
-              <div className="flex items-center justify-between gap-3">
+            <div className="p-3 border-b border-border/40 bg-muted/10 space-y-2">
+              <div className="flex items-center justify-between gap-2">
                 {/* Tabs */}
-                <div className="flex items-center gap-1.5 p-1 bg-muted/60 rounded-xl">
+                <div className="flex items-center gap-1 p-0.5 bg-muted/60 rounded-lg">
                   <button
                     type="button"
                     onClick={() => setDirectionalActiveTab("remaining")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1 ${
                       directionalActiveTab === "remaining"
-                        ? "bg-card text-foreground shadow-sm"
+                        ? "bg-card text-foreground shadow-2xs font-bold"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    <Sparkles className="size-3.5 text-primary" />
-                    Remaining Designations ({remainingMasterDesignations.length})
+                    <Sparkles className="size-3 text-primary" />
+                    Remaining ({remainingMasterDesignations.length})
                   </button>
                   <button
                     type="button"
                     onClick={() => setDirectionalActiveTab("all")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1 ${
                       directionalActiveTab === "all"
-                        ? "bg-card text-foreground shadow-sm"
+                        ? "bg-card text-foreground shadow-2xs font-bold"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    <Briefcase className="size-3.5" />
-                    All Master Pool ({MASTER_DESIGNATION_POOL.length})
+                    <Briefcase className="size-3" />
+                    All ({MASTER_DESIGNATION_POOL.length})
                   </button>
                   <button
                     type="button"
                     onClick={() => setDirectionalActiveTab("custom")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1 ${
                       directionalActiveTab === "custom"
-                        ? "bg-card text-foreground shadow-sm"
+                        ? "bg-card text-foreground shadow-2xs font-bold"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    <Plus className="size-3.5" />
+                    <Plus className="size-3" />
                     Custom Title
                   </button>
                 </div>
@@ -7148,19 +7316,19 @@ function CompanySetupPage() {
 
               {directionalActiveTab !== "custom" && (
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
                   <input
                     type="text"
                     value={directionalSearch}
                     onChange={(e) => setDirectionalSearch(e.target.value)}
-                    placeholder="Search designation by English name, Bengali name, or acronym (e.g. COO, Manager, নির্বাহী)..."
-                    className="w-full h-10 pl-9 pr-4 rounded-xl border border-border/60 bg-card text-xs outline-none focus:border-primary shadow-sm"
+                    placeholder="Search by English, Bengali, or code (e.g. COO, Manager, নির্বাহী)..."
+                    className="w-full h-8 pl-8 pr-3 rounded-lg border border-border/60 bg-card text-xs outline-none focus:border-primary shadow-2xs"
                     autoFocus
                   />
                   {directionalSearch && (
                     <button
                       onClick={() => setDirectionalSearch("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-xs"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-[10px]"
                     >
                       Clear
                     </button>
@@ -7170,15 +7338,15 @@ function CompanySetupPage() {
             </div>
 
             {/* List / Selection Area */}
-            <div className="p-4 overflow-y-auto flex-1 max-h-[50vh]">
+            <div className="p-3 overflow-y-auto flex-1 max-h-[48vh]">
               {directionalActiveTab === "custom" ? (
-                <div className="p-4 bg-muted/20 border border-border/60 rounded-xl space-y-4 max-w-lg mx-auto">
-                  <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                    <Plus className="size-4 text-primary" />
+                <div className="p-3 bg-muted/20 border border-border/60 rounded-xl space-y-3 max-w-md mx-auto">
+                  <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    <Plus className="size-3.5 text-primary" />
                     Create Custom Designation
                   </h3>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground/80 block">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-foreground/80 block">
                       Designation Title (English) *
                     </label>
                     <input
@@ -7187,12 +7355,12 @@ function CompanySetupPage() {
                       value={customDesigTitle}
                       onChange={(e) => setCustomDesigTitle(e.target.value)}
                       placeholder="e.g. VP OF ARTIFICIAL INTELLIGENCE"
-                      className="w-full h-10 px-3.5 rounded-lg border border-border/60 bg-card text-xs font-bold uppercase outline-none focus:border-primary"
+                      className="w-full h-8 px-3 rounded-lg border border-border/60 bg-card text-xs font-bold uppercase outline-none focus:border-primary"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-foreground/80 block">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-foreground/80 block">
                         Short Name / Code
                       </label>
                       <input
@@ -7200,23 +7368,23 @@ function CompanySetupPage() {
                         value={customDesigShortName}
                         onChange={(e) => setCustomDesigShortName(e.target.value)}
                         placeholder="e.g. VP-AI"
-                        className="w-full h-9 px-3 rounded-lg border border-border/60 bg-card text-xs uppercase outline-none focus:border-primary font-mono"
+                        className="w-full h-8 px-2.5 rounded-lg border border-border/60 bg-card text-xs uppercase outline-none focus:border-primary font-mono"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-foreground/80 block">
-                        Title in Bengali (বাংলা নাম)
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-foreground/80 block">
+                        Title in Bengali (বাংলা)
                       </label>
                       <input
                         type="text"
                         value={customDesigTitleBng}
                         onChange={(e) => setCustomDesigTitleBng(e.target.value)}
                         placeholder="e.g. ভিপি অফ এআই"
-                        className="w-full h-9 px-3 rounded-lg border border-border/60 bg-card text-xs outline-none focus:border-primary"
+                        className="w-full h-8 px-2.5 rounded-lg border border-border/60 bg-card text-xs outline-none focus:border-primary"
                       />
                     </div>
                   </div>
-                  <div className="pt-2 flex justify-end">
+                  <div className="pt-1 flex justify-end">
                     <button
                       type="button"
                       disabled={!customDesigTitle.trim()}
@@ -7228,10 +7396,12 @@ function CompanySetupPage() {
                           customDesigTitleBng.trim() || undefined
                         );
                       }}
-                      className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-sm hover:bg-primary/95 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                      className="h-8 px-4 rounded-lg bg-primary text-primary-foreground font-semibold text-xs shadow-2xs hover:bg-primary/95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                     >
-                      <Plus className="size-4" />
-                      Add {directionalSide.toUpperCase()} of {directionalTarget.shortName || directionalTarget.name}
+                      <Plus className="size-3.5" />
+                      {directionalTarget
+                        ? `Add ${directionalSide.toUpperCase()} of ${directionalTarget.shortName || directionalTarget.name}`
+                        : "Add as Root Designation (Level 1)"}
                     </button>
                   </div>
                 </div>
@@ -7251,10 +7421,10 @@ function CompanySetupPage() {
 
                   if (filtered.length === 0) {
                     return (
-                      <div className="py-12 text-center text-muted-foreground flex flex-col items-center justify-center">
-                        <Briefcase className="size-10 stroke-[1.5] text-muted-foreground/40 mb-3" />
-                        <p className="text-sm font-semibold text-foreground">No matching designations found</p>
-                        <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+                      <div className="py-8 text-center text-muted-foreground flex flex-col items-center justify-center">
+                        <Briefcase className="size-8 stroke-[1.5] text-muted-foreground/40 mb-2" />
+                        <p className="text-xs font-semibold text-foreground">No matching designations found</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 max-w-xs">
                           {directionalActiveTab === "remaining"
                             ? "All remaining standard designations have either been added or don't match your search."
                             : "No designations match your search criteria."}
@@ -7262,9 +7432,9 @@ function CompanySetupPage() {
                         <button
                           type="button"
                           onClick={() => setDirectionalActiveTab("custom")}
-                          className="mt-4 px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                          className="mt-3 px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
                         >
-                          <Plus className="size-3.5" />
+                          <Plus className="size-3" />
                           Create as Custom Designation instead
                         </button>
                       </div>
@@ -7272,47 +7442,47 @@ function CompanySetupPage() {
                   }
 
                   return (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {filtered.map((item, idx) => {
                         const isAlreadyAssigned = assignedDesignationNames.has(item.name.trim().toLowerCase());
                         return (
                           <div
                             key={`${item.name}-${idx}`}
                             onClick={() => handlePickAndPlaceDesignation(item.name, item.shortName, item.nameBng)}
-                            className="p-3 rounded-xl border border-border/60 hover:border-primary/60 bg-card hover:bg-primary/5 transition-all cursor-pointer group flex flex-col justify-between shadow-xs hover:shadow-md text-left"
+                            className="p-2.5 rounded-lg border border-border/60 hover:border-primary/60 bg-card hover:bg-primary/5 transition-all cursor-pointer group flex flex-col justify-between shadow-2xs hover:shadow-xs text-left"
                           >
-                            <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-start justify-between gap-1">
                               <div className="min-w-0">
-                                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground group-hover:bg-primary/15 group-hover:text-primary transition-colors">
+                                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-muted text-muted-foreground group-hover:bg-primary/15 group-hover:text-primary transition-colors">
                                   {item.shortName}
                                 </span>
                                 {item.category && (
-                                  <span className="text-[9px] text-muted-foreground/80 ml-1.5">
+                                  <span className="text-[8.5px] text-muted-foreground/70 ml-1">
                                     • {item.category}
                                   </span>
                                 )}
                               </div>
                               {isAlreadyAssigned && (
-                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium">
+                                <span className="text-[8.5px] px-1 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium shrink-0">
                                   In Chart
                                 </span>
                               )}
                             </div>
 
-                            <div className="mt-2">
-                              <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                            <div className="mt-1.5">
+                              <p className="text-[11px] font-bold text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
                                 {item.name}
                               </p>
                               {item.nameBng && (
-                                <p className="text-[11px] text-muted-foreground mt-0.5 font-medium line-clamp-1">
+                                <p className="text-[9.5px] text-muted-foreground mt-0.5 font-medium line-clamp-1">
                                   {item.nameBng}
                                 </p>
                               )}
                             </div>
 
-                            <div className="mt-2.5 pt-2 border-t border-border/40 flex items-center justify-between text-[10px] text-primary font-semibold opacity-80 group-hover:opacity-100">
-                              <span>Click to place {directionalSide}</span>
-                              <Plus className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            <div className="mt-2 pt-1 border-t border-border/40 flex items-center justify-between text-[9px] text-primary font-bold opacity-80 group-hover:opacity-100">
+                              <span>{directionalTarget ? `Place ${directionalSide}` : "Place as Root (L1)"}</span>
+                              <Plus className="size-3 group-hover:translate-x-0.5 transition-transform" />
                             </div>
                           </div>
                         );
@@ -7324,14 +7494,16 @@ function CompanySetupPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3.5 border-t border-border/50 bg-muted/20 flex items-center justify-between text-xs text-muted-foreground">
+            <div className="p-2.5 border-t border-border/50 bg-muted/20 flex items-center justify-between text-[11px] text-muted-foreground">
               <span>
-                Tip: Click any designation card to instantly insert it {directionalSide.toUpperCase()} of {directionalTarget.shortName || directionalTarget.name}.
+                {directionalTarget
+                  ? `Tip: Click any designation card to instantly insert it ${directionalSide.toUpperCase()}.`
+                  : "Tip: Click any designation card to set it as the root of your organization."}
               </span>
               <button
                 type="button"
                 onClick={() => setIsDirectionalPickerOpen(false)}
-                className="px-4 py-1.5 rounded-lg border border-border/60 hover:bg-muted font-medium text-xs text-foreground transition-colors cursor-pointer"
+                className="px-3 py-1 rounded-md border border-border/60 hover:bg-muted font-medium text-xs text-foreground transition-colors cursor-pointer"
               >
                 Close
               </button>
