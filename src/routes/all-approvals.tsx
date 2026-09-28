@@ -29,13 +29,18 @@ import {
   CalendarDays,
   MapPin,
   Check,
-  Smartphone
+  Smartphone,
+  DoorOpen,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { LoanApprovalViewModal, LoanApprovalModalData } from "@/components/modals/LoanApprovalViewModal";
 import { SimApprovalViewModal, SimApprovalModalData } from "@/components/modals/SimApprovalViewModal";
+import {
+  ConferenceRoomApprovalModal,
+  ConferenceRoomApprovalModalData,
+} from "@/components/modals/ConferenceRoomApprovalModal";
 
 
 export const Route = createFileRoute("/all-approvals")({
@@ -51,7 +56,8 @@ type ModuleType =
   | "Personnel"
   | "Loan"
   | "Attendance"
-  | "SIM";
+  | "SIM"
+  | "Conference Room";
 type StatusType = "Pending" | "Approved" | "Rejected";
 
 interface ApprovalRequest {
@@ -69,6 +75,7 @@ interface ApprovalRequest {
   date: string;
   status: StatusType;
   simData?: SimApprovalModalData;
+  conferenceData?: ConferenceRoomApprovalModalData;
 }
 
 const mockApprovals: ApprovalRequest[] = [
@@ -404,6 +411,123 @@ const mockApprovals: ApprovalRequest[] = [
       },
     },
   },
+
+  // Conference Room Booking Requisitions
+  {
+    id: "CRB-2026-001",
+    module: "Conference Room",
+    reqNo: "CRB-1001",
+    employee: {
+      name: "Md. Anik Islam",
+      id: "2023044078",
+      designation: "Deputy Manager",
+      department: "WEB-Team (Business Innovation)",
+    },
+    details: "Monthly ERP System Architecture & UI Progress Review — Room: Conference Room 1 (17:30 - 18:30)",
+    date: "2026-09-14",
+    status: "Pending",
+    conferenceData: {
+      id: "CRB-2026-001",
+      reqNo: "CRB-1001",
+      applicationDate: "14 Sep 2026",
+      submittedTime: "05:30 PM",
+      status: "Pending",
+      employee: {
+        name: "Md. Anik Islam",
+        id: "2023044078",
+        designation: "Deputy Manager",
+        department: "WEB-Team",
+        section: "Business Innovation",
+        location: "PSL-Operation",
+        joiningDate: "16 Aug 2023",
+        businessUnit: "Pakiza Software Limited",
+      },
+      bookingDetails: {
+        meetingRoom: "Conference Room 1",
+        date: "2026-09-14",
+        startTime: "17:30:00",
+        endTime: "18:30:00",
+        agenda: "Monthly ERP System Architecture & UI Progress Review",
+        totalParticipants: 10,
+        responsibleDepts: "WEB-Team (Business Innovation)",
+        responsiblePersons: [
+          {
+            name: "Md. Anik Islam",
+            designation: "Deputy Manager",
+            department: "WEB-Team",
+            company: "Pakiza Software Limited",
+            phone: "01324726844",
+          },
+          {
+            name: "Tahmid Afsar Shapno",
+            designation: "Asst. Manager",
+            department: "Project Resource",
+            company: "Pakiza Software Limited",
+            phone: "01700000000",
+          },
+        ],
+      },
+      comments: [
+        {
+          id: "c-101",
+          authorName: "Md. Anik Islam",
+          authorRole: "Deputy Manager",
+          timestamp: "14 Sep 2026 · 17:30",
+          comment: "Urgent ERP roadmap presentation required with Executive Committee.",
+          initials: "AI",
+        },
+      ],
+    },
+  },
+  {
+    id: "CRB-2026-002",
+    module: "Conference Room",
+    reqNo: "CRB-1002",
+    employee: {
+      name: "Md. Zahidul Islam",
+      id: "2018111002",
+      designation: "Chief Operating Officer",
+      department: "Executive Committee",
+    },
+    details: "Q3 Strategic HR & Payroll Operations — Room: Executive Boardroom (10:00 - 11:30)",
+    date: "2026-09-14",
+    status: "Pending",
+    conferenceData: {
+      id: "CRB-2026-002",
+      reqNo: "CRB-1002",
+      applicationDate: "14 Sep 2026",
+      submittedTime: "10:00 AM",
+      status: "Pending",
+      employee: {
+        name: "Md. Zahidul Islam",
+        id: "2018111002",
+        designation: "Chief Operating Officer",
+        department: "Executive Committee",
+        section: "HQ Operations",
+        location: "PSL HQ Floor",
+        joiningDate: "10 Jan 2018",
+        businessUnit: "Pakiza Software Limited",
+      },
+      bookingDetails: {
+        meetingRoom: "Executive Boardroom",
+        date: "2026-09-14",
+        startTime: "10:00:00",
+        endTime: "11:30:00",
+        agenda: "Q3 Strategic HR & Payroll Operations",
+        totalParticipants: 15,
+        responsibleDepts: "HR & Talent Management",
+        responsiblePersons: [
+          {
+            name: "Md. Zahidul Islam",
+            designation: "Chief Operating Officer",
+            department: "Executive Committee",
+            company: "Pakiza Software Limited",
+            phone: "01811112222",
+          },
+        ],
+      },
+    },
+  },
 ];
 
 const moduleConfig: Record<ModuleType, { icon: React.ElementType; color: string; bg: string }> = {
@@ -452,6 +576,11 @@ const moduleConfig: Record<ModuleType, { icon: React.ElementType; color: string;
     color: "text-teal-600 dark:text-teal-400",
     bg: "bg-teal-50 dark:bg-teal-500/10",
   },
+  "Conference Room": {
+    icon: DoorOpen,
+    color: "text-rose-600 dark:text-rose-400",
+    bg: "bg-rose-50 dark:bg-rose-500/10",
+  },
 };
 
 function AllApprovalsPage() {
@@ -465,6 +594,9 @@ function AllApprovalsPage() {
 
   const [isSimModalOpen, setIsSimModalOpen] = useState(false);
   const [selectedSimData, setSelectedSimData] = useState<SimApprovalModalData | null>(null);
+
+  const [isConferenceModalOpen, setIsConferenceModalOpen] = useState(false);
+  const [selectedConferenceData, setSelectedConferenceData] = useState<ConferenceRoomApprovalModalData | null>(null);
 
   const [selectedReq, setSelectedReq] = useState<any>(null);
   const [approvalComment, setApprovalComment] = useState("");
@@ -486,6 +618,36 @@ function AllApprovalsPage() {
 
 
   const handleOpenDetailsModal = (item: ApprovalRequest) => {
+    if (item.module === "Conference Room") {
+      if (item.conferenceData) {
+        setSelectedConferenceData(item.conferenceData);
+      } else {
+        setSelectedConferenceData({
+          id: item.id,
+          reqNo: item.reqNo,
+          applicationDate: format(new Date(item.date), "dd MMM yyyy"),
+          submittedTime: "10:00 AM",
+          status: item.status,
+          employee: {
+            name: item.employee.name,
+            id: item.employee.id,
+            designation: item.employee.designation,
+            department: item.employee.department,
+          },
+          bookingDetails: {
+            meetingRoom: "Conference Room 1",
+            date: item.date,
+            startTime: "10:00:00",
+            endTime: "11:30:00",
+            agenda: item.details,
+            totalParticipants: 10,
+            responsibleDepts: item.employee.department,
+          },
+        });
+      }
+      setIsConferenceModalOpen(true);
+      return;
+    }
     if (item.module === "SIM") {
       if (item.simData) {
         setSelectedSimData(item.simData);
@@ -1317,6 +1479,42 @@ function AllApprovalsPage() {
               }
               if (updatedDetails?.expectedLimit) {
                 mockApprovals[itemIdx].amount = updatedDetails.expectedLimit;
+              }
+            }
+          }
+        }}
+      />
+      {/* Conference Room Booking Approval View Modal */}
+      <ConferenceRoomApprovalModal
+        isOpen={isConferenceModalOpen}
+        onClose={() => setIsConferenceModalOpen(false)}
+        data={selectedConferenceData}
+        onStatusChange={(id, newStatus, updatedBooking, scheduleHistory) => {
+          if (selectedConferenceData && selectedConferenceData.id === id) {
+            const updatedConferenceData = {
+              ...selectedConferenceData,
+              status: newStatus,
+              bookingDetails: {
+                ...selectedConferenceData.bookingDetails,
+                ...updatedBooking,
+              },
+              scheduleHistory: scheduleHistory || selectedConferenceData.scheduleHistory,
+            };
+            setSelectedConferenceData(updatedConferenceData);
+
+            const itemIdx = mockApprovals.findIndex((m) => m.id === id);
+            if (itemIdx !== -1) {
+              mockApprovals[itemIdx].status = newStatus;
+              mockApprovals[itemIdx].conferenceData = updatedConferenceData;
+              if (updatedBooking?.meetingRoom || updatedBooking?.date || updatedBooking?.startTime) {
+                const room = updatedBooking.meetingRoom || selectedConferenceData.bookingDetails.meetingRoom;
+                const startTime = updatedBooking.startTime || selectedConferenceData.bookingDetails.startTime;
+                const endTime = updatedBooking.endTime || selectedConferenceData.bookingDetails.endTime;
+                const agenda = selectedConferenceData.bookingDetails.agenda;
+                mockApprovals[itemIdx].details = `${agenda} — Room: ${room} (${startTime} - ${endTime})`;
+                if (updatedBooking.date) {
+                  mockApprovals[itemIdx].date = updatedBooking.date;
+                }
               }
             }
           }

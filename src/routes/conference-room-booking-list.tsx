@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   DoorOpen,
   Calendar,
@@ -21,20 +22,37 @@ import {
   X,
   SearchIcon,
   RotateCcw,
+  User,
+  FileCheck,
+  MessageSquare,
+  Check,
+  ShieldCheck,
+  Laptop,
+  Tv,
+  Wifi,
+  Mic,
+  Video,
+  History,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/conference-room-booking-list")({
-  head: () => ({
-    meta: [
-      { title: "Conference Room Booking List — CRIPTON" },
-      {
-        name: "description",
-        content: "View, search, edit, and track corporate conference room bookings.",
-      },
-    ],
-  }),
-  component: ConferenceRoomBookingListPage,
-});
+export interface ScheduleHistory {
+  changed: boolean;
+  changedBy?: string;
+  changedAt?: string;
+  original: {
+    meetingRoom: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  };
+  updated: {
+    meetingRoom: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  };
+}
 
 interface ResponsiblePerson {
   name: string;
@@ -55,6 +73,7 @@ interface BookingItem {
   responsibleDepts: string;
   responsiblePersons: ResponsiblePerson[];
   status: "Pending" | "Approved" | "Rejected" | "Completed";
+  scheduleHistory?: ScheduleHistory;
 }
 
 const INITIAL_BOOKINGS: BookingItem[] = [
@@ -95,6 +114,23 @@ const INITIAL_BOOKINGS: BookingItem[] = [
     totalParticipants: 15,
     responsibleDepts: "HR & Talent Management",
     status: "Approved",
+    scheduleHistory: {
+      changed: true,
+      changedBy: "Rajebul Hasan Rajon (Facility Manager)",
+      changedAt: "14 Sep 2026 · 09:30 AM",
+      original: {
+        meetingRoom: "Conference Room 1",
+        date: "2026-09-14",
+        startTime: "09:00:00",
+        endTime: "10:30:00",
+      },
+      updated: {
+        meetingRoom: "Executive Boardroom",
+        date: "2026-09-14",
+        startTime: "10:00:00",
+        endTime: "11:30:00",
+      },
+    },
     responsiblePersons: [
       {
         name: "Md. Zahidul Islam",
@@ -496,117 +532,489 @@ function ConferenceRoomBookingListPage() {
           </div>
         </div>
 
-        {/* VIEW BOOKING MODAL (Matching Screenshot 2) */}
-        {viewingBooking && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-card border border-border rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl animate-in zoom-in-95">
+        {/* VIEW BOOKING MODAL (Matching Requisition View Modal Design) */}
+        <Dialog open={!!viewingBooking} onOpenChange={(open) => !open && setViewingBooking(null)}>
+          {viewingBooking && (
+            <DialogContent className="max-w-7xl p-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-xl overflow-hidden gap-0 max-h-[92vh] flex flex-col [&>button]:hidden text-slate-700 dark:text-slate-200">
               {/* Modal Header */}
-              <div className="flex items-center justify-between border-b border-border pb-3">
-                <h3 className="font-extrabold text-lg text-foreground flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-amber-500" />
-                  View Booking
-                </h3>
-                <button
-                  onClick={() => setViewingBooking(null)}
-                  className="p-1 rounded bg-muted text-muted-foreground hover:text-foreground"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+              <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-950/30 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="size-9 rounded-lg bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-100 dark:border-slate-700 shadow-3xs">
+                    <DoorOpen className="size-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-sm font-black text-slate-800 dark:text-slate-100 leading-none">
+                        Conference Room Booking Requisition
+                      </h2>
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[8.5px] font-black uppercase tracking-wider border ${
+                          viewingBooking.status === "Approved"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900"
+                            : viewingBooking.status === "Pending"
+                            ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900"
+                            : viewingBooking.status === "Completed"
+                            ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900"
+                            : "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900"
+                        }`}
+                      >
+                        • {viewingBooking.status}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-1">
+                      # Booking ID: {viewingBooking.id}
+                    </p>
+                  </div>
+                </div>
 
-              {/* Details Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
-                <div>
-                  <span className="text-muted-foreground font-bold block mb-1">
-                    Meeting Room <span className="text-red-500">*</span>
-                  </span>
-                  <p className="font-bold text-foreground text-sm">{viewingBooking.meetingRoom}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground font-bold block mb-1">
-                    Date <span className="text-red-500">*</span>
-                  </span>
-                  <p className="font-bold text-foreground text-sm">{viewingBooking.date}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground font-bold block mb-1">
-                    Start Time <span className="text-red-500">*</span>
-                  </span>
-                  <p className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">{viewingBooking.startTime}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground font-bold block mb-1">
-                    End Time <span className="text-red-500">*</span>
-                  </span>
-                  <p className="font-mono font-bold text-muted-foreground text-sm">{viewingBooking.endTime}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs pt-2">
-                <div className="sm:col-span-2">
-                  <span className="text-muted-foreground font-bold block mb-1">
-                    Agenda <span className="text-red-500">*</span>
-                  </span>
-                  <p className="font-medium text-foreground">{viewingBooking.agenda}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground font-bold block mb-1">
-                    Total Participants <span className="text-red-500">*</span>
-                  </span>
-                  <p className="font-bold text-foreground">{viewingBooking.totalParticipants}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground font-bold block mb-1">
-                    Status <span className="text-red-500">*</span>
-                  </span>
-                  <span className="font-bold text-amber-600 dark:text-amber-400">{viewingBooking.status}</span>
+                <div className="flex items-center gap-4">
+                  <div className="text-right border-r border-slate-100 dark:border-slate-800 pr-4">
+                    <span className="text-[9px] text-slate-400 dark:text-slate-500 block uppercase tracking-widest font-extrabold">
+                      BOOKING DATE & TIME
+                    </span>
+                    <span className="text-xs font-black text-slate-700 dark:text-slate-200 block mt-0.5">
+                      {viewingBooking.date}
+                    </span>
+                    <span className="text-[9.5px] text-emerald-600 dark:text-emerald-400 block mt-0.5 font-bold font-mono">
+                      {viewingBooking.startTime} – {viewingBooking.endTime}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setViewingBooking(null)}
+                    className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all shrink-0 shadow-3xs cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
 
-              {/* Responsible Persons Table */}
-              <div className="space-y-2 pt-2">
-                <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wider">
-                  Responsible Persons
-                </h4>
-                <div className="rounded-xl border border-border overflow-hidden">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-muted/70 text-muted-foreground font-bold border-b border-border text-[11px] uppercase">
+              {/* Modal Body */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#f8fafc]/40 dark:bg-slate-950/20">
+                <div className="grid grid-cols-1 gap-5">
+                  {/* Requester & Booking Details Card */}
+                  <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 p-5 shadow-2xs space-y-4">
+                    <div className="flex items-center gap-2 pb-1.5 border-b border-slate-100 dark:border-slate-800/60">
+                      <div className="w-6 h-6 rounded-md bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-100 dark:border-slate-900 shadow-3xs">
+                        <User className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                        Request For & Meeting Overview
+                      </span>
+                    </div>
+
+                    <div className="pl-1 text-xs flex flex-col sm:flex-row gap-5 items-center sm:items-start">
+                      {/* Employee Avatar */}
+                      <div className="w-[91px] h-[91px] shrink-0 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center shadow-3xs">
+                        <img
+                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&h=256&q=80"
+                          alt="Md. Anik Islam"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Details Grid */}
+                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-y-1.5 gap-x-12 font-semibold text-slate-700 dark:text-slate-200 w-full max-w-3xl">
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Requisition By:
+                          </span>
+                          <span className="text-slate-700 dark:text-slate-200 font-bold">
+                            {viewingBooking.responsiblePersons[0]?.name || "Md. Anik Islam"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Employee ID:
+                          </span>
+                          <span className="text-slate-700 dark:text-slate-200 font-bold font-mono">
+                            2023044078
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Designation:
+                          </span>
+                          <span className="text-slate-700 dark:text-slate-200 font-bold">
+                            {viewingBooking.responsiblePersons[0]?.designation || "Deputy Manager"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Department:
+                          </span>
+                          <span className="text-slate-700 dark:text-slate-200 font-bold">
+                            {viewingBooking.responsiblePersons[0]?.department || "WEB-Team"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Meeting Room:
+                          </span>
+                          <span className="text-rose-600 dark:text-rose-400 font-extrabold text-xs">
+                            {viewingBooking.meetingRoom}
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Booking Date:
+                          </span>
+                          <span className="text-slate-700 dark:text-slate-200 font-bold font-mono">
+                            {viewingBooking.date}
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Time Duration:
+                          </span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-bold font-mono">
+                            {viewingBooking.startTime} – {viewingBooking.endTime}
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Total Participants:
+                          </span>
+                          <span className="text-slate-700 dark:text-slate-200 font-bold">
+                            {viewingBooking.totalParticipants} Persons
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Responsible Depts:
+                          </span>
+                          <span className="text-slate-700 dark:text-slate-200 font-bold">
+                            {viewingBooking.responsibleDepts}
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Business Unit:
+                          </span>
+                          <span className="text-slate-700 dark:text-slate-200 font-bold">
+                            Pakiza Software Limited
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-1 sm:col-span-2 mt-1 pt-1.5 border-t border-slate-100 dark:border-slate-800">
+                          <span className="text-slate-400 dark:text-slate-500 font-normal w-[120px] shrink-0">
+                            Agenda / Purpose:
+                          </span>
+                          <span className="text-slate-800 dark:text-slate-100 font-bold italic">
+                            "{viewingBooking.agenda}"
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SCHEDULE & ROOM REALLOCATION HISTORY CARD */}
+                {viewingBooking.scheduleHistory && viewingBooking.scheduleHistory.changed && (
+                  <div className="bg-amber-50/70 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-900/60 p-5 shadow-2xs space-y-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-amber-200/60 dark:border-amber-900/40">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-6 h-6 rounded-md bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-3xs">
+                          <History className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <h3 className="text-xs font-black text-amber-900 dark:text-amber-200 uppercase tracking-wider">
+                            Requisition Schedule & Room Reallocation History
+                          </h3>
+                          <p className="text-[10px] font-semibold text-amber-700 dark:text-amber-400">
+                            Schedule was modified by {viewingBooking.scheduleHistory.changedBy || "Approval Authority"} on {viewingBooking.scheduleHistory.changedAt || "Approval"}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge className="bg-amber-600 text-white border-none font-extrabold text-[10px] uppercase">
+                        Modified Schedule Approved
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                      {/* Original Requester Schedule */}
+                      <div className="bg-white/80 dark:bg-slate-900/80 p-3.5 rounded-xl border border-amber-200/80 dark:border-slate-800 space-y-2">
+                        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                          <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                            Original Requested Schedule
+                          </span>
+                          <span className="text-[9.5px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-950/50 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-900">
+                            Requester Draft
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-y-2 gap-x-3 text-xs">
+                          <div>
+                            <span className="text-[9.5px] text-slate-400 block font-bold">MEETING ROOM</span>
+                            <span className="font-extrabold text-slate-700 dark:text-slate-300 line-through decoration-rose-400">
+                              {viewingBooking.scheduleHistory.original.meetingRoom}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[9.5px] text-slate-400 block font-bold">BOOKING DATE</span>
+                            <span className="font-bold text-slate-700 dark:text-slate-300 font-mono line-through decoration-rose-400">
+                              {viewingBooking.scheduleHistory.original.date}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[9.5px] text-slate-400 block font-bold">START TIME</span>
+                            <span className="font-bold text-slate-700 dark:text-slate-300 font-mono line-through decoration-rose-400">
+                              {viewingBooking.scheduleHistory.original.startTime}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[9.5px] text-slate-400 block font-bold">END TIME</span>
+                            <span className="font-bold text-slate-700 dark:text-slate-300 font-mono line-through decoration-rose-400">
+                              {viewingBooking.scheduleHistory.original.endTime}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Changed / Approved Schedule */}
+                      <div className="bg-emerald-50/60 dark:bg-emerald-950/40 p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-900/60 space-y-2">
+                        <div className="flex items-center justify-between border-b border-emerald-200/50 dark:border-emerald-900/40 pb-2">
+                          <span className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+                            Approved Final Schedule
+                          </span>
+                          <span className="text-[9.5px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-800">
+                            Approver Revised
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-y-2 gap-x-3 text-xs">
+                          <div>
+                            <span className="text-[9.5px] text-emerald-600 dark:text-emerald-400 block font-bold">MEETING ROOM</span>
+                            <span className="font-extrabold text-emerald-800 dark:text-emerald-200">
+                              {viewingBooking.scheduleHistory.updated.meetingRoom}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[9.5px] text-emerald-600 dark:text-emerald-400 block font-bold">BOOKING DATE</span>
+                            <span className="font-bold text-emerald-800 dark:text-emerald-200 font-mono">
+                              {viewingBooking.scheduleHistory.updated.date}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[9.5px] text-emerald-600 dark:text-emerald-400 block font-bold">START TIME</span>
+                            <span className="font-bold text-emerald-800 dark:text-emerald-200 font-mono">
+                              {viewingBooking.scheduleHistory.updated.startTime}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[9.5px] text-emerald-600 dark:text-emerald-400 block font-bold">END TIME</span>
+                            <span className="font-bold text-emerald-800 dark:text-emerald-200 font-mono">
+                              {viewingBooking.scheduleHistory.updated.endTime}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Responsible Persons Table */}
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs">
+                  <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-[#fcfdfd] dark:bg-slate-950/20 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-100 dark:border-slate-900">
+                        <Users className="w-3 h-3" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                        Responsible Persons & Delegates List
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-400">
+                      Total: {viewingBooking.responsiblePersons.length} Assigned
+                    </span>
+                  </div>
+
+                  <table className="w-full text-[11px] text-left">
+                    <thead className="bg-[#fcfdfd] dark:bg-slate-950/20 border-b border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                       <tr>
-                        <th className="p-3">Name</th>
-                        <th className="p-3">Designation</th>
-                        <th className="p-3">Department</th>
-                        <th className="p-3">Company</th>
-                        <th className="p-3">Phone</th>
+                        <th className="px-3 py-2.5 w-10 text-center whitespace-nowrap">SL</th>
+                        <th className="px-3 py-2.5 whitespace-nowrap">NAME</th>
+                        <th className="px-3 py-2.5 whitespace-nowrap">DESIGNATION</th>
+                        <th className="px-3 py-2.5 whitespace-nowrap">DEPARTMENT</th>
+                        <th className="px-3 py-2.5 whitespace-nowrap">COMPANY</th>
+                        <th className="px-3 py-2.5 whitespace-nowrap">PHONE NUMBER</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border/60 font-medium">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-slate-400 font-semibold">
                       {viewingBooking.responsiblePersons.map((person, i) => (
-                        <tr key={i} className="hover:bg-accent/40">
-                          <td className="p-3 font-bold text-foreground">{person.name}</td>
-                          <td className="p-3">{person.designation}</td>
-                          <td className="p-3 font-semibold text-primary">{person.department}</td>
-                          <td className="p-3">{person.company}</td>
-                          <td className="p-3 font-mono">{person.phone}</td>
+                        <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                          <td className="px-3 py-2.5 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="size-3.5 rounded border border-emerald-300 dark:border-emerald-700 bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
+                                <Check className="size-2.5 stroke-[3.5]" />
+                              </div>
+                              <span className="text-slate-800 dark:text-slate-200 font-mono font-bold">{i + 1}</span>
+                            </div>
+                          </td>
+                          <td className="px-3 py-2.5 font-bold text-slate-850 dark:text-slate-100">
+                            {person.name}
+                          </td>
+                          <td className="px-3 py-2.5">{person.designation}</td>
+                          <td className="px-3 py-2.5 font-semibold text-rose-600 dark:text-rose-400">
+                            {person.department}
+                          </td>
+                          <td className="px-3 py-2.5">{person.company}</td>
+                          <td className="px-3 py-2.5 font-mono text-[11px] font-bold text-slate-800 dark:text-slate-200">
+                            {person.phone}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
+
+                {/* Approval Workflow & Signatures */}
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 p-5 shadow-2xs space-y-4">
+                  <div className="flex items-center gap-2 pb-1.5">
+                    <div className="w-6 h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-slate-900 shadow-3xs">
+                      <FileCheck className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                      Approval Workflow & Signatures
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      {
+                        role: "Dept. Manager",
+                        name: viewingBooking.responsiblePersons[0]?.name || "Md. Anik Islam",
+                        title: "Deputy Manager",
+                        date: `${viewingBooking.date} · 09:25`,
+                        status: "Approved",
+                      },
+                      {
+                        role: "Facility Manager",
+                        name: "Rajebul Hasan Rajon",
+                        title: "Deputy Manager (Admin)",
+                        date: `${viewingBooking.date} · 09:30`,
+                        status: viewingBooking.status === "Pending" ? "Pending" : "Approved",
+                      },
+                      {
+                        role: "Operations Head",
+                        name: "Tahmid Afsar",
+                        title: "Asst. Manager (Operations)",
+                        date: `${viewingBooking.date} · 09:45`,
+                        status: viewingBooking.status === "Pending" ? "Pending" : viewingBooking.status,
+                      },
+                    ].map((sig, idx) => {
+                      const isSigApproved = sig.status === "Approved" || sig.status === "Completed";
+                      return (
+                        <div
+                          key={idx}
+                          className={`p-3 border rounded-xl flex flex-col justify-between h-[105px] relative text-slate-700 dark:text-slate-300 transition-colors ${
+                            isSigApproved
+                              ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/10"
+                              : "border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10"
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-center justify-between gap-1 mb-1.5">
+                              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                                {sig.role}
+                              </span>
+                              <span
+                                className={`inline-flex items-center gap-0.5 text-[8.5px] font-black uppercase ${
+                                  isSigApproved ? "text-emerald-600" : "text-amber-600"
+                                }`}
+                              >
+                                {isSigApproved ? "✓ Approved" : "⏳ Pending"}
+                              </span>
+                            </div>
+                            <p
+                              className={`text-[11.5px] font-extrabold leading-snug truncate ${
+                                isSigApproved
+                                  ? "text-slate-800 dark:text-slate-100"
+                                  : "text-slate-500 dark:text-slate-400 italic"
+                              }`}
+                            >
+                              {sig.name}
+                            </p>
+                            <p className="text-[9.5px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-tight">
+                              {sig.title}
+                            </p>
+                          </div>
+                          <div
+                            className={`mt-2 pt-1.5 border-t flex justify-between items-center text-[8.5px] font-mono ${
+                              isSigApproved
+                                ? "border-emerald-200/50 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400"
+                                : "border-amber-200/50 dark:border-amber-800/50 text-amber-600 dark:text-amber-500"
+                            }`}
+                          >
+                            <span>{sig.date.split(" · ")[1]}</span>
+                            <span>{sig.date.split(" · ")[0]}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Comments & Approval Notes */}
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 p-5 shadow-2xs space-y-4">
+                  <div className="flex items-center gap-2 pb-1.5">
+                    <div className="w-6 h-6 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-100 dark:border-slate-900 shadow-3xs">
+                      <MessageSquare className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                      Comments History & Approval Notes
+                    </span>
+                  </div>
+
+                  <div className="space-y-3 pr-1">
+                    <div className="flex gap-3 items-start bg-slate-50/40 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-800 p-3 rounded-xl text-slate-750 dark:text-slate-250">
+                      <div className="w-8 h-8 rounded-full bg-rose-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                        AI
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-[11.5px] font-extrabold text-slate-800 dark:text-slate-100">
+                            {viewingBooking.responsiblePersons[0]?.name || "Md. Anik Islam"} <span className="text-slate-400 font-semibold">· Deputy Manager</span>
+                          </span>
+                          <span className="text-[9.5px] text-slate-400 font-semibold font-mono">
+                            {viewingBooking.date} · {viewingBooking.startTime}
+                          </span>
+                        </div>
+                        <p className="text-[11.5px] font-semibold text-slate-650 dark:text-slate-350 leading-relaxed">
+                          "{viewingBooking.agenda}"
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Bottom CLOSE button matching Screenshot 2 */}
-              <div className="pt-3 border-t border-border flex justify-start">
+              {/* Modal Footer */}
+              <div className="px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-950/30 flex justify-between items-center shrink-0">
                 <button
-                  type="button"
-                  onClick={() => setViewingBooking(null)}
-                  className="px-6 py-2 text-xs font-bold rounded-lg bg-sky-500 text-white hover:bg-sky-600 transition-all shadow-md uppercase tracking-wider"
+                  onClick={() => window.print()}
+                  className="h-8.5 px-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
                 >
-                  CLOSE
+                  <Printer className="size-3.5" />
+                  <span>Print Slip</span>
+                </button>
+
+                <button
+                  onClick={() => setViewingBooking(null)}
+                  className="h-8.5 px-5 bg-slate-800 hover:bg-slate-900 text-white dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer uppercase tracking-wider"
+                >
+                  Close
                 </button>
               </div>
-            </div>
-          </div>
-        )}
+            </DialogContent>
+          )}
+        </Dialog>
 
         {/* EDIT BOOKING MODAL (Matching Screenshot 3) */}
         {editingBooking && (

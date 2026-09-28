@@ -2,6 +2,60 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "510",
+    "date": "2026-09-28T13:05",
+    "type": "New Feature / History Tracking",
+    "module": "Central Approvals - Conference Room Modal",
+    "link": "/all-approvals",
+    "descriptionEn": "Implemented Requisition Schedule & Room Reallocation History tracking for Conference Room Booking approvals. When an approver changes the meeting room, booking date, start time, or end time and approves the requisition, a schedule history card is recorded and rendered in both approval and view modals comparing original requested schedule with approved schedule.",
+    "descriptionBn": "কনফারেন্স রুম বুকিং অ্যাপপ্রুভালে শিডিউল ও রুম পুনর্নির্ধারণের ইতিহাস ট্র্যাকিং ফিচার যুক্ত করা হয়েছে। অ্যাপপ্রুভার যদি মিটিং রুম, তারিখ, স্টার্ট বা এন্ড টাইম পরিবর্তন করে অ্যাপপ্রুভ করেন, তবে অনুমোদিত রিকুইজিশন ভিউ করার সময় অরিজিনাল রিকুয়েস্ট করা শিডিউল ও পরিবর্তিত অ্যাপপ্রুভড শিডিউলের তুলনামূলক হিস্ট্রি কার্ড প্রদর্শিত হবে।"
+  },
+  {
+    "id": "509",
+    "date": "2026-09-28T12:12",
+    "type": "UI Clean Up",
+    "module": "Central Approvals - Conference Room Modal",
+    "link": "/all-approvals",
+    "descriptionEn": "Cleaned up Conference Room Approval Modal layout: removed gradient background fill, removed section title header, and removed outer stroke border from schedule modification fields.",
+    "descriptionBn": "কনফারেন্স রুম অ্যাপপ্রুভাল মোডালের শিডিউল সেকশন ক্লিন আপ করা হয়েছে: ব্যাকগ্রাউন্ডের গ্রাডিয়েন্ট কালার, হেডার টাইটেল টেক্সট এবং বাইরের স্ট্রোক বর্ডার সরিয়ে ফেলা হয়েছে।"
+  },
+  {
+    "id": "508",
+    "date": "2026-09-28T11:58",
+    "type": "UI / UX Refactoring",
+    "module": "Central Approvals - Conference Room Modal",
+    "link": "/all-approvals",
+    "descriptionEn": "Refactored ConferenceRoomApprovalModal: merged Approver schedule override controls & booking details into a single section named 'Booking Purpose & Details', stacked comment history and decision action panel vertically, and added a sticky bottom Approve/Reject action footer bar matching SimApprovalViewModal.",
+    "descriptionBn": "ConferenceRoomApprovalModal রিফ্যাক্টর করা হয়েছে: অ্যাপপ্রুভার শিডিউল কন্ট্রোলস ও বুকিং ডিটেইলস এক করে 'Booking Purpose & Details' নামক সিঙ্গেল সেকশনে রূপান্তর করা হয়েছে, কমেন্ট হিস্ট্রি ও ডিসিশন প্যানেল উপর-নিচে স্ট্যাক করা হয়েছে এবং সিম অ্যাপপ্রুভাল মোডালের মতো নিচে স্টিকি অ্যাপপ্রুভ/রিজেক্ট বাটন বার সংযোজন করা হয়েছে।"
+  },
+  {
+    "id": "507",
+    "date": "2026-09-28T11:48",
+    "type": "New Feature / Approvals",
+    "module": "Central Approvals - Conference Room",
+    "link": "/all-approvals",
+    "descriptionEn": "Added Conference Room Booking Requisition approval module to Central Approvals (/all-approvals). Integrated ConferenceRoomApprovalModal allowing facility approvers to inspect booking details and modify the Meeting Room, Booking Date, Start Time, and End Time prior to approval/rejection.",
+    "descriptionBn": "সেন্ট্রাল অ্যাপপ্রুভালস পেজে (/all-approvals) কনফারেন্স রুম বুকিং রিকুইজিশন অ্যাপপ্রুভাল মডিউল যুক্ত করা হয়েছে। এতে নতুন ConferenceRoomApprovalModal সংযোজন করা হয়েছে, যার মাধ্যমে ফেসিলিটি অ্যাপপ্রুভার বুকিংয়ের বিস্তারিত দেখার পাশাপাশি মিটিং রুম, তারিখ, স্টার্ট টাইম ও এন্ড টাইম পরিবর্তন করে অ্যাপপ্রুভ বা রিজেক্ট করতে পারবেন।"
+  },
+  {
+    "id": "506",
+    "date": "2026-09-28T11:37",
+    "type": "UI / UX Update",
+    "module": "Conference Room Booking List",
+    "link": "/conference-room-booking-list",
+    "descriptionEn": "Updated Conference Room Booking Requisition view modal: removed Room Amenities & Technical Configuration section and removed Status column from Responsible Persons & Delegates List table.",
+    "descriptionBn": "কনফারেন্স রুম বুকিং রিকুইজিশন ভিউ মোডাল আপডেট করা হয়েছে: রুম অ্যামেনিটিজ অ্যান্ড টেকনিক্যাল কনফিগারেশন সেকশনটি সরিয়ে ফেলা হয়েছে এবং রেসপন্সিবল পার্সনস টেবিল থেকে স্ট্যাটাস কলামটি বাদ দেওয়া হয়েছে।"
+  },
+  {
+    "id": "505",
+    "date": "2026-09-28T11:20",
+    "type": "UI / Modal Redesign",
+    "module": "Conference Room Booking List",
+    "link": "/conference-room-booking-list",
+    "descriptionEn": "Redesigned Conference Room View Booking Modal to match standard ERP Requisition View Modal layout featuring header icon badge with booking ID & status pill, Requester & Booking Overview card with employee avatar & metadata grid, Responsible Persons & Delegates sub-table with status badges, Room Technical Amenities & Setup chips, Approval Workflow & Signatures cards, Comments History timeline, and Print Slip & Close action buttons.",
+    "descriptionBn": "কনফারেন্স রুম বুকিং লিস্ট পেজের (/conference-room-booking-list) ভিউ বুকিং মোডালটি স্ট্যান্ডার্ড ERP রিকুইজিশন ভিউ মোডালের স্টাইলে পুনর্নির্মাণ করা হয়েছে। এতে বুকিং আইডি ও স্ট্যাটাস পিল সহ হেডার আইকন ব্যাজ, এমপ্লয়ি অ্যাভাটার ও মেটাডাটা গ্রিড সহ রিকুয়েস্টার ও বুকিং ওভারভিউ কার্ড, রেসপন্সিবল পার্সনস সাব-টেবিল, টেকনিক্যাল সুযোগ-সুবিধা কনফিগারেশন চিপস, অ্যাপপ্রুভাল ওয়ার্কফ্লো কার্ডস এবং প্রিন্ট স্লিপ ও ক্লোজ বাটন সংযুক্ত করা হয়েছে।"
+  },
+  {
     "id": "504",
     "date": "2026-09-27T10:18",
     "type": "UI / PDF Standard Layout Update",
