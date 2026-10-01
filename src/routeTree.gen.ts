@@ -207,8 +207,11 @@ import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
 import { Route as HrReportsRouteImport } from './routes/hr-reports'
+import { Route as HrReportTiffinCardRouteImport } from './routes/hr-report-tiffin-card'
+import { Route as HrReportTiffinAllowanceAllRouteImport } from './routes/hr-report-tiffin-allowance-all'
 import { Route as HrReportSimRequisitionRouteImport } from './routes/hr-report-sim-requisition'
 import { Route as HrReportOvertimeSummaryRouteImport } from './routes/hr-report-overtime-summary'
+import { Route as HrReportNightCardRouteImport } from './routes/hr-report-night-card'
 import { Route as HrReportNewJoiningInfoRouteImport } from './routes/hr-report-new-joining-info'
 import { Route as HrReportMonthlyAttendanceRouteImport } from './routes/hr-report-monthly-attendance'
 import { Route as HrReportLeaveSummaryRouteImport } from './routes/hr-report-leave-summary'
@@ -1336,6 +1339,17 @@ const HrReportsRoute = HrReportsRouteImport.update({
   path: '/hr-reports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HrReportTiffinCardRoute = HrReportTiffinCardRouteImport.update({
+  id: '/hr-report-tiffin-card',
+  path: '/hr-report-tiffin-card',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HrReportTiffinAllowanceAllRoute =
+  HrReportTiffinAllowanceAllRouteImport.update({
+    id: '/hr-report-tiffin-allowance-all',
+    path: '/hr-report-tiffin-allowance-all',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HrReportSimRequisitionRoute = HrReportSimRequisitionRouteImport.update({
   id: '/hr-report-sim-requisition',
   path: '/hr-report-sim-requisition',
@@ -1344,6 +1358,11 @@ const HrReportSimRequisitionRoute = HrReportSimRequisitionRouteImport.update({
 const HrReportOvertimeSummaryRoute = HrReportOvertimeSummaryRouteImport.update({
   id: '/hr-report-overtime-summary',
   path: '/hr-report-overtime-summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HrReportNightCardRoute = HrReportNightCardRouteImport.update({
+  id: '/hr-report-night-card',
+  path: '/hr-report-night-card',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HrReportNewJoiningInfoRoute = HrReportNewJoiningInfoRouteImport.update({
@@ -1794,8 +1813,11 @@ export interface FileRoutesByFullPath {
   '/hr-report-leave-summary': typeof HrReportLeaveSummaryRoute
   '/hr-report-monthly-attendance': typeof HrReportMonthlyAttendanceRoute
   '/hr-report-new-joining-info': typeof HrReportNewJoiningInfoRoute
+  '/hr-report-night-card': typeof HrReportNightCardRoute
   '/hr-report-overtime-summary': typeof HrReportOvertimeSummaryRoute
   '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
+  '/hr-report-tiffin-allowance-all': typeof HrReportTiffinAllowanceAllRoute
+  '/hr-report-tiffin-card': typeof HrReportTiffinCardRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -2069,8 +2091,11 @@ export interface FileRoutesByTo {
   '/hr-report-leave-summary': typeof HrReportLeaveSummaryRoute
   '/hr-report-monthly-attendance': typeof HrReportMonthlyAttendanceRoute
   '/hr-report-new-joining-info': typeof HrReportNewJoiningInfoRoute
+  '/hr-report-night-card': typeof HrReportNightCardRoute
   '/hr-report-overtime-summary': typeof HrReportOvertimeSummaryRoute
   '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
+  '/hr-report-tiffin-allowance-all': typeof HrReportTiffinAllowanceAllRoute
+  '/hr-report-tiffin-card': typeof HrReportTiffinCardRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -2345,8 +2370,11 @@ export interface FileRoutesById {
   '/hr-report-leave-summary': typeof HrReportLeaveSummaryRoute
   '/hr-report-monthly-attendance': typeof HrReportMonthlyAttendanceRoute
   '/hr-report-new-joining-info': typeof HrReportNewJoiningInfoRoute
+  '/hr-report-night-card': typeof HrReportNightCardRoute
   '/hr-report-overtime-summary': typeof HrReportOvertimeSummaryRoute
   '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
+  '/hr-report-tiffin-allowance-all': typeof HrReportTiffinAllowanceAllRoute
+  '/hr-report-tiffin-card': typeof HrReportTiffinCardRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -2622,8 +2650,11 @@ export interface FileRouteTypes {
     | '/hr-report-leave-summary'
     | '/hr-report-monthly-attendance'
     | '/hr-report-new-joining-info'
+    | '/hr-report-night-card'
     | '/hr-report-overtime-summary'
     | '/hr-report-sim-requisition'
+    | '/hr-report-tiffin-allowance-all'
+    | '/hr-report-tiffin-card'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -2897,8 +2928,11 @@ export interface FileRouteTypes {
     | '/hr-report-leave-summary'
     | '/hr-report-monthly-attendance'
     | '/hr-report-new-joining-info'
+    | '/hr-report-night-card'
     | '/hr-report-overtime-summary'
     | '/hr-report-sim-requisition'
+    | '/hr-report-tiffin-allowance-all'
+    | '/hr-report-tiffin-card'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -3172,8 +3206,11 @@ export interface FileRouteTypes {
     | '/hr-report-leave-summary'
     | '/hr-report-monthly-attendance'
     | '/hr-report-new-joining-info'
+    | '/hr-report-night-card'
     | '/hr-report-overtime-summary'
     | '/hr-report-sim-requisition'
+    | '/hr-report-tiffin-allowance-all'
+    | '/hr-report-tiffin-card'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -3448,8 +3485,11 @@ export interface RootRouteChildren {
   HrReportLeaveSummaryRoute: typeof HrReportLeaveSummaryRoute
   HrReportMonthlyAttendanceRoute: typeof HrReportMonthlyAttendanceRoute
   HrReportNewJoiningInfoRoute: typeof HrReportNewJoiningInfoRoute
+  HrReportNightCardRoute: typeof HrReportNightCardRoute
   HrReportOvertimeSummaryRoute: typeof HrReportOvertimeSummaryRoute
   HrReportSimRequisitionRoute: typeof HrReportSimRequisitionRoute
+  HrReportTiffinAllowanceAllRoute: typeof HrReportTiffinAllowanceAllRoute
+  HrReportTiffinCardRoute: typeof HrReportTiffinCardRoute
   HrReportsRoute: typeof HrReportsRoute
   IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
@@ -5042,6 +5082,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr-report-tiffin-card': {
+      id: '/hr-report-tiffin-card'
+      path: '/hr-report-tiffin-card'
+      fullPath: '/hr-report-tiffin-card'
+      preLoaderRoute: typeof HrReportTiffinCardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr-report-tiffin-allowance-all': {
+      id: '/hr-report-tiffin-allowance-all'
+      path: '/hr-report-tiffin-allowance-all'
+      fullPath: '/hr-report-tiffin-allowance-all'
+      preLoaderRoute: typeof HrReportTiffinAllowanceAllRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hr-report-sim-requisition': {
       id: '/hr-report-sim-requisition'
       path: '/hr-report-sim-requisition'
@@ -5054,6 +5108,13 @@ declare module '@tanstack/react-router' {
       path: '/hr-report-overtime-summary'
       fullPath: '/hr-report-overtime-summary'
       preLoaderRoute: typeof HrReportOvertimeSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr-report-night-card': {
+      id: '/hr-report-night-card'
+      path: '/hr-report-night-card'
+      fullPath: '/hr-report-night-card'
+      preLoaderRoute: typeof HrReportNightCardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hr-report-new-joining-info': {
@@ -5640,8 +5701,11 @@ const rootRouteChildren: RootRouteChildren = {
   HrReportLeaveSummaryRoute: HrReportLeaveSummaryRoute,
   HrReportMonthlyAttendanceRoute: HrReportMonthlyAttendanceRoute,
   HrReportNewJoiningInfoRoute: HrReportNewJoiningInfoRoute,
+  HrReportNightCardRoute: HrReportNightCardRoute,
   HrReportOvertimeSummaryRoute: HrReportOvertimeSummaryRoute,
   HrReportSimRequisitionRoute: HrReportSimRequisitionRoute,
+  HrReportTiffinAllowanceAllRoute: HrReportTiffinAllowanceAllRoute,
+  HrReportTiffinCardRoute: HrReportTiffinCardRoute,
   HrReportsRoute: HrReportsRoute,
   IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,

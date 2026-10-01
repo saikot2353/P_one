@@ -2,13 +2,218 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+<<<<<<< HEAD
     "id": "511",
+=======
+    "id": "532",
+    "date": "2026-10-01T11:45",
+    "type": "New Feature",
+    "module": "HR Reports (Tiffin Card)",
+    "link": "/hr-report-tiffin-card",
+    "descriptionEn": "Implemented a new 'Tiffin Card' report page in the HR Reports section, allowing users to view, filter, and export individual employee tiffin duty records including in/out times, total hours, and net pay.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন 'Tiffin Card' রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে ব্যবহারকারীরা নির্দিষ্ট কর্মীর টিফিন ডিউটির বিস্তারিত তথ্য (প্রবেশ/প্রস্থানের সময়, মোট ঘণ্টা এবং প্রদেয় অর্থের পরিমাণ) দেখতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
+    "id": "531",
+    "date": "2026-10-01T11:43",
+    "type": "New Feature",
+    "module": "HR Reports (Night Card)",
+    "link": "/hr-report-night-card",
+    "descriptionEn": "Implemented a new 'Night Card' report page in the HR Reports section, allowing users to view, filter, and export individual employee night duty records including in/out times, total hours, and net pay.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন 'Night Card' রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে ব্যবহারকারীরা নির্দিষ্ট কর্মীর নাইট ডিউটির বিস্তারিত তথ্য (প্রবেশ/প্রস্থানের সময়, মোট ঘণ্টা এবং প্রদেয় অর্থের পরিমাণ) দেখতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
+    "id": "530",
+    "date": "2026-10-01T11:42",
+    "type": "New Feature",
+    "module": "HR Reports (Tiffin Allowance All)",
+    "link": "/hr-report-tiffin-allowance-all",
+    "descriptionEn": "Implemented a new 'Tiffin Allowance All' report page in the HR Reports section, allowing users to view, filter, and export detailed tiffin allowance logs, total days, and net payable amounts for employees across various departments and sections.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন 'Tiffin Allowance All' রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে ব্যবহারকারীরা বিভিন্ন ডিপার্টমেন্ট এবং সেকশনের কর্মীদের টিফিন অ্যালাউন্সের বিস্তারিত তথ্য, মোট দিন এবং প্রদেয় অর্থের পরিমাণ দেখতে, ফিল্টার করতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
+    "id": "529",
+    "date": "2026-10-01T11:26",
+    "type": "Bug Fix / System Stability",
+    "module": "System Routing & Git Merge Conflict Resolution",
+    "link": "/changes",
+    "descriptionEn": "Resolved Git merge conflicts in changes tracking data and route definitions, preventing Vite runtime evaluation errors and restoring smooth navigation across the application.",
+    "descriptionBn": "চেঞ্জেস ট্র্যাকিং ও রাউট ডেফিনেশনের গিট মার্জ কনফ্লিক্ট সমাধান করা হয়েছে, যার ফলে ভাইট (Vite) রানটাইম এরর দূর হয়ে সিস্টেম স্বাভাবিকভাবে সচল হয়েছে।"
+  },
+  {
+    "id": "528",
+    "date": "2026-09-28T18:22",
+    "type": "UI/UX & Card Simplification",
+    "module": "Configure - Company Setup (Organogram Card Simplification)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Removed redundant 'Reports To' label and selector across the Designation Organogram: cards now cleanly focus directly on the designation name and title without cluttering reporting lines, and the 'Reports To' input was removed from the designation modal and table view.",
+    "descriptionBn": "পদবি ভিত্তিক অর্গ্যানোগ্রাম কার্ড থেকে অপ্রয়োজনীয় 'Reports To' লেখা ও অপশন সম্পূর্ণ বাদ দেওয়া হয়েছে: এখন কার্ডে সরাসরি পদবির নাম (Designation Name) পরিষ্কার ও সুন্দরভাবে প্রদর্শিত হয়, এবং ডেসিগনেশন মডাল ও টেবিল ভিউ থেকেও 'Reports To' ফিল্ডটি অপসারণ করা হয়েছে।"
+  },
+  {
+    "id": "527",
+    "date": "2026-09-28T18:10",
+    "type": "UI/UX & Builder Ergonomics",
+    "module": "Configure - Company Setup (Organogram Decluttering, Blank Canvas & Clear All)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Decluttered the Designation Organogram and introduced flexible blank canvas controls: 4-way directional add buttons and card toolbars are now cleanly hidden by default and revealed smoothly on hover (with a toolbar toggle to show all controls if desired), added a '+ Blank Canvas' action to initiate completely empty templates, added a dedicated 'Remove All' button to wipe/reset the active template's designations with confirmation, and provided an interactive Root Designation picker to place the starting role on an empty canvas.",
+    "descriptionBn": "পদবি ভিত্তিক অর্গ্যানোগ্রাম ডায়াগ্রামের অপ্রয়োজনীয় জটলা দূর করে পরিচ্ছন্ন ভিউ এবং শূন্য থেকে নতুন চার্ট তৈরির সুবিধা যুক্ত করা হয়েছে: কার্ডের চারপাশের ৪টি ডিরেকশনাল (+) বাটন এবং নিচের টুলবার এখন সাধারণ অবস্থায় লুকিয়ে থাকবে এবং মাউস হোভার করলেই মসৃণভাবে ভেসে উঠবে (প্রয়োজনে সব বাটন দৃশ্যমান রাখার টগল অপশনও রয়েছে), সম্পূর্ণ খালি টেমপ্লেট তৈরির জন্য '+ Blank Canvas' বোতাম এবং টেমপ্লেট মডালে স্পষ্ট চয়েস কার্ড যুক্ত করা হয়েছে, বর্তমান টেমপ্লেটের সব পদবি একসাথে মুছে ফেলার জন্য 'Remove All' অপশন যুক্ত করা হয়েছে, এবং শূন্য ক্যানভাসে প্রথম শীর্ষ পদবি (Level 1 Root) যুক্ত করার উপযোগী পিকার সিস্টেম চালু করা হয়েছে।"
+  },
+  {
+    "id": "526",
+    "date": "2026-09-28T17:52",
+    "type": "UI/UX & Design Beautification",
+    "module": "Configure - Company Setup (Organogram Beautification & Compact Layout)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Refined and beautified the Designation Organogram with an ultra-compact, high-density executive aesthetic: tightened card padding, streamlined card dimensions (185-195px multi-role, 210-260px single-role), subtle level badges, sleek 4-way micro directional add buttons (+ Above, + Below, ◄+, +►), compact branching & converging connection rails, modernized template directory table, and a space-efficient directional picker modal.",
+    "descriptionBn": "পদবি ভিত্তিক অর্গ্যানোগ্রাম ব্যবস্থাকে আরও আকর্ষণীয়, স্লিক এবং আল্ট্রা-কম্প্যাক্ট ডিজাইনে রূপান্তর করা হয়েছে: কার্ডের সাইজ ও প্যাডিং সুষম করা হয়েছে, প্রতিটি কার্ডের চারপাশের ৪টি ডিরেকশনাল (+) বাটনকে আধুনিক মাইক্রো-পিল আকারে নিখুঁত করা হয়েছে, কানেক্টিং রেল ও অ্যারোগুলোকে পরিমিত উচ্চতায় সাজানো হয়েছে, টেমপ্লেট ডিরেক্টরি টেবিলকে কম্প্যাক্ট করা হয়েছে এবং পদবি সিলেক্টর পপআপ মডালটিকে আরও দৃষ্টিনন্দন ও ব্যবহারবান্ধব করা হয়েছে।"
+  },
+  {
+    "id": "525",
+    "date": "2026-09-28T17:48",
+    "type": "Feature Enhancement & Interactive Builder",
+    "module": "Configure - Company Setup (Organogram Templates & Directional Builder)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Implemented interactive Template Table View and 4-way Directional Add (+) buttons for the Designation Organogram. Templates can now be managed in a list view with quick active/inactive toggles, direct diagram view & edit, clone, and deletion. In the diagram builder, every designation card features directional add options (+ Above, + Below, + Left, + Right). Clicking any direction opens a remaining designations picker modal to quickly select and place unassigned designations or create custom ones directly into the hierarchy.",
+    "descriptionBn": "অর্গ্যানোগ্রাম টেমপ্লেটগুলোর জন্য লিস্ট/টেবিল ভিউ এবং প্রতিটি পদবি কার্ডের ৪ দিকেই (উপরে, নিচে, ডানে, বামে) ডিরেকশনাল যোগ (+) অপশন যুক্ত করা হয়েছে। টেবিল ভিউ থেকে টেমপ্লেট সহজে এক ক্লিকে একটিভ/ইন-একটিভ করা এবং সরাসরি ডায়াগ্রাম দেখে এডিট করা যায়। ডায়াগ্রামে যেকোনো পদবির চারপাশে থাকা (+▲ উপরে, +▼ নিচে, ◄+ বামে, +► ডানে) বাটনে ক্লিক করলেই বাকি থাকা পদবিগুলোর লিস্ট চলে আসে, যেখান থেকে পছন্দমতো পদবি নির্বাচন করে সাথে সাথে কাঙ্ক্ষিত স্থানে যুক্ত করা যায়।"
+  },
+  {
+    "id": "524",
+    "date": "2026-09-28T17:35",
+    "type": "Feature Enhancement & Architecture",
+    "module": "Configure - Company Setup (Designation Organogram & Templates)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Replaced department-dependent organograms with a pure designation-based organogram system powered by dynamic templates. Features the exact corporate hierarchy (Board of Directors -> CEO -> parallel side-by-side CXOs [COO, CFO, CTO, CMO, CHRO] with branching and converging connector rails -> GM -> DGM -> AGM -> Senior Manager -> Manager -> Deputy Manager -> Assistant Manager -> Executive -> Officer), template active/inactive toggling, template duplication, custom template creation, and full persistent storage.",
+    "descriptionBn": "ডিপার্টমেন্টের প্রয়োজনীয়তা বাদ দিয়ে পুরোপুরি পদবি (Designation) ভিত্তিক ডায়নামিক অর্গ্যানোগ্রাম ব্যবস্থা চালু করা হয়েছে, যা টেমপ্লেট আকারে কাজ করে। ব্যবহারকারীর চাহিদা অনুযায়ী হুবহু হায়ারার্কি (Board of Directors -> CEO -> পাশাপাশি CXO [COO, CFO, CTO, CMO, CHRO] ব্রাঞ্চিং ও কনভার্জিং কানেক্টরসহ -> GM -> DGM -> AGM -> Senior Manager -> Manager -> Deputy Manager -> Assistant Manager -> Executive -> Officer) তৈরি করা হয়েছে। যেকোনো টেমপ্লেট একটি ক্লিকেই একটিভ বা ইন-একটিভ করা যায়, নতুন টেমপ্লেট তৈরি ও ক্লোন করা যায়।"
+  },
+  {
+    "id": "523",
+    "date": "2026-09-28T17:05",
+    "type": "Feature Enhancement",
+    "module": "Configure - Company Setup (Designation & Organogram)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Enhanced the Organogram with a dynamic multi-department side-by-side branch structure: root CEO/MD leadership trunk with horizontal distribution rail, side-by-side department column cards with ◄ ► horizontal reorder controls, multi-select department filter pills, department-specific color themes, and within-department side-by-side role positioning.",
+    "descriptionBn": "অর্গ্যানোগ্রাম ব্যবস্থাকে ডায়নামিক মাল্টি-ডিপার্টমেন্ট সাইড-বাই-সাইড ব্রাঞ্চ কাঠামোর সাথে আরও উন্নত করা হয়েছে: শীর্ষ সিইও/এমডি নোডের নিচে অনুভূমিক ডিস্ট্রিবিউশন রেল, পাশাপাশি সাজানো ডিপার্টমেন্ট কলাম কার্ড, ◄ ► বাটন দিয়ে ডিপার্টমেন্টগুলোর অবস্থান পরিবর্তন, মাল্টি-ডিপার্টমেন্ট ফিল্টার পিলস এবং প্রতিটি ডিপার্টমেন্টের নির্দিষ্ট কালার থিম যুক্ত করা হয়েছে।"
+  },
+  {
+    "id": "522",
+    "date": "2026-09-28T17:00",
+    "type": "New Feature & UI Component",
+    "module": "Configure - Company Setup (Designation & Organogram)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Added a dedicated 'Designation & Organogram' tab under Company Setup. Introduced multi-level hierarchy rank and side-by-side horizontal position controls for designations sharing the same level (e.g. CMO, CTO, CFO at Level 2). Included interactive Organogram Chart View, List View, department filtering, quick level/position controls, and full persistent storage.",
+    "descriptionBn": "কোম্পানি সেটিংসে 'Designation & Organogram' নামে একটি নতুন ট্যাব যুক্ত করা হয়েছে। একই লেভেলের পদবিগুলোকে (যেমন CMO, CTO, CFO) পাশাপাশি প্রদর্শন করার জন্য মাল্টি-লেভেল র্যাংক ও সাইড-বাই-সাইড পজিশন কন্ট্রোল সুবিধা তৈরি করা হয়েছে, যার সাথে ইন্টারঅ্যাক্টিভ অর্গ্যানোগ্রাম চার্ট ভিউ, লিস্ট ভিউ এবং ডিপার্টমেন্ট ফিল্টারিং যুক্ত রয়েছে।"
+  },
+  {
+    "id": "521",
+    "date": "2026-09-28T15:58",
+    "type": "Print Fix",
+    "module": "Global & Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Fixed floating AI Chatbot widget appearing on printed pages by applying print:hidden to the root chatbot container, adding global @media print display: none rules, and explicitly excluding fixed bottom-right floating widgets from print outputs.",
+    "descriptionBn": "প্রিন্ট করার সময় পাতার নিচের ডান কোনায় ভেসে থাকা এআই চ্যাটবট আইকন চলে আসার সমস্যাটি সমাধান করা হয়েছে: চ্যাটবটের রুট এলিমেন্টে print:hidden যুক্ত করা হয়েছে এবং গ্লোবাল প্রিন্ট সিএসএস-এ এটি পুরোপুরি হাইড করা হয়েছে।"
+  },
+  {
+    "id": "520",
+    "date": "2026-09-28T15:56",
+    "type": "UI & Typography Standardization",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Standardized and harmonized all font sizes across the Final Settlement Sheet: aligned section titles uniformly to 11px, box and table headers to 10px bold, data rows and values to 10px, subtotals to 10px with consistent 2-decimal formatting, and balanced Grand Total banner elements at 11px to eliminate disproportionate text.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের সমস্ত ফন্ট সাইজ সামঞ্জস্যপূর্ণ ও সুষম করা হয়েছে: প্রতিটি সেকশন টাইটেল ১১ পিক্সেল, টেবিল ও বক্সের হেডার ১০ পিক্সেল বোল্ড, সকল রো ও টাকার মান ১০ পিক্সেল এবং গ্র্যান্ড টোটাল ব্যানারকে সমান ১১ পিক্সেলে সুবিন্যস্ত করা হয়েছে যাতে কোনো লেখা অসঙ্গতভাবে বড় বা ছোট না দেখায়।"
+  },
+  {
+    "id": "519",
+    "date": "2026-09-28T15:52",
+    "type": "UI & Typography Update",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Enforced Inter font across the entire Final Settlement Sheet, ensuring all numbers, currency values, codes, and figures use Inter instead of monospace. Pinned the signatures block strictly to the bottom of the sheet across all screen heights and single-page print outputs.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের সমস্ত ফন্ট (সব নম্বর, টাকার পরিমাণ ও কোডসহ) 'Inter' ফন্টে রূপান্তর করা হয়েছে এবং স্বাক্ষরের অংশটি পাতার একেবারে নিচে পিন করে রাখা হয়েছে যাতে মাঝখানে ফাঁকা জায়গা থাকলেও স্বাক্ষর সবসময় নিচে অবস্থান করে।"
+  },
+  {
+    "id": "518",
+    "date": "2026-09-28T15:43",
+    "type": "Print Optimization",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Optimized single A4 print layout for Final Settlement Sheet: expanded top margin above management signatures (mt-14/print:mt-16), increased signature clearance height (h-20/print:h-22 and h-18/print:h-20), and widened inter-tier row spacing (mt-14/print:mt-16) to eliminate bottom whitespace while ensuring single-page print-to-fit compliance.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের সিঙ্গেল A4 প্রিন্ট লেআউট নিখুঁত করা হয়েছে: সিগনেচারের উপরের মার্জিন, সিগনেচার করার স্পেস হাইট এবং প্রথম ও দ্বিতীয় সারির মাঝের ফাঁকা জায়গা বৃদ্ধি করা হয়েছে, যার ফলে পাতার নিচের ফাঁকা জায়গা সুষমভাবে পূরণ হয়েছে এবং সিঙ্গেল A4 পেজে প্রিন্টও নিখুঁত বজায় রয়েছে।"
+  },
+  {
+    "id": "517",
+    "date": "2026-09-28T15:42",
+    "type": "UI Layout Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Separated 'Earning Sectors' and 'Deduction Sectors' into independent bordered boxes with a clean margin gap, resolving the cramped layout where the Total Earning summary was directly attached to the Deduction Sectors header.",
+    "descriptionBn": "'Payment Info' এর ভেতরে 'Earning Sectors' এবং 'Deduction Sectors'-কে দুটি পৃথক বর্ডার্ড বক্সে ভাগ করে মাঝে মার্জিন গ্যাপ দেওয়া হয়েছে, ফলে Total Earning এবং Deduction Sectors একে অপরের সাথে লেগে না থেকে পরিষ্কারভাবে আলাদা প্রদর্শিত হচ্ছে।"
+  },
+  {
+    "id": "516",
+    "date": "2026-09-28T15:40",
+    "type": "UI Layout Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Re-architected Final Settlement Sheet header: removed company address, aligned 'FINAL SETTLEMENT SHEET' title to the exact center between the logo and portrait, and resized the employee photo frame (66px × 82px) for a balanced professional appearance.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের হেডার সেকশন থেকে কোম্পানির ঠিকানা সম্পূর্ণ বাদ দেওয়া হয়েছে, 'FINAL SETTLEMENT SHEET' টাইটেলটি লোগো ও ছবির মাঝখানে সেন্টার অ্যালাইন করা হয়েছে এবং এমপ্লয়ির ছবির ফ্রেমের সাইজ প্রয়োজন অনুযায়ী কিছুটা বড় (66px × 82px) করে ভারসাম্যপূর্ণ করা হয়েছে।"
+  },
+  {
+    "id": "515",
+    "date": "2026-09-28T15:39",
+    "type": "UI Consistency",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Updated section heading colors for 'Earn Leave Details', 'Service Benefit Details', and 'Compensation Details' to match 'Payment Info' theme green (#4caf50), ensuring uniform visual branding across all settlement breakdown quadrants.",
+    "descriptionBn": "'Earn Leave Details', 'Service Benefit Details' এবং 'Compensation Details' সেকশন হেডারগুলোর কালার 'Payment Info' এর মতো একই ব্র্যান্ড থিম গ্রিন (#4caf50) কালারে পরিবর্তন করা হয়েছে।"
+  },
+  {
+    "id": "514",
+    "date": "2026-09-28T15:37",
+    "type": "UI Layout Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Reformatted Final Settlement Sheet header: removed duplicate 'Pakiza Software Limited' text header, placed the official logo directly on top followed vertically by the company address and 'FINAL SETTLEMENT SHEET' title, and reduced employee portrait photo frame dimensions for a cleaner compact layout.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের হেডার সেকশন রিফরম্যাট করা হয়েছে: অতিরিক্ত 'Pakiza Software Limited' টেক্সট সরিয়ে শুধুমাত্র লোগো রাখা হয়েছে এবং লোগোর ঠিক নিচে ক্রমান্বয়ে ঠিকানা ও 'FINAL SETTLEMENT SHEET' শিরোনাম সাজানো হয়েছে। পাশাপাশি এমপ্লয়ির ছবির সাইজ আরও ছোট ও পরিপাটি করা হয়েছে।"
+  },
+  {
+    "id": "513",
+    "date": "2026-09-28T15:36",
+    "type": "UI / Print Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Enhanced the Grand Total section in Final Settlement Sheet into a full-width colored banner containing Bangladeshi Taka In Words on the left and Grand Total amount on the right. Increased vertical spacing and height for management signature rows to provide proper clearance while maintaining single A4 page print-to-fit layout.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটে গ্র্যান্ড টোটাল সেকশনটিকে পুরো উইডথ জুড়ে একক কালারের ব্যানারে রূপান্তর করা হয়েছে, যার বাম পাশে টাকায় কথায় (In Words) এবং ডান পাশে গ্র্যান্ড টোটাল অ্যামাউন্ট প্রদর্শিত হচ্ছে। এছাড়া ম্যানেজমেন্ট সিগনেচার সেকশনের উপর-নিচ মার্জিন ও হাইট বাড়িয়ে পর্যাপ্ত ফাঁকা জায়গা (proper gap) নিশ্চিত করা হয়েছে যাতে সিঙ্গেল A4 পেজে প্রিন্টও নিখুঁত থাকে।"
+  },
+  {
+    "id": "512",
+    "date": "2026-09-28T15:32",
+    "type": "UI Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Integrated official Pakiza client logo (client_logo.png) into the Final Settlement Sheet header for both the detailed settlement view (/final-settlement) and settlement report printable statement modal (/final-settlement-report).",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের হেডার সেকশনে অফিসিয়াল পাকিজা ক্লায়েন্ট লোগো (client_logo.png) যুক্ত করা হয়েছে, যা ডিটেইল সেটেলমেন্ট ভিউ (/final-settlement) এবং সেটেলমেন্ট রিপোর্ট স্টেটমেন্ট প্রিভিউ মোডাল (/final-settlement-report) উভয় স্থানে প্রদর্শিত হবে।"
+  },
+  {
+    "id": "511b",
+>>>>>>> 8018517236bcbbca845b6c5fcfe6911510fcaac2
     "date": "2026-09-28T15:35",
     "type": "Bug Fix / Routing",
     "module": "Conference Room Booking List",
     "link": "/conference-room-booking-list",
     "descriptionEn": "Fixed TanStack Router Route export in conference-room-booking-list.tsx enabling the route to compile and render properly at http://localhost:3000/conference-room-booking-list.",
     "descriptionBn": "conference-room-booking-list.tsx ফাইলে TanStack রুট এক্সপোর্ট পুনঃসংযোজন করে রাউটিং ফিক্স করা হয়েছে, যার ফলে http://localhost:3000/conference-room-booking-list পেজটি যথাযথভাবে লোড হচ্ছে।"
+<<<<<<< HEAD
+=======
+  },
+  {
+    "id": "511",
+    "date": "2026-09-28T15:28",
+    "type": "UI / Print Optimization",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Updated Final Settlement Sheet (/final-settlement): added formal management signature blocks (Prepared By, Checked By HR, Head of HR, Checked By Accounts, Recipients Signature, Checked By Audit, Authorized By), populated realistic demo compensation data with remarks, separated Net Payable into a standalone right-aligned Grand Total box matching company layout, reduced vertical spacing, and optimized print styles to perfectly fit a single A4 page as-is.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটে (/final-settlement) অফিসিয়াল ফরম্যাট অনুযায়ী ৭টি সিগনেচার ব্লক যুক্ত করা হয়েছে (প্রিপেয়ার্ড বাই, চেকড বাই এইচআর, হেড অব এইচআর, চেকড বাই অ্যাকাউন্টস, রিসিভেন্টস সিগনেচার, চেকড বাই অডিট ও অথরাইজড বাই)। কম্পেনসেশন ডিটেইলসে রিমার্কস সহ ডেমো ডাটা যুক্ত করা হয়েছে, পেমেন্ট ইনফো থেকে নেট পেয়াবল আলাদা করে ডানে গ্র্যান্ড টোটাল হিসেবে অ্যালাইন করা হয়েছে, সেকশনগুলোর গ্যাপ কমিয়ে কম্প্যাক্ট করা হয়েছে এবং সিঙ্গেল A4 পেজে ফিট হওয়ার মতো প্রিন্ট অপটিমাইজেশন নিশ্চিত করা হয়েছে।"
+>>>>>>> 8018517236bcbbca845b6c5fcfe6911510fcaac2
   },
   {
     "id": "510",
