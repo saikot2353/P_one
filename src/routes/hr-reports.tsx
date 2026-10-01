@@ -42,6 +42,12 @@ function HRReportsPage() {
           to: "/hr-report-new-joining-info",
         },
         {
+          title: "Separation List",
+          icon: UserMinus,
+          desc: "Detailed report of separated employees.",
+          to: "/hr-report-separation-list",
+        },
+        {
           title: "Employee Count",
           icon: Users,
           desc: "Headcount breakdown by department, designation, and unit.",

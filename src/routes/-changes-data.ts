@@ -2,9 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
-<<<<<<< HEAD
-    "id": "511",
-=======
+    "id": "533",
+    "date": new Date().toISOString().slice(0, 16),
+    "type": "New Feature",
+    "module": "HR Reports (Separation List)",
+    "link": "/hr-report-separation-list",
+    "descriptionEn": "Implemented a new 'Separation List' report page in the HR Reports section, allowing users to view, filter, and export detailed employee separation records including designation, joining date, and action date.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন 'Separation List' রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে ব্যবহারকারীরা পদত্যাগ বা সেপারেশন হওয়া কর্মীদের বিস্তারিত তথ্য (পদবি, যোগদানের তারিখ, অ্যাকশন ডেট ইত্যাদি) দেখতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
     "id": "532",
     "date": "2026-10-01T11:45",
     "type": "New Feature",
@@ -195,15 +201,12 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   },
   {
     "id": "511b",
->>>>>>> 8018517236bcbbca845b6c5fcfe6911510fcaac2
     "date": "2026-09-28T15:35",
     "type": "Bug Fix / Routing",
     "module": "Conference Room Booking List",
     "link": "/conference-room-booking-list",
     "descriptionEn": "Fixed TanStack Router Route export in conference-room-booking-list.tsx enabling the route to compile and render properly at http://localhost:3000/conference-room-booking-list.",
     "descriptionBn": "conference-room-booking-list.tsx ফাইলে TanStack রুট এক্সপোর্ট পুনঃসংযোজন করে রাউটিং ফিক্স করা হয়েছে, যার ফলে http://localhost:3000/conference-room-booking-list পেজটি যথাযথভাবে লোড হচ্ছে।"
-<<<<<<< HEAD
-=======
   },
   {
     "id": "511",
@@ -213,7 +216,87 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     "link": "/final-settlement",
     "descriptionEn": "Updated Final Settlement Sheet (/final-settlement): added formal management signature blocks (Prepared By, Checked By HR, Head of HR, Checked By Accounts, Recipients Signature, Checked By Audit, Authorized By), populated realistic demo compensation data with remarks, separated Net Payable into a standalone right-aligned Grand Total box matching company layout, reduced vertical spacing, and optimized print styles to perfectly fit a single A4 page as-is.",
     "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটে (/final-settlement) অফিসিয়াল ফরম্যাট অনুযায়ী ৭টি সিগনেচার ব্লক যুক্ত করা হয়েছে (প্রিপেয়ার্ড বাই, চেকড বাই এইচআর, হেড অব এইচআর, চেকড বাই অ্যাকাউন্টস, রিসিভেন্টস সিগনেচার, চেকড বাই অডিট ও অথরাইজড বাই)। কম্পেনসেশন ডিটেইলসে রিমার্কস সহ ডেমো ডাটা যুক্ত করা হয়েছে, পেমেন্ট ইনফো থেকে নেট পেয়াবল আলাদা করে ডানে গ্র্যান্ড টোটাল হিসেবে অ্যালাইন করা হয়েছে, সেকশনগুলোর গ্যাপ কমিয়ে কম্প্যাক্ট করা হয়েছে এবং সিঙ্গেল A4 পেজে ফিট হওয়ার মতো প্রিন্ট অপটিমাইজেশন নিশ্চিত করা হয়েছে।"
->>>>>>> 8018517236bcbbca845b6c5fcfe6911510fcaac2
+  },
+  {
+    "id": "518",
+    "date": "2026-09-28T15:45",
+    "type": "UI / Print Optimization",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Improved print layout height (/print:h-20), and widened inter-tier row spacing (mt-14/print:mt-16) to eliminate bottom whitespace while ensuring single-page print-to-fit compliance.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের সিঙ্গেল A4 প্রিন্ট লেআউট নিখুঁত করা হয়েছে: সিগনেচারের উপরের মার্জিন, সিগনেচার করার স্পেস হাইট এবং প্রথম ও দ্বিতীয় সারির মাঝের ফাঁকা জায়গা বৃদ্ধি করা হয়েছে, যার ফলে পাতার নিচের ফাঁকা জায়গা সুষমভাবে পূরণ হয়েছে এবং সিঙ্গেল A4 পেজে প্রিন্টও নিখুঁত বজায় রয়েছে।"
+  },
+  {
+    "id": "517",
+    "date": "2026-09-28T15:42",
+    "type": "UI Layout Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Separated 'Earning Sectors' and 'Deduction Sectors' into independent bordered boxes with a clean margin gap, resolving the cramped layout where the Total Earning summary was directly attached to the Deduction Sectors header.",
+    "descriptionBn": "'Payment Info' এর ভেতরে 'Earning Sectors' এবং 'Deduction Sectors'-কে দুটি পৃথক বর্ডার্ড বক্সে ভাগ করে মাঝে মার্জিন গ্যাপ দেওয়া হয়েছে, ফলে Total Earning এবং Deduction Sectors একে অপরের সাথে লেগে না থেকে পরিষ্কারভাবে আলাদা প্রদর্শিত হচ্ছে।"
+  },
+  {
+    "id": "516",
+    "date": "2026-09-28T15:40",
+    "type": "UI Layout Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Re-architected Final Settlement Sheet header: removed company address, aligned 'FINAL SETTLEMENT SHEET' title to the exact center between the logo and portrait, and resized the employee photo frame (66px × 82px) for a balanced professional appearance.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের হেডার সেকশন থেকে কোম্পানির ঠিকানা সম্পূর্ণ বাদ দেওয়া হয়েছে, 'FINAL SETTLEMENT SHEET' টাইটেলটি লোগো ও ছবির মাঝখানে সেন্টার অ্যালাইন করা হয়েছে এবং এমপ্লয়ির ছবির ফ্রেমের সাইজ প্রয়োজন অনুযায়ী কিছুটা বড় (66px × 82px) করে ভারসাম্যপূর্ণ করা হয়েছে।"
+  },
+  {
+    "id": "515",
+    "date": "2026-09-28T15:39",
+    "type": "UI Consistency",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Updated section heading colors for 'Earn Leave Details', 'Service Benefit Details', and 'Compensation Details' to match 'Payment Info' theme green (#4caf50), ensuring uniform visual branding across all settlement breakdown quadrants.",
+    "descriptionBn": "'Earn Leave Details', 'Service Benefit Details' এবং 'Compensation Details' সেকশন হেডারগুলোর কালার 'Payment Info' এর মতো একই ব্র্যান্ড থিম গ্রিন (#4caf50) কালারে পরিবর্তন করা হয়েছে।"
+  },
+  {
+    "id": "514",
+    "date": "2026-09-28T15:37",
+    "type": "UI Layout Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Reformatted Final Settlement Sheet header: removed duplicate 'Pakiza Software Limited' text header, placed the official logo directly on top followed vertically by the company address and 'FINAL SETTLEMENT SHEET' title, and reduced employee portrait photo frame dimensions for a cleaner compact layout.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের হেডার সেকশন রিফরম্যাট করা হয়েছে: অতিরিক্ত 'Pakiza Software Limited' টেক্সট সরিয়ে শুধুমাত্র লোগো রাখা হয়েছে এবং লোগোর ঠিক নিচে ক্রমান্বয়ে ঠিকানা ও 'FINAL SETTLEMENT SHEET' শিরোনাম সাজানো হয়েছে। পাশাপাশি এমপ্লয়ির ছবির সাইজ আরও ছোট ও পরিপাটি করা হয়েছে।"
+  },
+  {
+    "id": "513",
+    "date": "2026-09-28T15:36",
+    "type": "UI / Print Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Enhanced the Grand Total section in Final Settlement Sheet into a full-width colored banner containing Bangladeshi Taka In Words on the left and Grand Total amount on the right. Increased vertical spacing and height for management signature rows to provide proper clearance while maintaining single A4 page print-to-fit layout.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটে গ্র্যান্ড টোটাল সেকশনটিকে পুরো উইডথ জুড়ে একক কালারের ব্যানারে রূপান্তর করা হয়েছে, যার বাম পাশে টাকায় কথায় (In Words) এবং ডান পাশে গ্র্যান্ড টোটাল অ্যামাউন্ট প্রদর্শিত হচ্ছে। এছাড়া ম্যানেজমেন্ট সিগনেচার সেকশনের উপর-নিচ মার্জিন ও হাইট বাড়িয়ে পর্যাপ্ত ফাঁকা জায়গা (proper gap) নিশ্চিত করা হয়েছে যাতে সিঙ্গেল A4 পেজে প্রিন্টও নিখুঁত থাকে।"
+  },
+  {
+    "id": "512",
+    "date": "2026-09-28T15:32",
+    "type": "UI Enhancement",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Integrated official Pakiza client logo (client_logo.png) into the Final Settlement Sheet header for both the detailed settlement view (/final-settlement) and settlement report printable statement modal (/final-settlement-report).",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের হেডার সেকশনে অফিসিয়াল পাকিজা ক্লায়েন্ট লোগো (client_logo.png) যুক্ত করা হয়েছে, যা ডিটেইল সেটেলমেন্ট ভিউ (/final-settlement) এবং সেটেলমেন্ট রিপোর্ট স্টেটমেন্ট প্রিভিউ মোডাল (/final-settlement-report) উভয় স্থানে প্রদর্শিত হবে।"
+  },
+  {
+    "id": "511b",
+    "date": "2026-09-28T15:35",
+    "type": "Bug Fix / Routing",
+    "module": "Conference Room Booking List",
+    "link": "/conference-room-booking-list",
+    "descriptionEn": "Fixed TanStack Router Route export in conference-room-booking-list.tsx enabling the route to compile and render properly at http://localhost:3000/conference-room-booking-list.",
+    "descriptionBn": "conference-room-booking-list.tsx ফাইলে TanStack রুট এক্সপোর্ট পুনঃসংযোজন করে রাউটিং ফিক্স করা হয়েছে, যার ফলে http://localhost:3000/conference-room-booking-list পেজটি যথাযথভাবে লোড হচ্ছে।"
+  },
+  {
+    "id": "511",
+    "date": "2026-09-28T15:28",
+    "type": "UI / Print Optimization",
+    "module": "Payroll - Final Settlement Sheet",
+    "link": "/final-settlement",
+    "descriptionEn": "Updated Final Settlement Sheet (/final-settlement): added formal management signature blocks (Prepared By, Checked By HR, Head of HR, Checked By Accounts, Recipients Signature, Checked By Audit, Authorized By), populated realistic demo compensation data with remarks, separated Net Payable into a standalone right-aligned Grand Total box matching company layout, reduced vertical spacing, and optimized print styles to perfectly fit a single A4 page as-is.",
+    "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটে (/final-settlement) অফিসিয়াল ফরম্যাট অনুযায়ী ৭টি সিগনেচার ব্লক যুক্ত করা হয়েছে (প্রিপেয়ার্ড বাই, চেকড বাই এইচআর, হেড অব এইচআর, চেকড বাই অ্যাকাউন্টস, রিসিভেন্টস সিগনেচার, চেকড বাই অডিট ও অথরাইজড বাই)। কম্পেনসেশন ডিটেইলসে রিমার্কস সহ ডেমো ডাটা যুক্ত করা হয়েছে, পেমেন্ট ইনফো থেকে নেট পেয়াবল আলাদা করে ডানে গ্র্যান্ড টোটাল হিসেবে অ্যালাইন করা হয়েছে, সেকশনগুলোর গ্যাপ কমিয়ে কম্প্যাক্ট করা হয়েছে এবং সিঙ্গেল A4 পেজে ফিট হওয়ার মতো প্রিন্ট অপটিমাইজেশন নিশ্চিত করা হয়েছে।"
   },
   {
     "id": "510",

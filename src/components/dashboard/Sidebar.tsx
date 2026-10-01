@@ -501,6 +501,8 @@ export const nav: NavItem[] = [
     to: "/hr-reports",
     subitems: [
       { label: "New Joining Info", to: "/hr-report-new-joining-info" },
+      { label: "Employee Info (Compliance)", to: "/hr-report-employee-info-compliance" },
+      { label: "Separation List", to: "/hr-report-separation-list" },
       { label: "Employee Count", to: "/hr-report-employee-count" },
       { label: "Leave Summary", to: "/hr-report-leave-summary" },
       { label: "Leave", to: "/hr-report-leave-details" },
