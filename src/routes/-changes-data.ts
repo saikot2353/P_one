@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "532",
+    "date": "2026-10-01T11:45",
+    "type": "New Feature",
+    "module": "HR Reports (Tiffin Card)",
+    "link": "/hr-report-tiffin-card",
+    "descriptionEn": "Implemented a new 'Tiffin Card' report page in the HR Reports section, allowing users to view, filter, and export individual employee tiffin duty records including in/out times, total hours, and net pay.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন 'Tiffin Card' রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে ব্যবহারকারীরা নির্দিষ্ট কর্মীর টিফিন ডিউটির বিস্তারিত তথ্য (প্রবেশ/প্রস্থানের সময়, মোট ঘণ্টা এবং প্রদেয় অর্থের পরিমাণ) দেখতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
+    "id": "531",
+    "date": "2026-10-01T11:43",
+    "type": "New Feature",
+    "module": "HR Reports (Night Card)",
+    "link": "/hr-report-night-card",
+    "descriptionEn": "Implemented a new 'Night Card' report page in the HR Reports section, allowing users to view, filter, and export individual employee night duty records including in/out times, total hours, and net pay.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন 'Night Card' রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে ব্যবহারকারীরা নির্দিষ্ট কর্মীর নাইট ডিউটির বিস্তারিত তথ্য (প্রবেশ/প্রস্থানের সময়, মোট ঘণ্টা এবং প্রদেয় অর্থের পরিমাণ) দেখতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
+    "id": "530",
+    "date": "2026-10-01T11:42",
+    "type": "New Feature",
+    "module": "HR Reports (Tiffin Allowance All)",
+    "link": "/hr-report-tiffin-allowance-all",
+    "descriptionEn": "Implemented a new 'Tiffin Allowance All' report page in the HR Reports section, allowing users to view, filter, and export detailed tiffin allowance logs, total days, and net payable amounts for employees across various departments and sections.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন 'Tiffin Allowance All' রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে ব্যবহারকারীরা বিভিন্ন ডিপার্টমেন্ট এবং সেকশনের কর্মীদের টিফিন অ্যালাউন্সের বিস্তারিত তথ্য, মোট দিন এবং প্রদেয় অর্থের পরিমাণ দেখতে, ফিল্টার করতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
     "id": "529",
     "date": "2026-10-01T11:26",
     "type": "Bug Fix / System Stability",

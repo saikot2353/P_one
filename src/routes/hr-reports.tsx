@@ -14,6 +14,8 @@ import {
   Smartphone,
   BarChart3,
   CalendarDays,
+  Coffee,
+  Moon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/hr-reports")({
@@ -82,6 +84,18 @@ function HRReportsPage() {
           desc: "Report on employees absent continuously beyond policy limits.",
           to: "/hr-report-continuous-absent",
         },
+        {
+          title: "Night Card",
+          icon: Moon,
+          desc: "Detailed individual night shift record and net pay overview.",
+          to: "/hr-report-night-card",
+        },
+        {
+          title: "Tiffin Card",
+          icon: Coffee,
+          desc: "Detailed individual tiffin duty record and net pay overview.",
+          to: "/hr-report-tiffin-card",
+        },
       ],
     },
     {
@@ -112,6 +126,12 @@ function HRReportsPage() {
           icon: Printer,
           desc: "Print approved overtime requisitions and slips.",
           to: "#",
+        },
+        {
+          title: "Tiffin Allowance All",
+          icon: Coffee,
+          desc: "Detailed report of tiffin allowances and net payable amounts.",
+          to: "/hr-report-tiffin-allowance-all",
         },
       ],
     },

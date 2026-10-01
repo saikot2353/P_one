@@ -511,6 +511,9 @@ export const nav: NavItem[] = [
       { label: "Print OT Requisition", to: "#" },
       { label: "Continuous Absent", to: "/hr-report-continuous-absent" },
       { label: "SIM Requisition Report", to: "/hr-report-sim-requisition" },
+      { label: "Tiffin Allowance All", to: "/hr-report-tiffin-allowance-all" },
+      { label: "Night Card", to: "/hr-report-night-card" },
+      { label: "Tiffin Card", to: "/hr-report-tiffin-card" },
     ],
   },
 ];
