@@ -2,7 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
-<<<<<<< HEAD
+    "id": "529",
+    "date": "2026-10-01T11:26",
+    "type": "Bug Fix / System Stability",
+    "module": "System Routing & Git Merge Conflict Resolution",
+    "link": "/changes",
+    "descriptionEn": "Resolved Git merge conflicts in changes tracking data and route definitions, preventing Vite runtime evaluation errors and restoring smooth navigation across the application.",
+    "descriptionBn": "চেঞ্জেস ট্র্যাকিং ও রাউট ডেফিনেশনের গিট মার্জ কনফ্লিক্ট সমাধান করা হয়েছে, যার ফলে ভাইট (Vite) রানটাইম এরর দূর হয়ে সিস্টেম স্বাভাবিকভাবে সচল হয়েছে।"
+  },
+  {
     "id": "528",
     "date": "2026-09-28T18:22",
     "type": "UI/UX & Card Simplification",
@@ -156,6 +164,15 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটের হেডার সেকশনে অফিসিয়াল পাকিজা ক্লায়েন্ট লোগো (client_logo.png) যুক্ত করা হয়েছে, যা ডিটেইল সেটেলমেন্ট ভিউ (/final-settlement) এবং সেটেলমেন্ট রিপোর্ট স্টেটমেন্ট প্রিভিউ মোডাল (/final-settlement-report) উভয় স্থানে প্রদর্শিত হবে।"
   },
   {
+    "id": "511b",
+    "date": "2026-09-28T15:35",
+    "type": "Bug Fix / Routing",
+    "module": "Conference Room Booking List",
+    "link": "/conference-room-booking-list",
+    "descriptionEn": "Fixed TanStack Router Route export in conference-room-booking-list.tsx enabling the route to compile and render properly at http://localhost:3000/conference-room-booking-list.",
+    "descriptionBn": "conference-room-booking-list.tsx ফাইলে TanStack রুট এক্সপোর্ট পুনঃসংযোজন করে রাউটিং ফিক্স করা হয়েছে, যার ফলে http://localhost:3000/conference-room-booking-list পেজটি যথাযথভাবে লোড হচ্ছে।"
+  },
+  {
     "id": "511",
     "date": "2026-09-28T15:28",
     "type": "UI / Print Optimization",
@@ -163,15 +180,6 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     "link": "/final-settlement",
     "descriptionEn": "Updated Final Settlement Sheet (/final-settlement): added formal management signature blocks (Prepared By, Checked By HR, Head of HR, Checked By Accounts, Recipients Signature, Checked By Audit, Authorized By), populated realistic demo compensation data with remarks, separated Net Payable into a standalone right-aligned Grand Total box matching company layout, reduced vertical spacing, and optimized print styles to perfectly fit a single A4 page as-is.",
     "descriptionBn": "ফাইনাল সেটেলমেন্ট শিটে (/final-settlement) অফিসিয়াল ফরম্যাট অনুযায়ী ৭টি সিগনেচার ব্লক যুক্ত করা হয়েছে (প্রিপেয়ার্ড বাই, চেকড বাই এইচআর, হেড অব এইচআর, চেকড বাই অ্যাকাউন্টস, রিসিভেন্টস সিগনেচার, চেকড বাই অডিট ও অথরাইজড বাই)। কম্পেনসেশন ডিটেইলসে রিমার্কস সহ ডেমো ডাটা যুক্ত করা হয়েছে, পেমেন্ট ইনফো থেকে নেট পেয়াবল আলাদা করে ডানে গ্র্যান্ড টোটাল হিসেবে অ্যালাইন করা হয়েছে, সেকশনগুলোর গ্যাপ কমিয়ে কম্প্যাক্ট করা হয়েছে এবং সিঙ্গেল A4 পেজে ফিট হওয়ার মতো প্রিন্ট অপটিমাইজেশন নিশ্চিত করা হয়েছে।"
-=======
-    "id": "511",
-    "date": "2026-09-28T15:35",
-    "type": "Bug Fix / Routing",
-    "module": "Conference Room Booking List",
-    "link": "/conference-room-booking-list",
-    "descriptionEn": "Fixed TanStack Router Route export in conference-room-booking-list.tsx enabling the route to compile and render properly at http://localhost:3000/conference-room-booking-list.",
-    "descriptionBn": "conference-room-booking-list.tsx ফাইলে TanStack রুট এক্সপোর্ট পুনঃসংযোজন করে রাউটিং ফিক্স করা হয়েছে, যার ফলে http://localhost:3000/conference-room-booking-list পেজটি যথাযথভাবে লোড হচ্ছে।"
->>>>>>> 4c0620b7616a5d3db9230d984e312daa08a6a58a
   },
   {
     "id": "510",
