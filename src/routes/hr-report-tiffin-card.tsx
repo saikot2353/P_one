@@ -56,6 +56,20 @@ const MOCK_EMPLOYEES: Record<string, {
         section: "Maintenance Utility & Textile",
         designation: "Engineer",
         unit: "N/A"
+    },
+    "2023050011": {
+        name: "Sonia Akter",
+        empType: "Worker",
+        section: "Sewing",
+        designation: "Operator",
+        unit: "PSL"
+    },
+    "2018090034": {
+        name: "Rakib Hasan",
+        empType: "Worker",
+        section: "Finishing",
+        designation: "Helper",
+        unit: "N/A"
     }
 }
 
@@ -76,6 +90,48 @@ const INITIAL_DATA: TiffinCardRecord[] = [
   },
   {
     date: "05-Aug-2026",
+    inTime: "08:00:00",
+    outTime: "20:00:00",
+    totalHours: "12:00",
+    netPay: "50.00"
+  },
+  {
+    date: "06-Aug-2026",
+    inTime: "08:00:00",
+    outTime: "20:00:00",
+    totalHours: "12:00",
+    netPay: "50.00"
+  },
+  {
+    date: "10-Aug-2026",
+    inTime: "08:00:00",
+    outTime: "20:00:00",
+    totalHours: "12:00",
+    netPay: "50.00"
+  },
+  {
+    date: "11-Aug-2026",
+    inTime: "08:00:00",
+    outTime: "20:00:00",
+    totalHours: "12:00",
+    netPay: "50.00"
+  },
+  {
+    date: "15-Aug-2026",
+    inTime: "08:00:00",
+    outTime: "20:00:00",
+    totalHours: "12:00",
+    netPay: "50.00"
+  },
+  {
+    date: "16-Aug-2026",
+    inTime: "08:00:00",
+    outTime: "20:00:00",
+    totalHours: "12:00",
+    netPay: "50.00"
+  },
+  {
+    date: "20-Aug-2026",
     inTime: "08:00:00",
     outTime: "20:00:00",
     totalHours: "12:00",

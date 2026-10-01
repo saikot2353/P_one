@@ -49,6 +49,27 @@ const MOCK_EMPLOYEES: Record<string, {
         section: "Admin and Compliance",
         designation: "Deputy Manager",
         unit: "N/A"
+    },
+    "2026061223": {
+        name: "Md. Parvej Hossain",
+        empType: "Office Executive",
+        section: "Maintenance Utility & Textile",
+        designation: "Engineer",
+        unit: "N/A"
+    },
+    "2023050011": {
+        name: "Sonia Akter",
+        empType: "Worker",
+        section: "Sewing",
+        designation: "Operator",
+        unit: "PSL"
+    },
+    "2018090034": {
+        name: "Rakib Hasan",
+        empType: "Worker",
+        section: "Finishing",
+        designation: "Helper",
+        unit: "N/A"
     }
 }
 
@@ -68,7 +89,56 @@ const INITIAL_DATA: NightCardRecord[] = [
     netPay: "250.00"
   },
   {
+    date: "03-Aug-2026",
+    inTime: "20:00:00",
+    outTime: "06:00:00",
+    totalHours: "10:00",
+    netPay: "250.00"
+  },
+  {
     date: "05-Aug-2026",
+    inTime: "20:00:00",
+    outTime: "06:00:00",
+    totalHours: "10:00",
+    netPay: "250.00"
+  },
+  {
+    date: "06-Aug-2026",
+    inTime: "20:00:00",
+    outTime: "06:00:00",
+    totalHours: "10:00",
+    netPay: "250.00"
+  },
+  {
+    date: "08-Aug-2026",
+    inTime: "20:00:00",
+    outTime: "06:00:00",
+    totalHours: "10:00",
+    netPay: "250.00"
+  },
+  {
+    date: "09-Aug-2026",
+    inTime: "20:00:00",
+    outTime: "06:00:00",
+    totalHours: "10:00",
+    netPay: "250.00"
+  },
+  {
+    date: "12-Aug-2026",
+    inTime: "20:00:00",
+    outTime: "06:00:00",
+    totalHours: "10:00",
+    netPay: "250.00"
+  },
+  {
+    date: "15-Aug-2026",
+    inTime: "20:00:00",
+    outTime: "06:00:00",
+    totalHours: "10:00",
+    netPay: "250.00"
+  },
+  {
+    date: "18-Aug-2026",
     inTime: "20:00:00",
     outTime: "06:00:00",
     totalHours: "10:00",
