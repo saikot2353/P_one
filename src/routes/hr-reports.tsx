@@ -85,6 +85,37 @@ function HRReportsPage() {
           to: "/hr-report-absenteeism-summary",
         },
         {
+          title: "Attendance Details PrevAbsent",
+          icon: Clock,
+          desc: "Generate and export attendance details for previously absent employees.",
+          to: "/hr-report-attendance-details-prevabsent",
+        },
+        {
+          title: "Attendance Details",
+          icon: Clock,
+          desc: "Generate and export comprehensive attendance details for employees.",
+          to: "/hr-report-attendance-details",
+        },
+        {
+          title: "Attendance & Overtime",
+          icon: Clock,
+          desc: "Generate and export attendance and overtime details for employees.",
+          to: "/hr-report-attendance-and-overtime",
+        },
+        {
+          title: "Without In Out Attendance",
+          icon: Clock,
+          desc: "Generate and export attendance report for employees missing proper in/out punches.",
+          to: "/hr-report-without-in-out-attendance",
+        },
+
+        {
+          title: "Absent Counseling Report",
+          icon: Clock,
+          desc: "Generate and export absent counseling remarks and reports for employees.",
+          to: "/hr-report-absent-counseling",
+        },
+        {
           title: "Continuous Absent",
           icon: UserX,
           desc: "Report on employees absent continuously beyond policy limits.",

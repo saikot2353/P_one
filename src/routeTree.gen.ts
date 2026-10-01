@@ -207,6 +207,7 @@ import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
 import { Route as HrReportsRouteImport } from './routes/hr-reports'
+import { Route as HrReportWithoutInOutAttendanceRouteImport } from './routes/hr-report-without-in-out-attendance'
 import { Route as HrReportTiffinCardRouteImport } from './routes/hr-report-tiffin-card'
 import { Route as HrReportTiffinAllowanceAllRouteImport } from './routes/hr-report-tiffin-allowance-all'
 import { Route as HrReportSimRequisitionRouteImport } from './routes/hr-report-sim-requisition'
@@ -221,7 +222,11 @@ import { Route as HrReportEmployeeInfoComplianceRouteImport } from './routes/hr-
 import { Route as HrReportEmployeeCountRouteImport } from './routes/hr-report-employee-count'
 import { Route as HrReportDailyAttendanceRouteImport } from './routes/hr-report-daily-attendance'
 import { Route as HrReportContinuousAbsentRouteImport } from './routes/hr-report-continuous-absent'
+import { Route as HrReportAttendanceDetailsPrevabsentRouteImport } from './routes/hr-report-attendance-details-prevabsent'
+import { Route as HrReportAttendanceDetailsRouteImport } from './routes/hr-report-attendance-details'
+import { Route as HrReportAttendanceAndOvertimeRouteImport } from './routes/hr-report-attendance-and-overtime'
 import { Route as HrReportAbsenteeismSummaryRouteImport } from './routes/hr-report-absenteeism-summary'
+import { Route as HrReportAbsentCounselingRouteImport } from './routes/hr-report-absent-counseling'
 import { Route as HrPolicyRouteImport } from './routes/hr-policy'
 import { Route as HolidaySummarySheetRouteImport } from './routes/holiday-summary-sheet'
 import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
@@ -1341,6 +1346,12 @@ const HrReportsRoute = HrReportsRouteImport.update({
   path: '/hr-reports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HrReportWithoutInOutAttendanceRoute =
+  HrReportWithoutInOutAttendanceRouteImport.update({
+    id: '/hr-report-without-in-out-attendance',
+    path: '/hr-report-without-in-out-attendance',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HrReportTiffinCardRoute = HrReportTiffinCardRouteImport.update({
   id: '/hr-report-tiffin-card',
   path: '/hr-report-tiffin-card',
@@ -1415,10 +1426,34 @@ const HrReportContinuousAbsentRoute =
     path: '/hr-report-continuous-absent',
     getParentRoute: () => rootRouteImport,
   } as any)
+const HrReportAttendanceDetailsPrevabsentRoute =
+  HrReportAttendanceDetailsPrevabsentRouteImport.update({
+    id: '/hr-report-attendance-details-prevabsent',
+    path: '/hr-report-attendance-details-prevabsent',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const HrReportAttendanceDetailsRoute =
+  HrReportAttendanceDetailsRouteImport.update({
+    id: '/hr-report-attendance-details',
+    path: '/hr-report-attendance-details',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const HrReportAttendanceAndOvertimeRoute =
+  HrReportAttendanceAndOvertimeRouteImport.update({
+    id: '/hr-report-attendance-and-overtime',
+    path: '/hr-report-attendance-and-overtime',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HrReportAbsenteeismSummaryRoute =
   HrReportAbsenteeismSummaryRouteImport.update({
     id: '/hr-report-absenteeism-summary',
     path: '/hr-report-absenteeism-summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const HrReportAbsentCounselingRoute =
+  HrReportAbsentCounselingRouteImport.update({
+    id: '/hr-report-absent-counseling',
+    path: '/hr-report-absent-counseling',
     getParentRoute: () => rootRouteImport,
   } as any)
 const HrPolicyRoute = HrPolicyRouteImport.update({
@@ -1818,7 +1853,11 @@ export interface FileRoutesByFullPath {
   '/financial-aid-list': typeof FinancialAidListRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-report-absent-counseling': typeof HrReportAbsentCounselingRoute
   '/hr-report-absenteeism-summary': typeof HrReportAbsenteeismSummaryRoute
+  '/hr-report-attendance-and-overtime': typeof HrReportAttendanceAndOvertimeRoute
+  '/hr-report-attendance-details': typeof HrReportAttendanceDetailsRoute
+  '/hr-report-attendance-details-prevabsent': typeof HrReportAttendanceDetailsPrevabsentRoute
   '/hr-report-continuous-absent': typeof HrReportContinuousAbsentRoute
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
@@ -1833,6 +1872,7 @@ export interface FileRoutesByFullPath {
   '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
   '/hr-report-tiffin-allowance-all': typeof HrReportTiffinAllowanceAllRoute
   '/hr-report-tiffin-card': typeof HrReportTiffinCardRoute
+  '/hr-report-without-in-out-attendance': typeof HrReportWithoutInOutAttendanceRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -2098,7 +2138,11 @@ export interface FileRoutesByTo {
   '/financial-aid-list': typeof FinancialAidListRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-report-absent-counseling': typeof HrReportAbsentCounselingRoute
   '/hr-report-absenteeism-summary': typeof HrReportAbsenteeismSummaryRoute
+  '/hr-report-attendance-and-overtime': typeof HrReportAttendanceAndOvertimeRoute
+  '/hr-report-attendance-details': typeof HrReportAttendanceDetailsRoute
+  '/hr-report-attendance-details-prevabsent': typeof HrReportAttendanceDetailsPrevabsentRoute
   '/hr-report-continuous-absent': typeof HrReportContinuousAbsentRoute
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
@@ -2113,6 +2157,7 @@ export interface FileRoutesByTo {
   '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
   '/hr-report-tiffin-allowance-all': typeof HrReportTiffinAllowanceAllRoute
   '/hr-report-tiffin-card': typeof HrReportTiffinCardRoute
+  '/hr-report-without-in-out-attendance': typeof HrReportWithoutInOutAttendanceRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -2379,7 +2424,11 @@ export interface FileRoutesById {
   '/financial-aid-list': typeof FinancialAidListRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
+  '/hr-report-absent-counseling': typeof HrReportAbsentCounselingRoute
   '/hr-report-absenteeism-summary': typeof HrReportAbsenteeismSummaryRoute
+  '/hr-report-attendance-and-overtime': typeof HrReportAttendanceAndOvertimeRoute
+  '/hr-report-attendance-details': typeof HrReportAttendanceDetailsRoute
+  '/hr-report-attendance-details-prevabsent': typeof HrReportAttendanceDetailsPrevabsentRoute
   '/hr-report-continuous-absent': typeof HrReportContinuousAbsentRoute
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
@@ -2394,6 +2443,7 @@ export interface FileRoutesById {
   '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
   '/hr-report-tiffin-allowance-all': typeof HrReportTiffinAllowanceAllRoute
   '/hr-report-tiffin-card': typeof HrReportTiffinCardRoute
+  '/hr-report-without-in-out-attendance': typeof HrReportWithoutInOutAttendanceRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -2661,7 +2711,11 @@ export interface FileRouteTypes {
     | '/financial-aid-list'
     | '/holiday-summary-sheet'
     | '/hr-policy'
+    | '/hr-report-absent-counseling'
     | '/hr-report-absenteeism-summary'
+    | '/hr-report-attendance-and-overtime'
+    | '/hr-report-attendance-details'
+    | '/hr-report-attendance-details-prevabsent'
     | '/hr-report-continuous-absent'
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
@@ -2676,6 +2730,7 @@ export interface FileRouteTypes {
     | '/hr-report-sim-requisition'
     | '/hr-report-tiffin-allowance-all'
     | '/hr-report-tiffin-card'
+    | '/hr-report-without-in-out-attendance'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -2941,7 +2996,11 @@ export interface FileRouteTypes {
     | '/financial-aid-list'
     | '/holiday-summary-sheet'
     | '/hr-policy'
+    | '/hr-report-absent-counseling'
     | '/hr-report-absenteeism-summary'
+    | '/hr-report-attendance-and-overtime'
+    | '/hr-report-attendance-details'
+    | '/hr-report-attendance-details-prevabsent'
     | '/hr-report-continuous-absent'
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
@@ -2956,6 +3015,7 @@ export interface FileRouteTypes {
     | '/hr-report-sim-requisition'
     | '/hr-report-tiffin-allowance-all'
     | '/hr-report-tiffin-card'
+    | '/hr-report-without-in-out-attendance'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -3221,7 +3281,11 @@ export interface FileRouteTypes {
     | '/financial-aid-list'
     | '/holiday-summary-sheet'
     | '/hr-policy'
+    | '/hr-report-absent-counseling'
     | '/hr-report-absenteeism-summary'
+    | '/hr-report-attendance-and-overtime'
+    | '/hr-report-attendance-details'
+    | '/hr-report-attendance-details-prevabsent'
     | '/hr-report-continuous-absent'
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
@@ -3236,6 +3300,7 @@ export interface FileRouteTypes {
     | '/hr-report-sim-requisition'
     | '/hr-report-tiffin-allowance-all'
     | '/hr-report-tiffin-card'
+    | '/hr-report-without-in-out-attendance'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -3502,7 +3567,11 @@ export interface RootRouteChildren {
   FinancialAidListRoute: typeof FinancialAidListRoute
   HolidaySummarySheetRoute: typeof HolidaySummarySheetRoute
   HrPolicyRoute: typeof HrPolicyRoute
+  HrReportAbsentCounselingRoute: typeof HrReportAbsentCounselingRoute
   HrReportAbsenteeismSummaryRoute: typeof HrReportAbsenteeismSummaryRoute
+  HrReportAttendanceAndOvertimeRoute: typeof HrReportAttendanceAndOvertimeRoute
+  HrReportAttendanceDetailsRoute: typeof HrReportAttendanceDetailsRoute
+  HrReportAttendanceDetailsPrevabsentRoute: typeof HrReportAttendanceDetailsPrevabsentRoute
   HrReportContinuousAbsentRoute: typeof HrReportContinuousAbsentRoute
   HrReportDailyAttendanceRoute: typeof HrReportDailyAttendanceRoute
   HrReportEmployeeCountRoute: typeof HrReportEmployeeCountRoute
@@ -3517,6 +3586,7 @@ export interface RootRouteChildren {
   HrReportSimRequisitionRoute: typeof HrReportSimRequisitionRoute
   HrReportTiffinAllowanceAllRoute: typeof HrReportTiffinAllowanceAllRoute
   HrReportTiffinCardRoute: typeof HrReportTiffinCardRoute
+  HrReportWithoutInOutAttendanceRoute: typeof HrReportWithoutInOutAttendanceRoute
   HrReportsRoute: typeof HrReportsRoute
   IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
@@ -5109,6 +5179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr-report-without-in-out-attendance': {
+      id: '/hr-report-without-in-out-attendance'
+      path: '/hr-report-without-in-out-attendance'
+      fullPath: '/hr-report-without-in-out-attendance'
+      preLoaderRoute: typeof HrReportWithoutInOutAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hr-report-tiffin-card': {
       id: '/hr-report-tiffin-card'
       path: '/hr-report-tiffin-card'
@@ -5207,11 +5284,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrReportContinuousAbsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr-report-attendance-details-prevabsent': {
+      id: '/hr-report-attendance-details-prevabsent'
+      path: '/hr-report-attendance-details-prevabsent'
+      fullPath: '/hr-report-attendance-details-prevabsent'
+      preLoaderRoute: typeof HrReportAttendanceDetailsPrevabsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr-report-attendance-details': {
+      id: '/hr-report-attendance-details'
+      path: '/hr-report-attendance-details'
+      fullPath: '/hr-report-attendance-details'
+      preLoaderRoute: typeof HrReportAttendanceDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr-report-attendance-and-overtime': {
+      id: '/hr-report-attendance-and-overtime'
+      path: '/hr-report-attendance-and-overtime'
+      fullPath: '/hr-report-attendance-and-overtime'
+      preLoaderRoute: typeof HrReportAttendanceAndOvertimeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hr-report-absenteeism-summary': {
       id: '/hr-report-absenteeism-summary'
       path: '/hr-report-absenteeism-summary'
       fullPath: '/hr-report-absenteeism-summary'
       preLoaderRoute: typeof HrReportAbsenteeismSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr-report-absent-counseling': {
+      id: '/hr-report-absent-counseling'
+      path: '/hr-report-absent-counseling'
+      fullPath: '/hr-report-absent-counseling'
+      preLoaderRoute: typeof HrReportAbsentCounselingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hr-policy': {
@@ -5734,7 +5839,12 @@ const rootRouteChildren: RootRouteChildren = {
   FinancialAidListRoute: FinancialAidListRoute,
   HolidaySummarySheetRoute: HolidaySummarySheetRoute,
   HrPolicyRoute: HrPolicyRoute,
+  HrReportAbsentCounselingRoute: HrReportAbsentCounselingRoute,
   HrReportAbsenteeismSummaryRoute: HrReportAbsenteeismSummaryRoute,
+  HrReportAttendanceAndOvertimeRoute: HrReportAttendanceAndOvertimeRoute,
+  HrReportAttendanceDetailsRoute: HrReportAttendanceDetailsRoute,
+  HrReportAttendanceDetailsPrevabsentRoute:
+    HrReportAttendanceDetailsPrevabsentRoute,
   HrReportContinuousAbsentRoute: HrReportContinuousAbsentRoute,
   HrReportDailyAttendanceRoute: HrReportDailyAttendanceRoute,
   HrReportEmployeeCountRoute: HrReportEmployeeCountRoute,
@@ -5749,6 +5859,7 @@ const rootRouteChildren: RootRouteChildren = {
   HrReportSimRequisitionRoute: HrReportSimRequisitionRoute,
   HrReportTiffinAllowanceAllRoute: HrReportTiffinAllowanceAllRoute,
   HrReportTiffinCardRoute: HrReportTiffinCardRoute,
+  HrReportWithoutInOutAttendanceRoute: HrReportWithoutInOutAttendanceRoute,
   HrReportsRoute: HrReportsRoute,
   IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,

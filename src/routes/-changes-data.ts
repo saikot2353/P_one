@@ -2,6 +2,60 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "539",
+    "date": "2026-10-01T11:18",
+    "type": "New Feature",
+    "module": "HR Reports (Absent Counseling)",
+    "link": "/hr-report-absent-counseling",
+    "descriptionEn": "Implemented a new Absent Counseling Report page in the HR Reports section to manage, track, and export employee absentee reasons and HR/Welfare actions.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন Absent Counseling রিপোর্ট পেজ যুক্ত করা হয়েছে, যার মাধ্যমে কর্মীদের অনুপস্থিতির কারণ এবং এইচআর বা ওয়েলফেয়ার টিমের গৃহীত পদক্ষেপ দেখা যাবে।"
+  },
+  {
+    "id": "538",
+    "date": "2026-10-01T11:14",
+    "type": "New Feature",
+    "module": "HR Reports (Continous Absent)",
+    "link": "/hr-report-continuous-absent",
+    "descriptionEn": "Implemented a new Continous Absent report page in the HR Reports section, enabling tracking of consecutive absentee streaks across all employees.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন Continous Absent রিপোর্ট পেজ যুক্ত করা হয়েছে, যার মাধ্যমে একটানা অনুপস্থিত কর্মীদের তালিকা এবং দিন সংখ্যা দেখা যাবে।"
+  },
+  {
+    "id": "537",
+    "date": "2026-10-01T11:02",
+    "type": "New Feature",
+    "module": "HR Reports (Without In Out Attendance)",
+    "link": "/hr-report-without-in-out-attendance",
+    "descriptionEn": "Implemented a new Without In Out Attendance report page in the HR Reports section, allowing HR to identify employees missing either clock-in or clock-out punches.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন Without In Out Attendance রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে এইচআর ইন বা আউট পাঞ্চ মিস হওয়া কর্মীদের তালিকা দেখতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
+    "id": "536",
+    "date": "2026-10-01T10:55",
+    "type": "New Feature",
+    "module": "HR Reports (Attendance & Overtime)",
+    "link": "/hr-report-attendance-and-overtime",
+    "descriptionEn": "Implemented a new Attendance & Overtime report page in the HR Reports section, allowing users to view, filter, and export detailed in/out times and overtime hours for all employees.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন Attendance & Overtime রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে ব্যবহারকারীরা সকল কর্মীদের নির্দিষ্ট দিনের প্রবেশ ও প্রস্থানের সময় এবং ওভারটাইম দেখতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
+    "id": "535",
+    "date": "2026-10-01T10:50",
+    "type": "New Feature",
+    "module": "HR Reports (Attendance Details)",
+    "link": "/hr-report-attendance-details",
+    "descriptionEn": "Implemented a new Attendance Details report page in the HR Reports section, allowing users to view, filter, and export detailed in/out times for all employees.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন Attendance Details রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে ব্যবহারকারীরা সকল কর্মীদের নির্দিষ্ট দিনের প্রবেশ ও প্রস্থানের সময় দেখতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
+    "id": "534",
+    "date": "2026-10-01T10:36",
+    "type": "New Feature",
+    "module": "HR Reports (Attendance Details PrevAbsent)",
+    "link": "/hr-report-attendance-details-prevabsent",
+    "descriptionEn": "Implemented a new Attendance Details PrevAbsent report page in the HR Reports section, allowing users to view, filter, and export detailed in/out times for previously absent employees.",
+    "descriptionBn": "এইচআর রিপোর্টস সেকশনে নতুন Attendance Details PrevAbsent রিপোর্ট পেজ যুক্ত করা হয়েছে, যেখান থেকে ব্যবহারকারীরা পূর্বে অনুপস্থিত থাকা কর্মীদের নির্দিষ্ট দিনের প্রবেশ ও প্রস্থানের সময় দেখতে ও এক্সপোর্ট করতে পারবেন।"
+  },
+  {
     "id": "533",
     "date": new Date().toISOString().slice(0, 16),
     "type": "New Feature",
