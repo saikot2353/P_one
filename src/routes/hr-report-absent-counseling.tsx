@@ -587,11 +587,9 @@ function AbsentCounselingReportPage() {
       <HRReportPdfModal
         isOpen={isPdfModalOpen}
         onClose={() => setIsPdfModalOpen(false)}
-        title="Absent Counseling Report"
-        subtitle="Detailed absentee counseling records and HR remarks"
+        reportTitle="Absent Counseling Report"
         data={filteredData}
         columns={pdfColumns}
-        filters={appliedFilters}
         layout="landscape"
       />
     </div>

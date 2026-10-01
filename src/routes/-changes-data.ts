@@ -2,6 +2,14 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "540",
+    "date": "2026-10-01T17:42",
+    "type": "Bug Fix",
+    "module": "HR Reports",
+    "descriptionEn": "Fixed PDF export modal prop mismatch (title to reportTitle) causing typescript errors across multiple HR report pages.",
+    "descriptionBn": "নাইট কার্ড এবং টিফিন কার্ড এর মত বিভিন্ন এইচআর রিপোর্টে পিডিএফ ডাউনলোড করার সময় যে সমস্যা হচ্ছিল তা ঠিক করা হয়েছে।"
+  },
+  {
     "id": "539",
     "date": "2026-10-01T11:18",
     "type": "New Feature",

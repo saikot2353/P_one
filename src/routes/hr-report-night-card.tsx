@@ -601,11 +601,9 @@ export function NightCardReportPage() {
       <HRReportPdfModal
         isOpen={isPdfModalOpen}
         onClose={() => setIsPdfModalOpen(false)}
-        title={`Night Card Report - ${empInfo.name}`}
+        reportTitle={`Night Card Report - ${empInfo.name}`}
         data={filteredData}
         columns={pdfColumns}
-        filters={appliedFilters}
-        landscape={false}
       />
     </div>
   );

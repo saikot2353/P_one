@@ -672,11 +672,9 @@ function AttendanceDetailsReportPage() {
       <HRReportPdfModal
         isOpen={isPdfModalOpen}
         onClose={() => setIsPdfModalOpen(false)}
-        title="Attendance Details"
-        subtitle="Comprehensive employee attendance report"
+        reportTitle="Attendance Details"
         data={filteredData}
         columns={pdfColumns}
-        filters={appliedFilters}
         layout="landscape"
       />
     </div>

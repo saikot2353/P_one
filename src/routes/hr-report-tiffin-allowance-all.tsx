@@ -764,11 +764,9 @@ export function TiffinAllowanceReportPage() {
       <HRReportPdfModal
         isOpen={isPdfModalOpen}
         onClose={() => setIsPdfModalOpen(false)}
-        title="Tiffin Allowance All Report"
+        reportTitle="Tiffin Allowance All Report"
         data={filteredData}
         columns={pdfColumns}
-        filters={appliedFilters}
-        landscape={true}
       />
     </div>
   );

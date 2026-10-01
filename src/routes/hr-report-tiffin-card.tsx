@@ -598,11 +598,9 @@ export function TiffinCardReportPage() {
       <HRReportPdfModal
         isOpen={isPdfModalOpen}
         onClose={() => setIsPdfModalOpen(false)}
-        title={`Tiffin Card Report - ${empInfo.name}`}
+        reportTitle={`Tiffin Card Report - ${empInfo.name}`}
         data={filteredData}
         columns={pdfColumns}
-        filters={appliedFilters}
-        landscape={false}
       />
     </div>
   );

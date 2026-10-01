@@ -651,11 +651,9 @@ function AttendanceDetailsPrevAbsentReportPage() {
       <HRReportPdfModal
         isOpen={isPdfModalOpen}
         onClose={() => setIsPdfModalOpen(false)}
-        title="Attendance Details PrevAbsent"
-        subtitle="Report of previously absent employee attendance"
+        reportTitle="Attendance Details PrevAbsent"
         data={filteredData}
         columns={pdfColumns}
-        filters={appliedFilters}
         layout="landscape"
       />
     </div>

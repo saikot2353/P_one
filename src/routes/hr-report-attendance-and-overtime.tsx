@@ -622,11 +622,9 @@ function AttendanceAndOvertimeReportPage() {
       <HRReportPdfModal
         isOpen={isPdfModalOpen}
         onClose={() => setIsPdfModalOpen(false)}
-        title="Attendance & Overtime"
-        subtitle="Comprehensive employee attendance and overtime report"
+        reportTitle="Attendance & Overtime"
         data={filteredData}
         columns={pdfColumns}
-        filters={appliedFilters}
         layout="landscape"
       />
     </div>

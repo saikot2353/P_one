@@ -707,11 +707,9 @@ function SeparationListReportPage() {
       <HRReportPdfModal
         isOpen={isPdfModalOpen}
         onClose={() => setIsPdfModalOpen(false)}
-        title="Separation List Report"
-        subtitle="Detailed list of employee separations"
+        reportTitle="Separation List Report"
         data={filteredData}
         columns={pdfColumns}
-        filters={appliedFilters}
         layout="landscape"
       />
     </div>

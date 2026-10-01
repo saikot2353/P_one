@@ -544,11 +544,9 @@ function WithoutInOutAttendanceReportPage() {
       <HRReportPdfModal
         isOpen={isPdfModalOpen}
         onClose={() => setIsPdfModalOpen(false)}
-        title="Without In Out Attendance"
-        subtitle="Employees missing proper in/out punches"
+        reportTitle="Without In Out Attendance"
         data={filteredData}
         columns={pdfColumns}
-        filters={appliedFilters}
         layout="landscape"
       />
     </div>
