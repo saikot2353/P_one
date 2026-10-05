@@ -1717,7 +1717,7 @@ function MonthlySalaryProcessPage() {
       department: r.department,
       section: r.section,
       designation: r.designation,
-      totalPay: r.gross?.toString() || r.netPay?.toString() || "0",
+      totalPay: r.totalPay?.toString() || r.gross?.toString() || "0",
     }));
     localStorage.setItem("print_payslip_data", JSON.stringify(printData));
     window.open(`/payslip-print?lang=${lang}`, "_blank");

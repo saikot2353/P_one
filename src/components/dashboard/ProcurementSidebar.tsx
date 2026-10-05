@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   LayoutDashboard,
   Settings,
@@ -16,6 +17,8 @@ import {
   LifeBuoy,
   LogOut,
   File,
+  ClipboardCheck,
+  Wallet,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -31,6 +34,7 @@ export interface SubItem {
   search?: Record<string, any>;
   subitems?: NestedItem[];
   count?: number;
+  activeRoutes?: string[];
 }
 
 export interface NavItem {
@@ -47,99 +51,169 @@ export interface NavItem {
 export const nav: NavItem[] = [
   { label: "Dashboard", to: "/procurement-dashboard", icon: LayoutDashboard },
   {
-    label: "Configuration",
+    label: "Procurement Master Data",
     icon: Settings,
     subitems: [
-      { label: "Currency Rate", to: "/procurement-config-currency-rate" },
-      { label: "Terms and Condition", to: "/procurement-config-terms" },
-      { label: "Bank Info", to: "/procurement-config-bank-info" },
-      { label: "Bank Accounts", to: "/procurement-config-bank-accounts" },
-    ]
+      {
+        label: "Vendor Category",
+        to: "/procurement-master-data",
+        search: { tab: "vendor-category" },
+      },
+      {
+        label: "Supplier/Vendor",
+        to: "/procurement-master-data",
+        search: { tab: "supplier-vendor" },
+      },
+      {
+        label: "Payment Terms",
+        to: "/procurement-master-data",
+        search: { tab: "payment-terms" },
+      },
+      {
+        label: "Currency",
+        to: "/procurement-master-data",
+        search: { tab: "currency" },
+      },
+      {
+        label: "Approval Authority",
+        to: "/procurement-master-data",
+        search: { tab: "approval-authority" },
+      },
+      {
+        label: "Document Configuration",
+        to: "/procurement-master-data",
+        search: { tab: "document-type-number-series" },
+      },
+    ],
   },
   {
-    label: "Proforma Invoice",
+    label: "Procurement Budget",
+    icon: Wallet,
+    subitems: [
+      {
+        label: "Budget Requisition",
+        to: "/procurement-master-data",
+        search: { tab: "budget" },
+      },
+      {
+        label: "Budget Approval",
+        to: "/procurement-master-data",
+        search: { tab: "budget-approval" },
+      },
+    ],
+  },
+  {
+    label: "Requisition Management",
     icon: FileText,
     subitems: [
-      { label: "Create PI", to: "/procurement-pi-create" },
-      { label: "PI List", to: "/procurement-pi-list" },
-      { label: "Edit DC Price", to: "/procurement-pi-edit-dc-price" },
-      { label: "Approve DC Price", to: "/procurement-pi-approve-dc-price" },
-      { label: "PI Delete Request", to: "/procurement-pi-delete-request" },
-    ]
+      {
+        label: "Purchase Requisition Register",
+        to: "/procurement-purchase-requisition",
+      },
+      {
+        label: "Purchase Requisition Approval",
+        to: "/procurement-pr-approval",
+      },
+      {
+        label: "Monthly Budget Requisition",
+        to: "/procurement-monthly-budget-requisition",
+      },
+      {
+        label: "Monthly Budget Requisition Approval",
+        to: "/procurement-monthly-budget-approval",
+      },
+    ],
   },
   {
-    label: "Purchase Order",
+    label: "Quotation Evaluation",
+    icon: ClipboardCheck,
+    subitems: [
+      {
+        label: "Comparative Statement",
+        to: "/procurement-comparative-statement",
+      },
+      {
+        label: "Comparative Statement Approval",
+        to: "/procurement-cs-approval",
+      },
+    ],
+  },
+  {
+    label: "Order Management",
     icon: ShoppingCart,
     subitems: [
-      { label: "Requisition Wise PO", to: "/procurement-po-requisition-wise" },
-      { label: "New Purchase Order", to: "/procurement-po-new" },
-      { label: "Purchase Order List", to: "/procurement-po-list" },
-      { label: "Work Order Approval", to: "/procurement-po-work-order-approval" },
-    ]
+      {
+        label: "Purchase Order/Work Order",
+        to: "/procurement-po-list",
+        activeRoutes: ["/procurement-po-new"],
+      },
+      {
+        label: "Purchase Order/Work Order Approval",
+        to: "/procurement-po-work-order-approval",
+      },
+    ],
   },
   {
-    label: "Billing",
+    label: "Billing Management",
     icon: CreditCard,
     subitems: [
-      { label: "Prepare Bill", to: "/procurement-billing-prepare" },
-      { label: "Purchase List", to: "/procurement-billing-purchase-list" },
-      { label: "VAT and Tax Register", to: "/procurement-billing-vat-tax-register" },
-      { label: "Loan List", to: "/procurement-billing-loan-list" },
-      { label: "Edit Bill Rate", to: "/procurement-billing-edit-rate" },
-      { label: "Approve Bill Rate", to: "/procurement-billing-approve-rate" },
-      { label: "Supplier Bill", to: "/procurement-billing-supplier-bill" },
-      { label: "VAT Tax Entry", to: "/procurement-billing-vat-tax-entry" },
-    ]
+      {
+        label: "Bill Register",
+        to: "/procurement-billing-supplier-bill-list",
+      },
+      {
+        label: "New Supplier Bill",
+        to: "/procurement-billing-supplier-bill",
+      },
+      {
+        label: "Bill Approval List",
+        to: "/procurement-billing-supplier-bill-approval-list",
+      },
+      {
+        label: "Bill Approval",
+        to: "/procurement-billing-supplier-bill-approval",
+      },
+    ],
   },
-  {
-    label: "Payment",
-    icon: Banknote,
-    subitems: [
-      { label: "Bill Payment", to: "/procurement-payment-bill" },
-      { label: "Payment List", to: "/procurement-payment-list" },
-    ]
-  },
-  {
-    label: "Audit",
-    icon: ShieldCheck,
-    subitems: [
-      { label: "MRR Audit", to: "/procurement-audit-mrr" },
-      { label: "Update Landed Cost", to: "/procurement-audit-landed-cost" },
-      { label: "Bill Audit", to: "/procurement-audit-bill" },
-    ]
-  },
-  {
-    label: "Reports",
-    icon: BarChart3,
-    subitems: [
-      { label: "Purchase Price", to: "/procurement-reports-purchase-price" },
-      { label: "Payment Statement", to: "/procurement-reports-payment-statement" },
-      { label: "Yarn Booking & PI Status", to: "/procurement-reports-yarn-booking-pi" },
-      { label: "DNC Rate", to: "/procurement-reports-dnc-rate" },
-      { label: "Combined PO Statement", to: "/procurement-reports-combined-po" },
-    ]
-  },
-  {
-    label: "Comparison Sheet",
-    icon: Blocks,
-    subitems: [
-      { label: "CS List", to: "/procurement-cs-batch-list" },
-      { label: "CS PO List", to: "/procurement-cs-create-workorder" },
-    ]
-  }
+  { label: "Payment", to: "/procurement-dashboard", icon: Banknote, count: 0 },
+  { label: "Reports", to: "/procurement-dashboard", icon: BarChart3, count: 0 },
 ];
 
 export function ProcurementSidebar() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+  const currentTab = (routerState.location.search as any)?.tab;
+  const effectiveTab =
+    currentTab || (currentPath === "/procurement-master-data" ? "vendor-category" : undefined);
   const scrollRef = useRef<HTMLElement>(null);
+
+  const isSubItemActive = (sub: SubItem) => {
+    const isPathMatch =
+      sub.to === currentPath ||
+      (sub.activeRoutes && sub.activeRoutes.includes(currentPath));
+    if (!isPathMatch) return false;
+    if (sub.search?.tab) {
+      return effectiveTab === sub.search.tab;
+    }
+    return true;
+  };
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
+    const searchTab = (routerState.location.search as any)?.tab;
+    const effTab =
+      searchTab || (currentPath === "/procurement-master-data" ? "vendor-category" : undefined);
     nav.forEach((item) => {
       if (item.subitems) {
         const isChildActive = item.subitems.some((sub) => {
-          return sub.to === currentPath;
+          const isPathMatch =
+            sub.to === currentPath ||
+            (sub.activeRoutes && sub.activeRoutes.includes(currentPath));
+          if (!isPathMatch) return false;
+          if (sub.search?.tab) {
+            return effTab === sub.search.tab;
+          }
+          return true;
         });
         if (isChildActive) {
           initial[item.label] = true;
@@ -168,6 +242,17 @@ export function ProcurementSidebar() {
       sessionStorage.setItem("procurement_sidebar_menus", JSON.stringify(openMenus));
     }
   }, [openMenus]);
+
+  useEffect(() => {
+    nav.forEach((item) => {
+      if (item.subitems) {
+        const isChildActive = item.subitems.some((sub) => isSubItemActive(sub));
+        if (isChildActive) {
+          setOpenMenus((prev) => ({ ...prev, [item.label]: true }));
+        }
+      }
+    });
+  }, [currentPath, effectiveTab]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && scrollRef.current) {
@@ -224,7 +309,7 @@ export function ProcurementSidebar() {
             </div>
           </div>
         </div>
-        
+
         <div className="leading-tight">
           <div className="font-extrabold tracking-tight text-[13px] text-sidebar-foreground group-hover:text-amber-500 transition-colors duration-300">
             CRIPTON
@@ -247,9 +332,10 @@ export function ProcurementSidebar() {
 
           // Determine parent active state dynamically
           const isParentActive =
-            (item.to === currentPath) ||
-            (item.subitems &&
-              item.subitems.some((sub) => sub.to === currentPath));
+            item.to === currentPath ||
+            (item.subitems && item.subitems.some((sub) => isSubItemActive(sub)));
+
+          const isPlaceholder = item.label !== "Dashboard";
 
           if (!item.subitems) {
             return (
@@ -259,18 +345,30 @@ export function ProcurementSidebar() {
               >
                 <Link
                   to={item.to || "/"}
+                  onClick={(e) => {
+                    if (isPlaceholder) {
+                      e.preventDefault();
+                      toast.info(
+                        `${item.label} module will be available in future releases. Master Data Management is currently active.`,
+                      );
+                    }
+                  }}
                   className={[
                     "group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all duration-200",
-                    isParentActive
+                    isParentActive && !isPlaceholder
                       ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-2xs"
                       : "text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                   ].join(" ")}
                 >
                   <Icon className="size-3.5 transition-transform duration-300 group-hover:scale-110 group-hover:text-amber-500" />
                   <span>{item.label}</span>
-                  {isParentActive && (
+                  {isPlaceholder ? (
+                    <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                      Soon
+                    </span>
+                  ) : isParentActive ? (
                     <span className="ml-auto size-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)] animate-pulse" />
-                  )}
+                  ) : null}
                 </Link>
               </div>
             );
@@ -307,15 +405,17 @@ export function ProcurementSidebar() {
               <div
                 className={[
                   "overflow-hidden transition-all duration-300 space-y-0.5 pl-3.5 bg-sidebar-accent/25 rounded-xl",
-                  isOpen ? "max-h-[600px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
+                  isOpen ? "max-h-[850px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
                 ].join(" ")}
               >
                 {item.subitems.map((sub) => {
-                  const isSubActive = sub.to === currentPath;
+                  const isSubActive = isSubItemActive(sub);
+
                   return (
                     <Link
                       key={sub.label}
                       to={sub.to || "/"}
+                      search={sub.search as any}
                       className={[
                         "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-150",
                         isSubActive

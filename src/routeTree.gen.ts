@@ -57,6 +57,8 @@ import { Route as ProcurementReportsPurchasePriceRouteImport } from './routes/pr
 import { Route as ProcurementReportsPaymentStatementRouteImport } from './routes/procurement-reports-payment-statement'
 import { Route as ProcurementReportsDncRateRouteImport } from './routes/procurement-reports-dnc-rate'
 import { Route as ProcurementReportsCombinedPoStatementRouteImport } from './routes/procurement-reports-combined-po-statement'
+import { Route as ProcurementPurchaseRequisitionRouteImport } from './routes/procurement-purchase-requisition'
+import { Route as ProcurementPrApprovalRouteImport } from './routes/procurement-pr-approval'
 import { Route as ProcurementPoWorkOrderApprovalRouteImport } from './routes/procurement-po-work-order-approval'
 import { Route as ProcurementPoRequisitionWiseRouteImport } from './routes/procurement-po-requisition-wise'
 import { Route as ProcurementPoNewRouteImport } from './routes/procurement-po-new'
@@ -68,6 +70,10 @@ import { Route as ProcurementPiCreateRouteImport } from './routes/procurement-pi
 import { Route as ProcurementPiApproveDcPriceRouteImport } from './routes/procurement-pi-approve-dc-price'
 import { Route as ProcurementPaymentListRouteImport } from './routes/procurement-payment-list'
 import { Route as ProcurementPaymentBillRouteImport } from './routes/procurement-payment-bill'
+import { Route as ProcurementMonthlyBudgetRequisitionRouteImport } from './routes/procurement-monthly-budget-requisition'
+import { Route as ProcurementMonthlyBudgetApprovalRouteImport } from './routes/procurement-monthly-budget-approval'
+import { Route as ProcurementMaterialReceiveListRouteImport } from './routes/procurement-material-receive-list'
+import { Route as ProcurementMasterDataRouteImport } from './routes/procurement-master-data'
 import { Route as ProcurementDashboardRouteImport } from './routes/procurement-dashboard'
 import { Route as ProcurementCsSupplierPriceRouteImport } from './routes/procurement-cs-supplier-price'
 import { Route as ProcurementCsSupplierItemsRouteImport } from './routes/procurement-cs-supplier-items'
@@ -75,6 +81,7 @@ import { Route as ProcurementCsDetailRouteImport } from './routes/procurement-cs
 import { Route as ProcurementCsCreateWorkorderRouteImport } from './routes/procurement-cs-create-workorder'
 import { Route as ProcurementCsCreateBatchRouteImport } from './routes/procurement-cs-create-batch'
 import { Route as ProcurementCsBatchListRouteImport } from './routes/procurement-cs-batch-list'
+import { Route as ProcurementCsApprovalRouteImport } from './routes/procurement-cs-approval'
 import { Route as ProcurementConfigTermsRouteImport } from './routes/procurement-config-terms'
 import { Route as ProcurementConfigSupplierOpeningRouteImport } from './routes/procurement-config-supplier-opening'
 import { Route as ProcurementConfigSupplierNameRouteImport } from './routes/procurement-config-supplier-name'
@@ -84,10 +91,14 @@ import { Route as ProcurementConfigLcBookingRouteImport } from './routes/procure
 import { Route as ProcurementConfigCurrencyRateRouteImport } from './routes/procurement-config-currency-rate'
 import { Route as ProcurementConfigBankInfoRouteImport } from './routes/procurement-config-bank-info'
 import { Route as ProcurementConfigBankAccountsRouteImport } from './routes/procurement-config-bank-accounts'
+import { Route as ProcurementComparativeStatementRouteImport } from './routes/procurement-comparative-statement'
 import { Route as ProcurementBillingVatTaxRegisterRouteImport } from './routes/procurement-billing-vat-tax-register'
 import { Route as ProcurementBillingVatTaxEntryRouteImport } from './routes/procurement-billing-vat-tax-entry'
 import { Route as ProcurementBillingSupplierRecordListRouteImport } from './routes/procurement-billing-supplier-record-list'
 import { Route as ProcurementBillingSupplierRecordRouteImport } from './routes/procurement-billing-supplier-record'
+import { Route as ProcurementBillingSupplierBillListRouteImport } from './routes/procurement-billing-supplier-bill-list'
+import { Route as ProcurementBillingSupplierBillApprovalListRouteImport } from './routes/procurement-billing-supplier-bill-approval-list'
+import { Route as ProcurementBillingSupplierBillApprovalRouteImport } from './routes/procurement-billing-supplier-bill-approval'
 import { Route as ProcurementBillingSupplierBillRouteImport } from './routes/procurement-billing-supplier-bill'
 import { Route as ProcurementBillingPurchaseListRouteImport } from './routes/procurement-billing-purchase-list'
 import { Route as ProcurementBillingPrepareV2RouteImport } from './routes/procurement-billing-prepare-v2'
@@ -177,13 +188,34 @@ import { Route as KpiAssessmentWorkflowRouteImport } from './routes/kpi-assessme
 import { Route as KpiApprovalRouteImport } from './routes/kpi-approval'
 import { Route as JdListRouteImport } from './routes/jd-list'
 import { Route as InventoryDashboardRouteImport } from './routes/inventory-dashboard'
+import { Route as InventoryConfigurationRouteImport } from './routes/inventory-configuration'
 import { Route as InvYarnOpeningStockRouteImport } from './routes/inv-yarn-opening-stock'
+import { Route as InvSupplierReturnListRouteImport } from './routes/inv-supplier-return-list'
+import { Route as InvStoreReturnReceiveListRouteImport } from './routes/inv-store-return-receive-list'
+import { Route as InvStoreReturnReceiveRouteImport } from './routes/inv-store-return-receive'
+import { Route as InvStockWriteoffListRouteImport } from './routes/inv-stock-writeoff-list'
+import { Route as InvStockWriteoffApprovalListRouteImport } from './routes/inv-stock-writeoff-approval-list'
+import { Route as InvStockWriteoffApprovalRouteImport } from './routes/inv-stock-writeoff-approval'
+import { Route as InvStockWriteoffRouteImport } from './routes/inv-stock-writeoff'
+import { Route as InvStockAdjustmentListRouteImport } from './routes/inv-stock-adjustment-list'
+import { Route as InvStockAdjustmentRouteImport } from './routes/inv-stock-adjustment'
+import { Route as InvReturnToStoreListRouteImport } from './routes/inv-return-to-store-list'
+import { Route as InvReceiveMrrRouteImport } from './routes/inv-receive-mrr'
 import { Route as InvReceiveListRouteImport } from './routes/inv-receive-list'
 import { Route as InvReceiveDirectRouteImport } from './routes/inv-receive-direct'
+import { Route as InvOpeningStockListRouteImport } from './routes/inv-opening-stock-list'
+import { Route as InvMaterialRequisitionListRouteImport } from './routes/inv-material-requisition-list'
+import { Route as InvMaterialRequisitionApprovalListRouteImport } from './routes/inv-material-requisition-approval-list'
+import { Route as InvMaterialRequisitionRouteImport } from './routes/inv-material-requisition'
 import { Route as InvIssueReturnRouteImport } from './routes/inv-issue-return'
 import { Route as InvIssueRegularRouteImport } from './routes/inv-issue-regular'
 import { Route as InvIssueMrrReturnRouteImport } from './routes/inv-issue-mrr-return'
 import { Route as InvIssueListRouteImport } from './routes/inv-issue-list'
+import { Route as InvIntercompanyTransferListRouteImport } from './routes/inv-intercompany-transfer-list'
+import { Route as InvIntercompanyTransferRouteImport } from './routes/inv-intercompany-transfer'
+import { Route as InvIntercompanyReceiveListRouteImport } from './routes/inv-intercompany-receive-list'
+import { Route as InvIntercompanyReceiveRouteImport } from './routes/inv-intercompany-receive'
+import { Route as InvDirectMrrListRouteImport } from './routes/inv-direct-mrr-list'
 import { Route as InvDashboardRouteImport } from './routes/inv-dashboard'
 import { Route as InvConfigUomRouteImport } from './routes/inv-config-uom'
 import { Route as InvConfigStoreNameRouteImport } from './routes/inv-config-store-name'
@@ -516,6 +548,17 @@ const ProcurementReportsCombinedPoStatementRoute =
     path: '/procurement-reports-combined-po-statement',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProcurementPurchaseRequisitionRoute =
+  ProcurementPurchaseRequisitionRouteImport.update({
+    id: '/procurement-purchase-requisition',
+    path: '/procurement-purchase-requisition',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementPrApprovalRoute = ProcurementPrApprovalRouteImport.update({
+  id: '/procurement-pr-approval',
+  path: '/procurement-pr-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProcurementPoWorkOrderApprovalRoute =
   ProcurementPoWorkOrderApprovalRouteImport.update({
     id: '/procurement-po-work-order-approval',
@@ -576,6 +619,29 @@ const ProcurementPaymentBillRoute = ProcurementPaymentBillRouteImport.update({
   path: '/procurement-payment-bill',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProcurementMonthlyBudgetRequisitionRoute =
+  ProcurementMonthlyBudgetRequisitionRouteImport.update({
+    id: '/procurement-monthly-budget-requisition',
+    path: '/procurement-monthly-budget-requisition',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementMonthlyBudgetApprovalRoute =
+  ProcurementMonthlyBudgetApprovalRouteImport.update({
+    id: '/procurement-monthly-budget-approval',
+    path: '/procurement-monthly-budget-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementMaterialReceiveListRoute =
+  ProcurementMaterialReceiveListRouteImport.update({
+    id: '/procurement-material-receive-list',
+    path: '/procurement-material-receive-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementMasterDataRoute = ProcurementMasterDataRouteImport.update({
+  id: '/procurement-master-data',
+  path: '/procurement-master-data',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProcurementDashboardRoute = ProcurementDashboardRouteImport.update({
   id: '/procurement-dashboard',
   path: '/procurement-dashboard',
@@ -613,6 +679,11 @@ const ProcurementCsCreateBatchRoute =
 const ProcurementCsBatchListRoute = ProcurementCsBatchListRouteImport.update({
   id: '/procurement-cs-batch-list',
   path: '/procurement-cs-batch-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementCsApprovalRoute = ProcurementCsApprovalRouteImport.update({
+  id: '/procurement-cs-approval',
+  path: '/procurement-cs-approval',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProcurementConfigTermsRoute = ProcurementConfigTermsRouteImport.update({
@@ -668,6 +739,12 @@ const ProcurementConfigBankAccountsRoute =
     path: '/procurement-config-bank-accounts',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProcurementComparativeStatementRoute =
+  ProcurementComparativeStatementRouteImport.update({
+    id: '/procurement-comparative-statement',
+    path: '/procurement-comparative-statement',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ProcurementBillingVatTaxRegisterRoute =
   ProcurementBillingVatTaxRegisterRouteImport.update({
     id: '/procurement-billing-vat-tax-register',
@@ -690,6 +767,24 @@ const ProcurementBillingSupplierRecordRoute =
   ProcurementBillingSupplierRecordRouteImport.update({
     id: '/procurement-billing-supplier-record',
     path: '/procurement-billing-supplier-record',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingSupplierBillListRoute =
+  ProcurementBillingSupplierBillListRouteImport.update({
+    id: '/procurement-billing-supplier-bill-list',
+    path: '/procurement-billing-supplier-bill-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingSupplierBillApprovalListRoute =
+  ProcurementBillingSupplierBillApprovalListRouteImport.update({
+    id: '/procurement-billing-supplier-bill-approval-list',
+    path: '/procurement-billing-supplier-bill-approval-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingSupplierBillApprovalRoute =
+  ProcurementBillingSupplierBillApprovalRouteImport.update({
+    id: '/procurement-billing-supplier-bill-approval',
+    path: '/procurement-billing-supplier-bill-approval',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ProcurementBillingSupplierBillRoute =
@@ -1160,9 +1255,72 @@ const InventoryDashboardRoute = InventoryDashboardRouteImport.update({
   path: '/inventory-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InventoryConfigurationRoute = InventoryConfigurationRouteImport.update({
+  id: '/inventory-configuration',
+  path: '/inventory-configuration',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvYarnOpeningStockRoute = InvYarnOpeningStockRouteImport.update({
   id: '/inv-yarn-opening-stock',
   path: '/inv-yarn-opening-stock',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvSupplierReturnListRoute = InvSupplierReturnListRouteImport.update({
+  id: '/inv-supplier-return-list',
+  path: '/inv-supplier-return-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStoreReturnReceiveListRoute =
+  InvStoreReturnReceiveListRouteImport.update({
+    id: '/inv-store-return-receive-list',
+    path: '/inv-store-return-receive-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvStoreReturnReceiveRoute = InvStoreReturnReceiveRouteImport.update({
+  id: '/inv-store-return-receive',
+  path: '/inv-store-return-receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStockWriteoffListRoute = InvStockWriteoffListRouteImport.update({
+  id: '/inv-stock-writeoff-list',
+  path: '/inv-stock-writeoff-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStockWriteoffApprovalListRoute =
+  InvStockWriteoffApprovalListRouteImport.update({
+    id: '/inv-stock-writeoff-approval-list',
+    path: '/inv-stock-writeoff-approval-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvStockWriteoffApprovalRoute =
+  InvStockWriteoffApprovalRouteImport.update({
+    id: '/inv-stock-writeoff-approval',
+    path: '/inv-stock-writeoff-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvStockWriteoffRoute = InvStockWriteoffRouteImport.update({
+  id: '/inv-stock-writeoff',
+  path: '/inv-stock-writeoff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStockAdjustmentListRoute = InvStockAdjustmentListRouteImport.update({
+  id: '/inv-stock-adjustment-list',
+  path: '/inv-stock-adjustment-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStockAdjustmentRoute = InvStockAdjustmentRouteImport.update({
+  id: '/inv-stock-adjustment',
+  path: '/inv-stock-adjustment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReturnToStoreListRoute = InvReturnToStoreListRouteImport.update({
+  id: '/inv-return-to-store-list',
+  path: '/inv-return-to-store-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReceiveMrrRoute = InvReceiveMrrRouteImport.update({
+  id: '/inv-receive-mrr',
+  path: '/inv-receive-mrr',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvReceiveListRoute = InvReceiveListRouteImport.update({
@@ -1173,6 +1331,28 @@ const InvReceiveListRoute = InvReceiveListRouteImport.update({
 const InvReceiveDirectRoute = InvReceiveDirectRouteImport.update({
   id: '/inv-receive-direct',
   path: '/inv-receive-direct',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvOpeningStockListRoute = InvOpeningStockListRouteImport.update({
+  id: '/inv-opening-stock-list',
+  path: '/inv-opening-stock-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvMaterialRequisitionListRoute =
+  InvMaterialRequisitionListRouteImport.update({
+    id: '/inv-material-requisition-list',
+    path: '/inv-material-requisition-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvMaterialRequisitionApprovalListRoute =
+  InvMaterialRequisitionApprovalListRouteImport.update({
+    id: '/inv-material-requisition-approval-list',
+    path: '/inv-material-requisition-approval-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvMaterialRequisitionRoute = InvMaterialRequisitionRouteImport.update({
+  id: '/inv-material-requisition',
+  path: '/inv-material-requisition',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvIssueReturnRoute = InvIssueReturnRouteImport.update({
@@ -1193,6 +1373,33 @@ const InvIssueMrrReturnRoute = InvIssueMrrReturnRouteImport.update({
 const InvIssueListRoute = InvIssueListRouteImport.update({
   id: '/inv-issue-list',
   path: '/inv-issue-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvIntercompanyTransferListRoute =
+  InvIntercompanyTransferListRouteImport.update({
+    id: '/inv-intercompany-transfer-list',
+    path: '/inv-intercompany-transfer-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvIntercompanyTransferRoute = InvIntercompanyTransferRouteImport.update({
+  id: '/inv-intercompany-transfer',
+  path: '/inv-intercompany-transfer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvIntercompanyReceiveListRoute =
+  InvIntercompanyReceiveListRouteImport.update({
+    id: '/inv-intercompany-receive-list',
+    path: '/inv-intercompany-receive-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvIntercompanyReceiveRoute = InvIntercompanyReceiveRouteImport.update({
+  id: '/inv-intercompany-receive',
+  path: '/inv-intercompany-receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvDirectMrrListRoute = InvDirectMrrListRouteImport.update({
+  id: '/inv-direct-mrr-list',
+  path: '/inv-direct-mrr-list',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvDashboardRoute = InvDashboardRouteImport.update({
@@ -1639,13 +1846,34 @@ export interface FileRoutesByFullPath {
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
   '/inv-dashboard': typeof InvDashboardRoute
+  '/inv-direct-mrr-list': typeof InvDirectMrrListRoute
+  '/inv-intercompany-receive': typeof InvIntercompanyReceiveRoute
+  '/inv-intercompany-receive-list': typeof InvIntercompanyReceiveListRoute
+  '/inv-intercompany-transfer': typeof InvIntercompanyTransferRoute
+  '/inv-intercompany-transfer-list': typeof InvIntercompanyTransferListRoute
   '/inv-issue-list': typeof InvIssueListRoute
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
   '/inv-issue-return': typeof InvIssueReturnRoute
+  '/inv-material-requisition': typeof InvMaterialRequisitionRoute
+  '/inv-material-requisition-approval-list': typeof InvMaterialRequisitionApprovalListRoute
+  '/inv-material-requisition-list': typeof InvMaterialRequisitionListRoute
+  '/inv-opening-stock-list': typeof InvOpeningStockListRoute
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
+  '/inv-receive-mrr': typeof InvReceiveMrrRoute
+  '/inv-return-to-store-list': typeof InvReturnToStoreListRoute
+  '/inv-stock-adjustment': typeof InvStockAdjustmentRoute
+  '/inv-stock-adjustment-list': typeof InvStockAdjustmentListRoute
+  '/inv-stock-writeoff': typeof InvStockWriteoffRoute
+  '/inv-stock-writeoff-approval': typeof InvStockWriteoffApprovalRoute
+  '/inv-stock-writeoff-approval-list': typeof InvStockWriteoffApprovalListRoute
+  '/inv-stock-writeoff-list': typeof InvStockWriteoffListRoute
+  '/inv-store-return-receive': typeof InvStoreReturnReceiveRoute
+  '/inv-store-return-receive-list': typeof InvStoreReturnReceiveListRoute
+  '/inv-supplier-return-list': typeof InvSupplierReturnListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
+  '/inventory-configuration': typeof InventoryConfigurationRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/jd-list': typeof JdListRoute
   '/kpi-approval': typeof KpiApprovalRoute
@@ -1735,10 +1963,14 @@ export interface FileRoutesByFullPath {
   '/procurement-billing-prepare-v2': typeof ProcurementBillingPrepareV2Route
   '/procurement-billing-purchase-list': typeof ProcurementBillingPurchaseListRoute
   '/procurement-billing-supplier-bill': typeof ProcurementBillingSupplierBillRoute
+  '/procurement-billing-supplier-bill-approval': typeof ProcurementBillingSupplierBillApprovalRoute
+  '/procurement-billing-supplier-bill-approval-list': typeof ProcurementBillingSupplierBillApprovalListRoute
+  '/procurement-billing-supplier-bill-list': typeof ProcurementBillingSupplierBillListRoute
   '/procurement-billing-supplier-record': typeof ProcurementBillingSupplierRecordRoute
   '/procurement-billing-supplier-record-list': typeof ProcurementBillingSupplierRecordListRoute
   '/procurement-billing-vat-tax-entry': typeof ProcurementBillingVatTaxEntryRoute
   '/procurement-billing-vat-tax-register': typeof ProcurementBillingVatTaxRegisterRoute
+  '/procurement-comparative-statement': typeof ProcurementComparativeStatementRoute
   '/procurement-config-bank-accounts': typeof ProcurementConfigBankAccountsRoute
   '/procurement-config-bank-info': typeof ProcurementConfigBankInfoRoute
   '/procurement-config-currency-rate': typeof ProcurementConfigCurrencyRateRoute
@@ -1748,6 +1980,7 @@ export interface FileRoutesByFullPath {
   '/procurement-config-supplier-name': typeof ProcurementConfigSupplierNameRoute
   '/procurement-config-supplier-opening': typeof ProcurementConfigSupplierOpeningRoute
   '/procurement-config-terms': typeof ProcurementConfigTermsRoute
+  '/procurement-cs-approval': typeof ProcurementCsApprovalRoute
   '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
   '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
   '/procurement-cs-create-workorder': typeof ProcurementCsCreateWorkorderRoute
@@ -1755,6 +1988,10 @@ export interface FileRoutesByFullPath {
   '/procurement-cs-supplier-items': typeof ProcurementCsSupplierItemsRoute
   '/procurement-cs-supplier-price': typeof ProcurementCsSupplierPriceRoute
   '/procurement-dashboard': typeof ProcurementDashboardRoute
+  '/procurement-master-data': typeof ProcurementMasterDataRoute
+  '/procurement-material-receive-list': typeof ProcurementMaterialReceiveListRoute
+  '/procurement-monthly-budget-approval': typeof ProcurementMonthlyBudgetApprovalRoute
+  '/procurement-monthly-budget-requisition': typeof ProcurementMonthlyBudgetRequisitionRoute
   '/procurement-payment-bill': typeof ProcurementPaymentBillRoute
   '/procurement-payment-list': typeof ProcurementPaymentListRoute
   '/procurement-pi-approve-dc-price': typeof ProcurementPiApproveDcPriceRoute
@@ -1766,6 +2003,8 @@ export interface FileRoutesByFullPath {
   '/procurement-po-new': typeof ProcurementPoNewRoute
   '/procurement-po-requisition-wise': typeof ProcurementPoRequisitionWiseRoute
   '/procurement-po-work-order-approval': typeof ProcurementPoWorkOrderApprovalRoute
+  '/procurement-pr-approval': typeof ProcurementPrApprovalRoute
+  '/procurement-purchase-requisition': typeof ProcurementPurchaseRequisitionRoute
   '/procurement-reports-combined-po-statement': typeof ProcurementReportsCombinedPoStatementRoute
   '/procurement-reports-dnc-rate': typeof ProcurementReportsDncRateRoute
   '/procurement-reports-payment-statement': typeof ProcurementReportsPaymentStatementRoute
@@ -1889,13 +2128,34 @@ export interface FileRoutesByTo {
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
   '/inv-dashboard': typeof InvDashboardRoute
+  '/inv-direct-mrr-list': typeof InvDirectMrrListRoute
+  '/inv-intercompany-receive': typeof InvIntercompanyReceiveRoute
+  '/inv-intercompany-receive-list': typeof InvIntercompanyReceiveListRoute
+  '/inv-intercompany-transfer': typeof InvIntercompanyTransferRoute
+  '/inv-intercompany-transfer-list': typeof InvIntercompanyTransferListRoute
   '/inv-issue-list': typeof InvIssueListRoute
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
   '/inv-issue-return': typeof InvIssueReturnRoute
+  '/inv-material-requisition': typeof InvMaterialRequisitionRoute
+  '/inv-material-requisition-approval-list': typeof InvMaterialRequisitionApprovalListRoute
+  '/inv-material-requisition-list': typeof InvMaterialRequisitionListRoute
+  '/inv-opening-stock-list': typeof InvOpeningStockListRoute
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
+  '/inv-receive-mrr': typeof InvReceiveMrrRoute
+  '/inv-return-to-store-list': typeof InvReturnToStoreListRoute
+  '/inv-stock-adjustment': typeof InvStockAdjustmentRoute
+  '/inv-stock-adjustment-list': typeof InvStockAdjustmentListRoute
+  '/inv-stock-writeoff': typeof InvStockWriteoffRoute
+  '/inv-stock-writeoff-approval': typeof InvStockWriteoffApprovalRoute
+  '/inv-stock-writeoff-approval-list': typeof InvStockWriteoffApprovalListRoute
+  '/inv-stock-writeoff-list': typeof InvStockWriteoffListRoute
+  '/inv-store-return-receive': typeof InvStoreReturnReceiveRoute
+  '/inv-store-return-receive-list': typeof InvStoreReturnReceiveListRoute
+  '/inv-supplier-return-list': typeof InvSupplierReturnListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
+  '/inventory-configuration': typeof InventoryConfigurationRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/jd-list': typeof JdListRoute
   '/kpi-approval': typeof KpiApprovalRoute
@@ -1985,10 +2245,14 @@ export interface FileRoutesByTo {
   '/procurement-billing-prepare-v2': typeof ProcurementBillingPrepareV2Route
   '/procurement-billing-purchase-list': typeof ProcurementBillingPurchaseListRoute
   '/procurement-billing-supplier-bill': typeof ProcurementBillingSupplierBillRoute
+  '/procurement-billing-supplier-bill-approval': typeof ProcurementBillingSupplierBillApprovalRoute
+  '/procurement-billing-supplier-bill-approval-list': typeof ProcurementBillingSupplierBillApprovalListRoute
+  '/procurement-billing-supplier-bill-list': typeof ProcurementBillingSupplierBillListRoute
   '/procurement-billing-supplier-record': typeof ProcurementBillingSupplierRecordRoute
   '/procurement-billing-supplier-record-list': typeof ProcurementBillingSupplierRecordListRoute
   '/procurement-billing-vat-tax-entry': typeof ProcurementBillingVatTaxEntryRoute
   '/procurement-billing-vat-tax-register': typeof ProcurementBillingVatTaxRegisterRoute
+  '/procurement-comparative-statement': typeof ProcurementComparativeStatementRoute
   '/procurement-config-bank-accounts': typeof ProcurementConfigBankAccountsRoute
   '/procurement-config-bank-info': typeof ProcurementConfigBankInfoRoute
   '/procurement-config-currency-rate': typeof ProcurementConfigCurrencyRateRoute
@@ -1998,6 +2262,7 @@ export interface FileRoutesByTo {
   '/procurement-config-supplier-name': typeof ProcurementConfigSupplierNameRoute
   '/procurement-config-supplier-opening': typeof ProcurementConfigSupplierOpeningRoute
   '/procurement-config-terms': typeof ProcurementConfigTermsRoute
+  '/procurement-cs-approval': typeof ProcurementCsApprovalRoute
   '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
   '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
   '/procurement-cs-create-workorder': typeof ProcurementCsCreateWorkorderRoute
@@ -2005,6 +2270,10 @@ export interface FileRoutesByTo {
   '/procurement-cs-supplier-items': typeof ProcurementCsSupplierItemsRoute
   '/procurement-cs-supplier-price': typeof ProcurementCsSupplierPriceRoute
   '/procurement-dashboard': typeof ProcurementDashboardRoute
+  '/procurement-master-data': typeof ProcurementMasterDataRoute
+  '/procurement-material-receive-list': typeof ProcurementMaterialReceiveListRoute
+  '/procurement-monthly-budget-approval': typeof ProcurementMonthlyBudgetApprovalRoute
+  '/procurement-monthly-budget-requisition': typeof ProcurementMonthlyBudgetRequisitionRoute
   '/procurement-payment-bill': typeof ProcurementPaymentBillRoute
   '/procurement-payment-list': typeof ProcurementPaymentListRoute
   '/procurement-pi-approve-dc-price': typeof ProcurementPiApproveDcPriceRoute
@@ -2016,6 +2285,8 @@ export interface FileRoutesByTo {
   '/procurement-po-new': typeof ProcurementPoNewRoute
   '/procurement-po-requisition-wise': typeof ProcurementPoRequisitionWiseRoute
   '/procurement-po-work-order-approval': typeof ProcurementPoWorkOrderApprovalRoute
+  '/procurement-pr-approval': typeof ProcurementPrApprovalRoute
+  '/procurement-purchase-requisition': typeof ProcurementPurchaseRequisitionRoute
   '/procurement-reports-combined-po-statement': typeof ProcurementReportsCombinedPoStatementRoute
   '/procurement-reports-dnc-rate': typeof ProcurementReportsDncRateRoute
   '/procurement-reports-payment-statement': typeof ProcurementReportsPaymentStatementRoute
@@ -2140,13 +2411,34 @@ export interface FileRoutesById {
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
   '/inv-dashboard': typeof InvDashboardRoute
+  '/inv-direct-mrr-list': typeof InvDirectMrrListRoute
+  '/inv-intercompany-receive': typeof InvIntercompanyReceiveRoute
+  '/inv-intercompany-receive-list': typeof InvIntercompanyReceiveListRoute
+  '/inv-intercompany-transfer': typeof InvIntercompanyTransferRoute
+  '/inv-intercompany-transfer-list': typeof InvIntercompanyTransferListRoute
   '/inv-issue-list': typeof InvIssueListRoute
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
   '/inv-issue-return': typeof InvIssueReturnRoute
+  '/inv-material-requisition': typeof InvMaterialRequisitionRoute
+  '/inv-material-requisition-approval-list': typeof InvMaterialRequisitionApprovalListRoute
+  '/inv-material-requisition-list': typeof InvMaterialRequisitionListRoute
+  '/inv-opening-stock-list': typeof InvOpeningStockListRoute
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
+  '/inv-receive-mrr': typeof InvReceiveMrrRoute
+  '/inv-return-to-store-list': typeof InvReturnToStoreListRoute
+  '/inv-stock-adjustment': typeof InvStockAdjustmentRoute
+  '/inv-stock-adjustment-list': typeof InvStockAdjustmentListRoute
+  '/inv-stock-writeoff': typeof InvStockWriteoffRoute
+  '/inv-stock-writeoff-approval': typeof InvStockWriteoffApprovalRoute
+  '/inv-stock-writeoff-approval-list': typeof InvStockWriteoffApprovalListRoute
+  '/inv-stock-writeoff-list': typeof InvStockWriteoffListRoute
+  '/inv-store-return-receive': typeof InvStoreReturnReceiveRoute
+  '/inv-store-return-receive-list': typeof InvStoreReturnReceiveListRoute
+  '/inv-supplier-return-list': typeof InvSupplierReturnListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
+  '/inventory-configuration': typeof InventoryConfigurationRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/jd-list': typeof JdListRoute
   '/kpi-approval': typeof KpiApprovalRoute
@@ -2236,10 +2528,14 @@ export interface FileRoutesById {
   '/procurement-billing-prepare-v2': typeof ProcurementBillingPrepareV2Route
   '/procurement-billing-purchase-list': typeof ProcurementBillingPurchaseListRoute
   '/procurement-billing-supplier-bill': typeof ProcurementBillingSupplierBillRoute
+  '/procurement-billing-supplier-bill-approval': typeof ProcurementBillingSupplierBillApprovalRoute
+  '/procurement-billing-supplier-bill-approval-list': typeof ProcurementBillingSupplierBillApprovalListRoute
+  '/procurement-billing-supplier-bill-list': typeof ProcurementBillingSupplierBillListRoute
   '/procurement-billing-supplier-record': typeof ProcurementBillingSupplierRecordRoute
   '/procurement-billing-supplier-record-list': typeof ProcurementBillingSupplierRecordListRoute
   '/procurement-billing-vat-tax-entry': typeof ProcurementBillingVatTaxEntryRoute
   '/procurement-billing-vat-tax-register': typeof ProcurementBillingVatTaxRegisterRoute
+  '/procurement-comparative-statement': typeof ProcurementComparativeStatementRoute
   '/procurement-config-bank-accounts': typeof ProcurementConfigBankAccountsRoute
   '/procurement-config-bank-info': typeof ProcurementConfigBankInfoRoute
   '/procurement-config-currency-rate': typeof ProcurementConfigCurrencyRateRoute
@@ -2249,6 +2545,7 @@ export interface FileRoutesById {
   '/procurement-config-supplier-name': typeof ProcurementConfigSupplierNameRoute
   '/procurement-config-supplier-opening': typeof ProcurementConfigSupplierOpeningRoute
   '/procurement-config-terms': typeof ProcurementConfigTermsRoute
+  '/procurement-cs-approval': typeof ProcurementCsApprovalRoute
   '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
   '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
   '/procurement-cs-create-workorder': typeof ProcurementCsCreateWorkorderRoute
@@ -2256,6 +2553,10 @@ export interface FileRoutesById {
   '/procurement-cs-supplier-items': typeof ProcurementCsSupplierItemsRoute
   '/procurement-cs-supplier-price': typeof ProcurementCsSupplierPriceRoute
   '/procurement-dashboard': typeof ProcurementDashboardRoute
+  '/procurement-master-data': typeof ProcurementMasterDataRoute
+  '/procurement-material-receive-list': typeof ProcurementMaterialReceiveListRoute
+  '/procurement-monthly-budget-approval': typeof ProcurementMonthlyBudgetApprovalRoute
+  '/procurement-monthly-budget-requisition': typeof ProcurementMonthlyBudgetRequisitionRoute
   '/procurement-payment-bill': typeof ProcurementPaymentBillRoute
   '/procurement-payment-list': typeof ProcurementPaymentListRoute
   '/procurement-pi-approve-dc-price': typeof ProcurementPiApproveDcPriceRoute
@@ -2267,6 +2568,8 @@ export interface FileRoutesById {
   '/procurement-po-new': typeof ProcurementPoNewRoute
   '/procurement-po-requisition-wise': typeof ProcurementPoRequisitionWiseRoute
   '/procurement-po-work-order-approval': typeof ProcurementPoWorkOrderApprovalRoute
+  '/procurement-pr-approval': typeof ProcurementPrApprovalRoute
+  '/procurement-purchase-requisition': typeof ProcurementPurchaseRequisitionRoute
   '/procurement-reports-combined-po-statement': typeof ProcurementReportsCombinedPoStatementRoute
   '/procurement-reports-dnc-rate': typeof ProcurementReportsDncRateRoute
   '/procurement-reports-payment-statement': typeof ProcurementReportsPaymentStatementRoute
@@ -2392,13 +2695,34 @@ export interface FileRouteTypes {
     | '/inv-config-store-name'
     | '/inv-config-uom'
     | '/inv-dashboard'
+    | '/inv-direct-mrr-list'
+    | '/inv-intercompany-receive'
+    | '/inv-intercompany-receive-list'
+    | '/inv-intercompany-transfer'
+    | '/inv-intercompany-transfer-list'
     | '/inv-issue-list'
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
     | '/inv-issue-return'
+    | '/inv-material-requisition'
+    | '/inv-material-requisition-approval-list'
+    | '/inv-material-requisition-list'
+    | '/inv-opening-stock-list'
     | '/inv-receive-direct'
     | '/inv-receive-list'
+    | '/inv-receive-mrr'
+    | '/inv-return-to-store-list'
+    | '/inv-stock-adjustment'
+    | '/inv-stock-adjustment-list'
+    | '/inv-stock-writeoff'
+    | '/inv-stock-writeoff-approval'
+    | '/inv-stock-writeoff-approval-list'
+    | '/inv-stock-writeoff-list'
+    | '/inv-store-return-receive'
+    | '/inv-store-return-receive-list'
+    | '/inv-supplier-return-list'
     | '/inv-yarn-opening-stock'
+    | '/inventory-configuration'
     | '/inventory-dashboard'
     | '/jd-list'
     | '/kpi-approval'
@@ -2488,10 +2812,14 @@ export interface FileRouteTypes {
     | '/procurement-billing-prepare-v2'
     | '/procurement-billing-purchase-list'
     | '/procurement-billing-supplier-bill'
+    | '/procurement-billing-supplier-bill-approval'
+    | '/procurement-billing-supplier-bill-approval-list'
+    | '/procurement-billing-supplier-bill-list'
     | '/procurement-billing-supplier-record'
     | '/procurement-billing-supplier-record-list'
     | '/procurement-billing-vat-tax-entry'
     | '/procurement-billing-vat-tax-register'
+    | '/procurement-comparative-statement'
     | '/procurement-config-bank-accounts'
     | '/procurement-config-bank-info'
     | '/procurement-config-currency-rate'
@@ -2501,6 +2829,7 @@ export interface FileRouteTypes {
     | '/procurement-config-supplier-name'
     | '/procurement-config-supplier-opening'
     | '/procurement-config-terms'
+    | '/procurement-cs-approval'
     | '/procurement-cs-batch-list'
     | '/procurement-cs-create-batch'
     | '/procurement-cs-create-workorder'
@@ -2508,6 +2837,10 @@ export interface FileRouteTypes {
     | '/procurement-cs-supplier-items'
     | '/procurement-cs-supplier-price'
     | '/procurement-dashboard'
+    | '/procurement-master-data'
+    | '/procurement-material-receive-list'
+    | '/procurement-monthly-budget-approval'
+    | '/procurement-monthly-budget-requisition'
     | '/procurement-payment-bill'
     | '/procurement-payment-list'
     | '/procurement-pi-approve-dc-price'
@@ -2519,6 +2852,8 @@ export interface FileRouteTypes {
     | '/procurement-po-new'
     | '/procurement-po-requisition-wise'
     | '/procurement-po-work-order-approval'
+    | '/procurement-pr-approval'
+    | '/procurement-purchase-requisition'
     | '/procurement-reports-combined-po-statement'
     | '/procurement-reports-dnc-rate'
     | '/procurement-reports-payment-statement'
@@ -2642,13 +2977,34 @@ export interface FileRouteTypes {
     | '/inv-config-store-name'
     | '/inv-config-uom'
     | '/inv-dashboard'
+    | '/inv-direct-mrr-list'
+    | '/inv-intercompany-receive'
+    | '/inv-intercompany-receive-list'
+    | '/inv-intercompany-transfer'
+    | '/inv-intercompany-transfer-list'
     | '/inv-issue-list'
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
     | '/inv-issue-return'
+    | '/inv-material-requisition'
+    | '/inv-material-requisition-approval-list'
+    | '/inv-material-requisition-list'
+    | '/inv-opening-stock-list'
     | '/inv-receive-direct'
     | '/inv-receive-list'
+    | '/inv-receive-mrr'
+    | '/inv-return-to-store-list'
+    | '/inv-stock-adjustment'
+    | '/inv-stock-adjustment-list'
+    | '/inv-stock-writeoff'
+    | '/inv-stock-writeoff-approval'
+    | '/inv-stock-writeoff-approval-list'
+    | '/inv-stock-writeoff-list'
+    | '/inv-store-return-receive'
+    | '/inv-store-return-receive-list'
+    | '/inv-supplier-return-list'
     | '/inv-yarn-opening-stock'
+    | '/inventory-configuration'
     | '/inventory-dashboard'
     | '/jd-list'
     | '/kpi-approval'
@@ -2738,10 +3094,14 @@ export interface FileRouteTypes {
     | '/procurement-billing-prepare-v2'
     | '/procurement-billing-purchase-list'
     | '/procurement-billing-supplier-bill'
+    | '/procurement-billing-supplier-bill-approval'
+    | '/procurement-billing-supplier-bill-approval-list'
+    | '/procurement-billing-supplier-bill-list'
     | '/procurement-billing-supplier-record'
     | '/procurement-billing-supplier-record-list'
     | '/procurement-billing-vat-tax-entry'
     | '/procurement-billing-vat-tax-register'
+    | '/procurement-comparative-statement'
     | '/procurement-config-bank-accounts'
     | '/procurement-config-bank-info'
     | '/procurement-config-currency-rate'
@@ -2751,6 +3111,7 @@ export interface FileRouteTypes {
     | '/procurement-config-supplier-name'
     | '/procurement-config-supplier-opening'
     | '/procurement-config-terms'
+    | '/procurement-cs-approval'
     | '/procurement-cs-batch-list'
     | '/procurement-cs-create-batch'
     | '/procurement-cs-create-workorder'
@@ -2758,6 +3119,10 @@ export interface FileRouteTypes {
     | '/procurement-cs-supplier-items'
     | '/procurement-cs-supplier-price'
     | '/procurement-dashboard'
+    | '/procurement-master-data'
+    | '/procurement-material-receive-list'
+    | '/procurement-monthly-budget-approval'
+    | '/procurement-monthly-budget-requisition'
     | '/procurement-payment-bill'
     | '/procurement-payment-list'
     | '/procurement-pi-approve-dc-price'
@@ -2769,6 +3134,8 @@ export interface FileRouteTypes {
     | '/procurement-po-new'
     | '/procurement-po-requisition-wise'
     | '/procurement-po-work-order-approval'
+    | '/procurement-pr-approval'
+    | '/procurement-purchase-requisition'
     | '/procurement-reports-combined-po-statement'
     | '/procurement-reports-dnc-rate'
     | '/procurement-reports-payment-statement'
@@ -2892,13 +3259,34 @@ export interface FileRouteTypes {
     | '/inv-config-store-name'
     | '/inv-config-uom'
     | '/inv-dashboard'
+    | '/inv-direct-mrr-list'
+    | '/inv-intercompany-receive'
+    | '/inv-intercompany-receive-list'
+    | '/inv-intercompany-transfer'
+    | '/inv-intercompany-transfer-list'
     | '/inv-issue-list'
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
     | '/inv-issue-return'
+    | '/inv-material-requisition'
+    | '/inv-material-requisition-approval-list'
+    | '/inv-material-requisition-list'
+    | '/inv-opening-stock-list'
     | '/inv-receive-direct'
     | '/inv-receive-list'
+    | '/inv-receive-mrr'
+    | '/inv-return-to-store-list'
+    | '/inv-stock-adjustment'
+    | '/inv-stock-adjustment-list'
+    | '/inv-stock-writeoff'
+    | '/inv-stock-writeoff-approval'
+    | '/inv-stock-writeoff-approval-list'
+    | '/inv-stock-writeoff-list'
+    | '/inv-store-return-receive'
+    | '/inv-store-return-receive-list'
+    | '/inv-supplier-return-list'
     | '/inv-yarn-opening-stock'
+    | '/inventory-configuration'
     | '/inventory-dashboard'
     | '/jd-list'
     | '/kpi-approval'
@@ -2988,10 +3376,14 @@ export interface FileRouteTypes {
     | '/procurement-billing-prepare-v2'
     | '/procurement-billing-purchase-list'
     | '/procurement-billing-supplier-bill'
+    | '/procurement-billing-supplier-bill-approval'
+    | '/procurement-billing-supplier-bill-approval-list'
+    | '/procurement-billing-supplier-bill-list'
     | '/procurement-billing-supplier-record'
     | '/procurement-billing-supplier-record-list'
     | '/procurement-billing-vat-tax-entry'
     | '/procurement-billing-vat-tax-register'
+    | '/procurement-comparative-statement'
     | '/procurement-config-bank-accounts'
     | '/procurement-config-bank-info'
     | '/procurement-config-currency-rate'
@@ -3001,6 +3393,7 @@ export interface FileRouteTypes {
     | '/procurement-config-supplier-name'
     | '/procurement-config-supplier-opening'
     | '/procurement-config-terms'
+    | '/procurement-cs-approval'
     | '/procurement-cs-batch-list'
     | '/procurement-cs-create-batch'
     | '/procurement-cs-create-workorder'
@@ -3008,6 +3401,10 @@ export interface FileRouteTypes {
     | '/procurement-cs-supplier-items'
     | '/procurement-cs-supplier-price'
     | '/procurement-dashboard'
+    | '/procurement-master-data'
+    | '/procurement-material-receive-list'
+    | '/procurement-monthly-budget-approval'
+    | '/procurement-monthly-budget-requisition'
     | '/procurement-payment-bill'
     | '/procurement-payment-list'
     | '/procurement-pi-approve-dc-price'
@@ -3019,6 +3416,8 @@ export interface FileRouteTypes {
     | '/procurement-po-new'
     | '/procurement-po-requisition-wise'
     | '/procurement-po-work-order-approval'
+    | '/procurement-pr-approval'
+    | '/procurement-purchase-requisition'
     | '/procurement-reports-combined-po-statement'
     | '/procurement-reports-dnc-rate'
     | '/procurement-reports-payment-statement'
@@ -3143,13 +3542,34 @@ export interface RootRouteChildren {
   InvConfigStoreNameRoute: typeof InvConfigStoreNameRoute
   InvConfigUomRoute: typeof InvConfigUomRoute
   InvDashboardRoute: typeof InvDashboardRoute
+  InvDirectMrrListRoute: typeof InvDirectMrrListRoute
+  InvIntercompanyReceiveRoute: typeof InvIntercompanyReceiveRoute
+  InvIntercompanyReceiveListRoute: typeof InvIntercompanyReceiveListRoute
+  InvIntercompanyTransferRoute: typeof InvIntercompanyTransferRoute
+  InvIntercompanyTransferListRoute: typeof InvIntercompanyTransferListRoute
   InvIssueListRoute: typeof InvIssueListRoute
   InvIssueMrrReturnRoute: typeof InvIssueMrrReturnRoute
   InvIssueRegularRoute: typeof InvIssueRegularRoute
   InvIssueReturnRoute: typeof InvIssueReturnRoute
+  InvMaterialRequisitionRoute: typeof InvMaterialRequisitionRoute
+  InvMaterialRequisitionApprovalListRoute: typeof InvMaterialRequisitionApprovalListRoute
+  InvMaterialRequisitionListRoute: typeof InvMaterialRequisitionListRoute
+  InvOpeningStockListRoute: typeof InvOpeningStockListRoute
   InvReceiveDirectRoute: typeof InvReceiveDirectRoute
   InvReceiveListRoute: typeof InvReceiveListRoute
+  InvReceiveMrrRoute: typeof InvReceiveMrrRoute
+  InvReturnToStoreListRoute: typeof InvReturnToStoreListRoute
+  InvStockAdjustmentRoute: typeof InvStockAdjustmentRoute
+  InvStockAdjustmentListRoute: typeof InvStockAdjustmentListRoute
+  InvStockWriteoffRoute: typeof InvStockWriteoffRoute
+  InvStockWriteoffApprovalRoute: typeof InvStockWriteoffApprovalRoute
+  InvStockWriteoffApprovalListRoute: typeof InvStockWriteoffApprovalListRoute
+  InvStockWriteoffListRoute: typeof InvStockWriteoffListRoute
+  InvStoreReturnReceiveRoute: typeof InvStoreReturnReceiveRoute
+  InvStoreReturnReceiveListRoute: typeof InvStoreReturnReceiveListRoute
+  InvSupplierReturnListRoute: typeof InvSupplierReturnListRoute
   InvYarnOpeningStockRoute: typeof InvYarnOpeningStockRoute
+  InventoryConfigurationRoute: typeof InventoryConfigurationRoute
   InventoryDashboardRoute: typeof InventoryDashboardRoute
   JdListRoute: typeof JdListRoute
   KpiApprovalRoute: typeof KpiApprovalRoute
@@ -3239,10 +3659,14 @@ export interface RootRouteChildren {
   ProcurementBillingPrepareV2Route: typeof ProcurementBillingPrepareV2Route
   ProcurementBillingPurchaseListRoute: typeof ProcurementBillingPurchaseListRoute
   ProcurementBillingSupplierBillRoute: typeof ProcurementBillingSupplierBillRoute
+  ProcurementBillingSupplierBillApprovalRoute: typeof ProcurementBillingSupplierBillApprovalRoute
+  ProcurementBillingSupplierBillApprovalListRoute: typeof ProcurementBillingSupplierBillApprovalListRoute
+  ProcurementBillingSupplierBillListRoute: typeof ProcurementBillingSupplierBillListRoute
   ProcurementBillingSupplierRecordRoute: typeof ProcurementBillingSupplierRecordRoute
   ProcurementBillingSupplierRecordListRoute: typeof ProcurementBillingSupplierRecordListRoute
   ProcurementBillingVatTaxEntryRoute: typeof ProcurementBillingVatTaxEntryRoute
   ProcurementBillingVatTaxRegisterRoute: typeof ProcurementBillingVatTaxRegisterRoute
+  ProcurementComparativeStatementRoute: typeof ProcurementComparativeStatementRoute
   ProcurementConfigBankAccountsRoute: typeof ProcurementConfigBankAccountsRoute
   ProcurementConfigBankInfoRoute: typeof ProcurementConfigBankInfoRoute
   ProcurementConfigCurrencyRateRoute: typeof ProcurementConfigCurrencyRateRoute
@@ -3252,6 +3676,7 @@ export interface RootRouteChildren {
   ProcurementConfigSupplierNameRoute: typeof ProcurementConfigSupplierNameRoute
   ProcurementConfigSupplierOpeningRoute: typeof ProcurementConfigSupplierOpeningRoute
   ProcurementConfigTermsRoute: typeof ProcurementConfigTermsRoute
+  ProcurementCsApprovalRoute: typeof ProcurementCsApprovalRoute
   ProcurementCsBatchListRoute: typeof ProcurementCsBatchListRoute
   ProcurementCsCreateBatchRoute: typeof ProcurementCsCreateBatchRoute
   ProcurementCsCreateWorkorderRoute: typeof ProcurementCsCreateWorkorderRoute
@@ -3259,6 +3684,10 @@ export interface RootRouteChildren {
   ProcurementCsSupplierItemsRoute: typeof ProcurementCsSupplierItemsRoute
   ProcurementCsSupplierPriceRoute: typeof ProcurementCsSupplierPriceRoute
   ProcurementDashboardRoute: typeof ProcurementDashboardRoute
+  ProcurementMasterDataRoute: typeof ProcurementMasterDataRoute
+  ProcurementMaterialReceiveListRoute: typeof ProcurementMaterialReceiveListRoute
+  ProcurementMonthlyBudgetApprovalRoute: typeof ProcurementMonthlyBudgetApprovalRoute
+  ProcurementMonthlyBudgetRequisitionRoute: typeof ProcurementMonthlyBudgetRequisitionRoute
   ProcurementPaymentBillRoute: typeof ProcurementPaymentBillRoute
   ProcurementPaymentListRoute: typeof ProcurementPaymentListRoute
   ProcurementPiApproveDcPriceRoute: typeof ProcurementPiApproveDcPriceRoute
@@ -3270,6 +3699,8 @@ export interface RootRouteChildren {
   ProcurementPoNewRoute: typeof ProcurementPoNewRoute
   ProcurementPoRequisitionWiseRoute: typeof ProcurementPoRequisitionWiseRoute
   ProcurementPoWorkOrderApprovalRoute: typeof ProcurementPoWorkOrderApprovalRoute
+  ProcurementPrApprovalRoute: typeof ProcurementPrApprovalRoute
+  ProcurementPurchaseRequisitionRoute: typeof ProcurementPurchaseRequisitionRoute
   ProcurementReportsCombinedPoStatementRoute: typeof ProcurementReportsCombinedPoStatementRoute
   ProcurementReportsDncRateRoute: typeof ProcurementReportsDncRateRoute
   ProcurementReportsPaymentStatementRoute: typeof ProcurementReportsPaymentStatementRoute
@@ -3662,6 +4093,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcurementReportsCombinedPoStatementRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/procurement-purchase-requisition': {
+      id: '/procurement-purchase-requisition'
+      path: '/procurement-purchase-requisition'
+      fullPath: '/procurement-purchase-requisition'
+      preLoaderRoute: typeof ProcurementPurchaseRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-pr-approval': {
+      id: '/procurement-pr-approval'
+      path: '/procurement-pr-approval'
+      fullPath: '/procurement-pr-approval'
+      preLoaderRoute: typeof ProcurementPrApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/procurement-po-work-order-approval': {
       id: '/procurement-po-work-order-approval'
       path: '/procurement-po-work-order-approval'
@@ -3739,6 +4184,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcurementPaymentBillRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/procurement-monthly-budget-requisition': {
+      id: '/procurement-monthly-budget-requisition'
+      path: '/procurement-monthly-budget-requisition'
+      fullPath: '/procurement-monthly-budget-requisition'
+      preLoaderRoute: typeof ProcurementMonthlyBudgetRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-monthly-budget-approval': {
+      id: '/procurement-monthly-budget-approval'
+      path: '/procurement-monthly-budget-approval'
+      fullPath: '/procurement-monthly-budget-approval'
+      preLoaderRoute: typeof ProcurementMonthlyBudgetApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-material-receive-list': {
+      id: '/procurement-material-receive-list'
+      path: '/procurement-material-receive-list'
+      fullPath: '/procurement-material-receive-list'
+      preLoaderRoute: typeof ProcurementMaterialReceiveListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-master-data': {
+      id: '/procurement-master-data'
+      path: '/procurement-master-data'
+      fullPath: '/procurement-master-data'
+      preLoaderRoute: typeof ProcurementMasterDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/procurement-dashboard': {
       id: '/procurement-dashboard'
       path: '/procurement-dashboard'
@@ -3786,6 +4259,13 @@ declare module '@tanstack/react-router' {
       path: '/procurement-cs-batch-list'
       fullPath: '/procurement-cs-batch-list'
       preLoaderRoute: typeof ProcurementCsBatchListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-cs-approval': {
+      id: '/procurement-cs-approval'
+      path: '/procurement-cs-approval'
+      fullPath: '/procurement-cs-approval'
+      preLoaderRoute: typeof ProcurementCsApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/procurement-config-terms': {
@@ -3851,6 +4331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcurementConfigBankAccountsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/procurement-comparative-statement': {
+      id: '/procurement-comparative-statement'
+      path: '/procurement-comparative-statement'
+      fullPath: '/procurement-comparative-statement'
+      preLoaderRoute: typeof ProcurementComparativeStatementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/procurement-billing-vat-tax-register': {
       id: '/procurement-billing-vat-tax-register'
       path: '/procurement-billing-vat-tax-register'
@@ -3877,6 +4364,27 @@ declare module '@tanstack/react-router' {
       path: '/procurement-billing-supplier-record'
       fullPath: '/procurement-billing-supplier-record'
       preLoaderRoute: typeof ProcurementBillingSupplierRecordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-supplier-bill-list': {
+      id: '/procurement-billing-supplier-bill-list'
+      path: '/procurement-billing-supplier-bill-list'
+      fullPath: '/procurement-billing-supplier-bill-list'
+      preLoaderRoute: typeof ProcurementBillingSupplierBillListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-supplier-bill-approval-list': {
+      id: '/procurement-billing-supplier-bill-approval-list'
+      path: '/procurement-billing-supplier-bill-approval-list'
+      fullPath: '/procurement-billing-supplier-bill-approval-list'
+      preLoaderRoute: typeof ProcurementBillingSupplierBillApprovalListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-supplier-bill-approval': {
+      id: '/procurement-billing-supplier-bill-approval'
+      path: '/procurement-billing-supplier-bill-approval'
+      fullPath: '/procurement-billing-supplier-bill-approval'
+      preLoaderRoute: typeof ProcurementBillingSupplierBillApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/procurement-billing-supplier-bill': {
@@ -4502,11 +5010,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InventoryDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inventory-configuration': {
+      id: '/inventory-configuration'
+      path: '/inventory-configuration'
+      fullPath: '/inventory-configuration'
+      preLoaderRoute: typeof InventoryConfigurationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-yarn-opening-stock': {
       id: '/inv-yarn-opening-stock'
       path: '/inv-yarn-opening-stock'
       fullPath: '/inv-yarn-opening-stock'
       preLoaderRoute: typeof InvYarnOpeningStockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-supplier-return-list': {
+      id: '/inv-supplier-return-list'
+      path: '/inv-supplier-return-list'
+      fullPath: '/inv-supplier-return-list'
+      preLoaderRoute: typeof InvSupplierReturnListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-store-return-receive-list': {
+      id: '/inv-store-return-receive-list'
+      path: '/inv-store-return-receive-list'
+      fullPath: '/inv-store-return-receive-list'
+      preLoaderRoute: typeof InvStoreReturnReceiveListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-store-return-receive': {
+      id: '/inv-store-return-receive'
+      path: '/inv-store-return-receive'
+      fullPath: '/inv-store-return-receive'
+      preLoaderRoute: typeof InvStoreReturnReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-writeoff-list': {
+      id: '/inv-stock-writeoff-list'
+      path: '/inv-stock-writeoff-list'
+      fullPath: '/inv-stock-writeoff-list'
+      preLoaderRoute: typeof InvStockWriteoffListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-writeoff-approval-list': {
+      id: '/inv-stock-writeoff-approval-list'
+      path: '/inv-stock-writeoff-approval-list'
+      fullPath: '/inv-stock-writeoff-approval-list'
+      preLoaderRoute: typeof InvStockWriteoffApprovalListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-writeoff-approval': {
+      id: '/inv-stock-writeoff-approval'
+      path: '/inv-stock-writeoff-approval'
+      fullPath: '/inv-stock-writeoff-approval'
+      preLoaderRoute: typeof InvStockWriteoffApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-writeoff': {
+      id: '/inv-stock-writeoff'
+      path: '/inv-stock-writeoff'
+      fullPath: '/inv-stock-writeoff'
+      preLoaderRoute: typeof InvStockWriteoffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-adjustment-list': {
+      id: '/inv-stock-adjustment-list'
+      path: '/inv-stock-adjustment-list'
+      fullPath: '/inv-stock-adjustment-list'
+      preLoaderRoute: typeof InvStockAdjustmentListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-adjustment': {
+      id: '/inv-stock-adjustment'
+      path: '/inv-stock-adjustment'
+      fullPath: '/inv-stock-adjustment'
+      preLoaderRoute: typeof InvStockAdjustmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-return-to-store-list': {
+      id: '/inv-return-to-store-list'
+      path: '/inv-return-to-store-list'
+      fullPath: '/inv-return-to-store-list'
+      preLoaderRoute: typeof InvReturnToStoreListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-receive-mrr': {
+      id: '/inv-receive-mrr'
+      path: '/inv-receive-mrr'
+      fullPath: '/inv-receive-mrr'
+      preLoaderRoute: typeof InvReceiveMrrRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inv-receive-list': {
@@ -4521,6 +5113,34 @@ declare module '@tanstack/react-router' {
       path: '/inv-receive-direct'
       fullPath: '/inv-receive-direct'
       preLoaderRoute: typeof InvReceiveDirectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-opening-stock-list': {
+      id: '/inv-opening-stock-list'
+      path: '/inv-opening-stock-list'
+      fullPath: '/inv-opening-stock-list'
+      preLoaderRoute: typeof InvOpeningStockListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-material-requisition-list': {
+      id: '/inv-material-requisition-list'
+      path: '/inv-material-requisition-list'
+      fullPath: '/inv-material-requisition-list'
+      preLoaderRoute: typeof InvMaterialRequisitionListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-material-requisition-approval-list': {
+      id: '/inv-material-requisition-approval-list'
+      path: '/inv-material-requisition-approval-list'
+      fullPath: '/inv-material-requisition-approval-list'
+      preLoaderRoute: typeof InvMaterialRequisitionApprovalListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-material-requisition': {
+      id: '/inv-material-requisition'
+      path: '/inv-material-requisition'
+      fullPath: '/inv-material-requisition'
+      preLoaderRoute: typeof InvMaterialRequisitionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inv-issue-return': {
@@ -4549,6 +5169,41 @@ declare module '@tanstack/react-router' {
       path: '/inv-issue-list'
       fullPath: '/inv-issue-list'
       preLoaderRoute: typeof InvIssueListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-intercompany-transfer-list': {
+      id: '/inv-intercompany-transfer-list'
+      path: '/inv-intercompany-transfer-list'
+      fullPath: '/inv-intercompany-transfer-list'
+      preLoaderRoute: typeof InvIntercompanyTransferListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-intercompany-transfer': {
+      id: '/inv-intercompany-transfer'
+      path: '/inv-intercompany-transfer'
+      fullPath: '/inv-intercompany-transfer'
+      preLoaderRoute: typeof InvIntercompanyTransferRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-intercompany-receive-list': {
+      id: '/inv-intercompany-receive-list'
+      path: '/inv-intercompany-receive-list'
+      fullPath: '/inv-intercompany-receive-list'
+      preLoaderRoute: typeof InvIntercompanyReceiveListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-intercompany-receive': {
+      id: '/inv-intercompany-receive'
+      path: '/inv-intercompany-receive'
+      fullPath: '/inv-intercompany-receive'
+      preLoaderRoute: typeof InvIntercompanyReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-direct-mrr-list': {
+      id: '/inv-direct-mrr-list'
+      path: '/inv-direct-mrr-list'
+      fullPath: '/inv-direct-mrr-list'
+      preLoaderRoute: typeof InvDirectMrrListRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inv-dashboard': {
@@ -5135,13 +5790,35 @@ const rootRouteChildren: RootRouteChildren = {
   InvConfigStoreNameRoute: InvConfigStoreNameRoute,
   InvConfigUomRoute: InvConfigUomRoute,
   InvDashboardRoute: InvDashboardRoute,
+  InvDirectMrrListRoute: InvDirectMrrListRoute,
+  InvIntercompanyReceiveRoute: InvIntercompanyReceiveRoute,
+  InvIntercompanyReceiveListRoute: InvIntercompanyReceiveListRoute,
+  InvIntercompanyTransferRoute: InvIntercompanyTransferRoute,
+  InvIntercompanyTransferListRoute: InvIntercompanyTransferListRoute,
   InvIssueListRoute: InvIssueListRoute,
   InvIssueMrrReturnRoute: InvIssueMrrReturnRoute,
   InvIssueRegularRoute: InvIssueRegularRoute,
   InvIssueReturnRoute: InvIssueReturnRoute,
+  InvMaterialRequisitionRoute: InvMaterialRequisitionRoute,
+  InvMaterialRequisitionApprovalListRoute:
+    InvMaterialRequisitionApprovalListRoute,
+  InvMaterialRequisitionListRoute: InvMaterialRequisitionListRoute,
+  InvOpeningStockListRoute: InvOpeningStockListRoute,
   InvReceiveDirectRoute: InvReceiveDirectRoute,
   InvReceiveListRoute: InvReceiveListRoute,
+  InvReceiveMrrRoute: InvReceiveMrrRoute,
+  InvReturnToStoreListRoute: InvReturnToStoreListRoute,
+  InvStockAdjustmentRoute: InvStockAdjustmentRoute,
+  InvStockAdjustmentListRoute: InvStockAdjustmentListRoute,
+  InvStockWriteoffRoute: InvStockWriteoffRoute,
+  InvStockWriteoffApprovalRoute: InvStockWriteoffApprovalRoute,
+  InvStockWriteoffApprovalListRoute: InvStockWriteoffApprovalListRoute,
+  InvStockWriteoffListRoute: InvStockWriteoffListRoute,
+  InvStoreReturnReceiveRoute: InvStoreReturnReceiveRoute,
+  InvStoreReturnReceiveListRoute: InvStoreReturnReceiveListRoute,
+  InvSupplierReturnListRoute: InvSupplierReturnListRoute,
   InvYarnOpeningStockRoute: InvYarnOpeningStockRoute,
+  InventoryConfigurationRoute: InventoryConfigurationRoute,
   InventoryDashboardRoute: InventoryDashboardRoute,
   JdListRoute: JdListRoute,
   KpiApprovalRoute: KpiApprovalRoute,
@@ -5232,11 +5909,18 @@ const rootRouteChildren: RootRouteChildren = {
   ProcurementBillingPrepareV2Route: ProcurementBillingPrepareV2Route,
   ProcurementBillingPurchaseListRoute: ProcurementBillingPurchaseListRoute,
   ProcurementBillingSupplierBillRoute: ProcurementBillingSupplierBillRoute,
+  ProcurementBillingSupplierBillApprovalRoute:
+    ProcurementBillingSupplierBillApprovalRoute,
+  ProcurementBillingSupplierBillApprovalListRoute:
+    ProcurementBillingSupplierBillApprovalListRoute,
+  ProcurementBillingSupplierBillListRoute:
+    ProcurementBillingSupplierBillListRoute,
   ProcurementBillingSupplierRecordRoute: ProcurementBillingSupplierRecordRoute,
   ProcurementBillingSupplierRecordListRoute:
     ProcurementBillingSupplierRecordListRoute,
   ProcurementBillingVatTaxEntryRoute: ProcurementBillingVatTaxEntryRoute,
   ProcurementBillingVatTaxRegisterRoute: ProcurementBillingVatTaxRegisterRoute,
+  ProcurementComparativeStatementRoute: ProcurementComparativeStatementRoute,
   ProcurementConfigBankAccountsRoute: ProcurementConfigBankAccountsRoute,
   ProcurementConfigBankInfoRoute: ProcurementConfigBankInfoRoute,
   ProcurementConfigCurrencyRateRoute: ProcurementConfigCurrencyRateRoute,
@@ -5246,6 +5930,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProcurementConfigSupplierNameRoute: ProcurementConfigSupplierNameRoute,
   ProcurementConfigSupplierOpeningRoute: ProcurementConfigSupplierOpeningRoute,
   ProcurementConfigTermsRoute: ProcurementConfigTermsRoute,
+  ProcurementCsApprovalRoute: ProcurementCsApprovalRoute,
   ProcurementCsBatchListRoute: ProcurementCsBatchListRoute,
   ProcurementCsCreateBatchRoute: ProcurementCsCreateBatchRoute,
   ProcurementCsCreateWorkorderRoute: ProcurementCsCreateWorkorderRoute,
@@ -5253,6 +5938,11 @@ const rootRouteChildren: RootRouteChildren = {
   ProcurementCsSupplierItemsRoute: ProcurementCsSupplierItemsRoute,
   ProcurementCsSupplierPriceRoute: ProcurementCsSupplierPriceRoute,
   ProcurementDashboardRoute: ProcurementDashboardRoute,
+  ProcurementMasterDataRoute: ProcurementMasterDataRoute,
+  ProcurementMaterialReceiveListRoute: ProcurementMaterialReceiveListRoute,
+  ProcurementMonthlyBudgetApprovalRoute: ProcurementMonthlyBudgetApprovalRoute,
+  ProcurementMonthlyBudgetRequisitionRoute:
+    ProcurementMonthlyBudgetRequisitionRoute,
   ProcurementPaymentBillRoute: ProcurementPaymentBillRoute,
   ProcurementPaymentListRoute: ProcurementPaymentListRoute,
   ProcurementPiApproveDcPriceRoute: ProcurementPiApproveDcPriceRoute,
@@ -5264,6 +5954,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProcurementPoNewRoute: ProcurementPoNewRoute,
   ProcurementPoRequisitionWiseRoute: ProcurementPoRequisitionWiseRoute,
   ProcurementPoWorkOrderApprovalRoute: ProcurementPoWorkOrderApprovalRoute,
+  ProcurementPrApprovalRoute: ProcurementPrApprovalRoute,
+  ProcurementPurchaseRequisitionRoute: ProcurementPurchaseRequisitionRoute,
   ProcurementReportsCombinedPoStatementRoute:
     ProcurementReportsCombinedPoStatementRoute,
   ProcurementReportsDncRateRoute: ProcurementReportsDncRateRoute,

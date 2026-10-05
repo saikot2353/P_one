@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -16,6 +17,14 @@ import {
   Wrench,
   Download,
   Upload,
+  PackageOpen,
+  RotateCcw,
+  Undo2,
+  ShieldCheck,
+  ArrowLeftRight,
+  SlidersHorizontal,
+  FileX2,
+  BarChart3,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -47,47 +56,210 @@ export interface NavItem {
 export const nav: NavItem[] = [
   { label: "Dashboard", to: "/inv-dashboard", icon: LayoutDashboard },
   {
-    label: "Configuration",
+    label: "Inventory Master Data",
     icon: Settings,
     subitems: [
-      { label: "Product Type", to: "/inv-config-product-type" },
-      { label: "Store Name", to: "/inv-config-store-name" },
-      { label: "Group Name", to: "/inv-config-group-name" },
-      { label: "Product Name", to: "/inv-config-product-name" },
-      { label: "UoM", to: "/inv-config-uom" },
-      { label: "Brand", to: "/inv-config-brand" },
-      { label: "Model", to: "/inv-config-model" },
-    ]
+      {
+        label: "Warehouse/Store",
+        to: "/inventory-configuration",
+        search: { tab: "warehouse-store" },
+      },
+      {
+        label: "Location/Batch Setup",
+        to: "/inventory-configuration",
+        search: { tab: "store-location" },
+      },
+      {
+        label: "Item Group",
+        to: "/inventory-configuration",
+        search: { tab: "item-group" },
+      },
+      {
+        label: "Item Creation",
+        to: "/inventory-configuration",
+        search: { tab: "item-sub-group" },
+      },
+      {
+        label: "Item Category",
+        to: "/inventory-configuration",
+        search: { tab: "item-category" },
+      },
+      {
+        label: "Brand",
+        to: "/inventory-configuration",
+        search: { tab: "brand" },
+      },
+      {
+        label: "Origin",
+        to: "/inventory-configuration",
+        search: { tab: "origin" },
+      },
+      {
+        label: "Unit of Measurement",
+        to: "/inventory-configuration",
+        search: { tab: "uom" },
+      },
+    ],
   },
   {
-    label: "Config",
-    icon: Wrench,
+    label: "Material Request",
+    icon: FileText,
     subitems: [
-      { label: "Opening Stock", to: "/inv-yarn-opening-stock" }
-    ]
+      {
+        label: "Request Register",
+        to: "/inv-material-requisition-list",
+      },
+      {
+        label: "New Request",
+        to: "/inv-material-requisition",
+      },
+      {
+        label: "Request Approval",
+        to: "/inv-material-requisition-approval-list",
+      },
+    ],
   },
   {
-    label: "Store Receive",
-    icon: Download,
+    label: "Material Issuance",
+    icon: PackageOpen,
     subitems: [
-      { label: "MRR Check", to: "/inv-receive-mrr-check" },
-      { label: "MRR Inspect", to: "/inv-receive-mrr-inspect" },
-      { label: "MRR Approve", to: "/inv-receive-mrr-approve" },
-      { label: "Direct Receive", to: "/inv-receive-direct" },
-      { label: "Receive List", to: "/inv-receive-list" },
-    ]
+      {
+        label: "Issue Register",
+        to: "/inv-issue-list",
+      },
+      {
+        label: "New Issue",
+        to: "/inv-issue-regular",
+      },
+    ],
   },
   {
-    label: "Store Issue",
-    icon: Upload,
+    label: "Material Receiving",
+    icon: Package,
     subitems: [
-      { label: "Issue Regular", to: "/inv-issue-regular" },
-      { label: "Issue List", to: "/inv-issue-list" },
-      { label: "Issue Return", to: "/inv-issue-return" },
-      { label: "Issue Return List", to: "/inv-issue-return-list" },
-      { label: "MRR Return Issue", to: "/inv-issue-mrr-return" },
-    ]
-  }
+      {
+        label: "Receipt Register",
+        to: "/procurement-material-receive-list",
+      },
+      {
+        label: "New Receipt",
+        to: "/inv-receive-mrr",
+      },
+      {
+        label: "Direct Receipt Register",
+        to: "/inv-direct-mrr-list",
+      },
+      {
+        label: "New Direct Receipt",
+        to: "/inv-receive-direct",
+      },
+    ],
+  },
+  {
+    label: "Supplier Returns",
+    icon: Undo2,
+    subitems: [
+      {
+        label: "Return Register",
+        to: "/inv-supplier-return-list",
+      },
+      {
+        label: "New Supplier Return",
+        to: "/inv-issue-mrr-return",
+      },
+    ],
+  },
+  {
+    label: "Store Returns",
+    icon: RotateCcw,
+    subitems: [
+      {
+        label: "Return Register",
+        to: "/inv-return-to-store-list",
+      },
+      {
+        label: "New Return",
+        to: "/inv-issue-return",
+      },
+      {
+        label: "Return Receiving Register",
+        to: "/inv-store-return-receive-list",
+      },
+      {
+        label: "New Return Receipt",
+        to: "/inv-store-return-receive",
+      },
+    ],
+  },
+  {
+    label: "Stock Transfers",
+    icon: ArrowLeftRight,
+    subitems: [
+      {
+        label: "Transfer Register",
+        to: "/inv-intercompany-transfer-list",
+      },
+      {
+        label: "New Transfer",
+        to: "/inv-intercompany-transfer",
+      },
+      {
+        label: "Transfer Receiving Register",
+        to: "/inv-intercompany-receive-list",
+      },
+      {
+        label: "New Transfer Receipt",
+        to: "/inv-intercompany-receive",
+      },
+    ],
+  },
+  {
+    label: "Stock Adjustments",
+    icon: SlidersHorizontal,
+    subitems: [
+      {
+        label: "Adjustment Register",
+        to: "/inv-stock-adjustment-list",
+      },
+      {
+        label: "New Adjustment",
+        to: "/inv-stock-adjustment",
+      },
+    ],
+  },
+  {
+    label: "Stock Write-Offs",
+    icon: FileX2,
+    subitems: [
+      {
+        label: "Write-Off Register",
+        to: "/inv-stock-writeoff-list",
+      },
+      {
+        label: "New Write-Off",
+        to: "/inv-stock-writeoff",
+      },
+      {
+        label: "Write-Off Approval",
+        to: "/inv-stock-writeoff-approval-list",
+      },
+    ],
+  },
+  {
+    label: "Opening Stock",
+    icon: Package,
+    subitems: [
+      {
+        label: "Opening Stock Register",
+        to: "/inv-opening-stock-list",
+      },
+      {
+        label: "New Opening Stock",
+        to: "/inv-yarn-opening-stock",
+      },
+    ],
+  },
+  { label: "Reports", to: "/inv-dashboard", icon: BarChart3 },
 ];
 
 export function InventorySidebar() {
@@ -143,6 +315,21 @@ export function InventorySidebar() {
       sessionStorage.setItem("sidebar_menus", JSON.stringify(openMenus));
     }
   }, [openMenus]);
+
+  useEffect(() => {
+    nav.forEach((item) => {
+      if (item.subitems) {
+        const isChildActive = item.subitems.some(
+          (sub) =>
+            sub.to === currentPath ||
+            (sub.subitems && sub.subitems.some((n) => n.to === currentPath))
+        );
+        if (isChildActive) {
+          setOpenMenus((prev) => ({ ...prev, [item.label]: true }));
+        }
+      }
+    });
+  }, [currentPath]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && scrollRef.current) {
@@ -237,6 +424,8 @@ export function InventorySidebar() {
                 return false;
               }));
 
+          const isPlaceholder = item.label !== "Dashboard";
+
           if (!item.subitems) {
             return (
               <div
@@ -246,18 +435,30 @@ export function InventorySidebar() {
                 <Link
                   to={item.to || "/"}
                   search={item.search}
+                  onClick={(e) => {
+                    if (isPlaceholder) {
+                      e.preventDefault();
+                      toast.info(
+                        `${item.label} module will be available in future releases. Inventory Control Center is currently active.`,
+                      );
+                    }
+                  }}
                   className={[
                     "group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all duration-200",
-                    isParentActive
+                    isParentActive && !isPlaceholder
                       ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-2xs"
                       : "text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                   ].join(" ")}
                 >
                   <Icon className="size-3.5 transition-transform duration-300 group-hover:scale-110 group-hover:text-sidebar-primary" />
                   <span>{item.label}</span>
-                  {isParentActive && (
+                  {isPlaceholder ? (
+                    <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                      Soon
+                    </span>
+                  ) : isParentActive ? (
                     <span className="ml-auto size-1.5 rounded-full bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)] animate-pulse" />
-                  )}
+                  ) : null}
                 </Link>
               </div>
             );

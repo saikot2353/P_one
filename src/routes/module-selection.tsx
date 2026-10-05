@@ -88,7 +88,7 @@ const modules = [
     icon: Package,
     color: "from-purple-500 to-fuchsia-600",
     shadow: "shadow-purple-500/20",
-    path: "/inventory-dashboard",
+    path: "/inv-dashboard",
   },
   {
     id: "asset",

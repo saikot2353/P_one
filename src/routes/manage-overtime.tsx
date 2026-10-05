@@ -374,7 +374,7 @@ function ManageOvertimePage() {
   const activeTab = searchParams.tab || "requisition";
 
   const setActiveTab = (tab: SearchParams["tab"]) => {
-    navigate({ search: { tab } });
+    navigate({ to: "/manage-overtime", search: { tab } });
   };
 
   // Top Filter States for OT Requisition

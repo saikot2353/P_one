@@ -40,7 +40,7 @@ export const Route = createFileRoute("/configure-structure")({
   component: StructureSetupPage,
 });
 
-type TabType = "group" | "company" | "area" | "mapping";
+type TabType = "group" | "company" | "area" | "mapping" | "departments" | "sections" | "units" | "lines";
 
 // ----------------------------------------------------
 // Interfaces

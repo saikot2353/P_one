@@ -1520,10 +1520,6 @@ function ProcurementAuditMrrPage() {
                       <span className="font-semibold text-slate-700">MRR DATE :</span>
                       <span className="text-slate-800">{selectedPrintMrr.mrrDate}</span>
                     </div>
-                    <div className="flex justify-between px-2.5 py-0.5">
-                      <span className="font-semibold text-slate-700">Revision :</span>
-                      <span className="text-slate-800">{selectedPrintMrr.revision || "00"}</span>
-                    </div>
                   </div>
                 </div>
               </div>

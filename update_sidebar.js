@@ -17,7 +17,7 @@ code = code.replace(/import \{[\s\S]*?\} from "lucide-react";/, `import {
 
 // Replace nav array
 code = code.replace(/export const nav: NavItem\[\] = \[[\s\S]*?\];/m, `export const nav: NavItem[] = [
-  { label: "Dashboard", to: "/inventory-dashboard", icon: LayoutDashboard },
+  { label: "Dashboard", to: "/inv-dashboard", icon: LayoutDashboard },
   {
     label: "Items & Catalog",
     icon: Blocks,

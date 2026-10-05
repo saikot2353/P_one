@@ -1,435 +1,856 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { InventorySidebar } from "@/components/dashboard/InventorySidebar";
 import { InventoryTopbar } from "@/components/dashboard/InventoryTopbar";
-import { Printer, FileSpreadsheet, FileText, Search, Filter, ChevronDown, Calendar, X } from "lucide-react";
-import pakizaLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
-
+import {
+  PackageOpen,
+  ArrowRight,
+  Filter,
+  Search,
+  ChevronDown,
+  Printer,
+  Calendar,
+  Building2,
+  User,
+  Clock,
+  CheckCircle2,
+  Layers,
+  FileSpreadsheet,
+  X,
+  History,
+  FileText,
+  Eye,
+} from "lucide-react";
+import {
+  MaterialRequisition,
+  MaterialIssue,
+  getStoredMaterialRequisitions,
+  setStoredMaterialRequisitions,
+  getStoredMaterialIssues,
+} from "@/lib/inventory-requisition-issue-data";
+import { DEFAULT_WAREHOUSES, getStoredData } from "@/lib/procurement-master-data";
+import {
+  StandardPreviewReportModal,
+  StandardReportData,
+} from "@/components/reports/StandardPreviewReportModal";
 
 export const Route = createFileRoute("/inv-issue-list")({
-  component: InvIssueListPage,
+  head: () => ({
+    meta: [
+      { title: "Material Issue List — Inventory ERP" },
+      {
+        name: "description",
+        content: "Track approved requisitions pending issue, partial issues, and remaining quantities.",
+      },
+    ],
+  }),
+  component: MaterialIssueListPage,
 });
 
-type IssueRecord = {
-  id: string;
-  issueTo: string;
-  issueNo: string;
-  issueDate: string;
-  srnNo: string;
-  challan: string;
-  gatePass: string;
-  loanStatus: string;
-};
+function MaterialIssueListPage() {
+  const navigate = useNavigate();
 
-const mockData: IssueRecord[] = [
-  { id: "1", issueTo: "Core Development", issueNo: "1112", issueDate: "15/07/2026", srnNo: "390428", challan: "2026071", gatePass: "", loanStatus: "" },
-  { id: "2", issueTo: "Admin", issueNo: "1113", issueDate: "18/07/2026", srnNo: "391166", challan: "2026071", gatePass: "", loanStatus: "" },
-  { id: "3", issueTo: "Admin", issueNo: "1114", issueDate: "18/07/2026", srnNo: "390949", challan: "2026071", gatePass: "", loanStatus: "" },
-  { id: "4", issueTo: "Digital Marketing", issueNo: "1115", issueDate: "18/07/2026", srnNo: "390888", challan: "2026071", gatePass: "", loanStatus: "" },
-  { id: "5", issueTo: "Admin", issueNo: "1116", issueDate: "18/07/2026", srnNo: "390727", challan: "2026071", gatePass: "", loanStatus: "" },
-];
-
-// ─── Smart UI Components ──────────────────────────────────────────────────
-
-function SmartInput({ label, value, onChange, placeholder, type = "text", readOnly = false, icon: Icon, disabled = false }: any) {
-  return (
-    <div className="flex flex-col gap-1.5 relative group">
-      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-0.5">
-        {label}
-      </label>
-      <div className="relative">
-        <input 
-          type={type}
-          readOnly={readOnly}
-          disabled={disabled}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          className={`w-full h-[36px] rounded-lg px-3 text-[11px] font-medium transition-all duration-200 outline-none ${
-            readOnly || disabled
-              ? "bg-slate-50 text-slate-400 cursor-not-allowed" 
-              : "bg-slate-100/80 hover:bg-slate-200/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border focus:border-blue-500/30 text-slate-700 placeholder:text-slate-400"
-          } ${type === 'date' ? '[&::-webkit-calendar-picker-indicator]:opacity-0 relative z-10' : ''} ${Icon ? 'pl-8' : ''}`}
-        />
-        {type === 'date' && (
-          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none z-0" />
-        )}
-        {Icon && (
-          <Icon className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none z-10" />
-        )}
-      </div>
-    </div>
-  )
-}
-
-function SmartSelect({ label, value, onChange, options, defaultOption, icon: Icon, disabled = false }: any) {
-  return (
-    <div className="flex flex-col gap-1.5 relative group">
-      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-0.5">
-        {label}
-      </label>
-      <div className="relative">
-        <select 
-          value={value}
-          onChange={onChange}
-          disabled={disabled}
-          className={`w-full h-[36px] rounded-lg px-3 text-[11px] font-medium transition-all duration-200 outline-none appearance-none ${
-            disabled
-              ? "bg-slate-50 text-slate-400 cursor-not-allowed" 
-              : "bg-slate-100/80 hover:bg-slate-200/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border focus:border-blue-500/30 text-slate-700 cursor-pointer"
-          } ${Icon ? 'pl-8' : ''}`}
-        >
-          {defaultOption && <option value="" disabled>{defaultOption}</option>}
-          {options.map((opt: any) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-        <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 size-3.5 ${disabled ? 'text-slate-300' : 'text-slate-400'} pointer-events-none`} />
-        {Icon && (
-          <Icon className={`absolute left-3 top-1/2 -translate-y-1/2 size-3.5 ${disabled ? 'text-slate-300' : 'text-slate-400'} pointer-events-none z-10`} />
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ─── Main Page ────────────────────────────────────────────────────────────
-
-function InvIssueListPage() {
-  const [issueType, setIssueType] = useState("Issue Regular");
-  const [dateFrom, setDateFrom] = useState("2026-07-11");
-  const [dateTo, setDateTo] = useState("2026-08-10");
-  const [issueTo, setIssueTo] = useState("All");
-  
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
-  
-  const [selectedIssue, setSelectedIssue] = useState<IssueRecord | null>(null);
-
-  const filteredData = mockData.filter(row => 
-    Object.values(row).some(val => val.toLowerCase().includes(searchQuery.toLowerCase()))
+  const [requisitions, setRequisitions] = useState<MaterialRequisition[]>(() =>
+    getStoredMaterialRequisitions()
   );
+  const [issuedRecords] = useState<MaterialIssue[]>(() => getStoredMaterialIssues());
+
+  useEffect(() => {
+    setStoredMaterialRequisitions(requisitions);
+  }, [requisitions]);
+
+  const warehouses = getStoredData("proc_warehouses_v2", DEFAULT_WAREHOUSES);
+
+  // Tabs: "pending" (Approved with pending or partial issue) vs "all" (All approved/issued MRs)
+  const [activeTab, setActiveTab] = useState<"pending" | "all">("pending");
+
+  // Filters State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mrIdFilter, setMrIdFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("All");
+  const [requestedByFilter, setRequestedByFilter] = useState("");
+  const [warehouseFilter, setWarehouseFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+
+  // Preview Report & Issue View State
+  const [previewReportOpen, setPreviewReportOpen] = useState(false);
+  const [reportTargetMR, setReportTargetMR] = useState<MaterialRequisition | null>(null);
+  const [viewingIssue, setViewingIssue] = useState<MaterialIssue | null>(null);
+
+  const handleViewMR = (mr: MaterialRequisition) => {
+    const existing = issuedRecords.find(
+      (iss) => iss.mrNumber === mr.mrNumber || iss.mrId === mr.id
+    );
+    navigate({
+      to: "/inv-issue-regular",
+      search: {
+        mrId: mr.id,
+        issueId: existing?.id,
+        mode: "view",
+      },
+    });
+  };
+
+  // Distinct Departments
+  const departments = useMemo(() => {
+    const set = new Set<string>();
+    requisitions.forEach((r) => r.department && set.add(r.department));
+    return Array.from(set);
+  }, [requisitions]);
+
+  // Approved Requisitions eligible for issue
+  const eligibleRequisitions = useMemo(() => {
+    return requisitions.filter((mr) => {
+      // Must be approved, partially issued, or fully issued
+      const isEligibleStatus =
+        mr.status === "Approved" ||
+        mr.status === "Partially Issued" ||
+        mr.status === "Fully Issued";
+
+      if (!isEligibleStatus) return false;
+
+      // Pending tab: Only shows MRs with remaining issue quantity > 0
+      if (activeTab === "pending") {
+        if (mr.remainingQuantity <= 0) return false;
+      }
+
+      // Quick search
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const match =
+          mr.mrNumber.toLowerCase().includes(q) ||
+          mr.department.toLowerCase().includes(q) ||
+          mr.requestedBy.toLowerCase().includes(q) ||
+          mr.warehouseStore.toLowerCase().includes(q);
+        if (!match) return false;
+      }
+
+      if (mrIdFilter.trim() && !mr.mrNumber.toLowerCase().includes(mrIdFilter.toLowerCase())) {
+        return false;
+      }
+      if (fromDate && mr.requisitionDate < fromDate) {
+        return false;
+      }
+      if (toDate && mr.requisitionDate > toDate) {
+        return false;
+      }
+      if (departmentFilter !== "All" && mr.department !== departmentFilter) {
+        return false;
+      }
+      if (
+        requestedByFilter.trim() &&
+        !mr.requestedBy.toLowerCase().includes(requestedByFilter.toLowerCase())
+      ) {
+        return false;
+      }
+      if (warehouseFilter !== "All" && mr.warehouseStore !== warehouseFilter) {
+        return false;
+      }
+      if (statusFilter !== "All") {
+        const derived =
+          mr.issuedQuantity === 0
+            ? "Pending Issue"
+            : mr.remainingQuantity > 0
+            ? "Partially Issued"
+            : "Fully Issued";
+        if (derived !== statusFilter) return false;
+      }
+
+      return true;
+    });
+  }, [
+    requisitions,
+    activeTab,
+    searchQuery,
+    mrIdFilter,
+    fromDate,
+    toDate,
+    departmentFilter,
+    requestedByFilter,
+    warehouseFilter,
+    statusFilter,
+  ]);
+
+  // Derived Status Label & Badge
+  const getDerivedIssueStatus = (mr: MaterialRequisition) => {
+    if (mr.issuedQuantity === 0) {
+      return {
+        label: "Pending Issue",
+        badge: "bg-blue-50 text-blue-700 border-blue-200",
+      };
+    }
+    if (mr.remainingQuantity > 0) {
+      return {
+        label: "Partially Issued",
+        badge: "bg-amber-50 text-amber-700 border-amber-200",
+      };
+    }
+    return {
+      label: "Fully Issued",
+      badge: "bg-purple-50 text-purple-700 border-purple-200",
+    };
+  };
+
+  const pendingIssueCount = useMemo(() => {
+    return requisitions.filter(
+      (r) =>
+        (r.status === "Approved" || r.status === "Partially Issued") && r.remainingQuantity > 0
+    ).length;
+  }, [requisitions]);
+
+  // Preview Report Data
+  const previewReportData: StandardReportData = useMemo(() => {
+    if (!reportTargetMR) {
+      return {
+        companyName: "Pakiza Knit Composite Ltd",
+        companyAddress: "Gorat, Ashulia, Savar, Dhaka, Bangladesh",
+        reportTitle: "MATERIAL ISSUE DISPATCH SUMMARY",
+        reportNumber: "ISS-PREVIEW",
+        reportDate: new Date().toISOString().slice(0, 10),
+        statusBadge: "Draft",
+        metaFields: [],
+        tableHeaders: [],
+        tableRows: [],
+      };
+    }
+    const issueStatus = getDerivedIssueStatus(reportTargetMR);
+    return {
+      companyName: reportTargetMR.organization || "Pakiza Knit Composite Ltd",
+      companyAddress: "Gorat, Ashulia, Savar, Dhaka, Bangladesh",
+      reportTitle: "MATERIAL ISSUE DISPATCH REPORT",
+      reportNumber: reportTargetMR.mrNumber,
+      reportDate: reportTargetMR.requisitionDate,
+      statusBadge: issueStatus.label,
+      metaFields: [
+        { label: "Department", value: reportTargetMR.department },
+        { label: "Requested By", value: reportTargetMR.requestedBy },
+        { label: "Warehouse / Store", value: reportTargetMR.warehouseStore },
+        { label: "Required Date", value: reportTargetMR.requiredDate },
+        { label: "Approved Date", value: reportTargetMR.approvedDate || "-" },
+      ],
+      tableHeaders: [
+        "SL",
+        "ITEM CODE",
+        "ITEM DESCRIPTION",
+        "UOM",
+        "REQ QTY",
+        "ISSUED QTY",
+        "REMAINING QTY",
+        "AVL STOCK",
+        "REMARKS",
+      ],
+      tableRows: reportTargetMR.items.map((it, idx) => [
+        String(idx + 1),
+        it.itemCode,
+        it.itemName,
+        it.uom,
+        String(it.requestedQuantity),
+        String(it.issuedQuantity || 0),
+        String(it.remainingQuantity),
+        String(it.availableStock),
+        it.remarks || "-",
+      ]),
+      summaryCards: [
+        { label: "Total Items", value: String(reportTargetMR.totalItems) },
+        { label: "Requested Qty", value: String(reportTargetMR.requestedQuantity) },
+        { label: "Issued Qty", value: String(reportTargetMR.issuedQuantity) },
+        { label: "Remaining Qty", value: String(reportTargetMR.remainingQuantity) },
+      ],
+      notes: [
+        `Requisition authorized on ${reportTargetMR.approvedDate || reportTargetMR.requisitionDate}.`,
+        reportTargetMR.remainingQuantity > 0
+          ? `Pending issue balance: ${reportTargetMR.remainingQuantity} units eligible for store dispatch.`
+          : "Requisition fully issued.",
+      ],
+      signatures: [
+        { title: "Store Officer", name: "Warehouse Dispatcher", date: "-" },
+        { title: "Received By", name: reportTargetMR.requestedBy, date: "-" },
+      ],
+    };
+  }, [reportTargetMR]);
 
   return (
     <div className="min-h-screen flex bg-slate-50 text-foreground">
       <InventorySidebar />
       <main className="flex-1 min-w-0 flex flex-col relative pb-20">
         <InventoryTopbar />
-        
-        <div className="p-4 md:p-6 space-y-6 w-full max-w-[1400px] mx-auto mt-4">
-          
+
+        <div className="p-4 sm:p-6 lg:p-7 space-y-6 w-full max-w-[1550px] mx-auto">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2 border-b border-slate-200/60">
-            <div>
-              <h1 className="text-xl font-black tracking-tight text-slate-800 flex items-center gap-2">
-                <FileText className="size-6 text-blue-500" />
-                Issue List
-              </h1>
-              <p className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-medium">
-                View and manage product issuance records
-              </p>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 font-bold shadow-sm">
+                <PackageOpen className="size-5" />
+              </div>
+              <div>
+                <h1 className="text-xl font-black text-slate-800 tracking-tight">
+                  Material Issue List
+                </h1>
+                <p className="text-xs text-slate-500 font-medium">
+                  Primary store dispatch queue for approved Material Requisitions with pending or partial issues
+                </p>
+              </div>
+            </div>
+
+            {/* View Tabs */}
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <button
+                onClick={() => setActiveTab("pending")}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  activeTab === "pending"
+                    ? "bg-white text-slate-800 shadow-sm"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <span>Pending / Partial Issue</span>
+                {pendingIssueCount > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white">
+                    {pendingIssueCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab("all")}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  activeTab === "all"
+                    ? "bg-white text-slate-800 shadow-sm"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <span>All Requisitions</span>
+                <span className="text-[10px] text-slate-400">
+                  (
+                  {
+                    requisitions.filter(
+                      (r) =>
+                        r.status === "Approved" ||
+                        r.status === "Partially Issued" ||
+                        r.status === "Fully Issued"
+                    ).length
+                  }
+                  )
+                </span>
+              </button>
             </div>
           </div>
 
-          {/* Filter Section Accordion */}
-          <div className="bg-white rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-200/60 overflow-hidden relative">
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500"></div>
-            
-            <button 
-              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-              className="w-full px-6 py-4 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors border-b border-slate-100 focus:outline-none"
-            >
-              <div className="flex items-center gap-2.5">
-                <Filter className="size-4 text-amber-500" />
-                <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Filter Options</span>
-              </div>
-              <ChevronDown className={`size-4 text-slate-400 transition-transform duration-300 ${isFiltersOpen ? "rotate-180" : ""}`} />
-            </button>
-            
-            <div className={`transition-all duration-300 ease-in-out ${isFiltersOpen ? "opacity-100 max-h-[1000px]" : "opacity-0 max-h-0 overflow-hidden"}`}>
-              <div className="p-6 md:p-8">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-6 items-end">
-                  
-                  <div className="md:col-span-3">
-                    <SmartSelect 
-                      label="ISSUE TYPE" 
-                      value={issueType} 
-                      onChange={(e: any) => setIssueType(e.target.value)} 
-                      options={[
-                        {value: "Issue Regular", label: "Issue Regular"},
-                        {value: "Issue Special", label: "Issue Special"},
-                      ]} 
-                    />
-                  </div>
-                  
-                  <div className="md:col-span-2">
-                    <SmartInput label="DATE FROM" type="date" value={dateFrom} onChange={(e: any) => setDateFrom(e.target.value)} />
-                  </div>
-                  
-                  <div className="md:col-span-2">
-                    <SmartInput label="DATE TO" type="date" value={dateTo} onChange={(e: any) => setDateTo(e.target.value)} />
-                  </div>
-                  
-                  <div className="md:col-span-3">
-                    <SmartSelect 
-                      label="ISSUE TO" 
-                      value={issueTo} 
-                      onChange={(e: any) => setIssueTo(e.target.value)} 
-                      options={[
-                        {value: "All", label: "All..."},
-                        {value: "Admin", label: "Admin"},
-                        {value: "Core Development", label: "Core Development"},
-                      ]} 
-                    />
+          {/* Filter Accordion */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+              <button
+                onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 border-b border-slate-100 transition-colors"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Filter className="size-4 text-indigo-600" />
+                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    Issue Queue Filters
+                  </span>
+                  <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                    {eligibleRequisitions.length} eligible requisitions
+                  </span>
+                </div>
+                <ChevronDown
+                  className={`size-4 text-slate-400 transition-transform duration-200 ${
+                    isFiltersOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {isFiltersOpen && (
+                <div className="p-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    {/* Requisition ID */}
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Requisition ID
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. MR-2026-0001"
+                        value={mrIdFilter}
+                        onChange={(e) => setMrIdFilter(e.target.value)}
+                        className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      />
+                    </div>
+
+                    {/* From Date & To Date side by side */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                          From Date
+                        </label>
+                        <input
+                          type="date"
+                          value={fromDate}
+                          onChange={(e) => setFromDate(e.target.value)}
+                          className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-2 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                          To Date
+                        </label>
+                        <input
+                          type="date"
+                          value={toDate}
+                          onChange={(e) => setToDate(e.target.value)}
+                          className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-2 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Department */}
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Department
+                      </label>
+                      <select
+                        value={departmentFilter}
+                        onChange={(e) => setDepartmentFilter(e.target.value)}
+                        className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      >
+                        <option value="All">All Departments</option>
+                        {departments.map((d) => (
+                          <option key={d} value={d}>
+                            {d}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Requested By */}
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Requested By
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Requester name..."
+                        value={requestedByFilter}
+                        onChange={(e) => setRequestedByFilter(e.target.value)}
+                        className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      />
+                    </div>
+
+                    {/* Warehouse / Store */}
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Warehouse / Store
+                      </label>
+                      <select
+                        value={warehouseFilter}
+                        onChange={(e) => setWarehouseFilter(e.target.value)}
+                        className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      >
+                        <option value="All">All Warehouses</option>
+                        {warehouses.map((w) => (
+                          <option key={w.id} value={w.name}>
+                            {w.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Status */}
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Status
+                      </label>
+                      <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      >
+                        <option value="All">All Statuses</option>
+                        <option value="Pending Issue">Pending Issue (0 issued)</option>
+                        <option value="Partially Issued">Partially Issued</option>
+                        <option value="Fully Issued">Fully Issued</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div className="md:col-span-2 flex justify-end">
-                    <button className="w-full h-[36px] bg-blue-500 hover:bg-blue-600 text-white font-bold text-[11px] tracking-wider rounded-lg transition-all flex items-center justify-center gap-2">
-                      SEARCH
+                  <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
+                    <button
+                      onClick={() => {
+                        setSearchQuery("");
+                        setMrIdFilter("");
+                        setFromDate("");
+                        setToDate("");
+                        setDepartmentFilter("All");
+                        setRequestedByFilter("");
+                        setWarehouseFilter("All");
+                        setStatusFilter("All");
+                      }}
+                      className="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+                    >
+                      Reset Filters
                     </button>
                   </div>
-
                 </div>
-              </div>
+              )}
             </div>
-          </div>
 
-          {/* Table Section */}
-          <div className="bg-white rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-200/60 overflow-hidden relative">
-            <div className="absolute left-0 top-4 bottom-4 w-1 bg-blue-500 rounded-r-md"></div>
-            
-            {/* Table Toolbar */}
-            <div className="p-6 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <button className="flex items-center gap-1.5 h-[32px] px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-[10px] font-bold tracking-wider uppercase rounded-lg transition-colors shadow-sm">
-                  <FileSpreadsheet className="size-3.5 text-emerald-600" />
-                  EXCEL
-                </button>
-                <button className="flex items-center gap-1.5 h-[32px] px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-[10px] font-bold tracking-wider uppercase rounded-lg transition-colors shadow-sm">
-                  <Printer className="size-3.5 text-slate-600" />
-                  PRINT
-                </button>
-              </div>
-              
-              <div className="w-full sm:w-auto relative group">
-                <div className="relative">
-                  <input 
+
+          {/* Table Card (Pending / Requisitions view) */}
+
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+              <div className="p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100">
+                <span className="text-sm font-black text-slate-800">
+                  {activeTab === "pending"
+                    ? "Requisitions Pending Material Issue"
+                    : "All Approved Requisitions"}{" "}
+                  ({eligibleRequisitions.length})
+                </span>
+
+                <div className="relative flex-1 sm:w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400" />
+                  <input
                     type="text"
-                    className="w-full sm:w-64 h-[32px] rounded-lg bg-slate-100/80 border border-slate-200 hover:border-blue-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 pl-9 pr-3 text-[10.5px] font-semibold text-slate-700 transition-all duration-200 outline-none placeholder:text-slate-400"
+                    placeholder="Search by MR, Dept, Requester..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search records..."
+                    className="w-full h-9 rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-3 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
                   />
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none group-focus-within:text-blue-500 transition-colors" />
                 </div>
               </div>
-            </div>
-            
-            {/* Table */}
-            <div className="overflow-x-auto p-6 pt-2">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-100/50 text-[9.5px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200">
-                    <th className="py-3 px-4 w-20">ACTIONS</th>
-                    <th className="py-3 px-4">ISSUE TO</th>
-                    <th className="py-3 px-4 w-28 text-center">ISSUE NO</th>
-                    <th className="py-3 px-4 w-32 text-center">ISSUE DATE</th>
-                    <th className="py-3 px-4 w-32 text-center">SRN NO</th>
-                    <th className="py-3 px-4 w-32 text-center">CHALLAN</th>
-                    <th className="py-3 px-4 w-28 text-center">GATEPASS</th>
-                    <th className="py-3 px-4 w-32 text-center">LOAN STATUS</th>
-                  </tr>
-                </thead>
-                <tbody className="text-[11px]">
-                  {filteredData.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="py-12 text-center text-slate-400">
-                        No records found matching your filters.
-                      </td>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-[11px]">
+                  <thead>
+                    <tr className="bg-slate-50/75 border-b border-slate-200/80 text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                      <th className="py-3 px-3.5 text-center w-12">SL</th>
+                      <th className="py-3 px-3.5">Requisition ID</th>
+                      <th className="py-3 px-3.5">Requisition Date</th>
+                      <th className="py-3 px-3.5">Department</th>
+                      <th className="py-3 px-3.5">Requested By</th>
+                      <th className="py-3 px-3.5">Warehouse / Store</th>
+                      <th className="py-3 px-3.5 text-center">Total Items</th>
+                      <th className="py-3 px-3.5 text-right">Requested Qty</th>
+                      <th className="py-3 px-3.5 text-right">Previously Issued</th>
+                      <th className="py-3 px-3.5 text-right font-black">Remaining Issue Qty</th>
+                      <th className="py-3 px-3.5 text-center">Status</th>
+                      <th className="py-3 px-3.5 text-center sticky right-0 bg-slate-50 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.05)]">
+                        Action
+                      </th>
                     </tr>
-                  ) : (
-                    filteredData.map((row) => (
-                      <tr 
-                        key={row.id} 
-                        className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors"
-                      >
-                        <td className="py-2.5 px-4">
-                          <div className="flex items-center gap-3">
-                            <input type="checkbox" className="rounded border-slate-300 text-blue-500 focus:ring-blue-500 cursor-pointer" />
-                            <button 
-                              onClick={() => setSelectedIssue(row)}
-                              className="text-slate-400 hover:text-blue-500 transition-colors p-1"
-                              title="Print Issue Details"
-                            >
-                              <Printer className="size-4" strokeWidth={2.5} />
-                            </button>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                    {eligibleRequisitions.length === 0 ? (
+                      <tr>
+                        <td colSpan={12} className="py-12 text-center text-slate-400">
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <CheckCircle2 className="size-8 text-indigo-300 stroke-[1.5]" />
+                            <p className="text-xs font-semibold text-slate-600">
+                              No requisitions pending issue
+                            </p>
+                            <p className="text-[10px] text-slate-400">
+                              All authorized material requisitions have been fully dispatched.
+                            </p>
                           </div>
                         </td>
-                        <td className="py-2.5 px-4 font-bold text-slate-700">{row.issueTo}</td>
-                        <td className="py-2.5 px-4 text-center font-medium text-slate-600">{row.issueNo}</td>
-                        <td className="py-2.5 px-4 text-center text-slate-600">{row.issueDate}</td>
-                        <td className="py-2.5 px-4 text-center text-slate-500">{row.srnNo}</td>
-                        <td className="py-2.5 px-4 text-center text-slate-500">{row.challan}</td>
-                        <td className="py-2.5 px-4 text-center text-slate-500">{row.gatePass || "-"}</td>
-                        <td className="py-2.5 px-4 text-center text-slate-500">{row.loanStatus || "-"}</td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Pagination Placeholder */}
-            <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-between items-center text-xs text-slate-500 font-medium">
-              <div>Showing {filteredData.length} of {mockData.length} entries</div>
-              <div className="flex gap-1.5">
-                <button className="px-3 py-1.5 border border-slate-200 rounded-md hover:bg-white hover:text-slate-800 transition-colors disabled:opacity-50">Previous</button>
-                <button className="px-3 py-1.5 border border-slate-200 bg-blue-500 text-white rounded-md font-bold shadow-sm">1</button>
-                <button className="px-3 py-1.5 border border-slate-200 rounded-md hover:bg-white hover:text-slate-800 transition-colors">2</button>
-                <button className="px-3 py-1.5 border border-slate-200 rounded-md hover:bg-white hover:text-slate-800 transition-colors">3</button>
-                <button className="px-3 py-1.5 border border-slate-200 rounded-md hover:bg-white hover:text-slate-800 transition-colors disabled:opacity-50">Next</button>
+                    ) : (
+                      eligibleRequisitions.map((mr, idx) => {
+                        const issueStatus = getDerivedIssueStatus(mr);
+                        const canIssue = mr.remainingQuantity > 0;
+
+                        return (
+                          <tr
+                            key={mr.id}
+                            className="hover:bg-slate-50/70 transition-colors group whitespace-nowrap"
+                          >
+                            <td className="py-3 px-3.5 text-center text-slate-400 font-mono text-[10px]">
+                              {idx + 1}
+                            </td>
+                            <td className="py-3 px-3.5">
+                              <span className="font-bold text-blue-600 font-mono">
+                                {mr.mrNumber}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3.5 text-slate-600 font-mono">
+                              {mr.requisitionDate}
+                            </td>
+                            <td className="py-3 px-3.5 font-semibold text-slate-800">
+                              {mr.department}
+                            </td>
+                            <td className="py-3 px-3.5 text-slate-800">{mr.requestedBy}</td>
+                            <td className="py-3 px-3.5 max-w-[160px] truncate" title={mr.warehouseStore}>
+                              {mr.warehouseStore}
+                            </td>
+                            <td className="py-3 px-3.5 text-center font-bold font-mono">
+                              {mr.totalItems}
+                            </td>
+                            <td className="py-3 px-3.5 text-right font-bold text-slate-900 font-mono">
+                              {mr.requestedQuantity.toLocaleString()}
+                            </td>
+                            <td className="py-3 px-3.5 text-right font-bold text-indigo-600 font-mono">
+                              {mr.issuedQuantity.toLocaleString()}
+                            </td>
+                            <td className="py-3 px-3.5 text-right font-bold text-amber-600 font-mono">
+                              {mr.remainingQuantity.toLocaleString()}
+                            </td>
+                            <td className="py-3 px-3.5 text-center">
+                              <span
+                                className={`px-2.5 py-1 rounded-full text-[9.5px] font-bold border ${issueStatus.badge}`}
+                              >
+                                {issueStatus.label}
+                              </span>
+                            </td>
+
+                            {/* Action: ISSUE BUTTON */}
+                            <td className="py-3 px-3.5 text-center sticky right-0 bg-white group-hover:bg-slate-50/70 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.05)]">
+                              <div className="flex items-center justify-center gap-1.5">
+                                {canIssue ? (
+                                  <Link
+                                    to="/inv-issue-regular"
+                                    search={{ mrId: mr.id }}
+                                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 active:scale-95 transition-all"
+                                  >
+                                    <PackageOpen className="size-3.5" />
+                                    Issue
+                                  </Link>
+                                ) : (
+                                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-400">
+                                    Dispatched
+                                  </span>
+                                )}
+
+                                <button
+                                  title="View Material Issue Details"
+                                  onClick={() => handleViewMR(mr)}
+                                  className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer"
+                                >
+                                  <Eye className="size-3.5" />
+                                </button>
+
+                                <button
+                                  title="Print Summary Note"
+                                  onClick={() => {
+                                    setReportTargetMR(mr);
+                                    setPreviewReportOpen(true);
+                                  }}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+                                >
+                                  <Printer className="size-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
-          </div>
         </div>
-      </main>
 
-      {/* Issue Print Details Modal */}
-      {selectedIssue && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-900/40 backdrop-blur-sm overflow-y-auto p-4 sm:p-6 animate-in fade-in duration-200">
-          <div className="bg-white text-slate-800 w-full max-w-5xl rounded-xl shadow-2xl relative my-auto border border-slate-200 overflow-hidden">
-            
-            {/* Print action bar (not printable) */}
-            <div className="absolute top-0 inset-x-0 h-14 bg-slate-50 border-b border-slate-200 flex items-center justify-between px-6 print:hidden">
-              <div className="text-[13px] font-bold text-slate-700 tracking-wide">Print Preview: Issue Challan</div>
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={() => window.print()}
-                  className="h-[32px] px-5 bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-bold tracking-wider rounded-lg shadow-sm flex items-center gap-1.5 transition-colors"
-                >
-                  <Printer className="size-3.5" />
-                  PRINT DOCUMENT
-                </button>
-                <button 
-                  onClick={() => setSelectedIssue(null)} 
-                  className="p-1.5 hover:bg-slate-200 rounded-lg transition-colors text-slate-500"
+        {/* Material Issue Details View Modal */}
+        {viewingIssue && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+              {/* Modal Header */}
+              <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                    <PackageOpen className="size-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-slate-800 text-base">
+                        Material Issue Details
+                      </h3>
+                      <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        {viewingIssue.issueNumber}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        {viewingIssue.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Store dispatch slip details against Requisition {viewingIssue.mrNumber}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setViewingIssue(null)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
                 >
                   <X className="size-5" />
                 </button>
               </div>
-            </div>
 
-            {/* Print Content */}
-            <div className="p-10 sm:p-14 mt-14 print:mt-0 font-sans">
-              
-              {/* Header */}
-              <div className="flex justify-between items-start mb-8 pb-6 border-b border-slate-200">
-                <img src={pakizaLogo} alt="Pakiza Software" className="h-10 object-contain mb-2" />
-                
-                <div className="text-center">
-                  <h1 className="text-xl text-emerald-600 font-normal tracking-wide">Pakiza Software Limited</h1>
-                  <p className="text-[10px] text-slate-500 mt-1">Khan ABC Tradeplex House#37, Floor#11 (B-11), Road#2, Dhaka-1205</p>
-                  <h2 className="text-2xl text-blue-500 mt-4 font-normal tracking-wide">Issue Challan</h2>
+              {/* Modal Content */}
+              <div className="p-6 space-y-6 overflow-y-auto">
+                {/* Meta details grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50/80 border border-slate-200/80">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Requisition ID
+                    </span>
+                    <span className="font-mono font-bold text-blue-600 text-xs mt-0.5 block">
+                      {viewingIssue.mrNumber}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Issue Date
+                    </span>
+                    <span className="font-mono font-medium text-slate-700 text-xs mt-0.5 block">
+                      {viewingIssue.issueDate}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Department
+                    </span>
+                    <span className="font-semibold text-slate-800 text-xs mt-0.5 block">
+                      {viewingIssue.department}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Issued To
+                    </span>
+                    <span className="font-medium text-slate-800 text-xs mt-0.5 block">
+                      {viewingIssue.issuedTo}
+                    </span>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Warehouse / Store
+                    </span>
+                    <span className="font-medium text-slate-800 text-xs mt-0.5 block">
+                      {viewingIssue.warehouseStore}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Total Items
+                    </span>
+                    <span className="font-mono font-bold text-slate-800 text-xs mt-0.5 block">
+                      {viewingIssue.totalItems}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Total Dispatched
+                    </span>
+                    <span className="font-mono font-bold text-indigo-600 text-xs mt-0.5 block">
+                      {viewingIssue.totalIssueQty.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
-                
-                <div className="w-48"></div> {/* Spacer for centering */}
+
+                {/* Items Table */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    Dispatched Items
+                  </h4>
+                  <div className="overflow-x-auto rounded-xl border border-slate-200">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                          <th className="py-2.5 px-3 text-center w-10">SL</th>
+                          <th className="py-2.5 px-3">Item Code</th>
+                          <th className="py-2.5 px-3">Item Description</th>
+                          <th className="py-2.5 px-3 text-center">UOM</th>
+                          <th className="py-2.5 px-3 text-right">Requested Qty</th>
+                          <th className="py-2.5 px-3 text-right text-indigo-700 font-bold">
+                            Issued Qty
+                          </th>
+                          <th className="py-2.5 px-3">Batch / Location</th>
+                          <th className="py-2.5 px-3">Remarks</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                        {viewingIssue.items.map((it, i) => (
+                          <tr key={it.id || i} className="hover:bg-slate-50/50">
+                            <td className="py-2 px-3 text-center text-slate-400 font-mono text-[10px]">
+                              {i + 1}
+                            </td>
+                            <td className="py-2 px-3 font-mono font-bold text-blue-600">
+                              {it.itemCode}
+                            </td>
+                            <td className="py-2 px-3 font-semibold text-slate-800">
+                              {it.itemName}
+                              {it.specification && (
+                                <p className="text-[10px] text-slate-400 font-normal">
+                                  {it.specification}
+                                </p>
+                              )}
+                            </td>
+                            <td className="py-2 px-3 text-center font-mono text-slate-600">
+                              {it.uom}
+                            </td>
+                            <td className="py-2 px-3 text-right font-mono text-slate-600">
+                              {(it.mrRequestedQty || 0).toLocaleString()}
+                            </td>
+                            <td className="py-2 px-3 text-right font-mono font-bold text-indigo-600">
+                              {it.issueQty.toLocaleString()}
+                            </td>
+                            <td className="py-2 px-3 text-slate-600 font-mono text-[10px]">
+                              {it.batchAllocations && it.batchAllocations.length > 0
+                                ? it.batchAllocations.map((b) => `Batch: ${b.batchNumber} (${b.quantity})`).join(", ")
+                                : it.locationAllocations && it.locationAllocations.length > 0
+                                ? it.locationAllocations.map((l) => `Loc: ${l.locationName} (${l.quantity})`).join(", ")
+                                : "-"}
+                            </td>
+                            <td className="py-2 px-3 text-slate-500">
+                              {it.remarks || "-"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-slate-50 font-bold border-t border-slate-200 text-slate-800">
+                          <td colSpan={5} className="py-2 px-3 text-right text-[10px] uppercase tracking-wider">
+                            Total Dispatched:
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono text-indigo-600">
+                            {viewingIssue.totalIssueQty.toLocaleString()}
+                          </td>
+                          <td colSpan={2}></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+
+                {viewingIssue.remarks && (
+                  <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
+                      Dispatch Remarks
+                    </span>
+                    <p className="text-xs text-slate-700">{viewingIssue.remarks}</p>
+                  </div>
+                )}
               </div>
 
-              {/* Document Details */}
-              <div className="grid grid-cols-3 gap-8 text-[11px] mb-8 text-slate-600">
-                <div className="space-y-3">
-                  <div className="flex">
-                    <div className="w-24 font-bold text-slate-500">Challan No:</div>
-                    <div className="font-bold text-slate-800">{selectedIssue.challan}</div>
-                  </div>
-                  <div className="flex">
-                    <div className="w-24 font-bold text-slate-500">Challan Date:</div>
-                    <div className="font-bold text-slate-800">{selectedIssue.issueDate}</div>
-                  </div>
-                  <div className="flex">
-                    <div className="w-24 font-bold text-slate-500">SRN No:</div>
-                    <div className="font-bold text-slate-800">{selectedIssue.srnNo}</div>
-                  </div>
-                  <div className="flex">
-                    <div className="w-24 font-bold text-slate-500">Buyer Name:</div>
-                    <div className="font-bold text-slate-800"></div>
-                  </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex">
-                    <div className="w-20 font-bold text-slate-500">Issue No:</div>
-                    <div className="font-bold text-slate-800">{selectedIssue.issueNo}</div>
-                  </div>
-                  <div className="flex">
-                    <div className="w-20 font-bold text-slate-500">Issue Date:</div>
-                    <div className="font-bold text-slate-800">{selectedIssue.issueDate}</div>
-                  </div>
-                  <div className="flex">
-                    <div className="w-20 font-bold text-slate-500">Batch No:</div>
-                    <div className="font-bold text-slate-800"></div>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex">
-                    <div className="w-24 font-bold text-slate-500">Issue To:</div>
-                    <div className="font-bold text-slate-800">{selectedIssue.issueTo}</div>
-                  </div>
-                  <div className="flex">
-                    <div className="w-24 font-bold text-slate-500">Product Type:</div>
-                    <div className="font-bold text-slate-800">General Items</div>
-                  </div>
-                  <div className="flex">
-                    <div className="w-24 font-bold text-slate-500">Remarks:</div>
-                    <div className="font-bold text-slate-800"></div>
-                  </div>
-                </div>
+              {/* Modal Footer */}
+              <div className="p-4 border-t border-slate-100 flex items-center justify-end gap-3 bg-slate-50/50">
+                <button
+                  type="button"
+                  onClick={() => setViewingIssue(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors"
+                >
+                  Close
+                </button>
               </div>
-
-              <div className="italic text-slate-400 text-[10px] mb-2 font-medium">Issue Details</div>
-
-              {/* Items Table */}
-              <table className="w-full text-[11px] border-collapse border-y border-slate-300">
-                <thead>
-                  <tr className="border-b-2 border-slate-300">
-                    <th className="p-2 text-left font-bold text-slate-500 w-12">#</th>
-                    <th className="p-2 text-left font-bold text-slate-500">Item</th>
-                    <th className="p-2 text-left font-bold text-slate-500 w-[25%]">Specification</th>
-                    <th className="p-2 text-left font-bold text-slate-500 w-24">Unit</th>
-                    <th className="p-2 text-left font-bold text-slate-500 w-24">Quantity</th>
-                  </tr>
-                </thead>
-                <tbody className="text-slate-700">
-                  <tr className="border-b border-slate-200">
-                    <td className="p-2 py-4">1</td>
-                    <td className="p-2 py-4 font-semibold text-slate-800">Facial Tissue</td>
-                    <td className="p-2 py-4"></td>
-                    <td className="p-2 py-4">BOX</td>
-                    <td className="p-2 py-4">1.000</td>
-                  </tr>
-                  <tr className="border-b border-slate-200">
-                    <td className="p-2 py-4">2</td>
-                    <td className="p-2 py-4 font-semibold text-slate-800">Towel Tissue</td>
-                    <td className="p-2 py-4"></td>
-                    <td className="p-2 py-4">PKT</td>
-                    <td className="p-2 py-4">3.000</td>
-                  </tr>
-                  <tr className="border-b border-slate-200">
-                    <td className="p-2 py-4">3</td>
-                    <td className="p-2 py-4 font-semibold text-slate-800">Toilet Tissue</td>
-                    <td className="p-2 py-4"></td>
-                    <td className="p-2 py-4">PCS</td>
-                    <td className="p-2 py-4">7.000</td>
-                  </tr>
-                </tbody>
-              </table>
-
             </div>
           </div>
-        </div>
-      )}
+        )}
 
+        {/* Preview Report Modal */}
+        <StandardPreviewReportModal
+          isOpen={previewReportOpen}
+          onClose={() => setPreviewReportOpen(false)}
+          data={previewReportData}
+        />
+      </main>
     </div>
   );
 }

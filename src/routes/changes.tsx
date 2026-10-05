@@ -21,33 +21,42 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v445");
+    const saved = localStorage.getItem("system_changes_v477");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
       setRecords(DEFAULT_CHANGE_RECORDS);
-      localStorage.setItem("system_changes_v445", JSON.stringify(DEFAULT_CHANGE_RECORDS));
+      localStorage.setItem("system_changes_v477", JSON.stringify(DEFAULT_CHANGE_RECORDS));
     }
   }, []);
 
   const handleExport = () => {
-    const headers = ["SL", "Date & Time", "Type", "Module/Area", "Description (English)", "Description (Bangla)"];
-    
+    const headers = [
+      "SL",
+      "Date & Time",
+      "Type",
+      "Module/Area",
+      "Description (English)",
+      "Description (Bangla)",
+    ];
+
     const rows = records.map((r, index) => [
       (index + 1).toString(),
       r.date,
       r.type,
       r.module,
       r.descriptionEn,
-      r.descriptionBn
+      r.descriptionBn,
     ]);
 
     const csvContent = [
       headers.join(","),
-      ...rows.map(e => e.map(val => `"${val.replace(/"/g, '""')}"`).join(","))
+      ...rows.map((e) => e.map((val) => `"${val.replace(/"/g, '""')}"`).join(",")),
     ].join("\n");
 
-    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob([new Uint8Array([0xef, 0xbb, 0xbf]), csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
@@ -62,7 +71,10 @@ function ChangesPage() {
       {/* Header toolbar */}
       <div className="h-14 border-b border-slate-300 bg-[#f3f4f6] flex items-center justify-between px-4 shrink-0 shadow-sm">
         <div className="flex items-center gap-4">
-          <Link to="/module-selection" className="p-1.5 rounded hover:bg-slate-300 text-slate-600 transition-colors">
+          <Link
+            to="/module-selection"
+            className="p-1.5 rounded hover:bg-slate-300 text-slate-600 transition-colors"
+          >
             <ArrowLeft size={18} />
           </Link>
           <div className="flex items-center gap-2 text-[#107c41] font-semibold text-lg">
@@ -96,11 +108,21 @@ function ChangesPage() {
           <thead className="sticky top-0 z-10">
             <tr className="bg-[#f3f4f6] text-slate-600 text-[11px] text-center border-b border-slate-300 font-normal">
               <th className="w-10 border-r border-slate-300 bg-slate-200"></th>
-              <th className="w-44 border-r border-slate-300 py-1.5 font-semibold text-slate-700">A (Date & Time)</th>
-              <th className="w-48 border-r border-slate-300 py-1.5 font-semibold text-slate-700">B (Type)</th>
-              <th className="w-64 border-r border-slate-300 py-1.5 font-semibold text-slate-700">C (Module/Area)</th>
-              <th className="w-[450px] border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">D (English)</th>
-              <th className="w-[450px] border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">E (Bangla)</th>
+              <th className="w-44 border-r border-slate-300 py-1.5 font-semibold text-slate-700">
+                A (Date & Time)
+              </th>
+              <th className="w-48 border-r border-slate-300 py-1.5 font-semibold text-slate-700">
+                B (Type)
+              </th>
+              <th className="w-64 border-r border-slate-300 py-1.5 font-semibold text-slate-700">
+                C (Module/Area)
+              </th>
+              <th className="w-[450px] border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">
+                D (English)
+              </th>
+              <th className="w-[450px] border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">
+                E (Bangla)
+              </th>
             </tr>
           </thead>
           <tbody>

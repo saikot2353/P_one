@@ -29,65 +29,360 @@ interface SearchMenuLink {
 }
 
 const searchableMenus: SearchMenuLink[] = [
-  { label: "Dashboard Overview", parent: "Home", to: "/procurement-dashboard", description: "Procurement Command Center dashboard overview" },
-  
+  {
+    label: "Dashboard Overview",
+    parent: "Home",
+    to: "/procurement-dashboard",
+    description: "Procurement Command Center dashboard overview",
+  },
+
+  // Master Data
+  {
+    label: "Warehouse / Store",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "warehouse-store" },
+    description: "Manage warehouse stores, valuation methods and negative stock rules",
+  },
+  {
+    label: "Store Location / Batch Configuration",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "store-location" },
+    description: "Manage location tracking and batch configuration rules",
+  },
+  {
+    label: "Vendor Category",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "vendor-category" },
+    description: "Classify suppliers and commercial vendor categories",
+  },
+  {
+    label: "Supplier / Vendor Master",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "supplier-vendor" },
+    description: "Supplier directory, contacts, banking, and terms",
+  },
+  {
+    label: "Item Group",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "item-group" },
+    description: "Top-level item groups and classifications",
+  },
+  {
+    label: "Item Creation",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "item-sub-group" },
+    description: "Item catalog, dynamic sub-group tree hierarchy and item creation",
+  },
+  {
+    label: "Item Category",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "item-category" },
+    description: "Product categories with inventory, asset, consumable classifications",
+  },
+  {
+    label: "Brand Master",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "brand" },
+    description: "Manufacturer brands, origin countries and official websites",
+  },
+  {
+    label: "Origin",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "origin" },
+    description: "Country of origin master codes and names",
+  },
+  {
+    label: "Unit of Measurement (UOM)",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "uom" },
+    description: "Measurement units and multi-level conversion factors",
+  },
+  {
+    label: "Payment Terms",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "payment-terms" },
+    description: "Commercial payment terms, advance %, credit days and rules",
+  },
+  {
+    label: "Currency Master",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "currency" },
+    description: "Global exchange rates, symbols and decimal precision",
+  },
+  {
+    label: "Budget Requisition",
+    parent: "Procurement Budget",
+    to: "/procurement-master-data",
+    search: { tab: "budget" },
+    description: "Departmental and Capex budgets, allocations and calculated limits",
+  },
+  {
+    label: "Budget Approval",
+    parent: "Procurement Budget",
+    to: "/procurement-master-data",
+    search: { tab: "budget-approval" },
+    description: "Multi-level budget workflow review, approvals and decisions",
+  },
+  {
+    label: "Approval Authority",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "approval-authority" },
+    description: "Configurable tiered monetary approval limits and roles",
+  },
+  {
+    label: "Document Type / Number Series",
+    parent: "Master Data",
+    to: "/procurement-master-data",
+    search: { tab: "document-type-number-series" },
+    description: "Centralized numbering series, prefixes and reset rules",
+  },
+
   // Configuration
-  { label: "Currency Rate", parent: "Configuration", to: "/procurement-config-currency-rate", description: "Manage global currency rates and exchanges" },
-  { label: "Terms and Condition", parent: "Configuration", to: "/procurement-config-terms", description: "Configure system terms and conditions templates" },
-  { label: "Bank Info", parent: "Configuration", to: "/procurement-config-bank-info", description: "Configure local and international bank details" },
-  { label: "Bank Accounts", parent: "Configuration", to: "/procurement-config-bank-accounts", description: "Manage company bank account configurations" },
-  
+  {
+    label: "Currency Rate",
+    parent: "Configuration",
+    to: "/procurement-config-currency-rate",
+    description: "Manage global currency rates and exchanges",
+  },
+  {
+    label: "Terms and Condition",
+    parent: "Configuration",
+    to: "/procurement-config-terms",
+    description: "Configure system terms and conditions templates",
+  },
+  {
+    label: "Bank Info",
+    parent: "Configuration",
+    to: "/procurement-config-bank-info",
+    description: "Configure local and international bank details",
+  },
+  {
+    label: "Bank Accounts",
+    parent: "Configuration",
+    to: "/procurement-config-bank-accounts",
+    description: "Manage company bank account configurations",
+  },
+
   // Proforma Invoice
-  { label: "Create PI", parent: "Proforma Invoice", to: "/procurement-pi-create", description: "Generate new Proforma Invoice drafts" },
-  { label: "PI List", parent: "Proforma Invoice", to: "/procurement-pi-list", description: "List of generated and active Proforma Invoices" },
-  { label: "Edit DC Price", parent: "Proforma Invoice", to: "/procurement-pi-edit-dc-price", description: "Update direct cost price values on PI" },
-  { label: "Approve DC Price", parent: "Proforma Invoice", to: "/procurement-pi-approve-dc-price", description: "Review and approve pending direct cost prices" },
-  { label: "PI Delete Request", parent: "Proforma Invoice", to: "/procurement-pi-delete-request", description: "Manage deletion requests for Proforma Invoices" },
-  
+  {
+    label: "Create PI",
+    parent: "Proforma Invoice",
+    to: "/procurement-pi-create",
+    description: "Generate new Proforma Invoice drafts",
+  },
+  {
+    label: "PI List",
+    parent: "Proforma Invoice",
+    to: "/procurement-pi-list",
+    description: "List of generated and active Proforma Invoices",
+  },
+  {
+    label: "Edit DC Price",
+    parent: "Proforma Invoice",
+    to: "/procurement-pi-edit-dc-price",
+    description: "Update direct cost price values on PI",
+  },
+  {
+    label: "Approve DC Price",
+    parent: "Proforma Invoice",
+    to: "/procurement-pi-approve-dc-price",
+    description: "Review and approve pending direct cost prices",
+  },
+  {
+    label: "PI Delete Request",
+    parent: "Proforma Invoice",
+    to: "/procurement-pi-delete-request",
+    description: "Manage deletion requests for Proforma Invoices",
+  },
+
   // Purchase Order
-  { label: "Requisition Wise PO", parent: "Purchase Order", to: "/procurement-po-requisition-wise", description: "Generate purchase orders directly from requisitions" },
-  { label: "New Purchase Order", parent: "Purchase Order", to: "/procurement-po-new", description: "Draft a new custom purchase order" },
-  { label: "Purchase Order List", parent: "Purchase Order", to: "/procurement-po-list", description: "Directory of all drafted, sent, and active POs" },
-  { label: "Work Order Approval", parent: "Purchase Order", to: "/procurement-po-work-order-approval", description: "Approve pending supplier work orders" },
-  
+  {
+    label: "Purchase Order / Work Order",
+    parent: "Purchase Order",
+    to: "/procurement-po-new",
+    description: "Unified creation form for Purchase Orders and Work Orders",
+  },
+  {
+    label: "PO / WO Approval",
+    parent: "Purchase Order",
+    to: "/procurement-po-work-order-approval",
+    description: "Multi-level approval console for Purchase Orders and Work Orders",
+  },
+  {
+    label: "Material Receive List",
+    parent: "Receiving",
+    to: "/procurement-material-receive-list",
+    description: "Store-wise receiving list for approved POs with Pending, Partial, and Complete tabs",
+  },
+
   // Billing
-  { label: "Prepare Bill", parent: "Billing", to: "/procurement-billing-prepare", description: "Generate bills from supplier records and receipts" },
-  { label: "Purchase List", parent: "Billing", to: "/procurement-billing-purchase-list", description: "Record of items purchased for billing audits" },
-  { label: "VAT and Tax Register", parent: "Billing", to: "/procurement-billing-vat-tax-register", description: "View compliance logs for VAT and taxes" },
-  { label: "Loan List", parent: "Billing", to: "/procurement-billing-loan-list", description: "Track active procurement loans and payables" },
-  { label: "Edit Bill Rate", parent: "Billing", to: "/procurement-billing-edit-rate", description: "Modify billing rates on existing supplier invoices" },
-  { label: "Approve Bill Rate", parent: "Billing", to: "/procurement-billing-approve-rate", description: "Approve rates and clear bill sheets for payout" },
-  { label: "Supplier Bill", parent: "Billing", to: "/procurement-billing-supplier-bill", description: "Unified supplier bill registry with smart bill creation" },
-  { label: "VAT Tax Entry", parent: "Billing", to: "/procurement-billing-vat-tax-entry", description: "Insert VAT and tax deductions for transactions" },
-  
+  {
+    label: "Prepare Bill",
+    parent: "Billing",
+    to: "/procurement-billing-prepare",
+    description: "Generate bills from supplier records and receipts",
+  },
+  {
+    label: "Purchase List",
+    parent: "Billing",
+    to: "/procurement-billing-purchase-list",
+    description: "Record of items purchased for billing audits",
+  },
+  {
+    label: "VAT and Tax Register",
+    parent: "Billing",
+    to: "/procurement-billing-vat-tax-register",
+    description: "View compliance logs for VAT and taxes",
+  },
+  {
+    label: "Loan List",
+    parent: "Billing",
+    to: "/procurement-billing-loan-list",
+    description: "Track active procurement loans and payables",
+  },
+  {
+    label: "Edit Bill Rate",
+    parent: "Billing",
+    to: "/procurement-billing-edit-rate",
+    description: "Modify billing rates on existing supplier invoices",
+  },
+  {
+    label: "Approve Bill Rate",
+    parent: "Billing",
+    to: "/procurement-billing-approve-rate",
+    description: "Approve rates and clear bill sheets for payout",
+  },
+  {
+    label: "Supplier Bill",
+    parent: "Billing",
+    to: "/procurement-billing-supplier-bill",
+    description: "Unified supplier bill registry with smart bill creation",
+  },
+  {
+    label: "VAT Tax Entry",
+    parent: "Billing",
+    to: "/procurement-billing-vat-tax-entry",
+    description: "Insert VAT and tax deductions for transactions",
+  },
+
   // Payment
-  { label: "Bill Payment", parent: "Payment", to: "/procurement-payment-bill", description: "Clear bills and process payments to bank/cash" },
-  { label: "Payment List", parent: "Payment", to: "/procurement-payment-list", description: "Registry of transaction payouts and receipts" },
-  
+  {
+    label: "Bill Payment",
+    parent: "Payment",
+    to: "/procurement-payment-bill",
+    description: "Clear bills and process payments to bank/cash",
+  },
+  {
+    label: "Payment List",
+    parent: "Payment",
+    to: "/procurement-payment-list",
+    description: "Registry of transaction payouts and receipts",
+  },
+
   // Audit
-  { label: "MRR Audit", parent: "Audit", to: "/procurement-audit-mrr", description: "Audit Material Receive Reports against invoices" },
-  { label: "Update Landed Cost", parent: "Audit", to: "/procurement-audit-landed-cost", description: "Calculate and insert final landed costs for inventory" },
-  { label: "Bill Audit", parent: "Audit", to: "/procurement-audit-bill", description: "Run system audits on supplier invoice records" },
-  
+  {
+    label: "MRR Audit",
+    parent: "Audit",
+    to: "/procurement-audit-mrr",
+    description: "Audit Material Receive Reports against invoices",
+  },
+  {
+    label: "Update Landed Cost",
+    parent: "Audit",
+    to: "/procurement-audit-landed-cost",
+    description: "Calculate and insert final landed costs for inventory",
+  },
+  {
+    label: "Bill Audit",
+    parent: "Audit",
+    to: "/procurement-audit-bill",
+    description: "Run system audits on supplier invoice records",
+  },
+
   // Reports
-  { label: "Purchase Price", parent: "Reports", to: "/procurement-reports-purchase-price", description: "Analytical report of historical purchase price indexes" },
-  { label: "Payment Statement", parent: "Reports", to: "/procurement-reports-payment-statement", description: "Export statements of total payouts per supplier" },
-  { label: "Yarn Booking & PI Status", parent: "Reports", to: "/procurement-reports-yarn-booking-pi", description: "Overview of booking statuses against PIs" },
-  { label: "DNC Rate", parent: "Reports", to: "/procurement-reports-dnc-rate", description: "Direct Net Cost variance rate reports" },
-  { label: "Combined PO Statement", parent: "Reports", to: "/procurement-reports-combined-po-statement", description: "Combined purchase orders statement report sheet" },
-  
+  {
+    label: "Purchase Price",
+    parent: "Reports",
+    to: "/procurement-reports-purchase-price",
+    description: "Analytical report of historical purchase price indexes",
+  },
+  {
+    label: "Payment Statement",
+    parent: "Reports",
+    to: "/procurement-reports-payment-statement",
+    description: "Export statements of total payouts per supplier",
+  },
+  {
+    label: "Yarn Booking & PI Status",
+    parent: "Reports",
+    to: "/procurement-reports-yarn-booking-pi",
+    description: "Overview of booking statuses against PIs",
+  },
+  {
+    label: "DNC Rate",
+    parent: "Reports",
+    to: "/procurement-reports-dnc-rate",
+    description: "Direct Net Cost variance rate reports",
+  },
+  {
+    label: "Combined PO Statement",
+    parent: "Reports",
+    to: "/procurement-reports-combined-po-statement",
+    description: "Combined purchase orders statement report sheet",
+  },
+
   // Comparison Sheet
-  { label: "Supplier Items", parent: "Comparison Sheet", to: "/procurement-cs-supplier-items", description: "List of items mapping suppliers and rates" },
-  { label: "Create CS Batch", parent: "Comparison Sheet", to: "/procurement-cs-create-batch", description: "Formulate a new Comparison Sheet batch for comparison" },
-  { label: "CS Batch List", parent: "Comparison Sheet", to: "/procurement-cs-batch-list", description: "Registry of drafted and approved comparison sheets" },
-  { label: "Supplier Price", parent: "Comparison Sheet", to: "/procurement-cs-supplier-price", description: "Verify price quotes and list variations" },
-  { label: "Create Workorder", parent: "Comparison Sheet", to: "/procurement-cs-create-workorder", description: "Approve the winner and auto-generate the workorder" },
+  {
+    label: "Supplier Items",
+    parent: "Comparison Sheet",
+    to: "/procurement-cs-supplier-items",
+    description: "List of items mapping suppliers and rates",
+  },
+  {
+    label: "Create CS Batch",
+    parent: "Comparison Sheet",
+    to: "/procurement-cs-create-batch",
+    description: "Formulate a new Comparison Sheet batch for comparison",
+  },
+  {
+    label: "CS Batch List",
+    parent: "Comparison Sheet",
+    to: "/procurement-cs-batch-list",
+    description: "Registry of drafted and approved comparison sheets",
+  },
+  {
+    label: "Supplier Price",
+    parent: "Comparison Sheet",
+    to: "/procurement-cs-supplier-price",
+    description: "Verify price quotes and list variations",
+  },
+  {
+    label: "Create Workorder",
+    parent: "Comparison Sheet",
+    to: "/procurement-cs-create-workorder",
+    description: "Approve the winner and auto-generate the workorder",
+  },
 ];
 
 function getCategoryIcon(parent: string) {
   switch (parent) {
     case "Home":
       return LayoutDashboard;
+    case "Master Data":
+      return Settings;
     case "Configuration":
       return Settings;
     case "Proforma Invoice":
@@ -110,9 +405,7 @@ function getCategoryIcon(parent: string) {
 }
 
 export function ProcurementTopbar() {
-  if (typeof window !== "undefined" && window.location.search.includes("embed=true")) {
-    return null;
-  }
+  const isEmbed = typeof window !== "undefined" && window.location.search.includes("embed=true");
 
   const [theme, setTheme] = useState(() => {
     if (typeof window !== "undefined") {
@@ -150,7 +443,7 @@ export function ProcurementTopbar() {
       (item) =>
         item.label.toLowerCase().includes(q) ||
         item.parent.toLowerCase().includes(q) ||
-        (item.description && item.description.toLowerCase().includes(q))
+        (item.description && item.description.toLowerCase().includes(q)),
     );
   }, [searchQuery]);
 
@@ -210,6 +503,8 @@ export function ProcurementTopbar() {
     else if (hours < 17) setGreeting("Good afternoon");
     else setGreeting("Good evening");
   }, []);
+
+  if (isEmbed) return null;
 
   return (
     <header className="h-14 px-5 flex items-center gap-3 border-b border-border/60 bg-card/90 backdrop-blur-md sticky top-0 z-20 transition-colors duration-300 shadow-2xs">
