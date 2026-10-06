@@ -2,6 +2,14 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "543",
+    "date": "2026-10-06T17:54",
+    "type": "Bug Fix",
+    "module": "Dependencies / Build & Deployment",
+    "descriptionEn": "Updated TanStack Start (@tanstack/react-start) and router dependencies to non-vulnerable patched versions (1.168.60+) to fix Vercel XSS vulnerability build error.",
+    "descriptionBn": "ভার্সেল (Vercel) বিল্ড এরর সমাধান করতে টানস্ট্যাক স্টার্ট (@tanstack/react-start) সহ প্যাকেজসমূহ নিরাপদ ও প্যাচড ভার্সনে (1.168.60+) আপডেট করা হয়েছে।"
+  },
+  {
     "id": "542",
     "date": "2026-10-06T17:43",
     "type": "Bug Fix",
