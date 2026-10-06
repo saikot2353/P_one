@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "542",
+    "date": "2026-10-06T17:43",
+    "type": "Bug Fix",
+    "module": "Configure - Company Setup (Designation Organogram)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Fixed TypeScript type error in openDirectionalAdd function to allow null target when adding the first designation to a blank organogram canvas.",
+    "descriptionBn": "খালি অর্গানোগ্রাম ক্যানভাসে প্রথম পদবী যোগ করার সময় ওপেন-ডিরেকশনাল-অ্যাড ফাংশনে নাল (null) টাইপ এরর সমাধান করা হয়েছে।"
+  },
+  {
     "id": "541",
     "date": "2026-10-06T17:15",
     "type": "Enhancement",

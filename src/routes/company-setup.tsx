@@ -2270,7 +2270,7 @@ function CompanySetupPage() {
   };
 
   const openDirectionalAdd = (
-    item: OrganogramDesignationItem,
+    item: OrganogramDesignationItem | null,
     side: "above" | "below" | "left" | "right"
   ) => {
     setDirectionalTarget(item);
