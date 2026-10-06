@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "541",
+    "date": "2026-10-06T17:15",
+    "type": "Enhancement",
+    "module": "Configure - Company Setup (Designation Organogram Direct Selection)",
+    "link": "/company-setup?tab=organogram",
+    "descriptionEn": "Restored the Designation Organogram system under Configure > Company Setup and updated the 'Add Next Hierarchy Level' action to directly open the designation selector modal for Level 2 selection without manual title entry.",
+    "descriptionBn": "Configure > Company Setup এ Organogram ফিচারটি পুনর্নির্মাণ করা হয়েছে এবং 'Add Next Hierarchy Level' বাটনে ক্লিক করলে ম্যানুয়ালি নাম টাইপ করার বদলে সরাসরি লেভেল ২ এর পদবী নির্বাচন করার সুবিধা যুক্ত করা হয়েছে।"
+  },
+  {
     "id": "540",
     "date": "2026-10-01T17:42",
     "type": "Bug Fix",
