@@ -398,15 +398,9 @@ interface YarnTypeSpec {
   id: string;
   yarnType: string;
   createDate: string;
-<<<<<<< HEAD
-  rate?: number;
-  rateConstraint?: RateConstraint | string;
-  status: "Active" | "Inactive";
-=======
   status?: "Active" | "Inactive";
   rate?: number;
   rateConstraint?: RateConstraint | string;
->>>>>>> 7a45f059a0b8cc3c72fbb12ba16599facfadd815
 }
 
 export const initialYarnTypes: YarnTypeSpec[] = [

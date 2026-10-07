@@ -9,284 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-<<<<<<< HEAD
-=======
-import { Route as ZakatListRouteImport } from './routes/zakat-list'
-import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
-import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
-import { Route as UserManagementRouteImport } from './routes/user-management'
-import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
-import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
-import { Route as SspProductBudgetRequestRouteImport } from './routes/ssp-product-budget-request'
-import { Route as SspNewRequisitionRouteImport } from './routes/ssp-new-requisition'
-import { Route as SspMyRequisitionRouteImport } from './routes/ssp-my-requisition'
-import { Route as SspMyAttendanceRouteImport } from './routes/ssp-my-attendance'
-import { Route as SspLeaveRequisitionRouteImport } from './routes/ssp-leave-requisition'
-import { Route as SspIouRequisitionViewRouteImport } from './routes/ssp-iou-requisition-view'
-import { Route as SspIouRequisitionRouteImport } from './routes/ssp-iou-requisition'
-import { Route as SspIctRequisitionRouteImport } from './routes/ssp-ict-requisition'
-import { Route as SspIctProductBudgetRequestRouteImport } from './routes/ssp-ict-product-budget-request'
-import { Route as SspGeneralProductBudgetRequestRouteImport } from './routes/ssp-general-product-budget-request'
-import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
-import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
-import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
-import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
-import { Route as SetManagerRouteImport } from './routes/set-manager'
-import { Route as SetHodRouteImport } from './routes/set-hod'
-import { Route as SeparationResignationRequestRouteImport } from './routes/separation-resignation-request'
-import { Route as SeparationPaymentRouteImport } from './routes/separation-payment'
-import { Route as SeparationExitDocumentsRouteImport } from './routes/separation-exit-documents'
-import { Route as SeparationCompanyInitiatedRouteImport } from './routes/separation-company-initiated'
-import { Route as SeparationClearanceConfigurationRouteImport } from './routes/separation-clearance-configuration'
-import { Route as SeparationClearanceApprovalRouteImport } from './routes/separation-clearance-approval'
-import { Route as SeparationClearanceRouteImport } from './routes/separation-clearance'
-import { Route as SalarySheetPrintRouteImport } from './routes/salary-sheet-print'
-import { Route as SalarySheetFullWithoutHolidayRouteImport } from './routes/salary-sheet-full-without-holiday'
-import { Route as SalarySheetFullWhRouteImport } from './routes/salary-sheet-full-wh'
-import { Route as SalarySheetExecRouteImport } from './routes/salary-sheet-exec'
-import { Route as SalaryProcessRouteImport } from './routes/salary-process'
-import { Route as RecruitmentIeListRouteImport } from './routes/recruitment-ie-list'
-import { Route as RecruitmentHrListRouteImport } from './routes/recruitment-hr-list'
-import { Route as RecruitmentConfigurationRouteImport } from './routes/recruitment-configuration'
-import { Route as RecruitmentBasicSetupRouteImport } from './routes/recruitment-basic-setup'
-import { Route as RecruitmentBasicListRouteImport } from './routes/recruitment-basic-list'
-import { Route as RecruitmentBasicInfoListRouteImport } from './routes/recruitment-basic-info-list'
-import { Route as RecruitmentBasicEntryRouteImport } from './routes/recruitment-basic-entry'
-import { Route as RecruitmentAssessmentListRouteImport } from './routes/recruitment-assessment-list'
-import { Route as ProposeIncrementRouteImport } from './routes/propose-increment'
-import { Route as ProcurementReportsYarnBookingPiRouteImport } from './routes/procurement-reports-yarn-booking-pi'
-import { Route as ProcurementReportsPurchasePriceRouteImport } from './routes/procurement-reports-purchase-price'
-import { Route as ProcurementReportsPaymentStatementRouteImport } from './routes/procurement-reports-payment-statement'
-import { Route as ProcurementReportsDncRateRouteImport } from './routes/procurement-reports-dnc-rate'
-import { Route as ProcurementReportsCombinedPoStatementRouteImport } from './routes/procurement-reports-combined-po-statement'
-import { Route as ProcurementPurchaseRequisitionRouteImport } from './routes/procurement-purchase-requisition'
-import { Route as ProcurementPrApprovalRouteImport } from './routes/procurement-pr-approval'
-import { Route as ProcurementPoWorkOrderApprovalRouteImport } from './routes/procurement-po-work-order-approval'
-import { Route as ProcurementPoRequisitionWiseRouteImport } from './routes/procurement-po-requisition-wise'
-import { Route as ProcurementPoNewRouteImport } from './routes/procurement-po-new'
-import { Route as ProcurementPoListRouteImport } from './routes/procurement-po-list'
-import { Route as ProcurementPiListRouteImport } from './routes/procurement-pi-list'
-import { Route as ProcurementPiEditDcPriceRouteImport } from './routes/procurement-pi-edit-dc-price'
-import { Route as ProcurementPiDeleteRequestRouteImport } from './routes/procurement-pi-delete-request'
-import { Route as ProcurementPiCreateRouteImport } from './routes/procurement-pi-create'
-import { Route as ProcurementPiApproveDcPriceRouteImport } from './routes/procurement-pi-approve-dc-price'
-import { Route as ProcurementPaymentListRouteImport } from './routes/procurement-payment-list'
-import { Route as ProcurementPaymentBillRouteImport } from './routes/procurement-payment-bill'
-import { Route as ProcurementMonthlyBudgetRequisitionRouteImport } from './routes/procurement-monthly-budget-requisition'
-import { Route as ProcurementMonthlyBudgetApprovalRouteImport } from './routes/procurement-monthly-budget-approval'
-import { Route as ProcurementMaterialReceiveListRouteImport } from './routes/procurement-material-receive-list'
-import { Route as ProcurementMasterDataRouteImport } from './routes/procurement-master-data'
-import { Route as ProcurementDashboardRouteImport } from './routes/procurement-dashboard'
-import { Route as ProcurementCsSupplierPriceRouteImport } from './routes/procurement-cs-supplier-price'
-import { Route as ProcurementCsSupplierItemsRouteImport } from './routes/procurement-cs-supplier-items'
-import { Route as ProcurementCsDetailRouteImport } from './routes/procurement-cs-detail'
-import { Route as ProcurementCsCreateWorkorderRouteImport } from './routes/procurement-cs-create-workorder'
-import { Route as ProcurementCsCreateBatchRouteImport } from './routes/procurement-cs-create-batch'
-import { Route as ProcurementCsBatchListRouteImport } from './routes/procurement-cs-batch-list'
-import { Route as ProcurementCsApprovalRouteImport } from './routes/procurement-cs-approval'
-import { Route as ProcurementConfigTermsRouteImport } from './routes/procurement-config-terms'
-import { Route as ProcurementConfigSupplierOpeningRouteImport } from './routes/procurement-config-supplier-opening'
-import { Route as ProcurementConfigSupplierNameRouteImport } from './routes/procurement-config-supplier-name'
-import { Route as ProcurementConfigPurchaseOptionRouteImport } from './routes/procurement-config-purchase-option'
-import { Route as ProcurementConfigLcBookingListRouteImport } from './routes/procurement-config-lc-booking-list'
-import { Route as ProcurementConfigLcBookingRouteImport } from './routes/procurement-config-lc-booking'
-import { Route as ProcurementConfigCurrencyRateRouteImport } from './routes/procurement-config-currency-rate'
-import { Route as ProcurementConfigBankInfoRouteImport } from './routes/procurement-config-bank-info'
-import { Route as ProcurementConfigBankAccountsRouteImport } from './routes/procurement-config-bank-accounts'
-import { Route as ProcurementComparativeStatementRouteImport } from './routes/procurement-comparative-statement'
-import { Route as ProcurementBillingVatTaxRegisterRouteImport } from './routes/procurement-billing-vat-tax-register'
-import { Route as ProcurementBillingVatTaxEntryRouteImport } from './routes/procurement-billing-vat-tax-entry'
-import { Route as ProcurementBillingSupplierRecordListRouteImport } from './routes/procurement-billing-supplier-record-list'
-import { Route as ProcurementBillingSupplierRecordRouteImport } from './routes/procurement-billing-supplier-record'
-import { Route as ProcurementBillingSupplierBillListRouteImport } from './routes/procurement-billing-supplier-bill-list'
-import { Route as ProcurementBillingSupplierBillApprovalListRouteImport } from './routes/procurement-billing-supplier-bill-approval-list'
-import { Route as ProcurementBillingSupplierBillApprovalRouteImport } from './routes/procurement-billing-supplier-bill-approval'
-import { Route as ProcurementBillingSupplierBillRouteImport } from './routes/procurement-billing-supplier-bill'
-import { Route as ProcurementBillingPurchaseListRouteImport } from './routes/procurement-billing-purchase-list'
-import { Route as ProcurementBillingPrepareV2RouteImport } from './routes/procurement-billing-prepare-v2'
-import { Route as ProcurementBillingPrepareRouteImport } from './routes/procurement-billing-prepare'
-import { Route as ProcurementBillingLoanListRouteImport } from './routes/procurement-billing-loan-list'
-import { Route as ProcurementBillingEditRateRouteImport } from './routes/procurement-billing-edit-rate'
-import { Route as ProcurementBillingApproveRateRouteImport } from './routes/procurement-billing-approve-rate'
-import { Route as ProcurementAuditMrrRouteImport } from './routes/procurement-audit-mrr'
-import { Route as ProcurementAuditLandedCostRouteImport } from './routes/procurement-audit-landed-cost'
-import { Route as ProcurementAuditBillRouteImport } from './routes/procurement-audit-bill'
-import { Route as PhonebookRouteImport } from './routes/phonebook'
-import { Route as PersonnelListRouteImport } from './routes/personnel-list'
-import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
-import { Route as PermissionManagementRouteImport } from './routes/permission-management'
-import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
-import { Route as PendingApprovalsRouteImport } from './routes/pending-approvals'
-import { Route as PayslipPrintRouteImport } from './routes/payslip-print'
-import { Route as PayrollSalarySubmitRouteImport } from './routes/payroll-salary-submit'
-import { Route as PayrollReportsRouteImport } from './routes/payroll-reports'
-import { Route as PayrollPeriodLockRouteImport } from './routes/payroll-period-lock'
-import { Route as PayrollLoanRouteImport } from './routes/payroll-loan'
-import { Route as PayrollDeductionsRouteImport } from './routes/payroll-deductions'
-import { Route as PayrollConfigureRouteImport } from './routes/payroll-configure'
-import { Route as PayrollCheckSalaryVattaxRouteImport } from './routes/payroll-check-salary-vattax'
-import { Route as PayrollCheckSalaryPlantheadRouteImport } from './routes/payroll-check-salary-planthead'
-import { Route as PayrollCheckSalaryAuditRouteImport } from './routes/payroll-check-salary-audit'
-import { Route as PayrollCheckSalaryAccountsRouteImport } from './routes/payroll-check-salary-accounts'
-import { Route as PayrollCheckSalaryRouteImport } from './routes/payroll-check-salary'
-import { Route as PayrollCheckBonusVattaxRouteImport } from './routes/payroll-check-bonus-vattax'
-import { Route as PayrollCheckBonusPlantheadRouteImport } from './routes/payroll-check-bonus-planthead'
-import { Route as PayrollCheckBonusAuditRouteImport } from './routes/payroll-check-bonus-audit'
-import { Route as PayrollCheckBonusAccountsRouteImport } from './routes/payroll-check-bonus-accounts'
-import { Route as PayrollCheckBonusRouteImport } from './routes/payroll-check-bonus'
-import { Route as PayrollBonusSubmitRouteImport } from './routes/payroll-bonus-submit'
-import { Route as PayrollBenefitsMonthlyRouteImport } from './routes/payroll-benefits-monthly'
-import { Route as PayrollBenefitsMasterDataRouteImport } from './routes/payroll-benefits-master-data'
-import { Route as PayrollBenefitsCommonRouteImport } from './routes/payroll-benefits-common'
-import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
-import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
-import { Route as OtSheetHolidayRouteImport } from './routes/ot-sheet-holiday'
-import { Route as NoticeRouteImport } from './routes/notice'
-import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
-import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
-import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salary-details'
-import { Route as ModuleSelectionRouteImport } from './routes/module-selection'
-import { Route as MessengerRouteImport } from './routes/messenger'
-import { Route as MerchandisingWorkOrdersRouteImport } from './routes/merchandising-work-orders'
-import { Route as MerchandisingTnaCalendarRouteImport } from './routes/merchandising-tna-calendar'
-import { Route as MerchandisingSampleTrackerRouteImport } from './routes/merchandising-sample-tracker'
-import { Route as MerchandisingSalesTargetEntryRouteImport } from './routes/merchandising-sales-target-entry'
-import { Route as MerchandisingReportsRouteImport } from './routes/merchandising-reports'
-import { Route as MerchandisingQuotationRouteImport } from './routes/merchandising-quotation'
-import { Route as MerchandisingPreCostingRouteImport } from './routes/merchandising-pre-costing'
-import { Route as MerchandisingPoRouteImport } from './routes/merchandising-po'
-import { Route as MerchandisingOrderProfileRouteImport } from './routes/merchandising-order-profile'
-import { Route as MerchandisingOrderListRouteImport } from './routes/merchandising-order-list'
-import { Route as MerchandisingMonthlyCapacityRouteImport } from './routes/merchandising-monthly-capacity'
-import { Route as MerchandisingMaterialBookingsRouteImport } from './routes/merchandising-material-bookings'
-import { Route as MerchandisingMasterSettingsRouteImport } from './routes/merchandising-master-settings'
-import { Route as MerchandisingInquiryRouteImport } from './routes/merchandising-inquiry'
-import { Route as MerchandisingDashboardRouteImport } from './routes/merchandising-dashboard'
-import { Route as MerchandisingCapacityDistributionRouteImport } from './routes/merchandising-capacity-distribution'
-import { Route as MerchandisingCapacityAllocationRouteImport } from './routes/merchandising-capacity-allocation'
-import { Route as MerchandisingCadRouteImport } from './routes/merchandising-cad'
-import { Route as MerchandisingBomRouteImport } from './routes/merchandising-bom'
-import { Route as MaternityPaymentReportRouteImport } from './routes/maternity-payment-report'
-import { Route as MaternityPaymentRouteImport } from './routes/maternity-payment'
-import { Route as MaternityConfigurationRouteImport } from './routes/maternity-configuration'
-import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
-import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as LoanApprovalRouteImport } from './routes/loan-approval'
-import { Route as LoanApplicationRouteImport } from './routes/loan-application'
-import { Route as LeaveListRouteImport } from './routes/leave-list'
-import { Route as LeaveApproveRouteImport } from './routes/leave-approve'
-import { Route as LeaveApplicationRouteImport } from './routes/leave-application'
-import { Route as LeaveRouteImport } from './routes/leave'
-import { Route as KpiTaskNameRouteImport } from './routes/kpi-task-name'
-import { Route as KpiSettingRouteImport } from './routes/kpi-setting'
-import { Route as KpiSelfAssessmentRouteImport } from './routes/kpi-self-assessment'
-import { Route as KpiReportRouteImport } from './routes/kpi-report'
-import { Route as KpiPeerReviewRouteImport } from './routes/kpi-peer-review'
-import { Route as KpiFinalReportRouteImport } from './routes/kpi-final-report'
-import { Route as KpiDashboardRouteImport } from './routes/kpi-dashboard'
-import { Route as KpiCyclesRouteImport } from './routes/kpi-cycles'
-import { Route as KpiAssessmentWorkflowRouteImport } from './routes/kpi-assessment-workflow'
-import { Route as KpiApprovalRouteImport } from './routes/kpi-approval'
-import { Route as JdListRouteImport } from './routes/jd-list'
-import { Route as InventoryDashboardRouteImport } from './routes/inventory-dashboard'
-import { Route as InventoryConfigurationRouteImport } from './routes/inventory-configuration'
-import { Route as InvYarnOpeningStockRouteImport } from './routes/inv-yarn-opening-stock'
-import { Route as InvSupplierReturnListRouteImport } from './routes/inv-supplier-return-list'
-import { Route as InvStoreReturnReceiveListRouteImport } from './routes/inv-store-return-receive-list'
-import { Route as InvStoreReturnReceiveRouteImport } from './routes/inv-store-return-receive'
-import { Route as InvStockWriteoffListRouteImport } from './routes/inv-stock-writeoff-list'
-import { Route as InvStockWriteoffApprovalListRouteImport } from './routes/inv-stock-writeoff-approval-list'
-import { Route as InvStockWriteoffApprovalRouteImport } from './routes/inv-stock-writeoff-approval'
-import { Route as InvStockWriteoffRouteImport } from './routes/inv-stock-writeoff'
-import { Route as InvStockAdjustmentListRouteImport } from './routes/inv-stock-adjustment-list'
-import { Route as InvStockAdjustmentRouteImport } from './routes/inv-stock-adjustment'
-import { Route as InvReturnToStoreListRouteImport } from './routes/inv-return-to-store-list'
-import { Route as InvReceiveMrrRouteImport } from './routes/inv-receive-mrr'
-import { Route as InvReceiveListRouteImport } from './routes/inv-receive-list'
-import { Route as InvReceiveDirectRouteImport } from './routes/inv-receive-direct'
-import { Route as InvOpeningStockListRouteImport } from './routes/inv-opening-stock-list'
-import { Route as InvMaterialRequisitionListRouteImport } from './routes/inv-material-requisition-list'
-import { Route as InvMaterialRequisitionApprovalListRouteImport } from './routes/inv-material-requisition-approval-list'
-import { Route as InvMaterialRequisitionRouteImport } from './routes/inv-material-requisition'
-import { Route as InvIssueReturnRouteImport } from './routes/inv-issue-return'
-import { Route as InvIssueRegularRouteImport } from './routes/inv-issue-regular'
-import { Route as InvIssueMrrReturnRouteImport } from './routes/inv-issue-mrr-return'
-import { Route as InvIssueListRouteImport } from './routes/inv-issue-list'
-import { Route as InvIntercompanyTransferListRouteImport } from './routes/inv-intercompany-transfer-list'
-import { Route as InvIntercompanyTransferRouteImport } from './routes/inv-intercompany-transfer'
-import { Route as InvIntercompanyReceiveListRouteImport } from './routes/inv-intercompany-receive-list'
-import { Route as InvIntercompanyReceiveRouteImport } from './routes/inv-intercompany-receive'
-import { Route as InvDirectMrrListRouteImport } from './routes/inv-direct-mrr-list'
-import { Route as InvDashboardRouteImport } from './routes/inv-dashboard'
-import { Route as InvConfigUomRouteImport } from './routes/inv-config-uom'
-import { Route as InvConfigStoreNameRouteImport } from './routes/inv-config-store-name'
-import { Route as InvConfigProductTypeRouteImport } from './routes/inv-config-product-type'
-import { Route as InvConfigProductNameRouteImport } from './routes/inv-config-product-name'
-import { Route as InvConfigModelRouteImport } from './routes/inv-config-model'
-import { Route as InvConfigGroupNameRouteImport } from './routes/inv-config-group-name'
-import { Route as InvConfigBrandRouteImport } from './routes/inv-config-brand'
-import { Route as IncrementReportRouteImport } from './routes/increment-report'
-import { Route as IncrementMultipleRouteImport } from './routes/increment-multiple'
-import { Route as IncrementHistoryRouteImport } from './routes/increment-history'
-import { Route as IncrementRouteImport } from './routes/increment'
-import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
-import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
-import { Route as HrPolicyRouteImport } from './routes/hr-policy'
-import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
-import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/financial-aid-budget-configuration'
-import { Route as FinalSettlementConfigurationRouteImport } from './routes/final-settlement-configuration'
-import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
-import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
-import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
-import { Route as EmployeeTaxPayRouteImport } from './routes/employee-tax-pay'
-import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
-import { Route as EmployeeDocVerificationRouteImport } from './routes/employee-doc-verification'
-import { Route as EmployeeDocIssueRouteImport } from './routes/employee-doc-issue'
-import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
-import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
-import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
-import { Route as ERecruitmentFormRouteImport } from './routes/e-recruitment-form'
-import { Route as DisciplinaryWarningLettersRouteImport } from './routes/disciplinary-warning-letters'
-import { Route as DisciplinaryShowcauseNoticesRouteImport } from './routes/disciplinary-showcause-notices'
-import { Route as DisciplinaryLeftyRouteImport } from './routes/disciplinary-lefty'
-import { Route as DisciplinaryCaseFilesRouteImport } from './routes/disciplinary-case-files'
-import { Route as DeptWiseSalarySheetRouteImport } from './routes/dept-wise-salary-sheet'
-import { Route as CreateRosterRouteImport } from './routes/create-roster'
-import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
-import { Route as ConfigureTaxRouteImport } from './routes/configure-tax'
-import { Route as ConfigureStructureRouteImport } from './routes/configure-structure'
-import { Route as ConfigurePoliciesRouteImport } from './routes/configure-policies'
-import { Route as ConfigurePersonnelRouteImport } from './routes/configure-personnel'
-import { Route as ConfigureLetterRouteImport } from './routes/configure-letter'
-import { Route as ConfigureEmploymentRouteImport } from './routes/configure-employment'
-import { Route as ConfigureEducationRouteImport } from './routes/configure-education'
-import { Route as ConfigureCompensationRouteImport } from './routes/configure-compensation'
-import { Route as ConferenceRoomBookingListRouteImport } from './routes/conference-room-booking-list'
-import { Route as ConferenceRoomBookingRouteImport } from './routes/conference-room-booking'
-import { Route as ConferenceRoomApprovalRouteImport } from './routes/conference-room-approval'
-import { Route as CompanySetupRouteImport } from './routes/company-setup'
-import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
-import { Route as CheckApproveSalaryRouteImport } from './routes/check-approve-salary'
-import { Route as ChangesRouteImport } from './routes/changes'
-import { Route as CashSheetPrintRouteImport } from './routes/cash-sheet-print'
-import { Route as BulkLeaveRouteImport } from './routes/bulk-leave'
-import { Route as BudgetStatementRouteImport } from './routes/budget-statement'
-import { Route as BudgetRequisitionApprovalsRouteImport } from './routes/budget-requisition-approvals'
-import { Route as BudgetPlanningRouteImport } from './routes/budget-planning'
-import { Route as BudgetOvertimeRouteImport } from './routes/budget-overtime'
-import { Route as BudgetMyRequisitionsRouteImport } from './routes/budget-my-requisitions'
-import { Route as BankSheetExecRouteImport } from './routes/bank-sheet-exec'
-import { Route as ApproveOvertimeRouteImport } from './routes/approve-overtime'
-import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increment-hr'
-import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-increment-gadget'
-import { Route as ApproveAdvanceRouteImport } from './routes/approve-advance'
-import { Route as AllowanceRequisitionRouteImport } from './routes/allowance-requisition'
-import { Route as AllowanceRateRouteImport } from './routes/allowance-rate'
-import { Route as AllApprovalsRouteImport } from './routes/all-approvals'
-import { Route as AdvanceSalaryProcessRouteImport } from './routes/advance-salary-process'
-import { Route as AddEmployeeRouteImport } from './routes/add-employee'
->>>>>>> 7a45f059a0b8cc3c72fbb12ba16599facfadd815
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AbsentCounselingRouteImport } from './routes/absent-counseling'
 import { Route as AddEmployeeRouteImport } from './routes/add-employee'
@@ -383,13 +105,34 @@ import { Route as InvConfigProductTypeRouteImport } from './routes/inv-config-pr
 import { Route as InvConfigStoreNameRouteImport } from './routes/inv-config-store-name'
 import { Route as InvConfigUomRouteImport } from './routes/inv-config-uom'
 import { Route as InvDashboardRouteImport } from './routes/inv-dashboard'
+import { Route as InvDirectMrrListRouteImport } from './routes/inv-direct-mrr-list'
+import { Route as InvIntercompanyReceiveRouteImport } from './routes/inv-intercompany-receive'
+import { Route as InvIntercompanyReceiveListRouteImport } from './routes/inv-intercompany-receive-list'
+import { Route as InvIntercompanyTransferRouteImport } from './routes/inv-intercompany-transfer'
+import { Route as InvIntercompanyTransferListRouteImport } from './routes/inv-intercompany-transfer-list'
 import { Route as InvIssueListRouteImport } from './routes/inv-issue-list'
 import { Route as InvIssueMrrReturnRouteImport } from './routes/inv-issue-mrr-return'
 import { Route as InvIssueRegularRouteImport } from './routes/inv-issue-regular'
 import { Route as InvIssueReturnRouteImport } from './routes/inv-issue-return'
+import { Route as InvMaterialRequisitionRouteImport } from './routes/inv-material-requisition'
+import { Route as InvMaterialRequisitionApprovalListRouteImport } from './routes/inv-material-requisition-approval-list'
+import { Route as InvMaterialRequisitionListRouteImport } from './routes/inv-material-requisition-list'
+import { Route as InvOpeningStockListRouteImport } from './routes/inv-opening-stock-list'
 import { Route as InvReceiveDirectRouteImport } from './routes/inv-receive-direct'
 import { Route as InvReceiveListRouteImport } from './routes/inv-receive-list'
+import { Route as InvReceiveMrrRouteImport } from './routes/inv-receive-mrr'
+import { Route as InvReturnToStoreListRouteImport } from './routes/inv-return-to-store-list'
+import { Route as InvStockAdjustmentRouteImport } from './routes/inv-stock-adjustment'
+import { Route as InvStockAdjustmentListRouteImport } from './routes/inv-stock-adjustment-list'
+import { Route as InvStockWriteoffRouteImport } from './routes/inv-stock-writeoff'
+import { Route as InvStockWriteoffApprovalRouteImport } from './routes/inv-stock-writeoff-approval'
+import { Route as InvStockWriteoffApprovalListRouteImport } from './routes/inv-stock-writeoff-approval-list'
+import { Route as InvStockWriteoffListRouteImport } from './routes/inv-stock-writeoff-list'
+import { Route as InvStoreReturnReceiveRouteImport } from './routes/inv-store-return-receive'
+import { Route as InvStoreReturnReceiveListRouteImport } from './routes/inv-store-return-receive-list'
+import { Route as InvSupplierReturnListRouteImport } from './routes/inv-supplier-return-list'
 import { Route as InvYarnOpeningStockRouteImport } from './routes/inv-yarn-opening-stock'
+import { Route as InventoryConfigurationRouteImport } from './routes/inventory-configuration'
 import { Route as InventoryDashboardRouteImport } from './routes/inventory-dashboard'
 import { Route as JdListRouteImport } from './routes/jd-list'
 import { Route as KpiApprovalRouteImport } from './routes/kpi-approval'
@@ -482,10 +225,14 @@ import { Route as ProcurementBillingPrepareRouteImport } from './routes/procurem
 import { Route as ProcurementBillingPrepareV2RouteImport } from './routes/procurement-billing-prepare-v2'
 import { Route as ProcurementBillingPurchaseListRouteImport } from './routes/procurement-billing-purchase-list'
 import { Route as ProcurementBillingSupplierBillRouteImport } from './routes/procurement-billing-supplier-bill'
+import { Route as ProcurementBillingSupplierBillApprovalRouteImport } from './routes/procurement-billing-supplier-bill-approval'
+import { Route as ProcurementBillingSupplierBillApprovalListRouteImport } from './routes/procurement-billing-supplier-bill-approval-list'
+import { Route as ProcurementBillingSupplierBillListRouteImport } from './routes/procurement-billing-supplier-bill-list'
 import { Route as ProcurementBillingSupplierRecordRouteImport } from './routes/procurement-billing-supplier-record'
 import { Route as ProcurementBillingSupplierRecordListRouteImport } from './routes/procurement-billing-supplier-record-list'
 import { Route as ProcurementBillingVatTaxEntryRouteImport } from './routes/procurement-billing-vat-tax-entry'
 import { Route as ProcurementBillingVatTaxRegisterRouteImport } from './routes/procurement-billing-vat-tax-register'
+import { Route as ProcurementComparativeStatementRouteImport } from './routes/procurement-comparative-statement'
 import { Route as ProcurementConfigBankAccountsRouteImport } from './routes/procurement-config-bank-accounts'
 import { Route as ProcurementConfigBankInfoRouteImport } from './routes/procurement-config-bank-info'
 import { Route as ProcurementConfigCurrencyRateRouteImport } from './routes/procurement-config-currency-rate'
@@ -495,6 +242,7 @@ import { Route as ProcurementConfigPurchaseOptionRouteImport } from './routes/pr
 import { Route as ProcurementConfigSupplierNameRouteImport } from './routes/procurement-config-supplier-name'
 import { Route as ProcurementConfigSupplierOpeningRouteImport } from './routes/procurement-config-supplier-opening'
 import { Route as ProcurementConfigTermsRouteImport } from './routes/procurement-config-terms'
+import { Route as ProcurementCsApprovalRouteImport } from './routes/procurement-cs-approval'
 import { Route as ProcurementCsBatchListRouteImport } from './routes/procurement-cs-batch-list'
 import { Route as ProcurementCsCreateBatchRouteImport } from './routes/procurement-cs-create-batch'
 import { Route as ProcurementCsCreateWorkorderRouteImport } from './routes/procurement-cs-create-workorder'
@@ -502,6 +250,10 @@ import { Route as ProcurementCsDetailRouteImport } from './routes/procurement-cs
 import { Route as ProcurementCsSupplierItemsRouteImport } from './routes/procurement-cs-supplier-items'
 import { Route as ProcurementCsSupplierPriceRouteImport } from './routes/procurement-cs-supplier-price'
 import { Route as ProcurementDashboardRouteImport } from './routes/procurement-dashboard'
+import { Route as ProcurementMasterDataRouteImport } from './routes/procurement-master-data'
+import { Route as ProcurementMaterialReceiveListRouteImport } from './routes/procurement-material-receive-list'
+import { Route as ProcurementMonthlyBudgetApprovalRouteImport } from './routes/procurement-monthly-budget-approval'
+import { Route as ProcurementMonthlyBudgetRequisitionRouteImport } from './routes/procurement-monthly-budget-requisition'
 import { Route as ProcurementPaymentBillRouteImport } from './routes/procurement-payment-bill'
 import { Route as ProcurementPaymentListRouteImport } from './routes/procurement-payment-list'
 import { Route as ProcurementPiApproveDcPriceRouteImport } from './routes/procurement-pi-approve-dc-price'
@@ -513,6 +265,8 @@ import { Route as ProcurementPoListRouteImport } from './routes/procurement-po-l
 import { Route as ProcurementPoNewRouteImport } from './routes/procurement-po-new'
 import { Route as ProcurementPoRequisitionWiseRouteImport } from './routes/procurement-po-requisition-wise'
 import { Route as ProcurementPoWorkOrderApprovalRouteImport } from './routes/procurement-po-work-order-approval'
+import { Route as ProcurementPrApprovalRouteImport } from './routes/procurement-pr-approval'
+import { Route as ProcurementPurchaseRequisitionRouteImport } from './routes/procurement-purchase-requisition'
 import { Route as ProcurementReportsCombinedPoStatementRouteImport } from './routes/procurement-reports-combined-po-statement'
 import { Route as ProcurementReportsDncRateRouteImport } from './routes/procurement-reports-dnc-rate'
 import { Route as ProcurementReportsPaymentStatementRouteImport } from './routes/procurement-reports-payment-statement'
@@ -641,1297 +395,9 @@ const BudgetOvertimeRoute = BudgetOvertimeRouteImport.update({
   path: '/budget-overtime',
   getParentRoute: () => rootRouteImport,
 } as any)
-<<<<<<< HEAD
 const BudgetPlanningRoute = BudgetPlanningRouteImport.update({
   id: '/budget-planning',
   path: '/budget-planning',
-=======
-const ShiftControlCenterRoute = ShiftControlCenterRouteImport.update({
-  id: '/shift-control-center',
-  path: '/shift-control-center',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SetManagerRoute = SetManagerRouteImport.update({
-  id: '/set-manager',
-  path: '/set-manager',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SetHodRoute = SetHodRouteImport.update({
-  id: '/set-hod',
-  path: '/set-hod',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SeparationResignationRequestRoute =
-  SeparationResignationRequestRouteImport.update({
-    id: '/separation-resignation-request',
-    path: '/separation-resignation-request',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const SeparationPaymentRoute = SeparationPaymentRouteImport.update({
-  id: '/separation-payment',
-  path: '/separation-payment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SeparationExitDocumentsRoute = SeparationExitDocumentsRouteImport.update({
-  id: '/separation-exit-documents',
-  path: '/separation-exit-documents',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SeparationCompanyInitiatedRoute =
-  SeparationCompanyInitiatedRouteImport.update({
-    id: '/separation-company-initiated',
-    path: '/separation-company-initiated',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const SeparationClearanceConfigurationRoute =
-  SeparationClearanceConfigurationRouteImport.update({
-    id: '/separation-clearance-configuration',
-    path: '/separation-clearance-configuration',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const SeparationClearanceApprovalRoute =
-  SeparationClearanceApprovalRouteImport.update({
-    id: '/separation-clearance-approval',
-    path: '/separation-clearance-approval',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const SeparationClearanceRoute = SeparationClearanceRouteImport.update({
-  id: '/separation-clearance',
-  path: '/separation-clearance',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SalarySheetPrintRoute = SalarySheetPrintRouteImport.update({
-  id: '/salary-sheet-print',
-  path: '/salary-sheet-print',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SalarySheetFullWithoutHolidayRoute =
-  SalarySheetFullWithoutHolidayRouteImport.update({
-    id: '/salary-sheet-full-without-holiday',
-    path: '/salary-sheet-full-without-holiday',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const SalarySheetFullWhRoute = SalarySheetFullWhRouteImport.update({
-  id: '/salary-sheet-full-wh',
-  path: '/salary-sheet-full-wh',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SalarySheetExecRoute = SalarySheetExecRouteImport.update({
-  id: '/salary-sheet-exec',
-  path: '/salary-sheet-exec',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SalaryProcessRoute = SalaryProcessRouteImport.update({
-  id: '/salary-process',
-  path: '/salary-process',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecruitmentIeListRoute = RecruitmentIeListRouteImport.update({
-  id: '/recruitment-ie-list',
-  path: '/recruitment-ie-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecruitmentHrListRoute = RecruitmentHrListRouteImport.update({
-  id: '/recruitment-hr-list',
-  path: '/recruitment-hr-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecruitmentConfigurationRoute =
-  RecruitmentConfigurationRouteImport.update({
-    id: '/recruitment-configuration',
-    path: '/recruitment-configuration',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const RecruitmentBasicSetupRoute = RecruitmentBasicSetupRouteImport.update({
-  id: '/recruitment-basic-setup',
-  path: '/recruitment-basic-setup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecruitmentBasicListRoute = RecruitmentBasicListRouteImport.update({
-  id: '/recruitment-basic-list',
-  path: '/recruitment-basic-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecruitmentBasicInfoListRoute =
-  RecruitmentBasicInfoListRouteImport.update({
-    id: '/recruitment-basic-info-list',
-    path: '/recruitment-basic-info-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const RecruitmentBasicEntryRoute = RecruitmentBasicEntryRouteImport.update({
-  id: '/recruitment-basic-entry',
-  path: '/recruitment-basic-entry',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecruitmentAssessmentListRoute =
-  RecruitmentAssessmentListRouteImport.update({
-    id: '/recruitment-assessment-list',
-    path: '/recruitment-assessment-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProposeIncrementRoute = ProposeIncrementRouteImport.update({
-  id: '/propose-increment',
-  path: '/propose-increment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementReportsYarnBookingPiRoute =
-  ProcurementReportsYarnBookingPiRouteImport.update({
-    id: '/procurement-reports-yarn-booking-pi',
-    path: '/procurement-reports-yarn-booking-pi',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementReportsPurchasePriceRoute =
-  ProcurementReportsPurchasePriceRouteImport.update({
-    id: '/procurement-reports-purchase-price',
-    path: '/procurement-reports-purchase-price',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementReportsPaymentStatementRoute =
-  ProcurementReportsPaymentStatementRouteImport.update({
-    id: '/procurement-reports-payment-statement',
-    path: '/procurement-reports-payment-statement',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementReportsDncRateRoute =
-  ProcurementReportsDncRateRouteImport.update({
-    id: '/procurement-reports-dnc-rate',
-    path: '/procurement-reports-dnc-rate',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementReportsCombinedPoStatementRoute =
-  ProcurementReportsCombinedPoStatementRouteImport.update({
-    id: '/procurement-reports-combined-po-statement',
-    path: '/procurement-reports-combined-po-statement',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementPurchaseRequisitionRoute =
-  ProcurementPurchaseRequisitionRouteImport.update({
-    id: '/procurement-purchase-requisition',
-    path: '/procurement-purchase-requisition',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementPrApprovalRoute = ProcurementPrApprovalRouteImport.update({
-  id: '/procurement-pr-approval',
-  path: '/procurement-pr-approval',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementPoWorkOrderApprovalRoute =
-  ProcurementPoWorkOrderApprovalRouteImport.update({
-    id: '/procurement-po-work-order-approval',
-    path: '/procurement-po-work-order-approval',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementPoRequisitionWiseRoute =
-  ProcurementPoRequisitionWiseRouteImport.update({
-    id: '/procurement-po-requisition-wise',
-    path: '/procurement-po-requisition-wise',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementPoNewRoute = ProcurementPoNewRouteImport.update({
-  id: '/procurement-po-new',
-  path: '/procurement-po-new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementPoListRoute = ProcurementPoListRouteImport.update({
-  id: '/procurement-po-list',
-  path: '/procurement-po-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementPiListRoute = ProcurementPiListRouteImport.update({
-  id: '/procurement-pi-list',
-  path: '/procurement-pi-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementPiEditDcPriceRoute =
-  ProcurementPiEditDcPriceRouteImport.update({
-    id: '/procurement-pi-edit-dc-price',
-    path: '/procurement-pi-edit-dc-price',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementPiDeleteRequestRoute =
-  ProcurementPiDeleteRequestRouteImport.update({
-    id: '/procurement-pi-delete-request',
-    path: '/procurement-pi-delete-request',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementPiCreateRoute = ProcurementPiCreateRouteImport.update({
-  id: '/procurement-pi-create',
-  path: '/procurement-pi-create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementPiApproveDcPriceRoute =
-  ProcurementPiApproveDcPriceRouteImport.update({
-    id: '/procurement-pi-approve-dc-price',
-    path: '/procurement-pi-approve-dc-price',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementPaymentListRoute = ProcurementPaymentListRouteImport.update({
-  id: '/procurement-payment-list',
-  path: '/procurement-payment-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementPaymentBillRoute = ProcurementPaymentBillRouteImport.update({
-  id: '/procurement-payment-bill',
-  path: '/procurement-payment-bill',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementMonthlyBudgetRequisitionRoute =
-  ProcurementMonthlyBudgetRequisitionRouteImport.update({
-    id: '/procurement-monthly-budget-requisition',
-    path: '/procurement-monthly-budget-requisition',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementMonthlyBudgetApprovalRoute =
-  ProcurementMonthlyBudgetApprovalRouteImport.update({
-    id: '/procurement-monthly-budget-approval',
-    path: '/procurement-monthly-budget-approval',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementMaterialReceiveListRoute =
-  ProcurementMaterialReceiveListRouteImport.update({
-    id: '/procurement-material-receive-list',
-    path: '/procurement-material-receive-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementMasterDataRoute = ProcurementMasterDataRouteImport.update({
-  id: '/procurement-master-data',
-  path: '/procurement-master-data',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementDashboardRoute = ProcurementDashboardRouteImport.update({
-  id: '/procurement-dashboard',
-  path: '/procurement-dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementCsSupplierPriceRoute =
-  ProcurementCsSupplierPriceRouteImport.update({
-    id: '/procurement-cs-supplier-price',
-    path: '/procurement-cs-supplier-price',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementCsSupplierItemsRoute =
-  ProcurementCsSupplierItemsRouteImport.update({
-    id: '/procurement-cs-supplier-items',
-    path: '/procurement-cs-supplier-items',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementCsDetailRoute = ProcurementCsDetailRouteImport.update({
-  id: '/procurement-cs-detail',
-  path: '/procurement-cs-detail',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementCsCreateWorkorderRoute =
-  ProcurementCsCreateWorkorderRouteImport.update({
-    id: '/procurement-cs-create-workorder',
-    path: '/procurement-cs-create-workorder',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementCsCreateBatchRoute =
-  ProcurementCsCreateBatchRouteImport.update({
-    id: '/procurement-cs-create-batch',
-    path: '/procurement-cs-create-batch',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementCsBatchListRoute = ProcurementCsBatchListRouteImport.update({
-  id: '/procurement-cs-batch-list',
-  path: '/procurement-cs-batch-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementCsApprovalRoute = ProcurementCsApprovalRouteImport.update({
-  id: '/procurement-cs-approval',
-  path: '/procurement-cs-approval',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementConfigTermsRoute = ProcurementConfigTermsRouteImport.update({
-  id: '/procurement-config-terms',
-  path: '/procurement-config-terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementConfigSupplierOpeningRoute =
-  ProcurementConfigSupplierOpeningRouteImport.update({
-    id: '/procurement-config-supplier-opening',
-    path: '/procurement-config-supplier-opening',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementConfigSupplierNameRoute =
-  ProcurementConfigSupplierNameRouteImport.update({
-    id: '/procurement-config-supplier-name',
-    path: '/procurement-config-supplier-name',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementConfigPurchaseOptionRoute =
-  ProcurementConfigPurchaseOptionRouteImport.update({
-    id: '/procurement-config-purchase-option',
-    path: '/procurement-config-purchase-option',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementConfigLcBookingListRoute =
-  ProcurementConfigLcBookingListRouteImport.update({
-    id: '/procurement-config-lc-booking-list',
-    path: '/procurement-config-lc-booking-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementConfigLcBookingRoute =
-  ProcurementConfigLcBookingRouteImport.update({
-    id: '/procurement-config-lc-booking',
-    path: '/procurement-config-lc-booking',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementConfigCurrencyRateRoute =
-  ProcurementConfigCurrencyRateRouteImport.update({
-    id: '/procurement-config-currency-rate',
-    path: '/procurement-config-currency-rate',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementConfigBankInfoRoute =
-  ProcurementConfigBankInfoRouteImport.update({
-    id: '/procurement-config-bank-info',
-    path: '/procurement-config-bank-info',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementConfigBankAccountsRoute =
-  ProcurementConfigBankAccountsRouteImport.update({
-    id: '/procurement-config-bank-accounts',
-    path: '/procurement-config-bank-accounts',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementComparativeStatementRoute =
-  ProcurementComparativeStatementRouteImport.update({
-    id: '/procurement-comparative-statement',
-    path: '/procurement-comparative-statement',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingVatTaxRegisterRoute =
-  ProcurementBillingVatTaxRegisterRouteImport.update({
-    id: '/procurement-billing-vat-tax-register',
-    path: '/procurement-billing-vat-tax-register',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingVatTaxEntryRoute =
-  ProcurementBillingVatTaxEntryRouteImport.update({
-    id: '/procurement-billing-vat-tax-entry',
-    path: '/procurement-billing-vat-tax-entry',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingSupplierRecordListRoute =
-  ProcurementBillingSupplierRecordListRouteImport.update({
-    id: '/procurement-billing-supplier-record-list',
-    path: '/procurement-billing-supplier-record-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingSupplierRecordRoute =
-  ProcurementBillingSupplierRecordRouteImport.update({
-    id: '/procurement-billing-supplier-record',
-    path: '/procurement-billing-supplier-record',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingSupplierBillListRoute =
-  ProcurementBillingSupplierBillListRouteImport.update({
-    id: '/procurement-billing-supplier-bill-list',
-    path: '/procurement-billing-supplier-bill-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingSupplierBillApprovalListRoute =
-  ProcurementBillingSupplierBillApprovalListRouteImport.update({
-    id: '/procurement-billing-supplier-bill-approval-list',
-    path: '/procurement-billing-supplier-bill-approval-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingSupplierBillApprovalRoute =
-  ProcurementBillingSupplierBillApprovalRouteImport.update({
-    id: '/procurement-billing-supplier-bill-approval',
-    path: '/procurement-billing-supplier-bill-approval',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingSupplierBillRoute =
-  ProcurementBillingSupplierBillRouteImport.update({
-    id: '/procurement-billing-supplier-bill',
-    path: '/procurement-billing-supplier-bill',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingPurchaseListRoute =
-  ProcurementBillingPurchaseListRouteImport.update({
-    id: '/procurement-billing-purchase-list',
-    path: '/procurement-billing-purchase-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingPrepareV2Route =
-  ProcurementBillingPrepareV2RouteImport.update({
-    id: '/procurement-billing-prepare-v2',
-    path: '/procurement-billing-prepare-v2',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingPrepareRoute =
-  ProcurementBillingPrepareRouteImport.update({
-    id: '/procurement-billing-prepare',
-    path: '/procurement-billing-prepare',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingLoanListRoute =
-  ProcurementBillingLoanListRouteImport.update({
-    id: '/procurement-billing-loan-list',
-    path: '/procurement-billing-loan-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingEditRateRoute =
-  ProcurementBillingEditRateRouteImport.update({
-    id: '/procurement-billing-edit-rate',
-    path: '/procurement-billing-edit-rate',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementBillingApproveRateRoute =
-  ProcurementBillingApproveRateRouteImport.update({
-    id: '/procurement-billing-approve-rate',
-    path: '/procurement-billing-approve-rate',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementAuditMrrRoute = ProcurementAuditMrrRouteImport.update({
-  id: '/procurement-audit-mrr',
-  path: '/procurement-audit-mrr',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcurementAuditLandedCostRoute =
-  ProcurementAuditLandedCostRouteImport.update({
-    id: '/procurement-audit-landed-cost',
-    path: '/procurement-audit-landed-cost',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProcurementAuditBillRoute = ProcurementAuditBillRouteImport.update({
-  id: '/procurement-audit-bill',
-  path: '/procurement-audit-bill',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PhonebookRoute = PhonebookRouteImport.update({
-  id: '/phonebook',
-  path: '/phonebook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PersonnelListRoute = PersonnelListRouteImport.update({
-  id: '/personnel-list',
-  path: '/personnel-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PersonnelApprovalRoute = PersonnelApprovalRouteImport.update({
-  id: '/personnel-approval',
-  path: '/personnel-approval',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PermissionManagementRoute = PermissionManagementRouteImport.update({
-  id: '/permission-management',
-  path: '/permission-management',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PendingManualAttendanceRoute = PendingManualAttendanceRouteImport.update({
-  id: '/pending-manual-attendance',
-  path: '/pending-manual-attendance',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PendingApprovalsRoute = PendingApprovalsRouteImport.update({
-  id: '/pending-approvals',
-  path: '/pending-approvals',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayslipPrintRoute = PayslipPrintRouteImport.update({
-  id: '/payslip-print',
-  path: '/payslip-print',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollSalarySubmitRoute = PayrollSalarySubmitRouteImport.update({
-  id: '/payroll-salary-submit',
-  path: '/payroll-salary-submit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollReportsRoute = PayrollReportsRouteImport.update({
-  id: '/payroll-reports',
-  path: '/payroll-reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollPeriodLockRoute = PayrollPeriodLockRouteImport.update({
-  id: '/payroll-period-lock',
-  path: '/payroll-period-lock',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollLoanRoute = PayrollLoanRouteImport.update({
-  id: '/payroll-loan',
-  path: '/payroll-loan',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollDeductionsRoute = PayrollDeductionsRouteImport.update({
-  id: '/payroll-deductions',
-  path: '/payroll-deductions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollConfigureRoute = PayrollConfigureRouteImport.update({
-  id: '/payroll-configure',
-  path: '/payroll-configure',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollCheckSalaryVattaxRoute =
-  PayrollCheckSalaryVattaxRouteImport.update({
-    id: '/payroll-check-salary-vattax',
-    path: '/payroll-check-salary-vattax',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const PayrollCheckSalaryPlantheadRoute =
-  PayrollCheckSalaryPlantheadRouteImport.update({
-    id: '/payroll-check-salary-planthead',
-    path: '/payroll-check-salary-planthead',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const PayrollCheckSalaryAuditRoute = PayrollCheckSalaryAuditRouteImport.update({
-  id: '/payroll-check-salary-audit',
-  path: '/payroll-check-salary-audit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollCheckSalaryAccountsRoute =
-  PayrollCheckSalaryAccountsRouteImport.update({
-    id: '/payroll-check-salary-accounts',
-    path: '/payroll-check-salary-accounts',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const PayrollCheckSalaryRoute = PayrollCheckSalaryRouteImport.update({
-  id: '/payroll-check-salary',
-  path: '/payroll-check-salary',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollCheckBonusVattaxRoute = PayrollCheckBonusVattaxRouteImport.update({
-  id: '/payroll-check-bonus-vattax',
-  path: '/payroll-check-bonus-vattax',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollCheckBonusPlantheadRoute =
-  PayrollCheckBonusPlantheadRouteImport.update({
-    id: '/payroll-check-bonus-planthead',
-    path: '/payroll-check-bonus-planthead',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const PayrollCheckBonusAuditRoute = PayrollCheckBonusAuditRouteImport.update({
-  id: '/payroll-check-bonus-audit',
-  path: '/payroll-check-bonus-audit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollCheckBonusAccountsRoute =
-  PayrollCheckBonusAccountsRouteImport.update({
-    id: '/payroll-check-bonus-accounts',
-    path: '/payroll-check-bonus-accounts',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const PayrollCheckBonusRoute = PayrollCheckBonusRouteImport.update({
-  id: '/payroll-check-bonus',
-  path: '/payroll-check-bonus',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollBonusSubmitRoute = PayrollBonusSubmitRouteImport.update({
-  id: '/payroll-bonus-submit',
-  path: '/payroll-bonus-submit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollBenefitsMonthlyRoute = PayrollBenefitsMonthlyRouteImport.update({
-  id: '/payroll-benefits-monthly',
-  path: '/payroll-benefits-monthly',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollBenefitsMasterDataRoute =
-  PayrollBenefitsMasterDataRouteImport.update({
-    id: '/payroll-benefits-master-data',
-    path: '/payroll-benefits-master-data',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const PayrollBenefitsCommonRoute = PayrollBenefitsCommonRouteImport.update({
-  id: '/payroll-benefits-common',
-  path: '/payroll-benefits-common',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollBenefitsRoute = PayrollBenefitsRouteImport.update({
-  id: '/payroll-benefits',
-  path: '/payroll-benefits',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayrollAdvanceRoute = PayrollAdvanceRouteImport.update({
-  id: '/payroll-advance',
-  path: '/payroll-advance',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OtSheetHolidayRoute = OtSheetHolidayRouteImport.update({
-  id: '/ot-sheet-holiday',
-  path: '/ot-sheet-holiday',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NoticeRoute = NoticeRouteImport.update({
-  id: '/notice',
-  path: '/notice',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MyDashboardRoute = MyDashboardRouteImport.update({
-  id: '/my-dashboard',
-  path: '/my-dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MonthlySalaryProcessRoute = MonthlySalaryProcessRouteImport.update({
-  id: '/monthly-salary-process',
-  path: '/monthly-salary-process',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MonthlySalaryDetailsRoute = MonthlySalaryDetailsRouteImport.update({
-  id: '/monthly-salary-details',
-  path: '/monthly-salary-details',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ModuleSelectionRoute = ModuleSelectionRouteImport.update({
-  id: '/module-selection',
-  path: '/module-selection',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessengerRoute = MessengerRouteImport.update({
-  id: '/messenger',
-  path: '/messenger',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchandisingWorkOrdersRoute = MerchandisingWorkOrdersRouteImport.update({
-  id: '/merchandising-work-orders',
-  path: '/merchandising-work-orders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchandisingTnaCalendarRoute =
-  MerchandisingTnaCalendarRouteImport.update({
-    id: '/merchandising-tna-calendar',
-    path: '/merchandising-tna-calendar',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MerchandisingSampleTrackerRoute =
-  MerchandisingSampleTrackerRouteImport.update({
-    id: '/merchandising-sample-tracker',
-    path: '/merchandising-sample-tracker',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MerchandisingSalesTargetEntryRoute =
-  MerchandisingSalesTargetEntryRouteImport.update({
-    id: '/merchandising-sales-target-entry',
-    path: '/merchandising-sales-target-entry',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MerchandisingReportsRoute = MerchandisingReportsRouteImport.update({
-  id: '/merchandising-reports',
-  path: '/merchandising-reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchandisingQuotationRoute = MerchandisingQuotationRouteImport.update({
-  id: '/merchandising-quotation',
-  path: '/merchandising-quotation',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchandisingPreCostingRoute = MerchandisingPreCostingRouteImport.update({
-  id: '/merchandising-pre-costing',
-  path: '/merchandising-pre-costing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchandisingPoRoute = MerchandisingPoRouteImport.update({
-  id: '/merchandising-po',
-  path: '/merchandising-po',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchandisingOrderProfileRoute =
-  MerchandisingOrderProfileRouteImport.update({
-    id: '/merchandising-order-profile',
-    path: '/merchandising-order-profile',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MerchandisingOrderListRoute = MerchandisingOrderListRouteImport.update({
-  id: '/merchandising-order-list',
-  path: '/merchandising-order-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchandisingMonthlyCapacityRoute =
-  MerchandisingMonthlyCapacityRouteImport.update({
-    id: '/merchandising-monthly-capacity',
-    path: '/merchandising-monthly-capacity',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MerchandisingMaterialBookingsRoute =
-  MerchandisingMaterialBookingsRouteImport.update({
-    id: '/merchandising-material-bookings',
-    path: '/merchandising-material-bookings',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MerchandisingMasterSettingsRoute =
-  MerchandisingMasterSettingsRouteImport.update({
-    id: '/merchandising-master-settings',
-    path: '/merchandising-master-settings',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MerchandisingInquiryRoute = MerchandisingInquiryRouteImport.update({
-  id: '/merchandising-inquiry',
-  path: '/merchandising-inquiry',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchandisingDashboardRoute = MerchandisingDashboardRouteImport.update({
-  id: '/merchandising-dashboard',
-  path: '/merchandising-dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchandisingCapacityDistributionRoute =
-  MerchandisingCapacityDistributionRouteImport.update({
-    id: '/merchandising-capacity-distribution',
-    path: '/merchandising-capacity-distribution',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MerchandisingCapacityAllocationRoute =
-  MerchandisingCapacityAllocationRouteImport.update({
-    id: '/merchandising-capacity-allocation',
-    path: '/merchandising-capacity-allocation',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MerchandisingCadRoute = MerchandisingCadRouteImport.update({
-  id: '/merchandising-cad',
-  path: '/merchandising-cad',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchandisingBomRoute = MerchandisingBomRouteImport.update({
-  id: '/merchandising-bom',
-  path: '/merchandising-bom',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MaternityPaymentReportRoute = MaternityPaymentReportRouteImport.update({
-  id: '/maternity-payment-report',
-  path: '/maternity-payment-report',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MaternityPaymentRoute = MaternityPaymentRouteImport.update({
-  id: '/maternity-payment',
-  path: '/maternity-payment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MaternityConfigurationRoute = MaternityConfigurationRouteImport.update({
-  id: '/maternity-configuration',
-  path: '/maternity-configuration',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
-  id: '/manual-attendance',
-  path: '/manual-attendance',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ManageOvertimeRoute = ManageOvertimeRouteImport.update({
-  id: '/manage-overtime',
-  path: '/manage-overtime',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoanApprovalRoute = LoanApprovalRouteImport.update({
-  id: '/loan-approval',
-  path: '/loan-approval',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoanApplicationRoute = LoanApplicationRouteImport.update({
-  id: '/loan-application',
-  path: '/loan-application',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LeaveListRoute = LeaveListRouteImport.update({
-  id: '/leave-list',
-  path: '/leave-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LeaveApproveRoute = LeaveApproveRouteImport.update({
-  id: '/leave-approve',
-  path: '/leave-approve',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LeaveApplicationRoute = LeaveApplicationRouteImport.update({
-  id: '/leave-application',
-  path: '/leave-application',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LeaveRoute = LeaveRouteImport.update({
-  id: '/leave',
-  path: '/leave',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KpiTaskNameRoute = KpiTaskNameRouteImport.update({
-  id: '/kpi-task-name',
-  path: '/kpi-task-name',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KpiSettingRoute = KpiSettingRouteImport.update({
-  id: '/kpi-setting',
-  path: '/kpi-setting',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KpiSelfAssessmentRoute = KpiSelfAssessmentRouteImport.update({
-  id: '/kpi-self-assessment',
-  path: '/kpi-self-assessment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KpiReportRoute = KpiReportRouteImport.update({
-  id: '/kpi-report',
-  path: '/kpi-report',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KpiPeerReviewRoute = KpiPeerReviewRouteImport.update({
-  id: '/kpi-peer-review',
-  path: '/kpi-peer-review',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KpiFinalReportRoute = KpiFinalReportRouteImport.update({
-  id: '/kpi-final-report',
-  path: '/kpi-final-report',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KpiDashboardRoute = KpiDashboardRouteImport.update({
-  id: '/kpi-dashboard',
-  path: '/kpi-dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KpiCyclesRoute = KpiCyclesRouteImport.update({
-  id: '/kpi-cycles',
-  path: '/kpi-cycles',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KpiAssessmentWorkflowRoute = KpiAssessmentWorkflowRouteImport.update({
-  id: '/kpi-assessment-workflow',
-  path: '/kpi-assessment-workflow',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KpiApprovalRoute = KpiApprovalRouteImport.update({
-  id: '/kpi-approval',
-  path: '/kpi-approval',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JdListRoute = JdListRouteImport.update({
-  id: '/jd-list',
-  path: '/jd-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InventoryDashboardRoute = InventoryDashboardRouteImport.update({
-  id: '/inventory-dashboard',
-  path: '/inventory-dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InventoryConfigurationRoute = InventoryConfigurationRouteImport.update({
-  id: '/inventory-configuration',
-  path: '/inventory-configuration',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvYarnOpeningStockRoute = InvYarnOpeningStockRouteImport.update({
-  id: '/inv-yarn-opening-stock',
-  path: '/inv-yarn-opening-stock',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvSupplierReturnListRoute = InvSupplierReturnListRouteImport.update({
-  id: '/inv-supplier-return-list',
-  path: '/inv-supplier-return-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvStoreReturnReceiveListRoute =
-  InvStoreReturnReceiveListRouteImport.update({
-    id: '/inv-store-return-receive-list',
-    path: '/inv-store-return-receive-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const InvStoreReturnReceiveRoute = InvStoreReturnReceiveRouteImport.update({
-  id: '/inv-store-return-receive',
-  path: '/inv-store-return-receive',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvStockWriteoffListRoute = InvStockWriteoffListRouteImport.update({
-  id: '/inv-stock-writeoff-list',
-  path: '/inv-stock-writeoff-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvStockWriteoffApprovalListRoute =
-  InvStockWriteoffApprovalListRouteImport.update({
-    id: '/inv-stock-writeoff-approval-list',
-    path: '/inv-stock-writeoff-approval-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const InvStockWriteoffApprovalRoute =
-  InvStockWriteoffApprovalRouteImport.update({
-    id: '/inv-stock-writeoff-approval',
-    path: '/inv-stock-writeoff-approval',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const InvStockWriteoffRoute = InvStockWriteoffRouteImport.update({
-  id: '/inv-stock-writeoff',
-  path: '/inv-stock-writeoff',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvStockAdjustmentListRoute = InvStockAdjustmentListRouteImport.update({
-  id: '/inv-stock-adjustment-list',
-  path: '/inv-stock-adjustment-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvStockAdjustmentRoute = InvStockAdjustmentRouteImport.update({
-  id: '/inv-stock-adjustment',
-  path: '/inv-stock-adjustment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvReturnToStoreListRoute = InvReturnToStoreListRouteImport.update({
-  id: '/inv-return-to-store-list',
-  path: '/inv-return-to-store-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvReceiveMrrRoute = InvReceiveMrrRouteImport.update({
-  id: '/inv-receive-mrr',
-  path: '/inv-receive-mrr',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvReceiveListRoute = InvReceiveListRouteImport.update({
-  id: '/inv-receive-list',
-  path: '/inv-receive-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvReceiveDirectRoute = InvReceiveDirectRouteImport.update({
-  id: '/inv-receive-direct',
-  path: '/inv-receive-direct',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvOpeningStockListRoute = InvOpeningStockListRouteImport.update({
-  id: '/inv-opening-stock-list',
-  path: '/inv-opening-stock-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvMaterialRequisitionListRoute =
-  InvMaterialRequisitionListRouteImport.update({
-    id: '/inv-material-requisition-list',
-    path: '/inv-material-requisition-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const InvMaterialRequisitionApprovalListRoute =
-  InvMaterialRequisitionApprovalListRouteImport.update({
-    id: '/inv-material-requisition-approval-list',
-    path: '/inv-material-requisition-approval-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const InvMaterialRequisitionRoute = InvMaterialRequisitionRouteImport.update({
-  id: '/inv-material-requisition',
-  path: '/inv-material-requisition',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvIssueReturnRoute = InvIssueReturnRouteImport.update({
-  id: '/inv-issue-return',
-  path: '/inv-issue-return',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvIssueRegularRoute = InvIssueRegularRouteImport.update({
-  id: '/inv-issue-regular',
-  path: '/inv-issue-regular',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvIssueMrrReturnRoute = InvIssueMrrReturnRouteImport.update({
-  id: '/inv-issue-mrr-return',
-  path: '/inv-issue-mrr-return',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvIssueListRoute = InvIssueListRouteImport.update({
-  id: '/inv-issue-list',
-  path: '/inv-issue-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvIntercompanyTransferListRoute =
-  InvIntercompanyTransferListRouteImport.update({
-    id: '/inv-intercompany-transfer-list',
-    path: '/inv-intercompany-transfer-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const InvIntercompanyTransferRoute = InvIntercompanyTransferRouteImport.update({
-  id: '/inv-intercompany-transfer',
-  path: '/inv-intercompany-transfer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvIntercompanyReceiveListRoute =
-  InvIntercompanyReceiveListRouteImport.update({
-    id: '/inv-intercompany-receive-list',
-    path: '/inv-intercompany-receive-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const InvIntercompanyReceiveRoute = InvIntercompanyReceiveRouteImport.update({
-  id: '/inv-intercompany-receive',
-  path: '/inv-intercompany-receive',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvDirectMrrListRoute = InvDirectMrrListRouteImport.update({
-  id: '/inv-direct-mrr-list',
-  path: '/inv-direct-mrr-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvDashboardRoute = InvDashboardRouteImport.update({
-  id: '/inv-dashboard',
-  path: '/inv-dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvConfigUomRoute = InvConfigUomRouteImport.update({
-  id: '/inv-config-uom',
-  path: '/inv-config-uom',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvConfigStoreNameRoute = InvConfigStoreNameRouteImport.update({
-  id: '/inv-config-store-name',
-  path: '/inv-config-store-name',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvConfigProductTypeRoute = InvConfigProductTypeRouteImport.update({
-  id: '/inv-config-product-type',
-  path: '/inv-config-product-type',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvConfigProductNameRoute = InvConfigProductNameRouteImport.update({
-  id: '/inv-config-product-name',
-  path: '/inv-config-product-name',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvConfigModelRoute = InvConfigModelRouteImport.update({
-  id: '/inv-config-model',
-  path: '/inv-config-model',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvConfigGroupNameRoute = InvConfigGroupNameRouteImport.update({
-  id: '/inv-config-group-name',
-  path: '/inv-config-group-name',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvConfigBrandRoute = InvConfigBrandRouteImport.update({
-  id: '/inv-config-brand',
-  path: '/inv-config-brand',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncrementReportRoute = IncrementReportRouteImport.update({
-  id: '/increment-report',
-  path: '/increment-report',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncrementMultipleRoute = IncrementMultipleRouteImport.update({
-  id: '/increment-multiple',
-  path: '/increment-multiple',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncrementHistoryRoute = IncrementHistoryRouteImport.update({
-  id: '/increment-history',
-  path: '/increment-history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncrementRoute = IncrementRouteImport.update({
-  id: '/increment',
-  path: '/increment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncentiveAllowanceRoute = IncentiveAllowanceRouteImport.update({
-  id: '/incentive-allowance',
-  path: '/incentive-allowance',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IdCardSetupRoute = IdCardSetupRouteImport.update({
-  id: '/id-card-setup',
-  path: '/id-card-setup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HrPolicyRoute = HrPolicyRouteImport.update({
-  id: '/hr-policy',
-  path: '/hr-policy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FinancialAidListRoute = FinancialAidListRouteImport.update({
-  id: '/financial-aid-list',
-  path: '/financial-aid-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FinancialAidBudgetConfigurationRoute =
-  FinancialAidBudgetConfigurationRouteImport.update({
-    id: '/financial-aid-budget-configuration',
-    path: '/financial-aid-budget-configuration',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const FinalSettlementConfigurationRoute =
-  FinalSettlementConfigurationRouteImport.update({
-    id: '/final-settlement-configuration',
-    path: '/final-settlement-configuration',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const FinalSettlementRoute = FinalSettlementRouteImport.update({
-  id: '/final-settlement',
-  path: '/final-settlement',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FinalApproveIncrementRoute = FinalApproveIncrementRouteImport.update({
-  id: '/final-approve-increment',
-  path: '/final-approve-increment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnrollFingerprintRoute = EnrollFingerprintRouteImport.update({
-  id: '/enroll-fingerprint',
-  path: '/enroll-fingerprint',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmployeeTaxPayRoute = EmployeeTaxPayRouteImport.update({
-  id: '/employee-tax-pay',
-  path: '/employee-tax-pay',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmployeeJobCardRoute = EmployeeJobCardRouteImport.update({
-  id: '/employee-job-card',
-  path: '/employee-job-card',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmployeeDocVerificationRoute = EmployeeDocVerificationRouteImport.update({
-  id: '/employee-doc-verification',
-  path: '/employee-doc-verification',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmployeeDocIssueRoute = EmployeeDocIssueRouteImport.update({
-  id: '/employee-doc-issue',
-  path: '/employee-doc-issue',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EarnLeaveWorkflowRoute = EarnLeaveWorkflowRouteImport.update({
-  id: '/earn-leave-workflow',
-  path: '/earn-leave-workflow',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EarnLeaveSubmitRoute = EarnLeaveSubmitRouteImport.update({
-  id: '/earn-leave-submit',
-  path: '/earn-leave-submit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EarnLeaveProcessRoute = EarnLeaveProcessRouteImport.update({
-  id: '/earn-leave-process',
-  path: '/earn-leave-process',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ERecruitmentFormRoute = ERecruitmentFormRouteImport.update({
-  id: '/e-recruitment-form',
-  path: '/e-recruitment-form',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DisciplinaryWarningLettersRoute =
-  DisciplinaryWarningLettersRouteImport.update({
-    id: '/disciplinary-warning-letters',
-    path: '/disciplinary-warning-letters',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DisciplinaryShowcauseNoticesRoute =
-  DisciplinaryShowcauseNoticesRouteImport.update({
-    id: '/disciplinary-showcause-notices',
-    path: '/disciplinary-showcause-notices',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DisciplinaryLeftyRoute = DisciplinaryLeftyRouteImport.update({
-  id: '/disciplinary-lefty',
-  path: '/disciplinary-lefty',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DisciplinaryCaseFilesRoute = DisciplinaryCaseFilesRouteImport.update({
-  id: '/disciplinary-case-files',
-  path: '/disciplinary-case-files',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DeptWiseSalarySheetRoute = DeptWiseSalarySheetRouteImport.update({
-  id: '/dept-wise-salary-sheet',
-  path: '/dept-wise-salary-sheet',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreateRosterRoute = CreateRosterRouteImport.update({
-  id: '/create-roster',
-  path: '/create-roster',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfigureTimeRoute = ConfigureTimeRouteImport.update({
-  id: '/configure-time',
-  path: '/configure-time',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfigureTaxRoute = ConfigureTaxRouteImport.update({
-  id: '/configure-tax',
-  path: '/configure-tax',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfigureStructureRoute = ConfigureStructureRouteImport.update({
-  id: '/configure-structure',
-  path: '/configure-structure',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfigurePoliciesRoute = ConfigurePoliciesRouteImport.update({
-  id: '/configure-policies',
-  path: '/configure-policies',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfigurePersonnelRoute = ConfigurePersonnelRouteImport.update({
-  id: '/configure-personnel',
-  path: '/configure-personnel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfigureLetterRoute = ConfigureLetterRouteImport.update({
-  id: '/configure-letter',
-  path: '/configure-letter',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfigureEmploymentRoute = ConfigureEmploymentRouteImport.update({
-  id: '/configure-employment',
-  path: '/configure-employment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfigureEducationRoute = ConfigureEducationRouteImport.update({
-  id: '/configure-education',
-  path: '/configure-education',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfigureCompensationRoute = ConfigureCompensationRouteImport.update({
-  id: '/configure-compensation',
-  path: '/configure-compensation',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConferenceRoomBookingListRoute =
-  ConferenceRoomBookingListRouteImport.update({
-    id: '/conference-room-booking-list',
-    path: '/conference-room-booking-list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ConferenceRoomBookingRoute = ConferenceRoomBookingRouteImport.update({
-  id: '/conference-room-booking',
-  path: '/conference-room-booking',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConferenceRoomApprovalRoute = ConferenceRoomApprovalRouteImport.update({
-  id: '/conference-room-approval',
-  path: '/conference-room-approval',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompanySetupRoute = CompanySetupRouteImport.update({
-  id: '/company-setup',
-  path: '/company-setup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompanyHolidayRoute = CompanyHolidayRouteImport.update({
-  id: '/company-holiday',
-  path: '/company-holiday',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckApproveSalaryRoute = CheckApproveSalaryRouteImport.update({
-  id: '/check-approve-salary',
-  path: '/check-approve-salary',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChangesRoute = ChangesRouteImport.update({
-  id: '/changes',
-  path: '/changes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CashSheetPrintRoute = CashSheetPrintRouteImport.update({
-  id: '/cash-sheet-print',
-  path: '/cash-sheet-print',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BulkLeaveRoute = BulkLeaveRouteImport.update({
-  id: '/bulk-leave',
-  path: '/bulk-leave',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BudgetStatementRoute = BudgetStatementRouteImport.update({
-  id: '/budget-statement',
-  path: '/budget-statement',
->>>>>>> 7a45f059a0b8cc3c72fbb12ba16599facfadd815
   getParentRoute: () => rootRouteImport,
 } as any)
 const BudgetRequisitionApprovalsRoute =
@@ -2356,6 +822,33 @@ const InvDashboardRoute = InvDashboardRouteImport.update({
   path: '/inv-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvDirectMrrListRoute = InvDirectMrrListRouteImport.update({
+  id: '/inv-direct-mrr-list',
+  path: '/inv-direct-mrr-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvIntercompanyReceiveRoute = InvIntercompanyReceiveRouteImport.update({
+  id: '/inv-intercompany-receive',
+  path: '/inv-intercompany-receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvIntercompanyReceiveListRoute =
+  InvIntercompanyReceiveListRouteImport.update({
+    id: '/inv-intercompany-receive-list',
+    path: '/inv-intercompany-receive-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvIntercompanyTransferRoute = InvIntercompanyTransferRouteImport.update({
+  id: '/inv-intercompany-transfer',
+  path: '/inv-intercompany-transfer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvIntercompanyTransferListRoute =
+  InvIntercompanyTransferListRouteImport.update({
+    id: '/inv-intercompany-transfer-list',
+    path: '/inv-intercompany-transfer-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const InvIssueListRoute = InvIssueListRouteImport.update({
   id: '/inv-issue-list',
   path: '/inv-issue-list',
@@ -2376,6 +869,28 @@ const InvIssueReturnRoute = InvIssueReturnRouteImport.update({
   path: '/inv-issue-return',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvMaterialRequisitionRoute = InvMaterialRequisitionRouteImport.update({
+  id: '/inv-material-requisition',
+  path: '/inv-material-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvMaterialRequisitionApprovalListRoute =
+  InvMaterialRequisitionApprovalListRouteImport.update({
+    id: '/inv-material-requisition-approval-list',
+    path: '/inv-material-requisition-approval-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvMaterialRequisitionListRoute =
+  InvMaterialRequisitionListRouteImport.update({
+    id: '/inv-material-requisition-list',
+    path: '/inv-material-requisition-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvOpeningStockListRoute = InvOpeningStockListRouteImport.update({
+  id: '/inv-opening-stock-list',
+  path: '/inv-opening-stock-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvReceiveDirectRoute = InvReceiveDirectRouteImport.update({
   id: '/inv-receive-direct',
   path: '/inv-receive-direct',
@@ -2386,9 +901,72 @@ const InvReceiveListRoute = InvReceiveListRouteImport.update({
   path: '/inv-receive-list',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvReceiveMrrRoute = InvReceiveMrrRouteImport.update({
+  id: '/inv-receive-mrr',
+  path: '/inv-receive-mrr',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReturnToStoreListRoute = InvReturnToStoreListRouteImport.update({
+  id: '/inv-return-to-store-list',
+  path: '/inv-return-to-store-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStockAdjustmentRoute = InvStockAdjustmentRouteImport.update({
+  id: '/inv-stock-adjustment',
+  path: '/inv-stock-adjustment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStockAdjustmentListRoute = InvStockAdjustmentListRouteImport.update({
+  id: '/inv-stock-adjustment-list',
+  path: '/inv-stock-adjustment-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStockWriteoffRoute = InvStockWriteoffRouteImport.update({
+  id: '/inv-stock-writeoff',
+  path: '/inv-stock-writeoff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStockWriteoffApprovalRoute =
+  InvStockWriteoffApprovalRouteImport.update({
+    id: '/inv-stock-writeoff-approval',
+    path: '/inv-stock-writeoff-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvStockWriteoffApprovalListRoute =
+  InvStockWriteoffApprovalListRouteImport.update({
+    id: '/inv-stock-writeoff-approval-list',
+    path: '/inv-stock-writeoff-approval-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvStockWriteoffListRoute = InvStockWriteoffListRouteImport.update({
+  id: '/inv-stock-writeoff-list',
+  path: '/inv-stock-writeoff-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStoreReturnReceiveRoute = InvStoreReturnReceiveRouteImport.update({
+  id: '/inv-store-return-receive',
+  path: '/inv-store-return-receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvStoreReturnReceiveListRoute =
+  InvStoreReturnReceiveListRouteImport.update({
+    id: '/inv-store-return-receive-list',
+    path: '/inv-store-return-receive-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvSupplierReturnListRoute = InvSupplierReturnListRouteImport.update({
+  id: '/inv-supplier-return-list',
+  path: '/inv-supplier-return-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvYarnOpeningStockRoute = InvYarnOpeningStockRouteImport.update({
   id: '/inv-yarn-opening-stock',
   path: '/inv-yarn-opening-stock',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryConfigurationRoute = InventoryConfigurationRouteImport.update({
+  id: '/inventory-configuration',
+  path: '/inventory-configuration',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InventoryDashboardRoute = InventoryDashboardRouteImport.update({
@@ -2875,6 +1453,24 @@ const ProcurementBillingSupplierBillRoute =
     path: '/procurement-billing-supplier-bill',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProcurementBillingSupplierBillApprovalRoute =
+  ProcurementBillingSupplierBillApprovalRouteImport.update({
+    id: '/procurement-billing-supplier-bill-approval',
+    path: '/procurement-billing-supplier-bill-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingSupplierBillApprovalListRoute =
+  ProcurementBillingSupplierBillApprovalListRouteImport.update({
+    id: '/procurement-billing-supplier-bill-approval-list',
+    path: '/procurement-billing-supplier-bill-approval-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingSupplierBillListRoute =
+  ProcurementBillingSupplierBillListRouteImport.update({
+    id: '/procurement-billing-supplier-bill-list',
+    path: '/procurement-billing-supplier-bill-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ProcurementBillingSupplierRecordRoute =
   ProcurementBillingSupplierRecordRouteImport.update({
     id: '/procurement-billing-supplier-record',
@@ -2897,6 +1493,12 @@ const ProcurementBillingVatTaxRegisterRoute =
   ProcurementBillingVatTaxRegisterRouteImport.update({
     id: '/procurement-billing-vat-tax-register',
     path: '/procurement-billing-vat-tax-register',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementComparativeStatementRoute =
+  ProcurementComparativeStatementRouteImport.update({
+    id: '/procurement-comparative-statement',
+    path: '/procurement-comparative-statement',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ProcurementConfigBankAccountsRoute =
@@ -2952,6 +1554,11 @@ const ProcurementConfigTermsRoute = ProcurementConfigTermsRouteImport.update({
   path: '/procurement-config-terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProcurementCsApprovalRoute = ProcurementCsApprovalRouteImport.update({
+  id: '/procurement-cs-approval',
+  path: '/procurement-cs-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProcurementCsBatchListRoute = ProcurementCsBatchListRouteImport.update({
   id: '/procurement-cs-batch-list',
   path: '/procurement-cs-batch-list',
@@ -2991,6 +1598,29 @@ const ProcurementDashboardRoute = ProcurementDashboardRouteImport.update({
   path: '/procurement-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProcurementMasterDataRoute = ProcurementMasterDataRouteImport.update({
+  id: '/procurement-master-data',
+  path: '/procurement-master-data',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementMaterialReceiveListRoute =
+  ProcurementMaterialReceiveListRouteImport.update({
+    id: '/procurement-material-receive-list',
+    path: '/procurement-material-receive-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementMonthlyBudgetApprovalRoute =
+  ProcurementMonthlyBudgetApprovalRouteImport.update({
+    id: '/procurement-monthly-budget-approval',
+    path: '/procurement-monthly-budget-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementMonthlyBudgetRequisitionRoute =
+  ProcurementMonthlyBudgetRequisitionRouteImport.update({
+    id: '/procurement-monthly-budget-requisition',
+    path: '/procurement-monthly-budget-requisition',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ProcurementPaymentBillRoute = ProcurementPaymentBillRouteImport.update({
   id: '/procurement-payment-bill',
   path: '/procurement-payment-bill',
@@ -3049,6 +1679,17 @@ const ProcurementPoWorkOrderApprovalRoute =
   ProcurementPoWorkOrderApprovalRouteImport.update({
     id: '/procurement-po-work-order-approval',
     path: '/procurement-po-work-order-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementPrApprovalRoute = ProcurementPrApprovalRouteImport.update({
+  id: '/procurement-pr-approval',
+  path: '/procurement-pr-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementPurchaseRequisitionRoute =
+  ProcurementPurchaseRequisitionRouteImport.update({
+    id: '/procurement-purchase-requisition',
+    path: '/procurement-purchase-requisition',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ProcurementReportsCombinedPoStatementRoute =
@@ -5583,7 +4224,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-<<<<<<< HEAD
     '/': {
       id: '/'
       path: '/'
@@ -5596,1924 +4236,6 @@ declare module '@tanstack/react-router' {
       path: '/absent-counseling'
       fullPath: '/absent-counseling'
       preLoaderRoute: typeof AbsentCounselingRouteImport
-=======
-    '/zakat-list': {
-      id: '/zakat-list'
-      path: '/zakat-list'
-      fullPath: '/zakat-list'
-      preLoaderRoute: typeof ZakatListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/zakat-budget-configuration': {
-      id: '/zakat-budget-configuration'
-      path: '/zakat-budget-configuration'
-      fullPath: '/zakat-budget-configuration'
-      preLoaderRoute: typeof ZakatBudgetConfigurationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/yearly-bonus-process': {
-      id: '/yearly-bonus-process'
-      path: '/yearly-bonus-process'
-      fullPath: '/yearly-bonus-process'
-      preLoaderRoute: typeof YearlyBonusProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/user-management': {
-      id: '/user-management'
-      path: '/user-management'
-      fullPath: '/user-management'
-      preLoaderRoute: typeof UserManagementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/transfer-control-center': {
-      id: '/transfer-control-center'
-      path: '/transfer-control-center'
-      fullPath: '/transfer-control-center'
-      preLoaderRoute: typeof TransferControlCenterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-request-manual-attendance': {
-      id: '/ssp-request-manual-attendance'
-      path: '/ssp-request-manual-attendance'
-      fullPath: '/ssp-request-manual-attendance'
-      preLoaderRoute: typeof SspRequestManualAttendanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-product-budget-request': {
-      id: '/ssp-product-budget-request'
-      path: '/ssp-product-budget-request'
-      fullPath: '/ssp-product-budget-request'
-      preLoaderRoute: typeof SspProductBudgetRequestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-new-requisition': {
-      id: '/ssp-new-requisition'
-      path: '/ssp-new-requisition'
-      fullPath: '/ssp-new-requisition'
-      preLoaderRoute: typeof SspNewRequisitionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-my-requisition': {
-      id: '/ssp-my-requisition'
-      path: '/ssp-my-requisition'
-      fullPath: '/ssp-my-requisition'
-      preLoaderRoute: typeof SspMyRequisitionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-my-attendance': {
-      id: '/ssp-my-attendance'
-      path: '/ssp-my-attendance'
-      fullPath: '/ssp-my-attendance'
-      preLoaderRoute: typeof SspMyAttendanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-leave-requisition': {
-      id: '/ssp-leave-requisition'
-      path: '/ssp-leave-requisition'
-      fullPath: '/ssp-leave-requisition'
-      preLoaderRoute: typeof SspLeaveRequisitionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-iou-requisition-view': {
-      id: '/ssp-iou-requisition-view'
-      path: '/ssp-iou-requisition-view'
-      fullPath: '/ssp-iou-requisition-view'
-      preLoaderRoute: typeof SspIouRequisitionViewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-iou-requisition': {
-      id: '/ssp-iou-requisition'
-      path: '/ssp-iou-requisition'
-      fullPath: '/ssp-iou-requisition'
-      preLoaderRoute: typeof SspIouRequisitionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-ict-requisition': {
-      id: '/ssp-ict-requisition'
-      path: '/ssp-ict-requisition'
-      fullPath: '/ssp-ict-requisition'
-      preLoaderRoute: typeof SspIctRequisitionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-ict-product-budget-request': {
-      id: '/ssp-ict-product-budget-request'
-      path: '/ssp-ict-product-budget-request'
-      fullPath: '/ssp-ict-product-budget-request'
-      preLoaderRoute: typeof SspIctProductBudgetRequestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-general-product-budget-request': {
-      id: '/ssp-general-product-budget-request'
-      path: '/ssp-general-product-budget-request'
-      fullPath: '/ssp-general-product-budget-request'
-      preLoaderRoute: typeof SspGeneralProductBudgetRequestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-attendance': {
-      id: '/ssp-attendance'
-      path: '/ssp-attendance'
-      fullPath: '/ssp-attendance'
-      preLoaderRoute: typeof SspAttendanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-approve-manual-attendance': {
-      id: '/ssp-approve-manual-attendance'
-      path: '/ssp-approve-manual-attendance'
-      fullPath: '/ssp-approve-manual-attendance'
-      preLoaderRoute: typeof SspApproveManualAttendanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ssp-approval': {
-      id: '/ssp-approval'
-      path: '/ssp-approval'
-      fullPath: '/ssp-approval'
-      preLoaderRoute: typeof SspApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shift-control-center': {
-      id: '/shift-control-center'
-      path: '/shift-control-center'
-      fullPath: '/shift-control-center'
-      preLoaderRoute: typeof ShiftControlCenterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/set-manager': {
-      id: '/set-manager'
-      path: '/set-manager'
-      fullPath: '/set-manager'
-      preLoaderRoute: typeof SetManagerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/set-hod': {
-      id: '/set-hod'
-      path: '/set-hod'
-      fullPath: '/set-hod'
-      preLoaderRoute: typeof SetHodRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/separation-resignation-request': {
-      id: '/separation-resignation-request'
-      path: '/separation-resignation-request'
-      fullPath: '/separation-resignation-request'
-      preLoaderRoute: typeof SeparationResignationRequestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/separation-payment': {
-      id: '/separation-payment'
-      path: '/separation-payment'
-      fullPath: '/separation-payment'
-      preLoaderRoute: typeof SeparationPaymentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/separation-exit-documents': {
-      id: '/separation-exit-documents'
-      path: '/separation-exit-documents'
-      fullPath: '/separation-exit-documents'
-      preLoaderRoute: typeof SeparationExitDocumentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/separation-company-initiated': {
-      id: '/separation-company-initiated'
-      path: '/separation-company-initiated'
-      fullPath: '/separation-company-initiated'
-      preLoaderRoute: typeof SeparationCompanyInitiatedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/separation-clearance-configuration': {
-      id: '/separation-clearance-configuration'
-      path: '/separation-clearance-configuration'
-      fullPath: '/separation-clearance-configuration'
-      preLoaderRoute: typeof SeparationClearanceConfigurationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/separation-clearance-approval': {
-      id: '/separation-clearance-approval'
-      path: '/separation-clearance-approval'
-      fullPath: '/separation-clearance-approval'
-      preLoaderRoute: typeof SeparationClearanceApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/separation-clearance': {
-      id: '/separation-clearance'
-      path: '/separation-clearance'
-      fullPath: '/separation-clearance'
-      preLoaderRoute: typeof SeparationClearanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/salary-sheet-print': {
-      id: '/salary-sheet-print'
-      path: '/salary-sheet-print'
-      fullPath: '/salary-sheet-print'
-      preLoaderRoute: typeof SalarySheetPrintRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/salary-sheet-full-without-holiday': {
-      id: '/salary-sheet-full-without-holiday'
-      path: '/salary-sheet-full-without-holiday'
-      fullPath: '/salary-sheet-full-without-holiday'
-      preLoaderRoute: typeof SalarySheetFullWithoutHolidayRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/salary-sheet-full-wh': {
-      id: '/salary-sheet-full-wh'
-      path: '/salary-sheet-full-wh'
-      fullPath: '/salary-sheet-full-wh'
-      preLoaderRoute: typeof SalarySheetFullWhRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/salary-sheet-exec': {
-      id: '/salary-sheet-exec'
-      path: '/salary-sheet-exec'
-      fullPath: '/salary-sheet-exec'
-      preLoaderRoute: typeof SalarySheetExecRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/salary-process': {
-      id: '/salary-process'
-      path: '/salary-process'
-      fullPath: '/salary-process'
-      preLoaderRoute: typeof SalaryProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recruitment-ie-list': {
-      id: '/recruitment-ie-list'
-      path: '/recruitment-ie-list'
-      fullPath: '/recruitment-ie-list'
-      preLoaderRoute: typeof RecruitmentIeListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recruitment-hr-list': {
-      id: '/recruitment-hr-list'
-      path: '/recruitment-hr-list'
-      fullPath: '/recruitment-hr-list'
-      preLoaderRoute: typeof RecruitmentHrListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recruitment-configuration': {
-      id: '/recruitment-configuration'
-      path: '/recruitment-configuration'
-      fullPath: '/recruitment-configuration'
-      preLoaderRoute: typeof RecruitmentConfigurationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recruitment-basic-setup': {
-      id: '/recruitment-basic-setup'
-      path: '/recruitment-basic-setup'
-      fullPath: '/recruitment-basic-setup'
-      preLoaderRoute: typeof RecruitmentBasicSetupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recruitment-basic-list': {
-      id: '/recruitment-basic-list'
-      path: '/recruitment-basic-list'
-      fullPath: '/recruitment-basic-list'
-      preLoaderRoute: typeof RecruitmentBasicListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recruitment-basic-info-list': {
-      id: '/recruitment-basic-info-list'
-      path: '/recruitment-basic-info-list'
-      fullPath: '/recruitment-basic-info-list'
-      preLoaderRoute: typeof RecruitmentBasicInfoListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recruitment-basic-entry': {
-      id: '/recruitment-basic-entry'
-      path: '/recruitment-basic-entry'
-      fullPath: '/recruitment-basic-entry'
-      preLoaderRoute: typeof RecruitmentBasicEntryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recruitment-assessment-list': {
-      id: '/recruitment-assessment-list'
-      path: '/recruitment-assessment-list'
-      fullPath: '/recruitment-assessment-list'
-      preLoaderRoute: typeof RecruitmentAssessmentListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/propose-increment': {
-      id: '/propose-increment'
-      path: '/propose-increment'
-      fullPath: '/propose-increment'
-      preLoaderRoute: typeof ProposeIncrementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-reports-yarn-booking-pi': {
-      id: '/procurement-reports-yarn-booking-pi'
-      path: '/procurement-reports-yarn-booking-pi'
-      fullPath: '/procurement-reports-yarn-booking-pi'
-      preLoaderRoute: typeof ProcurementReportsYarnBookingPiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-reports-purchase-price': {
-      id: '/procurement-reports-purchase-price'
-      path: '/procurement-reports-purchase-price'
-      fullPath: '/procurement-reports-purchase-price'
-      preLoaderRoute: typeof ProcurementReportsPurchasePriceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-reports-payment-statement': {
-      id: '/procurement-reports-payment-statement'
-      path: '/procurement-reports-payment-statement'
-      fullPath: '/procurement-reports-payment-statement'
-      preLoaderRoute: typeof ProcurementReportsPaymentStatementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-reports-dnc-rate': {
-      id: '/procurement-reports-dnc-rate'
-      path: '/procurement-reports-dnc-rate'
-      fullPath: '/procurement-reports-dnc-rate'
-      preLoaderRoute: typeof ProcurementReportsDncRateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-reports-combined-po-statement': {
-      id: '/procurement-reports-combined-po-statement'
-      path: '/procurement-reports-combined-po-statement'
-      fullPath: '/procurement-reports-combined-po-statement'
-      preLoaderRoute: typeof ProcurementReportsCombinedPoStatementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-purchase-requisition': {
-      id: '/procurement-purchase-requisition'
-      path: '/procurement-purchase-requisition'
-      fullPath: '/procurement-purchase-requisition'
-      preLoaderRoute: typeof ProcurementPurchaseRequisitionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-pr-approval': {
-      id: '/procurement-pr-approval'
-      path: '/procurement-pr-approval'
-      fullPath: '/procurement-pr-approval'
-      preLoaderRoute: typeof ProcurementPrApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-po-work-order-approval': {
-      id: '/procurement-po-work-order-approval'
-      path: '/procurement-po-work-order-approval'
-      fullPath: '/procurement-po-work-order-approval'
-      preLoaderRoute: typeof ProcurementPoWorkOrderApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-po-requisition-wise': {
-      id: '/procurement-po-requisition-wise'
-      path: '/procurement-po-requisition-wise'
-      fullPath: '/procurement-po-requisition-wise'
-      preLoaderRoute: typeof ProcurementPoRequisitionWiseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-po-new': {
-      id: '/procurement-po-new'
-      path: '/procurement-po-new'
-      fullPath: '/procurement-po-new'
-      preLoaderRoute: typeof ProcurementPoNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-po-list': {
-      id: '/procurement-po-list'
-      path: '/procurement-po-list'
-      fullPath: '/procurement-po-list'
-      preLoaderRoute: typeof ProcurementPoListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-pi-list': {
-      id: '/procurement-pi-list'
-      path: '/procurement-pi-list'
-      fullPath: '/procurement-pi-list'
-      preLoaderRoute: typeof ProcurementPiListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-pi-edit-dc-price': {
-      id: '/procurement-pi-edit-dc-price'
-      path: '/procurement-pi-edit-dc-price'
-      fullPath: '/procurement-pi-edit-dc-price'
-      preLoaderRoute: typeof ProcurementPiEditDcPriceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-pi-delete-request': {
-      id: '/procurement-pi-delete-request'
-      path: '/procurement-pi-delete-request'
-      fullPath: '/procurement-pi-delete-request'
-      preLoaderRoute: typeof ProcurementPiDeleteRequestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-pi-create': {
-      id: '/procurement-pi-create'
-      path: '/procurement-pi-create'
-      fullPath: '/procurement-pi-create'
-      preLoaderRoute: typeof ProcurementPiCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-pi-approve-dc-price': {
-      id: '/procurement-pi-approve-dc-price'
-      path: '/procurement-pi-approve-dc-price'
-      fullPath: '/procurement-pi-approve-dc-price'
-      preLoaderRoute: typeof ProcurementPiApproveDcPriceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-payment-list': {
-      id: '/procurement-payment-list'
-      path: '/procurement-payment-list'
-      fullPath: '/procurement-payment-list'
-      preLoaderRoute: typeof ProcurementPaymentListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-payment-bill': {
-      id: '/procurement-payment-bill'
-      path: '/procurement-payment-bill'
-      fullPath: '/procurement-payment-bill'
-      preLoaderRoute: typeof ProcurementPaymentBillRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-monthly-budget-requisition': {
-      id: '/procurement-monthly-budget-requisition'
-      path: '/procurement-monthly-budget-requisition'
-      fullPath: '/procurement-monthly-budget-requisition'
-      preLoaderRoute: typeof ProcurementMonthlyBudgetRequisitionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-monthly-budget-approval': {
-      id: '/procurement-monthly-budget-approval'
-      path: '/procurement-monthly-budget-approval'
-      fullPath: '/procurement-monthly-budget-approval'
-      preLoaderRoute: typeof ProcurementMonthlyBudgetApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-material-receive-list': {
-      id: '/procurement-material-receive-list'
-      path: '/procurement-material-receive-list'
-      fullPath: '/procurement-material-receive-list'
-      preLoaderRoute: typeof ProcurementMaterialReceiveListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-master-data': {
-      id: '/procurement-master-data'
-      path: '/procurement-master-data'
-      fullPath: '/procurement-master-data'
-      preLoaderRoute: typeof ProcurementMasterDataRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-dashboard': {
-      id: '/procurement-dashboard'
-      path: '/procurement-dashboard'
-      fullPath: '/procurement-dashboard'
-      preLoaderRoute: typeof ProcurementDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-cs-supplier-price': {
-      id: '/procurement-cs-supplier-price'
-      path: '/procurement-cs-supplier-price'
-      fullPath: '/procurement-cs-supplier-price'
-      preLoaderRoute: typeof ProcurementCsSupplierPriceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-cs-supplier-items': {
-      id: '/procurement-cs-supplier-items'
-      path: '/procurement-cs-supplier-items'
-      fullPath: '/procurement-cs-supplier-items'
-      preLoaderRoute: typeof ProcurementCsSupplierItemsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-cs-detail': {
-      id: '/procurement-cs-detail'
-      path: '/procurement-cs-detail'
-      fullPath: '/procurement-cs-detail'
-      preLoaderRoute: typeof ProcurementCsDetailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-cs-create-workorder': {
-      id: '/procurement-cs-create-workorder'
-      path: '/procurement-cs-create-workorder'
-      fullPath: '/procurement-cs-create-workorder'
-      preLoaderRoute: typeof ProcurementCsCreateWorkorderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-cs-create-batch': {
-      id: '/procurement-cs-create-batch'
-      path: '/procurement-cs-create-batch'
-      fullPath: '/procurement-cs-create-batch'
-      preLoaderRoute: typeof ProcurementCsCreateBatchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-cs-batch-list': {
-      id: '/procurement-cs-batch-list'
-      path: '/procurement-cs-batch-list'
-      fullPath: '/procurement-cs-batch-list'
-      preLoaderRoute: typeof ProcurementCsBatchListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-cs-approval': {
-      id: '/procurement-cs-approval'
-      path: '/procurement-cs-approval'
-      fullPath: '/procurement-cs-approval'
-      preLoaderRoute: typeof ProcurementCsApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-config-terms': {
-      id: '/procurement-config-terms'
-      path: '/procurement-config-terms'
-      fullPath: '/procurement-config-terms'
-      preLoaderRoute: typeof ProcurementConfigTermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-config-supplier-opening': {
-      id: '/procurement-config-supplier-opening'
-      path: '/procurement-config-supplier-opening'
-      fullPath: '/procurement-config-supplier-opening'
-      preLoaderRoute: typeof ProcurementConfigSupplierOpeningRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-config-supplier-name': {
-      id: '/procurement-config-supplier-name'
-      path: '/procurement-config-supplier-name'
-      fullPath: '/procurement-config-supplier-name'
-      preLoaderRoute: typeof ProcurementConfigSupplierNameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-config-purchase-option': {
-      id: '/procurement-config-purchase-option'
-      path: '/procurement-config-purchase-option'
-      fullPath: '/procurement-config-purchase-option'
-      preLoaderRoute: typeof ProcurementConfigPurchaseOptionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-config-lc-booking-list': {
-      id: '/procurement-config-lc-booking-list'
-      path: '/procurement-config-lc-booking-list'
-      fullPath: '/procurement-config-lc-booking-list'
-      preLoaderRoute: typeof ProcurementConfigLcBookingListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-config-lc-booking': {
-      id: '/procurement-config-lc-booking'
-      path: '/procurement-config-lc-booking'
-      fullPath: '/procurement-config-lc-booking'
-      preLoaderRoute: typeof ProcurementConfigLcBookingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-config-currency-rate': {
-      id: '/procurement-config-currency-rate'
-      path: '/procurement-config-currency-rate'
-      fullPath: '/procurement-config-currency-rate'
-      preLoaderRoute: typeof ProcurementConfigCurrencyRateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-config-bank-info': {
-      id: '/procurement-config-bank-info'
-      path: '/procurement-config-bank-info'
-      fullPath: '/procurement-config-bank-info'
-      preLoaderRoute: typeof ProcurementConfigBankInfoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-config-bank-accounts': {
-      id: '/procurement-config-bank-accounts'
-      path: '/procurement-config-bank-accounts'
-      fullPath: '/procurement-config-bank-accounts'
-      preLoaderRoute: typeof ProcurementConfigBankAccountsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-comparative-statement': {
-      id: '/procurement-comparative-statement'
-      path: '/procurement-comparative-statement'
-      fullPath: '/procurement-comparative-statement'
-      preLoaderRoute: typeof ProcurementComparativeStatementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-vat-tax-register': {
-      id: '/procurement-billing-vat-tax-register'
-      path: '/procurement-billing-vat-tax-register'
-      fullPath: '/procurement-billing-vat-tax-register'
-      preLoaderRoute: typeof ProcurementBillingVatTaxRegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-vat-tax-entry': {
-      id: '/procurement-billing-vat-tax-entry'
-      path: '/procurement-billing-vat-tax-entry'
-      fullPath: '/procurement-billing-vat-tax-entry'
-      preLoaderRoute: typeof ProcurementBillingVatTaxEntryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-supplier-record-list': {
-      id: '/procurement-billing-supplier-record-list'
-      path: '/procurement-billing-supplier-record-list'
-      fullPath: '/procurement-billing-supplier-record-list'
-      preLoaderRoute: typeof ProcurementBillingSupplierRecordListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-supplier-record': {
-      id: '/procurement-billing-supplier-record'
-      path: '/procurement-billing-supplier-record'
-      fullPath: '/procurement-billing-supplier-record'
-      preLoaderRoute: typeof ProcurementBillingSupplierRecordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-supplier-bill-list': {
-      id: '/procurement-billing-supplier-bill-list'
-      path: '/procurement-billing-supplier-bill-list'
-      fullPath: '/procurement-billing-supplier-bill-list'
-      preLoaderRoute: typeof ProcurementBillingSupplierBillListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-supplier-bill-approval-list': {
-      id: '/procurement-billing-supplier-bill-approval-list'
-      path: '/procurement-billing-supplier-bill-approval-list'
-      fullPath: '/procurement-billing-supplier-bill-approval-list'
-      preLoaderRoute: typeof ProcurementBillingSupplierBillApprovalListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-supplier-bill-approval': {
-      id: '/procurement-billing-supplier-bill-approval'
-      path: '/procurement-billing-supplier-bill-approval'
-      fullPath: '/procurement-billing-supplier-bill-approval'
-      preLoaderRoute: typeof ProcurementBillingSupplierBillApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-supplier-bill': {
-      id: '/procurement-billing-supplier-bill'
-      path: '/procurement-billing-supplier-bill'
-      fullPath: '/procurement-billing-supplier-bill'
-      preLoaderRoute: typeof ProcurementBillingSupplierBillRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-purchase-list': {
-      id: '/procurement-billing-purchase-list'
-      path: '/procurement-billing-purchase-list'
-      fullPath: '/procurement-billing-purchase-list'
-      preLoaderRoute: typeof ProcurementBillingPurchaseListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-prepare-v2': {
-      id: '/procurement-billing-prepare-v2'
-      path: '/procurement-billing-prepare-v2'
-      fullPath: '/procurement-billing-prepare-v2'
-      preLoaderRoute: typeof ProcurementBillingPrepareV2RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-prepare': {
-      id: '/procurement-billing-prepare'
-      path: '/procurement-billing-prepare'
-      fullPath: '/procurement-billing-prepare'
-      preLoaderRoute: typeof ProcurementBillingPrepareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-loan-list': {
-      id: '/procurement-billing-loan-list'
-      path: '/procurement-billing-loan-list'
-      fullPath: '/procurement-billing-loan-list'
-      preLoaderRoute: typeof ProcurementBillingLoanListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-edit-rate': {
-      id: '/procurement-billing-edit-rate'
-      path: '/procurement-billing-edit-rate'
-      fullPath: '/procurement-billing-edit-rate'
-      preLoaderRoute: typeof ProcurementBillingEditRateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-billing-approve-rate': {
-      id: '/procurement-billing-approve-rate'
-      path: '/procurement-billing-approve-rate'
-      fullPath: '/procurement-billing-approve-rate'
-      preLoaderRoute: typeof ProcurementBillingApproveRateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-audit-mrr': {
-      id: '/procurement-audit-mrr'
-      path: '/procurement-audit-mrr'
-      fullPath: '/procurement-audit-mrr'
-      preLoaderRoute: typeof ProcurementAuditMrrRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-audit-landed-cost': {
-      id: '/procurement-audit-landed-cost'
-      path: '/procurement-audit-landed-cost'
-      fullPath: '/procurement-audit-landed-cost'
-      preLoaderRoute: typeof ProcurementAuditLandedCostRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/procurement-audit-bill': {
-      id: '/procurement-audit-bill'
-      path: '/procurement-audit-bill'
-      fullPath: '/procurement-audit-bill'
-      preLoaderRoute: typeof ProcurementAuditBillRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/phonebook': {
-      id: '/phonebook'
-      path: '/phonebook'
-      fullPath: '/phonebook'
-      preLoaderRoute: typeof PhonebookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/personnel-list': {
-      id: '/personnel-list'
-      path: '/personnel-list'
-      fullPath: '/personnel-list'
-      preLoaderRoute: typeof PersonnelListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/personnel-approval': {
-      id: '/personnel-approval'
-      path: '/personnel-approval'
-      fullPath: '/personnel-approval'
-      preLoaderRoute: typeof PersonnelApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/permission-management': {
-      id: '/permission-management'
-      path: '/permission-management'
-      fullPath: '/permission-management'
-      preLoaderRoute: typeof PermissionManagementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pending-manual-attendance': {
-      id: '/pending-manual-attendance'
-      path: '/pending-manual-attendance'
-      fullPath: '/pending-manual-attendance'
-      preLoaderRoute: typeof PendingManualAttendanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pending-approvals': {
-      id: '/pending-approvals'
-      path: '/pending-approvals'
-      fullPath: '/pending-approvals'
-      preLoaderRoute: typeof PendingApprovalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payslip-print': {
-      id: '/payslip-print'
-      path: '/payslip-print'
-      fullPath: '/payslip-print'
-      preLoaderRoute: typeof PayslipPrintRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-salary-submit': {
-      id: '/payroll-salary-submit'
-      path: '/payroll-salary-submit'
-      fullPath: '/payroll-salary-submit'
-      preLoaderRoute: typeof PayrollSalarySubmitRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-reports': {
-      id: '/payroll-reports'
-      path: '/payroll-reports'
-      fullPath: '/payroll-reports'
-      preLoaderRoute: typeof PayrollReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-period-lock': {
-      id: '/payroll-period-lock'
-      path: '/payroll-period-lock'
-      fullPath: '/payroll-period-lock'
-      preLoaderRoute: typeof PayrollPeriodLockRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-loan': {
-      id: '/payroll-loan'
-      path: '/payroll-loan'
-      fullPath: '/payroll-loan'
-      preLoaderRoute: typeof PayrollLoanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-deductions': {
-      id: '/payroll-deductions'
-      path: '/payroll-deductions'
-      fullPath: '/payroll-deductions'
-      preLoaderRoute: typeof PayrollDeductionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-configure': {
-      id: '/payroll-configure'
-      path: '/payroll-configure'
-      fullPath: '/payroll-configure'
-      preLoaderRoute: typeof PayrollConfigureRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-check-salary-vattax': {
-      id: '/payroll-check-salary-vattax'
-      path: '/payroll-check-salary-vattax'
-      fullPath: '/payroll-check-salary-vattax'
-      preLoaderRoute: typeof PayrollCheckSalaryVattaxRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-check-salary-planthead': {
-      id: '/payroll-check-salary-planthead'
-      path: '/payroll-check-salary-planthead'
-      fullPath: '/payroll-check-salary-planthead'
-      preLoaderRoute: typeof PayrollCheckSalaryPlantheadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-check-salary-audit': {
-      id: '/payroll-check-salary-audit'
-      path: '/payroll-check-salary-audit'
-      fullPath: '/payroll-check-salary-audit'
-      preLoaderRoute: typeof PayrollCheckSalaryAuditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-check-salary-accounts': {
-      id: '/payroll-check-salary-accounts'
-      path: '/payroll-check-salary-accounts'
-      fullPath: '/payroll-check-salary-accounts'
-      preLoaderRoute: typeof PayrollCheckSalaryAccountsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-check-salary': {
-      id: '/payroll-check-salary'
-      path: '/payroll-check-salary'
-      fullPath: '/payroll-check-salary'
-      preLoaderRoute: typeof PayrollCheckSalaryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-check-bonus-vattax': {
-      id: '/payroll-check-bonus-vattax'
-      path: '/payroll-check-bonus-vattax'
-      fullPath: '/payroll-check-bonus-vattax'
-      preLoaderRoute: typeof PayrollCheckBonusVattaxRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-check-bonus-planthead': {
-      id: '/payroll-check-bonus-planthead'
-      path: '/payroll-check-bonus-planthead'
-      fullPath: '/payroll-check-bonus-planthead'
-      preLoaderRoute: typeof PayrollCheckBonusPlantheadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-check-bonus-audit': {
-      id: '/payroll-check-bonus-audit'
-      path: '/payroll-check-bonus-audit'
-      fullPath: '/payroll-check-bonus-audit'
-      preLoaderRoute: typeof PayrollCheckBonusAuditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-check-bonus-accounts': {
-      id: '/payroll-check-bonus-accounts'
-      path: '/payroll-check-bonus-accounts'
-      fullPath: '/payroll-check-bonus-accounts'
-      preLoaderRoute: typeof PayrollCheckBonusAccountsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-check-bonus': {
-      id: '/payroll-check-bonus'
-      path: '/payroll-check-bonus'
-      fullPath: '/payroll-check-bonus'
-      preLoaderRoute: typeof PayrollCheckBonusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-bonus-submit': {
-      id: '/payroll-bonus-submit'
-      path: '/payroll-bonus-submit'
-      fullPath: '/payroll-bonus-submit'
-      preLoaderRoute: typeof PayrollBonusSubmitRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-benefits-monthly': {
-      id: '/payroll-benefits-monthly'
-      path: '/payroll-benefits-monthly'
-      fullPath: '/payroll-benefits-monthly'
-      preLoaderRoute: typeof PayrollBenefitsMonthlyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-benefits-master-data': {
-      id: '/payroll-benefits-master-data'
-      path: '/payroll-benefits-master-data'
-      fullPath: '/payroll-benefits-master-data'
-      preLoaderRoute: typeof PayrollBenefitsMasterDataRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-benefits-common': {
-      id: '/payroll-benefits-common'
-      path: '/payroll-benefits-common'
-      fullPath: '/payroll-benefits-common'
-      preLoaderRoute: typeof PayrollBenefitsCommonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-benefits': {
-      id: '/payroll-benefits'
-      path: '/payroll-benefits'
-      fullPath: '/payroll-benefits'
-      preLoaderRoute: typeof PayrollBenefitsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payroll-advance': {
-      id: '/payroll-advance'
-      path: '/payroll-advance'
-      fullPath: '/payroll-advance'
-      preLoaderRoute: typeof PayrollAdvanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ot-sheet-holiday': {
-      id: '/ot-sheet-holiday'
-      path: '/ot-sheet-holiday'
-      fullPath: '/ot-sheet-holiday'
-      preLoaderRoute: typeof OtSheetHolidayRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notice': {
-      id: '/notice'
-      path: '/notice'
-      fullPath: '/notice'
-      preLoaderRoute: typeof NoticeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/my-dashboard': {
-      id: '/my-dashboard'
-      path: '/my-dashboard'
-      fullPath: '/my-dashboard'
-      preLoaderRoute: typeof MyDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/monthly-salary-process': {
-      id: '/monthly-salary-process'
-      path: '/monthly-salary-process'
-      fullPath: '/monthly-salary-process'
-      preLoaderRoute: typeof MonthlySalaryProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/monthly-salary-details': {
-      id: '/monthly-salary-details'
-      path: '/monthly-salary-details'
-      fullPath: '/monthly-salary-details'
-      preLoaderRoute: typeof MonthlySalaryDetailsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/module-selection': {
-      id: '/module-selection'
-      path: '/module-selection'
-      fullPath: '/module-selection'
-      preLoaderRoute: typeof ModuleSelectionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messenger': {
-      id: '/messenger'
-      path: '/messenger'
-      fullPath: '/messenger'
-      preLoaderRoute: typeof MessengerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-work-orders': {
-      id: '/merchandising-work-orders'
-      path: '/merchandising-work-orders'
-      fullPath: '/merchandising-work-orders'
-      preLoaderRoute: typeof MerchandisingWorkOrdersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-tna-calendar': {
-      id: '/merchandising-tna-calendar'
-      path: '/merchandising-tna-calendar'
-      fullPath: '/merchandising-tna-calendar'
-      preLoaderRoute: typeof MerchandisingTnaCalendarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-sample-tracker': {
-      id: '/merchandising-sample-tracker'
-      path: '/merchandising-sample-tracker'
-      fullPath: '/merchandising-sample-tracker'
-      preLoaderRoute: typeof MerchandisingSampleTrackerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-sales-target-entry': {
-      id: '/merchandising-sales-target-entry'
-      path: '/merchandising-sales-target-entry'
-      fullPath: '/merchandising-sales-target-entry'
-      preLoaderRoute: typeof MerchandisingSalesTargetEntryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-reports': {
-      id: '/merchandising-reports'
-      path: '/merchandising-reports'
-      fullPath: '/merchandising-reports'
-      preLoaderRoute: typeof MerchandisingReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-quotation': {
-      id: '/merchandising-quotation'
-      path: '/merchandising-quotation'
-      fullPath: '/merchandising-quotation'
-      preLoaderRoute: typeof MerchandisingQuotationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-pre-costing': {
-      id: '/merchandising-pre-costing'
-      path: '/merchandising-pre-costing'
-      fullPath: '/merchandising-pre-costing'
-      preLoaderRoute: typeof MerchandisingPreCostingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-po': {
-      id: '/merchandising-po'
-      path: '/merchandising-po'
-      fullPath: '/merchandising-po'
-      preLoaderRoute: typeof MerchandisingPoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-order-profile': {
-      id: '/merchandising-order-profile'
-      path: '/merchandising-order-profile'
-      fullPath: '/merchandising-order-profile'
-      preLoaderRoute: typeof MerchandisingOrderProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-order-list': {
-      id: '/merchandising-order-list'
-      path: '/merchandising-order-list'
-      fullPath: '/merchandising-order-list'
-      preLoaderRoute: typeof MerchandisingOrderListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-monthly-capacity': {
-      id: '/merchandising-monthly-capacity'
-      path: '/merchandising-monthly-capacity'
-      fullPath: '/merchandising-monthly-capacity'
-      preLoaderRoute: typeof MerchandisingMonthlyCapacityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-material-bookings': {
-      id: '/merchandising-material-bookings'
-      path: '/merchandising-material-bookings'
-      fullPath: '/merchandising-material-bookings'
-      preLoaderRoute: typeof MerchandisingMaterialBookingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-master-settings': {
-      id: '/merchandising-master-settings'
-      path: '/merchandising-master-settings'
-      fullPath: '/merchandising-master-settings'
-      preLoaderRoute: typeof MerchandisingMasterSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-inquiry': {
-      id: '/merchandising-inquiry'
-      path: '/merchandising-inquiry'
-      fullPath: '/merchandising-inquiry'
-      preLoaderRoute: typeof MerchandisingInquiryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-dashboard': {
-      id: '/merchandising-dashboard'
-      path: '/merchandising-dashboard'
-      fullPath: '/merchandising-dashboard'
-      preLoaderRoute: typeof MerchandisingDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-capacity-distribution': {
-      id: '/merchandising-capacity-distribution'
-      path: '/merchandising-capacity-distribution'
-      fullPath: '/merchandising-capacity-distribution'
-      preLoaderRoute: typeof MerchandisingCapacityDistributionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-capacity-allocation': {
-      id: '/merchandising-capacity-allocation'
-      path: '/merchandising-capacity-allocation'
-      fullPath: '/merchandising-capacity-allocation'
-      preLoaderRoute: typeof MerchandisingCapacityAllocationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-cad': {
-      id: '/merchandising-cad'
-      path: '/merchandising-cad'
-      fullPath: '/merchandising-cad'
-      preLoaderRoute: typeof MerchandisingCadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchandising-bom': {
-      id: '/merchandising-bom'
-      path: '/merchandising-bom'
-      fullPath: '/merchandising-bom'
-      preLoaderRoute: typeof MerchandisingBomRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/maternity-payment-report': {
-      id: '/maternity-payment-report'
-      path: '/maternity-payment-report'
-      fullPath: '/maternity-payment-report'
-      preLoaderRoute: typeof MaternityPaymentReportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/maternity-payment': {
-      id: '/maternity-payment'
-      path: '/maternity-payment'
-      fullPath: '/maternity-payment'
-      preLoaderRoute: typeof MaternityPaymentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/maternity-configuration': {
-      id: '/maternity-configuration'
-      path: '/maternity-configuration'
-      fullPath: '/maternity-configuration'
-      preLoaderRoute: typeof MaternityConfigurationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/manual-attendance': {
-      id: '/manual-attendance'
-      path: '/manual-attendance'
-      fullPath: '/manual-attendance'
-      preLoaderRoute: typeof ManualAttendanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/manage-overtime': {
-      id: '/manage-overtime'
-      path: '/manage-overtime'
-      fullPath: '/manage-overtime'
-      preLoaderRoute: typeof ManageOvertimeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/loan-approval': {
-      id: '/loan-approval'
-      path: '/loan-approval'
-      fullPath: '/loan-approval'
-      preLoaderRoute: typeof LoanApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/loan-application': {
-      id: '/loan-application'
-      path: '/loan-application'
-      fullPath: '/loan-application'
-      preLoaderRoute: typeof LoanApplicationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leave-list': {
-      id: '/leave-list'
-      path: '/leave-list'
-      fullPath: '/leave-list'
-      preLoaderRoute: typeof LeaveListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leave-approve': {
-      id: '/leave-approve'
-      path: '/leave-approve'
-      fullPath: '/leave-approve'
-      preLoaderRoute: typeof LeaveApproveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leave-application': {
-      id: '/leave-application'
-      path: '/leave-application'
-      fullPath: '/leave-application'
-      preLoaderRoute: typeof LeaveApplicationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leave': {
-      id: '/leave'
-      path: '/leave'
-      fullPath: '/leave'
-      preLoaderRoute: typeof LeaveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kpi-task-name': {
-      id: '/kpi-task-name'
-      path: '/kpi-task-name'
-      fullPath: '/kpi-task-name'
-      preLoaderRoute: typeof KpiTaskNameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kpi-setting': {
-      id: '/kpi-setting'
-      path: '/kpi-setting'
-      fullPath: '/kpi-setting'
-      preLoaderRoute: typeof KpiSettingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kpi-self-assessment': {
-      id: '/kpi-self-assessment'
-      path: '/kpi-self-assessment'
-      fullPath: '/kpi-self-assessment'
-      preLoaderRoute: typeof KpiSelfAssessmentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kpi-report': {
-      id: '/kpi-report'
-      path: '/kpi-report'
-      fullPath: '/kpi-report'
-      preLoaderRoute: typeof KpiReportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kpi-peer-review': {
-      id: '/kpi-peer-review'
-      path: '/kpi-peer-review'
-      fullPath: '/kpi-peer-review'
-      preLoaderRoute: typeof KpiPeerReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kpi-final-report': {
-      id: '/kpi-final-report'
-      path: '/kpi-final-report'
-      fullPath: '/kpi-final-report'
-      preLoaderRoute: typeof KpiFinalReportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kpi-dashboard': {
-      id: '/kpi-dashboard'
-      path: '/kpi-dashboard'
-      fullPath: '/kpi-dashboard'
-      preLoaderRoute: typeof KpiDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kpi-cycles': {
-      id: '/kpi-cycles'
-      path: '/kpi-cycles'
-      fullPath: '/kpi-cycles'
-      preLoaderRoute: typeof KpiCyclesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kpi-assessment-workflow': {
-      id: '/kpi-assessment-workflow'
-      path: '/kpi-assessment-workflow'
-      fullPath: '/kpi-assessment-workflow'
-      preLoaderRoute: typeof KpiAssessmentWorkflowRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kpi-approval': {
-      id: '/kpi-approval'
-      path: '/kpi-approval'
-      fullPath: '/kpi-approval'
-      preLoaderRoute: typeof KpiApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/jd-list': {
-      id: '/jd-list'
-      path: '/jd-list'
-      fullPath: '/jd-list'
-      preLoaderRoute: typeof JdListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inventory-dashboard': {
-      id: '/inventory-dashboard'
-      path: '/inventory-dashboard'
-      fullPath: '/inventory-dashboard'
-      preLoaderRoute: typeof InventoryDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inventory-configuration': {
-      id: '/inventory-configuration'
-      path: '/inventory-configuration'
-      fullPath: '/inventory-configuration'
-      preLoaderRoute: typeof InventoryConfigurationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-yarn-opening-stock': {
-      id: '/inv-yarn-opening-stock'
-      path: '/inv-yarn-opening-stock'
-      fullPath: '/inv-yarn-opening-stock'
-      preLoaderRoute: typeof InvYarnOpeningStockRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-supplier-return-list': {
-      id: '/inv-supplier-return-list'
-      path: '/inv-supplier-return-list'
-      fullPath: '/inv-supplier-return-list'
-      preLoaderRoute: typeof InvSupplierReturnListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-store-return-receive-list': {
-      id: '/inv-store-return-receive-list'
-      path: '/inv-store-return-receive-list'
-      fullPath: '/inv-store-return-receive-list'
-      preLoaderRoute: typeof InvStoreReturnReceiveListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-store-return-receive': {
-      id: '/inv-store-return-receive'
-      path: '/inv-store-return-receive'
-      fullPath: '/inv-store-return-receive'
-      preLoaderRoute: typeof InvStoreReturnReceiveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-stock-writeoff-list': {
-      id: '/inv-stock-writeoff-list'
-      path: '/inv-stock-writeoff-list'
-      fullPath: '/inv-stock-writeoff-list'
-      preLoaderRoute: typeof InvStockWriteoffListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-stock-writeoff-approval-list': {
-      id: '/inv-stock-writeoff-approval-list'
-      path: '/inv-stock-writeoff-approval-list'
-      fullPath: '/inv-stock-writeoff-approval-list'
-      preLoaderRoute: typeof InvStockWriteoffApprovalListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-stock-writeoff-approval': {
-      id: '/inv-stock-writeoff-approval'
-      path: '/inv-stock-writeoff-approval'
-      fullPath: '/inv-stock-writeoff-approval'
-      preLoaderRoute: typeof InvStockWriteoffApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-stock-writeoff': {
-      id: '/inv-stock-writeoff'
-      path: '/inv-stock-writeoff'
-      fullPath: '/inv-stock-writeoff'
-      preLoaderRoute: typeof InvStockWriteoffRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-stock-adjustment-list': {
-      id: '/inv-stock-adjustment-list'
-      path: '/inv-stock-adjustment-list'
-      fullPath: '/inv-stock-adjustment-list'
-      preLoaderRoute: typeof InvStockAdjustmentListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-stock-adjustment': {
-      id: '/inv-stock-adjustment'
-      path: '/inv-stock-adjustment'
-      fullPath: '/inv-stock-adjustment'
-      preLoaderRoute: typeof InvStockAdjustmentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-return-to-store-list': {
-      id: '/inv-return-to-store-list'
-      path: '/inv-return-to-store-list'
-      fullPath: '/inv-return-to-store-list'
-      preLoaderRoute: typeof InvReturnToStoreListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-receive-mrr': {
-      id: '/inv-receive-mrr'
-      path: '/inv-receive-mrr'
-      fullPath: '/inv-receive-mrr'
-      preLoaderRoute: typeof InvReceiveMrrRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-receive-list': {
-      id: '/inv-receive-list'
-      path: '/inv-receive-list'
-      fullPath: '/inv-receive-list'
-      preLoaderRoute: typeof InvReceiveListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-receive-direct': {
-      id: '/inv-receive-direct'
-      path: '/inv-receive-direct'
-      fullPath: '/inv-receive-direct'
-      preLoaderRoute: typeof InvReceiveDirectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-opening-stock-list': {
-      id: '/inv-opening-stock-list'
-      path: '/inv-opening-stock-list'
-      fullPath: '/inv-opening-stock-list'
-      preLoaderRoute: typeof InvOpeningStockListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-material-requisition-list': {
-      id: '/inv-material-requisition-list'
-      path: '/inv-material-requisition-list'
-      fullPath: '/inv-material-requisition-list'
-      preLoaderRoute: typeof InvMaterialRequisitionListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-material-requisition-approval-list': {
-      id: '/inv-material-requisition-approval-list'
-      path: '/inv-material-requisition-approval-list'
-      fullPath: '/inv-material-requisition-approval-list'
-      preLoaderRoute: typeof InvMaterialRequisitionApprovalListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-material-requisition': {
-      id: '/inv-material-requisition'
-      path: '/inv-material-requisition'
-      fullPath: '/inv-material-requisition'
-      preLoaderRoute: typeof InvMaterialRequisitionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-issue-return': {
-      id: '/inv-issue-return'
-      path: '/inv-issue-return'
-      fullPath: '/inv-issue-return'
-      preLoaderRoute: typeof InvIssueReturnRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-issue-regular': {
-      id: '/inv-issue-regular'
-      path: '/inv-issue-regular'
-      fullPath: '/inv-issue-regular'
-      preLoaderRoute: typeof InvIssueRegularRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-issue-mrr-return': {
-      id: '/inv-issue-mrr-return'
-      path: '/inv-issue-mrr-return'
-      fullPath: '/inv-issue-mrr-return'
-      preLoaderRoute: typeof InvIssueMrrReturnRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-issue-list': {
-      id: '/inv-issue-list'
-      path: '/inv-issue-list'
-      fullPath: '/inv-issue-list'
-      preLoaderRoute: typeof InvIssueListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-intercompany-transfer-list': {
-      id: '/inv-intercompany-transfer-list'
-      path: '/inv-intercompany-transfer-list'
-      fullPath: '/inv-intercompany-transfer-list'
-      preLoaderRoute: typeof InvIntercompanyTransferListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-intercompany-transfer': {
-      id: '/inv-intercompany-transfer'
-      path: '/inv-intercompany-transfer'
-      fullPath: '/inv-intercompany-transfer'
-      preLoaderRoute: typeof InvIntercompanyTransferRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-intercompany-receive-list': {
-      id: '/inv-intercompany-receive-list'
-      path: '/inv-intercompany-receive-list'
-      fullPath: '/inv-intercompany-receive-list'
-      preLoaderRoute: typeof InvIntercompanyReceiveListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-intercompany-receive': {
-      id: '/inv-intercompany-receive'
-      path: '/inv-intercompany-receive'
-      fullPath: '/inv-intercompany-receive'
-      preLoaderRoute: typeof InvIntercompanyReceiveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-direct-mrr-list': {
-      id: '/inv-direct-mrr-list'
-      path: '/inv-direct-mrr-list'
-      fullPath: '/inv-direct-mrr-list'
-      preLoaderRoute: typeof InvDirectMrrListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-dashboard': {
-      id: '/inv-dashboard'
-      path: '/inv-dashboard'
-      fullPath: '/inv-dashboard'
-      preLoaderRoute: typeof InvDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-config-uom': {
-      id: '/inv-config-uom'
-      path: '/inv-config-uom'
-      fullPath: '/inv-config-uom'
-      preLoaderRoute: typeof InvConfigUomRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-config-store-name': {
-      id: '/inv-config-store-name'
-      path: '/inv-config-store-name'
-      fullPath: '/inv-config-store-name'
-      preLoaderRoute: typeof InvConfigStoreNameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-config-product-type': {
-      id: '/inv-config-product-type'
-      path: '/inv-config-product-type'
-      fullPath: '/inv-config-product-type'
-      preLoaderRoute: typeof InvConfigProductTypeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-config-product-name': {
-      id: '/inv-config-product-name'
-      path: '/inv-config-product-name'
-      fullPath: '/inv-config-product-name'
-      preLoaderRoute: typeof InvConfigProductNameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-config-model': {
-      id: '/inv-config-model'
-      path: '/inv-config-model'
-      fullPath: '/inv-config-model'
-      preLoaderRoute: typeof InvConfigModelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-config-group-name': {
-      id: '/inv-config-group-name'
-      path: '/inv-config-group-name'
-      fullPath: '/inv-config-group-name'
-      preLoaderRoute: typeof InvConfigGroupNameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inv-config-brand': {
-      id: '/inv-config-brand'
-      path: '/inv-config-brand'
-      fullPath: '/inv-config-brand'
-      preLoaderRoute: typeof InvConfigBrandRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/increment-report': {
-      id: '/increment-report'
-      path: '/increment-report'
-      fullPath: '/increment-report'
-      preLoaderRoute: typeof IncrementReportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/increment-multiple': {
-      id: '/increment-multiple'
-      path: '/increment-multiple'
-      fullPath: '/increment-multiple'
-      preLoaderRoute: typeof IncrementMultipleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/increment-history': {
-      id: '/increment-history'
-      path: '/increment-history'
-      fullPath: '/increment-history'
-      preLoaderRoute: typeof IncrementHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/increment': {
-      id: '/increment'
-      path: '/increment'
-      fullPath: '/increment'
-      preLoaderRoute: typeof IncrementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/incentive-allowance': {
-      id: '/incentive-allowance'
-      path: '/incentive-allowance'
-      fullPath: '/incentive-allowance'
-      preLoaderRoute: typeof IncentiveAllowanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/id-card-setup': {
-      id: '/id-card-setup'
-      path: '/id-card-setup'
-      fullPath: '/id-card-setup'
-      preLoaderRoute: typeof IdCardSetupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hr-policy': {
-      id: '/hr-policy'
-      path: '/hr-policy'
-      fullPath: '/hr-policy'
-      preLoaderRoute: typeof HrPolicyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/financial-aid-list': {
-      id: '/financial-aid-list'
-      path: '/financial-aid-list'
-      fullPath: '/financial-aid-list'
-      preLoaderRoute: typeof FinancialAidListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/financial-aid-budget-configuration': {
-      id: '/financial-aid-budget-configuration'
-      path: '/financial-aid-budget-configuration'
-      fullPath: '/financial-aid-budget-configuration'
-      preLoaderRoute: typeof FinancialAidBudgetConfigurationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/final-settlement-configuration': {
-      id: '/final-settlement-configuration'
-      path: '/final-settlement-configuration'
-      fullPath: '/final-settlement-configuration'
-      preLoaderRoute: typeof FinalSettlementConfigurationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/final-settlement': {
-      id: '/final-settlement'
-      path: '/final-settlement'
-      fullPath: '/final-settlement'
-      preLoaderRoute: typeof FinalSettlementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/final-approve-increment': {
-      id: '/final-approve-increment'
-      path: '/final-approve-increment'
-      fullPath: '/final-approve-increment'
-      preLoaderRoute: typeof FinalApproveIncrementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/enroll-fingerprint': {
-      id: '/enroll-fingerprint'
-      path: '/enroll-fingerprint'
-      fullPath: '/enroll-fingerprint'
-      preLoaderRoute: typeof EnrollFingerprintRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/employee-tax-pay': {
-      id: '/employee-tax-pay'
-      path: '/employee-tax-pay'
-      fullPath: '/employee-tax-pay'
-      preLoaderRoute: typeof EmployeeTaxPayRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/employee-job-card': {
-      id: '/employee-job-card'
-      path: '/employee-job-card'
-      fullPath: '/employee-job-card'
-      preLoaderRoute: typeof EmployeeJobCardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/employee-doc-verification': {
-      id: '/employee-doc-verification'
-      path: '/employee-doc-verification'
-      fullPath: '/employee-doc-verification'
-      preLoaderRoute: typeof EmployeeDocVerificationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/employee-doc-issue': {
-      id: '/employee-doc-issue'
-      path: '/employee-doc-issue'
-      fullPath: '/employee-doc-issue'
-      preLoaderRoute: typeof EmployeeDocIssueRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/earn-leave-workflow': {
-      id: '/earn-leave-workflow'
-      path: '/earn-leave-workflow'
-      fullPath: '/earn-leave-workflow'
-      preLoaderRoute: typeof EarnLeaveWorkflowRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/earn-leave-submit': {
-      id: '/earn-leave-submit'
-      path: '/earn-leave-submit'
-      fullPath: '/earn-leave-submit'
-      preLoaderRoute: typeof EarnLeaveSubmitRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/earn-leave-process': {
-      id: '/earn-leave-process'
-      path: '/earn-leave-process'
-      fullPath: '/earn-leave-process'
-      preLoaderRoute: typeof EarnLeaveProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/e-recruitment-form': {
-      id: '/e-recruitment-form'
-      path: '/e-recruitment-form'
-      fullPath: '/e-recruitment-form'
-      preLoaderRoute: typeof ERecruitmentFormRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/disciplinary-warning-letters': {
-      id: '/disciplinary-warning-letters'
-      path: '/disciplinary-warning-letters'
-      fullPath: '/disciplinary-warning-letters'
-      preLoaderRoute: typeof DisciplinaryWarningLettersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/disciplinary-showcause-notices': {
-      id: '/disciplinary-showcause-notices'
-      path: '/disciplinary-showcause-notices'
-      fullPath: '/disciplinary-showcause-notices'
-      preLoaderRoute: typeof DisciplinaryShowcauseNoticesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/disciplinary-lefty': {
-      id: '/disciplinary-lefty'
-      path: '/disciplinary-lefty'
-      fullPath: '/disciplinary-lefty'
-      preLoaderRoute: typeof DisciplinaryLeftyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/disciplinary-case-files': {
-      id: '/disciplinary-case-files'
-      path: '/disciplinary-case-files'
-      fullPath: '/disciplinary-case-files'
-      preLoaderRoute: typeof DisciplinaryCaseFilesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dept-wise-salary-sheet': {
-      id: '/dept-wise-salary-sheet'
-      path: '/dept-wise-salary-sheet'
-      fullPath: '/dept-wise-salary-sheet'
-      preLoaderRoute: typeof DeptWiseSalarySheetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/create-roster': {
-      id: '/create-roster'
-      path: '/create-roster'
-      fullPath: '/create-roster'
-      preLoaderRoute: typeof CreateRosterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configure-time': {
-      id: '/configure-time'
-      path: '/configure-time'
-      fullPath: '/configure-time'
-      preLoaderRoute: typeof ConfigureTimeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configure-tax': {
-      id: '/configure-tax'
-      path: '/configure-tax'
-      fullPath: '/configure-tax'
-      preLoaderRoute: typeof ConfigureTaxRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configure-structure': {
-      id: '/configure-structure'
-      path: '/configure-structure'
-      fullPath: '/configure-structure'
-      preLoaderRoute: typeof ConfigureStructureRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configure-policies': {
-      id: '/configure-policies'
-      path: '/configure-policies'
-      fullPath: '/configure-policies'
-      preLoaderRoute: typeof ConfigurePoliciesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configure-personnel': {
-      id: '/configure-personnel'
-      path: '/configure-personnel'
-      fullPath: '/configure-personnel'
-      preLoaderRoute: typeof ConfigurePersonnelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configure-letter': {
-      id: '/configure-letter'
-      path: '/configure-letter'
-      fullPath: '/configure-letter'
-      preLoaderRoute: typeof ConfigureLetterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configure-employment': {
-      id: '/configure-employment'
-      path: '/configure-employment'
-      fullPath: '/configure-employment'
-      preLoaderRoute: typeof ConfigureEmploymentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configure-education': {
-      id: '/configure-education'
-      path: '/configure-education'
-      fullPath: '/configure-education'
-      preLoaderRoute: typeof ConfigureEducationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configure-compensation': {
-      id: '/configure-compensation'
-      path: '/configure-compensation'
-      fullPath: '/configure-compensation'
-      preLoaderRoute: typeof ConfigureCompensationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/conference-room-booking-list': {
-      id: '/conference-room-booking-list'
-      path: '/conference-room-booking-list'
-      fullPath: '/conference-room-booking-list'
-      preLoaderRoute: typeof ConferenceRoomBookingListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/conference-room-booking': {
-      id: '/conference-room-booking'
-      path: '/conference-room-booking'
-      fullPath: '/conference-room-booking'
-      preLoaderRoute: typeof ConferenceRoomBookingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/conference-room-approval': {
-      id: '/conference-room-approval'
-      path: '/conference-room-approval'
-      fullPath: '/conference-room-approval'
-      preLoaderRoute: typeof ConferenceRoomApprovalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/company-setup': {
-      id: '/company-setup'
-      path: '/company-setup'
-      fullPath: '/company-setup'
-      preLoaderRoute: typeof CompanySetupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/company-holiday': {
-      id: '/company-holiday'
-      path: '/company-holiday'
-      fullPath: '/company-holiday'
-      preLoaderRoute: typeof CompanyHolidayRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/check-approve-salary': {
-      id: '/check-approve-salary'
-      path: '/check-approve-salary'
-      fullPath: '/check-approve-salary'
-      preLoaderRoute: typeof CheckApproveSalaryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/changes': {
-      id: '/changes'
-      path: '/changes'
-      fullPath: '/changes'
-      preLoaderRoute: typeof ChangesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cash-sheet-print': {
-      id: '/cash-sheet-print'
-      path: '/cash-sheet-print'
-      fullPath: '/cash-sheet-print'
-      preLoaderRoute: typeof CashSheetPrintRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bulk-leave': {
-      id: '/bulk-leave'
-      path: '/bulk-leave'
-      fullPath: '/bulk-leave'
-      preLoaderRoute: typeof BulkLeaveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/budget-statement': {
-      id: '/budget-statement'
-      path: '/budget-statement'
-      fullPath: '/budget-statement'
-      preLoaderRoute: typeof BudgetStatementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/budget-requisition-approvals': {
-      id: '/budget-requisition-approvals'
-      path: '/budget-requisition-approvals'
-      fullPath: '/budget-requisition-approvals'
-      preLoaderRoute: typeof BudgetRequisitionApprovalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/budget-planning': {
-      id: '/budget-planning'
-      path: '/budget-planning'
-      fullPath: '/budget-planning'
-      preLoaderRoute: typeof BudgetPlanningRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/budget-overtime': {
-      id: '/budget-overtime'
-      path: '/budget-overtime'
-      fullPath: '/budget-overtime'
-      preLoaderRoute: typeof BudgetOvertimeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/budget-my-requisitions': {
-      id: '/budget-my-requisitions'
-      path: '/budget-my-requisitions'
-      fullPath: '/budget-my-requisitions'
-      preLoaderRoute: typeof BudgetMyRequisitionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bank-sheet-exec': {
-      id: '/bank-sheet-exec'
-      path: '/bank-sheet-exec'
-      fullPath: '/bank-sheet-exec'
-      preLoaderRoute: typeof BankSheetExecRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/approve-overtime': {
-      id: '/approve-overtime'
-      path: '/approve-overtime'
-      fullPath: '/approve-overtime'
-      preLoaderRoute: typeof ApproveOvertimeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/approve-increment-hr': {
-      id: '/approve-increment-hr'
-      path: '/approve-increment-hr'
-      fullPath: '/approve-increment-hr'
-      preLoaderRoute: typeof ApproveIncrementHrRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/approve-increment-gadget': {
-      id: '/approve-increment-gadget'
-      path: '/approve-increment-gadget'
-      fullPath: '/approve-increment-gadget'
-      preLoaderRoute: typeof ApproveIncrementGadgetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/approve-advance': {
-      id: '/approve-advance'
-      path: '/approve-advance'
-      fullPath: '/approve-advance'
-      preLoaderRoute: typeof ApproveAdvanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/allowance-requisition': {
-      id: '/allowance-requisition'
-      path: '/allowance-requisition'
-      fullPath: '/allowance-requisition'
-      preLoaderRoute: typeof AllowanceRequisitionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/allowance-rate': {
-      id: '/allowance-rate'
-      path: '/allowance-rate'
-      fullPath: '/allowance-rate'
-      preLoaderRoute: typeof AllowanceRateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/all-approvals': {
-      id: '/all-approvals'
-      path: '/all-approvals'
-      fullPath: '/all-approvals'
-      preLoaderRoute: typeof AllApprovalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/advance-salary-process': {
-      id: '/advance-salary-process'
-      path: '/advance-salary-process'
-      fullPath: '/advance-salary-process'
-      preLoaderRoute: typeof AdvanceSalaryProcessRouteImport
->>>>>>> 7a45f059a0b8cc3c72fbb12ba16599facfadd815
       parentRoute: typeof rootRouteImport
     }
     '/add-employee': {
@@ -8174,6 +4896,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-direct-mrr-list': {
+      id: '/inv-direct-mrr-list'
+      path: '/inv-direct-mrr-list'
+      fullPath: '/inv-direct-mrr-list'
+      preLoaderRoute: typeof InvDirectMrrListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-intercompany-receive': {
+      id: '/inv-intercompany-receive'
+      path: '/inv-intercompany-receive'
+      fullPath: '/inv-intercompany-receive'
+      preLoaderRoute: typeof InvIntercompanyReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-intercompany-receive-list': {
+      id: '/inv-intercompany-receive-list'
+      path: '/inv-intercompany-receive-list'
+      fullPath: '/inv-intercompany-receive-list'
+      preLoaderRoute: typeof InvIntercompanyReceiveListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-intercompany-transfer': {
+      id: '/inv-intercompany-transfer'
+      path: '/inv-intercompany-transfer'
+      fullPath: '/inv-intercompany-transfer'
+      preLoaderRoute: typeof InvIntercompanyTransferRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-intercompany-transfer-list': {
+      id: '/inv-intercompany-transfer-list'
+      path: '/inv-intercompany-transfer-list'
+      fullPath: '/inv-intercompany-transfer-list'
+      preLoaderRoute: typeof InvIntercompanyTransferListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-issue-list': {
       id: '/inv-issue-list'
       path: '/inv-issue-list'
@@ -8202,6 +4959,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvIssueReturnRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-material-requisition': {
+      id: '/inv-material-requisition'
+      path: '/inv-material-requisition'
+      fullPath: '/inv-material-requisition'
+      preLoaderRoute: typeof InvMaterialRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-material-requisition-approval-list': {
+      id: '/inv-material-requisition-approval-list'
+      path: '/inv-material-requisition-approval-list'
+      fullPath: '/inv-material-requisition-approval-list'
+      preLoaderRoute: typeof InvMaterialRequisitionApprovalListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-material-requisition-list': {
+      id: '/inv-material-requisition-list'
+      path: '/inv-material-requisition-list'
+      fullPath: '/inv-material-requisition-list'
+      preLoaderRoute: typeof InvMaterialRequisitionListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-opening-stock-list': {
+      id: '/inv-opening-stock-list'
+      path: '/inv-opening-stock-list'
+      fullPath: '/inv-opening-stock-list'
+      preLoaderRoute: typeof InvOpeningStockListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-receive-direct': {
       id: '/inv-receive-direct'
       path: '/inv-receive-direct'
@@ -8216,11 +5001,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvReceiveListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-receive-mrr': {
+      id: '/inv-receive-mrr'
+      path: '/inv-receive-mrr'
+      fullPath: '/inv-receive-mrr'
+      preLoaderRoute: typeof InvReceiveMrrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-return-to-store-list': {
+      id: '/inv-return-to-store-list'
+      path: '/inv-return-to-store-list'
+      fullPath: '/inv-return-to-store-list'
+      preLoaderRoute: typeof InvReturnToStoreListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-adjustment': {
+      id: '/inv-stock-adjustment'
+      path: '/inv-stock-adjustment'
+      fullPath: '/inv-stock-adjustment'
+      preLoaderRoute: typeof InvStockAdjustmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-adjustment-list': {
+      id: '/inv-stock-adjustment-list'
+      path: '/inv-stock-adjustment-list'
+      fullPath: '/inv-stock-adjustment-list'
+      preLoaderRoute: typeof InvStockAdjustmentListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-writeoff': {
+      id: '/inv-stock-writeoff'
+      path: '/inv-stock-writeoff'
+      fullPath: '/inv-stock-writeoff'
+      preLoaderRoute: typeof InvStockWriteoffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-writeoff-approval': {
+      id: '/inv-stock-writeoff-approval'
+      path: '/inv-stock-writeoff-approval'
+      fullPath: '/inv-stock-writeoff-approval'
+      preLoaderRoute: typeof InvStockWriteoffApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-writeoff-approval-list': {
+      id: '/inv-stock-writeoff-approval-list'
+      path: '/inv-stock-writeoff-approval-list'
+      fullPath: '/inv-stock-writeoff-approval-list'
+      preLoaderRoute: typeof InvStockWriteoffApprovalListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-stock-writeoff-list': {
+      id: '/inv-stock-writeoff-list'
+      path: '/inv-stock-writeoff-list'
+      fullPath: '/inv-stock-writeoff-list'
+      preLoaderRoute: typeof InvStockWriteoffListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-store-return-receive': {
+      id: '/inv-store-return-receive'
+      path: '/inv-store-return-receive'
+      fullPath: '/inv-store-return-receive'
+      preLoaderRoute: typeof InvStoreReturnReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-store-return-receive-list': {
+      id: '/inv-store-return-receive-list'
+      path: '/inv-store-return-receive-list'
+      fullPath: '/inv-store-return-receive-list'
+      preLoaderRoute: typeof InvStoreReturnReceiveListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-supplier-return-list': {
+      id: '/inv-supplier-return-list'
+      path: '/inv-supplier-return-list'
+      fullPath: '/inv-supplier-return-list'
+      preLoaderRoute: typeof InvSupplierReturnListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-yarn-opening-stock': {
       id: '/inv-yarn-opening-stock'
       path: '/inv-yarn-opening-stock'
       fullPath: '/inv-yarn-opening-stock'
       preLoaderRoute: typeof InvYarnOpeningStockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory-configuration': {
+      id: '/inventory-configuration'
+      path: '/inventory-configuration'
+      fullPath: '/inventory-configuration'
+      preLoaderRoute: typeof InventoryConfigurationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inventory-dashboard': {
@@ -8867,6 +5736,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcurementBillingSupplierBillRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/procurement-billing-supplier-bill-approval': {
+      id: '/procurement-billing-supplier-bill-approval'
+      path: '/procurement-billing-supplier-bill-approval'
+      fullPath: '/procurement-billing-supplier-bill-approval'
+      preLoaderRoute: typeof ProcurementBillingSupplierBillApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-supplier-bill-approval-list': {
+      id: '/procurement-billing-supplier-bill-approval-list'
+      path: '/procurement-billing-supplier-bill-approval-list'
+      fullPath: '/procurement-billing-supplier-bill-approval-list'
+      preLoaderRoute: typeof ProcurementBillingSupplierBillApprovalListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-supplier-bill-list': {
+      id: '/procurement-billing-supplier-bill-list'
+      path: '/procurement-billing-supplier-bill-list'
+      fullPath: '/procurement-billing-supplier-bill-list'
+      preLoaderRoute: typeof ProcurementBillingSupplierBillListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/procurement-billing-supplier-record': {
       id: '/procurement-billing-supplier-record'
       path: '/procurement-billing-supplier-record'
@@ -8893,6 +5783,13 @@ declare module '@tanstack/react-router' {
       path: '/procurement-billing-vat-tax-register'
       fullPath: '/procurement-billing-vat-tax-register'
       preLoaderRoute: typeof ProcurementBillingVatTaxRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-comparative-statement': {
+      id: '/procurement-comparative-statement'
+      path: '/procurement-comparative-statement'
+      fullPath: '/procurement-comparative-statement'
+      preLoaderRoute: typeof ProcurementComparativeStatementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/procurement-config-bank-accounts': {
@@ -8958,6 +5855,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcurementConfigTermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/procurement-cs-approval': {
+      id: '/procurement-cs-approval'
+      path: '/procurement-cs-approval'
+      fullPath: '/procurement-cs-approval'
+      preLoaderRoute: typeof ProcurementCsApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/procurement-cs-batch-list': {
       id: '/procurement-cs-batch-list'
       path: '/procurement-cs-batch-list'
@@ -9005,6 +5909,34 @@ declare module '@tanstack/react-router' {
       path: '/procurement-dashboard'
       fullPath: '/procurement-dashboard'
       preLoaderRoute: typeof ProcurementDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-master-data': {
+      id: '/procurement-master-data'
+      path: '/procurement-master-data'
+      fullPath: '/procurement-master-data'
+      preLoaderRoute: typeof ProcurementMasterDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-material-receive-list': {
+      id: '/procurement-material-receive-list'
+      path: '/procurement-material-receive-list'
+      fullPath: '/procurement-material-receive-list'
+      preLoaderRoute: typeof ProcurementMaterialReceiveListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-monthly-budget-approval': {
+      id: '/procurement-monthly-budget-approval'
+      path: '/procurement-monthly-budget-approval'
+      fullPath: '/procurement-monthly-budget-approval'
+      preLoaderRoute: typeof ProcurementMonthlyBudgetApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-monthly-budget-requisition': {
+      id: '/procurement-monthly-budget-requisition'
+      path: '/procurement-monthly-budget-requisition'
+      fullPath: '/procurement-monthly-budget-requisition'
+      preLoaderRoute: typeof ProcurementMonthlyBudgetRequisitionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/procurement-payment-bill': {
@@ -9082,6 +6014,20 @@ declare module '@tanstack/react-router' {
       path: '/procurement-po-work-order-approval'
       fullPath: '/procurement-po-work-order-approval'
       preLoaderRoute: typeof ProcurementPoWorkOrderApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-pr-approval': {
+      id: '/procurement-pr-approval'
+      path: '/procurement-pr-approval'
+      fullPath: '/procurement-pr-approval'
+      preLoaderRoute: typeof ProcurementPrApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-purchase-requisition': {
+      id: '/procurement-purchase-requisition'
+      path: '/procurement-purchase-requisition'
+      fullPath: '/procurement-purchase-requisition'
+      preLoaderRoute: typeof ProcurementPurchaseRequisitionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/procurement-reports-combined-po-statement': {

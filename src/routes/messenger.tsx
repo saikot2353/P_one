@@ -34,15 +34,6 @@ export const Route = createFileRoute("/messenger")({
 });
 
 // -- Mock Data Base --
-<<<<<<< HEAD
-const INITIAL_GROUPS = [
-  { id: "g1", name: "Business Innovation", avatar: "https://i.pravatar.cc/150?u=g1", lastMessage: "Great. Please review this video walkthrough.", time: "10:42 AM", unread: 2, members: 6, isDirect: false, isOnline: false },
-  { id: "g2", name: "HR Team", avatar: "https://i.pravatar.cc/150?u=g2", lastMessage: "Don't forget the all-hands meeting at 3 PM.", time: "09:15 AM", unread: 0, members: 3, isDirect: false, isOnline: false },
-  { id: "g3", name: "Finance & Accounts", avatar: "https://i.pravatar.cc/150?u=g3", lastMessage: "The Q3 reports are finalized.", time: "Yesterday", unread: 0, members: 4, isDirect: false, isOnline: false },
-  { id: "g4", name: "IT & Infrastructure", avatar: "https://i.pravatar.cc/150?u=g4", lastMessage: "Server maintenance scheduled for tonight.", time: "Yesterday", unread: 5, members: 5, isDirect: false, isOnline: false },
-  { id: "g5", name: "Marketing", avatar: "https://i.pravatar.cc/150?u=g5", lastMessage: "New ad creatives are ready for review.", time: "Tuesday", unread: 0, members: 2, isDirect: false, isOnline: false },
-  { id: "g6", name: "Security Operations", avatar: "https://i.pravatar.cc/150?u=g6", lastMessage: "Gate 2 access logs verified.", time: "Monday", unread: 0, members: 3, isDirect: false, isOnline: false },
-=======
 interface ChatItem {
   id: string;
   name: string;
@@ -62,7 +53,6 @@ const INITIAL_GROUPS: ChatItem[] = [
   { id: "g4", name: "IT & Infrastructure", avatar: "https://i.pravatar.cc/150?u=g4", lastMessage: "Server maintenance scheduled for tonight.", time: "Yesterday", unread: 5, members: 5, isDirect: false, isOnline: true },
   { id: "g5", name: "Marketing", avatar: "https://i.pravatar.cc/150?u=g5", lastMessage: "New ad creatives are ready for review.", time: "Tuesday", unread: 0, members: 2, isDirect: false, isOnline: false },
   { id: "g6", name: "Security Operations", avatar: "https://i.pravatar.cc/150?u=g6", lastMessage: "Gate 2 access logs verified.", time: "Monday", unread: 0, members: 3, isDirect: false, isOnline: true },
->>>>>>> 7a45f059a0b8cc3c72fbb12ba16599facfadd815
 ];
 
 const BASE_MESSAGES = [
