@@ -48,7 +48,7 @@ const modules: ModuleConfig[] = [
     icon: Calculator,
     color: "from-emerald-500 to-teal-600",
     shadow: "shadow-emerald-500/20",
-    path: "/",
+    path: "https://pakiza-accounts.vercel.app/",
   },
   {
     id: "procurement",
@@ -182,6 +182,28 @@ export function ModuleLauncher() {
           <div className="max-h-[360px] overflow-y-auto p-3 grid grid-cols-3 gap-2.5 scrollbar-thin">
             {modules.map((m) => {
               const Icon = m.icon;
+              const isExternal = m.path.startsWith("http://") || m.path.startsWith("https://");
+
+              if (isExternal) {
+                return (
+                  <a
+                    key={m.id}
+                    href={m.path}
+                    onClick={() => setIsOpen(false)}
+                    className="flex flex-col items-center gap-1.5 p-2 rounded-xl border border-transparent hover:border-slate-200/60 hover:bg-slate-50/70 dark:hover:border-slate-800/50 dark:hover:bg-slate-950/40 transition duration-200 group text-center cursor-pointer"
+                  >
+                    <div
+                      className={`size-10.5 rounded-xl bg-gradient-to-br ${m.color} ${m.shadow} flex items-center justify-center text-white transition-all duration-300 group-hover:scale-108 group-hover:-rotate-3 shadow-md`}
+                    >
+                      <Icon className="size-4.5 text-white" />
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 truncate w-full group-hover:text-primary transition-colors">
+                      {m.name}
+                    </span>
+                  </a>
+                );
+              }
+
               return (
                 <Link
                   key={m.id}

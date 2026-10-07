@@ -1039,17 +1039,14 @@ export function InventoryTopbar() {
                   <p className="text-[10px] text-muted-foreground font-medium truncate">tahmid@pakizasoftware.com</p>
                 </div>
                 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsProfileMenuOpen(false);
-                    alert("My Profile dashboard is under construction.");
-                  }}
+                <Link
+                  to="/my-profile"
+                  onClick={() => setIsProfileMenuOpen(false)}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold hover:bg-muted transition-colors text-left"
                 >
-                  <User className="size-4 text-muted-foreground" />
+                  <User className="size-4 text-primary" />
                   <span>My Profile</span>
-                </button>
+                </Link>
 
                 <button
                   type="button"

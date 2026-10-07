@@ -485,6 +485,7 @@ function BulkLeavePage() {
       "Line",
       "Grade",
       "Joining Date",
+      "Leave Count (CL/SL/EL)",
       "Leave Type",
       "From Date",
       "To Date",
@@ -506,6 +507,7 @@ function BulkLeavePage() {
         e.line,
         e.grade,
         e.joiningDate,
+        `CL: ${e.clBalance} | SL: ${e.slBalance} | EL: ${e.elBalance}`,
         leaveType,
         fromDate,
         toDate,
@@ -998,6 +1000,12 @@ function BulkLeavePage() {
                         <ArrowUpDown className="w-3 h-3 text-slate-400" />
                       </div>
                     </th>
+                    <th className="py-2.5 px-3 border-r border-slate-300 text-center whitespace-nowrap min-w-[140px]">
+                      <div className="flex items-center justify-center gap-1">
+                        <span>Leave Count</span>
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      </div>
+                    </th>
                     <th className="py-2.5 px-3">Default</th>
                   </tr>
                 </thead>
@@ -1005,7 +1013,7 @@ function BulkLeavePage() {
                   {filteredData.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={14}
+                        colSpan={15}
                         className="py-8 text-center text-slate-500 italic"
                       >
                         No employee records found matching search parameters.
@@ -1084,6 +1092,28 @@ function BulkLeavePage() {
                           </td>
                           <td className="py-2 px-3 border-r border-slate-200 text-slate-700 whitespace-nowrap">
                             {emp.joiningDate}
+                          </td>
+                          <td className="py-2 px-3 border-r border-slate-200 text-center whitespace-nowrap">
+                            <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono">
+                              <span
+                                className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-medium"
+                                title="Casual Leave (CL) Balance"
+                              >
+                                CL: <strong className="font-bold">{emp.clBalance}</strong>
+                              </span>
+                              <span
+                                className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium"
+                                title="Sick Leave (SL) Balance"
+                              >
+                                SL: <strong className="font-bold">{emp.slBalance}</strong>
+                              </span>
+                              <span
+                                className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-medium"
+                                title="Earned Leave (EL) Balance"
+                              >
+                                EL: <strong className="font-bold">{emp.elBalance}</strong>
+                              </span>
+                            </div>
                           </td>
                           <td className="py-2 px-3 text-slate-400 text-center">
                             —

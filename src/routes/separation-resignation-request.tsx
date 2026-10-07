@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { ResignationApprovalModal } from "@/components/ssp/ResignationApprovalModal";
 import {
   ChevronRight,
   Search,
@@ -647,113 +648,31 @@ Employee ID: ${loggedInEmployee.empId}`;
       )}
 
       {/* ULTRA-LUCRATIVE EXECUTIVE RESIGNATION LETTER VIEW MODAL */}
-      {viewItem && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 font-['Inter'] overflow-y-auto">
-          <div className="bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[95vh] flex flex-col overflow-hidden relative">
-            
-            {/* Top Brand Gradient Accent Bar */}
-            <div className="h-2 w-full bg-gradient-to-r from-blue-700 via-indigo-600 to-emerald-500" />
-
-            {/* Modal Controls Bar */}
-            <div className="px-8 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <FileText size={18} className="text-blue-600" />
-                <h3 className="font-bold text-slate-900 text-sm">
-                  Official Resignation Letter ({viewItem.id})
-                </h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow"
-                >
-                  <Printer size={14} /> Print Letter
-                </button>
-                <button onClick={() => setViewItem(null)} className="p-1 rounded text-slate-400 hover:text-slate-600">
-                  <X size={20} />
-                </button>
-              </div>
-            </div>
-
-            {/* Letter Document Paper */}
-            <div className="flex-1 overflow-y-auto p-8 sm:p-12 space-y-6 text-xs leading-relaxed bg-white text-slate-900">
-              
-              {/* Corporate Letterhead */}
-              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-                <div>
-                  <h1 className="text-xl font-black text-slate-900 tracking-tight">
-                    PAKIZA KNIT COMPOSITE LTD.
-                  </h1>
-                  <p className="text-[11px] text-slate-500 font-medium">
-                    Human Resource &amp; Administration Division
-                  </p>
-                </div>
-                <div className="text-right text-[11px] text-slate-400 font-mono">
-                  <div>Ref: PKCL/HR/RES/2026/041</div>
-                  <div>Submitted: {viewItem.submittedDate}</div>
-                </div>
-              </div>
-
-              {/* Metadata Card */}
-              <div className="p-4 rounded-xl bg-gradient-to-br from-slate-50 to-blue-50/50 border border-slate-200/80 shadow-2xs space-y-2">
-                <div className="font-bold text-slate-900 text-sm flex items-center justify-between">
-                  <span>Subject: {viewItem.subject}</span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-extrabold">
-                    {viewItem.status}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-slate-200/60 text-xs">
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Notice Date</span>
-                    <span className="font-bold text-slate-800">{viewItem.noticeDate}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Intended Last Working Day</span>
-                    <span className="font-extrabold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 inline-block">{viewItem.intendedLastWorkingDate}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Separation Reason</span>
-                    <span className="font-semibold text-slate-800">{viewItem.reason}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Formatted Letter Body */}
-              <div className="p-6 bg-slate-50/50 rounded-xl border border-slate-200 text-slate-900 whitespace-pre-wrap leading-relaxed text-xs space-y-3 font-sans">
-                {viewItem.letterBody}
-              </div>
-
-              {/* Attachment Pill if available */}
-              {viewItem.attachedFileName && (
-                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-blue-900 font-medium">
-                    <Paperclip size={16} className="text-blue-600" />
-                    <span>Attached Signed Copy: <strong>{viewItem.attachedFileName}</strong></span>
-                  </div>
-                  <span className="text-[10px] font-bold text-blue-600 uppercase">Verified File</span>
-                </div>
-              )}
-
-              {/* Signature Block */}
-              <div className="pt-8 border-t border-slate-200 flex justify-between items-end">
-                <div>
-                  <div className="text-slate-400 text-[10px]">Submitted By Employee</div>
-                  <div className="font-bold text-slate-900 text-sm mt-1">{viewItem.empName}</div>
-                  <div className="text-slate-500 text-xs">{viewItem.designation} (ID: {viewItem.empId})</div>
-                </div>
-
-                <div className="text-right">
-                  <div className="text-slate-400 text-[10px]">HR Department Verification</div>
-                  <div className="font-bold text-emerald-700 text-xs mt-1">✓ Notice Received &amp; Logged</div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      )}
+      <ResignationApprovalModal
+        open={!!viewItem}
+        onOpenChange={(open) => !open && setViewItem(null)}
+        data={viewItem as any}
+        onApprove={(id) => {
+          setResignations((prev) =>
+            prev.map((item) =>
+              item.id === id ? { ...item, status: "Cleared & Released" } : item
+            )
+          );
+          if (viewItem && viewItem.id === id) {
+            setViewItem({ ...viewItem, status: "Cleared & Released" });
+          }
+        }}
+        onReject={(id) => {
+          setResignations((prev) =>
+            prev.map((item) =>
+              item.id === id ? { ...item, status: "Rejected" as any } : item
+            )
+          );
+          if (viewItem && viewItem.id === id) {
+            setViewItem({ ...viewItem, status: "Rejected" as any });
+          }
+        }}
+      />
     </div>
   );
 }

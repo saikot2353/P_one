@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -20,6 +20,7 @@ import { LeaveApplicationModal } from "@/components/ssp/LeaveApplicationModal";
 import { GeneralStoreRequisitionModal } from "@/components/ssp/GeneralStoreRequisitionModal";
 import { GroupLeaveApplicationModal } from "@/components/ssp/GroupLeaveApplicationModal";
 import { IOURequisitionModal } from "@/components/ssp/IOURequisitionModal";
+import { SimRequisitionModal } from "@/components/ssp/SimRequisitionModal";
 
 export const Route = createFileRoute("/ssp-my-requisition")({
   component: MyRequisitionPage,
@@ -37,69 +38,152 @@ interface RequisitionRow {
   onClickView: () => void;
 }
 
+const BASE_TABLE_DATA: Omit<RequisitionRow, "onClickView">[] = [
+  {
+    id: "SIM/2026/00142",
+    reqNum: "SIM/2026/00142",
+    date: "2026-09-19",
+    status: "Pending",
+    doc: "SIM Requisition — New SIM Card Allocation (Official)",
+    note: "[On Behalf: Md. Anik Islam] Required for regular client visits and technical deployment communication",
+  },
+  {
+    id: "MRN/2026/00035",
+    reqNum: "MRN/2026/00035",
+    date: "2026-08-25",
+    status: "Approved",
+    doc: "IOU Requisition — Salary Advance",
+    note: "Family Issue (Advance BDT 5,000.00)",
+  },
+  {
+    id: "MRN/2026/00042",
+    reqNum: "MRN/2026/00042",
+    date: "2026-08-28",
+    status: "Pending",
+    doc: "IOU Requisition — Conveyance",
+    note: "Official Visit to Narsingdi Plant (BDT 3,500.00)",
+  },
+  {
+    id: "378956",
+    reqNum: "378956",
+    date: "2026-05-05",
+    status: "Approved",
+    doc: "General Product Store Requisition",
+    note: "",
+  },
+  {
+    id: "375460",
+    reqNum: "375460",
+    date: "2026-07-13",
+    status: "Pending",
+    doc: "Group Leave Application",
+    note: "Urgent training session and exam group leave",
+  },
+  {
+    id: "372569",
+    reqNum: "372569",
+    date: "2026-04-01",
+    status: "Approved",
+    doc: "Leave Application",
+    note: "",
+  },
+];
+
 function MyRequisitionPage() {
   const navigate = useNavigate();
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
   const [storeModalOpen, setStoreModalOpen] = useState(false);
   const [groupLeaveModalOpen, setGroupLeaveModalOpen] = useState(false);
   const [iouModalOpen, setIouModalOpen] = useState(false);
+  const [simModalOpen, setSimModalOpen] = useState(false);
+  const [selectedSimReq, setSelectedSimReq] = useState<any>(null);
 
   // States
   const [requester, setRequester] = useState("Tahmid Afsar");
   const [statusFilter, setStatusFilter] = useState<RequisitionStatus | "All">("All");
   const [dateFrom, setDateFrom] = useState("2026-03-01");
-  const [dateTo, setDateTo] = useState("2026-08-01");
+  const [dateTo, setDateTo] = useState("2026-09-30");
   const [reqNumber, setReqNumber] = useState("");
   const [globalSearch, setGlobalSearch] = useState("");
+  const [customRows, setCustomRows] = useState<Omit<RequisitionRow, "onClickView">[]>([]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("cripton_my_requisitions_custom");
+      if (stored) {
+        setCustomRows(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error("Failed to load custom requisitions", e);
+    }
+  }, []);
+
+  const handleOpenSimModal = (reqNum: string, fallbackRow?: any) => {
+    try {
+      const storedSimsRaw = localStorage.getItem("cripton_sim_requisitions");
+      if (storedSimsRaw) {
+        const storedSims = JSON.parse(storedSimsRaw);
+        const found = storedSims.find((s: any) => s.id === reqNum || s.reqNum === reqNum);
+        if (found) {
+          setSelectedSimReq(found);
+          setSimModalOpen(true);
+          return;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setSelectedSimReq(
+      (fallbackRow as any)?.simData || {
+        id: reqNum,
+        reqNum,
+        reqDate: fallbackRow?.date || "2026-09-19",
+        status: fallbackRow?.status || "Pending",
+        requestFor: fallbackRow?.doc?.replace("SIM Requisition — ", "") || "New SIM Card Allocation (Official)",
+        justification: fallbackRow?.note || "Required for regular client visits and technical deployment communication",
+        requisitionFor: "Md. Anik Islam (EMP-2023044078)",
+        section: "WEB-Team",
+        requesterName: "Tahmid Afsar",
+      }
+    );
+    setSimModalOpen(true);
+  };
 
   const requesterOptions = [{ value: "Tahmid Afsar", label: "Tahmid Afsar (Assistant Manager)" }];
 
   const tableData: RequisitionRow[] = [
-    {
-      id: "MRN/2026/00035",
-      reqNum: "MRN/2026/00035",
-      date: "2026-08-25",
-      status: "Approved",
-      doc: "IOU Requisition — Salary Advance",
-      note: "Family Issue (Advance BDT 5,000.00)",
-      onClickView: () => navigate({ to: "/ssp-iou-requisition-view" }),
-    },
-    {
-      id: "MRN/2026/00042",
-      reqNum: "MRN/2026/00042",
-      date: "2026-08-28",
-      status: "Pending",
-      doc: "IOU Requisition — Conveyance",
-      note: "Official Visit to Narsingdi Plant (BDT 3,500.00)",
-      onClickView: () => navigate({ to: "/ssp-iou-requisition-view" }),
-    },
-    {
-      id: "378956",
-      reqNum: "378956",
-      date: "2026-05-05",
-      status: "Approved",
-      doc: "General Product Store Requisition",
-      note: "",
-      onClickView: () => setStoreModalOpen(true),
-    },
-    {
-      id: "375460",
-      reqNum: "375460",
-      date: "2026-07-13",
-      status: "Pending",
-      doc: "Group Leave Application",
-      note: "Urgent training session and exam group leave",
-      onClickView: () => setGroupLeaveModalOpen(true),
-    },
-    {
-      id: "372569",
-      reqNum: "372569",
-      date: "2026-04-01",
-      status: "Approved",
-      doc: "Leave Application",
-      note: "",
-      onClickView: () => setLeaveModalOpen(true),
-    },
+    ...customRows.map((r) => ({
+      ...r,
+      onClickView: () => {
+        if (r.doc.includes("SIM Requisition") || r.reqNum.startsWith("SIM/")) {
+          handleOpenSimModal(r.reqNum, r);
+        } else if (r.doc.includes("IOU")) {
+          navigate({ to: "/ssp-iou-requisition-view" });
+        } else if (r.doc.includes("Store")) {
+          setStoreModalOpen(true);
+        } else if (r.doc.includes("Group Leave")) {
+          setGroupLeaveModalOpen(true);
+        } else {
+          setLeaveModalOpen(true);
+        }
+      },
+    })),
+    ...BASE_TABLE_DATA.map((r) => ({
+      ...r,
+      onClickView: () => {
+        if (r.id === "SIM/2026/00142" || r.doc.includes("SIM Requisition")) {
+          handleOpenSimModal(r.reqNum, r);
+        } else if (r.id === "MRN/2026/00035" || r.id === "MRN/2026/00042") {
+          navigate({ to: "/ssp-iou-requisition-view" });
+        } else if (r.id === "378956") {
+          setStoreModalOpen(true);
+        } else if (r.id === "375460") {
+          setGroupLeaveModalOpen(true);
+        } else {
+          setLeaveModalOpen(true);
+        }
+      },
+    })),
   ];
 
   // Calculate stats
@@ -413,6 +497,7 @@ function MyRequisitionPage() {
       <GeneralStoreRequisitionModal open={storeModalOpen} onOpenChange={setStoreModalOpen} />
       <GroupLeaveApplicationModal open={groupLeaveModalOpen} onOpenChange={setGroupLeaveModalOpen} />
       <IOURequisitionModal isOpen={iouModalOpen} onClose={() => setIouModalOpen(false)} />
+      <SimRequisitionModal open={simModalOpen} onOpenChange={setSimModalOpen} data={selectedSimReq} />
     </div>
   );
 }

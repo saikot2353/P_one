@@ -70,7 +70,7 @@ const modules = [
     icon: Calculator,
     color: "from-emerald-500 to-teal-600",
     shadow: "shadow-emerald-500/20",
-    path: "/",
+    path: "https://pakiza-accounts.vercel.app/",
   },
   {
     id: "procurement",
@@ -164,12 +164,31 @@ const modules = [
   },
 ];
 
-const ACTIVE_MODULE_IDS = ["hris", "merchandising", "procurement", "inventory", "dashboard"];
+const ACTIVE_MODULE_IDS = [
+  "hris",
+  "merchandising",
+  "finance",
+  "procurement",
+  "inventory",
+  "dashboard",
+];
 
 export default function ModuleSelectionPage() {
   const navigate = useNavigate();
   const [theme, setTheme] = useState<Theme>("light");
   const [hoveredModule, setHoveredModule] = useState<string | null>(null);
+
+  const handleModuleClick = (path: string, e?: React.MouseEvent) => {
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      if (e?.metaKey || e?.ctrlKey) {
+        window.open(path, "_blank");
+      } else {
+        window.location.href = path;
+      }
+    } else {
+      navigate({ to: path });
+    }
+  };
 
   // Auto-detect system theme initially, or load from localStorage
   useEffect(() => {
@@ -281,7 +300,7 @@ export default function ModuleSelectionPage() {
                 return (
                   <button
                     key={module.id}
-                    onClick={() => navigate({ to: module.path })}
+                    onClick={(e) => handleModuleClick(module.path, e)}
                     onMouseEnter={() => setHoveredModule(module.id)}
                     onMouseLeave={() => setHoveredModule(null)}
                     className={`group relative text-left p-6 rounded-2xl backdrop-blur-xl transition-all duration-300 border ${
@@ -350,7 +369,7 @@ export default function ModuleSelectionPage() {
                 return (
                   <button
                     key={module.id}
-                    onClick={() => navigate({ to: module.path })}
+                    onClick={(e) => handleModuleClick(module.path, e)}
                     onMouseEnter={() => setHoveredModule(module.id)}
                     onMouseLeave={() => setHoveredModule(null)}
                     className={`group relative text-left p-6 rounded-2xl backdrop-blur-xl transition-all duration-300 border ${
