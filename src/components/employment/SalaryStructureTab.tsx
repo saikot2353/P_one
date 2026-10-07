@@ -17,6 +17,7 @@ import {
   X,
   Layers,
   Coins,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -291,6 +292,32 @@ export function SalaryStructureTab({ searchQuery, empTypesList = [] }: SalaryStr
   const [compFixed, setCompFixed] = useState(750);
 
   const formulaInputRef = useRef<HTMLInputElement>(null);
+
+  // Inline formula editing state
+  const [inlineEditingCompId, setInlineEditingCompId] = useState<string | null>(null);
+  const [inlineFormulaText, setInlineFormulaText] = useState<string>("");
+
+  const handleStartInlineEdit = (comp: SalaryComponent) => {
+    setInlineEditingCompId(comp.id);
+    setInlineFormulaText(comp.valueFormula);
+  };
+
+  const handleSaveInlineEdit = (compId: string) => {
+    if (!inlineFormulaText.trim()) {
+      toast.error("Formula cannot be empty.");
+      return;
+    }
+    setFormComponents((prev) =>
+      prev.map((c) => (c.id === compId ? { ...c, valueFormula: inlineFormulaText.trim() } : c)),
+    );
+    setInlineEditingCompId(null);
+    toast.success("Formula updated inline!");
+  };
+
+  const handleCancelInlineEdit = () => {
+    setInlineEditingCompId(null);
+    setInlineFormulaText("");
+  };
 
   const filteredStructures = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
@@ -767,15 +794,69 @@ export function SalaryStructureTab({ searchQuery, empTypesList = [] }: SalaryStr
                             )}
                           </td>
                           <td className="px-4 py-3 font-mono text-xs font-semibold text-slate-700 dark:text-slate-300">
-                            {comp.valueFormula}
+                            {inlineEditingCompId === comp.id ? (
+                              <div className="flex items-center gap-1.5 min-w-[260px]">
+                                <input
+                                  type="text"
+                                  value={inlineFormulaText}
+                                  onChange={(e) => setInlineFormulaText(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") handleSaveInlineEdit(comp.id);
+                                    if (e.key === "Escape") handleCancelInlineEdit();
+                                  }}
+                                  autoFocus
+                                  placeholder="Enter formula or value"
+                                  className="h-8 px-2.5 rounded-lg border border-primary bg-background text-xs font-mono font-bold text-foreground focus:ring-2 focus:ring-primary/20 outline-none w-full"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleSaveInlineEdit(comp.id)}
+                                  className="size-7 shrink-0 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 flex items-center justify-center transition cursor-pointer"
+                                  title="Save Formula (Enter)"
+                                >
+                                  <Check className="size-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleCancelInlineEdit}
+                                  className="size-7 shrink-0 rounded-lg bg-red-500/10 text-red-600 hover:bg-red-500/20 flex items-center justify-center transition cursor-pointer"
+                                  title="Cancel (Esc)"
+                                >
+                                  <X className="size-3.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <div
+                                onDoubleClick={() => handleStartInlineEdit(comp)}
+                                className="flex items-center gap-2 group/cell"
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => openEditComp(comp)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:border-purple-500/60 text-xs font-mono font-bold transition group cursor-pointer shadow-2xs max-w-[290px]"
+                                  title="Click to edit formula in Formula Builder"
+                                >
+                                  <span className="truncate">{comp.valueFormula}</span>
+                                  <ExternalLink className="size-3 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition shrink-0" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartInlineEdit(comp)}
+                                  className="opacity-0 group-hover/cell:opacity-100 p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  title="Edit formula inline (or double-click cell)"
+                                >
+                                  <Pencil className="size-3" />
+                                </button>
+                              </div>
+                            )}
                           </td>
                           <td className="px-4 py-3 text-center">
                             <div className="flex items-center justify-center gap-2">
                               <button
                                 type="button"
                                 onClick={() => openEditComp(comp)}
-                                className="text-orange-500 hover:text-orange-600 transition p-1 cursor-pointer"
-                                title="Edit"
+                                className="text-orange-500 hover:text-orange-600 transition p-1 hover:bg-orange-500/10 rounded cursor-pointer"
+                                title="Edit Formula / Details"
                               >
                                 <Pencil className="size-3.5" />
                               </button>
@@ -886,17 +967,56 @@ export function SalaryStructureTab({ searchQuery, empTypesList = [] }: SalaryStr
               </div>
 
               {compType === "Formula" && (
-                <div className="space-y-3">
+                <div className="space-y-3.5">
+                  {/* Quick Preset Formulas */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider">
+                        QUICK PRESET FORMULAS:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setCompFormula("")}
+                        className="text-[10px] font-bold text-muted-foreground hover:text-red-500 transition cursor-pointer uppercase"
+                      >
+                        Clear Formula
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {[
+                        {
+                          label: "Worker Standard: (GROSS - MED - CONV - FOOD) / 1.5",
+                          val: "(GROSS - MED - CONV - FOOD) / 1.5",
+                        },
+                        { label: "50% of Gross: GROSS * 0.50", val: "GROSS * 0.50" },
+                        { label: "60% of Gross: GROSS * 0.60", val: "GROSS * 0.60" },
+                        { label: "50% of Basic: BASIC * 0.50", val: "BASIC * 0.50" },
+                      ].map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => {
+                            setCompFormula(preset.val);
+                            toast.info(`Preset applied: ${preset.val}`);
+                          }}
+                          className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-border/80 bg-muted/40 hover:bg-muted text-foreground transition active:scale-95 cursor-pointer shadow-2xs"
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div>
                     <label className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-1.5">
-                      FORMULA
+                      FORMULA <span className="text-red-500">*</span>
                     </label>
                     <input
                       ref={formulaInputRef}
                       type="text"
                       value={compFormula}
                       onChange={(e) => setCompFormula(e.target.value)}
-                      className="w-full h-12 px-3.5 rounded-xl border border-border/80 bg-background text-sm font-mono text-foreground outline-none"
+                      className="w-full h-12 px-3.5 rounded-xl border border-border/80 bg-background text-sm font-mono font-bold text-foreground outline-none"
                     />
                   </div>
 

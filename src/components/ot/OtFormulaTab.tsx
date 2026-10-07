@@ -24,6 +24,7 @@ import {
   Coins,
   ShieldAlert,
   Zap,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -227,6 +228,12 @@ export function evaluateFormulaSafe(
 
     let parsed = formula.toUpperCase();
 
+    // Remove comma separators in numbers e.g. 2,000 -> 2000
+    parsed = parsed.replace(/,/g, "");
+
+    // Convert percentage patterns like 50% or 50 % to (50 / 100)
+    parsed = parsed.replace(/(\d+(?:\.\d+)?)\s*%/g, "($1 / 100)");
+
     // Replace known variables
     const sortedKeys = Object.keys(variables).sort((a, b) => b.length - a.length);
     for (const key of sortedKeys) {
@@ -235,9 +242,9 @@ export function evaluateFormulaSafe(
     }
 
     // Check if there are unresolved letters/variables
-    const remainingLetters = parsed.replace(/[\d\s+\-*/().%]/g, "");
+    const remainingLetters = parsed.replace(/[\d\s+\-*/().]/g, "");
     if (remainingLetters.length > 0) {
-      return { result: null, error: `Unrecognized variable: ${remainingLetters}` };
+      return { result: null, error: `Unrecognized variable or symbol: ${remainingLetters}` };
     }
 
     // Safe math evaluation
@@ -326,8 +333,28 @@ export function OtFormulaTab({
   const [testConv, setTestConv] = useState<number>(450);
   const [testFood, setTestFood] = useState<number>(1250);
   const [testPf, setTestPf] = useState<number>(0);
-
   const formulaInputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Direct scale formula editing (from master table 1-click action)
+  const [directScaleForFormula, setDirectScaleForFormula] = useState<OtRateConfiguration | null>(null);
+
+  // Inline editing state for components table in the scale modal
+  const [inlineEditingCompId, setInlineEditingCompId] = useState<string | null>(null);
+  const [inlineFormulaText, setInlineFormulaText] = useState<string>("");
+
+  // Auto-focus formula input when submodal opens
+  useEffect(() => {
+    if (isCompModalOpen && compType === "Formula") {
+      const timer = setTimeout(() => {
+        if (formulaInputRef.current) {
+          formulaInputRef.current.focus();
+          const len = formulaInputRef.current.value.length;
+          formulaInputRef.current.setSelectionRange(len, len);
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isCompModalOpen, compType]);
 
   // Filter configurations by search query
   const filteredConfigs = useMemo(() => {
@@ -477,6 +504,7 @@ export function OtFormulaTab({
 
   // Open Submodal (Add / Edit Component)
   const openCompModal = (comp: OtFormulaComponent | null) => {
+    setDirectScaleForFormula(null);
     if (comp) {
       setEditingComp(comp);
       setCompCode(comp.code);
@@ -497,6 +525,43 @@ export function OtFormulaTab({
       setCompFixedAmount(100);
     }
     setIsCompModalOpen(true);
+  };
+
+  // Open Direct Formula Editor from Master Table (1-Click Action)
+  const openDirectFormulaModal = (scale: OtRateConfiguration, comp: OtFormulaComponent) => {
+    setDirectScaleForFormula(scale);
+    setEditingComp(comp);
+    setCompCode(comp.code);
+    setCompName(comp.name);
+    setCompType(comp.type);
+    setCompBasedOn(comp.basedOn || "-");
+    setCompFormula(comp.valueFormula || "");
+    setCompPctValue(comp.multiplierPct || 50);
+    setCompFixedAmount(comp.fixedAmount || 100);
+    setIsCompModalOpen(true);
+  };
+
+  // Inline Formula Editing Handlers (Direct Table Row Edit)
+  const handleStartInlineEdit = (comp: OtFormulaComponent) => {
+    setInlineEditingCompId(comp.id);
+    setInlineFormulaText(comp.valueFormula);
+  };
+
+  const handleSaveInlineEdit = (compId: string) => {
+    if (!inlineFormulaText.trim()) {
+      toast.error("Formula or value cannot be empty.");
+      return;
+    }
+    setFormComponents((prev) =>
+      prev.map((c) => (c.id === compId ? { ...c, valueFormula: inlineFormulaText.trim() } : c)),
+    );
+    setInlineEditingCompId(null);
+    toast.success("Formula updated inline!");
+  };
+
+  const handleCancelInlineEdit = () => {
+    setInlineEditingCompId(null);
+    setInlineFormulaText("");
   };
 
   // Insert token into formula textarea
@@ -560,14 +625,34 @@ export function OtFormulaTab({
       fixedAmount: compType === "Fixed Amount" ? compFixedAmount : undefined,
     };
 
-    if (editingComp) {
-      setFormComponents((prev) =>
-        prev.map((c) => (c.id === editingComp.id ? updatedComp : c)),
+    if (directScaleForFormula) {
+      const targetScale = directScaleForFormula;
+      setConfigurations((prev) =>
+        prev.map((cfg) =>
+          cfg.sl === targetScale.sl
+            ? {
+                ...cfg,
+                components: cfg.components.map((c) =>
+                  c.id === updatedComp.id ? updatedComp : c,
+                ),
+              }
+            : cfg,
+        ),
       );
-      toast.success(`Component "${compName}" updated.`);
+      setDirectScaleForFormula(null);
+      toast.success(
+        `Formula for "${compName}" updated directly in scale "${targetScale.scaleName}"!`,
+      );
     } else {
-      setFormComponents((prev) => [...prev, updatedComp]);
-      toast.success(`Component "${compName}" added.`);
+      if (editingComp) {
+        setFormComponents((prev) =>
+          prev.map((c) => (c.id === editingComp.id ? updatedComp : c)),
+        );
+        toast.success(`Component "${compName}" updated.`);
+      } else {
+        setFormComponents((prev) => [...prev, updatedComp]);
+        toast.success(`Component "${compName}" added.`);
+      }
     }
 
     setIsCompModalOpen(false);
@@ -774,22 +859,23 @@ export function OtFormulaTab({
                 <th className="sticky left-0 bg-inherit px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                   SL
                 </th>
-                <th className="sticky left-[60px] bg-inherit px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                <th className="sticky left-[60px] bg-inherit px-5 py-4 w-[130px] text-center border-r border-border/30 z-20">
                   ACTIONS
                 </th>
                 <th className="px-5 py-4 min-w-[200px]">SCALE NAME</th>
-                <th className="px-5 py-4 min-w-[160px]">EMPLOYEE TYPE</th>
-                <th className="px-5 py-4 min-w-[120px]">INPUT TYPE</th>
-                <th className="px-5 py-4 min-w-[170px]">CALCULATION METHOD</th>
-                <th className="px-5 py-4 min-w-[140px]">COMPONENTS</th>
-                <th className="px-5 py-4 min-w-[160px]">EFFECTIVE FROM</th>
-                <th className="px-5 py-4 w-[120px] text-center">STATUS</th>
+                <th className="px-5 py-4 min-w-[150px]">EMPLOYEE TYPE</th>
+                <th className="px-5 py-4 min-w-[110px]">INPUT TYPE</th>
+                <th className="px-5 py-4 min-w-[160px]">CALCULATION METHOD</th>
+                <th className="px-5 py-4 min-w-[130px]">COMPONENTS</th>
+                <th className="px-5 py-4 min-w-[230px]">PRIMARY OT FORMULA</th>
+                <th className="px-5 py-4 min-w-[150px]">EFFECTIVE FROM</th>
+                <th className="px-5 py-4 w-[110px] text-center">STATUS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30 text-foreground">
               {filteredConfigs.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-12 text-muted-foreground">
+                  <td colSpan={10} className="text-center py-12 text-muted-foreground">
                     <Calculator className="size-8 mx-auto mb-2 text-muted-foreground/40" />
                     No OT configurations match your search criteria.
                   </td>
@@ -807,7 +893,21 @@ export function OtFormulaTab({
 
                     {/* Actions */}
                     <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                      <div className="flex items-center justify-center gap-2.5">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => {
+                            const primary =
+                              row.components.find((c) => c.code === "REG_OT") ||
+                              row.components.find((c) => c.type === "Formula") ||
+                              row.components[0];
+                            if (primary) openDirectFormulaModal(row, primary);
+                            else openConfigModal(row);
+                          }}
+                          className="text-purple-600 hover:text-purple-700 transition p-1 hover:bg-purple-500/10 rounded-md cursor-pointer"
+                          title="Quick Edit Formula"
+                        >
+                          <Calculator className="size-4" />
+                        </button>
                         <button
                           onClick={() => openConfigModal(row)}
                           className="text-orange-500 hover:text-orange-600 transition p-1 hover:bg-orange-500/10 rounded-md cursor-pointer"
@@ -866,6 +966,29 @@ export function OtFormulaTab({
                       >
                         <span>{row.components.length} Items</span>
                       </button>
+                    </td>
+
+                    {/* Primary OT Formula (Clickable Direct Formula Edit) */}
+                    <td className="px-5 py-3.5">
+                      {(() => {
+                        const primary =
+                          row.components.find((c) => c.code === "REG_OT") ||
+                          row.components.find((c) => c.type === "Formula") ||
+                          row.components[0];
+                        if (!primary)
+                          return <span className="text-muted-foreground font-mono">—</span>;
+                        return (
+                          <button
+                            type="button"
+                            onClick={() => openDirectFormulaModal(row, primary)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:border-purple-500/60 text-xs font-mono font-bold transition group cursor-pointer shadow-2xs"
+                            title={`Click to edit formula for "${row.scaleName}"`}
+                          >
+                            <span className="truncate max-w-[210px]">{primary.valueFormula}</span>
+                            <ExternalLink className="size-3 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition shrink-0" />
+                          </button>
+                        );
+                      })()}
                     </td>
 
                     {/* Effective From */}
@@ -1169,37 +1292,84 @@ export function OtFormulaTab({
                               )}
                             </td>
                             <td className="px-4 py-3 font-mono text-xs font-semibold text-slate-700 dark:text-slate-300">
-                              <div className="flex items-center gap-1.5">
-                                <span className="truncate max-w-[260px]">{comp.valueFormula}</span>
-                                {comp.type === "Formula" && (
-                                  <span className="size-3.5 rounded bg-primary/10 text-primary flex items-center justify-center text-[9px]">
-                                    fx
-                                  </span>
-                                )}
-                              </div>
+                              {inlineEditingCompId === comp.id ? (
+                                <div className="flex items-center gap-1.5 min-w-[260px]">
+                                  <input
+                                    type="text"
+                                    value={inlineFormulaText}
+                                    onChange={(e) => setInlineFormulaText(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") handleSaveInlineEdit(comp.id);
+                                      if (e.key === "Escape") handleCancelInlineEdit();
+                                    }}
+                                    autoFocus
+                                    placeholder="Enter formula or value"
+                                    className="h-8 px-2.5 rounded-lg border border-primary bg-background text-xs font-mono font-bold text-foreground focus:ring-2 focus:ring-primary/20 outline-none w-full"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSaveInlineEdit(comp.id)}
+                                    className="size-7 shrink-0 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 flex items-center justify-center transition cursor-pointer"
+                                    title="Save Formula (Enter)"
+                                  >
+                                    <Check className="size-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={handleCancelInlineEdit}
+                                    className="size-7 shrink-0 rounded-lg bg-red-500/10 text-red-600 hover:bg-red-500/20 flex items-center justify-center transition cursor-pointer"
+                                    title="Cancel (Esc)"
+                                  >
+                                    <X className="size-3.5" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div
+                                  onDoubleClick={() => handleStartInlineEdit(comp)}
+                                  className="flex items-center gap-2 group/cell"
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => openCompModal(comp)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:border-purple-500/60 text-xs font-mono font-bold transition group cursor-pointer shadow-2xs max-w-[290px]"
+                                    title="Click to edit formula in Formula Builder"
+                                  >
+                                    <span className="truncate">{comp.valueFormula}</span>
+                                    <ExternalLink className="size-3 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition shrink-0" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleStartInlineEdit(comp)}
+                                    className="opacity-0 group-hover/cell:opacity-100 p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                    title="Edit formula inline (or double-click cell)"
+                                  >
+                                    <Pencil className="size-3" />
+                                  </button>
+                                </div>
+                              )}
                             </td>
                             <td className="px-4 py-3 text-center">
-                              <div className="flex items-center justify-center gap-2">
+                              <div className="flex items-center justify-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => openCompModal(comp)}
+                                  className="text-orange-500 hover:text-orange-600 transition p-1.5 hover:bg-orange-500/10 rounded-md cursor-pointer"
+                                  title="Edit Formula / Details"
+                                >
+                                  <Pencil className="size-3.5" />
+                                </button>
                                 <button
                                   type="button"
                                   onClick={() => handleDuplicateComponent(comp)}
-                                  className="text-blue-500 hover:text-blue-600 transition p-1 hover:bg-blue-500/10 rounded cursor-pointer"
+                                  className="text-blue-500 hover:text-blue-600 transition p-1.5 hover:bg-blue-500/10 rounded-md cursor-pointer"
                                   title="Duplicate"
                                 >
                                   <Copy className="size-3.5" />
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => openCompModal(comp)}
-                                  className="text-orange-500 hover:text-orange-600 transition p-1 hover:bg-orange-500/10 rounded cursor-pointer"
-                                  title="Edit Formula"
-                                >
-                                  <Pencil className="size-3.5" />
-                                </button>
-                                <button
-                                  type="button"
                                   onClick={() => handleRemoveComponent(comp.id)}
-                                  className="text-red-500 hover:text-red-650 transition p-1 hover:bg-red-500/10 rounded cursor-pointer"
+                                  className="text-red-500 hover:text-red-650 transition p-1.5 hover:bg-red-500/10 rounded-md cursor-pointer"
                                   title="Delete"
                                 >
                                   <Trash2 className="size-3.5" />
@@ -1424,38 +1594,97 @@ export function OtFormulaTab({
                 </div>
               )}
 
-              {/* If Type == "Formula" (Exact match to Screenshot 3 layout) */}
+              {/* If Type == "Formula" (Exact match to Screenshot 3 layout with Quick Presets) */}
               {compType === "Formula" && (
-                <div className="space-y-3">
+                <div className="space-y-3.5">
+                  {/* Quick Preset Formulas */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider">
+                        QUICK PRESET FORMULAS:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setCompFormula("")}
+                        className="text-[10px] font-bold text-muted-foreground hover:text-red-500 transition cursor-pointer uppercase"
+                      >
+                        Clear Formula
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {[
+                        { label: "Labour Law 2x: (BASIC / 208) * 2", val: "(BASIC / 208) * 2" },
+                        { label: "1.5x OT: (BASIC / 208) * 1.5", val: "(BASIC / 208) * 1.5" },
+                        { label: "1x Hourly: BASIC / 208", val: "BASIC / 208" },
+                        { label: "Festival 3x: (BASIC / 208) * 3", val: "(BASIC / 208) * 3" },
+                        {
+                          label: "Gross Deducted: (GROSS - MED - CONV - FOOD) / 104",
+                          val: "(GROSS - MED - CONV - FOOD) / 104",
+                        },
+                        { label: "Night Shift: (BASIC / 208) * 0.2", val: "(BASIC / 208) * 0.2" },
+                      ].map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => {
+                            setCompFormula(preset.val);
+                            toast.info(`Preset applied: ${preset.val}`);
+                          }}
+                          className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-border/80 bg-muted/40 hover:bg-muted text-foreground transition active:scale-95 cursor-pointer shadow-2xs"
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-1.5">
-                      FORMULA
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block">
+                        FORMULA <span className="text-red-500">*</span>
+                      </label>
+                      <span className="text-[10px] text-muted-foreground">
+                        Type directly or click variables / operators below
+                      </span>
+                    </div>
                     <textarea
                       ref={formulaInputRef}
                       rows={3}
                       value={compFormula}
                       onChange={(e) => setCompFormula(e.target.value)}
                       placeholder="e.g. (BASIC / 208) * 2"
-                      className="w-full p-3.5 rounded-2xl border border-border/80 bg-background text-sm font-mono font-medium text-foreground focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition"
+                      className="w-full p-3.5 rounded-2xl border border-border/80 bg-background text-sm font-mono font-bold text-foreground focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition"
                     />
                   </div>
 
                   {/* Variable & Operator Buttons Toolbar (Screenshot 3 style) */}
                   <div className="flex flex-wrap items-center gap-1.5 pt-1">
                     {/* Variable Pills */}
-                    {(["GROSS", "BASIC", "HRA", "MED", "CONV", "FOOD", "PF", "208", "REG_OT"] as const).map(
-                      (token) => (
-                        <button
-                          key={token}
-                          type="button"
-                          onClick={() => insertTokenIntoFormula(token)}
-                          className="px-3 py-1.5 rounded-lg border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-mono font-semibold transition active:scale-95 shadow-2xs cursor-pointer"
-                        >
-                          {token}
-                        </button>
-                      ),
-                    )}
+                    {(
+                      [
+                        "GROSS",
+                        "BASIC",
+                        "HRA",
+                        "MED",
+                        "CONV",
+                        "FOOD",
+                        "PF",
+                        "208",
+                        "104",
+                        "WORK_DAYS",
+                        "DAY_HOURS",
+                        "REG_OT",
+                      ] as const
+                    ).map((token) => (
+                      <button
+                        key={token}
+                        type="button"
+                        onClick={() => insertTokenIntoFormula(token)}
+                        className="px-3 py-1.5 rounded-lg border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-mono font-semibold transition active:scale-95 shadow-2xs cursor-pointer"
+                      >
+                        {token}
+                      </button>
+                    ))}
 
                     <span className="text-muted-foreground/40 font-light px-1">|</span>
 
@@ -1483,17 +1712,28 @@ export function OtFormulaTab({
 
                     <div className="flex flex-wrap items-center gap-1.5 pl-7 text-[11px]">
                       <span className="text-muted-foreground font-semibold">Variables:</span>
-                      {(["GROSS", "BASIC", "HRA", "MED", "CONV", "FOOD", "PF", "208", "REG_OT"] as const).map(
-                        (v) => (
-                          <span
-                            key={v}
-                            onClick={() => insertTokenIntoFormula(v)}
-                            className="px-2 py-0.5 rounded bg-blue-500/15 text-blue-700 dark:text-blue-300 font-mono font-bold cursor-pointer hover:bg-blue-500/25 transition"
-                          >
-                            {v}
-                          </span>
-                        ),
-                      )}
+                      {(
+                        [
+                          "GROSS",
+                          "BASIC",
+                          "HRA",
+                          "MED",
+                          "CONV",
+                          "FOOD",
+                          "PF",
+                          "208",
+                          "104",
+                          "REG_OT",
+                        ] as const
+                      ).map((v) => (
+                        <span
+                          key={v}
+                          onClick={() => insertTokenIntoFormula(v)}
+                          className="px-2 py-0.5 rounded bg-blue-500/15 text-blue-700 dark:text-blue-300 font-mono font-bold cursor-pointer hover:bg-blue-500/25 transition"
+                        >
+                          {v}
+                        </span>
+                      ))}
                     </div>
 
                     <div className="pl-7 text-[11px] text-muted-foreground">
@@ -1508,30 +1748,78 @@ export function OtFormulaTab({
                     </div>
                   </div>
 
-                  {/* Real-time Syntax & Value Preview Result */}
-                  <div className="p-3.5 rounded-xl border border-border/70 bg-card flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs">
-                      {evaluatedSubmodalFormula?.error ? (
-                        <>
-                          <AlertCircle className="size-4 text-red-500" />
-                          <span className="font-semibold text-red-500">
-                            {evaluatedSubmodalFormula.error}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="size-4 text-emerald-500" />
-                          <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                            Valid formula! Evaluates to:
-                          </span>
-                        </>
+                  {/* Real-time Syntax & Value Preview Result with Interactive Tester */}
+                  <div className="p-4 rounded-xl border border-border/70 bg-card space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs">
+                        {evaluatedSubmodalFormula?.error ? (
+                          <>
+                            <AlertCircle className="size-4 text-red-500 shrink-0" />
+                            <span className="font-semibold text-red-500">
+                              {evaluatedSubmodalFormula.error}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
+                            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                              Valid formula! Evaluates to:
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      {evaluatedSubmodalFormula?.result !== null && (
+                        <span className="text-base font-mono font-black text-primary">
+                          ৳{evaluatedSubmodalFormula?.result?.toFixed(2)} / hr
+                        </span>
                       )}
                     </div>
-                    {evaluatedSubmodalFormula?.result !== null && (
-                      <span className="text-sm font-mono font-black text-primary">
-                        ৳{evaluatedSubmodalFormula?.result?.toFixed(2)} / hr
-                      </span>
-                    )}
+
+                    {/* Interactive Tester Inputs */}
+                    <div className="pt-2 border-t border-border/40 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-[11px]">
+                      <div>
+                        <span className="text-muted-foreground block text-[10px] font-bold uppercase">
+                          Basic (৳)
+                        </span>
+                        <input
+                          type="number"
+                          value={testBasic}
+                          onChange={(e) => setTestBasic(Number(e.target.value) || 0)}
+                          className="w-full h-7 px-2 rounded-md border border-border/70 bg-background font-mono font-bold text-xs"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block text-[10px] font-bold uppercase">
+                          Gross (৳)
+                        </span>
+                        <input
+                          type="number"
+                          value={testGross}
+                          onChange={(e) => setTestGross(Number(e.target.value) || 0)}
+                          className="w-full h-7 px-2 rounded-md border border-border/70 bg-background font-mono font-bold text-xs"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block text-[10px] font-bold uppercase">
+                          Hours / Mo
+                        </span>
+                        <span className="h-7 px-2 flex items-center font-mono font-bold text-xs text-muted-foreground">
+                          208 hrs
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block text-[10px] font-bold uppercase">
+                          Live OT Rate
+                        </span>
+                        <span className="h-7 px-2 flex items-center font-mono font-black text-xs text-primary">
+                          ৳
+                          {evaluatedSubmodalFormula?.result !== null
+                            ? evaluatedSubmodalFormula?.result?.toFixed(2)
+                            : "0.00"}{" "}
+                          / hr
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}

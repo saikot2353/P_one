@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "546",
+    "date": "2026-10-07T14:38",
+    "type": "Enhancement",
+    "module": "Workspace Selection & Module Launcher (Finance & Accounting Integration)",
+    "link": "/module-selection",
+    "descriptionEn": "Activated 'Finance & Accounting' under the Active Modules section on the Workspace Selection page with direct routing to https://pakiza-accounts.vercel.app/, and updated the topbar Corporate Modules launcher accordingly.",
+    "descriptionBn": "ওয়ার্কস্পেস সিলেকশন পেজে 'Active Modules' সেকশনে 'Finance & Accounting' মডিউলটি যুক্ত করা হয়েছে যা ক্লিক করলে সরাসরি https://pakiza-accounts.vercel.app/ ওপেন হবে এবং টপবার মডিউল লঞ্চারেও লিংকটি আপডেট করা হয়েছে।"
+  },
+  {
+    "id": "545",
+    "date": "2026-10-07T13:00",
+    "type": "Enhancement",
+    "module": "Configure - Job & Employee Setup (OT & Salary Formula Editing)",
+    "link": "/configure-employment?tab=otFormula",
+    "descriptionEn": "Enhanced formula editing across OT Configuration and Salary Structure with 1-click direct formula editor from the master table, inline row editing with auto-save, formula builder submodal presets (2x Labour Law, 1.5x OT, Gross deducted, etc.), token inserters, and interactive live calculation sandbox tester.",
+    "descriptionBn": "ওটি কনফিগারেশন এবং স্যালারি স্ট্রাকচারে ফর্মুলা এডিটিং উন্নত করা হয়েছে; এখন মাস্টার টেবিল থেকেই ১-ক্লিকে সরাসরি ফর্মুলা এডিটর ওপেন করা যায়, টেবিলের রো-তে সরাসরি ইনলাইন টাইপ করে সেভ করা যায় এবং সাবমডালে কুইক প্রিসেট (লেবার ল ২x, ১.৫x, গ্রস ইত্যাদি), টোকেন ইনসার্টার ও লাইভ স্যালারি ক্যালকুলেটর যুক্ত করা হয়েছে।"
+  },
+  {
     "id": "544",
     "date": "2026-10-07T12:45",
     "type": "New Feature",
