@@ -196,11 +196,23 @@ export const nav: NavItem[] = [
     icon: ArrowLeftRight,
     subitems: [
       {
-        label: "Transfer Register",
-        to: "/inv-intercompany-transfer-list",
+        label: "Requisition Register",
+        to: "/inv-transfer-requisition-list",
       },
       {
-        label: "New Transfer",
+        label: "New Requisition",
+        to: "/inv-transfer-requisition",
+      },
+      {
+        label: "Requisition Approval",
+        to: "/inv-transfer-requisition-approval",
+      },
+      {
+        label: "Transfer Issue Register",
+        to: "/inv-transfer-issue-list",
+      },
+      {
+        label: "New Transfer Issue",
         to: "/inv-intercompany-transfer",
       },
       {
@@ -259,7 +271,72 @@ export const nav: NavItem[] = [
       },
     ],
   },
-  { label: "Reports", to: "/inv-dashboard", icon: BarChart3 },
+  {
+    label: "Reports",
+    icon: BarChart3,
+    subitems: [
+      {
+        label: "Stock Balance Register",
+        to: "/inv-report-stock-balance",
+      },
+      {
+        label: "Item Stock Register",
+        to: "/inv-report-item-stock",
+      },
+      {
+        label: "Item Transaction Ledger",
+        to: "/inv-report-transaction-ledger",
+      },
+      {
+        label: "Item Movement Register",
+        to: "/inv-report-item-movement",
+      },
+      {
+        label: "Batch Stock Register",
+        to: "/inv-report-batch-stock",
+      },
+      {
+        label: "Location Stock Register",
+        to: "/inv-report-location-stock",
+      },
+      {
+        label: "Item Receipt Register",
+        to: "/inv-report-receipt-register",
+      },
+      {
+        label: "Item Issue Register",
+        to: "/inv-report-issue-register",
+      },
+      {
+        label: "Stock Transfer Register",
+        to: "/inv-report-stock-transfer",
+      },
+      {
+        label: "Stock Adjustment Register",
+        to: "/inv-report-stock-adjustment",
+      },
+      {
+        label: "Stock Write-Off Register",
+        to: "/inv-report-stock-writeoff",
+      },
+      {
+        label: "Stock Valuation Register",
+        to: "/inv-report-stock-valuation",
+      },
+      {
+        label: "Month-wise Material Receive",
+        to: "/inv-report-monthly-receive",
+      },
+      {
+        label: "Month-wise Material Issue",
+        to: "/inv-report-monthly-issue",
+      },
+      {
+        label: "Month-wise Supplier Return",
+        to: "/inv-report-monthly-supplier-return",
+      },
+    ],
+  },
 ];
 
 export function InventorySidebar() {

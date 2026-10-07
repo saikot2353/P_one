@@ -124,6 +124,30 @@ function MaterialRequisitionPage() {
     if (currentMR) return currentMR.organization;
     return "Pakiza Knit Composite Ltd";
   });
+
+  // Company-wise Policy for Available Stock
+  const [companyStockPolicies, setCompanyStockPolicies] = useState<Record<string, boolean>>(() => {
+    try {
+      const raw = localStorage.getItem(COMPANY_AVAILABLE_STOCK_POLICIES_KEY);
+      return raw ? JSON.parse(raw) : DEFAULT_COMPANY_STOCK_POLICIES;
+    } catch {
+      return DEFAULT_COMPANY_STOCK_POLICIES;
+    }
+  });
+
+  const isAvailableStockPolicyEnabled = companyStockPolicies[organization] ?? true;
+
+  const handleToggleCompanyPolicy = () => {
+    const next = !isAvailableStockPolicyEnabled;
+    const updated = { ...companyStockPolicies, [organization]: next };
+    setCompanyStockPolicies(updated);
+    try {
+      localStorage.setItem(COMPANY_AVAILABLE_STOCK_POLICIES_KEY, JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+    toast.info(`Available Stock display ${next ? "ENABLED" : "DISABLED"} for "${organization}".`);
+  };
   const [department, setDepartment] = useState<string>(() => {
     if (currentMR) return currentMR.department;
     return "Production (Knitting)";
@@ -700,8 +724,8 @@ function MaterialRequisitionPage() {
             </div>
           </div>
 
-          {/* Shortage Warning Banner & PR Link */}
-          {hasShortage && (
+          {/* Shortage Warning Banner & PR Link (Only shown when Available Stock policy is enabled) */}
+          {hasShortage && isAvailableStockPolicyEnabled && (
             <div className="bg-amber-500/10 border-2 border-amber-500/30 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
@@ -739,6 +763,39 @@ function MaterialRequisitionPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Organization / Company with Policy Indicator */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                    Company / Organization *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleToggleCompanyPolicy}
+                    className={`text-[9px] font-bold px-1.5 py-0.5 rounded border transition cursor-pointer ${
+                      isAvailableStockPolicyEnabled
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                        : "bg-slate-100 text-slate-600 border-slate-300"
+                    }`}
+                    title="Click to toggle Available Stock policy for this company"
+                  >
+                    Policy: {isAvailableStockPolicyEnabled ? "Stock ON" : "Stock OFF"}
+                  </button>
+                </div>
+                <select
+                  disabled={isReadOnly}
+                  value={organization}
+                  onChange={(e) => setOrganization(e.target.value)}
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none disabled:bg-slate-50 disabled:cursor-not-allowed"
+                >
+                  <option value="Pakiza Knit Composite Ltd">Pakiza Knit Composite Ltd</option>
+                  <option value="Pakiza Cotton Mills Ltd">Pakiza Cotton Mills Ltd</option>
+                  <option value="Pakiza Spinning Mills Ltd">Pakiza Spinning Mills Ltd (Policy: Hidden)</option>
+                  <option value="Pakiza Woven Fashion Ltd">Pakiza Woven Fashion Ltd (Policy: Hidden)</option>
+                  <option value="Pakiza Apparels Ltd">Pakiza Apparels Ltd</option>
+                </select>
+              </div>
+
               {/* MR ID */}
               <div>
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
@@ -874,19 +931,36 @@ function MaterialRequisitionPage() {
                 <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
                   {items.length} item(s) in requisition
                 </span>
-                {!isReadOnly && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setItemSearchQuery("");
-                      setItemSearchOpen(true);
-                    }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
-                  >
-                    <Plus className="size-3.5" />
-                    <span>Add Item</span>
-                  </button>
-                )}
+                <div className="flex items-center gap-3">
+                  <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500">
+                    <span className="text-[10px] uppercase font-bold text-slate-400">Available Stock:</span>
+                    <button
+                      type="button"
+                      onClick={handleToggleCompanyPolicy}
+                      className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border cursor-pointer transition ${
+                        isAvailableStockPolicyEnabled
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100"
+                          : "bg-slate-100 text-slate-500 border-slate-300 hover:bg-slate-200"
+                      }`}
+                    >
+                      {isAvailableStockPolicyEnabled ? "✓ Visible (Policy)" : "✕ Hidden (Policy)"}
+                    </button>
+                  </div>
+
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setItemSearchQuery("");
+                        setItemSearchOpen(true);
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                    >
+                      <Plus className="size-3.5" />
+                      <span>Add Item</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -901,7 +975,9 @@ function MaterialRequisitionPage() {
                     <th className="py-3 px-3">Brand / Origin</th>
                     <th className="py-3 px-3">Requisition Store</th>
                     <th className="py-3 px-3 text-center w-16">UOM</th>
-                    <th className="py-3 px-3 text-right w-28">Available Stock</th>
+                    {isAvailableStockPolicyEnabled && (
+                      <th className="py-3 px-3 text-right w-28">Available Stock</th>
+                    )}
                     <th className="py-3 px-3 text-right w-28">Requested Qty</th>
                     {!isReadOnly && <th className="py-3 px-3 text-center w-14">Action</th>}
                   </tr>
@@ -909,7 +985,18 @@ function MaterialRequisitionPage() {
                 <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                   {items.length === 0 ? (
                     <tr>
-                      <td colSpan={isReadOnly ? 8 : 9} className="py-10 text-center text-slate-400">
+                      <td
+                        colSpan={
+                          isReadOnly
+                            ? isAvailableStockPolicyEnabled
+                              ? 8
+                              : 7
+                            : isAvailableStockPolicyEnabled
+                              ? 9
+                              : 8
+                        }
+                        className="py-10 text-center text-slate-400"
+                      >
                         No requisition items added yet. Click &ldquo;Add Item&rdquo; above to select from catalog.
                       </td>
                     </tr>
@@ -953,9 +1040,11 @@ function MaterialRequisitionPage() {
                           <td className="py-3 px-3 text-center font-mono font-bold text-slate-700">
                             {item.uom}
                           </td>
-                          <td className="py-3 px-3 text-right font-mono font-bold text-emerald-600">
-                            {item.availableStock.toLocaleString()}
-                          </td>
+                          {isAvailableStockPolicyEnabled && (
+                            <td className="py-3 px-3 text-right font-mono font-bold text-emerald-600">
+                              {item.availableStock.toLocaleString()}
+                            </td>
+                          )}
                           <td className="py-3 px-3 text-right">
                             {isReadOnly ? (
                               <span className="font-mono font-bold text-slate-900">

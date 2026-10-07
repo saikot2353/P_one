@@ -55,6 +55,8 @@ import { Route as ProposeIncrementRouteImport } from './routes/propose-increment
 import { Route as ProcurementReportsYarnBookingPiRouteImport } from './routes/procurement-reports-yarn-booking-pi'
 import { Route as ProcurementReportsPurchasePriceRouteImport } from './routes/procurement-reports-purchase-price'
 import { Route as ProcurementReportsPaymentStatementRouteImport } from './routes/procurement-reports-payment-statement'
+import { Route as ProcurementReportsMonthlySupplierBillRouteImport } from './routes/procurement-reports-monthly-supplier-bill'
+import { Route as ProcurementReportsMonthlyPurchaseRouteImport } from './routes/procurement-reports-monthly-purchase'
 import { Route as ProcurementReportsDncRateRouteImport } from './routes/procurement-reports-dnc-rate'
 import { Route as ProcurementReportsCombinedPoStatementRouteImport } from './routes/procurement-reports-combined-po-statement'
 import { Route as ProcurementPurchaseRequisitionRouteImport } from './routes/procurement-purchase-requisition'
@@ -190,6 +192,11 @@ import { Route as JdListRouteImport } from './routes/jd-list'
 import { Route as InventoryDashboardRouteImport } from './routes/inventory-dashboard'
 import { Route as InventoryConfigurationRouteImport } from './routes/inventory-configuration'
 import { Route as InvYarnOpeningStockRouteImport } from './routes/inv-yarn-opening-stock'
+import { Route as InvTransferRequisitionListRouteImport } from './routes/inv-transfer-requisition-list'
+import { Route as InvTransferRequisitionApprovalRouteImport } from './routes/inv-transfer-requisition-approval'
+import { Route as InvTransferRequisitionRouteImport } from './routes/inv-transfer-requisition'
+import { Route as InvTransferIssueListRouteImport } from './routes/inv-transfer-issue-list'
+import { Route as InvTransferIssueRouteImport } from './routes/inv-transfer-issue'
 import { Route as InvSupplierReturnListRouteImport } from './routes/inv-supplier-return-list'
 import { Route as InvStoreReturnReceiveListRouteImport } from './routes/inv-store-return-receive-list'
 import { Route as InvStoreReturnReceiveRouteImport } from './routes/inv-store-return-receive'
@@ -200,6 +207,21 @@ import { Route as InvStockWriteoffRouteImport } from './routes/inv-stock-writeof
 import { Route as InvStockAdjustmentListRouteImport } from './routes/inv-stock-adjustment-list'
 import { Route as InvStockAdjustmentRouteImport } from './routes/inv-stock-adjustment'
 import { Route as InvReturnToStoreListRouteImport } from './routes/inv-return-to-store-list'
+import { Route as InvReportTransactionLedgerRouteImport } from './routes/inv-report-transaction-ledger'
+import { Route as InvReportStockWriteoffRouteImport } from './routes/inv-report-stock-writeoff'
+import { Route as InvReportStockValuationRouteImport } from './routes/inv-report-stock-valuation'
+import { Route as InvReportStockTransferRouteImport } from './routes/inv-report-stock-transfer'
+import { Route as InvReportStockBalanceRouteImport } from './routes/inv-report-stock-balance'
+import { Route as InvReportStockAdjustmentRouteImport } from './routes/inv-report-stock-adjustment'
+import { Route as InvReportReceiptRegisterRouteImport } from './routes/inv-report-receipt-register'
+import { Route as InvReportMonthlySupplierReturnRouteImport } from './routes/inv-report-monthly-supplier-return'
+import { Route as InvReportMonthlyReceiveRouteImport } from './routes/inv-report-monthly-receive'
+import { Route as InvReportMonthlyIssueRouteImport } from './routes/inv-report-monthly-issue'
+import { Route as InvReportLocationStockRouteImport } from './routes/inv-report-location-stock'
+import { Route as InvReportItemStockRouteImport } from './routes/inv-report-item-stock'
+import { Route as InvReportItemMovementRouteImport } from './routes/inv-report-item-movement'
+import { Route as InvReportIssueRegisterRouteImport } from './routes/inv-report-issue-register'
+import { Route as InvReportBatchStockRouteImport } from './routes/inv-report-batch-stock'
 import { Route as InvReceiveMrrRouteImport } from './routes/inv-receive-mrr'
 import { Route as InvReceiveListRouteImport } from './routes/inv-receive-list'
 import { Route as InvReceiveDirectRouteImport } from './routes/inv-receive-direct'
@@ -534,6 +556,18 @@ const ProcurementReportsPaymentStatementRoute =
   ProcurementReportsPaymentStatementRouteImport.update({
     id: '/procurement-reports-payment-statement',
     path: '/procurement-reports-payment-statement',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementReportsMonthlySupplierBillRoute =
+  ProcurementReportsMonthlySupplierBillRouteImport.update({
+    id: '/procurement-reports-monthly-supplier-bill',
+    path: '/procurement-reports-monthly-supplier-bill',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementReportsMonthlyPurchaseRoute =
+  ProcurementReportsMonthlyPurchaseRouteImport.update({
+    id: '/procurement-reports-monthly-purchase',
+    path: '/procurement-reports-monthly-purchase',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ProcurementReportsDncRateRoute =
@@ -1265,6 +1299,33 @@ const InvYarnOpeningStockRoute = InvYarnOpeningStockRouteImport.update({
   path: '/inv-yarn-opening-stock',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvTransferRequisitionListRoute =
+  InvTransferRequisitionListRouteImport.update({
+    id: '/inv-transfer-requisition-list',
+    path: '/inv-transfer-requisition-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvTransferRequisitionApprovalRoute =
+  InvTransferRequisitionApprovalRouteImport.update({
+    id: '/inv-transfer-requisition-approval',
+    path: '/inv-transfer-requisition-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvTransferRequisitionRoute = InvTransferRequisitionRouteImport.update({
+  id: '/inv-transfer-requisition',
+  path: '/inv-transfer-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvTransferIssueListRoute = InvTransferIssueListRouteImport.update({
+  id: '/inv-transfer-issue-list',
+  path: '/inv-transfer-issue-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvTransferIssueRoute = InvTransferIssueRouteImport.update({
+  id: '/inv-transfer-issue',
+  path: '/inv-transfer-issue',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvSupplierReturnListRoute = InvSupplierReturnListRouteImport.update({
   id: '/inv-supplier-return-list',
   path: '/inv-supplier-return-list',
@@ -1316,6 +1377,85 @@ const InvStockAdjustmentRoute = InvStockAdjustmentRouteImport.update({
 const InvReturnToStoreListRoute = InvReturnToStoreListRouteImport.update({
   id: '/inv-return-to-store-list',
   path: '/inv-return-to-store-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportTransactionLedgerRoute =
+  InvReportTransactionLedgerRouteImport.update({
+    id: '/inv-report-transaction-ledger',
+    path: '/inv-report-transaction-ledger',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvReportStockWriteoffRoute = InvReportStockWriteoffRouteImport.update({
+  id: '/inv-report-stock-writeoff',
+  path: '/inv-report-stock-writeoff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportStockValuationRoute = InvReportStockValuationRouteImport.update({
+  id: '/inv-report-stock-valuation',
+  path: '/inv-report-stock-valuation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportStockTransferRoute = InvReportStockTransferRouteImport.update({
+  id: '/inv-report-stock-transfer',
+  path: '/inv-report-stock-transfer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportStockBalanceRoute = InvReportStockBalanceRouteImport.update({
+  id: '/inv-report-stock-balance',
+  path: '/inv-report-stock-balance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportStockAdjustmentRoute =
+  InvReportStockAdjustmentRouteImport.update({
+    id: '/inv-report-stock-adjustment',
+    path: '/inv-report-stock-adjustment',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvReportReceiptRegisterRoute =
+  InvReportReceiptRegisterRouteImport.update({
+    id: '/inv-report-receipt-register',
+    path: '/inv-report-receipt-register',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvReportMonthlySupplierReturnRoute =
+  InvReportMonthlySupplierReturnRouteImport.update({
+    id: '/inv-report-monthly-supplier-return',
+    path: '/inv-report-monthly-supplier-return',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvReportMonthlyReceiveRoute = InvReportMonthlyReceiveRouteImport.update({
+  id: '/inv-report-monthly-receive',
+  path: '/inv-report-monthly-receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportMonthlyIssueRoute = InvReportMonthlyIssueRouteImport.update({
+  id: '/inv-report-monthly-issue',
+  path: '/inv-report-monthly-issue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportLocationStockRoute = InvReportLocationStockRouteImport.update({
+  id: '/inv-report-location-stock',
+  path: '/inv-report-location-stock',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportItemStockRoute = InvReportItemStockRouteImport.update({
+  id: '/inv-report-item-stock',
+  path: '/inv-report-item-stock',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportItemMovementRoute = InvReportItemMovementRouteImport.update({
+  id: '/inv-report-item-movement',
+  path: '/inv-report-item-movement',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportIssueRegisterRoute = InvReportIssueRegisterRouteImport.update({
+  id: '/inv-report-issue-register',
+  path: '/inv-report-issue-register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReportBatchStockRoute = InvReportBatchStockRouteImport.update({
+  id: '/inv-report-batch-stock',
+  path: '/inv-report-batch-stock',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvReceiveMrrRoute = InvReceiveMrrRouteImport.update({
@@ -1862,6 +2002,21 @@ export interface FileRoutesByFullPath {
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-receive-mrr': typeof InvReceiveMrrRoute
+  '/inv-report-batch-stock': typeof InvReportBatchStockRoute
+  '/inv-report-issue-register': typeof InvReportIssueRegisterRoute
+  '/inv-report-item-movement': typeof InvReportItemMovementRoute
+  '/inv-report-item-stock': typeof InvReportItemStockRoute
+  '/inv-report-location-stock': typeof InvReportLocationStockRoute
+  '/inv-report-monthly-issue': typeof InvReportMonthlyIssueRoute
+  '/inv-report-monthly-receive': typeof InvReportMonthlyReceiveRoute
+  '/inv-report-monthly-supplier-return': typeof InvReportMonthlySupplierReturnRoute
+  '/inv-report-receipt-register': typeof InvReportReceiptRegisterRoute
+  '/inv-report-stock-adjustment': typeof InvReportStockAdjustmentRoute
+  '/inv-report-stock-balance': typeof InvReportStockBalanceRoute
+  '/inv-report-stock-transfer': typeof InvReportStockTransferRoute
+  '/inv-report-stock-valuation': typeof InvReportStockValuationRoute
+  '/inv-report-stock-writeoff': typeof InvReportStockWriteoffRoute
+  '/inv-report-transaction-ledger': typeof InvReportTransactionLedgerRoute
   '/inv-return-to-store-list': typeof InvReturnToStoreListRoute
   '/inv-stock-adjustment': typeof InvStockAdjustmentRoute
   '/inv-stock-adjustment-list': typeof InvStockAdjustmentListRoute
@@ -1872,6 +2027,11 @@ export interface FileRoutesByFullPath {
   '/inv-store-return-receive': typeof InvStoreReturnReceiveRoute
   '/inv-store-return-receive-list': typeof InvStoreReturnReceiveListRoute
   '/inv-supplier-return-list': typeof InvSupplierReturnListRoute
+  '/inv-transfer-issue': typeof InvTransferIssueRoute
+  '/inv-transfer-issue-list': typeof InvTransferIssueListRoute
+  '/inv-transfer-requisition': typeof InvTransferRequisitionRoute
+  '/inv-transfer-requisition-approval': typeof InvTransferRequisitionApprovalRoute
+  '/inv-transfer-requisition-list': typeof InvTransferRequisitionListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-configuration': typeof InventoryConfigurationRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
@@ -2007,6 +2167,8 @@ export interface FileRoutesByFullPath {
   '/procurement-purchase-requisition': typeof ProcurementPurchaseRequisitionRoute
   '/procurement-reports-combined-po-statement': typeof ProcurementReportsCombinedPoStatementRoute
   '/procurement-reports-dnc-rate': typeof ProcurementReportsDncRateRoute
+  '/procurement-reports-monthly-purchase': typeof ProcurementReportsMonthlyPurchaseRoute
+  '/procurement-reports-monthly-supplier-bill': typeof ProcurementReportsMonthlySupplierBillRoute
   '/procurement-reports-payment-statement': typeof ProcurementReportsPaymentStatementRoute
   '/procurement-reports-purchase-price': typeof ProcurementReportsPurchasePriceRoute
   '/procurement-reports-yarn-booking-pi': typeof ProcurementReportsYarnBookingPiRoute
@@ -2144,6 +2306,21 @@ export interface FileRoutesByTo {
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-receive-mrr': typeof InvReceiveMrrRoute
+  '/inv-report-batch-stock': typeof InvReportBatchStockRoute
+  '/inv-report-issue-register': typeof InvReportIssueRegisterRoute
+  '/inv-report-item-movement': typeof InvReportItemMovementRoute
+  '/inv-report-item-stock': typeof InvReportItemStockRoute
+  '/inv-report-location-stock': typeof InvReportLocationStockRoute
+  '/inv-report-monthly-issue': typeof InvReportMonthlyIssueRoute
+  '/inv-report-monthly-receive': typeof InvReportMonthlyReceiveRoute
+  '/inv-report-monthly-supplier-return': typeof InvReportMonthlySupplierReturnRoute
+  '/inv-report-receipt-register': typeof InvReportReceiptRegisterRoute
+  '/inv-report-stock-adjustment': typeof InvReportStockAdjustmentRoute
+  '/inv-report-stock-balance': typeof InvReportStockBalanceRoute
+  '/inv-report-stock-transfer': typeof InvReportStockTransferRoute
+  '/inv-report-stock-valuation': typeof InvReportStockValuationRoute
+  '/inv-report-stock-writeoff': typeof InvReportStockWriteoffRoute
+  '/inv-report-transaction-ledger': typeof InvReportTransactionLedgerRoute
   '/inv-return-to-store-list': typeof InvReturnToStoreListRoute
   '/inv-stock-adjustment': typeof InvStockAdjustmentRoute
   '/inv-stock-adjustment-list': typeof InvStockAdjustmentListRoute
@@ -2154,6 +2331,11 @@ export interface FileRoutesByTo {
   '/inv-store-return-receive': typeof InvStoreReturnReceiveRoute
   '/inv-store-return-receive-list': typeof InvStoreReturnReceiveListRoute
   '/inv-supplier-return-list': typeof InvSupplierReturnListRoute
+  '/inv-transfer-issue': typeof InvTransferIssueRoute
+  '/inv-transfer-issue-list': typeof InvTransferIssueListRoute
+  '/inv-transfer-requisition': typeof InvTransferRequisitionRoute
+  '/inv-transfer-requisition-approval': typeof InvTransferRequisitionApprovalRoute
+  '/inv-transfer-requisition-list': typeof InvTransferRequisitionListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-configuration': typeof InventoryConfigurationRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
@@ -2289,6 +2471,8 @@ export interface FileRoutesByTo {
   '/procurement-purchase-requisition': typeof ProcurementPurchaseRequisitionRoute
   '/procurement-reports-combined-po-statement': typeof ProcurementReportsCombinedPoStatementRoute
   '/procurement-reports-dnc-rate': typeof ProcurementReportsDncRateRoute
+  '/procurement-reports-monthly-purchase': typeof ProcurementReportsMonthlyPurchaseRoute
+  '/procurement-reports-monthly-supplier-bill': typeof ProcurementReportsMonthlySupplierBillRoute
   '/procurement-reports-payment-statement': typeof ProcurementReportsPaymentStatementRoute
   '/procurement-reports-purchase-price': typeof ProcurementReportsPurchasePriceRoute
   '/procurement-reports-yarn-booking-pi': typeof ProcurementReportsYarnBookingPiRoute
@@ -2427,6 +2611,21 @@ export interface FileRoutesById {
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-receive-mrr': typeof InvReceiveMrrRoute
+  '/inv-report-batch-stock': typeof InvReportBatchStockRoute
+  '/inv-report-issue-register': typeof InvReportIssueRegisterRoute
+  '/inv-report-item-movement': typeof InvReportItemMovementRoute
+  '/inv-report-item-stock': typeof InvReportItemStockRoute
+  '/inv-report-location-stock': typeof InvReportLocationStockRoute
+  '/inv-report-monthly-issue': typeof InvReportMonthlyIssueRoute
+  '/inv-report-monthly-receive': typeof InvReportMonthlyReceiveRoute
+  '/inv-report-monthly-supplier-return': typeof InvReportMonthlySupplierReturnRoute
+  '/inv-report-receipt-register': typeof InvReportReceiptRegisterRoute
+  '/inv-report-stock-adjustment': typeof InvReportStockAdjustmentRoute
+  '/inv-report-stock-balance': typeof InvReportStockBalanceRoute
+  '/inv-report-stock-transfer': typeof InvReportStockTransferRoute
+  '/inv-report-stock-valuation': typeof InvReportStockValuationRoute
+  '/inv-report-stock-writeoff': typeof InvReportStockWriteoffRoute
+  '/inv-report-transaction-ledger': typeof InvReportTransactionLedgerRoute
   '/inv-return-to-store-list': typeof InvReturnToStoreListRoute
   '/inv-stock-adjustment': typeof InvStockAdjustmentRoute
   '/inv-stock-adjustment-list': typeof InvStockAdjustmentListRoute
@@ -2437,6 +2636,11 @@ export interface FileRoutesById {
   '/inv-store-return-receive': typeof InvStoreReturnReceiveRoute
   '/inv-store-return-receive-list': typeof InvStoreReturnReceiveListRoute
   '/inv-supplier-return-list': typeof InvSupplierReturnListRoute
+  '/inv-transfer-issue': typeof InvTransferIssueRoute
+  '/inv-transfer-issue-list': typeof InvTransferIssueListRoute
+  '/inv-transfer-requisition': typeof InvTransferRequisitionRoute
+  '/inv-transfer-requisition-approval': typeof InvTransferRequisitionApprovalRoute
+  '/inv-transfer-requisition-list': typeof InvTransferRequisitionListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-configuration': typeof InventoryConfigurationRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
@@ -2572,6 +2776,8 @@ export interface FileRoutesById {
   '/procurement-purchase-requisition': typeof ProcurementPurchaseRequisitionRoute
   '/procurement-reports-combined-po-statement': typeof ProcurementReportsCombinedPoStatementRoute
   '/procurement-reports-dnc-rate': typeof ProcurementReportsDncRateRoute
+  '/procurement-reports-monthly-purchase': typeof ProcurementReportsMonthlyPurchaseRoute
+  '/procurement-reports-monthly-supplier-bill': typeof ProcurementReportsMonthlySupplierBillRoute
   '/procurement-reports-payment-statement': typeof ProcurementReportsPaymentStatementRoute
   '/procurement-reports-purchase-price': typeof ProcurementReportsPurchasePriceRoute
   '/procurement-reports-yarn-booking-pi': typeof ProcurementReportsYarnBookingPiRoute
@@ -2711,6 +2917,21 @@ export interface FileRouteTypes {
     | '/inv-receive-direct'
     | '/inv-receive-list'
     | '/inv-receive-mrr'
+    | '/inv-report-batch-stock'
+    | '/inv-report-issue-register'
+    | '/inv-report-item-movement'
+    | '/inv-report-item-stock'
+    | '/inv-report-location-stock'
+    | '/inv-report-monthly-issue'
+    | '/inv-report-monthly-receive'
+    | '/inv-report-monthly-supplier-return'
+    | '/inv-report-receipt-register'
+    | '/inv-report-stock-adjustment'
+    | '/inv-report-stock-balance'
+    | '/inv-report-stock-transfer'
+    | '/inv-report-stock-valuation'
+    | '/inv-report-stock-writeoff'
+    | '/inv-report-transaction-ledger'
     | '/inv-return-to-store-list'
     | '/inv-stock-adjustment'
     | '/inv-stock-adjustment-list'
@@ -2721,6 +2942,11 @@ export interface FileRouteTypes {
     | '/inv-store-return-receive'
     | '/inv-store-return-receive-list'
     | '/inv-supplier-return-list'
+    | '/inv-transfer-issue'
+    | '/inv-transfer-issue-list'
+    | '/inv-transfer-requisition'
+    | '/inv-transfer-requisition-approval'
+    | '/inv-transfer-requisition-list'
     | '/inv-yarn-opening-stock'
     | '/inventory-configuration'
     | '/inventory-dashboard'
@@ -2856,6 +3082,8 @@ export interface FileRouteTypes {
     | '/procurement-purchase-requisition'
     | '/procurement-reports-combined-po-statement'
     | '/procurement-reports-dnc-rate'
+    | '/procurement-reports-monthly-purchase'
+    | '/procurement-reports-monthly-supplier-bill'
     | '/procurement-reports-payment-statement'
     | '/procurement-reports-purchase-price'
     | '/procurement-reports-yarn-booking-pi'
@@ -2993,6 +3221,21 @@ export interface FileRouteTypes {
     | '/inv-receive-direct'
     | '/inv-receive-list'
     | '/inv-receive-mrr'
+    | '/inv-report-batch-stock'
+    | '/inv-report-issue-register'
+    | '/inv-report-item-movement'
+    | '/inv-report-item-stock'
+    | '/inv-report-location-stock'
+    | '/inv-report-monthly-issue'
+    | '/inv-report-monthly-receive'
+    | '/inv-report-monthly-supplier-return'
+    | '/inv-report-receipt-register'
+    | '/inv-report-stock-adjustment'
+    | '/inv-report-stock-balance'
+    | '/inv-report-stock-transfer'
+    | '/inv-report-stock-valuation'
+    | '/inv-report-stock-writeoff'
+    | '/inv-report-transaction-ledger'
     | '/inv-return-to-store-list'
     | '/inv-stock-adjustment'
     | '/inv-stock-adjustment-list'
@@ -3003,6 +3246,11 @@ export interface FileRouteTypes {
     | '/inv-store-return-receive'
     | '/inv-store-return-receive-list'
     | '/inv-supplier-return-list'
+    | '/inv-transfer-issue'
+    | '/inv-transfer-issue-list'
+    | '/inv-transfer-requisition'
+    | '/inv-transfer-requisition-approval'
+    | '/inv-transfer-requisition-list'
     | '/inv-yarn-opening-stock'
     | '/inventory-configuration'
     | '/inventory-dashboard'
@@ -3138,6 +3386,8 @@ export interface FileRouteTypes {
     | '/procurement-purchase-requisition'
     | '/procurement-reports-combined-po-statement'
     | '/procurement-reports-dnc-rate'
+    | '/procurement-reports-monthly-purchase'
+    | '/procurement-reports-monthly-supplier-bill'
     | '/procurement-reports-payment-statement'
     | '/procurement-reports-purchase-price'
     | '/procurement-reports-yarn-booking-pi'
@@ -3275,6 +3525,21 @@ export interface FileRouteTypes {
     | '/inv-receive-direct'
     | '/inv-receive-list'
     | '/inv-receive-mrr'
+    | '/inv-report-batch-stock'
+    | '/inv-report-issue-register'
+    | '/inv-report-item-movement'
+    | '/inv-report-item-stock'
+    | '/inv-report-location-stock'
+    | '/inv-report-monthly-issue'
+    | '/inv-report-monthly-receive'
+    | '/inv-report-monthly-supplier-return'
+    | '/inv-report-receipt-register'
+    | '/inv-report-stock-adjustment'
+    | '/inv-report-stock-balance'
+    | '/inv-report-stock-transfer'
+    | '/inv-report-stock-valuation'
+    | '/inv-report-stock-writeoff'
+    | '/inv-report-transaction-ledger'
     | '/inv-return-to-store-list'
     | '/inv-stock-adjustment'
     | '/inv-stock-adjustment-list'
@@ -3285,6 +3550,11 @@ export interface FileRouteTypes {
     | '/inv-store-return-receive'
     | '/inv-store-return-receive-list'
     | '/inv-supplier-return-list'
+    | '/inv-transfer-issue'
+    | '/inv-transfer-issue-list'
+    | '/inv-transfer-requisition'
+    | '/inv-transfer-requisition-approval'
+    | '/inv-transfer-requisition-list'
     | '/inv-yarn-opening-stock'
     | '/inventory-configuration'
     | '/inventory-dashboard'
@@ -3420,6 +3690,8 @@ export interface FileRouteTypes {
     | '/procurement-purchase-requisition'
     | '/procurement-reports-combined-po-statement'
     | '/procurement-reports-dnc-rate'
+    | '/procurement-reports-monthly-purchase'
+    | '/procurement-reports-monthly-supplier-bill'
     | '/procurement-reports-payment-statement'
     | '/procurement-reports-purchase-price'
     | '/procurement-reports-yarn-booking-pi'
@@ -3558,6 +3830,21 @@ export interface RootRouteChildren {
   InvReceiveDirectRoute: typeof InvReceiveDirectRoute
   InvReceiveListRoute: typeof InvReceiveListRoute
   InvReceiveMrrRoute: typeof InvReceiveMrrRoute
+  InvReportBatchStockRoute: typeof InvReportBatchStockRoute
+  InvReportIssueRegisterRoute: typeof InvReportIssueRegisterRoute
+  InvReportItemMovementRoute: typeof InvReportItemMovementRoute
+  InvReportItemStockRoute: typeof InvReportItemStockRoute
+  InvReportLocationStockRoute: typeof InvReportLocationStockRoute
+  InvReportMonthlyIssueRoute: typeof InvReportMonthlyIssueRoute
+  InvReportMonthlyReceiveRoute: typeof InvReportMonthlyReceiveRoute
+  InvReportMonthlySupplierReturnRoute: typeof InvReportMonthlySupplierReturnRoute
+  InvReportReceiptRegisterRoute: typeof InvReportReceiptRegisterRoute
+  InvReportStockAdjustmentRoute: typeof InvReportStockAdjustmentRoute
+  InvReportStockBalanceRoute: typeof InvReportStockBalanceRoute
+  InvReportStockTransferRoute: typeof InvReportStockTransferRoute
+  InvReportStockValuationRoute: typeof InvReportStockValuationRoute
+  InvReportStockWriteoffRoute: typeof InvReportStockWriteoffRoute
+  InvReportTransactionLedgerRoute: typeof InvReportTransactionLedgerRoute
   InvReturnToStoreListRoute: typeof InvReturnToStoreListRoute
   InvStockAdjustmentRoute: typeof InvStockAdjustmentRoute
   InvStockAdjustmentListRoute: typeof InvStockAdjustmentListRoute
@@ -3568,6 +3855,11 @@ export interface RootRouteChildren {
   InvStoreReturnReceiveRoute: typeof InvStoreReturnReceiveRoute
   InvStoreReturnReceiveListRoute: typeof InvStoreReturnReceiveListRoute
   InvSupplierReturnListRoute: typeof InvSupplierReturnListRoute
+  InvTransferIssueRoute: typeof InvTransferIssueRoute
+  InvTransferIssueListRoute: typeof InvTransferIssueListRoute
+  InvTransferRequisitionRoute: typeof InvTransferRequisitionRoute
+  InvTransferRequisitionApprovalRoute: typeof InvTransferRequisitionApprovalRoute
+  InvTransferRequisitionListRoute: typeof InvTransferRequisitionListRoute
   InvYarnOpeningStockRoute: typeof InvYarnOpeningStockRoute
   InventoryConfigurationRoute: typeof InventoryConfigurationRoute
   InventoryDashboardRoute: typeof InventoryDashboardRoute
@@ -3703,6 +3995,8 @@ export interface RootRouteChildren {
   ProcurementPurchaseRequisitionRoute: typeof ProcurementPurchaseRequisitionRoute
   ProcurementReportsCombinedPoStatementRoute: typeof ProcurementReportsCombinedPoStatementRoute
   ProcurementReportsDncRateRoute: typeof ProcurementReportsDncRateRoute
+  ProcurementReportsMonthlyPurchaseRoute: typeof ProcurementReportsMonthlyPurchaseRoute
+  ProcurementReportsMonthlySupplierBillRoute: typeof ProcurementReportsMonthlySupplierBillRoute
   ProcurementReportsPaymentStatementRoute: typeof ProcurementReportsPaymentStatementRoute
   ProcurementReportsPurchasePriceRoute: typeof ProcurementReportsPurchasePriceRoute
   ProcurementReportsYarnBookingPiRoute: typeof ProcurementReportsYarnBookingPiRoute
@@ -4077,6 +4371,20 @@ declare module '@tanstack/react-router' {
       path: '/procurement-reports-payment-statement'
       fullPath: '/procurement-reports-payment-statement'
       preLoaderRoute: typeof ProcurementReportsPaymentStatementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-reports-monthly-supplier-bill': {
+      id: '/procurement-reports-monthly-supplier-bill'
+      path: '/procurement-reports-monthly-supplier-bill'
+      fullPath: '/procurement-reports-monthly-supplier-bill'
+      preLoaderRoute: typeof ProcurementReportsMonthlySupplierBillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-reports-monthly-purchase': {
+      id: '/procurement-reports-monthly-purchase'
+      path: '/procurement-reports-monthly-purchase'
+      fullPath: '/procurement-reports-monthly-purchase'
+      preLoaderRoute: typeof ProcurementReportsMonthlyPurchaseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/procurement-reports-dnc-rate': {
@@ -5024,6 +5332,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvYarnOpeningStockRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-transfer-requisition-list': {
+      id: '/inv-transfer-requisition-list'
+      path: '/inv-transfer-requisition-list'
+      fullPath: '/inv-transfer-requisition-list'
+      preLoaderRoute: typeof InvTransferRequisitionListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-transfer-requisition-approval': {
+      id: '/inv-transfer-requisition-approval'
+      path: '/inv-transfer-requisition-approval'
+      fullPath: '/inv-transfer-requisition-approval'
+      preLoaderRoute: typeof InvTransferRequisitionApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-transfer-requisition': {
+      id: '/inv-transfer-requisition'
+      path: '/inv-transfer-requisition'
+      fullPath: '/inv-transfer-requisition'
+      preLoaderRoute: typeof InvTransferRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-transfer-issue-list': {
+      id: '/inv-transfer-issue-list'
+      path: '/inv-transfer-issue-list'
+      fullPath: '/inv-transfer-issue-list'
+      preLoaderRoute: typeof InvTransferIssueListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-transfer-issue': {
+      id: '/inv-transfer-issue'
+      path: '/inv-transfer-issue'
+      fullPath: '/inv-transfer-issue'
+      preLoaderRoute: typeof InvTransferIssueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-supplier-return-list': {
       id: '/inv-supplier-return-list'
       path: '/inv-supplier-return-list'
@@ -5092,6 +5435,111 @@ declare module '@tanstack/react-router' {
       path: '/inv-return-to-store-list'
       fullPath: '/inv-return-to-store-list'
       preLoaderRoute: typeof InvReturnToStoreListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-transaction-ledger': {
+      id: '/inv-report-transaction-ledger'
+      path: '/inv-report-transaction-ledger'
+      fullPath: '/inv-report-transaction-ledger'
+      preLoaderRoute: typeof InvReportTransactionLedgerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-stock-writeoff': {
+      id: '/inv-report-stock-writeoff'
+      path: '/inv-report-stock-writeoff'
+      fullPath: '/inv-report-stock-writeoff'
+      preLoaderRoute: typeof InvReportStockWriteoffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-stock-valuation': {
+      id: '/inv-report-stock-valuation'
+      path: '/inv-report-stock-valuation'
+      fullPath: '/inv-report-stock-valuation'
+      preLoaderRoute: typeof InvReportStockValuationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-stock-transfer': {
+      id: '/inv-report-stock-transfer'
+      path: '/inv-report-stock-transfer'
+      fullPath: '/inv-report-stock-transfer'
+      preLoaderRoute: typeof InvReportStockTransferRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-stock-balance': {
+      id: '/inv-report-stock-balance'
+      path: '/inv-report-stock-balance'
+      fullPath: '/inv-report-stock-balance'
+      preLoaderRoute: typeof InvReportStockBalanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-stock-adjustment': {
+      id: '/inv-report-stock-adjustment'
+      path: '/inv-report-stock-adjustment'
+      fullPath: '/inv-report-stock-adjustment'
+      preLoaderRoute: typeof InvReportStockAdjustmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-receipt-register': {
+      id: '/inv-report-receipt-register'
+      path: '/inv-report-receipt-register'
+      fullPath: '/inv-report-receipt-register'
+      preLoaderRoute: typeof InvReportReceiptRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-monthly-supplier-return': {
+      id: '/inv-report-monthly-supplier-return'
+      path: '/inv-report-monthly-supplier-return'
+      fullPath: '/inv-report-monthly-supplier-return'
+      preLoaderRoute: typeof InvReportMonthlySupplierReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-monthly-receive': {
+      id: '/inv-report-monthly-receive'
+      path: '/inv-report-monthly-receive'
+      fullPath: '/inv-report-monthly-receive'
+      preLoaderRoute: typeof InvReportMonthlyReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-monthly-issue': {
+      id: '/inv-report-monthly-issue'
+      path: '/inv-report-monthly-issue'
+      fullPath: '/inv-report-monthly-issue'
+      preLoaderRoute: typeof InvReportMonthlyIssueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-location-stock': {
+      id: '/inv-report-location-stock'
+      path: '/inv-report-location-stock'
+      fullPath: '/inv-report-location-stock'
+      preLoaderRoute: typeof InvReportLocationStockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-item-stock': {
+      id: '/inv-report-item-stock'
+      path: '/inv-report-item-stock'
+      fullPath: '/inv-report-item-stock'
+      preLoaderRoute: typeof InvReportItemStockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-item-movement': {
+      id: '/inv-report-item-movement'
+      path: '/inv-report-item-movement'
+      fullPath: '/inv-report-item-movement'
+      preLoaderRoute: typeof InvReportItemMovementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-issue-register': {
+      id: '/inv-report-issue-register'
+      path: '/inv-report-issue-register'
+      fullPath: '/inv-report-issue-register'
+      preLoaderRoute: typeof InvReportIssueRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-report-batch-stock': {
+      id: '/inv-report-batch-stock'
+      path: '/inv-report-batch-stock'
+      fullPath: '/inv-report-batch-stock'
+      preLoaderRoute: typeof InvReportBatchStockRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inv-receive-mrr': {
@@ -5807,6 +6255,21 @@ const rootRouteChildren: RootRouteChildren = {
   InvReceiveDirectRoute: InvReceiveDirectRoute,
   InvReceiveListRoute: InvReceiveListRoute,
   InvReceiveMrrRoute: InvReceiveMrrRoute,
+  InvReportBatchStockRoute: InvReportBatchStockRoute,
+  InvReportIssueRegisterRoute: InvReportIssueRegisterRoute,
+  InvReportItemMovementRoute: InvReportItemMovementRoute,
+  InvReportItemStockRoute: InvReportItemStockRoute,
+  InvReportLocationStockRoute: InvReportLocationStockRoute,
+  InvReportMonthlyIssueRoute: InvReportMonthlyIssueRoute,
+  InvReportMonthlyReceiveRoute: InvReportMonthlyReceiveRoute,
+  InvReportMonthlySupplierReturnRoute: InvReportMonthlySupplierReturnRoute,
+  InvReportReceiptRegisterRoute: InvReportReceiptRegisterRoute,
+  InvReportStockAdjustmentRoute: InvReportStockAdjustmentRoute,
+  InvReportStockBalanceRoute: InvReportStockBalanceRoute,
+  InvReportStockTransferRoute: InvReportStockTransferRoute,
+  InvReportStockValuationRoute: InvReportStockValuationRoute,
+  InvReportStockWriteoffRoute: InvReportStockWriteoffRoute,
+  InvReportTransactionLedgerRoute: InvReportTransactionLedgerRoute,
   InvReturnToStoreListRoute: InvReturnToStoreListRoute,
   InvStockAdjustmentRoute: InvStockAdjustmentRoute,
   InvStockAdjustmentListRoute: InvStockAdjustmentListRoute,
@@ -5817,6 +6280,11 @@ const rootRouteChildren: RootRouteChildren = {
   InvStoreReturnReceiveRoute: InvStoreReturnReceiveRoute,
   InvStoreReturnReceiveListRoute: InvStoreReturnReceiveListRoute,
   InvSupplierReturnListRoute: InvSupplierReturnListRoute,
+  InvTransferIssueRoute: InvTransferIssueRoute,
+  InvTransferIssueListRoute: InvTransferIssueListRoute,
+  InvTransferRequisitionRoute: InvTransferRequisitionRoute,
+  InvTransferRequisitionApprovalRoute: InvTransferRequisitionApprovalRoute,
+  InvTransferRequisitionListRoute: InvTransferRequisitionListRoute,
   InvYarnOpeningStockRoute: InvYarnOpeningStockRoute,
   InventoryConfigurationRoute: InventoryConfigurationRoute,
   InventoryDashboardRoute: InventoryDashboardRoute,
@@ -5959,6 +6427,10 @@ const rootRouteChildren: RootRouteChildren = {
   ProcurementReportsCombinedPoStatementRoute:
     ProcurementReportsCombinedPoStatementRoute,
   ProcurementReportsDncRateRoute: ProcurementReportsDncRateRoute,
+  ProcurementReportsMonthlyPurchaseRoute:
+    ProcurementReportsMonthlyPurchaseRoute,
+  ProcurementReportsMonthlySupplierBillRoute:
+    ProcurementReportsMonthlySupplierBillRoute,
   ProcurementReportsPaymentStatementRoute:
     ProcurementReportsPaymentStatementRoute,
   ProcurementReportsPurchasePriceRoute: ProcurementReportsPurchasePriceRoute,

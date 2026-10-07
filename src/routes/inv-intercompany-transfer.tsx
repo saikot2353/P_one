@@ -18,15 +18,21 @@ import {
   Send,
   Eye,
   X,
+  FileCheck2,
+  Tag,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   InterCompanyTransfer,
   InterCompanyTransferItem,
   TransferReasonType,
+  TransferType,
+  TransferRequisition,
   MASTER_COMPANIES,
   getStoredInterCompanyTransfers,
   saveInterCompanyTransfer,
+  getStoredTransferRequisitions,
 } from "@/lib/inventory-stock-management-data";
 import {
   DEFAULT_WAREHOUSES,
@@ -121,6 +127,23 @@ function InterCompanyTransferFormPage() {
     return existingTransfer?.toStore || "Spinning Spare Parts & Consumables Store";
   });
 
+  // Transfer Type (Inter-Company vs Intra-Company)
+  const [transferType, setTransferType] = useState<TransferType>(() => {
+    return existingTransfer?.transferType || "Inter-Company";
+  });
+
+  // Tagged Approved Transfer Requisition State
+  const [taggedReqNumber, setTaggedReqNumber] = useState<string>(() => {
+    return existingTransfer?.transferRequisitionNumber || "";
+  });
+
+  const [taggedReqId, setTaggedReqId] = useState<string>(() => {
+    return existingTransfer?.transferRequisitionId || "";
+  });
+
+  const [reqModalOpen, setReqModalOpen] = useState(false);
+  const [reqSearchQuery, setReqSearchQuery] = useState("");
+
   const [requestedBy] = useState<string>(() => {
     return existingTransfer?.requestedBy || "Tahmid Afsar Shapno (Store Manager)";
   });
@@ -139,6 +162,61 @@ function InterCompanyTransferFormPage() {
     const activeAll = warehouses.filter((w) => w.status === "Active");
     return activeAll.length > 0 ? activeAll : DEFAULT_WAREHOUSES;
   }, [warehouses, toCompany]);
+
+  // Available Approved Requisitions that can be tagged
+  const storedReqs = getStoredTransferRequisitions();
+  const availableApprovedRequisitions = useMemo(() => {
+    return storedReqs.filter((r) => {
+      if (r.status !== "Approved") return false;
+      if (transferType === "Inter-Company" && r.requestedFromCompany !== fromCompany) return false;
+      return true;
+    });
+  }, [storedReqs, fromCompany, transferType]);
+
+  const handleTagRequisition = (req: TransferRequisition) => {
+    setTaggedReqNumber(req.requisitionNumber);
+    setTaggedReqId(req.id);
+    setTransferType(req.transferType);
+    setFromCompany(req.requestedFromCompany);
+    setFromStore(req.requestedFromStore);
+    setToCompany(req.requisitioningCompany);
+    setToStore(req.requisitioningStore);
+
+    const mappedItems: InterCompanyTransferItem[] = req.items.map((it, idx) => {
+      const cat = catalogItems.find((c) => c.itemCode === it.itemCode);
+      const availStock = cat?.maximumStock || it.availableStock || 1000;
+      const qty = it.requiredQty;
+      const rate = it.estimatedUnitPrice || 100;
+      return {
+        id: `ict-row-${Date.now()}-${idx}`,
+        sl: idx + 1,
+        itemCode: it.itemCode,
+        itemName: it.itemName,
+        specification: it.specification || "-",
+        brand: it.brand || "Standard",
+        origin: it.origin || "Bangladesh",
+        uom: it.uom,
+        availableStock: availStock,
+        transferQty: qty,
+        unitPrice: rate,
+        totalValue: qty * rate,
+        remarks: it.remarks || `Against TR #${req.requisitionNumber}`,
+      };
+    });
+
+    if (mappedItems.length > 0) {
+      setItems(mappedItems);
+    }
+
+    setReqModalOpen(false);
+    toast.success(`Tagged Approved Transfer Requisition "${req.requisitionNumber}". Items & stores auto-filled.`);
+  };
+
+  const handleUntagRequisition = () => {
+    setTaggedReqNumber("");
+    setTaggedReqId("");
+    toast.info("Un-tagged Transfer Requisition.");
+  };
 
   // Item Search Modal State
   const [itemSearchOpen, setItemSearchOpen] = useState(false);
@@ -374,6 +452,9 @@ function InterCompanyTransferFormPage() {
   // Validations
   const validationErrors = useMemo(() => {
     const errs: string[] = [];
+    if (transferType === "Inter-Company" && !taggedReqNumber) {
+      errs.push("For Inter-Company Transfer, tagging an approved Transfer Requisition is mandatory.");
+    }
     if (transferReason === "Other" && !reasonDetails.trim()) {
       errs.push("Reason Details is mandatory when Transfer Reason is 'Other'.");
     }
@@ -393,7 +474,7 @@ function InterCompanyTransferFormPage() {
     });
 
     return errs;
-  }, [transferReason, reasonDetails, items]);
+  }, [transferType, taggedReqNumber, transferReason, reasonDetails, items]);
 
   // Save / Submit Handlers
   const handleSaveTransfer = (status: "Draft" | "Submitted") => {
@@ -406,7 +487,9 @@ function InterCompanyTransferFormPage() {
       id: existingTransfer?.id || `ict-${Date.now()}`,
       transferId,
       transferDate,
-      transferType: "Inter-Company",
+      transferType,
+      transferRequisitionNumber: taggedReqNumber || undefined,
+      transferRequisitionId: taggedReqId || undefined,
       transferReason,
       reasonDetails: transferReason === "Other" ? reasonDetails : undefined,
       remarks,
@@ -595,6 +678,109 @@ function InterCompanyTransferFormPage() {
               <span className="text-[11px] font-semibold text-slate-400">
                 Source and destination entities must be distinct
               </span>
+            </div>
+
+            {/* Transfer Type Selector & Policy / Tagging Banner */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-700">Transfer Type:</span>
+                  <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5">
+                    <button
+                      type="button"
+                      disabled={isViewMode}
+                      onClick={() => {
+                        setTransferType("Inter-Company");
+                      }}
+                      className={`px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer ${
+                        transferType === "Inter-Company"
+                          ? "bg-purple-600 text-white shadow-xs"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      Inter-Company Transfer
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isViewMode}
+                      onClick={() => {
+                        setTransferType("Intra-Company");
+                        setToCompany(fromCompany);
+                      }}
+                      className={`px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer ${
+                        transferType === "Intra-Company"
+                          ? "bg-blue-600 text-white shadow-xs"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      Intra-Company Transfer
+                    </button>
+                  </div>
+                </div>
+
+                {!isViewMode && (
+                  <button
+                    type="button"
+                    onClick={() => setReqModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-xs cursor-pointer self-start sm:self-auto"
+                  >
+                    <FileCheck2 className="size-3.5" />
+                    <span>+ Tag Approved Requisition</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Tagged Requisition or Warning Indicator */}
+              {taggedReqNumber ? (
+                <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-2 truncate">
+                    <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+                    <span className="font-bold text-emerald-950">Tagged Approved Requisition:</span>
+                    <span className="font-mono font-bold text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-300">
+                      {taggedReqNumber}
+                    </span>
+                    <span className="text-emerald-700 truncate hidden md:inline">
+                      • Requisitioned by {toCompany} ({toStore})
+                    </span>
+                  </div>
+                  {!isViewMode && (
+                    <button
+                      type="button"
+                      onClick={handleUntagRequisition}
+                      className="text-[11px] font-bold text-rose-600 hover:text-rose-800 underline cursor-pointer shrink-0 ml-2"
+                    >
+                      Remove Tag
+                    </button>
+                  )}
+                </div>
+              ) : transferType === "Inter-Company" ? (
+                <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 flex items-start sm:items-center justify-between gap-2 text-xs">
+                  <div className="flex items-start sm:items-center gap-2 text-amber-900">
+                    <AlertTriangle className="size-4 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
+                    <span>
+                      <strong>Inter-Company Transfer Rule:</strong> Transfer Requisition is{" "}
+                      <span className="font-bold underline text-amber-950">mandatory</span> and approval is required. Please tag an approved requisition before submitting.
+                    </span>
+                  </div>
+                  {!isViewMode && (
+                    <button
+                      type="button"
+                      onClick={() => setReqModalOpen(true)}
+                      className="text-xs font-bold text-indigo-700 hover:text-indigo-900 underline cursor-pointer shrink-0 whitespace-nowrap ml-2"
+                    >
+                      Select Requisition →
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 flex items-center gap-2 text-xs text-blue-900">
+                  <Info className="size-4 text-blue-600 shrink-0" />
+                  <span>
+                    <strong>Intra-Company Transfer Rule:</strong> Transfer Requisition is{" "}
+                    <strong>not mandatory</strong> and approval is <strong>not required</strong>. Goods can be transferred directly from one store to another within the same company.
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1005,6 +1191,136 @@ function InterCompanyTransferFormPage() {
             initialEntries={activeTrackingItem.batchAllocations}
             onSave={handleSaveBatchAllocations}
           />
+        )}
+
+        {/* Tag Approved Transfer Requisition Modal */}
+        {reqModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+            <div className="bg-white rounded-2xl border border-slate-200 w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-indigo-50/50">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
+                    <FileCheck2 className="size-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-slate-800">
+                      Tag Approved Transfer Requisition
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      Select an approved requisition to fulfill. Destination company, store, and items will be loaded automatically.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setReqModalOpen(false)}
+                  className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              <div className="p-4 border-b border-slate-100 bg-slate-50/30">
+                <div className="relative">
+                  <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={reqSearchQuery}
+                    onChange={(e) => setReqSearchQuery(e.target.value)}
+                    placeholder="Search by TR #, Requisitioning Company, Store, or Item..."
+                    className="w-full h-9 pl-9 pr-4 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="rounded-xl border border-slate-200 overflow-x-auto">
+                  <table className="w-full text-left text-xs min-w-[700px]">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase">
+                      <tr>
+                        <th className="py-2.5 px-3">Requisition No</th>
+                        <th className="py-2.5 px-3">Date</th>
+                        <th className="py-2.5 px-3">Requisitioning Entity (Recipient)</th>
+                        <th className="py-2.5 px-3 text-center">Items</th>
+                        <th className="py-2.5 px-3 text-right">Est. Value (৳)</th>
+                        <th className="py-2.5 px-3 text-center">Status</th>
+                        <th className="py-2.5 px-3 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {availableApprovedRequisitions
+                        .filter((r) => {
+                          if (!reqSearchQuery.trim()) return true;
+                          const q = reqSearchQuery.toLowerCase();
+                          return (
+                            r.requisitionNumber.toLowerCase().includes(q) ||
+                            r.requisitioningCompany.toLowerCase().includes(q) ||
+                            r.requisitioningStore.toLowerCase().includes(q) ||
+                            r.items.some((i) => i.itemName.toLowerCase().includes(q) || i.itemCode.toLowerCase().includes(q))
+                          );
+                        })
+                        .map((req) => (
+                          <tr key={req.id} className="hover:bg-slate-50 transition">
+                            <td className="py-2.5 px-3 font-mono font-bold text-indigo-600">
+                              {req.requisitionNumber}
+                            </td>
+                            <td className="py-2.5 px-3 text-slate-600">{req.requisitionDate}</td>
+                            <td className="py-2.5 px-3">
+                              <div className="font-bold text-slate-800">{req.requisitioningCompany}</div>
+                              <div className="text-[10px] text-slate-500">{req.requisitioningStore}</div>
+                            </td>
+                            <td className="py-2.5 px-3 text-center font-bold text-slate-700">
+                              {req.items.length} items ({req.totalRequiredQty} units)
+                            </td>
+                            <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
+                              ৳ {req.totalEstimatedValue.toLocaleString()}
+                            </td>
+                            <td className="py-2.5 px-3 text-center">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                {req.status}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3 text-right">
+                              <button
+                                type="button"
+                                onClick={() => handleTagRequisition(req)}
+                                className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition cursor-pointer"
+                              >
+                                + Tag & Load Items
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      {availableApprovedRequisitions.length === 0 && (
+                        <tr>
+                          <td colSpan={7} className="py-10 text-center text-slate-400">
+                            No approved requisitions found for source company &quot;{fromCompany}&quot;.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex justify-between items-center text-xs">
+                <Link
+                  to="/inv-transfer-requisition-approval"
+                  className="text-indigo-600 font-bold hover:underline"
+                >
+                  Need approval? Go to Transfer Requisition Approval Desk →
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setReqModalOpen(false)}
+                  className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium transition cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Item Search Modal */}

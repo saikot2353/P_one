@@ -17,6 +17,9 @@ import {
 import {
   ItemProductMaster,
   ItemSubGroup,
+  ItemGroup,
+  DEFAULT_ITEM_GROUPS,
+  getStoredData,
   ItemCategory,
   Brand,
   Origin,
@@ -190,6 +193,10 @@ export function ItemCreationPageForm({
   onSwitchToEdit,
 }: ItemCreationPageFormProps) {
   const [formData, setFormData] = useState<Partial<ItemProductMaster>>(() => {
+    const itemGroups = getStoredData("cripton_master_item_groups", DEFAULT_ITEM_GROUPS) as ItemGroup[];
+    const parentGroup = itemGroups.find((g) => g.id === targetSubGroup?.itemGroupId);
+    const inheritedServiceFlag = !!parentGroup?.serviceFlag;
+
     if (initialData) {
       const existingWarehouses =
         initialData.warehouses && initialData.warehouses.length > 0
@@ -215,6 +222,8 @@ export function ItemCreationPageForm({
         ...initialData,
         warehouses: existingWarehouses,
         conversionFactor: initialData.conversionFactor ?? 1,
+        serviceFlag: initialData.serviceFlag ?? inheritedServiceFlag,
+        valuationMethod: initialData.valuationMethod ?? "FIFO",
       };
     }
 
@@ -224,6 +233,8 @@ export function ItemCreationPageForm({
       subGroupId: targetSubGroup?.id || "",
       subGroupName: targetSubGroup?.subGroupName || "",
       subGroupBreadcrumb: subGroupBreadcrumb || "",
+      serviceFlag: inheritedServiceFlag,
+      valuationMethod: "FIFO",
       itemCategoryId: itemCategories[0]?.id || "",
       itemCategory: itemCategories[0]?.categoryName || "",
       brand: brands[0]?.brandName || "",
@@ -378,6 +389,8 @@ export function ItemCreationPageForm({
       safetyStock: Number(formData.safetyStock) || 0,
       batchTrackingRequired: !!formData.batchTrackingRequired,
       serialNumberTrackingRequired: !!formData.serialNumberTrackingRequired,
+      serviceFlag: !!formData.serviceFlag,
+      valuationMethod: formData.valuationMethod || "FIFO",
       defaultWarehouse: primaryWh,
       warehouses: formData.warehouses || [],
     };
@@ -593,6 +606,43 @@ export function ItemCreationPageForm({
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold mb-1 text-foreground">Valuation Method</label>
+              <select
+                disabled={isView}
+                value={formData.valuationMethod || "FIFO"}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    valuationMethod: e.target.value as "FIFO" | "LIFO" | "Weighted Average",
+                  })
+                }
+                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+              >
+                <option value="FIFO">FIFO (First In First Out)</option>
+                <option value="LIFO">LIFO (Last In First Out)</option>
+                <option value="Weighted Average">Weighted Average</option>
+              </select>
+            </div>
+
+            <div className="flex items-center justify-between p-2.5 rounded-xl border border-border/70 bg-muted/20">
+              <div>
+                <div className="text-xs font-bold text-foreground">Service Flag</div>
+                <div className="text-[10px] text-muted-foreground">
+                  Service / Non-inventory item
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  disabled={isView}
+                  checked={!!formData.serviceFlag}
+                  onChange={(e) => setFormData({ ...formData, serviceFlag: e.target.checked })}
+                  className="size-4.5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
             </div>
 
             <div className="sm:col-span-3">

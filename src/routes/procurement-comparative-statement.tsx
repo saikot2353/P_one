@@ -40,7 +40,38 @@ import {
   ExternalLink,
   ChevronDown,
   Percent,
+  History,
 } from "lucide-react";
+
+function getItemPurchaseHistory(item: CSItemQuote) {
+  const basePrice = item.targetPrice || item.estimatedPrice || 350;
+  return [
+    {
+      poNumber: "PO-2026-0042",
+      supplierName: "Dhaka Industrial Supplies Ltd.",
+      purchaseDate: "2026-01-18",
+      purchaseQty: Math.max(10, Math.round((item.quantity || 100) * 0.8)),
+      purchaseRate: Number((basePrice * 0.96).toFixed(2)),
+      purchaseAmount: Math.round(Math.max(10, Math.round((item.quantity || 100) * 0.8)) * basePrice * 0.96),
+    },
+    {
+      poNumber: "PO-2025-0891",
+      supplierName: "Bengal Poly & Paper Mills Ltd.",
+      purchaseDate: "2025-10-12",
+      purchaseQty: Math.max(15, Math.round((item.quantity || 100) * 1.2)),
+      purchaseRate: Number((basePrice * 1.02).toFixed(2)),
+      purchaseAmount: Math.round(Math.max(15, Math.round((item.quantity || 100) * 1.2)) * basePrice * 1.02),
+    },
+    {
+      poNumber: "PO-2025-0419",
+      supplierName: "Apex Materials & Packing Corp",
+      purchaseDate: "2025-06-25",
+      purchaseQty: Math.max(20, Math.round(item.quantity || 100)),
+      purchaseRate: Number((basePrice * 0.93).toFixed(2)),
+      purchaseAmount: Math.round(Math.max(20, Math.round(item.quantity || 100)) * basePrice * 0.93),
+    },
+  ];
+}
 import {
   ComparativeStatement,
   CSSupplierQuote,
@@ -121,6 +152,7 @@ export default function ComparativeStatementPage() {
   const [prModalOpen, setPrModalOpen] = useState(false);
   const [prSearchQuery, setPrSearchQuery] = useState("");
   const [awardMode, setAwardMode] = useState<"single" | "multiple">("multiple");
+  const [historyModalItem, setHistoryModalItem] = useState<CSItemQuote | null>(null);
 
   type CSFormData = Omit<ComparativeStatement, "id"> & {
     items: CSItemQuote[];
@@ -1578,7 +1610,17 @@ export default function ComparativeStatementPage() {
                                 {idx + 1}
                               </td>
                               <td className="py-2.5 px-3 border-r border-slate-200">
-                                <div className="font-semibold text-slate-900">{item.itemName}</div>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="font-semibold text-slate-900">{item.itemName}</div>
+                                  <button
+                                    type="button"
+                                    onClick={() => setHistoryModalItem(item)}
+                                    title={`View purchase price history for ${item.itemName}`}
+                                    className="size-5 rounded bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white border border-amber-500/30 text-[10px] font-black inline-flex items-center justify-center transition cursor-pointer shrink-0"
+                                  >
+                                    H
+                                  </button>
+                                </div>
                                 <div className="text-[11px] text-slate-500 mt-0.5 space-y-0.5">
                                   {item.specification && <div>Spec: {item.specification}</div>}
                                   {(item.brand || item.origin) && (
@@ -1717,7 +1759,7 @@ export default function ComparativeStatementPage() {
                           </td>
                           {viewSuppliers.map((s) => (
                             <td key={s.supplierId} className="py-2 px-3 border-r border-slate-200 text-right">
-                              + ৳ {(s.taxAmount ?? 0).toLocaleString("en-BD", { minimumFractionDigits: 2 })}
+                              + ৳ {(s.taxAmount ?? 0).toLocaleString("en-BD", { minimumFractionDigits: 2 })} ({s.taxPercentage ?? 0}%)
                             </td>
                           ))}
                         </tr>
@@ -2132,7 +2174,17 @@ export default function ComparativeStatementPage() {
                               {idx + 1}
                             </td>
                             <td className="py-2.5 px-3 border-r border-slate-200">
-                              <div className="font-semibold text-slate-900">{item.itemName}</div>
+                              <div className="flex items-center gap-1.5">
+                                <div className="font-semibold text-slate-900">{item.itemName}</div>
+                                <button
+                                  type="button"
+                                  onClick={() => setHistoryModalItem(item)}
+                                  title={`View purchase price history for ${item.itemName}`}
+                                  className="size-5 rounded bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white border border-amber-500/30 text-[10px] font-black inline-flex items-center justify-center transition cursor-pointer shrink-0"
+                                >
+                                  H
+                                </button>
+                              </div>
                               <div className="text-[11px] text-slate-500 mt-0.5 space-y-0.5">
                                 {item.specification && <div>Spec: {item.specification}</div>}
                                 {(item.brand || item.origin) && (
@@ -2265,6 +2317,27 @@ export default function ComparativeStatementPage() {
                                 handleSupplierChargeChange(
                                   s.supplierId,
                                   "vatPercentage",
+                                  Number(e.target.value)
+                                )
+                              }
+                              className="w-14 text-right px-2 py-0.5 border border-slate-200 rounded font-medium"
+                            />
+                            <span className="text-slate-400">%</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">Tax / AIT (%) (+):</span>
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={s.taxPercentage ?? 0}
+                              onChange={(e) =>
+                                handleSupplierChargeChange(
+                                  s.supplierId,
+                                  "taxPercentage",
                                   Number(e.target.value)
                                 )
                               }
@@ -2548,6 +2621,95 @@ export default function ComparativeStatementPage() {
                       </tbody>
                     </table>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Item Purchase Price History Modal */}
+          {historyModalItem && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-amber-50/50">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
+                      <History className="size-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-bold text-slate-900">
+                        Item Purchase Price History
+                      </h2>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Item: <span className="font-semibold text-slate-800">{historyModalItem.itemName}</span> ({historyModalItem.uom || "Unit"})
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setHistoryModalItem(null)}
+                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                  >
+                    <X className="size-5" />
+                  </button>
+                </div>
+
+                <div className="p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between text-xs">
+                  <div>
+                    <span className="text-slate-500">Current Required Qty:</span>{" "}
+                    <span className="font-bold text-slate-800">{historyModalItem.quantity} {historyModalItem.uom}</span>
+                  </div>
+                  {historyModalItem.targetPrice ? (
+                    <div>
+                      <span className="text-slate-500">Target / Budget Rate:</span>{" "}
+                      <span className="font-bold text-indigo-600">৳ {historyModalItem.targetPrice.toLocaleString()}</span>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4">
+                  <div className="rounded-xl border border-slate-200 overflow-x-auto">
+                    <table className="w-full text-left text-xs min-w-[620px]">
+                      <thead className="bg-slate-100/80 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase">
+                        <tr>
+                          <th className="py-2.5 px-3">PO # / Ref</th>
+                          <th className="py-2.5 px-3">Supplier Name</th>
+                          <th className="py-2.5 px-3">Purchase Date</th>
+                          <th className="py-2.5 px-3 text-right">Purchase Qty</th>
+                          <th className="py-2.5 px-3 text-right">Purchase Rate (৳)</th>
+                          <th className="py-2.5 px-3 text-right">Purchase Amount (৳)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {getItemPurchaseHistory(historyModalItem).map((hist, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50/70 transition">
+                            <td className="py-3 px-3 font-semibold text-indigo-600">{hist.poNumber}</td>
+                            <td className="py-3 px-3 font-medium text-slate-800">{hist.supplierName}</td>
+                            <td className="py-3 px-3 text-slate-600">{hist.purchaseDate}</td>
+                            <td className="py-3 px-3 text-right font-bold text-slate-700">
+                              {hist.purchaseQty.toLocaleString()} {historyModalItem.uom}
+                            </td>
+                            <td className="py-3 px-3 text-right font-bold text-emerald-600">
+                              ৳ {hist.purchaseRate.toLocaleString("en-BD", { minimumFractionDigits: 2 })}
+                            </td>
+                            <td className="py-3 px-3 text-right font-extrabold text-slate-900">
+                              ৳ {hist.purchaseAmount.toLocaleString("en-BD", { minimumFractionDigits: 2 })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="px-6 py-3 border-t border-slate-200 bg-slate-50/80 flex items-center justify-between text-xs text-slate-500">
+                  <span>Showing last 3 procurement cycles for comparison</span>
+                  <button
+                    type="button"
+                    onClick={() => setHistoryModalItem(null)}
+                    className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium transition cursor-pointer"
+                  >
+                    Close
+                  </button>
                 </div>
               </div>
             </div>

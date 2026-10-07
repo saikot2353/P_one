@@ -176,7 +176,28 @@ export const nav: NavItem[] = [
     ],
   },
   { label: "Payment", to: "/procurement-dashboard", icon: Banknote, count: 0 },
-  { label: "Reports", to: "/procurement-dashboard", icon: BarChart3, count: 0 },
+  {
+    label: "Reports",
+    icon: BarChart3,
+    subitems: [
+      {
+        label: "Month-wise Purchase Report",
+        to: "/procurement-reports-monthly-purchase",
+      },
+      {
+        label: "Month-wise Supplier Bill Report",
+        to: "/procurement-reports-monthly-supplier-bill",
+      },
+      {
+        label: "Purchase Price Report",
+        to: "/procurement-reports-purchase-price",
+      },
+      {
+        label: "Payment Statement",
+        to: "/procurement-reports-payment-statement",
+      },
+    ],
+  },
 ];
 
 export function ProcurementSidebar() {

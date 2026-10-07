@@ -421,6 +421,7 @@ export function PurchaseOrderWorkOrderPage() {
       subtotal: sub,
       discount: disc,
       vat: vat,
+      tax: 0,
       grandTotal: sub - disc + vat,
     };
   }, [poItems]);
@@ -429,19 +430,23 @@ export function PurchaseOrderWorkOrderPage() {
     let sub = 0;
     let disc = 0;
     let vat = 0;
+    let tax = 0;
 
     woItems.forEach((item) => {
       const lineBase = (item.workOrderQuantity || 0) * (item.unitRate || 0);
-      const lineVat = (lineBase * (item.vatRate || 5)) / 100;
+      const lineVat = (lineBase * (item.vatRate || 0)) / 100;
+      const lineTax = (lineBase * (item.taxRate || 0)) / 100;
       sub += lineBase;
       vat += lineVat;
+      tax += lineTax;
     });
 
     return {
       subtotal: sub,
       discount: 0,
       vat: vat,
-      grandTotal: sub + vat,
+      tax: tax,
+      grandTotal: sub + vat + tax,
     };
   }, [woItems]);
 
@@ -449,9 +454,15 @@ export function PurchaseOrderWorkOrderPage() {
 
   // 6. Available Catalog Items based on Creation Method
   const catalogItemsForSelection = useMemo(() => {
+    const masterItems = getStoredData("cripton_master_items", DEFAULT_ITEMS) as any[];
+    const isService = (code: string) => {
+      const match = masterItems.find((m) => m.itemCode === code);
+      return match ? !!match.serviceFlag : false;
+    };
+
+    let items: any[] = [];
     if (creationMethod === "Purchase Requisition") {
       // Items from tagged PRs that are unconsumed
-      const items: any[] = [];
       selectedPRs.forEach((prNo) => {
         const pr = availableApprovedPRs.find((p) => p.prNumber === prNo);
         if (pr) {
@@ -466,29 +477,31 @@ export function PurchaseOrderWorkOrderPage() {
               prQuantity: it.requestedQuantity || it.requiredQuantity || 10,
               estimatedUnitPrice: it.estimatedUnitPrice || 500,
               source: `PR: ${prNo}`,
+              serviceFlag: isService(it.itemCode),
             });
           });
         }
       });
-      return items;
     } else if (creationMethod === "Comparative Statement") {
       // Items from selected CS that are unconsumed
       const cs = availableApprovedCSs.find((c) => c.csNumber === selectedCS);
-      if (!cs) return [];
-      return cs.remainingItems.map((it) => ({
-        itemCode: it.itemCode,
-        itemName: it.itemName,
-        specification: it.specification || "Standard commercial grade",
-        brand: "OEM",
-        origin: "Bangladesh",
-        uom: it.unit || "PCS",
-        prQuantity: it.requiredQty || 10,
-        estimatedUnitPrice: it.lowestUnitPrice || it.estimatedUnitPrice || 1000,
-        source: `CS: ${selectedCS}`,
-      }));
+      if (cs) {
+        items = cs.remainingItems.map((it) => ({
+          itemCode: it.itemCode,
+          itemName: it.itemName,
+          specification: it.specification || "Standard commercial grade",
+          brand: "OEM",
+          origin: "Bangladesh",
+          uom: it.unit || "PCS",
+          prQuantity: it.requiredQty || 10,
+          estimatedUnitPrice: it.lowestUnitPrice || it.estimatedUnitPrice || 1000,
+          source: `CS: ${selectedCS}`,
+          serviceFlag: isService(it.itemCode),
+        }));
+      }
     } else {
       // Direct PO/WO: All active items from Item Master
-      return DEFAULT_ITEMS.filter((i) => i.status === "Active").map((it) => ({
+      items = masterItems.filter((i) => i.status === "Active").map((it) => ({
         itemCode: it.itemCode,
         itemName: it.itemName,
         specification: it.specification || "Standard commercial specification",
@@ -498,9 +511,16 @@ export function PurchaseOrderWorkOrderPage() {
         prQuantity: 0,
         estimatedUnitPrice: it.standardPurchasePrice || 500,
         source: "Item Master (Direct)",
+        serviceFlag: !!it.serviceFlag,
       }));
     }
-  }, [creationMethod, selectedPRs, selectedCS, availableApprovedPRs, availableApprovedCSs]);
+
+    // When Document Type = Work Order, show ONLY those items where Service Flag is enabled
+    if (docType === "Work Order") {
+      return items.filter((it) => it.serviceFlag === true);
+    }
+    return items;
+  }, [creationMethod, selectedPRs, selectedCS, availableApprovedPRs, availableApprovedCSs, docType]);
 
   // Filter Catalog Items inside Modal
   const filteredCatalogItems = useMemo(() => {
@@ -518,13 +538,55 @@ export function PurchaseOrderWorkOrderPage() {
 
   // Check if item is already added to table (Duplicate prevention)
   const isItemAlreadyAdded = (itemCode: string) => {
+    if (docType === "Work Order") {
+      return woItems.some((it) => it.serviceCode === itemCode);
+    }
     return poItems.some((it) => it.itemCode === itemCode);
   };
 
-  // 6 & 8. Add Item from Catalog
-  const handleAddPoItem = (catalogItem: any) => {
+  // 6 & 8. Add Item from Catalog (supports both PO and WO)
+  const handleAddCatalogItem = (catalogItem: any) => {
     if (isItemAlreadyAdded(catalogItem.itemCode)) {
-      toast.error(`Item "${catalogItem.itemName}" is already in the order. Duplicate items are not allowed.`);
+      toast.error(`Item "${catalogItem.itemName}" is already added. Duplicate items are not allowed.`);
+      return;
+    }
+
+    if (docType === "Work Order") {
+      const defaultUom = catalogItem.uom || "Job";
+      const qty = catalogItem.prQuantity > 0 ? catalogItem.prQuantity : 1;
+      const rate = catalogItem.estimatedUnitPrice || 1000;
+      const vatRate = 5;
+      const taxRate = 0;
+      const base = qty * rate;
+      const vat = (base * vatRate) / 100;
+      const tax = (base * taxRate) / 100;
+
+      const newWo: WOServiceItem = {
+        id: `woi-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        sl: woItems.length + 1,
+        serviceName: catalogItem.itemName,
+        serviceCode: catalogItem.itemCode,
+        workDescription: catalogItem.specification || "Standard scope of work",
+        specification: catalogItem.specification || "Standard commercial specification",
+        uom: defaultUom,
+        marketUnit: defaultUom,
+        conversion: `1 ${defaultUom} = 1 ${defaultUom}`,
+        estimatedQuantity: qty,
+        workOrderQuantity: qty,
+        unitRate: rate,
+        vatRate: vatRate,
+        vatAmount: vat,
+        taxRate: taxRate,
+        taxAmount: tax,
+        lineTotal: base + vat + tax,
+        serviceStartDate: new Date().toISOString().slice(0, 10),
+        serviceEndDate: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+        remarks: "",
+      };
+
+      setWoItems((prev) => [...prev, newWo]);
+      setItemSearchOpen(false);
+      toast.success(`Service item "${catalogItem.itemName}" added to Work Order.`);
       return;
     }
 
@@ -565,6 +627,8 @@ export function PurchaseOrderWorkOrderPage() {
     setItemSearchOpen(false);
     toast.success(`Added "${catalogItem.itemName}" to Order.`);
   };
+
+  const handleAddPoItem = handleAddCatalogItem;
 
   // Auto-populate item details when PR(s) are selected
   const populateItemsFromPRs = (prNumbers: string[]) => {
@@ -766,11 +830,14 @@ export function PurchaseOrderWorkOrderPage() {
           const updated = { ...item, [field]: val };
           const qty = Number(updated.workOrderQuantity) || 0;
           const rate = Number(updated.unitRate) || 0;
-          const vatR = Number(updated.vatRate) || 5;
+          const vatR = Number(updated.vatRate) || 0;
+          const taxR = Number(updated.taxRate) || 0;
           const base = qty * rate;
           const vat = (base * vatR) / 100;
+          const tax = (base * taxR) / 100;
           updated.vatAmount = vat;
-          updated.lineTotal = base + vat;
+          updated.taxAmount = tax;
+          updated.lineTotal = base + vat + tax;
           return updated;
         }
         return item;
@@ -876,6 +943,7 @@ export function PurchaseOrderWorkOrderPage() {
       subtotal: activeTotals.subtotal,
       discountTotal: activeTotals.discount,
       vatTotal: activeTotals.vat,
+      taxTotal: (activeTotals as any).tax || 0,
       grandTotal: activeTotals.grandTotal,
       termsAndConditions: tncText,
       attachments,
@@ -1383,14 +1451,27 @@ export function PurchaseOrderWorkOrderPage() {
                         <span>Add Item from Catalog</span>
                       </button>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={handleAddWoItem}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
-                      >
-                        <Plus className="size-3.5" />
-                        <span>Add Service Line</span>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setModalItemQuery("");
+                            setItemSearchOpen(true);
+                          }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                        >
+                          <Plus className="size-3.5" />
+                          <span>Add Service from Catalog</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleAddWoItem}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-bold transition cursor-pointer"
+                        >
+                          <Plus className="size-3.5" />
+                          <span>Add Custom Line</span>
+                        </button>
+                      </div>
                     )}
                   </div>
                 )}
@@ -1591,7 +1672,8 @@ export function PurchaseOrderWorkOrderPage() {
                         <th className="py-2.5 px-3 text-center w-20">UOM</th>
                         <th className="py-2.5 px-3 text-right w-24">Work Qty</th>
                         <th className="py-2.5 px-3 text-right min-w-[110px] w-28">Unit Rate (৳)</th>
-                        <th className="py-2.5 px-3 text-right min-w-[90px] w-24">VAT (%)</th>
+                        <th className="py-2.5 px-3 text-right min-w-[80px] w-20">VAT (%)</th>
+                        <th className="py-2.5 px-3 text-right min-w-[80px] w-20">Tax (%)</th>
                         <th className="py-2.5 px-3 text-right w-28">Total (৳)</th>
                         {!isViewMode && <th className="py-2.5 px-3 text-center w-14">Action</th>}
                       </tr>
@@ -1678,6 +1760,20 @@ export function PurchaseOrderWorkOrderPage() {
                               />
                             )}
                           </td>
+                          <td className="py-2 px-2">
+                            {isViewMode ? (
+                              <div className="text-right font-mono font-bold text-amber-600 dark:text-amber-400">{item.taxRate ?? 0}%</div>
+                            ) : (
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={item.taxRate ?? 0}
+                                onChange={(e) => handleUpdateWoItem(item.id, "taxRate", parseFloat(e.target.value) || 0)}
+                                className="w-full h-7 px-2 text-right bg-background border border-border/80 rounded-md text-xs font-mono font-bold text-amber-600 outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </td>
                           <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
                             ৳{item.lineTotal.toLocaleString()}
                           </td>
@@ -1696,7 +1792,7 @@ export function PurchaseOrderWorkOrderPage() {
                       ))}
                       {woItems.length === 0 && (
                         <tr>
-                          <td colSpan={9} className="py-10 text-center text-xs text-muted-foreground">
+                          <td colSpan={10} className="py-10 text-center text-xs text-muted-foreground">
                             No Service items added. Click &ldquo;Add Service Line&rdquo; to start.
                           </td>
                         </tr>
@@ -1723,6 +1819,10 @@ export function PurchaseOrderWorkOrderPage() {
                   <span>•</span>
                   <span className="text-blue-600 dark:text-blue-400">
                     Applicable VAT: <strong className="font-mono">+৳{activeTotals.vat.toLocaleString()}</strong>
+                  </span>
+                  <span>•</span>
+                  <span className="text-amber-600 dark:text-amber-400">
+                    Applicable Tax: <strong className="font-mono">+৳{(activeTotals as any).tax?.toLocaleString() || 0}</strong>
                   </span>
                 </div>
 

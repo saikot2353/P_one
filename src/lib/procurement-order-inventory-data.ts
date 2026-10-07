@@ -53,6 +53,8 @@ export interface WOServiceItem {
   unitRate: number;
   vatRate?: number;
   vatAmount?: number;
+  taxRate?: number; // Item-wise Tax %
+  taxAmount?: number; // Item-wise Tax Amount
   lineTotal: number;
   serviceStartDate: string;
   serviceEndDate: string;
@@ -118,6 +120,7 @@ export interface PurchaseOrder {
   subtotal: number;
   discountTotal: number;
   vatTotal: number;
+  taxTotal?: number; // Total Tax Amount
   grandTotal: number;
   // Terms & Conditions
   termsAndConditions: string;
@@ -240,7 +243,9 @@ export interface SupplierBill {
   subtotal: number;
   discount: number;
   vat: number;
+  tax?: number; // Tax / AIT
   otherCharges: number;
+  otherChargeServiceItemIds?: string[];
   adjustment: number;
   netBillAmount: number;
   roundOff: number;

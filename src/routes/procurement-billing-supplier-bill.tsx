@@ -43,6 +43,11 @@ import {
   getStoredPurchaseOrders,
 } from "@/lib/procurement-order-inventory-data";
 import {
+  DEFAULT_ITEMS,
+  getStoredData,
+  ItemProductMaster,
+} from "@/lib/procurement-master-data";
+import {
   StandardPreviewReportModal,
   StandardReportData,
 } from "@/components/reports/StandardPreviewReportModal";
@@ -102,11 +107,35 @@ export function SupplierBillPage() {
   const [remarks, setRemarks] = useState("");
   const [currentApprovalStatus, setCurrentApprovalStatus] = useState<SupplierBill["approvalStatus"]>("Draft");
 
-  // Other Charges & Adjustments & Manual Discount & Manual VAT Amount
+  // Other Charges & Adjustments & Manual Discount & Manual VAT & Tax
   const [otherCharges, setOtherCharges] = useState<number | "">(0);
   const [adjustment, setAdjustment] = useState<number | "">(0);
   const [manualDiscount, setManualDiscount] = useState<number | "">("");
   const [manualVatAmount, setManualVatAmount] = useState<number | "">("");
+  const [taxAmount, setTaxAmount] = useState<number | "">(0);
+  const [selectedServiceItemIds, setSelectedServiceItemIds] = useState<string[]>([]);
+  const [serviceSearchQuery, setServiceSearchQuery] = useState("");
+  const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
+
+  // Available service items where Service Flag is enabled
+  const availableServiceItems = useMemo(() => {
+    const masterItems = getStoredData("cripton_master_items", DEFAULT_ITEMS) as ItemProductMaster[];
+    return masterItems.filter((i) => i.serviceFlag === true);
+  }, []);
+
+  const handleToggleServiceItem = (serviceId: string) => {
+    setSelectedServiceItemIds((prev) => {
+      const exists = prev.includes(serviceId);
+      const next = exists ? prev.filter((id) => id !== serviceId) : [...prev, serviceId];
+      let total = 0;
+      next.forEach((id) => {
+        const item = availableServiceItems.find((s) => s.id === id);
+        total += item?.standardPurchasePrice || 1200;
+      });
+      setOtherCharges(total);
+      return next;
+    });
+  };
 
   // Modals
   const [poModalOpen, setPoModalOpen] = useState(false);
@@ -204,6 +233,8 @@ export function SupplierBillPage() {
     setRemarks(bill.remarks || "");
     setCurrentApprovalStatus(bill.approvalStatus);
     setOtherCharges(bill.otherCharges ?? 0);
+    setTaxAmount(bill.tax ?? 0);
+    setSelectedServiceItemIds(bill.otherChargeServiceItemIds ?? []);
     setAdjustment(bill.adjustment ?? 0);
     setManualDiscount(bill.discount ?? 0);
     setManualVatAmount(bill.vat ?? 0);
@@ -221,6 +252,8 @@ export function SupplierBillPage() {
     setRemarks("");
     setCurrentApprovalStatus("Draft");
     setOtherCharges(0);
+    setTaxAmount(0);
+    setSelectedServiceItemIds([]);
     setAdjustment(0);
     setManualDiscount("");
     setManualVatAmount("");
@@ -360,21 +393,23 @@ export function SupplierBillPage() {
     const disc = autoItemsDisc + extraDisc;
     const extraVat = manualVatAmount !== "" ? Math.max(0, Number(manualVatAmount)) : 0;
     const vat = autoItemsVat + extraVat;
+    const tax = Math.max(0, Number(taxAmount) || 0);
     const others = Math.max(0, Number(otherCharges) || 0);
     const adj = Number(adjustment) || 0;
-    const net = Math.max(0, sub - disc + vat + others + adj);
+    const net = Math.max(0, sub - disc + vat + tax + others + adj);
     const round = Math.round(net) - net;
 
     return {
       subtotal: sub,
       discount: disc,
       vat: vat,
+      tax: tax,
       otherCharges: others,
       adjustment: adj,
       netBillAmount: Math.round(net),
       roundOff: round,
     };
-  }, [billItems, otherCharges, adjustment, manualDiscount, manualVatAmount]);
+  }, [billItems, otherCharges, adjustment, manualDiscount, manualVatAmount, taxAmount]);
 
   // Save / Submit Bill
   const handleSubmitBill = (approvalStatus: SupplierBill["approvalStatus"]) => {
@@ -420,7 +455,9 @@ export function SupplierBillPage() {
               subtotal: summary.subtotal,
               discount: summary.discount,
               vat: summary.vat,
+              tax: summary.tax,
               otherCharges: summary.otherCharges,
+              otherChargeServiceItemIds: selectedServiceItemIds,
               adjustment: summary.adjustment,
               netBillAmount: summary.netBillAmount,
               roundOff: summary.roundOff,
@@ -455,7 +492,9 @@ export function SupplierBillPage() {
       subtotal: summary.subtotal,
       discount: summary.discount,
       vat: summary.vat,
+      tax: summary.tax,
       otherCharges: summary.otherCharges,
+      otherChargeServiceItemIds: selectedServiceItemIds,
       adjustment: summary.adjustment,
       netBillAmount: summary.netBillAmount,
       roundOff: summary.roundOff,
@@ -972,110 +1011,204 @@ export function SupplierBillPage() {
 
                 {/* Additional Financial Adjustment Inputs:
                     Other Charges, Adjustment (+/-), followed immediately by Discount and VAT Amount */}
-                <div className="grid grid-cols-2 gap-3 text-xs pt-1">
-                  <div>
+                {/* Additional Financial Adjustment Inputs:
+                    Other Charges (Multi-select service dropdown), Adjustment (+/-), Discount, VAT, and Tax */}
+                <div className="space-y-3 pt-1 text-xs">
+                  {/* Other Charges Multi-select Dropdown (Service items only) */}
+                  <div className="relative">
                     <label className="text-[10.5px] font-bold text-muted-foreground uppercase block mb-1">
-                      Other Charges (Freight/Loading)
+                      Other Charges (Freight/Loading) — Service Items
                     </label>
-                    <input
-                      type="number"
-                      min="0"
-                      disabled={isReadOnly}
-                      value={otherCharges}
-                      onKeyDown={(e) => {
-                        if (e.key === "-" || e.key === "e" || e.key === "E") e.preventDefault();
-                      }}
-                      onPaste={(e) => {
-                        const paste = e.clipboardData.getData("text");
-                        if (Number(paste) < 0 || paste.includes("-")) e.preventDefault();
-                      }}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === "") {
-                          setOtherCharges("");
-                        } else {
-                          const num = Number(val);
-                          setOtherCharges(isNaN(num) || num < 0 ? 0 : num);
-                        }
-                      }}
-                      className="w-full px-2.5 py-1.5 font-mono bg-background border border-border rounded-lg outline-none disabled:opacity-75 disabled:cursor-not-allowed"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10.5px] font-bold text-muted-foreground uppercase block mb-1">
-                      Adjustment (+/-)
-                    </label>
-                    <input
-                      type="number"
-                      disabled={isReadOnly}
-                      value={adjustment}
-                      onChange={(e) =>
-                        setAdjustment(e.target.value === "" ? "" : Number(e.target.value))
-                      }
-                      className="w-full px-2.5 py-1.5 font-mono bg-background border border-border rounded-lg outline-none disabled:opacity-75 disabled:cursor-not-allowed"
-                    />
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <button
+                          type="button"
+                          disabled={isReadOnly}
+                          onClick={() => setServiceDropdownOpen(!serviceDropdownOpen)}
+                          className="w-full min-h-9 px-3 py-1.5 text-xs text-left bg-background border border-border rounded-lg flex items-center justify-between gap-2 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                          <span className="truncate text-foreground font-medium">
+                            {selectedServiceItemIds.length > 0
+                              ? `${selectedServiceItemIds.length} service item(s) selected`
+                              : "Select service items (Freight, Loading, etc.)..."}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground shrink-0">▼</span>
+                        </button>
+
+                        {serviceDropdownOpen && (
+                          <div className="absolute z-30 mt-1 w-full bg-card border border-border rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                            <div className="p-2 border-b border-border bg-muted/40">
+                              <div className="relative">
+                                <Search className="size-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                <input
+                                  type="text"
+                                  value={serviceSearchQuery}
+                                  onChange={(e) => setServiceSearchQuery(e.target.value)}
+                                  placeholder="Search service items..."
+                                  className="w-full pl-7.5 pr-2 py-1 text-xs bg-background border border-border rounded-md outline-none"
+                                  autoFocus
+                                />
+                              </div>
+                            </div>
+                            <div className="max-h-48 overflow-y-auto p-1 divide-y divide-border/40">
+                              {availableServiceItems
+                                .filter((s) => {
+                                  if (!serviceSearchQuery.trim()) return true;
+                                  const q = serviceSearchQuery.toLowerCase();
+                                  return (
+                                    s.itemName.toLowerCase().includes(q) ||
+                                    s.itemCode.toLowerCase().includes(q)
+                                  );
+                                })
+                                .map((service) => {
+                                  const isSelected = selectedServiceItemIds.includes(service.id);
+                                  return (
+                                    <button
+                                      key={service.id}
+                                      type="button"
+                                      onClick={() => handleToggleServiceItem(service.id)}
+                                      className={`w-full p-2 text-left text-xs rounded-lg flex items-center justify-between gap-2 hover:bg-muted transition cursor-pointer ${
+                                        isSelected ? "bg-amber-500/10 font-bold text-amber-700 dark:text-amber-400" : ""
+                                      }`}
+                                    >
+                                      <div className="truncate">
+                                        <div className="font-semibold">{service.itemName}</div>
+                                        <div className="text-[10px] text-muted-foreground font-mono">
+                                          {service.itemCode} • ৳{(service.standardPurchasePrice || 1200).toLocaleString()}
+                                        </div>
+                                      </div>
+                                      <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        readOnly
+                                        className="size-4 accent-amber-500 rounded"
+                                      />
+                                    </button>
+                                  );
+                                })}
+                              {availableServiceItems.length === 0 && (
+                                <div className="p-3 text-center text-xs text-muted-foreground">
+                                  No service items found in Item Setup.
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Manual other charges amount input */}
+                      <div className="w-28 shrink-0">
+                        <input
+                          type="number"
+                          min="0"
+                          disabled={isReadOnly}
+                          value={otherCharges}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setOtherCharges(val === "" ? "" : Math.max(0, Number(val)));
+                          }}
+                          placeholder="Amount"
+                          className="w-full px-2.5 py-1.5 font-mono text-xs text-right bg-background border border-border rounded-lg outline-none disabled:opacity-75 disabled:cursor-not-allowed"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Selected Service Badges */}
+                    {selectedServiceItemIds.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                        {selectedServiceItemIds.map((id) => {
+                          const item = availableServiceItems.find((s) => s.id === id);
+                          return (
+                            <span
+                              key={id}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                            >
+                              <span>{item?.itemName || id}</span>
+                              {!isReadOnly && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleServiceItem(id)}
+                                  className="hover:text-rose-500 cursor-pointer ml-0.5"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Discount Field - immediately after Adjustment (+/-) */}
-                  <div>
-                    <label className="text-[10.5px] font-bold text-emerald-600 uppercase block mb-1">
-                      Discount (৳)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      disabled={isReadOnly}
-                      placeholder={String(summary.discount)}
-                      value={manualDiscount}
-                      onKeyDown={(e) => {
-                        if (e.key === "-" || e.key === "e" || e.key === "E") e.preventDefault();
-                      }}
-                      onPaste={(e) => {
-                        const paste = e.clipboardData.getData("text");
-                        if (Number(paste) < 0 || paste.includes("-")) e.preventDefault();
-                      }}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === "") {
-                          setManualDiscount("");
-                        } else {
-                          const num = Number(val);
-                          setManualDiscount(isNaN(num) || num < 0 ? 0 : num);
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <div>
+                      <label className="text-[10.5px] font-bold text-muted-foreground uppercase block mb-1">
+                        Adjustment (+/-)
+                      </label>
+                      <input
+                        type="number"
+                        disabled={isReadOnly}
+                        value={adjustment}
+                        onChange={(e) =>
+                          setAdjustment(e.target.value === "" ? "" : Number(e.target.value))
                         }
-                      }}
-                      className="w-full px-2.5 py-1.5 font-mono bg-background border border-emerald-500/40 rounded-lg outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
-                    />
-                  </div>
+                        className="w-full px-2.5 py-1.5 font-mono bg-background border border-border rounded-lg outline-none disabled:opacity-75 disabled:cursor-not-allowed"
+                      />
+                    </div>
 
-                  {/* VAT Amount Field - immediately after Adjustment (+/-) */}
-                  <div>
-                    <label className="text-[10.5px] font-bold text-blue-600 uppercase block mb-1">
-                      VAT Amount (৳)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      disabled={isReadOnly}
-                      placeholder={String(summary.vat)}
-                      value={manualVatAmount}
-                      onKeyDown={(e) => {
-                        if (e.key === "-" || e.key === "e" || e.key === "E") e.preventDefault();
-                      }}
-                      onPaste={(e) => {
-                        const paste = e.clipboardData.getData("text");
-                        if (Number(paste) < 0 || paste.includes("-")) e.preventDefault();
-                      }}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === "") {
-                          setManualVatAmount("");
-                        } else {
-                          const num = Number(val);
-                          setManualVatAmount(isNaN(num) || num < 0 ? 0 : num);
-                        }
-                      }}
-                      className="w-full px-2.5 py-1.5 font-mono bg-background border border-blue-500/40 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-75 disabled:cursor-not-allowed"
-                    />
+                    <div>
+                      <label className="text-[10.5px] font-bold text-emerald-600 uppercase block mb-1">
+                        Discount (৳)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        disabled={isReadOnly}
+                        placeholder={String(summary.discount)}
+                        value={manualDiscount}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setManualDiscount(val === "" ? "" : Math.max(0, Number(val)));
+                        }}
+                        className="w-full px-2.5 py-1.5 font-mono bg-background border border-emerald-500/40 rounded-lg outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10.5px] font-bold text-blue-600 uppercase block mb-1">
+                        VAT (৳)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        disabled={isReadOnly}
+                        placeholder={String(summary.vat)}
+                        value={manualVatAmount}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setManualVatAmount(val === "" ? "" : Math.max(0, Number(val)));
+                        }}
+                        className="w-full px-2.5 py-1.5 font-mono bg-background border border-blue-500/40 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-75 disabled:cursor-not-allowed"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10.5px] font-bold text-amber-600 uppercase block mb-1">
+                        Tax / AIT (৳)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        disabled={isReadOnly}
+                        placeholder="0"
+                        value={taxAmount}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setTaxAmount(val === "" ? "" : Math.max(0, Number(val)));
+                        }}
+                        className="w-full px-2.5 py-1.5 font-mono bg-background border border-amber-500/40 rounded-lg outline-none focus:ring-1 focus:ring-amber-500 disabled:opacity-75 disabled:cursor-not-allowed"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1099,6 +1232,13 @@ export function SupplierBillPage() {
                   <span>VAT</span>
                   <span className="font-mono font-bold text-foreground">
                     + ৳ {summary.vat.toLocaleString()}
+                  </span>
+                </div>
+                {/* Tax Field beside VAT and Total */}
+                <div className="flex justify-between items-center text-muted-foreground">
+                  <span>Tax / AIT</span>
+                  <span className="font-mono font-bold text-amber-600 dark:text-amber-400">
+                    + ৳ {summary.tax.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-muted-foreground">

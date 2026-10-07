@@ -52,11 +52,15 @@ export interface InterCompanyTransferItem {
   remarks?: string;
 }
 
+export type TransferType = "Inter-Company" | "Intra-Company";
+
 export interface InterCompanyTransfer {
   id: string;
   transferId: string;
   transferDate: string;
-  transferType: "Inter-Company";
+  transferType: TransferType;
+  transferRequisitionNumber?: string;
+  transferRequisitionId?: string;
   transferReason: TransferReasonType;
   reasonDetails?: string;
   remarks?: string;
@@ -74,6 +78,60 @@ export interface InterCompanyTransfer {
   totalTransferValue: number;
   status: TransferStatus;
   items: InterCompanyTransferItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// 1.1 Transfer Requisition Models
+// ---------------------------------------------------------------------------
+export type TransferRequisitionStatus =
+  | "Draft"
+  | "Approval Pending"
+  | "Approved"
+  | "Returned for Correction"
+  | "Rejected"
+  | "Partially Issued"
+  | "Fully Issued";
+
+export interface TransferRequisitionItem {
+  id: string;
+  sl: number;
+  itemCode: string;
+  itemName: string;
+  specification: string;
+  brand: string;
+  origin: string;
+  uom: string;
+  requiredQty: number;
+  issuedQty?: number;
+  availableStock?: number;
+  estimatedUnitPrice: number;
+  totalEstimatedValue: number;
+  remarks?: string;
+}
+
+export interface TransferRequisition {
+  id: string;
+  requisitionNumber: string;
+  requisitionDate: string;
+  transferType: TransferType;
+  requisitioningCompany: string;
+  requisitioningStore: string;
+  requestedFromCompany: string;
+  requestedFromStore: string;
+  requestedBy: string;
+  remarks?: string;
+  totalItems: number;
+  totalRequiredQty: number;
+  totalEstimatedValue: number;
+  status: TransferRequisitionStatus;
+  approvedBy?: string;
+  approvalDate?: string;
+  approvalRemarks?: string;
+  returnedRemarks?: string;
+  rejectedRemarks?: string;
+  items: TransferRequisitionItem[];
   createdAt: string;
   updatedAt: string;
 }
@@ -726,6 +784,215 @@ export const SEED_STOCK_WRITEOFFS: StockWriteOff[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// Seed Data: Transfer Requisitions
+// ---------------------------------------------------------------------------
+export const SEED_TRANSFER_REQUISITIONS: TransferRequisition[] = [
+  {
+    id: "tr-seed-1",
+    requisitionNumber: "TR-2026-001",
+    requisitionDate: "2026-10-01",
+    transferType: "Inter-Company",
+    requisitioningCompany: "Pakiza Knit Composite Ltd",
+    requisitioningStore: "PKCL Central Raw Material Warehouse",
+    requestedFromCompany: "Pakiza Spinning Mills Ltd",
+    requestedFromStore: "Spinning Spare Parts & Consumables Store",
+    requestedBy: "Md. Anik Islam (Store Officer)",
+    approvedBy: "Engr. Tanvir Ahmed (Head of Spinning Operations)",
+    approvalDate: "2026-10-02",
+    approvalRemarks: "Approved for transfer dispatch against production order #EXP-889.",
+    remarks: "Urgent yarn cone requirement for Export Knitting Batch #EXP-889",
+    totalItems: 1,
+    totalRequiredQty: 500,
+    totalEstimatedValue: 210000,
+    status: "Approved",
+    createdAt: "2026-10-01T09:30:00Z",
+    updatedAt: "2026-10-02T11:00:00Z",
+    items: [
+      {
+        id: "tr-item-1",
+        sl: 1,
+        itemCode: "ITM-YRN-30-1",
+        itemName: "100% Combed Cotton Yarn Ne 30/1",
+        specification: "100% Combed Cotton, Ne 30/1 ring spun, Auto coned",
+        brand: "Pakiza Spin",
+        origin: "Bangladesh",
+        uom: "KG",
+        requiredQty: 500,
+        issuedQty: 0,
+        availableStock: 25000,
+        estimatedUnitPrice: 420,
+        totalEstimatedValue: 210000,
+        remarks: "Cone count 30/1 ring spun",
+      },
+    ],
+  },
+  {
+    id: "tr-seed-2",
+    requisitionNumber: "TR-2026-002",
+    requisitionDate: "2026-10-04",
+    transferType: "Inter-Company",
+    requisitioningCompany: "Pakiza Knit Composite Ltd",
+    requisitioningStore: "PKCL Central Raw Material Warehouse",
+    requestedFromCompany: "Pakiza Technovation Limited",
+    requestedFromStore: "Pakiza Technovation Central IT & Hardware Depot",
+    requestedBy: "Tahmid Afsar Shapno (Store Manager)",
+    remarks: "Workstation laptops and network switches for new knitting floor control room",
+    totalItems: 2,
+    totalRequiredQty: 5,
+    totalEstimatedValue: 415000,
+    status: "Approval Pending",
+    createdAt: "2026-10-04T10:15:00Z",
+    updatedAt: "2026-10-04T10:15:00Z",
+    items: [
+      {
+        id: "tr-item-2",
+        sl: 1,
+        itemCode: "ITM-IT-LAT-5440",
+        itemName: "Dell Latitude 5440 Core i7 Business Laptop",
+        specification: "13th Gen Intel Core i7-1370P, 16GB DDR5, 512GB NVMe SSD",
+        brand: "Dell Technologies",
+        origin: "Malaysia",
+        uom: "PCS",
+        requiredQty: 3,
+        issuedQty: 0,
+        availableStock: 15,
+        estimatedUnitPrice: 125000,
+        totalEstimatedValue: 375000,
+        remarks: "ERP control terminals",
+      },
+      {
+        id: "tr-item-3",
+        sl: 2,
+        itemCode: "ITM-PAP-A4-80",
+        itemName: "Double A Premium A4 Printing Paper 80 GSM",
+        specification: "80 GSM high brightness photocopy paper, 500 sheets/ream",
+        brand: "Double A",
+        origin: "Thailand",
+        uom: "REAM",
+        requiredQty: 2,
+        issuedQty: 0,
+        availableStock: 80,
+        estimatedUnitPrice: 480,
+        totalEstimatedValue: 960,
+        remarks: "Documentation papers",
+      },
+    ],
+  },
+  {
+    id: "tr-seed-3",
+    requisitionNumber: "TR-2026-003",
+    requisitionDate: "2026-10-05",
+    transferType: "Intra-Company",
+    requisitioningCompany: "Pakiza Knit Composite Ltd",
+    requisitioningStore: "Dyeing & Finishing Auxiliary Chemical Store",
+    requestedFromCompany: "Pakiza Knit Composite Ltd",
+    requestedFromStore: "PKCL Central Raw Material Warehouse",
+    requestedBy: "Kazi Faruk (Dyeing Shift In-charge)",
+    approvedBy: "Internal Store Transfer",
+    approvalDate: "2026-10-05",
+    approvalRemarks: "Intra-company direct requisition approved automatically.",
+    remarks: "Intra-store chemical transfer for batch #DY-902",
+    totalItems: 1,
+    totalRequiredQty: 50,
+    totalEstimatedValue: 42500,
+    status: "Approved",
+    createdAt: "2026-10-05T08:00:00Z",
+    updatedAt: "2026-10-05T08:00:00Z",
+    items: [
+      {
+        id: "tr-item-4",
+        sl: 1,
+        itemCode: "ITM-DYE-BLK-B",
+        itemName: "Reactive Black B Dyestuff Standard",
+        specification: "High solubility reactive dyestuff, textile grade",
+        brand: "Dystar",
+        origin: "Germany",
+        uom: "KG",
+        requiredQty: 50,
+        issuedQty: 0,
+        availableStock: 600,
+        estimatedUnitPrice: 850,
+        totalEstimatedValue: 42500,
+        remarks: "Dyeing shade verification",
+      },
+    ],
+  },
+  {
+    id: "tr-seed-4",
+    requisitionNumber: "TR-2026-004",
+    requisitionDate: "2026-10-06",
+    transferType: "Inter-Company",
+    requisitioningCompany: "Pakiza Garments Ltd",
+    requisitioningStore: "Apparel Cutting & Sewing Consumable Store",
+    requestedFromCompany: "Pakiza Knit Composite Ltd",
+    requestedFromStore: "PKCL Central Raw Material Warehouse",
+    requestedBy: "Shamim Reza (Garments Store Supervisor)",
+    remarks: "Single Jersey Grey Knitted Fabric replenishment for winter export order",
+    totalItems: 1,
+    totalRequiredQty: 1200,
+    totalEstimatedValue: 456000,
+    status: "Approval Pending",
+    createdAt: "2026-10-06T11:20:00Z",
+    updatedAt: "2026-10-06T11:20:00Z",
+    items: [
+      {
+        id: "tr-item-5",
+        sl: 1,
+        itemCode: "ITM-FAB-SJ-180",
+        itemName: "Single Jersey 100% Cotton Grey Fabric 180 GSM",
+        specification: "100% Cotton 30s yarn knit, 180 GSM tubular fabric",
+        brand: "Pakiza Knit",
+        origin: "Bangladesh",
+        uom: "KG",
+        requiredQty: 1200,
+        issuedQty: 0,
+        availableStock: 8500,
+        estimatedUnitPrice: 380,
+        totalEstimatedValue: 456000,
+        remarks: "Export order PO-8890",
+      },
+    ],
+  },
+  {
+    id: "tr-seed-5",
+    requisitionNumber: "TR-2026-005",
+    requisitionDate: "2026-10-06",
+    transferType: "Inter-Company",
+    requisitioningCompany: "Pakiza Spinning Mills Ltd",
+    requisitioningStore: "Spinning Spare Parts & Consumables Store",
+    requestedFromCompany: "Pakiza Knit Composite Ltd",
+    requestedFromStore: "PKCL Central Raw Material Warehouse",
+    requestedBy: "Rafiqul Islam (Mechanical Maintenance)",
+    returnedRemarks: "Please verify exact machine model & spindle dimensions before re-submitting.",
+    remarks: "High speed ring spindle replacement parts",
+    totalItems: 1,
+    totalRequiredQty: 20,
+    totalEstimatedValue: 64000,
+    status: "Returned for Correction",
+    createdAt: "2026-10-06T14:00:00Z",
+    updatedAt: "2026-10-06T16:30:00Z",
+    items: [
+      {
+        id: "tr-item-6",
+        sl: 1,
+        itemCode: "ITM-SPN-BOLSTER-20",
+        itemName: "High Speed Ring Spindle Bolster Assembly",
+        specification: "Rieter G35 compatible spindle bolster insert, high-load",
+        brand: "Rieter OEM",
+        origin: "Switzerland",
+        uom: "PCS",
+        requiredQty: 20,
+        issuedQty: 0,
+        availableStock: 45,
+        estimatedUnitPrice: 3200,
+        totalEstimatedValue: 64000,
+        remarks: "Frame 4 overhaul",
+      },
+    ],
+  },
+];
+
+// ---------------------------------------------------------------------------
 // LocalStorage Persistence Keys
 // ---------------------------------------------------------------------------
 const STORAGE_KEYS = {
@@ -733,10 +1000,35 @@ const STORAGE_KEYS = {
   RECEIVES: "inv_intercompany_receives_v2",
   ADJUSTMENTS: "inv_stock_adjustments_v2",
   WRITEOFFS: "inv_stock_writeoffs_v2",
+  TRANSFER_REQUISITIONS: "inv_transfer_requisitions_v2",
 };
 
 // ---------------------------------------------------------------------------
-// Helper Methods
+// Helper Methods: Transfer Requisitions
+// ---------------------------------------------------------------------------
+export function getStoredTransferRequisitions(): TransferRequisition[] {
+  return getStoredData(STORAGE_KEYS.TRANSFER_REQUISITIONS, SEED_TRANSFER_REQUISITIONS);
+}
+
+export function saveStoredTransferRequisitions(data: TransferRequisition[]): void {
+  setStoredData(STORAGE_KEYS.TRANSFER_REQUISITIONS, data);
+}
+
+export function saveTransferRequisition(req: TransferRequisition): void {
+  const current = getStoredTransferRequisitions();
+  const existingIndex = current.findIndex(
+    (r) => r.id === req.id || r.requisitionNumber === req.requisitionNumber
+  );
+  if (existingIndex >= 0) {
+    current[existingIndex] = { ...req, updatedAt: new Date().toISOString() };
+  } else {
+    current.unshift(req);
+  }
+  saveStoredTransferRequisitions(current);
+}
+
+// ---------------------------------------------------------------------------
+// Helper Methods: Stock Transfers
 // ---------------------------------------------------------------------------
 export function getStoredInterCompanyTransfers(): InterCompanyTransfer[] {
   return getStoredData(STORAGE_KEYS.TRANSFERS, SEED_INTERCOMPANY_TRANSFERS);
@@ -755,6 +1047,21 @@ export function saveInterCompanyTransfer(transfer: InterCompanyTransfer): void {
     current.unshift(transfer);
   }
   saveStoredInterCompanyTransfers(current);
+
+  // If this transfer is issued against a Transfer Requisition, update the requisition status
+  if (transfer.transferRequisitionNumber) {
+    const requisitions = getStoredTransferRequisitions();
+    const trIndex = requisitions.findIndex(
+      (r) =>
+        r.requisitionNumber === transfer.transferRequisitionNumber ||
+        r.id === transfer.transferRequisitionId
+    );
+    if (trIndex >= 0) {
+      requisitions[trIndex].status = "Fully Issued";
+      requisitions[trIndex].updatedAt = new Date().toISOString();
+      saveStoredTransferRequisitions(requisitions);
+    }
+  }
 }
 
 export function getStoredInterCompanyReceives(): InterCompanyReceive[] {

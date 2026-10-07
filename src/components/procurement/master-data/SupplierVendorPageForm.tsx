@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, Save, Users, Building, CreditCard, FileText, Edit } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ArrowLeft, Save, Users, Building, CreditCard, FileText, Edit, Check, ChevronDown, X, Search, Globe } from "lucide-react";
 import { SupplierVendor, VendorCategory, Origin } from "@/lib/procurement-master-data";
 
 interface SupplierVendorPageFormProps {
@@ -33,6 +33,7 @@ export function SupplierVendorPageForm({
       bin: "",
       registrationNo: "",
       country: origins[0]?.originName || "Bangladesh",
+      localForeignStatus: (origins[0]?.originName || "Bangladesh").toLowerCase() === "bangladesh" ? "Local" : "Foreign",
       address: "",
       status: "Active",
       createDate: new Date().toISOString().split("T")[0],
@@ -50,6 +51,9 @@ export function SupplierVendorPageForm({
       termsConditionsDescription: "",
     };
   });
+
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [categorySearchQuery, setCategorySearchQuery] = useState("");
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const isView = mode === "view";
@@ -79,6 +83,7 @@ export function SupplierVendorPageForm({
       bin: formData.bin || "",
       registrationNo: formData.registrationNo || "",
       country: formData.country || "Bangladesh",
+      localForeignStatus: (formData.country || "Bangladesh").toLowerCase() === "bangladesh" ? "Local" : "Foreign",
       address: formData.address || "",
       status: formData.status || "Active",
       createDate: formData.createDate || new Date().toISOString().split("T")[0],
@@ -212,20 +217,112 @@ export function SupplierVendorPageForm({
               )}
             </div>
 
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">Vendor Category</label>
-              <select
-                disabled={isView}
-                value={formData.vendorCategory || ""}
-                onChange={(e) => setFormData({ ...formData, vendorCategory: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+            {/* Multi-Selection Vendor Category */}
+            <div className="relative">
+              <label className="block text-xs font-bold mb-1 text-foreground">
+                Vendor Category (Multiple Selection)
+              </label>
+              
+              {/* Selected Categories Tags */}
+              <div
+                onClick={() => !isView && setCategoryDropdownOpen((prev) => !prev)}
+                className={`min-h-9 p-1.5 rounded-lg border border-border/80 bg-background text-xs font-medium focus-within:border-amber-500 flex flex-wrap items-center gap-1.5 cursor-pointer ${
+                  isView ? "bg-muted/50 cursor-default" : ""
+                }`}
               >
-                {vendorCategories.map((vc) => (
-                  <option key={vc.id} value={vc.categoryName}>
-                    {vc.categoryName}
-                  </option>
-                ))}
-              </select>
+                {(() => {
+                  const selectedList = formData.vendorCategory
+                    ? formData.vendorCategory.split(",").map((s) => s.trim()).filter(Boolean)
+                    : [];
+                  if (selectedList.length === 0) {
+                    return <span className="text-muted-foreground text-xs px-1.5">Select Vendor Categories...</span>;
+                  }
+                  return selectedList.map((catName) => (
+                    <span
+                      key={catName}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-[11px] font-bold"
+                    >
+                      {catName}
+                      {!isView && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const next = selectedList.filter((c) => c !== catName);
+                            setFormData({ ...formData, vendorCategory: next.join(", ") });
+                          }}
+                          className="hover:text-rose-500 transition-colors"
+                        >
+                          <X className="size-3" />
+                        </button>
+                      )}
+                    </span>
+                  ));
+                })()}
+                {!isView && (
+                  <ChevronDown className="size-3.5 text-muted-foreground ml-auto shrink-0 mr-1" />
+                )}
+              </div>
+
+              {/* Multi-Selection Dropdown Menu */}
+              {categoryDropdownOpen && !isView && (
+                <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-card rounded-xl border border-border shadow-xl p-2 space-y-1.5 max-h-56 flex flex-col">
+                  <div className="relative shrink-0">
+                    <Search className="size-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      type="text"
+                      autoFocus
+                      value={categorySearchQuery}
+                      onChange={(e) => setCategorySearchQuery(e.target.value)}
+                      placeholder="Search categories..."
+                      className="w-full pl-8 pr-2.5 h-7.5 rounded-lg border border-border/80 bg-muted/40 text-xs font-medium focus:border-amber-500 outline-none"
+                    />
+                  </div>
+                  <div className="overflow-y-auto flex-1 divide-y divide-border/40 pr-0.5">
+                    {vendorCategories
+                      .filter((vc) =>
+                        !categorySearchQuery.trim() ||
+                        vc.categoryName.toLowerCase().includes(categorySearchQuery.toLowerCase())
+                      )
+                      .map((vc) => {
+                        const selectedList = formData.vendorCategory
+                          ? formData.vendorCategory.split(",").map((s) => s.trim()).filter(Boolean)
+                          : [];
+                        const isSelected = selectedList.includes(vc.categoryName);
+                        return (
+                          <button
+                            type="button"
+                            key={vc.id}
+                            onClick={() => {
+                              let next: string[];
+                              if (isSelected) {
+                                next = selectedList.filter((c) => c !== vc.categoryName);
+                              } else {
+                                next = [...selectedList, vc.categoryName];
+                              }
+                              setFormData({ ...formData, vendorCategory: next.join(", ") });
+                            }}
+                            className={`w-full py-1.5 px-2 rounded-md text-xs font-medium text-left flex items-center justify-between hover:bg-amber-500/10 hover:text-amber-600 transition cursor-pointer ${
+                              isSelected ? "bg-amber-500/15 text-amber-600 font-bold" : "text-foreground"
+                            }`}
+                          >
+                            <span>{vc.categoryName}</span>
+                            {isSelected && <Check className="size-3.5 text-amber-500 shrink-0" />}
+                          </button>
+                        );
+                      })}
+                  </div>
+                  <div className="pt-1 border-t border-border/40 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setCategoryDropdownOpen(false)}
+                      className="px-2.5 py-1 text-[11px] font-bold rounded bg-amber-500 text-white hover:bg-amber-600 cursor-pointer"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>
@@ -244,12 +341,17 @@ export function SupplierVendorPageForm({
               </select>
             </div>
 
+            {/* Country with Auto-derived Local / Foreign Determination */}
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">Country</label>
               <select
                 disabled={isView}
                 value={formData.country || "Bangladesh"}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                onChange={(e) => {
+                  const country = e.target.value;
+                  const localForeignStatus = country.trim().toLowerCase() === "bangladesh" ? "Local" : "Foreign";
+                  setFormData({ ...formData, country, localForeignStatus });
+                }}
                 className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
               >
                 {origins.map((o) => (
@@ -258,6 +360,28 @@ export function SupplierVendorPageForm({
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Auto-derived Local / Foreign Status Indicator */}
+            <div>
+              <label className="block text-xs font-bold mb-1 text-foreground">
+                Origin Status (Local / Foreign Flag)
+              </label>
+              <div className="w-full h-9 px-3 rounded-lg border border-border/80 bg-muted/40 flex items-center justify-between text-xs">
+                <span
+                  className={`font-black uppercase tracking-wider text-[11px] px-2 py-0.5 rounded-full border ${
+                    (formData.localForeignStatus || (formData.country?.toLowerCase() === "bangladesh" ? "Local" : "Foreign")) === "Local"
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                      : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30"
+                  }`}
+                >
+                  {formData.localForeignStatus || (formData.country?.toLowerCase() === "bangladesh" ? "Local" : "Foreign")}
+                </span>
+                <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                  <Globe className="size-3 text-muted-foreground" />
+                  Auto-determined
+                </span>
+              </div>
             </div>
 
             <div>

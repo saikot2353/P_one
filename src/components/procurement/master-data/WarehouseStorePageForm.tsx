@@ -44,7 +44,7 @@ export function WarehouseStorePageForm({
       storeManager: "",
       contactNumber: "",
       status: "Active",
-      stockValuationMethod: "FIFO",
+      stockValuationMethod: "Weighted Average",
       serialNumberTrackingRequired: false,
       batchTrackingRequired: true,
       transactionModificationDays: 7,
@@ -148,7 +148,7 @@ export function WarehouseStorePageForm({
       storeManager: formData.storeManager || "",
       contactNumber: formData.contactNumber || "",
       status: formData.status || "Active",
-      stockValuationMethod: formData.stockValuationMethod || "FIFO",
+      stockValuationMethod: formData.stockValuationMethod || "Weighted Average",
       serialNumberTrackingRequired: !!formData.serialNumberTrackingRequired,
       batchTrackingRequired: !!formData.batchTrackingRequired,
       transactionModificationDays: Number(formData.transactionModificationDays) || 7,
@@ -580,7 +580,7 @@ export function WarehouseStorePageForm({
               </label>
               <select
                 disabled={isView}
-                value={formData.stockValuationMethod || "FIFO"}
+                value={formData.stockValuationMethod || "Weighted Average"}
                 onChange={(e) =>
                   setFormData({
                     ...formData,

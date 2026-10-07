@@ -375,6 +375,7 @@ function ProcurementMasterDataPage() {
   const [expandedSubGroupIds, setExpandedSubGroupIds] = useState<Record<string, boolean>>({});
   const [subGroupSearchQuery, setSubGroupSearchQuery] = useState("");
   const [selectedSubGroupTreeId, setSelectedSubGroupTreeId] = useState<string | null>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [catalogItemSearchQuery, setCatalogItemSearchQuery] = useState("");
   const [isExcelUploadOpen, setIsExcelUploadOpen] = useState(false);
 
@@ -848,6 +849,20 @@ function ProcurementMasterDataPage() {
       subGroupCode: `SUB-${Math.floor(100 + Math.random() * 900)}`,
       subGroupName: "",
       itemGroupId: itemGroups[0]?.id || "",
+      parentSubGroupId: null,
+      description: "",
+      status: "Active",
+    });
+    setSubGroupFormErrors({});
+    setIsSubGroupModalOpen(true);
+  };
+
+  const handleOpenAddSubGroupUnderGroup = (grp: ItemGroup) => {
+    setSubGroupModalMode("create");
+    setSubGroupFormValues({
+      subGroupCode: `SUB-${Math.floor(100 + Math.random() * 900)}`,
+      subGroupName: "",
+      itemGroupId: grp.id,
       parentSubGroupId: null,
       description: "",
       status: "Active",
@@ -1417,7 +1432,7 @@ function ProcurementMasterDataPage() {
                   </div>
 
                   {/* Selected Node Path Breadcrumbs */}
-                  {selectedSubGroupTreeId && (
+                  {selectedSubGroupTreeId ? (
                     <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2 truncate">
                         <span className="font-bold text-amber-700 dark:text-amber-400">
@@ -1435,30 +1450,29 @@ function ProcurementMasterDataPage() {
                         Clear Selection
                       </button>
                     </div>
-                  )}
+                  ) : selectedGroupId ? (
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2 truncate">
+                        <span className="font-bold text-amber-700 dark:text-amber-400">
+                          Selected Root Item Group:
+                        </span>
+                        <span className="font-mono text-[11px] font-bold text-foreground truncate">
+                          {itemGroups.find((g) => g.id === selectedGroupId)?.groupName}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedGroupId(null)}
+                        className="text-muted-foreground hover:text-foreground text-[10.5px] font-semibold cursor-pointer shrink-0"
+                      >
+                        Clear Selection
+                      </button>
+                    </div>
+                  ) : null}
 
-                  {/* Dynamic Recursive Tree */}
-                  <div className="rounded-xl border border-border/70 p-3 bg-card space-y-1 overflow-x-auto min-h-[300px]">
+                  {/* Dynamic Recursive Tree with Main/Root Parent Item Group */}
+                  <div className="rounded-xl border border-border/70 p-3 bg-card space-y-2 overflow-x-auto min-h-[300px]">
                     {(() => {
-                      const treeNodes = buildSubGroupTreeNodes(itemSubGroups);
-
-                      if (treeNodes.length === 0) {
-                        return (
-                          <div className="py-12 text-center text-muted-foreground">
-                            <FolderTree className="size-8 text-amber-500 mx-auto opacity-60 mb-2" />
-                            <div className="font-bold text-foreground">No Sub Groups Found</div>
-                            <button
-                              type="button"
-                              onClick={handleOpenAddRootSubGroup}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-bold transition shadow-xs mt-3 cursor-pointer"
-                            >
-                              <Plus className="size-3.5" />
-                              Create Sub Group
-                            </button>
-                          </div>
-                        );
-                      }
-
                       const renderSubGroupTree = (nodes: SubGroupTreeNode[]) => {
                         return (
                           <div className="space-y-1">
@@ -1478,7 +1492,7 @@ function ProcurementMasterDataPage() {
                               return (
                                 <div key={node.id} className="space-y-1">
                                   <div
-                                    style={{ paddingLeft: `${node.depth * 24 + 8}px` }}
+                                    style={{ paddingLeft: `${node.depth * 20 + 8}px` }}
                                     className={`flex items-center justify-between p-2 rounded-lg transition-all text-xs border ${
                                       isSelected
                                         ? "bg-amber-500/15 border-amber-500/60 shadow-2xs"
@@ -1513,59 +1527,47 @@ function ProcurementMasterDataPage() {
 
                                       <FolderTree
                                         className={`size-4 shrink-0 ${
-                                          node.depth === 0
-                                            ? "text-amber-500"
-                                            : node.depth === 1
-                                              ? "text-blue-500"
-                                              : node.depth === 2
-                                                ? "text-emerald-500"
-                                                : "text-purple-500"
+                                          node.depth === 1
+                                            ? "text-blue-500"
+                                            : node.depth === 2
+                                              ? "text-emerald-500"
+                                              : "text-purple-500"
                                         }`}
                                       />
 
                                       <button
                                         type="button"
-                                        onClick={() => setSelectedSubGroupTreeId(node.id)}
+                                        onClick={() => {
+                                          setSelectedSubGroupTreeId(node.id);
+                                          setSelectedGroupId(node.itemGroupId);
+                                        }}
                                         className="font-bold text-foreground hover:text-amber-500 text-left truncate flex items-center gap-2 cursor-pointer"
                                       >
-                                        <span className="truncate">{node.subGroupName}</span>
-                                        <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-muted text-muted-foreground font-semibold shrink-0">
+                                        <span>{node.subGroupName}</span>
+                                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted/60 text-muted-foreground">
                                           {node.subGroupCode}
                                         </span>
-                                        <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20 shrink-0">
-                                          Level {node.depth + 1}
-                                        </span>
-                                        {isQueryMatch && (
-                                          <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-extrabold shrink-0">
-                                            Match
-                                          </span>
-                                        )}
                                       </button>
                                     </div>
 
-                                    <div className="flex items-center gap-2 shrink-0">
-                                      {/* CREATE ITEM BUTTON (Under this Sub Group) */}
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-1 shrink-0 ml-2">
                                       <button
                                         type="button"
-                                        onClick={() => handleOpenCreateItemForSubGroup(node)}
-                                        title={`Create new Item under ${node.subGroupName}`}
-                                        className="flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold bg-amber-500 text-white hover:bg-amber-600 transition shadow-2xs cursor-pointer"
-                                      >
-                                        <Package className="size-3.5" />
-                                        <span>Create Item</span>
-                                      </button>
-
-                                      {/* Add Child Sub Group */}
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          handleOpenAddSubGroupChild(node.id, node.itemGroupId)
-                                        }
-                                        title="Add child sub-group under this node"
-                                        className="flex items-center gap-1 px-2 py-1 rounded text-[11px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500 hover:text-white transition cursor-pointer"
+                                        onClick={() => handleOpenAddChildSubGroup(node)}
+                                        title="Add Child Sub Group"
+                                        className="size-6 rounded flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
                                       >
                                         <Plus className="size-3" />
-                                        <span>Add Child</span>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleOpenCreateItem(node)}
+                                        title={`Create item under ${node.subGroupName}`}
+                                        className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white transition cursor-pointer"
+                                      >
+                                        Create Item
                                       </button>
 
                                       <button
@@ -1604,9 +1606,103 @@ function ProcurementMasterDataPage() {
                         );
                       };
 
-                      return renderSubGroupTree(treeNodes);
+                      return (
+                        <div className="space-y-2">
+                          {itemGroups.map((grp) => {
+                            const rootSubNodes = buildSubGroupTreeNodes(itemSubGroups, grp.id, null, 1);
+                            const isGrpExpanded = expandedSubGroupIds[grp.id] !== false;
+                            const isGrpSelected = selectedGroupId === grp.id && !selectedSubGroupTreeId;
+                            const grpItemCount = items.filter((it) => {
+                              const sg = itemSubGroups.find((s) => s.id === it.subGroupId);
+                              return sg?.itemGroupId === grp.id;
+                            }).length;
+
+                            return (
+                              <div key={grp.id} className="space-y-1">
+                                {/* Root Parent Item Group Node */}
+                                <div
+                                  className={`flex items-center justify-between p-2.5 rounded-xl transition-all text-xs border ${
+                                    isGrpSelected
+                                      ? "bg-amber-500/20 border-amber-500 shadow-2xs ring-1 ring-amber-500/40"
+                                      : "bg-muted/40 hover:bg-muted/70 border-border/80"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setExpandedSubGroupIds((prev) => ({
+                                          ...prev,
+                                          [grp.id]: !isGrpExpanded,
+                                        }))
+                                      }
+                                      className="size-5 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
+                                    >
+                                      {isGrpExpanded ? (
+                                        <ChevronDown className="size-4 text-amber-500" />
+                                      ) : (
+                                        <ChevronRight className="size-4" />
+                                      )}
+                                    </button>
+
+                                    <div className="p-1 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0">
+                                      <Layers className="size-4" />
+                                    </div>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedGroupId(grp.id);
+                                        setSelectedSubGroupTreeId(null);
+                                      }}
+                                      className="font-extrabold text-foreground hover:text-amber-500 text-left truncate flex items-center gap-2 cursor-pointer"
+                                    >
+                                      <span className="font-bold">{grp.groupName}</span>
+                                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-background border border-border text-muted-foreground">
+                                        {grp.groupCode}
+                                      </span>
+                                      {grp.serviceFlag && (
+                                        <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
+                                          SERVICE GROUP
+                                        </span>
+                                      )}
+                                    </button>
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                                    <span className="text-[10px] font-semibold text-muted-foreground px-2 py-0.5 rounded bg-background border border-border/60">
+                                      {grpItemCount} items
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenAddSubGroupUnderGroup(grp)}
+                                      title={`Add sub group under ${grp.groupName}`}
+                                      className="size-6 rounded flex items-center justify-center bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white transition cursor-pointer"
+                                    >
+                                      <Plus className="size-3" />
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Child Sub Groups under this Item Group */}
+                                {isGrpExpanded && rootSubNodes.length > 0 && (
+                                  <div className="pl-4 border-l-2 border-amber-500/30 ml-3.5 my-1 space-y-1">
+                                    {renderSubGroupTree(rootSubNodes)}
+                                  </div>
+                                )}
+                                {isGrpExpanded && rootSubNodes.length === 0 && (
+                                  <div className="pl-9 py-1 text-[11px] text-muted-foreground italic">
+                                    No sub groups configured under this group yet.
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
                     })()}
                   </div>
+                  
 
                   {/* ITEMS LIST UNDER SELECTED SUB GROUP (Catalog Explorer) */}
                   <div className="pt-4 border-t border-border/70 space-y-3">
@@ -1617,7 +1713,9 @@ function ProcurementMasterDataPage() {
                           <span>
                             {selectedSubGroupTreeId
                               ? `Items under: ${itemSubGroups.find((s) => s.id === selectedSubGroupTreeId)?.subGroupName}`
-                              : "All Catalog Items"}
+                              : selectedGroupId
+                                ? `Items under Group: ${itemGroups.find((g) => g.id === selectedGroupId)?.groupName}`
+                                : "All Catalog Items"}
                           </span>
                         </h3>
                         <p className="text-[11px] text-muted-foreground">
@@ -1667,8 +1765,11 @@ function ProcurementMasterDataPage() {
                         <tbody className="divide-y divide-border/60">
                           {(() => {
                             const subGroupItems = items.filter((it) => {
+                              const matchesGroup = selectedGroupId
+                                ? itemSubGroups.some((sg) => sg.id === it.subGroupId && sg.itemGroupId === selectedGroupId)
+                                : true;
                               const matchesSub = selectedSubGroupTreeId ? it.subGroupId === selectedSubGroupTreeId : true;
-                              if (!matchesSub) return false;
+                              if (!matchesGroup || !matchesSub) return false;
                               if (!catalogItemSearchQuery.trim()) return true;
                               const q = catalogItemSearchQuery.toLowerCase();
                               return (
@@ -1697,7 +1798,19 @@ function ProcurementMasterDataPage() {
                                   {item.itemCode}
                                 </td>
                                 <td className="py-2.5 px-3 font-bold text-foreground">
-                                  {item.itemName}
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span>{item.itemName}</span>
+                                    {item.serviceFlag && (
+                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
+                                        SERVICE
+                                      </span>
+                                    )}
+                                    {item.valuationMethod && (
+                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                        {item.valuationMethod}
+                                      </span>
+                                    )}
+                                  </div>
                                 </td>
                                 <td className="py-2.5 px-3">{item.itemCategory}</td>
                                 <td className="py-2.5 px-3">{item.brand || "—"}</td>
@@ -1827,6 +1940,7 @@ function ProcurementMasterDataPage() {
                             <th className="py-3 px-3.5">Contact Person</th>
                             <th className="py-3 px-3.5">Mobile</th>
                             <th className="py-3 px-3.5">Country</th>
+                            <th className="py-3 px-3.5">Origin Type</th>
                             <th className="py-3 px-3.5">Status</th>
                           </>
                         )}
@@ -1908,6 +2022,8 @@ function ProcurementMasterDataPage() {
                             <th className="py-3 px-3.5">Currency Code</th>
                             <th className="py-3 px-3.5">Currency Name</th>
                             <th className="py-3 px-3.5">Symbol</th>
+                            <th className="py-3 px-3.5">Cur. Sub Unit</th>
+                            <th className="py-3 px-3.5">Amount Format</th>
                             <th className="py-3 px-3.5">Exchange Rate</th>
                             <th className="py-3 px-3.5">Rate Date</th>
                             <th className="py-3 px-3.5">Status</th>
@@ -2080,6 +2196,17 @@ function ProcurementMasterDataPage() {
                                 <td className="py-2.5 px-3.5">{item.contactPersonName || "—"}</td>
                                 <td className="py-2.5 px-3.5 font-mono">{item.mobileNumber || "—"}</td>
                                 <td className="py-2.5 px-3.5">{item.country || "Bangladesh"}</td>
+                                <td className="py-2.5 px-3.5">
+                                  <span
+                                    className={`text-[9.5px] font-extrabold px-2 py-0.5 rounded-full border ${
+                                      (item.localForeignStatus || (item.country?.toLowerCase() === "bangladesh" ? "Local" : "Foreign")) === "Local"
+                                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                                        : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30"
+                                    }`}
+                                  >
+                                    {item.localForeignStatus || (item.country?.toLowerCase() === "bangladesh" ? "Local" : "Foreign")}
+                                  </span>
+                                </td>
                                 <td className="py-2.5 px-3.5">
                                   <span
                                     className={`text-[9.5px] font-extrabold px-2 py-0.5 rounded-full border ${
@@ -2282,6 +2409,12 @@ function ProcurementMasterDataPage() {
                                 </td>
                                 <td className="py-2.5 px-3.5 font-bold text-amber-600 dark:text-amber-400 text-sm">
                                   {item.symbol || "$"}
+                                </td>
+                                <td className="py-2.5 px-3.5 text-xs text-muted-foreground font-medium">
+                                  {item.subUnit || "—"}
+                                </td>
+                                <td className="py-2.5 px-3.5 font-mono text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                                  {item.amountFormat || "1,00,000.00"}
                                 </td>
                                 <td className="py-2.5 px-3.5 font-mono font-bold">
                                   {item.exchangeRate ?? 1.0}

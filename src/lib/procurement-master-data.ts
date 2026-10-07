@@ -130,6 +130,7 @@ export interface SupplierVendor {
   bin: string;
   registrationNo: string;
   country: string;
+  localForeignStatus?: "Local" | "Foreign";
   status: "Active" | "Inactive";
   createDate: string;
   remarks?: string;
@@ -227,6 +228,7 @@ export interface ItemGroup {
   description: string;
   status: "Active" | "Inactive";
   parentGroupId?: string;
+  serviceFlag?: boolean;
 }
 
 // -------------------------------------------------------------
@@ -339,6 +341,8 @@ export interface ItemProductMaster {
   model?: string;
   partNumber?: string;
   origin?: string;
+  serviceFlag?: boolean;
+  valuationMethod?: "FIFO" | "LIFO" | "Weighted Average";
   status: "Active" | "Inactive";
   createDate?: string;
   // Legacy / tab fallbacks
@@ -451,6 +455,8 @@ export interface Currency {
   exchangeRate: number;
   rateDate: string;
   baseCurrency: boolean;
+  subUnit?: string;
+  amountFormat?: string;
   status: "Active" | "Inactive";
 }
 
@@ -654,7 +660,7 @@ export const DEFAULT_WAREHOUSES: WarehouseStore[] = [
     status: "Active",
     batchTrackingRequired: true,
     serialNumberTrackingRequired: false,
-    stockValuationMethod: "FIFO",
+    stockValuationMethod: "Weighted Average",
     permissions: [
       {
         employeeId: "2023043910",
@@ -702,7 +708,7 @@ export const DEFAULT_WAREHOUSES: WarehouseStore[] = [
     status: "Active",
     batchTrackingRequired: true,
     serialNumberTrackingRequired: true,
-    stockValuationMethod: "FIFO",
+    stockValuationMethod: "Weighted Average",
     permissions: [
       {
         employeeId: "2023043910",
@@ -723,7 +729,7 @@ export const DEFAULT_WAREHOUSES: WarehouseStore[] = [
     status: "Active",
     batchTrackingRequired: true,
     serialNumberTrackingRequired: false,
-    stockValuationMethod: "Standard Cost",
+    stockValuationMethod: "Weighted Average",
     permissions: [
       {
         employeeId: "2023046001",
@@ -1146,6 +1152,14 @@ export const DEFAULT_ITEM_GROUPS: ItemGroup[] = [
     description: "Manufactured knitwear, retail apparel, and export garment shipments",
     status: "Active",
   },
+  {
+    id: "grp-service",
+    groupCode: "GRP-SRV",
+    groupName: "Services & Logistical Charges",
+    description: "Freight, transportation, loading/unloading, equipment maintenance and repair services",
+    status: "Active",
+    serviceFlag: true,
+  },
 ];
 
 export const DEFAULT_ITEM_SUB_GROUPS: ItemSubGroup[] = [
@@ -1296,6 +1310,33 @@ export const DEFAULT_ITEM_SUB_GROUPS: ItemSubGroup[] = [
     itemGroupId: "grp-raw",
     parentSubGroupId: "sub-cotton",
     description: "Single jersey knitting yarn Ne 30/1 combed",
+    status: "Active",
+  },
+  {
+    id: "sub-freight",
+    subGroupCode: "SUB-FRT",
+    subGroupName: "Freight & Transport Charges",
+    itemGroupId: "grp-service",
+    parentSubGroupId: null,
+    description: "Inward & outward shipping, carriage and transport",
+    status: "Active",
+  },
+  {
+    id: "sub-loading",
+    subGroupCode: "SUB-LOAD",
+    subGroupName: "Loading & Handling Services",
+    itemGroupId: "grp-service",
+    parentSubGroupId: null,
+    description: "Loading, unloading, and warehouse porter handling services",
+    status: "Active",
+  },
+  {
+    id: "sub-srv-maint",
+    subGroupCode: "SUB-MAINT",
+    subGroupName: "Maintenance & Repair Services",
+    itemGroupId: "grp-service",
+    parentSubGroupId: null,
+    description: "Equipment overhaul, repair and contract service jobs",
     status: "Active",
   },
 ];
@@ -1734,6 +1775,126 @@ export const DEFAULT_ITEMS: ItemProductMaster[] = [
     standardPurchasePrice: 480,
     currency: "BDT",
     specifications: [{ specCode: "SPEC-GSM", specName: "Fabric Weight / GSM", value: "80" }],
+  },
+  {
+    id: "itm-srv-frt",
+    itemCode: "SRV-FRT-01",
+    itemName: "Freight & Carriage Inward (Road Transport)",
+    itemGroupId: "grp-service",
+    itemGroupName: "Services & Logistical Charges",
+    subGroupId: "sub-freight",
+    subGroupName: "Freight & Transport Charges",
+    subGroupBreadcrumb: "Services & Logistical Charges > Freight & Transport Charges",
+    itemCategoryId: "cat-1",
+    itemCategory: "General Service",
+    itemType: "Service",
+    serviceFlag: true,
+    specification: "Standard overland freight transportation and delivery charges per vehicle trip",
+    origin: "Bangladesh",
+    status: "Active",
+    createDate: "2026-09-01",
+    purchaseUOM: "Trip",
+    stockUOM: "Trip",
+    conversionFactor: 1,
+    minimumStock: 0,
+    maximumStock: 0,
+    reorderLevel: 0,
+    safetyStock: 0,
+    batchTrackingRequired: false,
+    serialNumberTrackingRequired: false,
+    standardPurchasePrice: 4500,
+    currency: "BDT",
+    valuationMethod: "FIFO",
+  },
+  {
+    id: "itm-srv-load",
+    itemCode: "SRV-LOAD-02",
+    itemName: "Loading & Unloading / Labour Handling",
+    itemGroupId: "grp-service",
+    itemGroupName: "Services & Logistical Charges",
+    subGroupId: "sub-loading",
+    subGroupName: "Loading & Handling Services",
+    subGroupBreadcrumb: "Services & Logistical Charges > Loading & Handling Services",
+    itemCategoryId: "cat-1",
+    itemCategory: "General Service",
+    itemType: "Service",
+    serviceFlag: true,
+    specification: "Manual cargo loading, unloading and warehouse handling operations",
+    origin: "Bangladesh",
+    status: "Active",
+    createDate: "2026-09-01",
+    purchaseUOM: "Job",
+    stockUOM: "Job",
+    conversionFactor: 1,
+    minimumStock: 0,
+    maximumStock: 0,
+    reorderLevel: 0,
+    safetyStock: 0,
+    batchTrackingRequired: false,
+    serialNumberTrackingRequired: false,
+    standardPurchasePrice: 2500,
+    currency: "BDT",
+    valuationMethod: "FIFO",
+  },
+  {
+    id: "itm-srv-maint",
+    itemCode: "SRV-MAINT-03",
+    itemName: "Machinery Preventive Maintenance & Overhaul",
+    itemGroupId: "grp-service",
+    itemGroupName: "Services & Logistical Charges",
+    subGroupId: "sub-srv-maint",
+    subGroupName: "Maintenance & Repair Services",
+    subGroupBreadcrumb: "Services & Logistical Charges > Maintenance & Repair Services",
+    itemCategoryId: "cat-1",
+    itemCategory: "Technical Service",
+    itemType: "Service",
+    serviceFlag: true,
+    specification: "Comprehensive mechanical diagnostic, calibration, servicing and motor overhaul",
+    origin: "Bangladesh",
+    status: "Active",
+    createDate: "2026-09-01",
+    purchaseUOM: "Job",
+    stockUOM: "Job",
+    conversionFactor: 1,
+    minimumStock: 0,
+    maximumStock: 0,
+    reorderLevel: 0,
+    safetyStock: 0,
+    batchTrackingRequired: false,
+    serialNumberTrackingRequired: false,
+    standardPurchasePrice: 35000,
+    currency: "BDT",
+    valuationMethod: "LIFO",
+  },
+  {
+    id: "itm-srv-qa",
+    itemCode: "SRV-QA-04",
+    itemName: "Laboratory QA & Textile Fabric Testing Service",
+    itemGroupId: "grp-service",
+    itemGroupName: "Services & Logistical Charges",
+    subGroupId: "sub-srv-maint",
+    subGroupName: "Maintenance & Repair Services",
+    subGroupBreadcrumb: "Services & Logistical Charges > Maintenance & Repair Services",
+    itemCategoryId: "cat-1",
+    itemCategory: "Technical Service",
+    itemType: "Service",
+    serviceFlag: true,
+    specification: "GSM, shrinkage, colorfastness, and tensile strength laboratory testing batch",
+    origin: "Bangladesh",
+    status: "Active",
+    createDate: "2026-09-01",
+    purchaseUOM: "Batch",
+    stockUOM: "Batch",
+    conversionFactor: 1,
+    minimumStock: 0,
+    maximumStock: 0,
+    reorderLevel: 0,
+    safetyStock: 0,
+    batchTrackingRequired: false,
+    serialNumberTrackingRequired: false,
+    standardPurchasePrice: 8500,
+    currency: "BDT",
+    valuationMethod: "FIFO",
   },
 ];
 

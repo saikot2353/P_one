@@ -314,6 +314,18 @@ const searchableMenus: SearchMenuLink[] = [
 
   // Reports
   {
+    label: "Month-wise Purchase Report",
+    parent: "Reports",
+    to: "/procurement-reports-monthly-purchase",
+    description: "Track monthly purchases, vendor volumes, and tax breakdowns",
+  },
+  {
+    label: "Month-wise Supplier Bill Report",
+    parent: "Reports",
+    to: "/procurement-reports-monthly-supplier-bill",
+    description: "Track verified supplier bills, AIT withholding tax, and VAT",
+  },
+  {
     label: "Purchase Price",
     parent: "Reports",
     to: "/procurement-reports-purchase-price",

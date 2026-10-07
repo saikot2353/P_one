@@ -48,6 +48,7 @@ export function ItemGroupPageForm({
       groupCode: formData.groupCode || `GRP-${Date.now()}`,
       groupName: formData.groupName || "",
       description: formData.description || "",
+      serviceFlag: !!formData.serviceFlag,
       status: (formData.status as any) || "Active",
     };
 
@@ -179,6 +180,24 @@ export function ItemGroupPageForm({
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
+            </div>
+
+            <div className="sm:col-span-2 p-3 bg-muted/30 border border-border/70 rounded-xl flex items-center justify-between">
+              <div>
+                <label className="text-xs font-bold text-foreground block">Service Flag (Service Group)</label>
+                <p className="text-[11px] text-muted-foreground">
+                  Mark this group for Service / Scope of Work items. All items created under this group will automatically inherit the Service Flag.
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  disabled={isView}
+                  checked={!!formData.serviceFlag}
+                  onChange={(e) => setFormData({ ...formData, serviceFlag: e.target.checked })}
+                  className="size-4.5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
             </div>
 
             <div className="sm:col-span-2">

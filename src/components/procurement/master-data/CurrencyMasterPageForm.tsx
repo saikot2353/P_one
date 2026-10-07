@@ -27,6 +27,8 @@ export function CurrencyMasterPageForm({
       exchangeRate: 1.0,
       rateDate: new Date().toISOString().split("T")[0],
       baseCurrency: false,
+      subUnit: "",
+      amountFormat: "1,00,000.00",
       status: "Active",
     };
   });
@@ -57,6 +59,8 @@ export function CurrencyMasterPageForm({
       exchangeRate: Number(formData.exchangeRate) || 1.0,
       rateDate: formData.rateDate || new Date().toISOString().split("T")[0],
       baseCurrency: !!formData.baseCurrency,
+      subUnit: formData.subUnit || "",
+      amountFormat: formData.amountFormat || "1,00,000.00",
       status: (formData.status as any) || "Active",
     };
 
@@ -215,6 +219,38 @@ export function CurrencyMasterPageForm({
                 onChange={(e) => setFormData({ ...formData, rateDate: e.target.value })}
                 className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
               />
+            </div>
+
+            {/* Cur. Sub Unit */}
+            <div>
+              <label className="block text-xs font-bold mb-1 text-foreground">Cur. Sub Unit</label>
+              <input
+                type="text"
+                disabled={isView}
+                value={formData.subUnit || ""}
+                onChange={(e) => setFormData({ ...formData, subUnit: e.target.value })}
+                placeholder="e.g. Paisa, Cent, Pence, Sen"
+                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+              />
+            </div>
+
+            {/* Amount Format Dropdown */}
+            <div>
+              <label className="block text-xs font-bold mb-1 text-foreground">Amount Format</label>
+              <select
+                disabled={isView}
+                value={formData.amountFormat || "1,00,000.00"}
+                onChange={(e) => setFormData({ ...formData, amountFormat: e.target.value })}
+                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+              >
+                <option value="1,00,000">1,00,000 — Bangladesh Format</option>
+                <option value="100,000">100,000 — International Format</option>
+                <option value="100000">100000 — No Comma</option>
+                <option value="1,00,000.00">1,00,000.00 — Bangladesh Format with 2 Decimals</option>
+                <option value="100,000.00">100,000.00 — International Format with 2 Decimals</option>
+                <option value="1,00,000.000">1,00,000.000 — Bangladesh Format with 3 Decimals</option>
+                <option value="100,000.000">100,000.000 — International Format with 3 Decimals</option>
+              </select>
             </div>
 
             <div>
