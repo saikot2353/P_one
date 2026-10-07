@@ -22,8 +22,13 @@ import {
   SlidersHorizontal,
   GripVertical,
   Settings,
+  Calculator,
+  DollarSign,
+  Coins,
 } from "lucide-react";
 import { toast } from "sonner";
+import { OtFormulaTab } from "@/components/ot/OtFormulaTab";
+import { SalaryStructureTab } from "@/components/employment/SalaryStructureTab";
 
 export const Route = createFileRoute("/configure-employment")({
   head: () => ({
@@ -32,7 +37,7 @@ export const Route = createFileRoute("/configure-employment")({
       {
         name: "description",
         content:
-          "Configure designation groups, job titles, employee types, grades, countries, religions, and places in BD.",
+          "Configure designation groups, job titles, employee types, grades, countries, religions, places in BD, salary structure setup, and OT formula configurations.",
       },
     ],
   }),
@@ -47,7 +52,9 @@ type TabType =
   | "nature"
   | "country"
   | "religion"
-  | "place";
+  | "place"
+  | "salaryStructure"
+  | "otFormula";
 
 // ----------------------------------------------------
 // Interfaces
@@ -1755,6 +1762,8 @@ function EmploymentSetupPage() {
   };
 
   const [salaryScales, setSalaryScales] = useState<Record<number, SalaryScale>>({});
+  const [triggerAddOt, setTriggerAddOt] = useState(0);
+  const [triggerAddSalary, setTriggerAddSalary] = useState(0);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -1771,6 +1780,8 @@ function EmploymentSetupPage() {
           "country",
           "religion",
           "place",
+          "salaryStructure",
+          "otFormula",
         ].includes(tabParam)
       ) {
         setActiveTab(tabParam);
@@ -2364,13 +2375,15 @@ function EmploymentSetupPage() {
   // Tab Header Items
   const tabsList: { type: TabType; label: string; icon: any }[] = [
     { type: "designationGroup", label: "Designation Group", icon: Shield },
-    { type: "jobTitle", label: "Job Title", icon: Award },
     { type: "empType", label: "Employee Type", icon: UserCheck },
     { type: "grade", label: "Grade", icon: Briefcase },
     { type: "nature", label: "Job Nature", icon: Briefcase },
+    { type: "jobTitle", label: "Job Title (Designation)", icon: Award },
     { type: "country", label: "Country", icon: Globe },
     { type: "religion", label: "Religion", icon: Heart },
     { type: "place", label: "Place in BD", icon: MapPin },
+    { type: "salaryStructure", label: "Salary Structure Setup", icon: DollarSign },
+    { type: "otFormula", label: "OT Configuration (Formula)", icon: Calculator },
   ];
 
   return (
@@ -2390,7 +2403,7 @@ function EmploymentSetupPage() {
                 <ChevronRight className="size-3.5" />
                 <span>Configure</span>
                 <ChevronRight className="size-3.5" />
-                <span className="text-primary font-bold">Employment Setup</span>
+                <span className="text-primary font-bold">Job & Employee Setup</span>
               </div>
               <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
                 <UserCheck className="size-6 text-primary" />
@@ -2423,7 +2436,15 @@ function EmploymentSetupPage() {
                 </>
               )}
               <button
-                onClick={() => openForm(null)}
+                onClick={() => {
+                  if (activeTab === "otFormula") {
+                    setTriggerAddOt((prev) => prev + 1);
+                  } else if (activeTab === "salaryStructure") {
+                    setTriggerAddSalary((prev) => prev + 1);
+                  } else {
+                    openForm(null);
+                  }
+                }}
                 className="h-10 px-5 rounded-lg bg-primary text-primary-foreground font-black text-xs hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer"
               >
                 <Plus className="size-4.5" /> Add New Record
@@ -2492,9 +2513,22 @@ function EmploymentSetupPage() {
           </div>
 
           {/* Master Table Router */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
-              {activeTab === "designationGroup" && (
+          {activeTab === "otFormula" ? (
+            <OtFormulaTab
+              searchQuery={searchQuery}
+              empTypesList={empTypes}
+              hideToolbar={true}
+              triggerAdd={triggerAddOt}
+            />
+          ) : activeTab === "salaryStructure" ? (
+            <SalaryStructureTab
+              searchQuery={searchQuery}
+              empTypesList={empTypes}
+            />
+          ) : (
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                {activeTab === "designationGroup" && (
                 <table
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "800px" }}
@@ -3216,6 +3250,7 @@ function EmploymentSetupPage() {
               )}
             </div>
           </div>
+          )}
         </div>
 
         {/* Master Modal Router */}

@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "544",
+    "date": "2026-10-07T12:45",
+    "type": "New Feature",
+    "module": "Configure - Job & Employee Setup (OT Configuration Formula)",
+    "link": "/configure-employment?tab=otFormula",
+    "descriptionEn": "Added a new 'OT Configuration (Formula)' tab in Job & Employee Setup with formula-based overtime hourly rate builder, mathematical operator toolbar, variables (BASIC, GROSS, 208, etc.), type-based rules (Regular, Holiday, Festival, Night), and live calculation simulation.",
+    "descriptionBn": "Job & Employee Setup পেজে নতুন 'OT Configuration (Formula)' ট্যাব যুক্ত করা হয়েছে যার মাধ্যমে টাইপ ভিত্তিক ওভারটাইম রেট ফর্মুলা তৈরি, গাণিতিক অপারেটর ও ভ্যারিয়েবল (BASIC, GROSS, 208 ইত্যাদি) দিয়ে কাস্টম সমীকরণ এবং লাইভ সিমুলেশন প্রিভিউ দেখা যাবে।"
+  },
+  {
     "id": "543",
     "date": "2026-10-06T17:54",
     "type": "Bug Fix",
