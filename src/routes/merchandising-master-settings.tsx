@@ -434,8 +434,6 @@ interface YarnCountSpec {
   id: string;
   name: string;
   createdDate: string;
-  rate?: number;
-  rateConstraint?: RateConstraint | string;
   status: "Active" | "Inactive";
   rate?: number;
   rateConstraint?: RateConstraint | string;
