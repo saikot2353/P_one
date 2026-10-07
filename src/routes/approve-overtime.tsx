@@ -223,7 +223,6 @@ function ApproveOvertimePage() {
       empId: "2023045146",
       empIdOff: "OFF-5146",
       name: "Asif Hossain",
-      empIdOffName: "Asif Hossain",
       type: "Worker",
       department: "Admin",
       designation: "Driver",

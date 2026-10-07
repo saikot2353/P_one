@@ -559,7 +559,7 @@ function EmployeeDocVerificationPage() {
                     ) : filteredEmployees.map((emp, idx) => {
                       const total = emp.documents.length;
                       const pending = emp.documents.filter((d) => d.status === "Pending").length;
-                      const rejected = emp.documents.filter((d) => d.status === "Rejected").length;
+                      const flagged = emp.documents.filter((d) => d.status === "Flagged").length;
                       const verified = emp.documents.filter((d) => d.status === "Verified").length;
                       const overallStatus = getOverallStatus(emp);
                       const pct = total > 0 ? Math.round((verified / total) * 100) : 0;
@@ -583,14 +583,14 @@ function EmployeeDocVerificationPage() {
                             <div className="space-y-1.5">
                               <div className="flex justify-between text-[9px] font-bold">
                                 <span className="text-slate-400">{verified}/{total} verified</span>
-                                <span className={rejected > 0 ? "text-rose-500" : pending > 0 ? "text-amber-500" : "text-emerald-600"}>{pct}%</span>
+                                <span className={flagged > 0 ? "text-rose-500" : pending > 0 ? "text-amber-500" : "text-emerald-600"}>{pct}%</span>
                               </div>
                               <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                <div className={`h-full rounded-full transition-all duration-500 ${rejected > 0 ? "bg-rose-400" : pending > 0 ? "bg-amber-400" : "bg-emerald-500"}`} style={{ width: `${pct}%` }} />
+                                <div className={`h-full rounded-full transition-all duration-500 ${flagged > 0 ? "bg-rose-400" : pending > 0 ? "bg-amber-400" : "bg-emerald-500"}`} style={{ width: `${pct}%` }} />
                               </div>
                               <div className="flex items-center gap-2 text-[9px] font-semibold">
                                 {pending > 0 && <span className="text-amber-600 dark:text-amber-400">{pending} pending</span>}
-                                {rejected > 0 && <span className="text-rose-600 dark:text-rose-400">{rejected} rejected</span>}
+                                {flagged > 0 && <span className="text-rose-600 dark:text-rose-400">{flagged} flagged</span>}
                                 {verified > 0 && <span className="text-emerald-600 dark:text-emerald-400">{verified} ok</span>}
                               </div>
                             </div>

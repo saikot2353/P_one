@@ -5,7 +5,6 @@ import { ProcurementTopbar } from "@/components/dashboard/ProcurementTopbar";
 import {
   ShoppingCart,
   DollarSign,
-  ChevronRight,
   Package,
   CheckCircle2,
   Building,
@@ -17,6 +16,16 @@ import {
   TrendingDown,
   ShieldCheck,
   Zap,
+  Filter,
+  RefreshCw,
+  Download,
+  FileText,
+  Truck,
+  Receipt,
+  FileCheck2,
+  ChevronRight,
+  ExternalLink,
+  Search,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -32,489 +41,975 @@ import {
   Pie,
   Cell,
   Legend,
+  ComposedChart,
+  Line,
 } from "recharts";
+import { toast } from "sonner";
+import {
+  DEFAULT_SUPPLIERS,
+  DEFAULT_ITEMS,
+  DEFAULT_WAREHOUSES,
+  DEFAULT_ITEM_CATEGORIES,
+} from "@/lib/procurement-master-data";
+import {
+  getStoredPurchaseOrders,
+  getStoredPoItems,
+  getStoredWoItems,
+  getStoredMaterialReceipts,
+  getStoredSupplierBills,
+  PurchaseOrder,
+} from "@/lib/procurement-order-inventory-data";
+import {
+  DEFAULT_PURCHASE_REQUISITIONS,
+  DEFAULT_COMPARATIVE_STATEMENTS,
+} from "@/lib/procurement-requisition-data";
 
 export const Route = createFileRoute("/procurement-dashboard")({
   head: () => ({
     meta: [
-      { title: "Procurement Command Center — CRIPTON" },
-      { name: "description", content: "Professional purchasing, billing, audits, and comparison sheets." },
+      { title: "Procurement Command Center & Spend Intelligence — CRIPTON" },
+      {
+        name: "description",
+        content:
+          "End-to-end purchasing lifecycle, supplier SLA rating, procurement bottlenecks, and spend analytics.",
+      },
     ],
   }),
   component: ProcurementDashboardPage,
 });
 
-// --- Mock Data ---
-
-const mockPOs = [
-  { id: "1", poNo: "PO-2026-00481", date: "2026-08-23", supplier: "Zhejiang Yarn Spinning Co.", requisitionNo: "REQ-2026-091", totalValue: "$45,200.00", deliveryDate: "2026-09-15", status: "Work Order Approval" },
-  { id: "2", poNo: "PO-2026-00482", date: "2026-08-21", supplier: "Apex Textile Chemical Ltd", requisitionNo: "REQ-2026-093", totalValue: "৳1,520,000.00", deliveryDate: "2026-09-05", status: "Approved" },
-  { id: "3", poNo: "PO-2026-00483", date: "2026-08-24", supplier: "Dacca Accessories & Thread Ind.", requisitionNo: "REQ-2026-095", totalValue: "$8,950.00", deliveryDate: "2026-09-10", status: "Draft" },
-  { id: "4", poNo: "PO-2026-00484", date: "2026-08-22", supplier: "Euro Machinery Corp.", requisitionNo: "REQ-2026-098", totalValue: "€124,500.00", deliveryDate: "2026-10-01", status: "Approved" },
+const PIPELINE_STAGES = [
+  { id: "pr", title: "1. PR Requisitions", icon: FileText, color: "text-blue-600 bg-blue-50 border-blue-200" },
+  { id: "pr_appr", title: "2. PR Approvals", icon: CheckCircle2, color: "text-indigo-600 bg-indigo-50 border-indigo-200" },
+  { id: "po", title: "3. PO Issued", icon: ShoppingCart, color: "text-amber-600 bg-amber-50 border-amber-200" },
+  { id: "po_appr", title: "4. PO Approved", icon: FileCheck2, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+  { id: "dispatch", title: "5. Dispatched", icon: Truck, color: "text-purple-600 bg-purple-50 border-purple-200" },
+  { id: "mrr", title: "6. MRR Received", icon: Package, color: "text-teal-600 bg-teal-50 border-teal-200" },
+  { id: "bill", title: "7. Supplier Bill", icon: Receipt, color: "text-rose-600 bg-rose-50 border-rose-200" },
+  { id: "pay", title: "8. Settlement", icon: DollarSign, color: "text-emerald-700 bg-emerald-100 border-emerald-300" },
 ];
 
-const mockLCs = [
-  { id: "LCB-2026-001", supplier: "Zhejiang Yarn Spinning Co.", pi: "PI-2026-YRN-089", value: "$45,200.00", bank: "Eastern Bank Ltd", date: "2026-08-24", status: "Draft" },
-  { id: "LCB-2026-002", supplier: "Euro Machinery Corp.", pi: "PI-2026-MAC-012", value: "€124,500.00", bank: "HSBC Bangladesh", date: "2026-08-22", status: "Active" },
-];
-
-const purchaseTrends = [
-  { m: "Jan", import: 45000, local: 20000 },
-  { m: "Feb", import: 52000, local: 24000 },
-  { m: "Mar", import: 61000, local: 28000 },
-  { m: "Apr", import: 58000, local: 22000 },
-  { m: "May", import: 72000, local: 31000 },
-  { m: "Jun", import: 80000, local: 35000 },
-  { m: "Jul", import: 68000, local: 29000 },
-  { m: "Aug", import: 85000, local: 38000 },
-];
-
-const categorySpend = [
-  { name: "Yarn", value: 420000, color: "var(--chart-1)" },
-  { name: "Chemicals", value: 280000, color: "var(--chart-2)" },
-  { name: "Machinery", value: 350000, color: "var(--chart-3)" },
-  { name: "Accessories", value: 150000, color: "var(--chart-4)" },
-  { name: "Packaging", value: 95000, color: "var(--chart-5)" },
-];
-
-const supplierPayouts = [
-  { name: "Apex", paid: 152 },
-  { name: "Zhejiang", paid: 242 },
-  { name: "Global Log.", paid: 89 },
-  { name: "Dacca Acc.", paid: 120 },
-  { name: "Euro Mach.", paid: 350 },
-];
-
-function CustomTooltip({ active, payload, label }: any) {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-card/95 backdrop-blur-md border border-border/80 p-3 rounded-xl shadow-xl animate-in fade-in zoom-in duration-200">
-        <p className="font-bold text-xs text-foreground mb-1.5">{label}</p>
-        <div className="space-y-1.5">
-          {payload.map((p: any, i: number) => (
-            <div key={i} className="flex items-center gap-2 text-[11px]">
-              <span
-                className="size-2 rounded-full shadow-xs"
-                style={{ backgroundColor: p.color || p.stroke || p.fill }}
-              />
-              <span className="text-muted-foreground/90 font-semibold">{p.name}:</span>
-              <span className="font-bold text-foreground ml-auto">${p.value.toLocaleString()}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-  return null;
-}
+const CATEGORY_COLORS = ["#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6"];
 
 function ProcurementDashboardPage() {
+  // Global Filters
+  const [dateRange, setDateRange] = useState<string>("This Fiscal Year");
+  const [selectedOrg, setSelectedOrg] = useState<string>("All Organizations");
+  const [selectedDept, setSelectedDept] = useState<string>("All Departments");
+  const [selectedSupplier, setSelectedSupplier] = useState<string>("All Suppliers");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  // Data from Storage
+  const purchaseOrders = useMemo(() => getStoredPurchaseOrders(), []);
+  const poItemsMap = useMemo(() => getStoredPoItems(), []);
+  const mrrs = useMemo(() => getStoredMaterialReceipts(), []);
+  const supplierBills = useMemo(() => getStoredSupplierBills(), []);
+  const prs = useMemo(() => DEFAULT_PURCHASE_REQUISITIONS, []);
+  const suppliers = useMemo(() => DEFAULT_SUPPLIERS, []);
+
+  // Filtered POs
+  const filteredOrders = useMemo(() => {
+    return purchaseOrders.filter((po) => {
+      if (selectedSupplier !== "All Suppliers" && po.supplierName !== selectedSupplier) {
+        return false;
+      }
+      if (selectedDept !== "All Departments" && po.department !== selectedDept) {
+        return false;
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const match =
+          po.orderNumber.toLowerCase().includes(q) ||
+          po.supplierName.toLowerCase().includes(q) ||
+          po.prepareBy.toLowerCase().includes(q);
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [purchaseOrders, selectedSupplier, selectedDept, searchQuery]);
+
+  // Executive KPI Aggregations
+  const kpis = useMemo(() => {
+    let totalProcurementSpend = 0;
+    let pendingPoCount = 0;
+    let approvedPoCount = 0;
+
+    filteredOrders.forEach((po) => {
+      totalProcurementSpend += Number(po.grandTotal || 0);
+      if (po.orderStatus === "Approved") approvedPoCount++;
+      else if (po.orderStatus === "Submitted" || po.orderStatus === "Pending Approval" || po.orderStatus === "Draft") {
+        pendingPoCount++;
+      }
+    });
+
+    const pendingPrCount = prs.filter((p) => p.status === "Submitted" || p.status === "Pending Approval").length;
+    const mrrCount = mrrs.length;
+    const pendingBillCount = supplierBills.filter((b) => b.approvalStatus === "Submitted" || b.approvalStatus === "Pending Approval").length;
+    const totalTransactions = filteredOrders.length + mrrs.length + supplierBills.length;
+
+    return {
+      totalProcurementSpend,
+      pendingPrCount,
+      totalOrdersCount: filteredOrders.length,
+      pendingPoCount,
+      approvedPoCount,
+      mrrCount,
+      pendingBillCount,
+      totalTransactions,
+    };
+  }, [filteredOrders, prs, mrrs, supplierBills]);
+
+  // Pipeline Stage Metrics
+  const pipelineMetrics = useMemo(() => {
+    return [
+      { count: prs.length, value: "৳ 4.8M" },
+      { count: prs.filter((p) => p.status === "Approved").length, value: "৳ 3.9M" },
+      { count: filteredOrders.length, value: `৳ ${(kpis.totalProcurementSpend / 1000000).toFixed(1)}M` },
+      { count: kpis.approvedPoCount, value: "৳ 3.1M" },
+      { count: 3, value: "৳ 890k" },
+      { count: mrrs.length, value: "৳ 2.6M" },
+      { count: supplierBills.length, value: "৳ 2.4M" },
+      { count: 18, value: "৳ 2.1M" },
+    ];
+  }, [prs, filteredOrders, kpis, mrrs, supplierBills]);
+
+  // Monthly Spend Comparison Trend
+  const monthlySpendData = useMemo(() => {
+    return [
+      { month: "May", currentYear: 1850000, previousYear: 1420000, budget: 2000000 },
+      { month: "Jun", currentYear: 2200000, previousYear: 1650000, budget: 2100000 },
+      { month: "Jul", currentYear: 1980000, previousYear: 1580000, budget: 2000000 },
+      { month: "Aug", currentYear: 2450000, previousYear: 1890000, budget: 2300000 },
+      { month: "Sep", currentYear: 2780000, previousYear: 2100000, budget: 2500000 },
+      { month: "Oct", currentYear: 2150000, previousYear: 1950000, budget: 2400000 },
+    ];
+  }, []);
+
+  // Category Spend Distribution
+  const categorySpendData = useMemo(() => {
+    return [
+      { name: "Raw Fibers & Yarn", value: 4500000, percent: 42, color: "#6366f1" },
+      { name: "Dyes & Aux Chemicals", value: 2400000, percent: 22, color: "#0ea5e9" },
+      { name: "Machinery Spare Parts", value: 1650000, percent: 15, color: "#10b981" },
+      { name: "Packaging Materials", value: 1200000, percent: 11, color: "#f59e0b" },
+      { name: "IT & Admin Equipment", value: 850000, percent: 8, color: "#ec4899" },
+      { name: "General Hardware", value: 220000, percent: 2, color: "#8b5cf6" },
+    ];
+  }, []);
+
+  // Top 10 Suppliers with SLA Ranking
+  const top10Suppliers = useMemo(() => {
+    return [
+      {
+        rank: 1,
+        name: "Square Textiles Ltd.",
+        code: "SUP-003",
+        poCount: 14,
+        totalSpend: 3850000,
+        otdRate: 98,
+        qualityScore: 99.2,
+        leadTime: "4 Days",
+        status: "Strategic Partner",
+      },
+      {
+        rank: 2,
+        name: "Global Tech Solutions Ltd.",
+        code: "SUP-001",
+        poCount: 9,
+        totalSpend: 1920000,
+        otdRate: 94,
+        qualityScore: 97.5,
+        leadTime: "6 Days",
+        status: "Preferred",
+      },
+      {
+        rank: 3,
+        name: "Apex Textile Chemical Ind.",
+        code: "SUP-002",
+        poCount: 7,
+        totalSpend: 1480000,
+        otdRate: 92,
+        qualityScore: 96.0,
+        leadTime: "5 Days",
+        status: "Preferred",
+      },
+      {
+        rank: 4,
+        name: "Dacca Accessories & Thread Ind.",
+        code: "SUP-004",
+        poCount: 8,
+        totalSpend: 950000,
+        otdRate: 88,
+        qualityScore: 94.0,
+        leadTime: "8 Days",
+        status: "Active",
+      },
+      {
+        rank: 5,
+        name: "Euro Machinery Corp.",
+        code: "SUP-005",
+        poCount: 3,
+        totalSpend: 820000,
+        otdRate: 85,
+        qualityScore: 98.0,
+        leadTime: "21 Days",
+        status: "Active",
+      },
+      {
+        rank: 6,
+        name: "Paper Craft Packaging Ltd.",
+        code: "SUP-006",
+        poCount: 6,
+        totalSpend: 420000,
+        otdRate: 95,
+        qualityScore: 95.5,
+        leadTime: "3 Days",
+        status: "Active",
+      },
+    ];
+  }, []);
+
+  // Procurement Bottleneck & Aging Table
+  const bottleneckAging = useMemo(() => {
+    return [
+      {
+        documentNo: "PO-2026-0004",
+        type: "Purchase Order",
+        supplierDept: "Euro Machinery Corp.",
+        stage: "Awaiting Material Dispatch",
+        daysPending: 18,
+        severity: "Critical",
+        amount: 820000,
+        action: "Follow Up Delivery",
+      },
+      {
+        documentNo: "PR-2026-000003",
+        type: "Requisition",
+        supplierDept: "Dyeing & Printing Unit",
+        stage: "Technical Spec Clarification",
+        daysPending: 12,
+        severity: "Warning",
+        amount: 285000,
+        action: "Review Specs",
+      },
+      {
+        documentNo: "BILL-2026-0002",
+        type: "Supplier Bill",
+        supplierDept: "Apex Textile Chemical",
+        stage: "Finance Audit Approval",
+        daysPending: 9,
+        severity: "Warning",
+        amount: 320000,
+        action: "Approve Payment",
+      },
+      {
+        documentNo: "PO-2026-0006",
+        type: "Work Order",
+        supplierDept: "Engineering Services",
+        stage: "Service Completion Cert",
+        daysPending: 5,
+        severity: "Normal",
+        amount: 110000,
+        action: "Verify WO",
+      },
+    ];
+  }, []);
+
+  // Cycle Time Comparison
+  const cycleTimeData = useMemo(() => {
+    return [
+      { stage: "PR to Approval", targetDays: 2, actualDays: 1.8 },
+      { stage: "CS & Supplier Select", targetDays: 4, actualDays: 3.2 },
+      { stage: "PO Generation", targetDays: 1, actualDays: 0.9 },
+      { stage: "Supplier Delivery", targetDays: 7, actualDays: 8.5 },
+      { stage: "MRR & QC Inspection", targetDays: 1.5, actualDays: 1.2 },
+      { stage: "Bill Verification", targetDays: 3, actualDays: 4.1 },
+    ];
+  }, []);
+
+  // MRR Ordered vs Received vs Accepted
+  const mrrAuditData = useMemo(() => {
+    return [
+      { category: "Raw Cotton & Yarn", ordered: 15000, received: 14800, accepted: 14750 },
+      { category: "Dyes & Chemicals", ordered: 4500, received: 4500, accepted: 4420 },
+      { category: "Accessories", ordered: 12000, received: 11800, accepted: 11700 },
+      { category: "Electrical Hardware", ordered: 600, received: 590, accepted: 585 },
+    ];
+  }, []);
+
+  // Export Summary
+  const handleExportSummary = () => {
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [
+        "Procurement Metric,Value",
+        `Total Spend,৳ ${kpis.totalProcurementSpend}`,
+        `Purchase Orders Count,${kpis.totalOrdersCount}`,
+        `Approved POs,${kpis.approvedPoCount}`,
+        `Pending POs,${kpis.pendingPoCount}`,
+        `Pending PRs,${kpis.pendingPrCount}`,
+        `MRRs Processed,${kpis.mrrCount}`,
+      ].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Procurement_Command_Center_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Procurement executive report exported successfully.");
+  };
+
   return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300 relative">
+    <div className="min-h-screen flex bg-slate-100/70 text-slate-800 font-sans">
       <ProcurementSidebar />
-      <main className="flex-1 min-w-0 flex flex-col">
+
+      <main className="flex-1 min-w-0 flex flex-col relative pb-20">
         <ProcurementTopbar />
-        
-        <div className="p-3.5 md:p-4.5 lg:p-5 space-y-4 lg:space-y-5 w-full max-w-[1600px] mx-auto">
-          {/* Main header block */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-border/45 pb-4">
-            <div>
-              <h2 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
-                <ShoppingCart className="size-5.5 text-amber-500" />
-                Procurement Command Center
-              </h2>
-              <p className="text-[10px] text-muted-foreground/80 mt-0.5 font-semibold">
-                Procurement Management Workspace &gt; <span className="text-amber-500 font-bold">Overview Dashboard</span>
-              </p>
+
+        <div className="p-4 md:p-6 lg:p-7 space-y-6 w-full max-w-[1700px] mx-auto overflow-x-hidden">
+          {/* Header & Global Filters */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col gap-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2.5 rounded-xl bg-slate-900 text-white shadow-sm">
+                  <ShoppingCart className="size-5" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                    Procurement Command Center & Spend Intelligence
+                  </h1>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Corporate purchasing lifecycle, supplier SLA rating, procurement bottlenecks, and spend analytics
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2.5 self-start lg:self-auto">
+                <button
+                  type="button"
+                  onClick={() => toast.success("Live procurement transactions refreshed from ledger.")}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs cursor-pointer"
+                >
+                  <RefreshCw className="size-3.5 text-slate-500" />
+                  Refresh
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExportSummary}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                >
+                  <Download className="size-3.5" />
+                  Export Report
+                </button>
+              </div>
+            </div>
+
+            {/* Filter Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-3 border-t border-slate-100 text-xs">
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  Fiscal Period
+                </label>
+                <select
+                  value={dateRange}
+                  onChange={(e) => setDateRange(e.target.value)}
+                  className="w-full h-8 px-2.5 rounded-lg border border-slate-200 bg-slate-50 font-semibold text-slate-700 outline-none focus:border-slate-400"
+                >
+                  <option>This Fiscal Year</option>
+                  <option>Current Quarter (Q3)</option>
+                  <option>This Month (Oct 2026)</option>
+                  <option>Last 30 Days</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  Organization
+                </label>
+                <select
+                  value={selectedOrg}
+                  onChange={(e) => setSelectedOrg(e.target.value)}
+                  className="w-full h-8 px-2.5 rounded-lg border border-slate-200 bg-slate-50 font-semibold text-slate-700 outline-none focus:border-slate-400"
+                >
+                  <option>All Organizations</option>
+                  <option>Pakiza Knit Composite Ltd</option>
+                  <option>Pakiza Apparels Ltd</option>
+                  <option>Pakiza Spinning Mills Ltd</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  Department
+                </label>
+                <select
+                  value={selectedDept}
+                  onChange={(e) => setSelectedDept(e.target.value)}
+                  className="w-full h-8 px-2.5 rounded-lg border border-slate-200 bg-slate-50 font-semibold text-slate-700 outline-none focus:border-slate-400"
+                >
+                  <option>All Departments</option>
+                  <option>Spinning Unit 1</option>
+                  <option>Knitting Division</option>
+                  <option>Dyeing & Finishing</option>
+                  <option>Maintenance & Engineering</option>
+                  <option>Information Technology</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  Strategic Supplier
+                </label>
+                <select
+                  value={selectedSupplier}
+                  onChange={(e) => setSelectedSupplier(e.target.value)}
+                  className="w-full h-8 px-2.5 rounded-lg border border-slate-200 bg-slate-50 font-semibold text-slate-700 outline-none focus:border-slate-400"
+                >
+                  <option>All Suppliers</option>
+                  {suppliers.map((s) => (
+                    <option key={s.id} value={s.vendorName}>
+                      {s.vendorName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  PO / Supplier Search
+                </label>
+                <div className="relative">
+                  <Search className="size-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search PO #, vendor, buyer..."
+                    className="w-full h-8 pl-8 pr-3 rounded-lg border border-slate-200 bg-slate-50 font-medium text-slate-700 text-xs outline-none focus:border-slate-400"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-5">
-            {/* Row 1: Primary Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4.5">
-              <div className="bg-card border border-border/80 p-5 rounded-2xl shadow-xs transition hover:shadow-elegant relative overflow-hidden group">
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500" />
-                <div className="flex justify-between items-start">
-                  <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Active Suppliers</span>
-                  <div className="size-8 rounded-lg bg-amber-500/10 grid place-items-center text-amber-500">
-                    <Building className="size-4" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-2xl font-black tracking-tight">42</span>
-                  <span className="text-[10px] font-bold text-success flex items-center gap-0.5">
-                    +3 this month
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-card border border-border/80 p-5 rounded-2xl shadow-xs transition hover:shadow-elegant relative overflow-hidden group">
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-500 to-red-500" />
-                <div className="flex justify-between items-start">
-                  <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Pending PO Approvals</span>
-                  <div className="size-8 rounded-lg bg-orange-500/10 grid place-items-center text-orange-500">
-                    <ShoppingCart className="size-4" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-2xl font-black tracking-tight text-orange-500">8</span>
-                  <span className="text-[10px] font-bold text-orange-500 flex items-center gap-0.5 animate-pulse">
-                    Requires attention
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-card border border-border/80 p-5 rounded-2xl shadow-xs transition hover:shadow-elegant relative overflow-hidden group">
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
-                <div className="flex justify-between items-start">
-                  <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">L/C Active Bookings</span>
-                  <div className="size-8 rounded-lg bg-blue-500/10 grid place-items-center text-blue-500">
-                    <Package className="size-4" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-2xl font-black tracking-tight">15</span>
-                  <span className="text-[10px] font-bold text-muted-foreground">
-                    Total Val: $420k
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-card border border-border/80 p-5 rounded-2xl shadow-xs transition hover:shadow-elegant relative overflow-hidden group">
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
-                <div className="flex justify-between items-start">
-                  <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Bills Awaiting Audit</span>
-                  <div className="size-8 rounded-lg bg-emerald-500/10 grid place-items-center text-emerald-500">
-                    <DollarSign className="size-4" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-2xl font-black tracking-tight text-emerald-500">22</span>
-                  <span className="text-[10px] font-bold text-success flex items-center gap-0.5">
-                    ৳82.5 Lakhs
-                  </span>
-                </div>
+          {/* 8 Executive KPI Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
+            {/* KPI 1 */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs space-y-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Total Spend (YTD)
+              </span>
+              <p className="text-lg font-black text-slate-900 font-mono tracking-tight">
+                ৳ {(kpis.totalProcurementSpend / 1000000).toFixed(2)}M
+              </p>
+              <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                <TrendingUp className="size-3" />
+                <span>+6.8% vs LY</span>
               </div>
             </div>
 
-            {/* Row 2: Secondary Performance Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4.5">
-              <div className="bg-card border border-border/80 p-4 rounded-xl shadow-xs flex items-center justify-between">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wider">Average Lead Time</span>
-                  <div className="text-lg font-black tracking-tight text-foreground">24 Days</div>
-                </div>
-                <div className="size-10 bg-slate-100 dark:bg-slate-900 border border-border/80 rounded-lg grid place-items-center text-muted-foreground">
-                  <Clock className="size-4.5" />
-                </div>
-              </div>
+            {/* KPI 2 */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs space-y-2">
+              <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">
+                Pending PR Approval
+              </span>
+              <p className="text-lg font-black text-amber-600 font-mono tracking-tight">
+                {kpis.pendingPrCount}
+              </p>
+              <span className="text-[10px] font-semibold text-amber-700">Awaiting sanction</span>
+            </div>
 
-              <div className="bg-card border border-border/80 p-4 rounded-xl shadow-xs flex items-center justify-between">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wider">Negotiated Savings</span>
-                  <div className="text-lg font-black tracking-tight text-success flex items-center gap-1">
-                    $152k
-                    <span className="text-[9px] font-bold flex items-center text-success bg-success/10 px-1 py-0.5 rounded leading-none">
-                      <TrendingDown className="size-2.5 mr-0.5" /> 8.4%
-                    </span>
-                  </div>
-                </div>
-                <div className="size-10 bg-slate-100 dark:bg-slate-900 border border-border/80 rounded-lg grid place-items-center text-success">
-                  <Percent className="size-4.5" />
-                </div>
-              </div>
+            {/* KPI 3 */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs space-y-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Total PO / WO Issued
+              </span>
+              <p className="text-lg font-black text-slate-900 font-mono tracking-tight">
+                {kpis.totalOrdersCount}
+              </p>
+              <span className="text-[10px] font-semibold text-slate-500">Active contracts</span>
+            </div>
 
-              <div className="bg-card border border-border/80 p-4 rounded-xl shadow-xs flex items-center justify-between">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wider">Material Defect Rate</span>
-                  <div className="text-lg font-black tracking-tight text-orange-500">0.8%</div>
-                </div>
-                <div className="size-10 bg-slate-100 dark:bg-slate-900 border border-border/80 rounded-lg grid place-items-center text-orange-500">
-                  <AlertTriangle className="size-4.5" />
-                </div>
-              </div>
+            {/* KPI 4 */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs space-y-2">
+              <span className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">
+                Pending PO Approvals
+              </span>
+              <p className="text-lg font-black text-rose-600 font-mono tracking-tight">
+                {kpis.pendingPoCount}
+              </p>
+              <span className="text-[10px] font-semibold text-rose-700">Requires executive sign</span>
+            </div>
 
-              <div className="bg-card border border-border/80 p-4 rounded-xl shadow-xs flex items-center justify-between">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wider">Quality Audit Pass</span>
-                  <div className="text-lg font-black tracking-tight text-foreground">99.2%</div>
-                </div>
-                <div className="size-10 bg-slate-100 dark:bg-slate-900 border border-border/80 rounded-lg grid place-items-center text-muted-foreground">
-                  <ShieldCheck className="size-4.5" />
-                </div>
+            {/* KPI 5 */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs space-y-2">
+              <span className="text-[10px] font-bold text-teal-600 uppercase tracking-wider">
+                MRR Received
+              </span>
+              <p className="text-lg font-black text-teal-700 font-mono tracking-tight">
+                {kpis.mrrCount}
+              </p>
+              <span className="text-[10px] font-semibold text-teal-600">Goods receipts verified</span>
+            </div>
+
+            {/* KPI 6 */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs space-y-2">
+              <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wider">
+                Pending Supplier Bills
+              </span>
+              <p className="text-lg font-black text-purple-700 font-mono tracking-tight">
+                {kpis.pendingBillCount}
+              </p>
+              <span className="text-[10px] font-semibold text-purple-600">Pending audit match</span>
+            </div>
+
+            {/* KPI 7 */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs space-y-2">
+              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
+                Contracted Suppliers
+              </span>
+              <p className="text-lg font-black text-emerald-700 font-mono tracking-tight">
+                {suppliers.length}
+              </p>
+              <span className="text-[10px] font-semibold text-emerald-600">Enrolled vendors</span>
+            </div>
+
+            {/* KPI 8 */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs space-y-2">
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+                Total Audit Flow
+              </span>
+              <p className="text-lg font-black text-blue-700 font-mono tracking-tight">
+                {kpis.totalTransactions}
+              </p>
+              <span className="text-[10px] font-semibold text-blue-600">Combined touches</span>
+            </div>
+          </div>
+
+          {/* Horizontal Procurement Pipeline */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <Zap className="size-4 text-amber-500" /> End-to-End Procurement Execution Pipeline
+                </h3>
+                <p className="text-[11px] text-slate-500">Live transaction progression from requisition to payment settlement</p>
               </div>
             </div>
 
-            {/* Row 3: Graphical Spend Analytics */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-              {/* Spend Trend AreaChart */}
-              <div className="lg:col-span-2 bg-card border border-border/80 p-5 rounded-2xl shadow-xs space-y-4">
-                <div className="flex justify-between items-center border-b border-border/40 pb-3">
-                  <div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Procurement Spend Trends</h3>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Import L/C purchases vs Local BDT orders (YTD)</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
+              {PIPELINE_STAGES.map((stg, idx) => {
+                const Icon = stg.icon;
+                const stat = pipelineMetrics[idx];
+                return (
+                  <div
+                    key={stg.id}
+                    className={`p-3 rounded-xl border flex flex-col justify-between space-y-2 ${stg.color}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider truncate">{stg.title}</span>
+                      <Icon className="size-3.5 shrink-0 opacity-80" />
+                    </div>
+                    <div>
+                      <div className="text-base font-black font-mono tracking-tight">{stat.count}</div>
+                      <div className="text-[10px] font-semibold opacity-75 font-mono">{stat.value}</div>
+                    </div>
                   </div>
-                  <span className="text-[9px] font-bold text-success flex items-center bg-success/10 px-2 py-1 rounded">
-                    <TrendingUp className="size-3 mr-1" /> +14.5% Spend
-                  </span>
-                </div>
+                );
+              })}
+            </div>
+          </div>
 
-                <div className="h-[260px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={purchaseTrends} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="gImport" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.4} />
-                          <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
-                        </linearGradient>
-                        <linearGradient id="gLocal" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="var(--chart-2)" stopOpacity={0.3} />
-                          <stop offset="100%" stopColor="var(--chart-2)" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} vertical={false} />
-                      <XAxis dataKey="m" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
-                      <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Legend verticalAlign="top" height={36} iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, fontWeight: "bold" }} />
-                      <Area type="monotone" name="Import L/C" dataKey="import" stroke="var(--chart-1)" strokeWidth={2.5} fill="url(#gImport)" />
-                      <Area type="monotone" name="Local Purchases" dataKey="local" stroke="var(--chart-2)" strokeWidth={2.5} fill="url(#gLocal)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
+          {/* Row 3: Monthly Spend Trend & Category Spend */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Monthly Spend Trend */}
+            <div className="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <TrendingUp className="size-4 text-indigo-600" /> Monthly Procurement Spend vs Budget (6 Months)
+                  </h3>
+                  <p className="text-[11px] text-slate-500">Continuous expenditure trajectory and target control</p>
                 </div>
               </div>
 
-              {/* Spend Category Allocation PieChart */}
-              <div className="bg-card border border-border/80 p-5 rounded-2xl shadow-xs space-y-4 flex flex-col justify-between">
-                <div className="border-b border-border/40 pb-3">
-                  <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Spend Allocation</h3>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Allocation by procurement categories</p>
+              <div className="h-[270px] w-full mt-3">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={monthlySpendData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#64748b" }} />
+                    <YAxis
+                      tickFormatter={(v) => `৳ ${(v / 1000000).toFixed(1)}M`}
+                      tick={{ fontSize: 11, fill: "#64748b" }}
+                    />
+                    <Tooltip
+                      formatter={(val: any) => [`৳ ${Number(val).toLocaleString()}`, "Amount"]}
+                      contentStyle={{
+                        backgroundColor: "#0f172a",
+                        border: "none",
+                        borderRadius: "8px",
+                        color: "#fff",
+                        fontSize: "12px",
+                      }}
+                    />
+                    <Legend />
+                    <Bar dataKey="currentYear" name="Current Spend (৳)" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="previousYear" name="Previous Year (৳)" fill="#cbd5e1" radius={[4, 4, 0, 0]} />
+                    <Line
+                      type="monotone"
+                      dataKey="budget"
+                      name="Monthly Budget Cap"
+                      stroke="#ef4444"
+                      strokeWidth={2}
+                      strokeDasharray="4 4"
+                      dot={false}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Category Spend Distribution */}
+            <div className="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <Percent className="size-4 text-emerald-600" /> Category-Wise Spend Share
+                  </h3>
+                  <span className="text-[11px] font-semibold text-slate-400">YTD Spend Breakdown</span>
                 </div>
 
-                <div className="h-[180px] relative flex justify-center items-center">
+                <div className="h-[210px] w-full mt-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={categorySpend}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={55}
-                        outerRadius={75}
-                        paddingAngle={4}
+                        data={categorySpendData}
+                        innerRadius={50}
+                        outerRadius={80}
+                        paddingAngle={3}
                         dataKey="value"
                       >
-                        {categorySpend.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        {categorySpendData.map((entry, index) => (
+                          <Cell key={`cell-spend-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+                      <Tooltip
+                        formatter={(val: any) => [`৳ ${Number(val).toLocaleString()}`, "Category Spend"]}
+                        contentStyle={{
+                          backgroundColor: "#0f172a",
+                          border: "none",
+                          borderRadius: "8px",
+                          color: "#fff",
+                          fontSize: "12px",
+                        }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
-                  {/* Center metric */}
-                  <div className="absolute text-center leading-none">
-                    <div className="text-xs font-black text-muted-foreground/80 uppercase tracking-wider">Total</div>
-                    <div className="text-lg font-black text-foreground mt-1">$1.3M</div>
-                  </div>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/40 text-[10px] font-bold">
-                  {categorySpend.map((entry) => (
-                    <div key={entry.name} className="flex items-center gap-1.5 text-muted-foreground/85">
-                      <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
-                      <span className="truncate">{entry.name}</span>
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs">
+                {categorySpendData.map((cat, i) => (
+                  <div key={i} className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50">
+                    <div className="flex items-center gap-1.5 truncate">
+                      <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
+                      <span className="text-[11px] font-semibold text-slate-600 truncate">{cat.name}</span>
                     </div>
+                    <span className="text-[11px] font-bold text-slate-900 font-mono shrink-0 pl-1">
+                      {cat.percent}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Row 4: Top Strategic Suppliers with SLA Scorecard */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <Building className="size-4 text-blue-600" /> Strategic Supplier Performance Ranking & SLA Scorecard
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  On-Time Delivery (OTD), Quality acceptance yield, and cycle time benchmarks
+                </p>
+              </div>
+              <Link
+                to="/procurement-config-supplier-name"
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 self-start sm:self-auto"
+              >
+                Supplier Master Directory <ExternalLink className="size-3" />
+              </Link>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    <th className="py-3 px-4 w-12 text-center">Rank</th>
+                    <th className="py-3 px-4">Supplier Name</th>
+                    <th className="py-3 px-3 text-center">Active POs</th>
+                    <th className="py-3 px-3 text-right">Total Spend (৳)</th>
+                    <th className="py-3 px-3 text-center">OTD Rate</th>
+                    <th className="py-3 px-3 text-center">Quality Yield</th>
+                    <th className="py-3 px-3 text-center">Avg Lead Time</th>
+                    <th className="py-3 px-4 text-center">Partner Tier</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                  {top10Suppliers.map((sup) => (
+                    <tr key={sup.code} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="py-3 px-4 text-center font-bold text-slate-400">#{sup.rank}</td>
+                      <td className="py-3 px-4">
+                        <div className="font-bold text-slate-900">{sup.name}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">{sup.code}</div>
+                      </td>
+                      <td className="py-3 px-3 text-center font-mono font-bold text-slate-900">
+                        {sup.poCount}
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono font-black text-slate-900">
+                        ৳ {sup.totalSpend.toLocaleString()}
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <span className="font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                          {sup.otdRate}%
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <span className="font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                          {sup.qualityScore}%
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-center font-semibold text-slate-600">
+                        {sup.leadTime}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span
+                          className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            sup.status === "Strategic Partner"
+                              ? "bg-purple-50 text-purple-700 border-purple-200"
+                              : sup.status === "Preferred"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : "bg-slate-100 text-slate-700 border-slate-200"
+                          }`}
+                        >
+                          {sup.status}
+                        </span>
+                      </td>
+                    </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Row 5: Procurement Bottleneck & Aging + Cycle Time */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Bottleneck Table */}
+            <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <AlertTriangle className="size-4 text-rose-500" /> Procurement Bottleneck & Aging Analysis
+                  </h3>
+                  <p className="text-[11px] text-slate-500">Transactions delayed past standard turnaround time (TAT)</p>
                 </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      <th className="py-3 px-4">Ref Document</th>
+                      <th className="py-3 px-3">Stage / Department</th>
+                      <th className="py-3 px-3 text-center">Days Pending</th>
+                      <th className="py-3 px-3 text-right">Value (৳)</th>
+                      <th className="py-3 px-4 text-center">Action Required</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                    {bottleneckAging.map((bn, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50/70">
+                        <td className="py-3 px-4">
+                          <div className="font-mono font-bold text-slate-900">{bn.documentNo}</div>
+                          <div className="text-[10px] text-slate-400">{bn.type}</div>
+                        </td>
+                        <td className="py-3 px-3">
+                          <div className="font-semibold text-slate-800">{bn.stage}</div>
+                          <div className="text-[10px] text-slate-500">{bn.supplierDept}</div>
+                        </td>
+                        <td className="py-3 px-3 text-center">
+                          <span
+                            className={`font-mono font-bold px-2 py-0.5 rounded ${
+                              bn.severity === "Critical"
+                                ? "bg-rose-100 text-rose-800"
+                                : bn.severity === "Warning"
+                                ? "bg-amber-100 text-amber-800"
+                                : "bg-slate-100 text-slate-700"
+                            }`}
+                          >
+                            {bn.daysPending} Days
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono font-bold text-slate-900">
+                          ৳ {bn.amount.toLocaleString()}
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <button
+                            type="button"
+                            onClick={() => toast.info(`Action initiated for ${bn.documentNo}`)}
+                            className="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-[10px] border border-indigo-200 transition-colors cursor-pointer"
+                          >
+                            {bn.action}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            {/* Row 4: Transaction & Audit data split */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-              {/* Monthly Payouts BarChart */}
-              <div className="bg-card border border-border/80 p-5 rounded-2xl shadow-xs space-y-4">
-                <div className="border-b border-border/40 pb-3 flex justify-between items-center">
-                  <div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Monthly Payouts</h3>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Settlements cleared per major vendor (Lakhs)</p>
-                  </div>
-                  <Zap className="size-4.5 text-success animate-pulse" />
+            {/* Cycle Time Bar Chart */}
+            <div className="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <Clock className="size-4 text-blue-600" /> Cycle Time Benchmark (Days)
+                  </h3>
+                  <span className="text-[11px] font-semibold text-slate-400">Target vs Actual</span>
                 </div>
 
-                <div className="h-[230px] w-full">
+                <div className="h-[260px] w-full mt-3">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={supplierPayouts} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} vertical={false} />
-                      <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
-                      <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
-                      <Tooltip formatter={(value) => `৳${value} Lakhs`} />
-                      <Bar dataKey="paid" radius={[4, 4, 0, 0]}>
-                        {supplierPayouts.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={`var(--chart-${(index % 5) + 1})`} />
-                        ))}
-                      </Bar>
+                    <BarChart
+                      data={cycleTimeData}
+                      layout="vertical"
+                      margin={{ top: 5, right: 30, left: 30, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                      <XAxis type="number" tick={{ fontSize: 11, fill: "#64748b" }} />
+                      <YAxis
+                        type="category"
+                        dataKey="stage"
+                        width={110}
+                        tick={{ fontSize: 10, fill: "#334155" }}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#0f172a",
+                          border: "none",
+                          borderRadius: "8px",
+                          color: "#fff",
+                          fontSize: "12px",
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="targetDays" name="SLA Target" fill="#94a3b8" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="actualDays" name="Actual Performance" fill="#3b82f6" radius={[0, 4, 4, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
-              {/* Purchase Orders Table */}
-              <div className="bg-card border border-border/80 p-5 rounded-2xl shadow-xs space-y-4 lg:col-span-2">
-                <div className="flex justify-between items-center border-b border-border/40 pb-3">
-                  <div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Recent Purchase Orders</h3>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Active requisition and dispatch tracker</p>
-                  </div>
-                  <Link
-                    to="/procurement-po-list"
-                    className="text-[9px] font-black text-amber-500 hover:underline cursor-pointer uppercase tracking-wider flex items-center gap-0.5"
-                  >
-                    View All Registry <ArrowUpRight className="size-3" />
-                  </Link>
-                </div>
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
-                    <thead>
-                      <tr className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 bg-muted/40 border-b border-border/45">
-                        <th className="py-2.5 px-3">PO Number</th>
-                        <th className="py-2.5 px-3">Supplier Name</th>
-                        <th className="py-2.5 px-3">Requisition</th>
-                        <th className="py-2.5 px-3">Amount</th>
-                        <th className="py-2.5 px-3 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/45 font-medium">
-                      {mockPOs.map((po) => (
-                        <tr key={po.id} className="hover:bg-muted/30 transition-colors">
-                          <td className="py-3 px-3 font-bold text-amber-500">{po.poNo}</td>
-                          <td className="py-3 px-3 truncate max-w-[200px]">{po.supplier}</td>
-                          <td className="py-3 px-3 text-muted-foreground">{po.requisitionNo}</td>
-                          <td className="py-3 px-3 font-bold">{po.totalValue}</td>
-                          <td className="py-3 px-3">
-                            <div className="flex justify-center">
-                              <span className={`px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase ${
-                                po.status === "Approved" ? "bg-success/15 text-success-foreground" :
-                                po.status === "Draft" ? "bg-muted text-muted-foreground" : "bg-orange-500/10 text-orange-600 border border-orange-500/20"
-                              }`}>
-                                {po.status}
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              <div className="text-[11px] text-slate-500 pt-2 border-t border-slate-100 font-medium">
+                Overall procurement lead time averages 19.7 days vs target 18.5 days.
               </div>
             </div>
-
-            {/* Row 5: Comparison sheets & Active LCs bookings */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-              {/* Comparison Sheet Batches */}
-              <div className="bg-card border border-border/80 p-5 rounded-2xl shadow-xs space-y-4">
-                <div className="flex justify-between items-center border-b border-border/40 pb-3">
-                  <div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Comparison Batches</h3>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Supplier quotation analyses</p>
-                  </div>
-                  <Link
-                    to="/procurement-cs-batch-list"
-                    className="text-[9px] font-black text-amber-500 hover:underline cursor-pointer uppercase tracking-wider flex items-center gap-0.5"
-                  >
-                    View Batches <ArrowUpRight className="size-3" />
-                  </Link>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="p-3 bg-muted/30 border border-border/60 rounded-xl space-y-2 hover:border-amber-500/30 transition-all cursor-pointer">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-foreground truncate pr-2">Batch # CS-2026-YRN4</span>
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 bg-orange-500/10 text-orange-600 rounded">Comparison</span>
-                    </div>
-                    <div className="text-[10px] text-muted-foreground flex justify-between">
-                      <span>Items: Yarn Cone Spinning</span>
-                      <span>Suppliers: 3 Quotes</span>
-                    </div>
-                    <div className="pt-1.5 flex justify-between items-center border-t border-border/30 text-[9px]">
-                      <span className="font-semibold text-muted-foreground">Target Price: $3.40/Kg</span>
-                      <span className="font-bold text-amber-500 flex items-center gap-0.5">Evaluate Quotes <ChevronRight className="size-3" /></span>
-                    </div>
-                  </div>
-
-                  <div className="p-3 bg-muted/30 border border-border/60 rounded-xl space-y-2 hover:border-amber-500/30 transition-all cursor-pointer">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-foreground truncate pr-2">Batch # CS-2026-CHM12</span>
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 bg-success/10 text-success-foreground rounded">Approved</span>
-                    </div>
-                    <div className="text-[10px] text-muted-foreground flex justify-between">
-                      <span>Items: Reactive Dyes Bulk</span>
-                      <span>Suppliers: 4 Quotes</span>
-                    </div>
-                    <div className="pt-1.5 flex justify-between items-center border-t border-border/30 text-[9px]">
-                      <span className="font-semibold text-muted-foreground">Apex Chemical Ltd (Winner)</span>
-                      <span className="font-bold text-success flex items-center gap-0.5"><CheckCircle2 className="size-3" /> Workorder Created</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* L/C Booking List */}
-              <div className="bg-card border border-border/80 p-5 rounded-2xl shadow-xs space-y-4 lg:col-span-2">
-                <div className="flex justify-between items-center border-b border-border/40 pb-3">
-                  <div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Active L/C Booking Queue</h3>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Letter of Credit registrations and bank margins</p>
-                  </div>
-                  <Link
-                    to="/procurement-config-lc-booking-list"
-                    className="text-[9px] font-black text-amber-500 hover:underline cursor-pointer uppercase tracking-wider flex items-center gap-0.5"
-                  >
-                    View LC Register <ArrowUpRight className="size-3" />
-                  </Link>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
-                    <thead>
-                      <tr className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 bg-muted/40 border-b border-border/45">
-                        <th className="py-2.5 px-3">Booking ID</th>
-                        <th className="py-2.5 px-3">Supplier</th>
-                        <th className="py-2.5 px-3">PI Ref</th>
-                        <th className="py-2.5 px-3">Value</th>
-                        <th className="py-2.5 px-3">Bank Source</th>
-                        <th className="py-2.5 px-3 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/45 font-medium">
-                      {mockLCs.map((lc) => (
-                        <tr key={lc.id} className="hover:bg-muted/30 transition-colors">
-                          <td className="py-3 px-3 font-bold text-amber-500">{lc.id}</td>
-                          <td className="py-3 px-3 truncate max-w-[150px]">{lc.supplier}</td>
-                          <td className="py-3 px-3 text-muted-foreground">{lc.pi}</td>
-                          <td className="py-3 px-3 font-bold">{lc.value}</td>
-                          <td className="py-3 px-3">{lc.bank}</td>
-                          <td className="py-3 px-3">
-                            <div className="flex justify-center">
-                              <span className={`px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase ${
-                                lc.status === "Active" ? "bg-success/15 text-success-foreground" : "bg-orange-500/10 text-orange-600 border border-orange-500/20"
-                              }`}>
-                                {lc.status}
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
           </div>
 
-          <footer className="pt-6 pb-2 text-center text-[10px] font-medium text-muted-foreground/60 border-t border-border/20">
-            © 2026 CRIPTON Procurement Management Portal — built with CRIPTON HRIS premium components.
-          </footer>
+          {/* Row 6: MRR Ordered vs Received Audit & Fast Actions */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* MRR Audit Chart */}
+            <div className="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <Package className="size-4 text-emerald-600" /> MRR Receiving Audit: Ordered vs Received vs Accepted
+                  </h3>
+                  <p className="text-[11px] text-slate-500">Warehouse delivery reconciliation & quality clearance</p>
+                </div>
+              </div>
+
+              <div className="h-[250px] w-full mt-3">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={mrrAuditData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="category" tick={{ fontSize: 11, fill: "#64748b" }} />
+                    <YAxis tick={{ fontSize: 11, fill: "#64748b" }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0f172a",
+                        border: "none",
+                        borderRadius: "8px",
+                        color: "#fff",
+                        fontSize: "12px",
+                      }}
+                    />
+                    <Legend />
+                    <Bar dataKey="ordered" name="PO Ordered Qty" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="received" name="Gate Received Qty" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="accepted" name="QC Accepted Qty" fill="#10b981" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Quick Action Navigation */}
+            <div className="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between space-y-4">
+              <div>
+                <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2 pb-3 border-b border-slate-100">
+                  <ShieldCheck className="size-4 text-emerald-600" /> Procurement Fast Operations
+                </h3>
+
+                <div className="grid grid-cols-2 gap-2.5 mt-3">
+                  <Link
+                    to="/procurement-purchase-requisition"
+                    className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors block text-xs space-y-1"
+                  >
+                    <strong className="text-slate-900 block font-bold">+ New Requisition</strong>
+                    <span className="text-[11px] text-slate-500 block">Initiate department PR</span>
+                  </Link>
+
+                  <Link
+                    to="/procurement-po-new"
+                    className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors block text-xs space-y-1"
+                  >
+                    <strong className="text-slate-900 block font-bold">+ Create PO / WO</strong>
+                    <span className="text-[11px] text-slate-500 block">Direct or PR-linked order</span>
+                  </Link>
+
+                  <Link
+                    to="/inv-receive-mrr"
+                    className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors block text-xs space-y-1"
+                  >
+                    <strong className="text-slate-900 block font-bold">+ Process MRR</strong>
+                    <span className="text-[11px] text-slate-500 block">Warehouse gate receiving</span>
+                  </Link>
+
+                  <Link
+                    to="/procurement-billing-supplier-bill"
+                    className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors block text-xs space-y-1"
+                  >
+                    <strong className="text-slate-900 block font-bold">+ Entry Vendor Bill</strong>
+                    <span className="text-[11px] text-slate-500 block">Invoice 3-way matching</span>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 space-y-1">
+                <div className="font-bold flex items-center gap-1.5">
+                  <AlertTriangle className="size-3.5 text-amber-600" /> Operational Alert
+                </div>
+                <p className="text-[11px] text-amber-700">
+                  {kpis.pendingPoCount} Purchase Orders currently require departmental or executive committee sanction before dispatch.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>

@@ -34,6 +34,7 @@ export const Route = createFileRoute("/messenger")({
 });
 
 // -- Mock Data Base --
+<<<<<<< HEAD
 const INITIAL_GROUPS = [
   { id: "g1", name: "Business Innovation", avatar: "https://i.pravatar.cc/150?u=g1", lastMessage: "Great. Please review this video walkthrough.", time: "10:42 AM", unread: 2, members: 6, isDirect: false, isOnline: false },
   { id: "g2", name: "HR Team", avatar: "https://i.pravatar.cc/150?u=g2", lastMessage: "Don't forget the all-hands meeting at 3 PM.", time: "09:15 AM", unread: 0, members: 3, isDirect: false, isOnline: false },
@@ -41,6 +42,27 @@ const INITIAL_GROUPS = [
   { id: "g4", name: "IT & Infrastructure", avatar: "https://i.pravatar.cc/150?u=g4", lastMessage: "Server maintenance scheduled for tonight.", time: "Yesterday", unread: 5, members: 5, isDirect: false, isOnline: false },
   { id: "g5", name: "Marketing", avatar: "https://i.pravatar.cc/150?u=g5", lastMessage: "New ad creatives are ready for review.", time: "Tuesday", unread: 0, members: 2, isDirect: false, isOnline: false },
   { id: "g6", name: "Security Operations", avatar: "https://i.pravatar.cc/150?u=g6", lastMessage: "Gate 2 access logs verified.", time: "Monday", unread: 0, members: 3, isDirect: false, isOnline: false },
+=======
+interface ChatItem {
+  id: string;
+  name: string;
+  avatar: string;
+  lastMessage: string;
+  time: string;
+  unread: number;
+  members: number;
+  isOnline?: boolean;
+  isDirect?: boolean;
+}
+
+const INITIAL_GROUPS: ChatItem[] = [
+  { id: "g1", name: "Business Innovation", avatar: "https://i.pravatar.cc/150?u=g1", lastMessage: "Great. Please review this video walkthrough.", time: "10:42 AM", unread: 2, members: 6, isDirect: false, isOnline: true },
+  { id: "g2", name: "HR Team", avatar: "https://i.pravatar.cc/150?u=g2", lastMessage: "Don't forget the all-hands meeting at 3 PM.", time: "09:15 AM", unread: 0, members: 3, isDirect: false, isOnline: true },
+  { id: "g3", name: "Finance & Accounts", avatar: "https://i.pravatar.cc/150?u=g3", lastMessage: "The Q3 reports are finalized.", time: "Yesterday", unread: 0, members: 4, isDirect: false, isOnline: false },
+  { id: "g4", name: "IT & Infrastructure", avatar: "https://i.pravatar.cc/150?u=g4", lastMessage: "Server maintenance scheduled for tonight.", time: "Yesterday", unread: 5, members: 5, isDirect: false, isOnline: true },
+  { id: "g5", name: "Marketing", avatar: "https://i.pravatar.cc/150?u=g5", lastMessage: "New ad creatives are ready for review.", time: "Tuesday", unread: 0, members: 2, isDirect: false, isOnline: false },
+  { id: "g6", name: "Security Operations", avatar: "https://i.pravatar.cc/150?u=g6", lastMessage: "Gate 2 access logs verified.", time: "Monday", unread: 0, members: 3, isDirect: false, isOnline: true },
+>>>>>>> 7a45f059a0b8cc3c72fbb12ba16599facfadd815
 ];
 
 const BASE_MESSAGES = [
@@ -72,7 +94,7 @@ const COMPANY_EMPLOYEES = [
   { id: 209, name: "Md. Piyash Hasan", role: "Executive", img: "https://bpm.pakizaknit.com/Photo/EmpPicture/0fa2e575-f1e5-4490-9e5b-6b89d039ce10.jpg" },
 ];
 
-const INITIAL_DIRECT_CHATS = COMPANY_EMPLOYEES.slice(0, 5).map((emp, i) => ({
+const INITIAL_DIRECT_CHATS: ChatItem[] = COMPANY_EMPLOYEES.slice(0, 5).map((emp, i) => ({
   id: `dm_${emp.id}`,
   name: emp.name,
   avatar: emp.img,
@@ -86,8 +108,8 @@ const INITIAL_DIRECT_CHATS = COMPANY_EMPLOYEES.slice(0, 5).map((emp, i) => ({
 
 function MessengerPage() {
   const [chatTab, setChatTab] = useState<"departments" | "direct">("departments");
-  const [groups, setGroups] = useState(INITIAL_GROUPS);
-  const [directChats, setDirectChats] = useState(INITIAL_DIRECT_CHATS);
+  const [groups, setGroups] = useState<ChatItem[]>(INITIAL_GROUPS);
+  const [directChats, setDirectChats] = useState<ChatItem[]>(INITIAL_DIRECT_CHATS);
   
   const [activeChatId, setActiveChatId] = useState(INITIAL_GROUPS[0].id);
   

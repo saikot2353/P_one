@@ -371,13 +371,9 @@ function InvReceiveListPage() {
                       <div className="w-1/3 p-1 border-r border-black font-semibold text-left flex items-center">MRR NO :</div>
                       <div className="w-2/3 p-1 font-mono text-left">{selectedMRR.mrr}</div>
                     </div>
-                    <div className="flex border-b border-black">
+                    <div className="flex">
                       <div className="w-1/3 p-1 border-r border-black font-semibold text-left flex items-center">MRR DATE :</div>
                       <div className="w-2/3 p-1 font-mono text-left">{selectedMRR.mrrDate}</div>
-                    </div>
-                    <div className="flex">
-                      <div className="w-1/3 p-1 border-r border-black font-semibold text-left flex items-center">Revision :</div>
-                      <div className="w-2/3 p-1 font-mono text-left">00</div>
                     </div>
                   </div>
                 </div>

@@ -3,339 +3,932 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ProcurementSidebar } from "@/components/dashboard/ProcurementSidebar";
 import { ProcurementTopbar } from "@/components/dashboard/ProcurementTopbar";
 import {
-  Plus,
-  Pencil,
-  Trash2,
-  SlidersHorizontal,
-  X,
-  FileSpreadsheet,
-  Printer,
-  FileText,
+  ShieldCheck,
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  Calendar,
+  Building2,
+  Package,
+  Wrench,
   Search,
+  Eye,
+  FileText,
+  Clock,
+  ChevronRight,
+  Filter,
+  Check,
+  ArrowLeft,
+  X,
+  Printer,
+  FileSpreadsheet,
 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  PurchaseOrder,
+  POItem,
+  WOServiceItem,
+  getStoredPurchaseOrders,
+  setStoredPurchaseOrders,
+  getStoredPoItems,
+  getStoredWoItems,
+} from "@/lib/procurement-order-inventory-data";
+import pakizaSoftwareLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
 
 export const Route = createFileRoute("/procurement-po-work-order-approval")({
   head: () => ({
     meta: [
-      { title: "Work Order Approval Console — CRIPTON Procurement" },
-      { name: "description", content: "Work Order Approval Console dynamic mock database console." },
+      { title: "Purchase Order / Work Order Approval — CRIPTON Procurement" },
+      {
+        name: "description",
+        content: "Dedicated Approval console for submitted Purchase Orders and Work Orders with full-page review dossier and action modals.",
+      },
     ],
   }),
-  component: ProcurementPoWorkOrderApprovalPage,
+  component: PurchaseOrderWorkOrderApprovalPage,
 });
 
-function ProcurementPoWorkOrderApprovalPage() {
+export function PurchaseOrderWorkOrderApprovalPage() {
+  const [orders, setOrders] = useState<PurchaseOrder[]>(() => getStoredPurchaseOrders());
+  const poItemsMap = useMemo(() => getStoredPoItems(), []);
+  const woItemsMap = useMemo(() => getStoredWoItems(), []);
+
+  // Filter & Search
   const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("All");
 
-  const tableHeaders = ["Work Order ID", "Supplier Profile", "PO Ref", "WO Date", "FOB Amount", "L/C Requirement", "Approval status"];
-  const columnKeys = ["id", "supplier", "po", "date", "amount", "lc", "status"];
-  const initialData = [
-    {
-        "id": "WO-2026-0012",
-        "supplier": "Zhejiang Yarn Spinning Co.",
-        "po": "PO-2026-00481",
-        "date": "2026-08-24",
-        "amount": "$45,200.00",
-        "lc": "Sight LC Needed",
-        "status": "Under Review"
+  // Selected Order for Full-Page Details Review
+  const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
+
+  // PDF Preview Modal
+  const [pdfPreviewOrder, setPdfPreviewOrder] = useState<PurchaseOrder | null>(null);
+
+  // Approval Action Modal State
+  const [actionModalOpen, setActionModalOpen] = useState(false);
+  const [activeAction, setActiveAction] = useState<"Approve" | "Return for Correction" | "Reject Order">("Approve");
+  const [actionComments, setActionComments] = useState("");
+
+  const approverName = "Engr. Mahmudul Hassan";
+  const approverDesignation = "Head of Procurement & Technical Services";
+  const approvalDateTime = new Date().toLocaleString();
+
+  // 13. Separate Approval List: ONLY "Submitted" (or "Pending Approval") orders appear in this list
+  const submittedOrders = useMemo(() => {
+    return orders.filter((ord) => {
+      const isSubmitted =
+        ord.orderStatus === "Submitted" ||
+        ord.orderStatus === "Pending Approval";
+
+      if (!isSubmitted) return false;
+
+      const matchesSearch =
+        ord.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ord.supplierName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ord.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (ord.prepareBy && ord.prepareBy.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesType = typeFilter === "All" || ord.documentType === typeFilter;
+
+      return matchesSearch && matchesType;
+    });
+  }, [orders, searchQuery, typeFilter]);
+
+  // Open Action Modal
+  const handleOpenActionModal = (action: "Approve" | "Return for Correction" | "Reject Order") => {
+    setActiveAction(action);
+    setActionComments("");
+    setActionModalOpen(true);
+  };
+
+  // Confirm Approval Action
+  const handleConfirmAction = () => {
+    if (!selectedOrder) return;
+
+    if (activeAction !== "Approve" && !actionComments.trim()) {
+      toast.error(`Comments are mandatory when you choose to ${activeAction.toLowerCase()}.`);
+      return;
     }
-];
 
-  const [tableData, setTableData] = useState<any[]>(initialData);
+    let nextStatus: PurchaseOrder["orderStatus"] = "Approved";
+    if (activeAction === "Return for Correction") {
+      nextStatus = "Returned for Correction";
+    } else if (activeAction === "Reject Order") {
+      nextStatus = "Rejected";
+    }
 
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any | null>(null);
-  const [formData, setFormData] = useState<Record<string, string>>({});
+    const newStep = {
+      level: (selectedOrder.currentApprovalLevel || 1) + 1,
+      approver: approverName,
+      designation: approverDesignation,
+      action: activeAction === "Reject Order" ? ("Rejected" as const) : activeAction === "Return for Correction" ? ("Returned for Correction" as const) : ("Approved" as const),
+      dateTime: approvalDateTime,
+      remarks: actionComments || "Approved without conditions.",
+    };
 
-  // Filtering
-  const filteredData = useMemo(() => {
-    return tableData.filter((row) => {
-      return Object.values(row).some((val) => 
-        String(val).toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    });
-  }, [tableData, searchQuery]);
+    const updatedOrder: PurchaseOrder = {
+      ...selectedOrder,
+      orderStatus: nextStatus,
+      approverName,
+      approvalDate: approvalDateTime,
+      approvalRemarks: actionComments,
+      approvalHistory: [...(selectedOrder.approvalHistory || []), newStep],
+    };
 
-  const openCreateModal = () => {
-    setEditingItem(null);
-    const initialForm: Record<string, string> = {};
-    columnKeys.forEach((key) => {
-      initialForm[key] = "";
-    });
-    setFormData(initialForm);
-    setIsModalOpen(true);
-  };
+    const updatedList = orders.map((o) =>
+      o.id === selectedOrder.id ? updatedOrder : o
+    );
 
-  const openEditModal = (item: any) => {
-    setEditingItem(item);
-    setFormData({ ...item });
-    setIsModalOpen(true);
-  };
+    setOrders(updatedList);
+    setStoredPurchaseOrders(updatedList);
+    setActionModalOpen(false);
+    setSelectedOrder(null);
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditingItem(null);
-  };
-
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingItem) {
-      setTableData((prev) =>
-        prev.map((item) => (item.id === editingItem.id ? { ...item, ...formData } : item))
-      );
+    if (activeAction === "Approve") {
+      toast.success(`${selectedOrder.documentType} "${selectedOrder.orderNumber}" has been Approved successfully!`);
+    } else if (activeAction === "Return for Correction") {
+      toast.warning(`${selectedOrder.documentType} "${selectedOrder.orderNumber}" has been returned to requester for correction.`);
     } else {
-      const newId = (Math.max(0, ...tableData.map((item) => parseInt(item.id) || 0)) + 1).toString();
-      const newItem = { ...formData, id: newId };
-      setTableData((prev) => [...prev, newItem]);
+      toast.error(`${selectedOrder.documentType} "${selectedOrder.orderNumber}" has been Rejected.`);
     }
-    closeModal();
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this record?")) {
-      setTableData((prev) => prev.filter((item) => item.id !== id));
-    }
-  };
+  // Items for the selected order
+  const currentPoItems = useMemo(() => {
+    if (!selectedOrder) return [];
+    return poItemsMap[selectedOrder.orderNumber] || selectedOrder.items || [];
+  }, [selectedOrder, poItemsMap]);
+
+  const currentWoItems = useMemo(() => {
+    if (!selectedOrder) return [];
+    return woItemsMap[selectedOrder.orderNumber] || selectedOrder.woItems || [];
+  }, [selectedOrder, woItemsMap]);
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300 relative font-sans">
+    <div className="flex h-screen bg-background font-sans antialiased text-foreground overflow-hidden">
       <ProcurementSidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative">
+
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <ProcurementTopbar />
-        
-        <div className="p-4 md:p-6 lg:p-8 space-y-6 w-full max-w-[1600px] mx-auto">
-          {/* Breadcrumb Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h1 className="text-xl font-black tracking-tight text-foreground flex items-center gap-2">
-                <SlidersHorizontal className="size-5.5 text-primary" />
-                Work Order Approval Console
-              </h1>
-              <p className="text-xs text-muted-foreground mt-1 font-normal">
-                Procurement Workspace &gt; Configuration &gt; <span className="text-amber-500 font-semibold">Work Order Approval Console</span>
-              </p>
-            </div>
-            <button 
-              onClick={openCreateModal}
-              className="h-9 px-4 bg-[#0d6efd] hover:bg-blue-700 text-white font-semibold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer shrink-0"
-            >
-              <Plus className="size-4" />
-              Add New Record
-            </button>
-          </div>
 
-          {/* Table Container */}
-          <div className="bg-card border border-border rounded-xl shadow-sm flex flex-col overflow-hidden">
-            
-            {/* Toolbar */}
-            <div className="p-4 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900">
-              
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
-                  <FileSpreadsheet className="size-3.5 text-emerald-600" /> Excel
-                </button>
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
-                  <Printer className="size-3.5 text-blue-600" /> Print
-                </button>
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
-                  <FileText className="size-3.5 text-red-600" /> PDF
-                </button>
-              </div>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-6">
+          {/* ============================================================== */}
+          {/* 14. FULL-PAGE APPROVAL DETAILS VIEW (NO ORDER QUEUE SECTION) */}
+          {/* ============================================================== */}
+          {selectedOrder ? (
+            <div className="space-y-6 w-full pb-6">
+              {/* Top Navigation & Breadcrumb */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-4">
+                <div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium mb-1">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedOrder(null)}
+                      className="hover:text-foreground flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400 cursor-pointer"
+                    >
+                      <ArrowLeft className="size-3" /> Back to Approval List
+                    </button>
+                    <ChevronRight className="size-3" />
+                    <span>Approval Details</span>
+                    <ChevronRight className="size-3" />
+                    <span className="font-mono font-bold text-foreground">{selectedOrder.orderNumber}</span>
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground flex items-center gap-2.5">
+                    <ShieldCheck className="size-7 text-amber-500" />
+                    {selectedOrder.documentType} Approval Dossier
+                  </h1>
+                </div>
 
-              {/* Search Box */}
-              <div className="relative w-full sm:w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9.5 pr-3 h-[32px] bg-[#f8fafc] border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-500 rounded-md text-xs font-normal text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
-                />
-              </div>
-
-            </div>
-
-            {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap bg-slate-50 dark:bg-slate-800">
-                    <th className="px-4 py-2.5 font-semibold w-16 text-center border-r border-slate-100">
-                      <div className="flex items-center justify-center gap-1">
-                        <span>SL</span>
-                      </div>
-                    </th>
-                    <th className="px-4 py-2.5 font-semibold w-24 text-center border-r border-slate-100">
-                      <div className="flex items-center justify-center">
-                        <span>ACTIONS</span>
-                      </div>
-                    </th>
-                    {tableHeaders.map((header: string) => (
-                      <th key={header} className="px-4 py-2.5 font-semibold border-r border-slate-100 last:border-r-0">
-                        <div className="flex items-center justify-between">
-                          <span>{header}</span>
-                          <SlidersHorizontal className="size-2.5 text-slate-400" />
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-normal text-slate-700 dark:text-slate-200 bg-white dark:bg-transparent">
-                  {filteredData.map((row: any, index: number) => (
-                    <tr key={row.id || index} className="hover:bg-slate-50 border-b border-slate-100 transition-colors">
-                      <td className="px-4 py-2.5 text-center border-r border-slate-100 text-slate-500 font-normal">
-                        {index + 1}
-                      </td>
-                      <td className="px-4 py-2.5 text-center border-r border-slate-100">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => openEditModal(row)}
-                            className="text-orange-500 hover:text-orange-700 transition"
-                            title="Edit"
-                          >
-                            <Pencil className="size-3.5" strokeWidth={2} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(row.id)}
-                            className="text-rose-500 hover:text-rose-700 transition"
-                            title="Delete"
-                          >
-                            <Trash2 className="size-3.5" strokeWidth={2} />
-                          </button>
-                        </div>
-                      </td>
-                      {columnKeys.map((key: string) => {
-                        const value = row[key];
-                        const isStatus = key === "status" || key === "isActive";
-
-                        return (
-                          <td key={key} className="px-4.5 py-2.5 border-r border-slate-100 last:border-r-0 max-w-[220px] truncate font-normal text-slate-700 dark:text-slate-200">
-                            {isStatus ? (
-                              <span className={`px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase ${
-                                value === "Approved" || value === "Active" || value === "Audit Complete" || value === "Verified"
-                                  ? "bg-success/15 text-success-foreground"
-                                  : value === "Draft"
-                                  ? "bg-muted text-muted-foreground"
-                                  : "bg-orange-500/10 text-orange-600 border border-orange-500/20"
-                              }`}>
-                                {value}
-                              </span>
-                            ) : (
-                              <span>
-                                {value}
-                              </span>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                  {filteredData.length === 0 && (
-                    <tr>
-                      <td colSpan={tableHeaders.length + 2} className="text-center py-10 text-muted-foreground font-semibold">
-                        No records found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Table Footer / Pagination stats */}
-            <div className="p-4 border-t border-slate-100 bg-[#fcfdfd] dark:bg-slate-900/40 text-[11px] text-muted-foreground font-normal flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span>Showing 1 to {filteredData.length} of {tableData.length} entries</span>
-              <div className="flex items-center gap-1.5 font-sans">
-                <button className="px-2 py-1 text-slate-400 hover:text-slate-700 font-normal">Previous</button>
-                <button className="size-6 bg-[#8BC34A] text-white font-semibold rounded flex items-center justify-center text-[10px]">1</button>
-                <button className="px-2 py-1 text-slate-400 hover:text-slate-700 font-normal">Next</button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        {/* CURRENCY INFO DIALOG MODAL */}
-        {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-sm shadow-xl border border-border/80 overflow-hidden flex flex-col">
-              
-              {/* Modal Header */}
-              <div className="flex justify-between items-center p-4 border-b border-border/40 shrink-0">
-                <h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-100 font-sans">
-                  Work Order Approval Console Info
-                </h3>
-                <button 
-                  onClick={closeModal} 
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition p-1"
-                >
-                  <X className="size-4.5" strokeWidth={2} />
-                </button>
-              </div>
-
-              {/* Modal Body Form */}
-              <form onSubmit={handleSave} className="flex-1 p-5 space-y-7">
-                {columnKeys.map((key, idx) => {
-                  if (key === "id") return null;
-                  const labelName = tableHeaders[idx - 1] || key;
-                  const value = formData[key] || "";
-                  
-                  return (
-                    <div key={key} className="space-y-1.5 relative border-b border-slate-200 dark:border-slate-800 pb-1.5 focus-within:border-blue-500 transition-colors">
-                      <label className="text-[10px] font-normal text-slate-400 block tracking-wide select-none">
-                        {labelName} {key === "status" || key === "isActive" ? "" : "*"}
-                      </label>
-                      {key === "status" || key === "isActive" ? (
-                        <select
-                          value={value}
-                          onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                          className="w-full bg-transparent outline-none border-none text-[12px] font-normal text-slate-800 dark:text-slate-100 py-0.5 focus:ring-0 cursor-pointer font-sans"
-                        >
-                          <option value="Active">Active</option>
-                          <option value="Inactive">Inactive</option>
-                        </select>
-                      ) : (
-                        <input
-                          type="text"
-                          required
-                          value={value}
-                          onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                          className="w-full bg-transparent outline-none border-none text-[12px] font-normal text-slate-800 dark:text-slate-100 py-0.5 focus:ring-0"
-                        />
-                      )}
-                    </div>
-                  );
-                })}
-
-                {/* Modal Footer Controls */}
-                <div className="pt-4 flex justify-between items-center border-t border-border/40">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={closeModal}
-                    className="text-xs font-medium text-slate-800 dark:text-slate-200 hover:text-slate-600 transition tracking-wide font-sans cursor-pointer uppercase py-2 px-4"
+                    onClick={() => setPdfPreviewOrder(selectedOrder)}
+                    className="h-9 px-3.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-foreground font-bold text-xs rounded-xl flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap shrink-0 min-w-fit"
                   >
-                    CLOSE
+                    <Printer className="size-4 text-blue-600 dark:text-blue-400" /> View / Print PDF
                   </button>
                   <button
-                    type="submit"
-                    className={`px-5 py-2.5 text-xs font-semibold text-white rounded-sm shadow-sm transition duration-150 uppercase tracking-wide cursor-pointer ${
-                      editingItem 
-                        ? "bg-[#2196F3] hover:bg-[#1E88E5]" 
-                        : "bg-[#8BC34A] hover:bg-[#7CB342]"
-                    }`}
+                    type="button"
+                    onClick={() => setSelectedOrder(null)}
+                    className="h-9 px-3.5 bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground font-bold text-xs rounded-xl flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap shrink-0 min-w-fit"
                   >
-                    {editingItem ? "UPDATE" : "CREATE"}
+                    <X className="size-4" /> Close Details
                   </button>
                 </div>
-              </form>
+              </div>
 
+              {/* Order Header & Supplier Overview */}
+              <div className="bg-card rounded-2xl border border-border p-5 shadow-2xs space-y-4">
+                <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="size-6 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center text-xs font-black">
+                      1
+                    </span>
+                    <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
+                      Order Header &amp; Supplier Information
+                    </h2>
+                  </div>
+                  <span className="text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                    Status: {selectedOrder.orderStatus}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Order Type</span>
+                    <span className="font-bold text-foreground mt-0.5 block">{selectedOrder.documentType}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Order Number</span>
+                    <span className="font-mono font-bold text-blue-600 dark:text-blue-400 mt-0.5 block">{selectedOrder.orderNumber}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Order Date</span>
+                    <span className="font-semibold text-foreground mt-0.5 block">{selectedOrder.orderDate}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Prepared By</span>
+                    <span className="font-semibold text-foreground mt-0.5 block">{selectedOrder.prepareBy}</span>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Department</span>
+                    <span className="font-semibold text-foreground mt-0.5 block">{selectedOrder.department}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Supplier / Vendor</span>
+                    <span className="font-bold text-foreground mt-0.5 block truncate">
+                      {selectedOrder.supplierName} ({selectedOrder.supplierCode || "SUP"})
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Contact &amp; Mobile</span>
+                    <span className="font-medium text-muted-foreground mt-0.5 block">
+                      {selectedOrder.contactPerson} • {selectedOrder.contactNumber || "N/A"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">
+                      {selectedOrder.documentType === "Purchase Order" ? "Delivery Warehouse" : "Work Location"}
+                    </span>
+                    <span className="font-semibold text-foreground mt-0.5 block truncate">
+                      {selectedOrder.documentType === "Purchase Order" ? selectedOrder.deliveryWarehouse : selectedOrder.workLocation}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ============================================================== */}
+              {/* 15. MATERIAL LINE ITEMS */}
+              {/* ============================================================== */}
+              <div className="bg-card rounded-2xl border border-border p-5 shadow-2xs space-y-4">
+                <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="size-6 rounded-lg bg-purple-500/10 text-purple-600 flex items-center justify-center text-xs font-black">
+                      2
+                    </span>
+                    <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
+                      {selectedOrder.documentType === "Purchase Order"
+                        ? "Material Line Items"
+                        : "Scope of Work / Services"}
+                    </h2>
+                  </div>
+                  <span className="text-xs text-muted-foreground font-semibold">
+                    {selectedOrder.documentType === "Purchase Order"
+                      ? `${currentPoItems.length} Material Item(s)`
+                      : `${currentWoItems.length} Service Line(s)`}
+                  </span>
+                </div>
+
+                {selectedOrder.documentType === "Purchase Order" ? (
+                  <div className="overflow-x-auto rounded-xl border border-border">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border whitespace-nowrap">
+                          <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
+                          <th className="py-2.5 px-3 font-bold">Item Name &amp; Code</th>
+                          <th className="py-2.5 px-3 font-bold">Specification</th>
+                          <th className="py-2.5 px-3 font-bold">Brand / Origin</th>
+                          <th className="py-2.5 px-3 w-16 font-bold text-center">SKU UOM</th>
+                          <th className="py-2.5 px-3 w-20 font-bold text-center">Market Unit</th>
+                          <th className="py-2.5 px-3 w-28 font-bold">Conversion</th>
+                          <th className="py-2.5 px-3 w-24 text-right font-bold">Order Qty</th>
+                          <th className="py-2.5 px-3 w-24 text-right font-bold text-blue-600 dark:text-blue-400">Base Qty</th>
+                          <th className="py-2.5 px-3 w-28 text-right font-bold">Unit Price</th>
+                          <th className="py-2.5 px-3 w-20 text-right font-bold">VAT</th>
+                          <th className="py-2.5 px-3 w-28 text-right font-bold">Total Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {currentPoItems.map((item, idx) => {
+                          const marketUnit = item.marketUnit || item.purchaseUom || item.uom;
+                          const factor = item.conversionFactor && item.conversionFactor > 0 ? item.conversionFactor : 1;
+                          const eqBaseQty = item.equivalentBaseQty != null ? item.equivalentBaseQty : (item.orderedQuantity * factor);
+
+                          return (
+                            <tr key={item.id || idx} className="hover:bg-muted/20">
+                              <td className="py-2 px-3 text-center text-muted-foreground font-bold">
+                                {idx + 1}
+                              </td>
+                              <td className="py-2 px-3">
+                                <div className="font-bold text-foreground">{item.itemName}</div>
+                                <div className="font-mono text-[10px] text-muted-foreground">{item.itemCode}</div>
+                              </td>
+                              <td className="py-2 px-3 text-[11px] text-muted-foreground max-w-[180px] truncate" title={item.specification}>
+                                {item.specification || "—"}
+                              </td>
+                              <td className="py-2 px-3 text-muted-foreground text-[11px]">
+                                {[item.brand, item.origin].filter(Boolean).join(" / ") || "—"}
+                              </td>
+                              <td className="py-2 px-3 text-center font-semibold text-muted-foreground">
+                                {item.uom}
+                              </td>
+                              <td className="py-2 px-3 text-center font-bold text-blue-600 dark:text-blue-400">
+                                {marketUnit}
+                              </td>
+                              <td className="py-2 px-3 font-mono text-[11px] text-muted-foreground whitespace-nowrap">
+                                {item.conversion || (factor !== 1 ? `1 ${marketUnit} = ${factor} ${item.uom}` : `1:1 Standard`)}
+                              </td>
+                              <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
+                                {item.orderedQuantity} {marketUnit}
+                              </td>
+                              <td className="py-2 px-3 text-right font-mono font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                                {eqBaseQty} {item.uom}
+                              </td>
+                              <td className="py-2 px-3 text-right font-mono text-muted-foreground whitespace-nowrap">
+                                ৳{item.unitPrice.toLocaleString()} <span className="text-[10px] text-muted-foreground">/ {marketUnit}</span>
+                              </td>
+                              <td className="py-2 px-3 text-right font-mono text-muted-foreground whitespace-nowrap">
+                                {item.vatRate ? `${item.vatRate}% (৳${(item.vatAmount || 0).toLocaleString()})` : "—"}
+                              </td>
+                              <td className="py-2 px-3 text-right font-mono font-bold text-foreground whitespace-nowrap">
+                                ৳{item.lineTotal.toLocaleString()}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto rounded-xl border border-border">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border whitespace-nowrap">
+                          <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
+                          <th className="py-2.5 px-3 font-bold">Service / Work Name</th>
+                          <th className="py-2.5 px-3 font-bold">Service Code</th>
+                          <th className="py-2.5 px-3 font-bold">Work Description &amp; Scope</th>
+                          <th className="py-2.5 px-3 w-16 font-bold text-center">UOM</th>
+                          <th className="py-2.5 px-3 w-20 text-right font-bold">Work Order Qty</th>
+                          <th className="py-2.5 px-3 w-24 text-right font-bold">Unit Rate</th>
+                          <th className="py-2.5 px-3 w-28 text-right font-bold">Line Total</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {currentWoItems.map((item, idx) => (
+                          <tr key={item.id || idx} className="hover:bg-muted/20">
+                            <td className="py-2 px-3 text-center text-muted-foreground font-bold">{idx + 1}</td>
+                            <td className="py-2 px-3 font-bold text-foreground">{item.serviceName}</td>
+                            <td className="py-2 px-3 font-mono text-[11px] text-muted-foreground">{item.serviceCode}</td>
+                            <td className="py-2 px-3 text-[11px] text-muted-foreground">{item.workDescription} • {item.specification}</td>
+                            <td className="py-2 px-3 text-center text-muted-foreground font-semibold">{item.uom}</td>
+                            <td className="py-2 px-3 text-right font-mono font-bold text-foreground">{item.workOrderQuantity}</td>
+                            <td className="py-2 px-3 text-right font-mono text-muted-foreground">৳{item.unitRate.toLocaleString()}</td>
+                            <td className="py-2 px-3 text-right font-mono font-bold text-foreground">৳{item.lineTotal.toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Financial Summary */}
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-border flex flex-wrap justify-between items-center text-xs">
+                  <div className="text-muted-foreground space-y-1">
+                    <div>Subtotal: <strong className="text-foreground">৳{selectedOrder.subtotal.toLocaleString()}</strong></div>
+                    <div>Discount Deducted: <strong className="text-rose-600">-৳{selectedOrder.discountTotal.toLocaleString()}</strong></div>
+                    <div>Applicable VAT: <strong className="text-blue-600 dark:text-blue-400">+৳{selectedOrder.vatTotal.toLocaleString()}</strong></div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold block">
+                      Total Sanctioned Value
+                    </span>
+                    <span className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                      ৳{selectedOrder.grandTotal.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Terms & Conditions & Attachments */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-card rounded-2xl border border-border p-5 space-y-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
+                    Terms &amp; Conditions
+                  </span>
+                  <div className="text-xs font-mono text-slate-700 dark:text-slate-300 whitespace-pre-line bg-muted/20 p-3 rounded-xl border border-border leading-relaxed">
+                    {selectedOrder.termsAndConditions || "Standard commercial terms apply."}
+                  </div>
+                </div>
+
+                <div className="bg-card rounded-2xl border border-border p-5 space-y-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
+                    Order Attachments (Optional)
+                  </span>
+                  <div className="space-y-2">
+                    {selectedOrder.attachments?.map((att) => (
+                      <div
+                        key={att.id}
+                        className="flex items-center justify-between p-2.5 rounded-xl bg-muted/20 border border-border text-xs"
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          <FileText className="size-4 text-blue-600 shrink-0" />
+                          <span className="font-semibold text-foreground truncate">{att.documentName || att.fileName}</span>
+                        </div>
+                        <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold underline cursor-pointer shrink-0">
+                          Download
+                        </span>
+                      </div>
+                    ))}
+                    {(!selectedOrder.attachments || selectedOrder.attachments.length === 0) && (
+                      <div className="py-4 text-center text-xs text-muted-foreground">
+                        No attachments uploaded for this order.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* ============================================================== */
+            /* 13. DEDICATED PURCHASE ORDER / WORK ORDER APPROVAL LIST */
+            /* ============================================================== */
+            <div className="space-y-6 w-full">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-4">
+                <div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium mb-1">
+                    <span>Procurement</span>
+                    <ChevronRight className="size-3" />
+                    <span>Purchase Order</span>
+                    <ChevronRight className="size-3" />
+                    <span className="text-amber-500 font-bold">PO / WO Approval</span>
+                  </div>
+                  <h1 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-2.5">
+                    <ShieldCheck className="size-7 text-amber-500" />
+                    Purchase Order / Work Order Approval
+                  </h1>
+                  <p className="text-xs text-muted-foreground mt-0.5 font-medium">
+                    Official review queue displaying submitted orders awaiting managerial verification and approval sign-off.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="px-3.5 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20 text-xs font-bold flex items-center gap-1.5">
+                    <Clock className="size-3.5" />
+                    {submittedOrders.length} Submitted Order(s)
+                  </span>
+                </div>
+              </div>
+
+              {/* Filters Bar */}
+              <div className="bg-card rounded-2xl border border-border p-4 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="relative w-full sm:w-80">
+                  <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search by order no, supplier, requester..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-8 pr-3 py-2 text-xs bg-muted/40 border border-border rounded-xl outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    className="text-xs px-3 py-2 bg-muted/40 border border-border rounded-xl outline-none font-semibold cursor-pointer"
+                  >
+                    <option value="All">All Document Types</option>
+                    <option value="Purchase Order">Purchase Order</option>
+                    <option value="Work Order">Work Order</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Dedicated Approval List Table */}
+              <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-2xs">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-muted/80 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border whitespace-nowrap">
+                        <th className="py-3 px-4 w-12 text-center font-bold">SL</th>
+                        <th className="py-3 px-4 font-bold">Order Number</th>
+                        <th className="py-3 px-4 font-bold">Type</th>
+                        <th className="py-3 px-4 font-bold">Date</th>
+                        <th className="py-3 px-4 font-bold">Supplier / Vendor</th>
+                        <th className="py-3 px-4 font-bold">Department</th>
+                        <th className="py-3 px-4 font-bold">Prepared By</th>
+                        <th className="py-3 px-4 text-right font-bold">Total Amount</th>
+                        <th className="py-3 px-4 text-center font-bold">Status</th>
+                        <th className="py-3 px-4 text-center font-bold">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {submittedOrders.map((ord, idx) => (
+                        <tr key={ord.id || idx} className="hover:bg-muted/20 transition">
+                          <td className="py-3 px-4 text-center text-muted-foreground font-bold">
+                            {idx + 1}
+                          </td>
+                          <td className="py-3 px-4 font-mono font-bold">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedOrder(ord)}
+                              className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                            >
+                              {ord.orderNumber}
+                            </button>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-foreground font-semibold text-[10px]">
+                              {ord.documentType === "Purchase Order" ? (
+                                <Package className="size-3 text-amber-500" />
+                              ) : (
+                                <Wrench className="size-3 text-cyan-500" />
+                              )}
+                              {ord.documentType}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-muted-foreground font-medium">
+                            {ord.orderDate}
+                          </td>
+                          <td className="py-3 px-4 font-bold text-foreground max-w-[200px] truncate" title={ord.supplierName}>
+                            {ord.supplierName}
+                          </td>
+                          <td className="py-3 px-4 text-muted-foreground">
+                            {ord.department}
+                          </td>
+                          <td className="py-3 px-4 text-muted-foreground">
+                            {ord.prepareBy}
+                          </td>
+                          <td className="py-3 px-4 text-right font-mono font-bold text-foreground">
+                            ৳{ord.grandTotal.toLocaleString()}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide bg-amber-500/10 text-amber-600 border border-amber-500/20 inline-flex items-center gap-1">
+                              <Clock className="size-3" /> Submitted
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedOrder(ord)}
+                                className="h-7 px-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] rounded-lg flex items-center gap-1 shadow-xs transition cursor-pointer"
+                                title="Open Approval Details"
+                              >
+                                Review &amp; Decide
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setPdfPreviewOrder(ord)}
+                                className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition cursor-pointer"
+                                title="View PDF Document"
+                              >
+                                <Eye className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+
+                      {submittedOrders.length === 0 && (
+                        <tr>
+                          <td colSpan={10} className="py-12 text-center text-xs text-muted-foreground">
+                            <CheckCircle2 className="size-8 text-emerald-500 mx-auto mb-2 opacity-60" />
+                            <p className="font-semibold text-foreground">All caught up!</p>
+                            <p className="text-[11px]">There are currently no submitted Purchase Orders or Work Orders awaiting approval.</p>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
+
+        {/* ============================================================== */}
+        {/* 16. STATIONARY DOCKED APPROVAL ACTIONS BAR (PERSISTENT VIEWPORT DOCK) */}
+        {/* ============================================================== */}
+        {selectedOrder && (
+          <div className="shrink-0 bg-white/95 dark:bg-card/95 backdrop-blur-md border-t border-border p-4 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 z-20">
+            <div className="flex items-center gap-2">
+              <span className="size-3 rounded-full bg-amber-500 animate-ping" />
+              <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+                Order <strong className="font-mono text-foreground">{selectedOrder.orderNumber}</strong> is awaiting your authorization decision.
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={() => handleOpenActionModal("Reject Order")}
+                className="flex-1 sm:flex-none h-10 px-5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs transition cursor-pointer whitespace-nowrap shrink-0 min-w-fit"
+              >
+                <XCircle className="size-4" /> Reject Order
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleOpenActionModal("Return for Correction")}
+                className="flex-1 sm:flex-none h-10 px-5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs transition cursor-pointer whitespace-nowrap shrink-0 min-w-fit"
+              >
+                <RotateCcw className="size-4" /> Return for Correction
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleOpenActionModal("Approve")}
+                className="flex-1 sm:flex-none h-10 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs transition cursor-pointer whitespace-nowrap shrink-0 min-w-fit"
+              >
+                <CheckCircle2 className="size-4" /> Approve
+              </button>
             </div>
           </div>
         )}
+      </div>
 
-      </main>
+      {/* ============================================================== */}
+      {/* 16. APPROVAL ACTION MODAL (COMMENTS TEXTBOX & CONFIRM/CANCEL) */}
+      {/* ============================================================== */}
+      {actionModalOpen && selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className={`p-4 border-b flex justify-between items-center ${
+              activeAction === "Approve"
+                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900"
+                : activeAction === "Return for Correction"
+                ? "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900"
+                : "bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900"
+            }`}>
+              <div className="flex items-center gap-2">
+                {activeAction === "Approve" && <CheckCircle2 className="size-5 text-emerald-600" />}
+                {activeAction === "Return for Correction" && <RotateCcw className="size-5 text-amber-600" />}
+                {activeAction === "Reject Order" && <XCircle className="size-5 text-rose-600" />}
+                <h3 className="text-sm font-bold text-foreground">
+                  Confirm Decision: {activeAction}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActionModalOpen(false)}
+                className="size-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 space-y-4 text-xs">
+              <div className="bg-muted/40 p-3 rounded-xl border border-border space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Order Number:</span>
+                  <span className="font-mono font-bold text-foreground">{selectedOrder.orderNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Supplier:</span>
+                  <span className="font-semibold text-foreground">{selectedOrder.supplierName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Amount:</span>
+                  <span className="font-mono font-bold text-emerald-600">৳{selectedOrder.grandTotal.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1.5">
+                  Comments {activeAction !== "Approve" && <span className="text-rose-500">* (Mandatory)</span>}
+                </label>
+                <textarea
+                  rows={4}
+                  placeholder={
+                    activeAction === "Approve"
+                      ? "Enter any approval notes, caveats, or remarks (optional)..."
+                      : activeAction === "Return for Correction"
+                      ? "Specify what corrections or adjustments the requester must make..."
+                      : "State the mandatory justification for rejecting this order..."
+                  }
+                  value={actionComments}
+                  onChange={(e) => setActionComments(e.target.value)}
+                  className="w-full p-3 bg-muted/30 border border-border rounded-xl text-xs outline-none focus:border-amber-500 font-sans"
+                />
+              </div>
+
+              <div className="text-[11px] text-muted-foreground">
+                Approver: <strong className="text-foreground">{approverName}</strong> • {approverDesignation}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-border flex items-center justify-end gap-2 bg-muted/10">
+              <button
+                type="button"
+                onClick={() => setActionModalOpen(false)}
+                className="h-9 px-4 bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground font-bold text-xs rounded-xl cursor-pointer whitespace-nowrap shrink-0 min-w-fit"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmAction}
+                className={`h-9 px-5 text-white font-bold text-xs rounded-xl cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap shrink-0 min-w-fit ${
+                  activeAction === "Approve"
+                    ? "bg-emerald-600 hover:bg-emerald-700 shadow-sm"
+                    : activeAction === "Return for Correction"
+                    ? "bg-amber-500 hover:bg-amber-600 shadow-sm"
+                    : "bg-rose-600 hover:bg-rose-700 shadow-sm"
+                }`}
+              >
+                <Check className="size-4" /> Confirm Action
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* 12. OFFICIAL PDF / REPORT VIEW MODAL */}
+      {/* ============================================================== */}
+      {pdfPreviewOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-card border border-border rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-4 border-b border-border flex justify-between items-center bg-slate-50/70 dark:bg-slate-900/70">
+              <div className="flex items-center gap-2">
+                <FileText className="size-5 text-blue-600" />
+                <h3 className="text-sm font-bold text-foreground">
+                  Official Document Preview — {pdfPreviewOrder.orderNumber}
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Printer className="size-3.5" /> Print Document
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPdfPreviewOrder(null)}
+                  className="size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Printable Document Container */}
+            <div className="p-6 overflow-y-auto flex-1 bg-white text-slate-900 text-xs font-sans space-y-5 print:p-0">
+              {/* Pakiza Official Header */}
+              <div className="border-b-2 border-slate-900 pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-40">
+                    <img src={pakizaSoftwareLogo} alt="Pakiza Logo" className="h-10 w-auto object-contain" />
+                  </div>
+                  <div className="text-center flex-1">
+                    <h1 className="text-base font-black tracking-wide uppercase text-slate-950">
+                      PAKIZA KNIT COMPOSITE LTD.
+                    </h1>
+                    <p className="text-[10px] text-slate-600">
+                      Khan ABC Tradeplex, House #37, Road #2, Dhanmondi, Dhaka-1205
+                    </p>
+                    <span className="inline-block mt-1 px-4 py-0.5 bg-slate-900 text-white font-mono font-black text-xs uppercase tracking-widest rounded-sm">
+                      {pdfPreviewOrder.documentType === "Purchase Order" ? "PURCHASE ORDER" : "WORK ORDER"}
+                    </span>
+                  </div>
+                  <div className="w-40 text-right text-[10px] text-slate-500">
+                    Date: {new Date().toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Metadata Grid */}
+              <div className="grid grid-cols-2 gap-4 border border-slate-300 rounded-lg p-3 bg-slate-50/50">
+                <div className="space-y-1">
+                  <div><strong>PO/WO No:</strong> <span className="font-mono font-bold text-blue-700">{pdfPreviewOrder.orderNumber}</span></div>
+                  <div><strong>Order Date:</strong> {pdfPreviewOrder.orderDate}</div>
+                  <div><strong>PR Reference:</strong> {pdfPreviewOrder.prIds?.join(", ") || "N/A"}</div>
+                  <div><strong>CS Reference:</strong> {pdfPreviewOrder.csId || "N/A"}</div>
+                  <div><strong>Payment Terms:</strong> {pdfPreviewOrder.paymentMode || "Credit 30 Days"}</div>
+                </div>
+                <div className="space-y-1">
+                  <div><strong>Supplier:</strong> <span className="font-bold">{pdfPreviewOrder.supplierName}</span></div>
+                  <div><strong>Contact Person:</strong> {pdfPreviewOrder.contactPerson}</div>
+                  <div><strong>Mobile:</strong> {pdfPreviewOrder.contactNumber || "N/A"}</div>
+                  <div><strong>Delivery Location:</strong> {pdfPreviewOrder.deliveryWarehouse || pdfPreviewOrder.workLocation}</div>
+                  <div><strong>Prepared By:</strong> {pdfPreviewOrder.prepareBy} ({pdfPreviewOrder.department})</div>
+                </div>
+              </div>
+
+              {/* Line Items Table */}
+              <table className="w-full border-collapse border border-slate-300 text-[11px]">
+                <thead>
+                  <tr className="bg-slate-100 text-slate-700 font-bold uppercase text-[9.5px]">
+                    <th className="border border-slate-300 p-2 text-center w-8">SL</th>
+                    <th className="border border-slate-300 p-2">Item Description &amp; Spec</th>
+                    <th className="border border-slate-300 p-2 text-center">SKU UOM</th>
+                    <th className="border border-slate-300 p-2 text-center">Market Unit</th>
+                    <th className="border border-slate-300 p-2 text-center">Conversion</th>
+                    <th className="border border-slate-300 p-2 text-right">Order Qty</th>
+                    <th className="border border-slate-300 p-2 text-right">Unit Price</th>
+                    <th className="border border-slate-300 p-2 text-right">VAT</th>
+                    <th className="border border-slate-300 p-2 text-right">Total (৳)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(poItemsMap[pdfPreviewOrder.orderNumber] || pdfPreviewOrder.items || []).map((it, idx) => (
+                    <tr key={idx}>
+                      <td className="border border-slate-300 p-2 text-center">{idx + 1}</td>
+                      <td className="border border-slate-300 p-2">
+                        <div className="font-bold">{it.itemName}</div>
+                        <div className="text-[10px] text-slate-500">{it.itemCode} • {it.specification}</div>
+                      </td>
+                      <td className="border border-slate-300 p-2 text-center">{it.uom}</td>
+                      <td className="border border-slate-300 p-2 text-center font-bold">{it.marketUnit || it.purchaseUom || it.uom}</td>
+                      <td className="border border-slate-300 p-2 text-center text-[10px] text-slate-600">
+                        {it.conversion || "1:1 Standard"}
+                      </td>
+                      <td className="border border-slate-300 p-2 text-right font-mono font-bold">{it.orderedQuantity}</td>
+                      <td className="border border-slate-300 p-2 text-right font-mono">৳{it.unitPrice.toLocaleString()}</td>
+                      <td className="border border-slate-300 p-2 text-right font-mono">{it.vatRate ? `${it.vatRate}%` : "—"}</td>
+                      <td className="border border-slate-300 p-2 text-right font-mono font-bold">৳{it.lineTotal.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Financial Summary */}
+              <div className="flex justify-end">
+                <div className="w-64 space-y-1 bg-slate-50 p-3 border border-slate-300 rounded-lg text-[11px]">
+                  <div className="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span className="font-mono font-bold">৳{pdfPreviewOrder.subtotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-rose-600">
+                    <span>Discount:</span>
+                    <span className="font-mono font-bold">-৳{pdfPreviewOrder.discountTotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-blue-700">
+                    <span>Applicable VAT:</span>
+                    <span className="font-mono font-bold">+৳{pdfPreviewOrder.vatTotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-base font-black border-t border-slate-400 pt-1 text-slate-950">
+                    <span>Grand Total:</span>
+                    <span className="font-mono">৳{pdfPreviewOrder.grandTotal.toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Terms and Conditions */}
+              {pdfPreviewOrder.termsAndConditions && (
+                <div className="space-y-1 pt-2 border-t border-slate-200">
+                  <span className="font-bold text-[10px] uppercase tracking-wider block text-slate-900">
+                    TERMS &amp; CONDITIONS:
+                  </span>
+                  <p className="text-[10px] text-slate-700 whitespace-pre-line leading-relaxed">
+                    {pdfPreviewOrder.termsAndConditions}
+                  </p>
+                </div>
+              )}
+
+              {/* 4-Tier Signatures Block */}
+              <div className="pt-10 grid grid-cols-4 gap-4 text-center text-[10px] font-bold text-slate-700">
+                <div className="border-t border-slate-400 pt-1.5">
+                  <p className="text-slate-950 font-black">{pdfPreviewOrder.prepareBy}</p>
+                  <p className="text-slate-500 font-normal">Prepared By</p>
+                </div>
+                <div className="border-t border-slate-400 pt-1.5">
+                  <p className="text-slate-950 font-black">Engr. Tariqul Islam</p>
+                  <p className="text-slate-500 font-normal">Checked &amp; Verified By</p>
+                </div>
+                <div className="border-t border-slate-400 pt-1.5">
+                  <p className="text-slate-950 font-black">Kamrul Islam</p>
+                  <p className="text-slate-500 font-normal">Head of Procurement</p>
+                </div>
+                <div className="border-t border-slate-400 pt-1.5">
+                  <p className="text-slate-950 font-black">Rafiqul Islam</p>
+                  <p className="text-slate-500 font-normal">Approved By / MD</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -18,7 +18,7 @@ import {
   Download,
   FolderOpen,
   Activity,
-  CircleDollarSign, Clock, UserCheck, MessageSquare, AlertCircle, X, Building2, Briefcase, CalendarDays, MapPin, Check,
+  CircleDollarSign, Clock, UserCheck, MessageSquare, AlertCircle, X, Building2, Briefcase, CalendarDays, MapPin, Check, Layers,
 } from "lucide-react";
 
 export const Route = createFileRoute("/approve-advance")({
@@ -721,7 +721,7 @@ function ApproveAdvancePage() {
 
                   <div className="flex items-start gap-2.5">
                     <div className="w-7 h-7 rounded-md bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
-                      <LayersIcon className="w-3.5 h-3.5 text-slate-400" />
+                      <Layers className="w-3.5 h-3.5 text-slate-400" />
                     </div>
                     <div>
                       <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">SECTION</p>
@@ -741,7 +741,7 @@ function ApproveAdvancePage() {
 
                   <div className="flex items-start gap-2.5">
                     <div className="w-7 h-7 rounded-md bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
-                      <BuildingIcon className="w-3.5 h-3.5 text-slate-400" />
+                      <Building2 className="w-3.5 h-3.5 text-slate-400" />
                     </div>
                     <div>
                       <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">BUSINESS UNIT</p>

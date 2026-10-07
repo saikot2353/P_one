@@ -3,6 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Printer } from "lucide-react";
 
 export const Route = createFileRoute("/payslip-print")({
+  validateSearch: (search: Record<string, unknown>): { lang?: "en" | "bn" } => ({
+    lang: search.lang === "bn" ? "bn" : "en",
+  }),
   component: PayslipPrintPage,
 });
 
@@ -27,7 +30,7 @@ interface PayslipTemplate {
 }
 
 export function PayslipPrintPage() {
-  const { lang = "en" } = Route.useSearch<{ lang?: "en" | "bn" }>();
+  const { lang = "en" } = Route.useSearch();
   const [employees, setEmployees] = useState<any[]>([]);
   const [templates, setTemplates] = useState<PayslipTemplate[]>([]);
 

@@ -370,7 +370,7 @@ function PayrollDeductionsPage() {
             prorataReductionType: t.prorataReductionType || "percent",
             prorataReductionValue: t.prorataReductionValue !== undefined ? t.prorataReductionValue : (t.prorataReductionPercent !== undefined ? t.prorataReductionPercent : 50)
           }));
-          setTemplates(migrated);
+          setTemplates(migrated as DeductionTemplate[]);
         }
       } catch (e) {
         console.error("Failed to parse templates from localStorage", e);

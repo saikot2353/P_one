@@ -398,9 +398,15 @@ interface YarnTypeSpec {
   id: string;
   yarnType: string;
   createDate: string;
+<<<<<<< HEAD
   rate?: number;
   rateConstraint?: RateConstraint | string;
   status: "Active" | "Inactive";
+=======
+  status?: "Active" | "Inactive";
+  rate?: number;
+  rateConstraint?: RateConstraint | string;
+>>>>>>> 7a45f059a0b8cc3c72fbb12ba16599facfadd815
 }
 
 export const initialYarnTypes: YarnTypeSpec[] = [
@@ -437,6 +443,8 @@ interface YarnCountSpec {
   rate?: number;
   rateConstraint?: RateConstraint | string;
   status: "Active" | "Inactive";
+  rate?: number;
+  rateConstraint?: RateConstraint | string;
 }
 
 export const initialYarnCounts: YarnCountSpec[] = [
@@ -555,7 +563,7 @@ interface SpecialCostSpec {
   ratePerDzn: number;
   rateConstraint: RateConstraint;
   isActive: "Active" | "Inactive";
-  rateCharts: SpecialCostRateChart[];
+  rateCharts?: SpecialCostRateChart[];
 }
 
 export const initialSpecialCosts: SpecialCostSpec[] = [
@@ -873,8 +881,8 @@ interface TrimsMaster {
   subCategory: string;
   uom: string;
   unitPriceUsd: number;
-  rateConstraint: RateConstraint;
-  nominatedSupplier: string;
+  rateConstraint?: RateConstraint;
+  nominatedSupplier?: string;
 }
 
 interface SpecParameter {
@@ -2389,7 +2397,7 @@ function MerchandisingMasterSettingsPage() {
 
     setSpecialCosts(prev => prev.map(sc => {
       if (sc.id !== selectedSpecialCostId) return sc;
-      let newCharts = [...sc.rateCharts];
+      let newCharts = [...(sc.rateCharts || [])];
       if (editingRateChartItem) {
         newCharts = newCharts.map(rc => rc.id === editingRateChartItem.id ? { ...rc, ...rateChartForm } as SpecialCostRateChart : rc);
         toast.success("Rate Chart entry updated successfully!");
@@ -2415,7 +2423,7 @@ function MerchandisingMasterSettingsPage() {
     if (!selectedSpecialCostId) return;
     setSpecialCosts(prev => prev.map(sc => {
       if (sc.id !== selectedSpecialCostId) return sc;
-      return { ...sc, rateCharts: sc.rateCharts.filter(rc => rc.id !== rcId) };
+      return { ...sc, rateCharts: (sc.rateCharts || []).filter(rc => rc.id !== rcId) };
     }));
     toast.success("Rate Chart entry deleted successfully!");
   };
@@ -3546,7 +3554,7 @@ function MerchandisingMasterSettingsPage() {
 
   const filteredTrims = trims.filter(t =>
     t.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.nominatedSupplier.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (t.nominatedSupplier || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
