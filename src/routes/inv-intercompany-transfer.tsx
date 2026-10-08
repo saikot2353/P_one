@@ -56,16 +56,17 @@ import {
 export const Route = createFileRoute("/inv-intercompany-transfer")({
   validateSearch: (
     search: Record<string, unknown>
-  ): { transferId?: string; mode?: "view" | "edit" } => ({
+  ): { transferId?: string; mode?: "view" | "edit"; type?: string } => ({
     transferId: search.transferId as string | undefined,
     mode: search.mode as "view" | "edit" | undefined,
+    type: search.type as string | undefined,
   }),
   head: () => ({
     meta: [
-      { title: "Inter-Company Stock Transfer Entry — Inventory ERP" },
+      { title: "Multi-Company & Intra-Company Stock Transfer Entry — Inventory ERP" },
       {
         name: "description",
-        content: "Transfer materials between group entities with real-time stock and batch validation.",
+        content: "Transfer materials between group entities or internal stores with real-time stock and batch validation.",
       },
     ],
   }),
@@ -127,8 +128,9 @@ function InterCompanyTransferFormPage() {
     return existingTransfer?.toStore || "Spinning Spare Parts & Consumables Store";
   });
 
-  // Transfer Type (Inter-Company vs Intra-Company)
+  // Transfer Type (Multi-Company vs Intra-Company)
   const [transferType, setTransferType] = useState<TransferType>(() => {
+    if (searchParams.type === "intra") return "Intra-Company";
     return existingTransfer?.transferType || "Inter-Company";
   });
 
@@ -698,7 +700,7 @@ function InterCompanyTransferFormPage() {
                           : "text-slate-600 hover:text-slate-900"
                       }`}
                     >
-                      Inter-Company Transfer
+                      Multi-Company Transfer
                     </button>
                     <button
                       type="button"
@@ -706,6 +708,15 @@ function InterCompanyTransferFormPage() {
                       onClick={() => {
                         setTransferType("Intra-Company");
                         setToCompany(fromCompany);
+                        const sameCompanyStores = warehouses.filter(
+                          (w) => w.organization === fromCompany && w.status === "Active"
+                        );
+                        const otherStore =
+                          sameCompanyStores.find((s) => (s.storeName || s.name) !== fromStore) ||
+                          sameCompanyStores[0];
+                        if (otherStore) {
+                          setToStore(otherStore.storeName || otherStore.name);
+                        }
                       }}
                       className={`px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer ${
                         transferType === "Intra-Company"
@@ -758,7 +769,7 @@ function InterCompanyTransferFormPage() {
                   <div className="flex items-start sm:items-center gap-2 text-amber-900">
                     <AlertTriangle className="size-4 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
                     <span>
-                      <strong>Inter-Company Transfer Rule:</strong> Transfer Requisition is{" "}
+                      <strong>Multi-Company Transfer Rule:</strong> Transfer Requisition is{" "}
                       <span className="font-bold underline text-amber-950">mandatory</span> and approval is required. Please tag an approved requisition before submitting.
                     </span>
                   </div>

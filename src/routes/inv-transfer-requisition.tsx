@@ -705,8 +705,6 @@ function TransferRequisitionFormPage() {
                     <th className="py-2.5 px-3 w-28">Brand / Origin</th>
                     <th className="py-2.5 px-3 w-20 text-center">UOM</th>
                     <th className="py-2.5 px-3 w-28 text-right">Required Qty</th>
-                    <th className="py-2.5 px-3 w-28 text-right">Est. Rate (৳)</th>
-                    <th className="py-2.5 px-3 w-32 text-right">Est. Total (৳)</th>
                     <th className="py-2.5 px-3 min-w-[150px]">Remarks</th>
                     {!isViewMode && <th className="py-2.5 px-3 w-12 text-center">Action</th>}
                   </tr>
@@ -742,12 +740,6 @@ function TransferRequisitionFormPage() {
                             className="w-24 h-8 px-2 rounded border border-slate-200 text-right font-bold text-slate-900 focus:border-blue-500 outline-none text-xs"
                           />
                         )}
-                      </td>
-                      <td className="py-2.5 px-3 text-right text-slate-600 font-mono">
-                        ৳ {it.estimatedUnitPrice.toLocaleString()}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-bold text-slate-900 font-mono">
-                        ৳ {it.totalEstimatedValue.toLocaleString()}
                       </td>
                       <td className="py-2.5 px-3">
                         {isViewMode ? (
@@ -792,12 +784,6 @@ function TransferRequisitionFormPage() {
                     {totalRequiredQty.toLocaleString()} units
                   </span>
                 </div>
-                <div>
-                  <span className="text-slate-500">Total Est. Value: </span>
-                  <span className="font-black text-blue-700 text-sm font-mono">
-                    ৳ {totalEstimatedValue.toLocaleString()}
-                  </span>
-                </div>
               </div>
             </div>
           </div>
@@ -834,7 +820,7 @@ function TransferRequisitionFormPage() {
                   type="text"
                   value={itemSearchQuery}
                   onChange={(e) => setItemSearchQuery(e.target.value)}
-                  placeholder="Search item by name, code, specification..."
+                  placeholder="Search item by name, code, specification, brand, origin..."
                   className="w-full h-9 pl-9 pr-4 rounded-xl border border-slate-200 bg-white text-xs text-slate-900 focus:border-blue-500 outline-none"
                   autoFocus
                 />
@@ -849,26 +835,28 @@ function TransferRequisitionFormPage() {
                     key={cat.id}
                     className="py-3 px-2 flex items-center justify-between hover:bg-slate-50 rounded-lg transition"
                   >
-                    <div>
+                    <div className="space-y-1">
                       <div className="font-bold text-xs text-slate-900">{cat.itemName}</div>
-                      <div className="text-[10px] text-slate-500 font-mono">
-                        {cat.itemCode} • {cat.stockUOM} • Est. Rate: ৳{(cat.standardPurchasePrice || 250).toLocaleString()}
+                      <div className="text-[11px] text-slate-600">
+                        <span className="font-semibold text-slate-700">Specification:</span> {cat.specification || "Standard"}
                       </div>
-                      {cat.specification && (
-                        <div className="text-[10px] text-slate-400 max-w-md truncate">
-                          {cat.specification}
-                        </div>
-                      )}
+                      <div className="text-[11px] text-slate-600 flex items-center gap-3">
+                        <span><span className="font-semibold text-slate-700">Brand:</span> {cat.brand || "—"}</span>
+                        <span>•</span>
+                        <span><span className="font-semibold text-slate-700">Origin:</span> {cat.origin || "—"}</span>
+                        <span>•</span>
+                        <span className="font-mono text-[10px] text-slate-400">{cat.itemCode} ({cat.stockUOM})</span>
+                      </div>
                     </div>
                     {isAlready ? (
-                      <span className="px-2 py-1 rounded text-[11px] font-bold bg-slate-100 text-slate-400">
+                      <span className="px-2 py-1 rounded text-[11px] font-bold bg-slate-100 text-slate-400 shrink-0">
                         Already Added
                       </span>
                     ) : (
                       <button
                         type="button"
                         onClick={() => handleAddCatalogItem(cat)}
-                        className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition cursor-pointer shrink-0"
                       >
                         + Select
                       </button>

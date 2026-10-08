@@ -57,6 +57,14 @@ import {
   StandardReportData,
 } from "@/components/reports/StandardPreviewReportModal";
 
+const COMPANY_AVAILABLE_STOCK_POLICIES_KEY = "cripton_company_stock_policies_v1";
+const DEFAULT_COMPANY_STOCK_POLICIES: Record<string, boolean> = {
+  "Pakiza Knit Composite Ltd": true,
+  "Pakiza Cotton Mills Ltd": true,
+  "Pakiza Apparels Ltd": true,
+  "Pakiza Woven Composite Ltd": true,
+};
+
 interface MRSearch {
   action?: "create" | "edit" | "view" | "approve";
   id?: string;

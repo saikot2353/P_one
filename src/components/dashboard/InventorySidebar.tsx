@@ -312,10 +312,6 @@ export const nav: NavItem[] = [
         to: "/inv-report-stock-transfer",
       },
       {
-        label: "Stock Adjustment Register",
-        to: "/inv-report-stock-adjustment",
-      },
-      {
         label: "Stock Write-Off Register",
         to: "/inv-report-stock-writeoff",
       },

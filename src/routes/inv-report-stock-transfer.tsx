@@ -88,7 +88,10 @@ export function StockTransferRegisterPage() {
       if (filterToCompany !== "All" && row.toCompany !== filterToCompany) return false;
       if (filterFromStore !== "All" && row.fromStore !== filterFromStore) return false;
       if (filterToStore !== "All" && row.toStore !== filterToStore) return false;
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
       if (filterBatch.trim() && !row.batch.toLowerCase().includes(filterBatch.toLowerCase().trim()))
         return false;
       if (filterStatus !== "All" && row.status !== filterStatus) return false;
@@ -123,16 +126,10 @@ export function StockTransferRegisterPage() {
     searchQuery,
   ]);
 
-  // KPIs as requested: Pending, In Transit, Partially Received, Fully Received, Short / Variance
-  const kpis = useMemo(() => {
-    const pending = filteredRows.filter((r) => r.status === "Pending").length;
-    const inTransit = filteredRows.filter((r) => r.status === "In Transit").length;
-    const partiallyReceived = filteredRows.filter((r) => r.status === "Partially Received").length;
-    const fullyReceived = filteredRows.filter((r) => r.status === "Fully Received").length;
-    const variance = filteredRows.filter((r) => r.status === "Short / Variance").length;
-
-    return { pending, inTransit, partiallyReceived, fullyReceived, variance };
-  }, [filteredRows]);
+  const totalTransferQty = useMemo(() => filteredRows.reduce((s, r) => s + r.quantity, 0), [filteredRows]);
+  const totalReceivedQty = useMemo(() => filteredRows.reduce((s, r) => s + r.receivedQty, 0), [filteredRows]);
+  const totalPendingQty = useMemo(() => filteredRows.reduce((s, r) => s + r.pendingQty, 0), [filteredRows]);
+  const totalTransferVal = useMemo(() => filteredRows.reduce((s, r) => s + r.quantity * 150, 0), [filteredRows]);
 
   const handleResetFilters = () => {
     setFilterTransferId("");
@@ -332,35 +329,6 @@ export function StockTransferRegisterPage() {
             </div>
           </div>
 
-          {/* 5 Required KPIs */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[11px] font-medium text-muted-foreground">Pending</span>
-              <p className="text-lg font-bold mt-1 text-foreground">{kpis.pending}</p>
-              <span className="text-[10px] text-muted-foreground">Awaiting dispatch</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-blue-500/20 bg-blue-500/5 shadow-xs">
-              <span className="text-[11px] font-medium text-blue-600">In Transit</span>
-              <p className="text-lg font-bold mt-1 text-blue-600">{kpis.inTransit}</p>
-              <span className="text-[10px] text-muted-foreground">On the road</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-amber-500/20 bg-amber-500/5 shadow-xs">
-              <span className="text-[11px] font-medium text-amber-600">Partially Received</span>
-              <p className="text-lg font-bold mt-1 text-amber-600">{kpis.partiallyReceived}</p>
-              <span className="text-[10px] text-muted-foreground">Balance remaining</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 shadow-xs">
-              <span className="text-[11px] font-medium text-emerald-600">Fully Received</span>
-              <p className="text-lg font-bold mt-1 text-emerald-600">{kpis.fullyReceived}</p>
-              <span className="text-[10px] text-muted-foreground">Stock updated</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-rose-500/20 bg-rose-500/5 shadow-xs">
-              <span className="text-[11px] font-medium text-rose-600">Short / Variance</span>
-              <p className="text-lg font-bold mt-1 text-rose-600">{kpis.variance}</p>
-              <span className="text-[10px] text-muted-foreground">Discrepancy logged</span>
-            </div>
-          </div>
-
           {/* Filter Section */}
           <div className="p-4 rounded-xl border border-border/70 bg-card/60 backdrop-blur-xs space-y-3 shadow-xs">
             <div className="flex items-center justify-between pb-2 border-b border-border/50">
@@ -418,16 +386,19 @@ export function StockTransferRegisterPage() {
 
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
+                <input
+                  type="text"
+                  list="transfer-items-list"
+                  placeholder="Search item name/code..."
+                  value={filterItem === "All" ? "" : filterItem}
                   onChange={(e) => setFilterItem(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Items</option>
+                />
+                <datalist id="transfer-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               <div>
@@ -438,11 +409,9 @@ export function StockTransferRegisterPage() {
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
                 >
                   <option value="All">All Statuses</option>
-                  <option value="Pending">Pending</option>
                   <option value="In Transit">In Transit</option>
                   <option value="Partially Received">Partially Received</option>
                   <option value="Fully Received">Fully Received</option>
-                  <option value="Short / Variance">Short / Variance</option>
                 </select>
               </div>
 
@@ -493,8 +462,8 @@ export function StockTransferRegisterPage() {
                     <th className="py-2.5 px-3 text-right">Transfer Qty</th>
                     <th className="py-2.5 px-3 text-right">Received Qty</th>
                     <th className="py-2.5 px-3 text-right">Pending Qty</th>
+                    <th className="py-2.5 px-3 text-right">Value (৳)</th>
                     <th className="py-2.5 px-3 text-center">Status</th>
-                    <th className="py-2.5 px-3 text-center">Lifecycle Flow</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
@@ -525,6 +494,9 @@ export function StockTransferRegisterPage() {
                         <td className="py-2 px-3 text-right font-mono text-amber-600 font-semibold">
                           {row.pendingQty.toLocaleString()}
                         </td>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
+                          ৳{formatAmount(row.quantity * 150)}
+                        </td>
                         <td className="py-2 px-3 text-center whitespace-nowrap">
                           <span
                             className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
@@ -540,19 +512,30 @@ export function StockTransferRegisterPage() {
                             {row.status}
                           </span>
                         </td>
-                        <td className="py-2 px-3 text-center">
-                          <button
-                            onClick={() => setSelectedTransferModal(row)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/10 hover:bg-primary/20 text-primary text-[11px] font-bold transition cursor-pointer"
-                          >
-                            <Eye className="size-3" />
-                            <span>View Flow</span>
-                          </button>
-                        </td>
                       </tr>
                     ))
                   )}
                 </tbody>
+                <tfoot className="bg-muted/60 font-semibold border-t border-border sticky bottom-0">
+                  <tr>
+                    <td colSpan={5} className="py-2.5 px-3 text-right uppercase tracking-wider text-[11px] text-muted-foreground font-bold">
+                      Total
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-foreground">
+                      {totalTransferQty.toLocaleString()}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-emerald-600">
+                      {totalReceivedQty.toLocaleString()}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-amber-600">
+                      {totalPendingQty.toLocaleString()}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-foreground">
+                      ৳{formatAmount(totalTransferVal)}
+                    </td>
+                    <td></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>

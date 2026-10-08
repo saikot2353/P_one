@@ -30,6 +30,7 @@ import {
   Check,
   Paperclip,
   Download,
+  History,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -59,6 +60,36 @@ import {
   setStoredWoItems,
 } from "@/lib/procurement-order-inventory-data";
 import pakizaSoftwareLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
+
+function getItemPurchaseHistory(item: { itemName: string; unitPrice?: number; uom?: string }) {
+  const basePrice = item.unitPrice || 450;
+  return [
+    {
+      poNumber: "PO-2026-0042",
+      supplierName: "Dhaka Industrial Supplies Ltd.",
+      purchaseDate: "2026-01-18",
+      purchaseQty: 120,
+      purchaseRate: Number((basePrice * 0.96).toFixed(2)),
+      purchaseAmount: Math.round(120 * basePrice * 0.96),
+    },
+    {
+      poNumber: "PO-2025-0891",
+      supplierName: "Bengal Poly & Paper Mills Ltd.",
+      purchaseDate: "2025-10-12",
+      purchaseQty: 250,
+      purchaseRate: Number((basePrice * 1.02).toFixed(2)),
+      purchaseAmount: Math.round(250 * basePrice * 1.02),
+    },
+    {
+      poNumber: "PO-2025-0419",
+      supplierName: "Apex Materials & Packing Corp",
+      purchaseDate: "2025-06-25",
+      purchaseQty: 100,
+      purchaseRate: Number((basePrice * 0.93).toFixed(2)),
+      purchaseAmount: Math.round(100 * basePrice * 0.93),
+    },
+  ];
+}
 
 export const Route = createFileRoute("/procurement-po-new")({
   validateSearch: (search: Record<string, unknown>): { editId?: string; mode?: string } => ({
@@ -143,6 +174,13 @@ export function PurchaseOrderWorkOrderPage() {
   const [itemSearchOpen, setItemSearchOpen] = useState(false);
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [newTemplateModalOpen, setNewTemplateModalOpen] = useState(false);
+  const [historyModalItem, setHistoryModalItem] = useState<{
+    itemCode: string;
+    itemName: string;
+    specification?: string;
+    uom?: string;
+    unitPrice?: number;
+  } | null>(null);
 
   // Search terms inside modals
   const [modalPrQuery, setModalPrQuery] = useState("");
@@ -411,18 +449,20 @@ export function PurchaseOrderWorkOrderPage() {
       const lineTaxable = Math.max(0, lineBase - lineDisc);
       // 7. VAT calculation based on editable vatRate
       const lineVat = (lineTaxable * (item.vatRate || 0)) / 100;
+      const lineTax = (lineTaxable * (item.taxRate || 0)) / 100;
 
       sub += lineBase;
       disc += lineDisc;
       vat += lineVat;
+      tax += lineTax;
     });
 
     return {
       subtotal: sub,
       discount: disc,
       vat: vat,
-      tax: 0,
-      grandTotal: sub - disc + vat,
+      tax: tax,
+      grandTotal: sub - disc + vat + tax,
     };
   }, [poItems]);
 
@@ -597,6 +637,7 @@ export function PurchaseOrderWorkOrderPage() {
     const qty = catalogItem.prQuantity > 0 ? catalogItem.prQuantity : 1;
     const eqBaseQty = qty * factor;
     const vatRate = 5; // default 5%
+    const taxRate = 0; // default 0%
     const lineTotal = qty * unitPrice * (1 + vatRate / 100);
 
     const newItem: POItem = {
@@ -619,6 +660,8 @@ export function PurchaseOrderWorkOrderPage() {
       discount: 0,
       vatRate: vatRate, // 7. Editable VAT
       vatAmount: (qty * unitPrice * vatRate) / 100,
+      taxRate: taxRate,
+      taxAmount: 0,
       lineTotal: lineTotal,
       remarks: "",
     };
@@ -777,13 +820,16 @@ export function PurchaseOrderWorkOrderPage() {
           const price = Number(updated.unitPrice) || 0;
           const disc = Number(updated.discount) || 0;
           const vatR = Number(updated.vatRate) || 0;
+          const taxR = Number(updated.taxRate) || 0;
 
           const base = qty * price;
           const taxable = Math.max(0, base - disc);
           const vatAmt = (taxable * vatR) / 100;
+          const taxAmt = (taxable * taxR) / 100;
 
           updated.vatAmount = vatAmt;
-          updated.lineTotal = taxable + vatAmt;
+          updated.taxAmount = taxAmt;
+          updated.lineTotal = taxable + vatAmt + taxAmt;
 
           return updated;
         }
@@ -1495,6 +1541,7 @@ export function PurchaseOrderWorkOrderPage() {
                         <th className="py-2.5 px-3 min-w-[110px] w-28 text-right">Unit Price (৳)</th>
                         <th className="py-2.5 px-3 text-right w-20">Discount (৳)</th>
                         <th className="py-2.5 px-3 text-right min-w-[90px] w-24">VAT (%)</th>
+                        <th className="py-2.5 px-3 text-right min-w-[90px] w-24">Tax (%)</th>
                         <th className="py-2.5 px-3 text-right w-28">Total (৳)</th>
                         {!isViewMode && <th className="py-2.5 px-3 text-center w-14">Action</th>}
                       </tr>
@@ -1506,7 +1553,25 @@ export function PurchaseOrderWorkOrderPage() {
                             {idx + 1}
                           </td>
                           <td className="py-2 px-3">
-                            <div className="font-bold text-foreground">{item.itemName}</div>
+                            <div className="flex items-center gap-1.5">
+                              <div className="font-bold text-foreground">{item.itemName}</div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setHistoryModalItem({
+                                    itemCode: item.itemCode,
+                                    itemName: item.itemName,
+                                    specification: item.specification,
+                                    uom: item.marketUnit || item.uom,
+                                    unitPrice: item.unitPrice,
+                                  })
+                                }
+                                className="size-5 rounded bg-amber-100 hover:bg-amber-200 text-amber-800 text-[10px] font-bold flex items-center justify-center cursor-pointer transition border border-amber-300 shrink-0"
+                                title={`View purchase price history for ${item.itemName} (H)`}
+                              >
+                                H
+                              </button>
+                            </div>
                             <div className="text-[10px] text-muted-foreground font-mono">{item.itemCode}</div>
                           </td>
                           <td className="py-2 px-3 text-[11px] text-muted-foreground max-w-[200px] truncate" title={item.specification}>
@@ -1630,6 +1695,23 @@ export function PurchaseOrderWorkOrderPage() {
                               />
                             )}
                           </td>
+                          <td className="py-2 px-2 min-w-[90px] w-24">
+                            {isViewMode ? (
+                              <div className="text-right font-mono font-bold text-amber-600 dark:text-amber-400">
+                                {item.taxRate || 0}%
+                              </div>
+                            ) : (
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.5"
+                                value={item.taxRate ?? 0}
+                                onChange={(e) => handleUpdatePoItem(item.id, "taxRate" as any, parseFloat(e.target.value) || 0)}
+                                className="w-full h-7 px-2 bg-background border border-border/80 rounded-md text-xs font-mono text-right font-bold text-amber-600 dark:text-amber-400 outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </td>
                           <td className="py-2 px-3 text-right font-mono font-bold text-foreground whitespace-nowrap">
                             ৳{item.lineTotal.toLocaleString()}
                           </td>
@@ -1685,16 +1767,35 @@ export function PurchaseOrderWorkOrderPage() {
                             {idx + 1}
                           </td>
                           <td className="py-2 px-3">
-                            {isViewMode ? (
-                              <div className="font-bold text-foreground">{item.serviceName}</div>
-                            ) : (
-                              <input
-                                type="text"
-                                value={item.serviceName}
-                                onChange={(e) => handleUpdateWoItem(item.id, "serviceName", e.target.value)}
-                                className="w-full h-7 px-2 bg-background border border-border/80 rounded-md text-xs font-bold outline-none focus:border-blue-500"
-                              />
-                            )}
+                            <div className="flex items-center gap-1.5">
+                              {isViewMode ? (
+                                <div className="font-bold text-foreground">{item.serviceName}</div>
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={item.serviceName}
+                                  onChange={(e) => handleUpdateWoItem(item.id, "serviceName", e.target.value)}
+                                  className="w-full h-7 px-2 bg-background border border-border/80 rounded-md text-xs font-bold outline-none focus:border-blue-500"
+                                />
+                              )}
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setHistoryModalItem({
+                                    itemCode: item.serviceCode,
+                                    itemName: item.serviceName,
+                                    specification: item.specification,
+                                    uom: item.uom,
+                                    unitPrice: item.unitRate,
+                                  })
+                                }
+                                className="size-5 rounded bg-amber-100 hover:bg-amber-200 text-amber-800 text-[10px] font-bold flex items-center justify-center cursor-pointer transition border border-amber-300 shrink-0"
+                                title={`View purchase price history for ${item.serviceName} (H)`}
+                              >
+                                H
+                              </button>
+                            </div>
+                            <div className="text-[10px] text-muted-foreground font-mono">{item.serviceCode}</div>
                           </td>
                           <td className="py-2 px-3">
                             {isViewMode ? (
@@ -2595,6 +2696,74 @@ export function PurchaseOrderWorkOrderPage() {
                   <div><strong>Mobile:</strong> {currentSupplier.mobileNumber || (currentSupplier as any).mobile || "—"}</div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Item-wise Purchase History Modal */}
+      {historyModalItem && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-background border border-border rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-5 py-3.5 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="size-7 rounded-lg bg-amber-500/15 text-amber-600 flex items-center justify-center font-bold text-xs">
+                  H
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">
+                    Purchase Price History
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    {historyModalItem.itemName} ({historyModalItem.itemCode})
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHistoryModalItem(null)}
+                className="size-7 rounded-lg hover:bg-muted text-muted-foreground flex items-center justify-center transition"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="text-xs text-muted-foreground">
+                Previous purchase order history for this item across approved procurement records:
+              </div>
+              <div className="border border-border rounded-lg overflow-hidden">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="bg-muted/50 border-b border-border text-[11px] font-semibold text-muted-foreground">
+                      <th className="py-2 px-3 text-left">Supplier Name</th>
+                      <th className="py-2 px-3 text-left">Purchase Date</th>
+                      <th className="py-2 px-3 text-right">Purchase Quantity</th>
+                      <th className="py-2 px-3 text-right">Purchase Rate / Price</th>
+                      <th className="py-2 px-3 text-right">Purchase Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {getItemPurchaseHistory(historyModalItem).map((hist, i) => (
+                      <tr key={i} className="hover:bg-muted/20">
+                        <td className="py-2.5 px-3 font-medium text-foreground">{hist.supplierName}</td>
+                        <td className="py-2.5 px-3 text-muted-foreground font-mono">{hist.purchaseDate}</td>
+                        <td className="py-2.5 px-3 text-right font-mono font-medium">{hist.purchaseQty} {historyModalItem.uom || "PCS"}</td>
+                        <td className="py-2.5 px-3 text-right font-mono text-emerald-600 dark:text-emerald-400 font-bold">৳{hist.purchaseRate.toLocaleString()}</td>
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-foreground">৳{hist.purchaseAmount.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="px-5 py-3 bg-muted/20 border-t border-border flex justify-end">
+              <button
+                type="button"
+                onClick={() => setHistoryModalItem(null)}
+                className="px-4 py-1.5 bg-secondary text-secondary-foreground rounded-lg text-xs font-semibold hover:bg-secondary/80 transition"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

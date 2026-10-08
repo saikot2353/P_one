@@ -73,16 +73,21 @@ export function StockWriteOffRegisterPage() {
 
   const filteredRows = useMemo(() => {
     return INITIAL_STOCK_WRITEOFF_DATA.filter((row) => {
+      // Display only approved/posted write-offs
+      if (row.status !== "Approved" && row.status !== "Posted") return false;
+
       if (
         filterWriteOffId.trim() &&
         !row.writeOffId.toLowerCase().includes(filterWriteOffId.toLowerCase().trim())
       )
         return false;
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
       if (filterStore !== "All" && row.store !== filterStore) return false;
       if (filterBatch.trim() && !row.batch.toLowerCase().includes(filterBatch.toLowerCase().trim()))
         return false;
-      if (filterStatus !== "All" && row.status !== filterStatus) return false;
 
       if (fromDate && row.date < fromDate) return false;
       if (toDate && row.date > toDate) return false;
@@ -104,22 +109,18 @@ export function StockWriteOffRegisterPage() {
     filterItem,
     filterStore,
     filterBatch,
-    filterStatus,
     fromDate,
     toDate,
     searchQuery,
   ]);
 
-  // 6 Required KPIs: Total Write-Offs, Total Write-Off Qty, Total Write-Off Value, Pending Approval, Approved, Posted
+  // KPIs: Total Write-Offs, Total Write-Off Qty, Total Write-Off Value
   const kpis = useMemo(() => {
     const totalCount = filteredRows.length;
     const totalQty = filteredRows.reduce((s, r) => s + r.quantity, 0);
     const totalValue = filteredRows.reduce((s, r) => s + r.value, 0);
-    const pending = filteredRows.filter((r) => r.status === "Pending Approval").length;
-    const approved = filteredRows.filter((r) => r.status === "Approved").length;
-    const posted = filteredRows.filter((r) => r.status === "Posted").length;
 
-    return { totalCount, totalQty, totalValue, pending, approved, posted };
+    return { totalCount, totalQty, totalValue };
   }, [filteredRows]);
 
   const handleResetFilters = () => {
@@ -127,7 +128,6 @@ export function StockWriteOffRegisterPage() {
     setFilterItem("All");
     setFilterStore("All");
     setFilterBatch("");
-    setFilterStatus("All");
     setFromDate("2026-08-01");
     setToDate("2026-10-31");
     setSearchQuery("");
@@ -308,37 +308,22 @@ export function StockWriteOffRegisterPage() {
             </div>
           </div>
 
-          {/* 6 Required KPIs */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-            <div className="p-3 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[10.5px] font-medium text-muted-foreground">Total Write-Offs</span>
-              <p className="text-base font-bold mt-1 text-foreground">{kpis.totalCount} Cases</p>
-              <span className="text-[10px] text-muted-foreground">All logged</span>
+          {/* 3 KPIs */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
+              <span className="text-[11px] font-medium text-muted-foreground">Total Approved/Posted Cases</span>
+              <p className="text-lg font-bold mt-1 text-foreground">{kpis.totalCount} Cases</p>
+              <span className="text-[10px] text-muted-foreground">Recognized casualties</span>
             </div>
-            <div className="p-3 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[10.5px] font-medium text-muted-foreground">Total Write-Off Qty</span>
-              <p className="text-base font-bold mt-1 text-foreground font-mono">{kpis.totalQty.toLocaleString()}</p>
+            <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
+              <span className="text-[11px] font-medium text-muted-foreground">Total Write-Off Qty</span>
+              <p className="text-lg font-bold mt-1 text-foreground font-mono">{kpis.totalQty.toLocaleString()}</p>
               <span className="text-[10px] text-rose-500 font-medium">Scrapped units</span>
             </div>
-            <div className="p-3 rounded-xl border border-rose-500/20 bg-rose-500/5 shadow-xs">
-              <span className="text-[10.5px] font-medium text-rose-600">Total Write-Off Value</span>
-              <p className="text-base font-bold mt-1 text-rose-600 font-mono">{formatAmount(kpis.totalValue, undefined, true)}</p>
+            <div className="p-3.5 rounded-xl border border-rose-500/20 bg-rose-500/5 shadow-xs">
+              <span className="text-[11px] font-medium text-rose-600">Total Write-Off Value</span>
+              <p className="text-lg font-bold mt-1 text-rose-600 font-mono">{formatAmount(kpis.totalValue, undefined, true)}</p>
               <span className="text-[10px] text-muted-foreground">{currencyCfg.format}</span>
-            </div>
-            <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/5 shadow-xs">
-              <span className="text-[10.5px] font-medium text-amber-600">Pending Approval</span>
-              <p className="text-base font-bold mt-1 text-amber-600">{kpis.pending}</p>
-              <span className="text-[10px] text-muted-foreground">Under review</span>
-            </div>
-            <div className="p-3 rounded-xl border border-blue-500/20 bg-blue-500/5 shadow-xs">
-              <span className="text-[10.5px] font-medium text-blue-600">Approved</span>
-              <p className="text-base font-bold mt-1 text-blue-600">{kpis.approved}</p>
-              <span className="text-[10px] text-muted-foreground">Ready to post</span>
-            </div>
-            <div className="p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 shadow-xs">
-              <span className="text-[10.5px] font-medium text-emerald-600">Posted</span>
-              <p className="text-base font-bold mt-1 text-emerald-600">{kpis.posted}</p>
-              <span className="text-[10px] text-muted-foreground">Final derecognition</span>
             </div>
           </div>
 
@@ -357,7 +342,7 @@ export function StockWriteOffRegisterPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Write-Off ID</label>
                 <input
@@ -371,16 +356,19 @@ export function StockWriteOffRegisterPage() {
 
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
+                <input
+                  type="text"
+                  list="writeoff-items-list"
+                  placeholder="Search item name/code..."
+                  value={filterItem === "All" ? "" : filterItem}
                   onChange={(e) => setFilterItem(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Items</option>
+                />
+                <datalist id="writeoff-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               <div>
@@ -394,20 +382,6 @@ export function StockWriteOffRegisterPage() {
                   {stores.map((s) => (
                     <option key={s} value={s}>{s}</option>
                   ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Status</label>
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Statuses</option>
-                  <option value="Pending Approval">Pending Approval</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Posted">Posted</option>
                 </select>
               </div>
 
@@ -454,12 +428,12 @@ export function StockWriteOffRegisterPage() {
                     <th className="py-2.5 px-3">Write-Off ID</th>
                     <th className="py-2.5 px-3">Item Code & Name</th>
                     <th className="py-2.5 px-3">Store</th>
+                    <th className="py-2.5 px-3">Location</th>
                     <th className="py-2.5 px-3">Batch</th>
                     <th className="py-2.5 px-3 text-right">Quantity</th>
                     <th className="py-2.5 px-3 text-right">Unit Cost</th>
                     <th className="py-2.5 px-3 text-right">Value Lost</th>
                     <th className="py-2.5 px-3">Reason</th>
-                    <th className="py-2.5 px-3 text-center">Status</th>
                     <th className="py-2.5 px-3 text-center">Action</th>
                   </tr>
                 </thead>
@@ -467,7 +441,7 @@ export function StockWriteOffRegisterPage() {
                   {filteredRows.length === 0 ? (
                     <tr>
                       <td colSpan={11} className="py-8 text-center text-muted-foreground">
-                        No write-off entries found.
+                        No approved/posted write-off entries found.
                       </td>
                     </tr>
                   ) : (
@@ -481,6 +455,7 @@ export function StockWriteOffRegisterPage() {
                           {row.itemName} <span className="font-mono text-muted-foreground text-[11px]">({row.itemCode})</span>
                         </td>
                         <td className="py-2 px-3 text-foreground whitespace-nowrap">{row.store}</td>
+                        <td className="py-2 px-3 text-muted-foreground font-mono text-[11px]">{row.location || "-"}</td>
                         <td className="py-2 px-3 font-mono text-[11px] text-purple-600 dark:text-purple-400">{row.batch || "-"}</td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
                           {row.quantity.toLocaleString()}
@@ -493,19 +468,6 @@ export function StockWriteOffRegisterPage() {
                         </td>
                         <td className="py-2 px-3 text-muted-foreground max-w-[200px] truncate" title={row.reason}>
                           {row.reason}
-                        </td>
-                        <td className="py-2 px-3 text-center whitespace-nowrap">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              row.status === "Posted"
-                                ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
-                                : row.status === "Approved"
-                                ? "bg-blue-500/10 text-blue-600 border border-blue-500/20"
-                                : "bg-amber-500/10 text-amber-600 border border-amber-500/20"
-                            }`}
-                          >
-                            {row.status}
-                          </span>
                         </td>
                         <td className="py-2 px-3 text-center">
                           <button
@@ -520,6 +482,21 @@ export function StockWriteOffRegisterPage() {
                     ))
                   )}
                 </tbody>
+                <tfoot className="bg-muted/60 font-semibold border-t border-border sticky bottom-0">
+                  <tr>
+                    <td colSpan={6} className="py-2.5 px-3 text-right uppercase tracking-wider text-[11px] text-muted-foreground font-bold">
+                      Total
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-foreground">
+                      {kpis.totalQty.toLocaleString()}
+                    </td>
+                    <td></td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-rose-600">
+                      {formatAmount(kpis.totalValue, undefined, true)}
+                    </td>
+                    <td colSpan={2}></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>
@@ -585,16 +562,6 @@ export function StockWriteOffRegisterPage() {
                 <p className="text-foreground text-xs">{selectedWriteOffModal.reason}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
-                <div>
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold">Approval Authority</span>
-                  <p className="font-bold text-foreground text-xs mt-0.5">{selectedWriteOffModal.approvalBy || "Pending Review"}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold">Posting Date & Status</span>
-                  <p className="font-bold text-primary text-xs mt-0.5">{selectedWriteOffModal.postedDate || "In Review"} ({selectedWriteOffModal.status})</p>
-                </div>
-              </div>
             </div>
 
             <div className="flex justify-end px-5 py-3 border-t border-border bg-muted/20">

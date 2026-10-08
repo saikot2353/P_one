@@ -39,6 +39,7 @@ export interface SupplierBillReportRow {
   poWoNo: string;
   mrrNo: string;
   billType: "Local" | "Foreign" | "Service" | "Work Order";
+  quantity: number;
   billAmount: number;
   discount: number;
   tax: number;
@@ -163,9 +164,13 @@ export interface LocationStockRow {
   shelf: string;
   bin: string;
   locationCode: string;
+  locationName?: string;
   locationType: "Rack" | "Shelf" | "Bin" | "Floor";
   itemCode: string;
   itemName: string;
+  specification?: string;
+  brand?: string;
+  origin?: string;
   batch: string;
   uom: string;
   quantity: number;
@@ -222,6 +227,7 @@ export interface ItemIssueRow {
   itemCode: string;
   itemName: string;
   itemGroup: string;
+  itemCategory?: string;
   specification: string;
   brand: string;
   origin: string;
@@ -231,6 +237,7 @@ export interface ItemIssueRow {
   batch: string;
   location: string;
   quantity: number;
+  unitCost?: number;
   issuedTo: string;
   status: "Issued" | "Dispatched" | "Posted";
 }
@@ -311,6 +318,7 @@ export interface SupplierReturnReportRow {
   itemCode: string;
   itemName: string;
   itemGroup: string;
+  itemCategory?: string;
   specification: string;
   brand: string;
   origin: string;
@@ -524,6 +532,7 @@ export const INITIAL_SUPPLIER_BILL_REPORT_DATA: SupplierBillReportRow[] = [
     poWoNo: "PO-2026-0089",
     mrrNo: "MRR-2026-0592",
     billType: "Local",
+    quantity: 500,
     billAmount: 54000,
     discount: 1000,
     tax: 2700,
@@ -543,6 +552,7 @@ export const INITIAL_SUPPLIER_BILL_REPORT_DATA: SupplierBillReportRow[] = [
     poWoNo: "PO-2026-0088",
     mrrNo: "MRR-2026-0590",
     billType: "Local",
+    quantity: 2500,
     billAmount: 950000,
     discount: 5000,
     tax: 28500,
@@ -562,6 +572,7 @@ export const INITIAL_SUPPLIER_BILL_REPORT_DATA: SupplierBillReportRow[] = [
     poWoNo: "WO-2026-0034",
     mrrNo: "SRV-2026-0012",
     billType: "Service",
+    quantity: 1,
     billAmount: 85000,
     discount: 0,
     tax: 6375,
@@ -581,6 +592,7 @@ export const INITIAL_SUPPLIER_BILL_REPORT_DATA: SupplierBillReportRow[] = [
     poWoNo: "PO-2026-0076",
     mrrNo: "MRR-2026-0583",
     billType: "Foreign",
+    quantity: 800,
     billAmount: 744000,
     discount: 12000,
     tax: 37200,
@@ -600,6 +612,7 @@ export const INITIAL_SUPPLIER_BILL_REPORT_DATA: SupplierBillReportRow[] = [
     poWoNo: "PO-2026-0071",
     mrrNo: "MRR-2026-0579",
     billType: "Local",
+    quantity: 1500,
     billAmount: 76000,
     discount: 1600,
     tax: 1520,
@@ -619,6 +632,7 @@ export const INITIAL_SUPPLIER_BILL_REPORT_DATA: SupplierBillReportRow[] = [
     poWoNo: "PO-2026-0062",
     mrrNo: "MRR-2026-0570",
     billType: "Local",
+    quantity: 2800,
     billAmount: 1035000,
     discount: 10000,
     tax: 31050,
@@ -1089,9 +1103,13 @@ export const INITIAL_LOCATION_STOCK_DATA: LocationStockRow[] = [
     shelf: "Shelf-A",
     bin: "Bin-04",
     locationCode: "SAV-R01-SA-B04",
+    locationName: "Savar Warehouse Aisle 1 - Bin 4",
     locationType: "Bin",
     itemCode: "ITM-001",
     itemName: "Manager Chair",
+    specification: "High back mesh ergonomic chair",
+    brand: "Hatil",
+    origin: "Bangladesh",
     batch: "-",
     uom: "PCS",
     quantity: 18,
@@ -1105,9 +1123,13 @@ export const INITIAL_LOCATION_STOCK_DATA: LocationStockRow[] = [
     shelf: "Shelf-B",
     bin: "Bin-01",
     locationCode: "SAV-R03-SB-B01",
+    locationName: "Savar Warehouse Aisle 3 - Bin 1",
     locationType: "Bin",
     itemCode: "ACC-001",
     itemName: "Sewing Thread 40/2 5000m",
+    specification: "100% Spun Polyester lubricated",
+    brand: "Astra",
+    origin: "Germany",
     batch: "-",
     uom: "CONE",
     quantity: 450,
@@ -1121,9 +1143,13 @@ export const INITIAL_LOCATION_STOCK_DATA: LocationStockRow[] = [
     shelf: "Shelf-02",
     bin: "Bin-10",
     locationCode: "PWFL-RB-S02-B10",
+    locationName: "PWFL Store Rack B - Bin 10",
     locationType: "Bin",
     itemCode: "FAB-001",
     itemName: "Cotton Twill 20x16 Fabric",
+    specification: "100% Cotton 3/1 Twill Greige 58 inch",
+    brand: "Pakiza Weaving",
+    origin: "Bangladesh",
     batch: "-",
     uom: "YDS",
     quantity: 140,
@@ -1137,9 +1163,13 @@ export const INITIAL_LOCATION_STOCK_DATA: LocationStockRow[] = [
     shelf: "Shelf-01",
     bin: "Bin-05",
     locationCode: "DHM-RE-S01-B05",
+    locationName: "Dhamrai Spare Rack E - Bin 5",
     locationType: "Bin",
     itemCode: "SPR-001",
     itemName: "Sewing Machine Needle Groz-Beckert DBx1",
+    specification: "System DBx1 Size 90/14 Chrome",
+    brand: "Groz-Beckert",
+    origin: "Germany",
     batch: "-",
     uom: "PKT",
     quantity: 120,
@@ -1277,6 +1307,7 @@ export const INITIAL_ISSUE_REGISTER_DATA: ItemIssueRow[] = [
     itemCode: "YRN-001",
     itemName: "Cotton Yarn 30/1 Combed",
     itemGroup: "Yarn Raw Material",
+    itemCategory: "Raw Materials",
     specification: "100% Cotton Ring Spun Ne 30/1",
     brand: "Meghna Gold",
     origin: "Bangladesh",
@@ -1286,6 +1317,7 @@ export const INITIAL_ISSUE_REGISTER_DATA: ItemIssueRow[] = [
     batch: "BAT-YRN-2610-01",
     location: "Row-A / Pallet-01",
     quantity: 800,
+    unitCost: 380,
     issuedTo: "Knitting Floor Production Head (Emp ID: PKCL-104)",
     status: "Issued",
   },
@@ -1299,6 +1331,7 @@ export const INITIAL_ISSUE_REGISTER_DATA: ItemIssueRow[] = [
     itemCode: "CHM-001",
     itemName: "Reactive Black B Dye",
     itemGroup: "Dyes & Chemicals",
+    itemCategory: "Chemicals & Processing",
     specification: "C.I. Reactive Black 5",
     brand: "Novacron",
     origin: "Switzerland",
@@ -1308,6 +1341,7 @@ export const INITIAL_ISSUE_REGISTER_DATA: ItemIssueRow[] = [
     batch: "BAT-DYE-2609-04",
     location: "Drum Rack C-12",
     quantity: 300,
+    unitCost: 450,
     issuedTo: "General Store (PWFL) Logistics Driver",
     status: "Dispatched",
   },
@@ -1321,6 +1355,7 @@ export const INITIAL_ISSUE_REGISTER_DATA: ItemIssueRow[] = [
     itemCode: "YRN-001",
     itemName: "Cotton Yarn 30/1 Combed",
     itemGroup: "Yarn Raw Material",
+    itemCategory: "Raw Materials",
     specification: "100% Cotton Ring Spun Ne 30/1",
     brand: "Meghna Gold",
     origin: "Bangladesh",
@@ -1330,6 +1365,7 @@ export const INITIAL_ISSUE_REGISTER_DATA: ItemIssueRow[] = [
     batch: "BAT-YRN-2609-02",
     location: "Row-A / Pallet-03",
     quantity: 300,
+    unitCost: 380,
     issuedTo: "Meghna Yarn Mills Delivery Agent",
     status: "Posted",
   },
@@ -1343,6 +1379,7 @@ export const INITIAL_ISSUE_REGISTER_DATA: ItemIssueRow[] = [
     itemCode: "CHM-001",
     itemName: "Reactive Black B Dye",
     itemGroup: "Dyes & Chemicals",
+    itemCategory: "Chemicals & Processing",
     specification: "C.I. Reactive Black 5",
     brand: "Novacron",
     origin: "Switzerland",
@@ -1352,6 +1389,7 @@ export const INITIAL_ISSUE_REGISTER_DATA: ItemIssueRow[] = [
     batch: "BAT-DYE-2608-01",
     location: "Drum Rack C-12",
     quantity: 25,
+    unitCost: 450,
     issuedTo: "Effluent Disposal Unit",
     status: "Posted",
   },
@@ -1365,6 +1403,7 @@ export const INITIAL_ISSUE_REGISTER_DATA: ItemIssueRow[] = [
     itemCode: "CHM-001",
     itemName: "Reactive Black B Dye",
     itemGroup: "Dyes & Chemicals",
+    itemCategory: "Chemicals & Processing",
     specification: "C.I. Reactive Black 5",
     brand: "Novacron",
     origin: "Switzerland",
@@ -1374,6 +1413,7 @@ export const INITIAL_ISSUE_REGISTER_DATA: ItemIssueRow[] = [
     batch: "BAT-DYE-2609-04",
     location: "Drum Rack C-12",
     quantity: 15,
+    unitCost: 450,
     issuedTo: "Store Inventory Adjustment Log",
     status: "Posted",
   },
@@ -1605,6 +1645,7 @@ export const INITIAL_SUPPLIER_RETURN_REPORT_DATA: SupplierReturnReportRow[] = [
     itemCode: "ITM-001",
     itemName: "Manager Chair",
     itemGroup: "Office Furniture",
+    itemCategory: "General Consumables",
     specification: "Mesh back damaged caster wheels",
     brand: "Champion",
     origin: "Bangladesh",
@@ -1630,6 +1671,7 @@ export const INITIAL_SUPPLIER_RETURN_REPORT_DATA: SupplierReturnReportRow[] = [
     itemCode: "YRN-001",
     itemName: "Cotton Yarn 30/1 Combed",
     itemGroup: "Yarn Raw Material",
+    itemCategory: "Raw Materials",
     specification: "Excess yarn twist CV% rejection",
     brand: "Meghna Gold",
     origin: "Bangladesh",
@@ -1655,6 +1697,7 @@ export const INITIAL_SUPPLIER_RETURN_REPORT_DATA: SupplierReturnReportRow[] = [
     itemCode: "ACC-001",
     itemName: "Sewing Thread 40/2 5000m",
     itemGroup: "Sewing Accessories",
+    itemCategory: "Packaging",
     specification: "Shade variance from approved sample card",
     brand: "Astra",
     origin: "Bangladesh",

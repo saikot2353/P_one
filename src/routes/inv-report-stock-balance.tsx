@@ -105,19 +105,27 @@ export function StockBalanceRegisterPage() {
     return INITIAL_STOCK_BALANCE_DATA.filter((row) => {
       if (filterCompany !== "All" && row.company !== filterCompany) return false;
       if (filterStore !== "All" && row.store !== filterStore) return false;
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
-      if (filterItemGroup !== "All" && row.itemGroup !== filterItemGroup) return false;
-      if (filterItemCategory !== "All" && row.itemCategory !== filterItemCategory) return false;
-      if (filterBrand !== "All" && row.brand !== filterBrand) return false;
-      if (filterOrigin !== "All" && row.origin !== filterOrigin) return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
+      if (filterItemGroup.trim() && filterItemGroup !== "All") {
+        const q = filterItemGroup.toLowerCase().trim();
+        if (!row.itemGroup.toLowerCase().includes(q)) return false;
+      }
+      if (filterItemCategory.trim() && filterItemCategory !== "All") {
+        const q = filterItemCategory.toLowerCase().trim();
+        if (!row.itemCategory.toLowerCase().includes(q)) return false;
+      }
+      if (filterBrand.trim() && filterBrand !== "All") {
+        const q = filterBrand.toLowerCase().trim();
+        if (!row.brand.toLowerCase().includes(q)) return false;
+      }
+      if (filterOrigin.trim() && filterOrigin !== "All") {
+        const q = filterOrigin.toLowerCase().trim();
+        if (!row.origin.toLowerCase().includes(q)) return false;
+      }
       if (filterStockStatus !== "All" && row.stockStatus !== filterStockStatus) return false;
-      if (filterBatch.trim() && !row.batch.toLowerCase().includes(filterBatch.toLowerCase().trim()))
-        return false;
-      if (
-        filterLocation.trim() &&
-        !row.location.toLowerCase().includes(filterLocation.toLowerCase().trim())
-      )
-        return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -125,8 +133,7 @@ export function StockBalanceRegisterPage() {
           row.itemCode.toLowerCase().includes(q) ||
           row.itemName.toLowerCase().includes(q) ||
           row.specification.toLowerCase().includes(q) ||
-          row.store.toLowerCase().includes(q) ||
-          row.batch.toLowerCase().includes(q);
+          row.store.toLowerCase().includes(q);
         if (!match) return false;
       }
 
@@ -141,8 +148,6 @@ export function StockBalanceRegisterPage() {
     filterBrand,
     filterOrigin,
     filterStockStatus,
-    filterBatch,
-    filterLocation,
     searchQuery,
   ]);
 
@@ -381,8 +386,8 @@ export function StockBalanceRegisterPage() {
             </div>
           </div>
 
-          {/* 6 Required KPI Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+          {/* KPI Cards (Low Stock removed) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
             <div className="p-3 rounded-xl border border-border/70 bg-card shadow-xs">
               <span className="text-[10.5px] font-medium text-muted-foreground">Total Items</span>
               <p className="text-base font-bold mt-1 text-foreground">{kpis.totalItems} SKUs</p>
@@ -401,13 +406,6 @@ export function StockBalanceRegisterPage() {
                 {formatAmount(kpis.totalVal, undefined, true)}
               </p>
               <span className="text-[10px] text-muted-foreground">{currencyCfg.format}</span>
-            </div>
-            <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/5 shadow-xs">
-              <span className="text-[10.5px] font-medium text-amber-600 dark:text-amber-400">Low Stock Items</span>
-              <p className="text-base font-bold mt-1 text-amber-600 dark:text-amber-400 font-mono">
-                {kpis.lowStock}
-              </p>
-              <span className="text-[10px] text-muted-foreground">Below reorder point</span>
             </div>
             <div className="p-3 rounded-xl border border-rose-500/20 bg-rose-500/5 shadow-xs">
               <span className="text-[10.5px] font-medium text-rose-600 dark:text-rose-400">Out of Stock</span>
@@ -471,49 +469,94 @@ export function StockBalanceRegisterPage() {
                 </select>
               </div>
 
-              {/* Item */}
+              {/* Item Search */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
+                <input
+                  type="text"
+                  list="sb-items-list"
+                  placeholder="Search Item..."
+                  value={filterItem === "All" ? "" : filterItem}
                   onChange={(e) => setFilterItem(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Items</option>
+                />
+                <datalist id="sb-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
-              {/* Item Group */}
+              {/* Item Group Search */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item Group</label>
-                <select
-                  value={filterItemGroup}
+                <input
+                  type="text"
+                  list="sb-groups-list"
+                  placeholder="Search Group..."
+                  value={filterItemGroup === "All" ? "" : filterItemGroup}
                   onChange={(e) => setFilterItemGroup(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Groups</option>
+                />
+                <datalist id="sb-groups-list">
                   {itemGroups.map((g) => (
-                    <option key={g} value={g}>{g}</option>
+                    <option key={g} value={g} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
-              {/* Item Category */}
+              {/* Item Category Search */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item Category</label>
-                <select
-                  value={filterItemCategory}
+                <input
+                  type="text"
+                  list="sb-categories-list"
+                  placeholder="Search Category..."
+                  value={filterItemCategory === "All" ? "" : filterItemCategory}
                   onChange={(e) => setFilterItemCategory(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Categories</option>
+                />
+                <datalist id="sb-categories-list">
                   {itemCategories.map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                    <option key={c} value={c} />
                   ))}
-                </select>
+                </datalist>
+              </div>
+
+              {/* Brand Search */}
+              <div>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Brand</label>
+                <input
+                  type="text"
+                  list="sb-brands-list"
+                  placeholder="Search Brand..."
+                  value={filterBrand === "All" ? "" : filterBrand}
+                  onChange={(e) => setFilterBrand(e.target.value)}
+                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
+                />
+                <datalist id="sb-brands-list">
+                  {brands.map((b) => (
+                    <option key={b} value={b} />
+                  ))}
+                </datalist>
+              </div>
+
+              {/* Origin Search */}
+              <div>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Origin</label>
+                <input
+                  type="text"
+                  list="sb-origins-list"
+                  placeholder="Search Origin..."
+                  value={filterOrigin === "All" ? "" : filterOrigin}
+                  onChange={(e) => setFilterOrigin(e.target.value)}
+                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
+                />
+                <datalist id="sb-origins-list">
+                  {origins.map((o) => (
+                    <option key={o} value={o} />
+                  ))}
+                </datalist>
               </div>
 
               {/* Stock Status */}
@@ -525,64 +568,8 @@ export function StockBalanceRegisterPage() {
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
                 >
                   <option value="All">All Statuses</option>
-                  <option value="Normal">Normal</option>
-                  <option value="Low Stock">Low Stock</option>
                   <option value="Out of Stock">Out of Stock</option>
                   <option value="In-Transit">In-Transit</option>
-                </select>
-              </div>
-
-              {/* Batch */}
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Batch No.</label>
-                <input
-                  type="text"
-                  placeholder="e.g. BAT-YRN..."
-                  value={filterBatch}
-                  onChange={(e) => setFilterBatch(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                />
-              </div>
-
-              {/* Location */}
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Location / Bin</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Rack-01 / Bin-04"
-                  value={filterLocation}
-                  onChange={(e) => setFilterLocation(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                />
-              </div>
-
-              {/* Brand */}
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Brand</label>
-                <select
-                  value={filterBrand}
-                  onChange={(e) => setFilterBrand(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Brands</option>
-                  {brands.map((b) => (
-                    <option key={b} value={b}>{b}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Origin */}
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Origin</label>
-                <select
-                  value={filterOrigin}
-                  onChange={(e) => setFilterOrigin(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Origins</option>
-                  {origins.map((o) => (
-                    <option key={o} value={o}>{o}</option>
-                  ))}
                 </select>
               </div>
 
@@ -629,7 +616,6 @@ export function StockBalanceRegisterPage() {
                     <th className="py-2.5 px-3">UOM</th>
                     <th className="py-2.5 px-3">Store</th>
                     <th className="py-2.5 px-3 text-right">Available Qty</th>
-                    <th className="py-2.5 px-3 text-right">Reserved Qty</th>
                     <th className="py-2.5 px-3 text-right">In-Transit Qty</th>
                     <th className="py-2.5 px-3 text-right">Damaged Qty</th>
                     <th className="py-2.5 px-3 text-right">Total Qty</th>
@@ -641,7 +627,7 @@ export function StockBalanceRegisterPage() {
                 <tbody className="divide-y divide-border/60">
                   {filteredRows.length === 0 ? (
                     <tr>
-                      <td colSpan={16} className="py-8 text-center text-muted-foreground">
+                      <td colSpan={15} className="py-8 text-center text-muted-foreground">
                         No stock balance records found for the active criteria.
                       </td>
                     </tr>
@@ -683,9 +669,6 @@ export function StockBalanceRegisterPage() {
                         </td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
                           {row.availableQty.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-3 text-right font-mono text-muted-foreground">
-                          {row.reservedQty.toLocaleString()}
                         </td>
                         <td className="py-2 px-3 text-right font-mono text-blue-600 dark:text-blue-400">
                           {row.inTransitQty.toLocaleString()}
@@ -736,9 +719,6 @@ export function StockBalanceRegisterPage() {
                       </td>
                       <td className="py-3 px-3 text-right font-mono text-xs font-bold text-emerald-600">
                         {filteredRows.reduce((s, r) => s + r.availableQty, 0).toLocaleString()}
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono text-xs">
-                        {filteredRows.reduce((s, r) => s + r.reservedQty, 0).toLocaleString()}
                       </td>
                       <td className="py-3 px-3 text-right font-mono text-xs text-blue-600">
                         {kpis.inTransit.toLocaleString()}

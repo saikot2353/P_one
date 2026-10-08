@@ -75,9 +75,10 @@ export function ItemMovementRegisterPage() {
 
   const filteredRows = useMemo(() => {
     return INITIAL_MOVEMENT_DATA.filter((row) => {
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
-      if (filterFromStore !== "All" && row.fromStore !== filterFromStore) return false;
-      if (filterToStore !== "All" && row.toStore !== filterToStore) return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
       if (filterTxType !== "All" && row.transaction !== filterTxType) return false;
       if (filterBatch.trim() && !row.batch.toLowerCase().includes(filterBatch.toLowerCase().trim()))
         return false;
@@ -92,9 +93,7 @@ export function ItemMovementRegisterPage() {
         const match =
           row.reference.toLowerCase().includes(q) ||
           row.itemCode.toLowerCase().includes(q) ||
-          row.itemName.toLowerCase().includes(q) ||
-          row.fromStore.toLowerCase().includes(q) ||
-          row.toStore.toLowerCase().includes(q);
+          row.itemName.toLowerCase().includes(q);
         if (!match) return false;
       }
 
@@ -102,8 +101,6 @@ export function ItemMovementRegisterPage() {
     });
   }, [
     filterItem,
-    filterFromStore,
-    filterToStore,
     filterTxType,
     filterBatch,
     filterLocation,
@@ -313,47 +310,22 @@ export function ItemMovementRegisterPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
+                <input
+                  type="text"
+                  list="movement-items-list"
+                  placeholder="Search item name/code..."
+                  value={filterItem === "All" ? "" : filterItem}
                   onChange={(e) => setFilterItem(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Items</option>
+                />
+                <datalist id="movement-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">From Store</label>
-                <select
-                  value={filterFromStore}
-                  onChange={(e) => setFilterFromStore(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Sources</option>
-                  {stores.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">To Store</label>
-                <select
-                  value={filterToStore}
-                  onChange={(e) => setFilterToStore(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Destinations</option>
-                  {stores.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
+                </datalist>
               </div>
 
               <div>
@@ -417,26 +389,22 @@ export function ItemMovementRegisterPage() {
           {/* Table */}
           <div className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-xs">
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-              <table className="w-full text-xs text-left border-collapse min-w-[1300px]">
+              <table className="w-full text-xs text-left border-collapse min-w-[900px]">
                 <thead className="bg-muted/80 text-muted-foreground font-semibold uppercase text-[10.5px] sticky top-0 z-10 backdrop-blur-xs border-b border-border">
                   <tr>
                     <th className="py-2.5 px-3">Date</th>
                     <th className="py-2.5 px-3">Item</th>
                     <th className="py-2.5 px-3">Transaction</th>
                     <th className="py-2.5 px-3">Reference</th>
-                    <th className="py-2.5 px-3">From Store</th>
-                    <th className="py-2.5 px-3">To Store</th>
                     <th className="py-2.5 px-3">Batch</th>
                     <th className="py-2.5 px-3">Location</th>
                     <th className="py-2.5 px-3 text-right">Quantity</th>
-                    <th className="py-2.5 px-3 text-center">Status</th>
-                    <th className="py-2.5 px-3 text-center">Movement Timeline</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {filteredRows.length === 0 ? (
                     <tr>
-                      <td colSpan={11} className="py-8 text-center text-muted-foreground">
+                      <td colSpan={7} className="py-8 text-center text-muted-foreground">
                         No item movement records found.
                       </td>
                     </tr>
@@ -455,8 +423,6 @@ export function ItemMovementRegisterPage() {
                         <td className="py-2 px-3 font-mono font-semibold text-primary whitespace-nowrap">
                           {row.reference}
                         </td>
-                        <td className="py-2 px-3 text-foreground">{row.fromStore}</td>
-                        <td className="py-2 px-3 text-foreground font-medium">{row.toStore}</td>
                         <td className="py-2 px-3 font-mono text-[11px] text-purple-600 dark:text-purple-400">
                           {row.batch || "-"}
                         </td>
@@ -466,24 +432,20 @@ export function ItemMovementRegisterPage() {
                         <td className="py-2 px-3 text-right font-mono font-black text-foreground">
                           {row.quantity.toLocaleString()}
                         </td>
-                        <td className="py-2 px-3 text-center whitespace-nowrap">
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                            {row.status}
-                          </span>
-                        </td>
-                        <td className="py-2 px-3 text-center">
-                          <button
-                            onClick={() => setSelectedTimelineMovement(row)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/10 hover:bg-primary/20 text-primary text-[11px] font-bold transition cursor-pointer"
-                          >
-                            <GitCommit className="size-3" />
-                            <span>View Timeline</span>
-                          </button>
-                        </td>
                       </tr>
                     ))
                   )}
                 </tbody>
+                <tfoot className="bg-muted/60 font-semibold border-t border-border sticky bottom-0">
+                  <tr>
+                    <td colSpan={6} className="py-2.5 px-3 text-right uppercase tracking-wider text-[11px] text-muted-foreground font-bold">
+                      Total Quantity
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-foreground">
+                      {filteredRows.reduce((s, r) => s + r.quantity, 0).toLocaleString()}
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>

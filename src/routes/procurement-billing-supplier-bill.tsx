@@ -114,6 +114,7 @@ export function SupplierBillPage() {
   const [manualVatAmount, setManualVatAmount] = useState<number | "">("");
   const [taxAmount, setTaxAmount] = useState<number | "">(0);
   const [selectedServiceItemIds, setSelectedServiceItemIds] = useState<string[]>([]);
+  const [serviceItemAmounts, setServiceItemAmounts] = useState<Record<string, number>>({});
   const [serviceSearchQuery, setServiceSearchQuery] = useState("");
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
 
@@ -127,14 +128,34 @@ export function SupplierBillPage() {
     setSelectedServiceItemIds((prev) => {
       const exists = prev.includes(serviceId);
       const next = exists ? prev.filter((id) => id !== serviceId) : [...prev, serviceId];
+      const item = availableServiceItems.find((s) => s.id === serviceId);
+      const defaultPrice = item?.standardPurchasePrice || 1200;
+
+      const newAmounts = { ...serviceItemAmounts };
+      if (!exists) {
+        newAmounts[serviceId] = newAmounts[serviceId] ?? defaultPrice;
+      } else {
+        delete newAmounts[serviceId];
+      }
+      setServiceItemAmounts(newAmounts);
+
       let total = 0;
       next.forEach((id) => {
-        const item = availableServiceItems.find((s) => s.id === id);
-        total += item?.standardPurchasePrice || 1200;
+        total += newAmounts[id] ?? (availableServiceItems.find((s) => s.id === id)?.standardPurchasePrice || 1200);
       });
       setOtherCharges(total);
       return next;
     });
+  };
+
+  const handleUpdateServiceItemAmount = (id: string, amount: number) => {
+    const updated = { ...serviceItemAmounts, [id]: amount };
+    setServiceItemAmounts(updated);
+    let total = 0;
+    selectedServiceItemIds.forEach((sid) => {
+      total += (sid === id ? amount : (updated[sid] ?? 0));
+    });
+    setOtherCharges(total);
   };
 
   // Modals
@@ -1014,10 +1035,10 @@ export function SupplierBillPage() {
                 {/* Additional Financial Adjustment Inputs:
                     Other Charges (Multi-select service dropdown), Adjustment (+/-), Discount, VAT, and Tax */}
                 <div className="space-y-3 pt-1 text-xs">
-                  {/* Other Charges Multi-select Dropdown (Service items only) */}
+                  {/* Other Charges Multi-select Dropdown & Per-item Amounts */}
                   <div className="relative">
                     <label className="text-[10.5px] font-bold text-muted-foreground uppercase block mb-1">
-                      Other Charges (Freight/Loading) — Service Items
+                      Other Charges
                     </label>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
@@ -1029,8 +1050,8 @@ export function SupplierBillPage() {
                         >
                           <span className="truncate text-foreground font-medium">
                             {selectedServiceItemIds.length > 0
-                              ? `${selectedServiceItemIds.length} service item(s) selected`
-                              : "Select service items (Freight, Loading, etc.)..."}
+                              ? `${selectedServiceItemIds.length} item(s) selected`
+                              : "Select service items (Freight, Loading, Handling)..."}
                           </span>
                           <span className="text-[10px] text-muted-foreground shrink-0">▼</span>
                         </button>
@@ -1096,44 +1117,68 @@ export function SupplierBillPage() {
                         )}
                       </div>
 
-                      {/* Manual other charges amount input */}
+                      {/* Total other charges amount display / fallback input */}
                       <div className="w-28 shrink-0">
                         <input
                           type="number"
                           min="0"
-                          disabled={isReadOnly}
+                          disabled={isReadOnly || selectedServiceItemIds.length > 0}
                           value={otherCharges}
                           onChange={(e) => {
                             const val = e.target.value;
                             setOtherCharges(val === "" ? "" : Math.max(0, Number(val)));
                           }}
                           placeholder="Amount"
-                          className="w-full px-2.5 py-1.5 font-mono text-xs text-right bg-background border border-border rounded-lg outline-none disabled:opacity-75 disabled:cursor-not-allowed"
+                          title={selectedServiceItemIds.length > 0 ? "Calculated from selected service items below" : "Enter manual other charges"}
+                          className="w-full px-2.5 py-1.5 font-mono text-xs text-right bg-background border border-border rounded-lg outline-none disabled:opacity-85 disabled:cursor-not-allowed font-bold"
                         />
                       </div>
                     </div>
 
-                    {/* Selected Service Badges */}
+                    {/* Single-item amount input field for each selected Other Charge */}
                     {selectedServiceItemIds.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      <div className="mt-2 space-y-1.5 border border-border/70 rounded-xl p-2.5 bg-muted/20">
+                        <div className="text-[11px] font-bold text-muted-foreground flex items-center justify-between">
+                          <span>Selected Other Charges:</span>
+                          <span className="font-mono text-foreground font-extrabold">Total: ৳{summary.otherCharges.toLocaleString()}</span>
+                        </div>
                         {selectedServiceItemIds.map((id) => {
                           const item = availableServiceItems.find((s) => s.id === id);
+                          const currentAmt = serviceItemAmounts[id] ?? item?.standardPurchasePrice ?? 1200;
                           return (
-                            <span
+                            <div
                               key={id}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                              className="flex items-center justify-between gap-2 p-1.5 rounded-lg bg-background border border-border/60 text-xs"
                             >
-                              <span>{item?.itemName || id}</span>
-                              {!isReadOnly && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleToggleServiceItem(id)}
-                                  className="hover:text-rose-500 cursor-pointer ml-0.5"
-                                >
-                                  ×
-                                </button>
-                              )}
-                            </span>
+                              <div className="truncate flex-1">
+                                <span className="font-bold text-foreground">{item?.itemName || id}</span>
+                                <span className="ml-1.5 font-mono text-[10px] text-muted-foreground">({item?.itemCode})</span>
+                              </div>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="text-[11px] font-semibold text-muted-foreground">৳</span>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  disabled={isReadOnly}
+                                  value={currentAmt}
+                                  onChange={(e) =>
+                                    handleUpdateServiceItemAmount(id, Math.max(0, parseFloat(e.target.value) || 0))
+                                  }
+                                  placeholder="0.00"
+                                  className="w-24 px-2 py-1 font-mono text-xs text-right bg-background border border-border rounded-md outline-none focus:border-amber-500 font-bold"
+                                />
+                                {!isReadOnly && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleServiceItem(id)}
+                                    className="p-1 rounded text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 transition cursor-pointer ml-1"
+                                    title="Remove this charge"
+                                  >
+                                    <Trash2 className="size-3" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
                           );
                         })}
                       </div>
@@ -1194,7 +1239,7 @@ export function SupplierBillPage() {
 
                     <div>
                       <label className="text-[10.5px] font-bold text-amber-600 uppercase block mb-1">
-                        Tax / AIT (৳)
+                        Tax (৳)
                       </label>
                       <input
                         type="number"
@@ -1227,7 +1272,7 @@ export function SupplierBillPage() {
                     - ৳ {summary.discount.toLocaleString()}
                   </span>
                 </div>
-                {/* VAT Label: changed from VAT (5%) to VAT */}
+                {/* VAT Label */}
                 <div className="flex justify-between items-center text-muted-foreground">
                   <span>VAT</span>
                   <span className="font-mono font-bold text-foreground">
@@ -1236,7 +1281,7 @@ export function SupplierBillPage() {
                 </div>
                 {/* Tax Field beside VAT and Total */}
                 <div className="flex justify-between items-center text-muted-foreground">
-                  <span>Tax / AIT</span>
+                  <span>Tax</span>
                   <span className="font-mono font-bold text-amber-600 dark:text-amber-400">
                     + ৳ {summary.tax.toLocaleString()}
                   </span>

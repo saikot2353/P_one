@@ -72,12 +72,13 @@ export function BatchStockRegisterPage() {
 
   const filteredRows = useMemo(() => {
     return INITIAL_BATCH_STOCK_DATA.filter((row) => {
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
       if (filterStore !== "All" && row.store !== filterStore) return false;
       if (filterBatchStatus !== "All" && row.status !== filterBatchStatus) return false;
       if (filterBatchNo.trim() && !row.batch.toLowerCase().includes(filterBatchNo.toLowerCase().trim()))
-        return false;
-      if (filterLocation.trim() && !row.location.toLowerCase().includes(filterLocation.toLowerCase().trim()))
         return false;
       if (filterExpiryDate && row.expiryDate > filterExpiryDate) return false;
 
@@ -97,7 +98,6 @@ export function BatchStockRegisterPage() {
     filterItem,
     filterBatchNo,
     filterStore,
-    filterLocation,
     filterExpiryDate,
     filterBatchStatus,
     searchQuery,
@@ -335,19 +335,22 @@ export function BatchStockRegisterPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
+                <input
+                  type="text"
+                  list="batch-items-list"
+                  placeholder="Search item name/code..."
+                  value={filterItem === "All" ? "" : filterItem}
                   onChange={(e) => setFilterItem(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Batch Items</option>
+                />
+                <datalist id="batch-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               <div>
@@ -373,17 +376,6 @@ export function BatchStockRegisterPage() {
                     <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
-              </div>
-
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Location</label>
-                <input
-                  type="text"
-                  placeholder="Filter location..."
-                  value={filterLocation}
-                  onChange={(e) => setFilterLocation(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                />
               </div>
 
               <div>
@@ -423,8 +415,8 @@ export function BatchStockRegisterPage() {
                     <th className="py-2.5 px-3">Manufacture Date</th>
                     <th className="py-2.5 px-3">Expiry Date</th>
                     <th className="py-2.5 px-3">Store</th>
-                    <th className="py-2.5 px-3">Location</th>
                     <th className="py-2.5 px-3 text-right">Quantity</th>
+                    <th className="py-2.5 px-3 text-right">Value (৳)</th>
                     <th className="py-2.5 px-3 text-center">Status</th>
                     <th className="py-2.5 px-3 text-center">Action / Drill-down</th>
                   </tr>
@@ -448,9 +440,11 @@ export function BatchStockRegisterPage() {
                         <td className="py-2 px-3 text-muted-foreground whitespace-nowrap">{row.mfgDate}</td>
                         <td className="py-2 px-3 text-foreground whitespace-nowrap font-medium">{row.expiryDate}</td>
                         <td className="py-2 px-3 text-foreground whitespace-nowrap">{row.store}</td>
-                        <td className="py-2 px-3 text-muted-foreground font-mono">{row.location}</td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
                           {row.quantity.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                          ৳{formatAmount(row.quantity * row.unitCost)}
                         </td>
                         <td className="py-2 px-3 text-center whitespace-nowrap">
                           <span
@@ -478,6 +472,20 @@ export function BatchStockRegisterPage() {
                     ))
                   )}
                 </tbody>
+                <tfoot className="bg-muted/60 font-semibold border-t border-border sticky bottom-0">
+                  <tr>
+                    <td colSpan={5} className="py-2.5 px-3 text-right uppercase tracking-wider text-[11px] text-muted-foreground font-bold">
+                      Total
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-foreground">
+                      {filteredRows.reduce((s, r) => s + r.quantity, 0).toLocaleString()}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-emerald-600 dark:text-emerald-400">
+                      ৳{formatAmount(filteredRows.reduce((s, r) => s + r.quantity * r.unitCost, 0))}
+                    </td>
+                    <td colSpan={2}></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>

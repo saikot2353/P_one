@@ -82,7 +82,10 @@ export function ItemReceiptRegisterPage() {
 
   const filteredRows = useMemo(() => {
     return INITIAL_RECEIPT_REGISTER_DATA.filter((row) => {
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
       if (filterStore !== "All" && row.store !== filterStore) return false;
       if (filterSupplier !== "All" && row.supplier !== filterSupplier) return false;
       if (filterReceiptType !== "All" && row.receiptType !== filterReceiptType) return false;
@@ -108,6 +111,7 @@ export function ItemReceiptRegisterPage() {
   }, [filterItem, filterStore, filterSupplier, filterReceiptType, filterBatch, fromDate, toDate, searchQuery]);
 
   const totalQty = useMemo(() => filteredRows.reduce((s, r) => s + r.quantity, 0), [filteredRows]);
+  const totalVal = useMemo(() => filteredRows.reduce((s, r) => s + r.quantity * (r.unitPrice || 0), 0), [filteredRows]);
 
   const handleResetFilters = () => {
     setFilterItem("All");
@@ -307,16 +311,19 @@ export function ItemReceiptRegisterPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
+                <input
+                  type="text"
+                  list="receipt-items-list"
+                  placeholder="Search item name/code..."
+                  value={filterItem === "All" ? "" : filterItem}
                   onChange={(e) => setFilterItem(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Items</option>
+                />
+                <datalist id="receipt-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               <div>
@@ -409,7 +416,7 @@ export function ItemReceiptRegisterPage() {
                     <th className="py-2.5 px-3">Batch</th>
                     <th className="py-2.5 px-3">Location</th>
                     <th className="py-2.5 px-3 text-right">Quantity</th>
-                    <th className="py-2.5 px-3 text-center">Action</th>
+                    <th className="py-2.5 px-3 text-right">Value (৳)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
@@ -443,19 +450,26 @@ export function ItemReceiptRegisterPage() {
                         <td className="py-2 px-3 text-right font-mono font-black text-emerald-600 dark:text-emerald-400">
                           +{row.quantity.toLocaleString()} {row.uom}
                         </td>
-                        <td className="py-2 px-3 text-center">
-                          <button
-                            onClick={() => setSelectedReceiptModal(row)}
-                            className="p-1 rounded-md hover:bg-muted text-primary cursor-pointer transition"
-                            title="View Receipt Details"
-                          >
-                            <Eye className="size-3.5" />
-                          </button>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
+                          ৳{formatAmount(row.quantity * (row.unitPrice || 0))}
                         </td>
                       </tr>
                     ))
                   )}
                 </tbody>
+                <tfoot className="bg-muted/60 font-semibold border-t border-border sticky bottom-0">
+                  <tr>
+                    <td colSpan={8} className="py-2.5 px-3 text-right uppercase tracking-wider text-[11px] text-muted-foreground font-bold">
+                      Total
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-emerald-600 dark:text-emerald-400">
+                      {totalQty.toLocaleString()}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-foreground">
+                      ৳{formatAmount(totalVal)}
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>

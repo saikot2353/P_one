@@ -241,6 +241,7 @@ import { Route as InvIssueReturnRouteImport } from './routes/inv-issue-return'
 import { Route as InvIssueRegularRouteImport } from './routes/inv-issue-regular'
 import { Route as InvIssueMrrReturnRouteImport } from './routes/inv-issue-mrr-return'
 import { Route as InvIssueListRouteImport } from './routes/inv-issue-list'
+import { Route as InvIntraCompanyTransferRouteImport } from './routes/inv-intra-company-transfer'
 import { Route as InvIntercompanyTransferListRouteImport } from './routes/inv-intercompany-transfer-list'
 import { Route as InvIntercompanyTransferRouteImport } from './routes/inv-intercompany-transfer'
 import { Route as InvIntercompanyReceiveListRouteImport } from './routes/inv-intercompany-receive-list'
@@ -1591,6 +1592,11 @@ const InvIssueListRoute = InvIssueListRouteImport.update({
   path: '/inv-issue-list',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvIntraCompanyTransferRoute = InvIntraCompanyTransferRouteImport.update({
+  id: '/inv-intra-company-transfer',
+  path: '/inv-intra-company-transfer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvIntercompanyTransferListRoute =
   InvIntercompanyTransferListRouteImport.update({
     id: '/inv-intercompany-transfer-list',
@@ -2240,6 +2246,7 @@ export interface FileRoutesByFullPath {
   '/inv-intercompany-receive-list': typeof InvIntercompanyReceiveListRoute
   '/inv-intercompany-transfer': typeof InvIntercompanyTransferRoute
   '/inv-intercompany-transfer-list': typeof InvIntercompanyTransferListRoute
+  '/inv-intra-company-transfer': typeof InvIntraCompanyTransferRoute
   '/inv-issue-list': typeof InvIssueListRoute
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
@@ -2579,6 +2586,7 @@ export interface FileRoutesByTo {
   '/inv-intercompany-receive-list': typeof InvIntercompanyReceiveListRoute
   '/inv-intercompany-transfer': typeof InvIntercompanyTransferRoute
   '/inv-intercompany-transfer-list': typeof InvIntercompanyTransferListRoute
+  '/inv-intra-company-transfer': typeof InvIntraCompanyTransferRoute
   '/inv-issue-list': typeof InvIssueListRoute
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
@@ -2919,6 +2927,7 @@ export interface FileRoutesById {
   '/inv-intercompany-receive-list': typeof InvIntercompanyReceiveListRoute
   '/inv-intercompany-transfer': typeof InvIntercompanyTransferRoute
   '/inv-intercompany-transfer-list': typeof InvIntercompanyTransferListRoute
+  '/inv-intra-company-transfer': typeof InvIntraCompanyTransferRoute
   '/inv-issue-list': typeof InvIssueListRoute
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
@@ -3260,6 +3269,7 @@ export interface FileRouteTypes {
     | '/inv-intercompany-receive-list'
     | '/inv-intercompany-transfer'
     | '/inv-intercompany-transfer-list'
+    | '/inv-intra-company-transfer'
     | '/inv-issue-list'
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
@@ -3599,6 +3609,7 @@ export interface FileRouteTypes {
     | '/inv-intercompany-receive-list'
     | '/inv-intercompany-transfer'
     | '/inv-intercompany-transfer-list'
+    | '/inv-intra-company-transfer'
     | '/inv-issue-list'
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
@@ -3938,6 +3949,7 @@ export interface FileRouteTypes {
     | '/inv-intercompany-receive-list'
     | '/inv-intercompany-transfer'
     | '/inv-intercompany-transfer-list'
+    | '/inv-intra-company-transfer'
     | '/inv-issue-list'
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
@@ -4278,6 +4290,7 @@ export interface RootRouteChildren {
   InvIntercompanyReceiveListRoute: typeof InvIntercompanyReceiveListRoute
   InvIntercompanyTransferRoute: typeof InvIntercompanyTransferRoute
   InvIntercompanyTransferListRoute: typeof InvIntercompanyTransferListRoute
+  InvIntraCompanyTransferRoute: typeof InvIntraCompanyTransferRoute
   InvIssueListRoute: typeof InvIssueListRoute
   InvIssueMrrReturnRoute: typeof InvIssueMrrReturnRoute
   InvIssueRegularRoute: typeof InvIssueRegularRoute
@@ -6142,6 +6155,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvIssueListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-intra-company-transfer': {
+      id: '/inv-intra-company-transfer'
+      path: '/inv-intra-company-transfer'
+      fullPath: '/inv-intra-company-transfer'
+      preLoaderRoute: typeof InvIntraCompanyTransferRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-intercompany-transfer-list': {
       id: '/inv-intercompany-transfer-list'
       path: '/inv-intercompany-transfer-list'
@@ -6983,6 +7003,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvIntercompanyReceiveListRoute: InvIntercompanyReceiveListRoute,
   InvIntercompanyTransferRoute: InvIntercompanyTransferRoute,
   InvIntercompanyTransferListRoute: InvIntercompanyTransferListRoute,
+  InvIntraCompanyTransferRoute: InvIntraCompanyTransferRoute,
   InvIssueListRoute: InvIssueListRoute,
   InvIssueMrrReturnRoute: InvIssueMrrReturnRoute,
   InvIssueRegularRoute: InvIssueRegularRoute,

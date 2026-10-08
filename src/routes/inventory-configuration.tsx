@@ -295,6 +295,7 @@ function InventoryConfigurationPage() {
   const [expandedSubGroupIds, setExpandedSubGroupIds] = useState<Record<string, boolean>>({});
   const [subGroupSearchQuery, setSubGroupSearchQuery] = useState("");
   const [selectedSubGroupTreeId, setSelectedSubGroupTreeId] = useState<string | null>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [catalogItemSearchQuery, setCatalogItemSearchQuery] = useState("");
   const [isExcelUploadOpen, setIsExcelUploadOpen] = useState(false);
 
@@ -1054,19 +1055,24 @@ function InventoryConfigurationPage() {
                   </div>
 
                   {/* Selected Node Path Breadcrumbs */}
-                  {selectedSubGroupTreeId && (
+                  {(selectedSubGroupTreeId || selectedGroupId) && (
                     <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2 truncate">
                         <span className="font-bold text-amber-700 dark:text-amber-400">
                           Selected Hierarchy:
                         </span>
                         <span className="font-mono text-[11px] font-bold text-foreground truncate">
-                          {getSubGroupBreadcrumb(selectedSubGroupTreeId, itemSubGroups, itemGroups)}
+                          {selectedSubGroupTreeId
+                            ? getSubGroupBreadcrumb(selectedSubGroupTreeId, itemSubGroups, itemGroups)
+                            : itemGroups.find((g) => g.id === selectedGroupId)?.groupName}
                         </span>
                       </div>
                       <button
                         type="button"
-                        onClick={() => setSelectedSubGroupTreeId(null)}
+                        onClick={() => {
+                          setSelectedSubGroupTreeId(null);
+                          setSelectedGroupId(null);
+                        }}
                         className="text-muted-foreground hover:text-foreground text-[10.5px] font-semibold cursor-pointer shrink-0"
                       >
                         Clear Selection
@@ -1075,15 +1081,13 @@ function InventoryConfigurationPage() {
                   )}
 
                   {/* Dynamic Recursive Tree */}
-                  <div className="rounded-xl border border-border/70 p-3 bg-card space-y-1 overflow-x-auto min-h-[300px]">
+                  <div className="rounded-xl border border-border/70 p-3 bg-card space-y-2 overflow-x-auto min-h-[300px]">
                     {(() => {
-                      const treeNodes = buildSubGroupTreeNodes(itemSubGroups);
-
-                      if (treeNodes.length === 0) {
+                      if (itemGroups.length === 0 && itemSubGroups.length === 0) {
                         return (
                           <div className="py-12 text-center text-muted-foreground">
                             <FolderTree className="size-8 text-amber-500 mx-auto opacity-60 mb-2" />
-                            <div className="font-bold text-foreground">No Sub Groups Found</div>
+                            <div className="font-bold text-foreground">No Groups Found</div>
                             <button
                               type="button"
                               onClick={handleOpenAddRootSubGroup}
@@ -1115,7 +1119,7 @@ function InventoryConfigurationPage() {
                               return (
                                 <div key={node.id} className="space-y-1">
                                   <div
-                                    style={{ paddingLeft: `${node.depth * 24 + 8}px` }}
+                                    style={{ paddingLeft: `${node.depth * 20 + 8}px` }}
                                     className={`flex items-center justify-between p-2 rounded-lg transition-all text-xs border ${
                                       isSelected
                                         ? "bg-amber-500/15 border-amber-500/60 shadow-2xs"
@@ -1162,7 +1166,10 @@ function InventoryConfigurationPage() {
 
                                       <button
                                         type="button"
-                                        onClick={() => setSelectedSubGroupTreeId(node.id)}
+                                        onClick={() => {
+                                          setSelectedSubGroupTreeId(node.id);
+                                          setSelectedGroupId(null);
+                                        }}
                                         className="font-bold text-foreground hover:text-amber-500 text-left truncate flex items-center gap-2 cursor-pointer"
                                       >
                                         <span className="truncate">{node.subGroupName}</span>
@@ -1241,7 +1248,95 @@ function InventoryConfigurationPage() {
                         );
                       };
 
-                      return renderSubGroupTree(treeNodes);
+                      return (
+                        <div className="space-y-2">
+                          {itemGroups.map((grp) => {
+                            const rootSubNodes = buildSubGroupTreeNodes(itemSubGroups, grp.id, null, 1);
+                            const isGrpExpanded = expandedSubGroupIds[grp.id] !== false;
+                            const isGrpSelected = selectedGroupId === grp.id && !selectedSubGroupTreeId;
+                            const grpItemCount = items.filter((it) => {
+                              const sg = itemSubGroups.find((s) => s.id === it.subGroupId);
+                              return it.groupId === grp.id || sg?.itemGroupId === grp.id;
+                            }).length;
+
+                            return (
+                              <div key={grp.id} className="space-y-1">
+                                {/* Root Parent Item Group Node */}
+                                <div
+                                  className={`flex items-center justify-between p-2.5 rounded-xl transition-all text-xs border ${
+                                    isGrpSelected
+                                      ? "bg-amber-500/20 border-amber-500 shadow-2xs ring-1 ring-amber-500/40"
+                                      : "bg-muted/40 hover:bg-muted/70 border-border/80"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setExpandedSubGroupIds((prev) => ({
+                                          ...prev,
+                                          [grp.id]: !isGrpExpanded,
+                                        }))
+                                      }
+                                      className="size-5 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
+                                    >
+                                      {isGrpExpanded ? (
+                                        <ChevronDown className="size-4 text-amber-500" />
+                                      ) : (
+                                        <ChevronRight className="size-4" />
+                                      )}
+                                    </button>
+
+                                    <div className="p-1 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0">
+                                      <Layers className="size-4" />
+                                    </div>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedGroupId(grp.id);
+                                        setSelectedSubGroupTreeId(null);
+                                      }}
+                                      className="font-extrabold text-foreground hover:text-amber-500 text-left truncate flex items-center gap-2 cursor-pointer"
+                                    >
+                                      <span className="font-bold">{grp.groupName}</span>
+                                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-background border border-border text-muted-foreground">
+                                        {grp.groupCode}
+                                      </span>
+                                      {grp.serviceFlag && (
+                                        <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
+                                          SERVICE
+                                        </span>
+                                      )}
+                                    </button>
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                                    <span className="text-[10px] font-semibold text-muted-foreground px-2 py-0.5 rounded bg-background border border-border/60">
+                                      {grpItemCount} items
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenAddRootSubGroup()}
+                                      title={`Add sub group under ${grp.groupName}`}
+                                      className="size-6 rounded flex items-center justify-center bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white transition cursor-pointer"
+                                    >
+                                      <Plus className="size-3" />
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Child Sub Groups under this Item Group */}
+                                {isGrpExpanded && rootSubNodes.length > 0 && (
+                                  <div className="pl-4 border-l-2 border-amber-500/30 ml-3.5 my-1 space-y-1">
+                                    {renderSubGroupTree(rootSubNodes)}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
                     })()}
                   </div>
 
@@ -1253,13 +1348,15 @@ function InventoryConfigurationPage() {
                           <Package className="size-4 text-amber-500" />
                           <span>
                             {selectedSubGroupTreeId
-                              ? `Items under: ${itemSubGroups.find((s) => s.id === selectedSubGroupTreeId)?.subGroupName}`
-                              : "All Catalog Items"}
+                              ? `Items under Sub Group: ${itemSubGroups.find((s) => s.id === selectedSubGroupTreeId)?.subGroupName}`
+                              : selectedGroupId
+                                ? `Items under Group: ${itemGroups.find((g) => g.id === selectedGroupId)?.groupName}`
+                                : "All Catalog Items"}
                           </span>
                         </h3>
                         <p className="text-[11px] text-muted-foreground">
-                          {selectedSubGroupTreeId
-                            ? "Filtered by active tree node. To create an item, click 'Create Item' on the relevant node above."
+                          {selectedSubGroupTreeId || selectedGroupId
+                            ? "Filtered by active tree node. Select a tree node above or search below."
                             : "Showing all items in master catalog. Select a tree node above or search below."}
                         </p>
                       </div>
@@ -1304,8 +1401,12 @@ function InventoryConfigurationPage() {
                         <tbody className="divide-y divide-border/60">
                           {(() => {
                             const subGroupItems = items.filter((it) => {
+                              const matchesGroup = selectedGroupId
+                                ? it.groupId === selectedGroupId ||
+                                  itemSubGroups.find((s) => s.id === it.subGroupId)?.itemGroupId === selectedGroupId
+                                : true;
                               const matchesSub = selectedSubGroupTreeId ? it.subGroupId === selectedSubGroupTreeId : true;
-                              if (!matchesSub) return false;
+                              if (!matchesGroup || !matchesSub) return false;
                               if (!catalogItemSearchQuery.trim()) return true;
                               const q = catalogItemSearchQuery.toLowerCase();
                               return (

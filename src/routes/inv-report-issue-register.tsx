@@ -77,7 +77,10 @@ export function ItemIssueRegisterPage() {
 
   const filteredRows = useMemo(() => {
     return INITIAL_ISSUE_REGISTER_DATA.filter((row) => {
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
       if (filterStore !== "All" && row.store !== filterStore) return false;
       if (filterIssueType !== "All" && row.issueType !== filterIssueType) return false;
       if (filterBatch.trim() && !row.batch.toLowerCase().includes(filterBatch.toLowerCase().trim()))
@@ -104,6 +107,7 @@ export function ItemIssueRegisterPage() {
   }, [filterItem, filterStore, filterIssueType, filterBatch, filterLocation, fromDate, toDate, searchQuery]);
 
   const totalQty = useMemo(() => filteredRows.reduce((s, r) => s + r.quantity, 0), [filteredRows]);
+  const totalVal = useMemo(() => filteredRows.reduce((s, r) => s + r.quantity * (r.unitCost || 120), 0), [filteredRows]);
 
   const handleResetFilters = () => {
     setFilterItem("All");
@@ -303,16 +307,19 @@ export function ItemIssueRegisterPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
+                <input
+                  type="text"
+                  list="issue-items-list"
+                  placeholder="Search item name/code..."
+                  value={filterItem === "All" ? "" : filterItem}
                   onChange={(e) => setFilterItem(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Items</option>
+                />
+                <datalist id="issue-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               <div>
@@ -401,8 +408,8 @@ export function ItemIssueRegisterPage() {
                     <th className="py-2.5 px-3">Batch</th>
                     <th className="py-2.5 px-3">Location</th>
                     <th className="py-2.5 px-3 text-right">Quantity</th>
+                    <th className="py-2.5 px-3 text-right">Value (৳)</th>
                     <th className="py-2.5 px-3">Issued To</th>
-                    <th className="py-2.5 px-3 text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
@@ -433,22 +440,30 @@ export function ItemIssueRegisterPage() {
                         <td className="py-2 px-3 text-right font-mono font-black text-rose-500">
                           -{row.quantity.toLocaleString()} {row.uom}
                         </td>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
+                          ৳{formatAmount(row.quantity * (row.unitCost || 120))}
+                        </td>
                         <td className="py-2 px-3 text-muted-foreground max-w-[200px] truncate" title={row.issuedTo}>
                           {row.issuedTo}
-                        </td>
-                        <td className="py-2 px-3 text-center">
-                          <button
-                            onClick={() => setSelectedIssueModal(row)}
-                            className="p-1 rounded-md hover:bg-muted text-primary cursor-pointer transition"
-                            title="View Issue Voucher"
-                          >
-                            <Eye className="size-3.5" />
-                          </button>
                         </td>
                       </tr>
                     ))
                   )}
                 </tbody>
+                <tfoot className="bg-muted/60 font-semibold border-t border-border sticky bottom-0">
+                  <tr>
+                    <td colSpan={7} className="py-2.5 px-3 text-right uppercase tracking-wider text-[11px] text-muted-foreground font-bold">
+                      Total
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-rose-500">
+                      -{totalQty.toLocaleString()}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-foreground">
+                      ৳{formatAmount(totalVal)}
+                    </td>
+                    <td></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>

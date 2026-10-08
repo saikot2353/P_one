@@ -657,26 +657,79 @@ function TransferRequisitionApprovalPage() {
               )}
             </div>
 
-            <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => {
-                  setReportTarget(inspectedReq);
-                  setPreviewReportOpen(true);
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition cursor-pointer"
-              >
-                <Printer className="size-3.5" />
-                <span>Print Dossier</span>
-              </button>
+            <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReportTarget(inspectedReq);
+                    setPreviewReportOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition cursor-pointer"
+                >
+                  <Printer className="size-3.5" />
+                  <span>Print Dossier</span>
+                </button>
+              </div>
 
-              <button
-                type="button"
-                onClick={() => setInspectedReq(null)}
-                className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs transition cursor-pointer"
-              >
-                Close
-              </button>
+              <div className="flex items-center gap-2">
+                {inspectedReq.status === "Approval Pending" && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = inspectedReq;
+                        setInspectedReq(null);
+                        setActionTarget(target);
+                        setActionType("Approve");
+                        setActionComment("Approved for warehouse transfer dispatch.");
+                      }}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-2xs cursor-pointer"
+                    >
+                      <CheckCircle2 className="size-3.5" />
+                      <span>Approve</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = inspectedReq;
+                        setInspectedReq(null);
+                        setActionTarget(target);
+                        setActionType("Return");
+                        setActionComment("");
+                      }}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold text-xs transition cursor-pointer"
+                    >
+                      <RotateCcw className="size-3.5" />
+                      <span>Return</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = inspectedReq;
+                        setInspectedReq(null);
+                        setActionTarget(target);
+                        setActionType("Reject");
+                        setActionComment("");
+                      }}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold text-xs transition cursor-pointer"
+                    >
+                      <XCircle className="size-3.5" />
+                      <span>Reject</span>
+                    </button>
+                  </>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => setInspectedReq(null)}
+                  className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs transition cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

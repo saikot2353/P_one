@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import {
   INITIAL_LOCATION_STOCK_DATA,
   LocationStockRow,
+  INITIAL_LEDGER_DATA,
 } from "@/lib/reports-mock-data";
 import { formatAmount, getActiveCurrencyConfig } from "@/lib/currency-format-utils";
 import { exportToCSV, exportToExcel } from "@/lib/report-export-utils";
@@ -49,7 +50,7 @@ export function LocationStockRegisterPage() {
   const [filterStore, setFilterStore] = useState("All");
   const [filterLocationType, setFilterLocationType] = useState("All");
   const [filterItem, setFilterItem] = useState("All");
-  const [filterBatch, setFilterBatch] = useState("");
+  const [filterLocation, setFilterLocation] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Modals
@@ -66,19 +67,33 @@ export function LocationStockRegisterPage() {
     () => Array.from(new Set(INITIAL_LOCATION_STOCK_DATA.map((l) => l.itemName))),
     []
   );
+  const locations = useMemo(
+    () => Array.from(new Set(INITIAL_LOCATION_STOCK_DATA.map((l) => l.locationName || l.locationCode))),
+    []
+  );
 
   const filteredRows = useMemo(() => {
     return INITIAL_LOCATION_STOCK_DATA.filter((row) => {
       if (filterStore !== "All" && row.store !== filterStore) return false;
       if (filterLocationType !== "All" && row.locationType !== filterLocationType) return false;
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
-      if (filterBatch.trim() && !row.batch.toLowerCase().includes(filterBatch.toLowerCase().trim()))
-        return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
+      if (filterLocation.trim()) {
+        const q = filterLocation.toLowerCase().trim();
+        const locName = (row.locationName || "").toLowerCase();
+        const locCode = row.locationCode.toLowerCase();
+        const bin = row.bin.toLowerCase();
+        const rack = row.rack.toLowerCase();
+        if (!locName.includes(q) && !locCode.includes(q) && !bin.includes(q) && !rack.includes(q)) return false;
+      }
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const match =
           row.locationCode.toLowerCase().includes(q) ||
+          (row.locationName && row.locationName.toLowerCase().includes(q)) ||
           row.itemCode.toLowerCase().includes(q) ||
           row.itemName.toLowerCase().includes(q) ||
           row.rack.toLowerCase().includes(q) ||
@@ -89,7 +104,7 @@ export function LocationStockRegisterPage() {
 
       return true;
     });
-  }, [filterStore, filterLocationType, filterItem, filterBatch, searchQuery]);
+  }, [filterStore, filterLocationType, filterItem, filterLocation, searchQuery]);
 
   const totalQty = useMemo(() => filteredRows.reduce((s, r) => s + r.quantity, 0), [filteredRows]);
   const totalVal = useMemo(() => filteredRows.reduce((s, r) => s + r.stockValue, 0), [filteredRows]);
@@ -98,7 +113,7 @@ export function LocationStockRegisterPage() {
     setFilterStore("All");
     setFilterLocationType("All");
     setFilterItem("All");
-    setFilterBatch("");
+    setFilterLocation("");
     setSearchQuery("");
     toast.info("Filters reset");
   };
@@ -278,30 +293,6 @@ export function LocationStockRegisterPage() {
             </div>
           </div>
 
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[11px] font-medium text-muted-foreground">Active Storage Locations</span>
-              <p className="text-lg font-bold mt-1 text-foreground">{filteredRows.length} Bins / Slots</p>
-              <span className="text-[10px] text-muted-foreground">Mapped storage</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[11px] font-medium text-muted-foreground">Total Units in Bins</span>
-              <p className="text-lg font-bold mt-1 text-foreground font-mono">{totalQty.toLocaleString()}</p>
-              <span className="text-[10px] text-emerald-600 font-medium">Physical inventory</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 shadow-xs">
-              <span className="text-[11px] font-medium text-primary">Bin Stock Valuation</span>
-              <p className="text-lg font-bold mt-1 text-primary font-mono">{formatAmount(totalVal, undefined, true)}</p>
-              <span className="text-[10px] text-muted-foreground">{currencyCfg.format}</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[11px] font-medium text-muted-foreground">Location Hierarchy</span>
-              <p className="text-lg font-bold mt-1 text-foreground">Store &gt; Rack &gt; Shelf &gt; Bin</p>
-              <span className="text-[10px] text-muted-foreground">Full drilldown supported</span>
-            </div>
-          </div>
-
           {/* Filter Section */}
           <div className="p-4 rounded-xl border border-border/70 bg-card/60 backdrop-blur-xs space-y-3 shadow-xs">
             <div className="flex items-center justify-between pb-2 border-b border-border/50">
@@ -317,7 +308,7 @@ export function LocationStockRegisterPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Store</label>
                 <select
@@ -349,27 +340,36 @@ export function LocationStockRegisterPage() {
 
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
+                <input
+                  type="text"
+                  list="loc-items-list"
+                  placeholder="Search item name/code..."
+                  value={filterItem === "All" ? "" : filterItem}
                   onChange={(e) => setFilterItem(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Items</option>
+                />
+                <datalist id="loc-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Batch</label>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Location</label>
                 <input
                   type="text"
-                  placeholder="Filter batch..."
-                  value={filterBatch}
-                  onChange={(e) => setFilterBatch(e.target.value)}
+                  list="loc-locations-list"
+                  placeholder="Search location..."
+                  value={filterLocation}
+                  onChange={(e) => setFilterLocation(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
                 />
+                <datalist id="loc-locations-list">
+                  {locations.map((loc) => (
+                    <option key={loc} value={loc} />
+                  ))}
+                </datalist>
               </div>
 
               <div>
@@ -391,13 +391,15 @@ export function LocationStockRegisterPage() {
           {/* Table */}
           <div className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-xs">
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-              <table className="w-full text-xs text-left border-collapse min-w-[1100px]">
+              <table className="w-full text-xs text-left border-collapse min-w-[1200px]">
                 <thead className="bg-muted/80 text-muted-foreground font-semibold uppercase text-[10.5px] sticky top-0 z-10 backdrop-blur-xs border-b border-border">
                   <tr>
                     <th className="py-2.5 px-3">Store</th>
-                    <th className="py-2.5 px-3">Location Hierarchy</th>
+                    <th className="py-2.5 px-3">Location Name</th>
                     <th className="py-2.5 px-3">Item Code & Name</th>
-                    <th className="py-2.5 px-3">Batch</th>
+                    <th className="py-2.5 px-3">Specification</th>
+                    <th className="py-2.5 px-3">Brand</th>
+                    <th className="py-2.5 px-3">Origin</th>
                     <th className="py-2.5 px-3">UOM</th>
                     <th className="py-2.5 px-3 text-right">Quantity</th>
                     <th className="py-2.5 px-3 text-right">Stock Value</th>
@@ -407,7 +409,7 @@ export function LocationStockRegisterPage() {
                 <tbody className="divide-y divide-border/60">
                   {filteredRows.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="py-8 text-center text-muted-foreground">
+                      <td colSpan={10} className="py-8 text-center text-muted-foreground">
                         No location stock records found.
                       </td>
                     </tr>
@@ -415,17 +417,19 @@ export function LocationStockRegisterPage() {
                     filteredRows.map((row) => (
                       <tr key={row.id} className="hover:bg-muted/40 transition">
                         <td className="py-2 px-3 font-semibold text-foreground whitespace-nowrap">{row.store}</td>
-                        <td className="py-2 px-3">
-                          <span className="font-mono text-primary font-semibold flex items-center gap-1">
-                            <MapPin className="size-3 text-primary" />
-                            {row.rack} &gt; {row.shelf} &gt; {row.bin}
+                        <td className="py-2 px-3 font-medium text-foreground">
+                          <span className="font-semibold text-primary flex items-center gap-1">
+                            <MapPin className="size-3 text-primary shrink-0" />
+                            {row.locationName || `${row.rack} > ${row.shelf} > ${row.bin}`}
                           </span>
                           <span className="text-[10px] text-muted-foreground font-mono">[{row.locationCode}]</span>
                         </td>
                         <td className="py-2 px-3 font-medium text-foreground whitespace-nowrap">
                           {row.itemName} <span className="font-mono text-muted-foreground text-[11px]">({row.itemCode})</span>
                         </td>
-                        <td className="py-2 px-3 font-mono text-[11px] text-purple-600 dark:text-purple-400">{row.batch}</td>
+                        <td className="py-2 px-3 text-muted-foreground">{row.specification || "-"}</td>
+                        <td className="py-2 px-3 text-foreground whitespace-nowrap">{row.brand || "-"}</td>
+                        <td className="py-2 px-3 text-foreground whitespace-nowrap">{row.origin || "-"}</td>
                         <td className="py-2 px-3 text-muted-foreground">{row.uom}</td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
                           {row.quantity.toLocaleString()}
@@ -438,29 +442,43 @@ export function LocationStockRegisterPage() {
                             onClick={() => setSelectedLocationDrilldown(row)}
                             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/10 hover:bg-primary/20 text-primary text-[11px] font-bold transition cursor-pointer"
                           >
-                            <Layers className="size-3" />
-                            <span>Drill-down</span>
+                            <History className="size-3" />
+                            <span>Stock History</span>
                           </button>
                         </td>
                       </tr>
                     ))
                   )}
                 </tbody>
+                <tfoot className="bg-muted/60 font-semibold border-t border-border sticky bottom-0">
+                  <tr>
+                    <td colSpan={7} className="py-2.5 px-3 text-right uppercase tracking-wider text-[11px] text-muted-foreground font-bold">
+                      Total
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-foreground">
+                      {totalQty.toLocaleString()}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-primary">
+                      {formatAmount(totalVal, undefined, true)}
+                    </td>
+                    <td></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>
         </main>
       </div>
 
-      {/* Location Drill-down Modal as requested: Store ↓ Rack ↓ Shelf ↓ Bin ↓ Item ↓ Batch */}
+      {/* Item Stock Movement History Drill-down Modal */}
       {selectedLocationDrilldown && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="bg-card border border-border rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-muted/40">
               <div className="flex items-center gap-2">
-                <MapPin className="size-4 text-primary" />
+                <History className="size-4 text-primary" />
                 <h3 className="font-bold text-sm text-foreground">
-                  Location Hierarchy Drill-down
+                  Stock Movement History — {selectedLocationDrilldown.itemName}
                 </h3>
               </div>
               <button
@@ -472,42 +490,76 @@ export function LocationStockRegisterPage() {
             </div>
 
             <div className="p-5 space-y-3 text-xs">
-              <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 space-y-2">
-                <h4 className="font-bold text-primary text-xs uppercase tracking-wide">
-                  Physical Storage Tree:
-                </h4>
-                <div className="space-y-1 pl-2 font-mono text-[11px] text-foreground">
-                  <div className="flex items-center gap-2 font-bold text-xs">
-                    <span className="size-2 rounded-full bg-primary" />
-                    <span>Store: {selectedLocationDrilldown.store}</span>
-                  </div>
-                  <div className="pl-4 flex items-center gap-2 text-muted-foreground">
-                    <span>↓ Rack:</span> <span className="font-bold text-foreground">{selectedLocationDrilldown.rack}</span>
-                  </div>
-                  <div className="pl-8 flex items-center gap-2 text-muted-foreground">
-                    <span>↓ Shelf:</span> <span className="font-bold text-foreground">{selectedLocationDrilldown.shelf}</span>
-                  </div>
-                  <div className="pl-12 flex items-center gap-2 text-muted-foreground">
-                    <span>↓ Bin:</span> <span className="font-bold text-primary font-bold">{selectedLocationDrilldown.bin} ({selectedLocationDrilldown.locationCode})</span>
-                  </div>
-                  <div className="pl-16 flex items-center gap-2 text-emerald-600 font-semibold">
-                    <span>↓ Item:</span> <span>{selectedLocationDrilldown.itemName} [{selectedLocationDrilldown.itemCode}]</span>
-                  </div>
-                  <div className="pl-20 flex items-center gap-2 text-purple-600 font-semibold">
-                    <span>↓ Batch:</span> <span>{selectedLocationDrilldown.batch}</span>
-                  </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 rounded-xl bg-muted/30 border border-border/60">
+                <div>
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold">Item & Code</span>
+                  <p className="font-semibold text-foreground mt-0.5">{selectedLocationDrilldown.itemName} ({selectedLocationDrilldown.itemCode})</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold">Location</span>
+                  <p className="font-semibold text-primary mt-0.5">{selectedLocationDrilldown.locationName || selectedLocationDrilldown.locationCode}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold">Current Balance</span>
+                  <p className="font-mono font-bold text-foreground mt-0.5">{selectedLocationDrilldown.quantity} {selectedLocationDrilldown.uom}</p>
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-muted/40 border border-border/60 flex justify-between">
-                <div>
-                  <span className="text-muted-foreground">Physical Qty:</span>
-                  <p className="font-bold font-mono text-sm text-foreground">{selectedLocationDrilldown.quantity} {selectedLocationDrilldown.uom}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-muted-foreground">Stock Valuation:</span>
-                  <p className="font-bold font-mono text-sm text-primary">{formatAmount(selectedLocationDrilldown.stockValue, undefined, true)}</p>
-                </div>
+              <div className="rounded-xl border border-border overflow-hidden">
+                <table className="w-full text-xs text-left border-collapse">
+                  <thead className="bg-muted/80 text-muted-foreground font-semibold uppercase text-[10px] border-b border-border">
+                    <tr>
+                      <th className="py-2 px-3">Date</th>
+                      <th className="py-2 px-3">Transaction</th>
+                      <th className="py-2 px-3">Reference</th>
+                      <th className="py-2 px-3 text-right">In Qty</th>
+                      <th className="py-2 px-3 text-right">Out Qty</th>
+                      <th className="py-2 px-3 text-right">Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {(() => {
+                      const ledgerRows = INITIAL_LEDGER_DATA.filter((l) => l.itemCode === selectedLocationDrilldown.itemCode);
+                      const rows = ledgerRows.length > 0 ? ledgerRows : [
+                        { id: "h1", date: "2026-09-01", transactionType: "Opening Stock", referenceNo: "OPN-2026-001", inQty: selectedLocationDrilldown.quantity + 50, outQty: 0, balance: selectedLocationDrilldown.quantity + 50 },
+                        { id: "h2", date: "2026-09-18", transactionType: "Material Issue", referenceNo: "ISS-2026-088", inQty: 0, outQty: 50, balance: selectedLocationDrilldown.quantity },
+                      ];
+                      return rows.map((r) => (
+                        <tr key={r.id} className="hover:bg-muted/40 transition">
+                          <td className="py-2 px-3 text-foreground whitespace-nowrap">{r.date}</td>
+                          <td className="py-2 px-3">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                              {r.transactionType}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3 font-mono font-semibold text-primary">{r.referenceNo}</td>
+                          <td className="py-2 px-3 text-right font-mono text-emerald-600 font-semibold">{r.inQty > 0 ? `+${r.inQty.toLocaleString()}` : "-"}</td>
+                          <td className="py-2 px-3 text-right font-mono text-rose-600 font-semibold">{r.outQty > 0 ? `-${r.outQty.toLocaleString()}` : "-"}</td>
+                          <td className="py-2 px-3 text-right font-mono font-bold text-foreground">{r.balance.toLocaleString()}</td>
+                        </tr>
+                      ));
+                    })()}
+                  </tbody>
+                  <tfoot className="bg-muted/60 font-semibold border-t border-border">
+                    {(() => {
+                      const ledgerRows = INITIAL_LEDGER_DATA.filter((l) => l.itemCode === selectedLocationDrilldown.itemCode);
+                      const rows = ledgerRows.length > 0 ? ledgerRows : [
+                        { id: "h1", date: "2026-09-01", transactionType: "Opening Stock", referenceNo: "OPN-2026-001", inQty: selectedLocationDrilldown.quantity + 50, outQty: 0, balance: selectedLocationDrilldown.quantity + 50 },
+                        { id: "h2", date: "2026-09-18", transactionType: "Material Issue", referenceNo: "ISS-2026-088", inQty: 0, outQty: 50, balance: selectedLocationDrilldown.quantity },
+                      ];
+                      const totalIn = rows.reduce((s, r) => s + r.inQty, 0);
+                      const totalOut = rows.reduce((s, r) => s + r.outQty, 0);
+                      return (
+                        <tr>
+                          <td colSpan={3} className="py-2 px-3 text-right uppercase text-[10.5px] text-muted-foreground font-bold">Total Flow</td>
+                          <td className="py-2 px-3 text-right font-mono font-bold text-emerald-600">+{totalIn.toLocaleString()}</td>
+                          <td className="py-2 px-3 text-right font-mono font-bold text-rose-600">-{totalOut.toLocaleString()}</td>
+                          <td className="py-2 px-3 text-right font-mono font-black text-foreground">{selectedLocationDrilldown.quantity.toLocaleString()}</td>
+                        </tr>
+                      );
+                    })()}
+                  </tfoot>
+                </table>
               </div>
             </div>
 

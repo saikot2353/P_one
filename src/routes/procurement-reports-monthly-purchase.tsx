@@ -35,11 +35,11 @@ import {
 export const Route = createFileRoute("/procurement-reports-monthly-purchase")({
   head: () => ({
     meta: [
-      { title: "Month-wise Purchase Report — Procurement | CRIPTON" },
+      { title: "Item-wise Purchase Report — Procurement | CRIPTON" },
       {
         name: "description",
         content:
-          "Track purchase transactions month-by-month with subtotals, vendor summaries, tax and amount breakdowns.",
+          "Track purchase transactions item-by-item with vendor summaries, tax and amount breakdowns.",
       },
     ],
   }),
@@ -53,15 +53,14 @@ export function MonthWisePurchaseReportPage() {
   // Filters
   const [filterCompany, setFilterCompany] = useState("All");
   const [filterSupplier, setFilterSupplier] = useState("All");
-  const [filterPurchaseType, setFilterPurchaseType] = useState("All");
   const [filterPoWo, setFilterPoWo] = useState("");
   const [filterItem, setFilterItem] = useState("All");
   const [filterItemGroup, setFilterItemGroup] = useState("All");
   const [filterItemCategory, setFilterItemCategory] = useState("All");
   const [filterBrand, setFilterBrand] = useState("All");
   const [filterOrigin, setFilterOrigin] = useState("All");
-  const [fromMonth, setFromMonth] = useState("2026-01");
-  const [toMonth, setToMonth] = useState("2026-12");
+  const [fromDate, setFromDate] = useState("2026-01-01");
+  const [toDate, setToDate] = useState("2026-12-31");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Pagination & Sorting
@@ -107,19 +106,31 @@ export function MonthWisePurchaseReportPage() {
   const filteredRows = useMemo(() => {
     return INITIAL_PURCHASE_REPORT_DATA.filter((row) => {
       if (filterCompany !== "All" && row.company !== filterCompany) return false;
-      if (filterSupplier !== "All" && row.supplier !== filterSupplier) return false;
-      if (filterPurchaseType !== "All" && row.purchaseType !== filterPurchaseType) return false;
+      if (filterSupplier.trim() && filterSupplier !== "All") {
+        if (!row.supplier.toLowerCase().includes(filterSupplier.toLowerCase().trim())) return false;
+      }
       if (filterPoWo.trim() && !row.poWoNo.toLowerCase().includes(filterPoWo.toLowerCase().trim()))
         return false;
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
-      if (filterItemGroup !== "All" && row.itemGroup !== filterItemGroup) return false;
-      if (filterItemCategory !== "All" && row.itemCategory !== filterItemCategory) return false;
-      if (filterBrand !== "All" && row.brand !== filterBrand) return false;
-      if (filterOrigin !== "All" && row.origin !== filterOrigin) return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
+      if (filterItemGroup.trim() && filterItemGroup !== "All") {
+        if (!row.itemGroup.toLowerCase().includes(filterItemGroup.toLowerCase().trim())) return false;
+      }
+      if (filterItemCategory.trim() && filterItemCategory !== "All") {
+        if (!row.itemCategory.toLowerCase().includes(filterItemCategory.toLowerCase().trim())) return false;
+      }
+      if (filterBrand.trim() && filterBrand !== "All") {
+        if (!row.brand.toLowerCase().includes(filterBrand.toLowerCase().trim())) return false;
+      }
+      if (filterOrigin.trim() && filterOrigin !== "All") {
+        if (!row.origin.toLowerCase().includes(filterOrigin.toLowerCase().trim())) return false;
+      }
 
-      // Month range filter
-      if (fromMonth && row.month < fromMonth) return false;
-      if (toMonth && row.month > toMonth) return false;
+      // Date range filter
+      if (fromDate && row.purchaseDate < fromDate) return false;
+      if (toDate && row.purchaseDate > toDate) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -137,35 +148,20 @@ export function MonthWisePurchaseReportPage() {
   }, [
     filterCompany,
     filterSupplier,
-    filterPurchaseType,
     filterPoWo,
     filterItem,
     filterItemGroup,
     filterItemCategory,
     filterBrand,
     filterOrigin,
-    fromMonth,
-    toMonth,
+    fromDate,
+    toDate,
     searchQuery,
   ]);
 
-  // Grouped by Month
-  const groupedByMonth = useMemo(() => {
-    const groups: { [key: string]: { label: string; rows: PurchaseReportRow[] } } = {};
-    // Sort descending by month
-    const sorted = [...filteredRows].sort((a, b) => b.month.localeCompare(a.month));
-
-    sorted.forEach((row) => {
-      if (!groups[row.month]) {
-        groups[row.month] = {
-          label: row.monthLabel,
-          rows: [],
-        };
-      }
-      groups[row.month].rows.push(row);
-    });
-
-    return groups;
+  // Date-wise sorted rows
+  const sortedRows = useMemo(() => {
+    return [...filteredRows].sort((a, b) => b.purchaseDate.localeCompare(a.purchaseDate));
   }, [filteredRows]);
 
   // Overall totals
@@ -185,15 +181,14 @@ export function MonthWisePurchaseReportPage() {
   const handleResetFilters = () => {
     setFilterCompany("All");
     setFilterSupplier("All");
-    setFilterPurchaseType("All");
     setFilterPoWo("");
     setFilterItem("All");
     setFilterItemGroup("All");
     setFilterItemCategory("All");
     setFilterBrand("All");
     setFilterOrigin("All");
-    setFromMonth("2026-01");
-    setToMonth("2026-12");
+    setFromDate("2026-01-01");
+    setToDate("2026-12-31");
     setSearchQuery("");
     setCurrentPage(1);
     toast.info("Filters reset to default");
@@ -201,7 +196,6 @@ export function MonthWisePurchaseReportPage() {
 
   const handleExportCSV = () => {
     const headers = [
-      "Month",
       "Purchase Date",
       "PO/WO No.",
       "Purchase Type",
@@ -222,8 +216,7 @@ export function MonthWisePurchaseReportPage() {
       "Status",
     ];
 
-    const rows = filteredRows.map((r) => [
-      r.monthLabel,
+    const rows = sortedRows.map((r) => [
       r.purchaseDate,
       r.poWoNo,
       r.purchaseType,
@@ -244,13 +237,12 @@ export function MonthWisePurchaseReportPage() {
       r.status,
     ]);
 
-    exportToCSV(`Month_wise_Purchase_Report_${fromMonth}_to_${toMonth}.csv`, headers, rows);
+    exportToCSV(`Item_wise_Purchase_Report_${fromDate}_to_${toDate}.csv`, headers, rows);
     toast.success("CSV export downloaded successfully!");
   };
 
   const handleExportExcel = () => {
     const headers = [
-      "Month",
       "Purchase Date",
       "PO/WO No.",
       "Purchase Type",
@@ -271,8 +263,7 @@ export function MonthWisePurchaseReportPage() {
       "Status",
     ];
 
-    const rows = filteredRows.map((r) => [
-      r.monthLabel,
+    const rows = sortedRows.map((r) => [
       r.purchaseDate,
       r.poWoNo,
       r.purchaseType,
@@ -299,8 +290,8 @@ export function MonthWisePurchaseReportPage() {
     ];
 
     exportToExcel(
-      `Month_wise_Purchase_Report_${fromMonth}_to_${toMonth}.xls`,
-      "Month-wise Purchase Report",
+      `Item_wise_Purchase_Report_${fromDate}_to_${toDate}.xls`,
+      "Item-wise Purchase Report",
       headers,
       rows,
       subtotals
@@ -322,7 +313,7 @@ export function MonthWisePurchaseReportPage() {
       "Status",
     ];
 
-    const tableRows = filteredRows.map((r, idx) => [
+    const tableRows = sortedRows.map((r, idx) => [
       idx + 1,
       r.purchaseDate,
       r.poWoNo,
@@ -336,15 +327,14 @@ export function MonthWisePurchaseReportPage() {
     ]);
 
     setPdfReportData({
-      reportTitle: "MONTH-WISE PURCHASE REPORT",
+      reportTitle: "ITEM-WISE PURCHASE REPORT",
       documentNumber: `PUR-REP-${new Date().toISOString().slice(0, 10)}`,
       reportDate: new Date().toLocaleDateString("en-GB"),
       companyName: filterCompany !== "All" ? filterCompany : "Pakiza Group of Industries",
       department: "Central Procurement & Supply Chain",
       metadata: [
-        { label: "Period Range", value: `${fromMonth} to ${toMonth}` },
+        { label: "Period Range", value: `${fromDate} to ${toDate}` },
         { label: "Supplier Filter", value: filterSupplier },
-        { label: "Purchase Type", value: filterPurchaseType },
         { label: "Total Transactions", value: filteredRows.length },
       ],
       tableHeaders,
@@ -382,14 +372,14 @@ export function MonthWisePurchaseReportPage() {
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 <h1 className="text-xl font-bold tracking-tight text-foreground">
-                  Month-wise Purchase Report
+                  Item-wise Purchase Report
                 </h1>
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                   Procurement Reports
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Comprehensive monthly aggregated purchase registers, price breakdowns, and vendor volumes.
+                Item-wise purchase transactions, rates, taxes, and amount breakdowns.
               </p>
             </div>
 
@@ -418,26 +408,14 @@ export function MonthWisePurchaseReportPage() {
             </div>
           </div>
 
-          {/* KPI Summary Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[11px] font-medium text-muted-foreground">Total Purchases</span>
-              <p className="text-lg font-bold mt-1 text-foreground">{filteredRows.length} Records</p>
-              <span className="text-[10px] text-muted-foreground">Active in selected range</span>
-            </div>
+          {/* KPI Summary Cards - Total Purchases and Total VAT Incurred removed per requirement */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
               <span className="text-[11px] font-medium text-muted-foreground">Total Purchased Qty</span>
               <p className="text-lg font-bold mt-1 text-foreground font-mono">
                 {overallTotals.qty.toLocaleString()}
               </p>
-              <span className="text-[10px] text-emerald-600 font-medium">Aggregated Units</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[11px] font-medium text-muted-foreground">Total VAT Incurred</span>
-              <p className="text-lg font-bold mt-1 text-foreground font-mono">
-                {formatAmount(overallTotals.vat, undefined, true)}
-              </p>
-              <span className="text-[10px] text-muted-foreground">Configured Tax Format</span>
+              <span className="text-[10px] text-emerald-600 font-medium">Aggregated Units in Range</span>
             </div>
             <div className="p-3.5 rounded-xl border border-border/70 bg-primary/5 border-primary/20 shadow-xs">
               <span className="text-[11px] font-medium text-primary">Grand Total Amount</span>
@@ -465,7 +443,7 @@ export function MonthWisePurchaseReportPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
               {/* Company */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Company</label>
@@ -481,34 +459,23 @@ export function MonthWisePurchaseReportPage() {
                 </select>
               </div>
 
-              {/* Supplier */}
+              {/* Supplier (Searchable) */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Supplier / Vendor</label>
-                <select
-                  value={filterSupplier}
-                  onChange={(e) => setFilterSupplier(e.target.value)}
+                <input
+                  type="text"
+                  list="purchase-rep-suppliers"
+                  placeholder="Search supplier..."
+                  value={filterSupplier === "All" ? "" : filterSupplier}
+                  onChange={(e) => setFilterSupplier(e.target.value || "All")}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
+                />
+                <datalist id="purchase-rep-suppliers">
                   <option value="All">All Suppliers</option>
                   {suppliers.map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={s} value={s} />
                   ))}
-                </select>
-              </div>
-
-              {/* Purchase Type */}
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Purchase Type</label>
-                <select
-                  value={filterPurchaseType}
-                  onChange={(e) => setFilterPurchaseType(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Types</option>
-                  <option value="Local">Local</option>
-                  <option value="Foreign">Foreign</option>
-                  <option value="Work Order">Work Order</option>
-                </select>
+                </datalist>
               </div>
 
               {/* PO/WO No */}
@@ -523,128 +490,146 @@ export function MonthWisePurchaseReportPage() {
                 />
               </div>
 
-              {/* From Month */}
+              {/* From Date */}
               <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">From Month</label>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">From Date</label>
                 <input
-                  type="month"
-                  value={fromMonth}
-                  onChange={(e) => setFromMonth(e.target.value)}
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
                 />
               </div>
 
-              {/* To Month */}
+              {/* To Date */}
               <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">To Month</label>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">To Date</label>
                 <input
-                  type="month"
-                  value={toMonth}
-                  onChange={(e) => setToMonth(e.target.value)}
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
                 />
               </div>
 
-              {/* Item */}
+              {/* Item (Searchable) */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
-                  onChange={(e) => setFilterItem(e.target.value)}
+                <input
+                  type="text"
+                  list="purchase-rep-items"
+                  placeholder="Search item..."
+                  value={filterItem === "All" ? "" : filterItem}
+                  onChange={(e) => setFilterItem(e.target.value || "All")}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
+                />
+                <datalist id="purchase-rep-items">
                   <option value="All">All Items</option>
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
-              {/* Item Group */}
+              {/* Item Group (Searchable) */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item Group</label>
-                <select
-                  value={filterItemGroup}
-                  onChange={(e) => setFilterItemGroup(e.target.value)}
+                <input
+                  type="text"
+                  list="purchase-rep-groups"
+                  placeholder="Search group..."
+                  value={filterItemGroup === "All" ? "" : filterItemGroup}
+                  onChange={(e) => setFilterItemGroup(e.target.value || "All")}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
+                />
+                <datalist id="purchase-rep-groups">
                   <option value="All">All Groups</option>
                   {itemGroups.map((g) => (
-                    <option key={g} value={g}>{g}</option>
+                    <option key={g} value={g} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
-              {/* Item Category */}
+              {/* Item Category (Searchable) */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item Category</label>
-                <select
-                  value={filterItemCategory}
-                  onChange={(e) => setFilterItemCategory(e.target.value)}
+                <input
+                  type="text"
+                  list="purchase-rep-categories"
+                  placeholder="Search category..."
+                  value={filterItemCategory === "All" ? "" : filterItemCategory}
+                  onChange={(e) => setFilterItemCategory(e.target.value || "All")}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
+                />
+                <datalist id="purchase-rep-categories">
                   <option value="All">All Categories</option>
                   {itemCategories.map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                    <option key={c} value={c} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
-              {/* Brand */}
+              {/* Brand (Searchable) */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Brand</label>
-                <select
-                  value={filterBrand}
-                  onChange={(e) => setFilterBrand(e.target.value)}
+                <input
+                  type="text"
+                  list="purchase-rep-brands"
+                  placeholder="Search brand..."
+                  value={filterBrand === "All" ? "" : filterBrand}
+                  onChange={(e) => setFilterBrand(e.target.value || "All")}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
+                />
+                <datalist id="purchase-rep-brands">
                   <option value="All">All Brands</option>
                   {brands.map((b) => (
-                    <option key={b} value={b}>{b}</option>
+                    <option key={b} value={b} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
-              {/* Origin */}
+              {/* Origin (Searchable) */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Origin</label>
-                <select
-                  value={filterOrigin}
-                  onChange={(e) => setFilterOrigin(e.target.value)}
+                <input
+                  type="text"
+                  list="purchase-rep-origins"
+                  placeholder="Search origin..."
+                  value={filterOrigin === "All" ? "" : filterOrigin}
+                  onChange={(e) => setFilterOrigin(e.target.value || "All")}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
+                />
+                <datalist id="purchase-rep-origins">
                   <option value="All">All Origins</option>
                   {origins.map((o) => (
-                    <option key={o} value={o}>{o}</option>
+                    <option key={o} value={o} />
                   ))}
-                </select>
+                </datalist>
               </div>
+            </div>
 
-              {/* Global search */}
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Quick Search</label>
-                <div className="relative mt-1">
-                  <input
-                    type="text"
-                    placeholder="Search keywords..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-8 pl-7 pr-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                  />
-                  <Search className="size-3.5 absolute left-2 top-2 text-muted-foreground" />
-                </div>
+            {/* Quick search */}
+            <div className="pt-1 border-t border-border/50">
+              <div className="relative max-w-sm">
+                <input
+                  type="text"
+                  placeholder="Quick search keywords (PO, supplier, item)..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-8 pl-7 pr-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
+                />
+                <Search className="size-3.5 absolute left-2 top-2 text-muted-foreground" />
               </div>
             </div>
           </div>
 
-          {/* Grouped Month-wise Report Table */}
+          {/* Date-wise Report Table */}
           <div className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-xs">
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
               <table className="w-full text-xs text-left border-collapse min-w-[1700px]">
                 <thead className="bg-muted/80 text-muted-foreground font-semibold uppercase text-[10.5px] sticky top-0 z-10 backdrop-blur-xs border-b border-border">
                   <tr>
-                    <th className="py-2.5 px-3">Month</th>
-                    <th className="py-2.5 px-3">Purchase Date</th>
+                    <th className="py-2.5 px-3">Date</th>
                     <th className="py-2.5 px-3">PO/WO No.</th>
                     <th className="py-2.5 px-3">Type</th>
                     <th className="py-2.5 px-3">Supplier / Vendor</th>
@@ -666,137 +651,86 @@ export function MonthWisePurchaseReportPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
-                  {Object.keys(groupedByMonth).length === 0 ? (
+                  {sortedRows.length === 0 ? (
                     <tr>
-                      <td colSpan={20} className="py-8 text-center text-muted-foreground">
+                      <td colSpan={19} className="py-8 text-center text-muted-foreground">
                         No purchase records found matching the specified filters.
                       </td>
                     </tr>
                   ) : (
-                    Object.entries(groupedByMonth).map(([monthKey, group]) => {
-                      const groupQty = group.rows.reduce((s, r) => s + r.quantity, 0);
-                      const groupDiscount = group.rows.reduce((s, r) => s + r.discount, 0);
-                      const groupVat = group.rows.reduce((s, r) => s + r.vat, 0);
-                      const groupOther = group.rows.reduce((s, r) => s + r.otherCharges, 0);
-                      const groupTotal = group.rows.reduce((s, r) => s + r.totalAmount, 0);
-
-                      return (
-                        <tbody key={monthKey} className="divide-y divide-border/50">
-                          {/* Group Header */}
-                          <tr className="bg-primary/5 font-bold text-primary border-t-2 border-primary/20">
-                            <td colSpan={20} className="py-2 px-3 text-xs tracking-wide">
-                              <div className="flex items-center justify-between">
-                                <span className="flex items-center gap-2">
-                                  <Calendar className="size-3.5 text-primary" />
-                                  <span>{group.label}</span>
-                                  <span className="text-[10px] font-normal text-muted-foreground">
-                                    ({group.rows.length} transactions)
-                                  </span>
-                                </span>
-                                <span className="text-xs font-mono">
-                                  Subtotal: {formatAmount(groupTotal, undefined, true)}
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-
-                          {/* Rows */}
-                          {group.rows.map((row) => (
-                            <tr key={row.id} className="hover:bg-muted/40 transition">
-                              <td className="py-2 px-3 text-muted-foreground font-mono text-[11px]">
-                                {row.monthLabel}
-                              </td>
-                              <td className="py-2 px-3 text-foreground whitespace-nowrap">
-                                {row.purchaseDate}
-                              </td>
-                              <td className="py-2 px-3 font-semibold text-primary font-mono whitespace-nowrap">
-                                {row.poWoNo}
-                              </td>
-                              <td className="py-2 px-3">
-                                <span
-                                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                                    row.purchaseType === "Work Order"
-                                      ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20"
-                                      : row.purchaseType === "Foreign"
-                                      ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
-                                      : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                                  }`}
-                                >
-                                  {row.purchaseType}
-                                </span>
-                              </td>
-                              <td className="py-2 px-3 font-medium text-foreground whitespace-nowrap">
-                                {row.supplier}
-                              </td>
-                              <td className="py-2 px-3 font-mono text-[11px] text-muted-foreground">
-                                {row.itemCode}
-                              </td>
-                              <td className="py-2 px-3 font-semibold text-foreground whitespace-nowrap">
-                                {row.itemName}
-                              </td>
-                              <td className="py-2 px-3 text-muted-foreground max-w-[200px] truncate" title={row.specification}>
-                                {row.specification || "-"}
-                              </td>
-                              <td className="py-2 px-3 text-foreground">{row.brand}</td>
-                              <td className="py-2 px-3 text-foreground">{row.origin}</td>
-                              <td className="py-2 px-3 text-muted-foreground">{row.uom}</td>
-                              <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
-                                {row.quantity.toLocaleString()}
-                              </td>
-                              <td className="py-2 px-3 text-right font-mono text-foreground">
-                                {formatAmount(row.unitPrice)}
-                              </td>
-                              <td className="py-2 px-3 text-right font-mono text-muted-foreground">
-                                {formatAmount(row.discount)}
-                              </td>
-                              <td className="py-2 px-3 text-right font-mono text-muted-foreground">
-                                {row.taxPercent}%
-                              </td>
-                              <td className="py-2 px-3 text-right font-mono text-muted-foreground">
-                                {formatAmount(row.vat)}
-                              </td>
-                              <td className="py-2 px-3 text-right font-mono text-muted-foreground">
-                                {formatAmount(row.otherCharges)}
-                              </td>
-                              <td className="py-2 px-3 text-right font-mono font-bold text-primary">
-                                {formatAmount(row.totalAmount)}
-                              </td>
-                              <td className="py-2 px-3 text-center whitespace-nowrap">
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                                  {row.status}
-                                </span>
-                              </td>
-                              <td className="py-2 px-3 text-center">
-                                <button
-                                  onClick={() => setSelectedPoModal(row)}
-                                  className="p-1 rounded-md hover:bg-muted text-primary cursor-pointer transition"
-                                  title="View PO/WO Details"
-                                >
-                                  <Eye className="size-3.5" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-
-                          {/* Monthly Subtotal Row */}
-                          <tr className="bg-muted/60 font-bold text-foreground border-b-2 border-border/80">
-                            <td colSpan={11} className="py-2 px-3 text-right text-[11px] uppercase tracking-wide">
-                              Subtotal for {group.label}:
-                            </td>
-                            <td className="py-2 px-3 text-right font-mono">{groupQty.toLocaleString()}</td>
-                            <td className="py-2 px-3 text-right font-mono">-</td>
-                            <td className="py-2 px-3 text-right font-mono">{formatAmount(groupDiscount)}</td>
-                            <td className="py-2 px-3 text-right font-mono">-</td>
-                            <td className="py-2 px-3 text-right font-mono">{formatAmount(groupVat)}</td>
-                            <td className="py-2 px-3 text-right font-mono">{formatAmount(groupOther)}</td>
-                            <td className="py-2 px-3 text-right font-mono text-primary font-bold">
-                              {formatAmount(groupTotal)}
-                            </td>
-                            <td colSpan={2}></td>
-                          </tr>
-                        </tbody>
-                      );
-                    })
+                    sortedRows.map((row) => (
+                      <tr key={row.id} className="hover:bg-muted/40 transition">
+                        <td className="py-2 px-3 text-foreground whitespace-nowrap font-medium">
+                          {row.purchaseDate}
+                        </td>
+                        <td className="py-2 px-3 font-semibold text-primary font-mono whitespace-nowrap">
+                          {row.poWoNo}
+                        </td>
+                        <td className="py-2 px-3">
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                              row.purchaseType === "Work Order"
+                                ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                                : row.purchaseType === "Foreign"
+                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                                : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                            }`}
+                          >
+                            {row.purchaseType}
+                          </span>
+                        </td>
+                        <td className="py-2 px-3 font-medium text-foreground whitespace-nowrap">
+                          {row.supplier}
+                        </td>
+                        <td className="py-2 px-3 font-mono text-[11px] text-muted-foreground">
+                          {row.itemCode}
+                        </td>
+                        <td className="py-2 px-3 font-semibold text-foreground whitespace-nowrap">
+                          {row.itemName}
+                        </td>
+                        <td className="py-2 px-3 text-muted-foreground max-w-[200px] truncate" title={row.specification}>
+                          {row.specification || "-"}
+                        </td>
+                        <td className="py-2 px-3 text-foreground">{row.brand}</td>
+                        <td className="py-2 px-3 text-foreground">{row.origin}</td>
+                        <td className="py-2 px-3 text-muted-foreground">{row.uom}</td>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
+                          {row.quantity.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono text-foreground">
+                          {formatAmount(row.unitPrice)}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                          {formatAmount(row.discount)}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                          {row.taxPercent}%
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                          {formatAmount(row.vat)}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                          {formatAmount(row.otherCharges)}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-primary">
+                          {formatAmount(row.totalAmount)}
+                        </td>
+                        <td className="py-2 px-3 text-center whitespace-nowrap">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                            {row.status}
+                          </span>
+                        </td>
+                        <td className="py-2 px-3 text-center">
+                          <button
+                            onClick={() => setSelectedPoModal(row)}
+                            className="p-1 rounded-md hover:bg-muted text-primary cursor-pointer transition"
+                            title="View PO/WO Details"
+                          >
+                            <Eye className="size-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
                   )}
                 </tbody>
 
@@ -804,10 +738,10 @@ export function MonthWisePurchaseReportPage() {
                 {filteredRows.length > 0 && (
                   <tfoot className="bg-primary/10 text-foreground font-black border-t-2 border-primary/30">
                     <tr>
-                      <td colSpan={11} className="py-3 px-3 text-right text-xs uppercase tracking-wider text-primary">
+                      <td colSpan={10} className="py-3 px-3 text-right text-xs uppercase tracking-wider text-primary">
                         OVERALL GRAND TOTAL:
                       </td>
-                      <td className="py-3 px-3 text-right font-mono text-xs">
+                      <td className="py-3 px-3 text-right font-mono text-xs text-primary font-bold">
                         {overallTotals.qty.toLocaleString()}
                       </td>
                       <td className="py-3 px-3 text-right font-mono">-</td>
@@ -830,7 +764,7 @@ export function MonthWisePurchaseReportPage() {
             {/* Bottom Info Bar */}
             <div className="flex items-center justify-between px-4 py-2.5 bg-muted/30 border-t border-border text-xs text-muted-foreground">
               <div>
-                Showing <span className="font-bold text-foreground">{filteredRows.length}</span> purchase entries across {Object.keys(groupedByMonth).length} months.
+                Showing <span className="font-bold text-foreground">{filteredRows.length}</span> purchase entries.
               </div>
               <div className="text-[11px] font-mono">
                 Currency: <span className="font-bold text-foreground">{currencyCfg.currencyCode}</span> ({currencyCfg.symbol}) | Format: <span className="font-bold text-foreground">{currencyCfg.format}</span>

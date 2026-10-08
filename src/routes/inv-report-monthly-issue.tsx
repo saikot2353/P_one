@@ -47,6 +47,7 @@ export function MonthWiseMaterialIssueReportPage() {
   const [filterStore, setFilterStore] = useState("All");
   const [filterItem, setFilterItem] = useState("All");
   const [filterItemGroup, setFilterItemGroup] = useState("All");
+  const [filterItemCategory, setFilterItemCategory] = useState("All");
   const [filterIssueType, setFilterIssueType] = useState("All");
   const [filterBatch, setFilterBatch] = useState("");
   const [filterLocation, setFilterLocation] = useState("");
@@ -82,13 +83,24 @@ export function MonthWiseMaterialIssueReportPage() {
     () => Array.from(new Set(INITIAL_ISSUE_REGISTER_DATA.map((i) => i.itemGroup))),
     []
   );
+  const itemCategories = useMemo(
+    () => Array.from(new Set(INITIAL_ISSUE_REGISTER_DATA.map((i) => i.itemCategory).filter(Boolean))),
+    []
+  );
 
   const filteredRows = useMemo(() => {
     return INITIAL_ISSUE_REGISTER_DATA.filter((row) => {
       if (filterCompany !== "All" && row.company !== filterCompany) return false;
       if (filterStore !== "All" && row.store !== filterStore) return false;
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
-      if (filterItemGroup !== "All" && row.itemGroup !== filterItemGroup) return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
+      if (filterItemGroup.trim() && filterItemGroup !== "All") {
+        const q = filterItemGroup.toLowerCase().trim();
+        if (!row.itemGroup.toLowerCase().includes(q)) return false;
+      }
+      if (filterItemCategory !== "All" && row.itemCategory !== filterItemCategory) return false;
       if (filterIssueType !== "All" && row.issueType !== filterIssueType) return false;
       if (filterBatch.trim() && !row.batch.toLowerCase().includes(filterBatch.toLowerCase().trim()))
         return false;
@@ -116,6 +128,7 @@ export function MonthWiseMaterialIssueReportPage() {
     filterStore,
     filterItem,
     filterItemGroup,
+    filterItemCategory,
     filterIssueType,
     filterBatch,
     filterLocation,
@@ -124,31 +137,34 @@ export function MonthWiseMaterialIssueReportPage() {
     searchQuery,
   ]);
 
-  // Grouped by Month
-  const groupedByMonth = useMemo(() => {
-    const groups: { [key: string]: { label: string; rows: ItemIssueRow[] } } = {};
-    const sorted = [...filteredRows].sort((a, b) => b.month.localeCompare(a.month));
-
-    sorted.forEach((row) => {
-      if (!groups[row.month]) {
-        groups[row.month] = {
-          label: row.monthLabel,
-          rows: [],
-        };
-      }
-      groups[row.month].rows.push(row);
+  // Monthly Summaries
+  const monthlySummaries = useMemo(() => {
+    const map = new Map<string, { month: string; monthLabel: string; totalQty: number; totalVal: number; count: number }>();
+    filteredRows.forEach((r) => {
+      const existing = map.get(r.month) || {
+        month: r.month,
+        monthLabel: r.monthLabel,
+        totalQty: 0,
+        totalVal: 0,
+        count: 0,
+      };
+      existing.totalQty += r.quantity;
+      existing.totalVal += r.quantity * (r.unitCost || 120);
+      existing.count += 1;
+      map.set(r.month, existing);
     });
-
-    return groups;
+    return Array.from(map.values()).sort((a, b) => b.month.localeCompare(a.month));
   }, [filteredRows]);
 
   const totalQty = useMemo(() => filteredRows.reduce((s, r) => s + r.quantity, 0), [filteredRows]);
+  const totalVal = useMemo(() => filteredRows.reduce((s, r) => s + r.quantity * (r.unitCost || 120), 0), [filteredRows]);
 
   const handleResetFilters = () => {
     setFilterCompany("All");
     setFilterStore("All");
     setFilterItem("All");
     setFilterItemGroup("All");
+    setFilterItemCategory("All");
     setFilterIssueType("All");
     setFilterBatch("");
     setFilterLocation("");
@@ -159,120 +175,36 @@ export function MonthWiseMaterialIssueReportPage() {
   };
 
   const handleExportCSV = () => {
-    const headers = [
-      "Month",
-      "Issue Date",
-      "Issue Type",
-      "Issue Reference",
-      "Item Code",
-      "Item Name",
-      "Specification",
-      "Brand",
-      "Origin",
-      "UOM",
-      "Store",
-      "Batch",
-      "Location",
-      "Issued Quantity",
-      "Issued To",
-      "Status",
-    ];
-
-    const rows = filteredRows.map((r) => [
-      r.monthLabel,
-      r.date,
-      r.issueType,
-      r.reference,
-      r.itemCode,
-      r.itemName,
-      r.specification,
-      r.brand,
-      r.origin,
-      r.uom,
-      r.store,
-      r.batch,
-      r.location,
-      r.quantity,
-      r.issuedTo,
-      r.status,
-    ]);
+    const headers = ["Month", "Issued Quantity", "Value (BDT)"];
+    const rows = monthlySummaries.map((m) => [m.monthLabel, m.totalQty, m.totalVal]);
 
     exportToCSV(`Month_wise_Material_Issue_Report_${fromMonth}_to_${toMonth}.csv`, headers, rows);
     toast.success("CSV export downloaded successfully!");
   };
 
   const handleExportExcel = () => {
-    const headers = [
-      "Month",
-      "Issue Date",
-      "Issue Type",
-      "Issue Reference",
-      "Item Code",
-      "Item Name",
-      "Specification",
-      "Brand",
-      "Origin",
-      "UOM",
-      "Store",
-      "Batch",
-      "Location",
-      "Issued Quantity",
-      "Issued To",
-      "Status",
-    ];
-
-    const rows = filteredRows.map((r) => [
-      r.monthLabel,
-      r.date,
-      r.issueType,
-      r.reference,
-      r.itemCode,
-      r.itemName,
-      r.specification,
-      r.brand,
-      r.origin,
-      r.uom,
-      r.store,
-      r.batch,
-      r.location,
-      r.quantity,
-      r.issuedTo,
-      r.status,
-    ]);
+    const headers = ["Month", "Issued Quantity", "Value (BDT)"];
+    const rows = monthlySummaries.map((m) => [m.monthLabel, m.totalQty, m.totalVal]);
 
     exportToExcel(
       `Month_wise_Material_Issue_Report_${fromMonth}_to_${toMonth}.xls`,
       "Month-wise Material Issue Report",
       headers,
       rows,
-      [{ label: "Overall Total Issued Quantity", value: totalQty.toLocaleString() }]
+      [
+        { label: "Overall Total Issued Quantity", value: totalQty.toLocaleString() },
+        { label: "Overall Total Value (BDT)", value: "৳" + formatAmount(totalVal) },
+      ]
     );
     toast.success("Excel report generated successfully!");
   };
 
   const handlePrintPDF = () => {
-    const tableHeaders = [
-      "Month",
-      "Date",
-      "Type",
-      "Ref",
-      "Item",
-      "Store",
-      "Qty",
-      "Issued To",
-      "Status",
-    ];
-
-    const tableRows = filteredRows.map((r) => [
-      r.monthLabel,
-      r.date,
-      r.issueType,
-      r.reference,
-      r.itemName,
-      r.store,
-      r.quantity,
-      r.issuedTo,
-      r.status,
+    const tableHeaders = ["Month", "Issued Quantity", "Value (৳)"];
+    const tableRows = monthlySummaries.map((m) => [
+      m.monthLabel,
+      m.totalQty.toLocaleString(),
+      `৳${formatAmount(m.totalVal)}`,
     ]);
 
     setPdfReportData({
@@ -283,11 +215,14 @@ export function MonthWiseMaterialIssueReportPage() {
       department: "Production Outward & Material Issue",
       metadata: [
         { label: "Period", value: `${fromMonth} to ${toMonth}` },
-        { label: "Total Issues", value: filteredRows.length },
+        { label: "Total Months", value: monthlySummaries.length },
       ],
       tableHeaders,
       tableRows,
-      financials: [{ label: "Overall Issued Quantity", value: totalQty.toLocaleString(), highlight: true }],
+      financials: [
+        { label: "Overall Issued Quantity", value: totalQty.toLocaleString(), highlight: true },
+        { label: "Overall Total Value", value: `৳${formatAmount(totalVal)}`, highlight: true },
+      ],
       signatures: [
         { role: "Issuing Store Head", name: "Dispatcher Officer" },
         { role: "Internal Audit", name: "Plant Audit Team" },
@@ -392,40 +327,62 @@ export function MonthWiseMaterialIssueReportPage() {
 
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
-                  onChange={(e) => setFilterItem(e.target.value)}
+                <input
+                  type="text"
+                  list="item-issue-options"
+                  placeholder="Search item..."
+                  value={filterItem === "All" ? "" : filterItem}
+                  onChange={(e) => setFilterItem(e.target.value || "All")}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
+                />
+                <datalist id="item-issue-options">
                   <option value="All">All Items</option>
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item Group</label>
-                <select
-                  value={filterItemGroup}
-                  onChange={(e) => setFilterItemGroup(e.target.value)}
+                <input
+                  type="text"
+                  list="group-issue-options"
+                  placeholder="Search group..."
+                  value={filterItemGroup === "All" ? "" : filterItemGroup}
+                  onChange={(e) => setFilterItemGroup(e.target.value || "All")}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
+                />
+                <datalist id="group-issue-options">
                   <option value="All">All Groups</option>
                   {itemGroups.map((g) => (
-                    <option key={g} value={g}>{g}</option>
+                    <option key={g} value={g} />
+                  ))}
+                </datalist>
+              </div>
+
+              <div>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item Category</label>
+                <select
+                  value={filterItemCategory}
+                  onChange={(e) => setFilterItemCategory(e.target.value)}
+                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
+                >
+                  <option value="All">All Categories</option>
+                  {itemCategories.map((c) => (
+                    <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Issue Type (5)</label>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Issue Type</label>
                 <select
                   value={filterIssueType}
                   onChange={(e) => setFilterIssueType(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
                 >
-                  <option value="All">All 5 Types</option>
+                  <option value="All">All Types</option>
                   {issueTypes.map((t) => (
                     <option key={t} value={t}>{t}</option>
                   ))}
@@ -457,117 +414,53 @@ export function MonthWiseMaterialIssueReportPage() {
           {/* Table */}
           <div className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-xs">
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-              <table className="w-full text-xs text-left border-collapse min-w-[1500px]">
+              <table className="w-full text-xs text-left border-collapse">
                 <thead className="bg-muted/80 text-muted-foreground font-semibold uppercase text-[10.5px] sticky top-0 z-10 backdrop-blur-xs border-b border-border">
                   <tr>
-                    <th className="py-2.5 px-3">Month</th>
-                    <th className="py-2.5 px-3">Issue Date</th>
-                    <th className="py-2.5 px-3">Issue Type</th>
-                    <th className="py-2.5 px-3">Issue Reference</th>
-                    <th className="py-2.5 px-3">Item Code</th>
-                    <th className="py-2.5 px-3">Item Name</th>
-                    <th className="py-2.5 px-3">Specification</th>
-                    <th className="py-2.5 px-3">Brand</th>
-                    <th className="py-2.5 px-3">Origin</th>
-                    <th className="py-2.5 px-3">UOM</th>
-                    <th className="py-2.5 px-3">Store</th>
-                    <th className="py-2.5 px-3">Batch</th>
-                    <th className="py-2.5 px-3">Location</th>
-                    <th className="py-2.5 px-3 text-right">Issued Qty</th>
-                    <th className="py-2.5 px-3">Issued To</th>
-                    <th className="py-2.5 px-3 text-center">Status</th>
+                    <th className="py-2.5 px-4 font-bold">Month</th>
+                    <th className="py-2.5 px-4 text-right font-bold">Issued Quantity</th>
+                    <th className="py-2.5 px-4 text-right font-bold">Value (৳)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
-                  {Object.keys(groupedByMonth).length === 0 ? (
+                  {monthlySummaries.length === 0 ? (
                     <tr>
-                      <td colSpan={16} className="py-8 text-center text-muted-foreground">
+                      <td colSpan={3} className="py-8 text-center text-muted-foreground">
                         No monthly issue transactions found.
                       </td>
                     </tr>
                   ) : (
-                    Object.entries(groupedByMonth).map(([monthKey, group]) => {
-                      const groupQty = group.rows.reduce((s, r) => s + r.quantity, 0);
-
-                      return (
-                        <tbody key={monthKey} className="divide-y divide-border/50">
-                          {/* Monthly Header */}
-                          <tr className="bg-primary/5 font-bold text-primary border-t-2 border-primary/20">
-                            <td colSpan={16} className="py-2 px-3 text-xs tracking-wide">
-                              <div className="flex items-center justify-between">
-                                <span className="flex items-center gap-2">
-                                  <Calendar className="size-3.5 text-primary" />
-                                  <span>{group.label}</span>
-                                  <span className="text-[10px] font-normal text-muted-foreground">
-                                    ({group.rows.length} outward issues)
-                                  </span>
-                                </span>
-                                <span className="text-xs font-mono font-bold text-rose-600">
-                                  Subtotal Issued: -{groupQty.toLocaleString()} units
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-
-                          {/* Rows */}
-                          {group.rows.map((row) => (
-                            <tr key={row.id} className="hover:bg-muted/40 transition">
-                              <td className="py-2 px-3 text-muted-foreground font-mono text-[11px]">{row.monthLabel}</td>
-                              <td className="py-2 px-3 text-foreground whitespace-nowrap">{row.date}</td>
-                              <td className="py-2 px-3">
-                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                                  {row.issueType}
-                                </span>
-                              </td>
-                              <td className="py-2 px-3 font-mono font-semibold text-primary whitespace-nowrap">{row.reference}</td>
-                              <td className="py-2 px-3 font-mono text-[11px] text-muted-foreground">{row.itemCode}</td>
-                              <td className="py-2 px-3 font-semibold text-foreground whitespace-nowrap">{row.itemName}</td>
-                              <td className="py-2 px-3 text-muted-foreground max-w-[200px] truncate" title={row.specification}>{row.specification}</td>
-                              <td className="py-2 px-3 text-foreground">{row.brand}</td>
-                              <td className="py-2 px-3 text-foreground">{row.origin}</td>
-                              <td className="py-2 px-3 text-muted-foreground">{row.uom}</td>
-                              <td className="py-2 px-3 text-foreground whitespace-nowrap">{row.store}</td>
-                              <td className="py-2 px-3 font-mono text-[11px] text-purple-600 dark:text-purple-400">{row.batch || "-"}</td>
-                              <td className="py-2 px-3 text-muted-foreground font-mono text-[11px]">{row.location || "-"}</td>
-                              <td className="py-2 px-3 text-right font-mono font-black text-rose-600">
-                                -{row.quantity.toLocaleString()}
-                              </td>
-                              <td className="py-2 px-3 text-muted-foreground max-w-[200px] truncate" title={row.issuedTo}>{row.issuedTo}</td>
-                              <td className="py-2 px-3 text-center whitespace-nowrap">
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                                  {row.status}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-
-                          {/* Subtotal */}
-                          <tr className="bg-muted/60 font-bold text-foreground border-b-2 border-border/80">
-                            <td colSpan={13} className="py-2 px-3 text-right text-[11px] uppercase tracking-wide">
-                              Monthly Subtotal ({group.label}):
-                            </td>
-                            <td className="py-2 px-3 text-right font-mono text-rose-600 font-bold">
-                              -{groupQty.toLocaleString()}
-                            </td>
-                            <td colSpan={2}></td>
-                          </tr>
-                        </tbody>
-                      );
-                    })
+                    monthlySummaries.map((row) => (
+                      <tr key={row.month} className="hover:bg-muted/40 transition">
+                        <td className="py-2.5 px-4 font-semibold text-foreground flex items-center gap-2">
+                          <Calendar className="size-3.5 text-primary" />
+                          <span>{row.monthLabel}</span>
+                          <span className="text-[10px] text-muted-foreground font-normal">
+                            ({row.count} issues)
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-4 text-right font-mono font-bold text-rose-600">
+                          {row.totalQty.toLocaleString()}
+                        </td>
+                        <td className="py-2.5 px-4 text-right font-mono font-bold text-foreground">
+                          ৳{formatAmount(row.totalVal)}
+                        </td>
+                      </tr>
+                    ))
                   )}
                 </tbody>
 
-                {filteredRows.length > 0 && (
+                {monthlySummaries.length > 0 && (
                   <tfoot className="bg-primary/10 text-foreground font-black border-t-2 border-primary/30">
                     <tr>
-                      <td colSpan={13} className="py-3 px-3 text-right text-xs uppercase tracking-wider text-primary">
-                        OVERALL GRAND TOTAL ISSUED:
+                      <td className="py-3 px-4 text-left text-xs uppercase tracking-wider text-primary font-bold">
+                        OVERALL TOTAL
                       </td>
-                      <td className="py-3 px-3 text-right font-mono text-sm text-rose-600 font-black">
-                        -{totalQty.toLocaleString()} Units
+                      <td className="py-3 px-4 text-right font-mono text-sm text-rose-600 font-black">
+                        {totalQty.toLocaleString()}
                       </td>
-                      <td colSpan={2} className="py-3 px-3 text-center text-[10px] text-muted-foreground">
-                        {filteredRows.length} Total Issues
+                      <td className="py-3 px-4 text-right font-mono text-sm text-primary font-black">
+                        ৳{formatAmount(totalVal)}
                       </td>
                     </tr>
                   </tfoot>

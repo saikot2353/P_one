@@ -91,8 +91,11 @@ export function ItemTransactionLedgerPage() {
 
   // Filtered dataset
   const filteredRows = useMemo(() => {
-    return INITIAL_LEDGER_DATA.filter((row) => {
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
+    return INITIAL_TRANSACTION_LEDGER_DATA.filter((row) => {
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
       if (filterStore !== "All" && row.store !== filterStore) return false;
       if (filterTxType !== "All" && row.transactionType !== filterTxType) return false;
       if (filterRefNo.trim() && !row.referenceNo.toLowerCase().includes(filterRefNo.toLowerCase().trim()))
@@ -329,8 +332,8 @@ export function ItemTransactionLedgerPage() {
             </div>
           </div>
 
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {/* Quick Metrics (Transaction Types Tracked KPI card removed) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
               <span className="text-[11px] font-medium text-muted-foreground">Ledger Transactions</span>
               <p className="text-lg font-bold mt-1 text-foreground">{filteredRows.length} Entries</p>
@@ -345,11 +348,6 @@ export function ItemTransactionLedgerPage() {
               <span className="text-[11px] font-medium text-rose-600">Total Outflow (Issues)</span>
               <p className="text-lg font-bold mt-1 text-rose-600 font-mono">-{totalOut.toLocaleString()}</p>
               <span className="text-[10px] text-muted-foreground">Stock deductions</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 shadow-xs">
-              <span className="text-[11px] font-medium text-primary">Transaction Types Tracked</span>
-              <p className="text-lg font-bold mt-1 text-primary">11 Standard Sources</p>
-              <span className="text-[10px] text-muted-foreground">Double-entry audit trail</span>
             </div>
           </div>
 
@@ -369,19 +367,22 @@ export function ItemTransactionLedgerPage() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
-              {/* Item */}
+              {/* Item Search */}
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
+                <input
+                  type="text"
+                  list="ledger-items-list"
+                  placeholder="Search Item..."
+                  value={filterItem === "All" ? "" : filterItem}
                   onChange={(e) => setFilterItem(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Items</option>
+                />
+                <datalist id="ledger-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               {/* Store */}
@@ -559,6 +560,27 @@ export function ItemTransactionLedgerPage() {
                     ))
                   )}
                 </tbody>
+                {filteredRows.length > 0 && (
+                  <tfoot className="bg-primary/10 text-foreground font-black border-t-2 border-primary/30 sticky bottom-0">
+                    <tr>
+                      <td colSpan={7} className="py-3 px-3 text-right text-xs uppercase tracking-wider text-primary">
+                        TOTAL LEDGER MOVEMENTS:
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        +{totalIn.toLocaleString()}
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-xs font-bold text-rose-500">
+                        -{totalOut.toLocaleString()}
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-sm text-primary font-black">
+                        {(filteredRows[filteredRows.length - 1]?.balance ?? 0).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-3 text-center text-[10px] text-muted-foreground font-normal">
+                        {filteredRows.length} Entries
+                      </td>
+                    </tr>
+                  </tfoot>
+                )}
               </table>
             </div>
 

@@ -184,9 +184,9 @@ export function ItemGroupPageForm({
 
             <div className="sm:col-span-2 p-3 bg-muted/30 border border-border/70 rounded-xl flex items-center justify-between">
               <div>
-                <label className="text-xs font-bold text-foreground block">Service Flag (Service Group)</label>
+                <label className="text-xs font-bold text-foreground block">Service</label>
                 <p className="text-[11px] text-muted-foreground">
-                  Mark this group for Service / Scope of Work items. All items created under this group will automatically inherit the Service Flag.
+                  Mark this group for Service / Scope of Work items. All items created under this group will automatically inherit the Service flag.
                 </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">

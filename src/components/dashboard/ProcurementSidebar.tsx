@@ -181,20 +181,12 @@ export const nav: NavItem[] = [
     icon: BarChart3,
     subitems: [
       {
-        label: "Month-wise Purchase Report",
+        label: "Item-wise Purchase Report",
         to: "/procurement-reports-monthly-purchase",
       },
       {
         label: "Month-wise Supplier Bill Report",
         to: "/procurement-reports-monthly-supplier-bill",
-      },
-      {
-        label: "Purchase Price Report",
-        to: "/procurement-reports-purchase-price",
-      },
-      {
-        label: "Payment Statement",
-        to: "/procurement-reports-payment-statement",
       },
     ],
   },

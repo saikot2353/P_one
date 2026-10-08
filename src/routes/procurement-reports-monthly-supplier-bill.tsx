@@ -130,6 +130,7 @@ export function MonthWiseSupplierBillReportPage() {
   const overallTotals = useMemo(() => {
     return filteredRows.reduce(
       (acc, r) => ({
+        quantity: acc.quantity + (r.quantity || 0),
         billAmount: acc.billAmount + r.billAmount,
         discount: acc.discount + r.discount,
         tax: acc.tax + r.tax,
@@ -137,7 +138,7 @@ export function MonthWiseSupplierBillReportPage() {
         other: acc.other + r.otherCharges,
         total: acc.total + r.totalAmount,
       }),
-      { billAmount: 0, discount: 0, tax: 0, vat: 0, other: 0, total: 0 }
+      { quantity: 0, billAmount: 0, discount: 0, tax: 0, vat: 0, other: 0, total: 0 }
     );
   }, [filteredRows]);
 
@@ -161,6 +162,7 @@ export function MonthWiseSupplierBillReportPage() {
       "Supplier / Vendor",
       "PO/WO No.",
       "MRR No.",
+      "Total Qty",
       "Bill Amount",
       "Discount",
       "Tax",
@@ -177,6 +179,7 @@ export function MonthWiseSupplierBillReportPage() {
       r.supplier,
       r.poWoNo,
       r.mrrNo,
+      (r.quantity || 0).toLocaleString(),
       formatAmount(r.billAmount),
       formatAmount(r.discount),
       formatAmount(r.tax),
@@ -198,6 +201,7 @@ export function MonthWiseSupplierBillReportPage() {
       "Supplier / Vendor",
       "PO/WO No.",
       "MRR No.",
+      "Total Qty",
       "Bill Amount",
       "Discount",
       "Tax",
@@ -214,6 +218,7 @@ export function MonthWiseSupplierBillReportPage() {
       r.supplier,
       r.poWoNo,
       r.mrrNo,
+      r.quantity || 0,
       formatAmount(r.billAmount),
       formatAmount(r.discount),
       formatAmount(r.tax),
@@ -224,6 +229,7 @@ export function MonthWiseSupplierBillReportPage() {
     ]);
 
     const subtotals = [
+      { label: "Overall Total Quantity", value: overallTotals.quantity.toLocaleString() },
       { label: "Overall Total Bill Amount", value: formatAmount(overallTotals.billAmount) },
       { label: "Overall Net Total Amount", value: formatAmount(overallTotals.total, undefined, true) },
     ];
@@ -246,6 +252,7 @@ export function MonthWiseSupplierBillReportPage() {
       "Supplier",
       "PO/WO No.",
       "MRR No.",
+      "Total Qty",
       "Bill Amt",
       "Tax & VAT",
       "Net Total",
@@ -259,6 +266,7 @@ export function MonthWiseSupplierBillReportPage() {
       r.supplier,
       r.poWoNo,
       r.mrrNo,
+      (r.quantity || 0).toLocaleString(),
       formatAmount(r.billAmount),
       formatAmount(r.tax + r.vat),
       formatAmount(r.totalAmount),
@@ -498,34 +506,36 @@ export function MonthWiseSupplierBillReportPage() {
           {/* Grouped Month-wise Supplier Bill Table */}
           <div className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-xs">
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-              <table className="w-full text-xs text-left border-collapse min-w-[1400px]">
+              <table className="w-full text-xs text-left border-collapse min-w-[1550px]">
                 <thead className="bg-muted/80 text-muted-foreground font-semibold uppercase text-[10.5px] sticky top-0 z-10 backdrop-blur-xs border-b border-border">
                   <tr>
-                    <th className="py-2.5 px-3">Month</th>
-                    <th className="py-2.5 px-3">Bill Date</th>
-                    <th className="py-2.5 px-3">Bill No.</th>
-                    <th className="py-2.5 px-3">Supplier / Vendor</th>
-                    <th className="py-2.5 px-3">PO/WO No.</th>
-                    <th className="py-2.5 px-3">MRR No.</th>
-                    <th className="py-2.5 px-3 text-right">Bill Amount</th>
-                    <th className="py-2.5 px-3 text-right">Discount</th>
-                    <th className="py-2.5 px-3 text-right">Tax</th>
-                    <th className="py-2.5 px-3 text-right">VAT</th>
-                    <th className="py-2.5 px-3 text-right">Other Charges</th>
-                    <th className="py-2.5 px-3 text-right">Total Amount</th>
-                    <th className="py-2.5 px-3 text-center">Status</th>
-                    <th className="py-2.5 px-3 text-center">Action</th>
+                    <th className="py-2.5 px-3 whitespace-nowrap">Month</th>
+                    <th className="py-2.5 px-3 whitespace-nowrap">Bill Date</th>
+                    <th className="py-2.5 px-3 whitespace-nowrap">Bill No.</th>
+                    <th className="py-2.5 px-3 whitespace-nowrap">Supplier / Vendor</th>
+                    <th className="py-2.5 px-3 whitespace-nowrap">PO/WO No.</th>
+                    <th className="py-2.5 px-3 whitespace-nowrap">MRR No.</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap">Total Qty</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap">Bill Amount</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap">Discount</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap">Tax</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap">VAT</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap">Other Charges</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap">Total Amount</th>
+                    <th className="py-2.5 px-3 text-center whitespace-nowrap">Status</th>
+                    <th className="py-2.5 px-3 text-center whitespace-nowrap">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {Object.keys(groupedByMonth).length === 0 ? (
                     <tr>
-                      <td colSpan={14} className="py-8 text-center text-muted-foreground">
+                      <td colSpan={15} className="py-8 text-center text-muted-foreground">
                         No supplier bill records found matching the specified filters.
                       </td>
                     </tr>
                   ) : (
                     Object.entries(groupedByMonth).map(([monthKey, group]) => {
+                      const groupQty = group.rows.reduce((s, r) => s + (r.quantity || 0), 0);
                       const groupBillAmt = group.rows.reduce((s, r) => s + r.billAmount, 0);
                       const groupDiscount = group.rows.reduce((s, r) => s + r.discount, 0);
                       const groupTax = group.rows.reduce((s, r) => s + r.tax, 0);
@@ -537,7 +547,7 @@ export function MonthWiseSupplierBillReportPage() {
                         <tbody key={monthKey} className="divide-y divide-border/50">
                           {/* Group Header */}
                           <tr className="bg-primary/5 font-bold text-primary border-t-2 border-primary/20">
-                            <td colSpan={14} className="py-2 px-3 text-xs tracking-wide">
+                            <td colSpan={15} className="py-2 px-3 text-xs tracking-wide">
                               <div className="flex items-center justify-between">
                                 <span className="flex items-center gap-2">
                                   <Calendar className="size-3.5 text-primary" />
@@ -556,7 +566,7 @@ export function MonthWiseSupplierBillReportPage() {
                           {/* Rows */}
                           {group.rows.map((row) => (
                             <tr key={row.id} className="hover:bg-muted/40 transition">
-                              <td className="py-2 px-3 text-muted-foreground font-mono text-[11px]">
+                              <td className="py-2 px-3 text-muted-foreground font-mono text-[11px] whitespace-nowrap">
                                 {row.monthLabel}
                               </td>
                               <td className="py-2 px-3 text-foreground whitespace-nowrap">
@@ -574,22 +584,25 @@ export function MonthWiseSupplierBillReportPage() {
                               <td className="py-2 px-3 font-mono text-muted-foreground whitespace-nowrap">
                                 {row.mrrNo}
                               </td>
-                              <td className="py-2 px-3 text-right font-mono text-foreground font-semibold">
+                              <td className="py-2 px-3 text-right font-mono font-semibold text-foreground whitespace-nowrap">
+                                {(row.quantity || 0).toLocaleString()}
+                              </td>
+                              <td className="py-2 px-3 text-right font-mono text-foreground font-semibold whitespace-nowrap">
                                 {formatAmount(row.billAmount)}
                               </td>
-                              <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                              <td className="py-2 px-3 text-right font-mono text-muted-foreground whitespace-nowrap">
                                 {formatAmount(row.discount)}
                               </td>
-                              <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                              <td className="py-2 px-3 text-right font-mono text-muted-foreground whitespace-nowrap">
                                 {formatAmount(row.tax)}
                               </td>
-                              <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                              <td className="py-2 px-3 text-right font-mono text-muted-foreground whitespace-nowrap">
                                 {formatAmount(row.vat)}
                               </td>
-                              <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                              <td className="py-2 px-3 text-right font-mono text-muted-foreground whitespace-nowrap">
                                 {formatAmount(row.otherCharges)}
                               </td>
-                              <td className="py-2 px-3 text-right font-mono font-bold text-primary">
+                              <td className="py-2 px-3 text-right font-mono font-bold text-primary whitespace-nowrap">
                                 {formatAmount(row.totalAmount)}
                               </td>
                               <td className="py-2 px-3 text-center whitespace-nowrap">
@@ -605,7 +618,7 @@ export function MonthWiseSupplierBillReportPage() {
                                   {row.status}
                                 </span>
                               </td>
-                              <td className="py-2 px-3 text-center">
+                              <td className="py-2 px-3 text-center whitespace-nowrap">
                                 <button
                                   onClick={() => setSelectedBillModal(row)}
                                   className="p-1 rounded-md hover:bg-muted text-primary cursor-pointer transition"
@@ -621,6 +634,9 @@ export function MonthWiseSupplierBillReportPage() {
                           <tr className="bg-muted/60 font-bold text-foreground border-b-2 border-border/80">
                             <td colSpan={6} className="py-2 px-3 text-right text-[11px] uppercase tracking-wide">
                               Subtotal for {group.label}:
+                            </td>
+                            <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
+                              {groupQty.toLocaleString()}
                             </td>
                             <td className="py-2 px-3 text-right font-mono">{formatAmount(groupBillAmt)}</td>
                             <td className="py-2 px-3 text-right font-mono">{formatAmount(groupDiscount)}</td>
@@ -640,10 +656,13 @@ export function MonthWiseSupplierBillReportPage() {
 
                 {/* Overall Grand Total Footer */}
                 {filteredRows.length > 0 && (
-                  <tfoot className="bg-primary/10 text-foreground font-black border-t-2 border-primary/30">
+                  <tfoot className="bg-primary/10 text-foreground font-black border-t-2 border-primary/30 sticky bottom-0">
                     <tr>
                       <td colSpan={6} className="py-3 px-3 text-right text-xs uppercase tracking-wider text-primary">
                         OVERALL GRAND TOTAL:
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-xs font-black text-primary">
+                        {overallTotals.quantity.toLocaleString()}
                       </td>
                       <td className="py-3 px-3 text-right font-mono text-xs">
                         {formatAmount(overallTotals.billAmount)}

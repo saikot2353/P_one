@@ -115,6 +115,10 @@ export function StockAdjustmentRegisterPage() {
     searchQuery,
   ]);
 
+  const totalPreviousQty = useMemo(() => filteredRows.reduce((s, r) => s + r.previousQty, 0), [filteredRows]);
+  const totalFinalQty = useMemo(() => filteredRows.reduce((s, r) => s + r.finalQty, 0), [filteredRows]);
+  const netAdjustmentQty = useMemo(() => filteredRows.reduce((s, r) => s + (r.adjustmentType === "Stock Increase" ? r.adjustmentQty : -r.adjustmentQty), 0), [filteredRows]);
+
   const handleResetFilters = () => {
     setFilterAdjustmentId("");
     setFilterItem("All");
@@ -480,6 +484,27 @@ export function StockAdjustmentRegisterPage() {
                     ))
                   )}
                 </tbody>
+                {filteredRows.length > 0 && (
+                  <tfoot className="bg-primary/10 text-foreground font-black border-t-2 border-primary/30 sticky bottom-0">
+                    <tr>
+                      <td colSpan={5} className="py-3 px-3 text-right text-xs uppercase tracking-wider text-primary">
+                        TOTAL STOCK ADJUSTMENTS:
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-xs">
+                        {totalPreviousQty.toLocaleString()}
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-xs font-bold text-foreground">
+                        {netAdjustmentQty >= 0 ? `+${netAdjustmentQty.toLocaleString()}` : netAdjustmentQty.toLocaleString()}
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-sm text-primary font-black">
+                        {totalFinalQty.toLocaleString()}
+                      </td>
+                      <td colSpan={2} className="py-3 px-3 text-center text-[10px] text-muted-foreground font-normal">
+                        {filteredRows.length} Adjustments
+                      </td>
+                    </tr>
+                  </tfoot>
+                )}
               </table>
             </div>
           </div>

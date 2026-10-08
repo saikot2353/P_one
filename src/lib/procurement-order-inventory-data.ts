@@ -34,6 +34,8 @@ export interface POItem {
   discount: number;
   vatRate: number; // e.g. 5% or 7.5%
   vatAmount: number;
+  taxRate?: number; // Item-wise Tax %
+  taxAmount?: number; // Item-wise Tax Amount
   lineTotal: number;
   remarks?: string;
 }

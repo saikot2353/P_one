@@ -609,27 +609,26 @@ export function ItemCreationPageForm({
             </div>
 
             <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">Valuation Method</label>
+              <label className="block text-xs font-bold mb-1 text-foreground">Issue Type</label>
               <select
                 disabled={isView}
                 value={formData.valuationMethod || "FIFO"}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    valuationMethod: e.target.value as "FIFO" | "LIFO" | "Weighted Average",
+                    valuationMethod: e.target.value as "FIFO" | "LIFO",
                   })
                 }
                 className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
               >
                 <option value="FIFO">FIFO (First In First Out)</option>
                 <option value="LIFO">LIFO (Last In First Out)</option>
-                <option value="Weighted Average">Weighted Average</option>
               </select>
             </div>
 
             <div className="flex items-center justify-between p-2.5 rounded-xl border border-border/70 bg-muted/20">
               <div>
-                <div className="text-xs font-bold text-foreground">Service Flag</div>
+                <div className="text-xs font-bold text-foreground">Service</div>
                 <div className="text-[10px] text-muted-foreground">
                   Service / Non-inventory item
                 </div>

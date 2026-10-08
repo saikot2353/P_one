@@ -190,6 +190,24 @@ export function ItemCategoryPageForm({
               </select>
             </div>
 
+            <div className="flex items-center justify-between p-2.5 rounded-xl border border-border/70 bg-muted/20">
+              <div>
+                <div className="text-xs font-bold text-foreground">Service</div>
+                <div className="text-[10px] text-muted-foreground">
+                  Service / Non-inventory category
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  disabled={isView}
+                  checked={!!formData.isService}
+                  onChange={(e) => setFormData({ ...formData, isService: e.target.checked })}
+                  className="size-4.5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+            </div>
+
 
 
             <div className="sm:col-span-2">

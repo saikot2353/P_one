@@ -241,7 +241,6 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Item Receipt Register", parent: "Inventory Reports", to: "/inv-report-receipt-register", description: "All incoming inventory receipts" },
   { label: "Item Issue Register", parent: "Inventory Reports", to: "/inv-report-issue-register", description: "All outgoing inventory issues" },
   { label: "Stock Transfer Register", parent: "Inventory Reports", to: "/inv-report-stock-transfer", description: "Inter & Intra company stock transfers" },
-  { label: "Stock Adjustment Register", parent: "Inventory Reports", to: "/inv-report-stock-adjustment", description: "Manual stock quantity adjustment history" },
   { label: "Stock Write-Off Register", parent: "Inventory Reports", to: "/inv-report-stock-writeoff", description: "Permanent stock casualty derecognitions" },
   { label: "Stock Valuation Register", parent: "Inventory Reports", to: "/inv-report-stock-valuation", description: "Financial inventory valuation register" },
   { label: "Month-wise Material Receive", parent: "Inventory Reports", to: "/inv-report-monthly-receive", description: "Monthly inward inventory report" },

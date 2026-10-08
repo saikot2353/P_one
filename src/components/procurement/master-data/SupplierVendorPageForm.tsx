@@ -220,7 +220,7 @@ export function SupplierVendorPageForm({
             {/* Multi-Selection Vendor Category */}
             <div className="relative">
               <label className="block text-xs font-bold mb-1 text-foreground">
-                Vendor Category (Multiple Selection)
+                Vendor Category
               </label>
               
               {/* Selected Categories Tags */}

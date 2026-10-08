@@ -86,8 +86,14 @@ export function StockValuationRegisterPage() {
     return INITIAL_STOCK_BALANCE_DATA.filter((row) => {
       if (filterCompany !== "All" && row.company !== filterCompany) return false;
       if (filterStore !== "All" && row.store !== filterStore) return false;
-      if (filterItem !== "All" && row.itemName !== filterItem) return false;
-      if (filterItemGroup !== "All" && row.itemGroup !== filterItemGroup) return false;
+      if (filterItem.trim() && filterItem !== "All") {
+        const q = filterItem.toLowerCase().trim();
+        if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
+      }
+      if (filterItemGroup.trim() && filterItemGroup !== "All") {
+        const q = filterItemGroup.toLowerCase().trim();
+        if (!row.itemGroup.toLowerCase().includes(q)) return false;
+      }
       if (filterItemCategory !== "All" && row.itemCategory !== filterItemCategory) return false;
       if (filterBatch.trim() && !row.batch.toLowerCase().includes(filterBatch.toLowerCase().trim()))
         return false;
@@ -307,8 +313,8 @@ export function StockValuationRegisterPage() {
             </div>
           </div>
 
-          {/* 4 Required KPIs: Total Stock Value, Total Stock Quantity, Average Unit Cost, Highest Value Item */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {/* 3 KPIs */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 shadow-xs">
               <span className="text-[11px] font-medium text-primary">Total Stock Value</span>
               <p className="text-lg font-bold mt-1 text-primary font-mono">{formatAmount(kpis.totalValue, undefined, true)}</p>
@@ -318,11 +324,6 @@ export function StockValuationRegisterPage() {
               <span className="text-[11px] font-medium text-muted-foreground">Total Stock Quantity</span>
               <p className="text-lg font-bold mt-1 text-foreground font-mono">{kpis.totalQty.toLocaleString()}</p>
               <span className="text-[10px] text-emerald-600 font-medium">Physical inventory</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[11px] font-medium text-muted-foreground">Average Unit Cost</span>
-              <p className="text-lg font-bold mt-1 text-foreground font-mono">{formatAmount(kpis.avgUnitCost, undefined, true)}</p>
-              <span className="text-[10px] text-muted-foreground">Weighted rate</span>
             </div>
             <div className="p-3.5 rounded-xl border border-amber-500/20 bg-amber-500/5 shadow-xs">
               <span className="text-[11px] font-medium text-amber-600">Highest Value Item</span>
@@ -350,7 +351,7 @@ export function StockValuationRegisterPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Company</label>
                 <select
@@ -381,28 +382,48 @@ export function StockValuationRegisterPage() {
 
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <select
-                  value={filterItem}
+                <input
+                  type="text"
+                  list="val-items-list"
+                  placeholder="Search item..."
+                  value={filterItem === "All" ? "" : filterItem}
                   onChange={(e) => setFilterItem(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Items</option>
+                />
+                <datalist id="val-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i}>{i}</option>
+                    <option key={i} value={i} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               <div>
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item Group</label>
-                <select
-                  value={filterItemGroup}
+                <input
+                  type="text"
+                  list="val-groups-list"
+                  placeholder="Search group..."
+                  value={filterItemGroup === "All" ? "" : filterItemGroup}
                   onChange={(e) => setFilterItemGroup(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Groups</option>
+                />
+                <datalist id="val-groups-list">
                   {itemGroups.map((g) => (
-                    <option key={g} value={g}>{g}</option>
+                    <option key={g} value={g} />
+                  ))}
+                </datalist>
+              </div>
+
+              <div>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item Category</label>
+                <select
+                  value={filterItemCategory}
+                  onChange={(e) => setFilterItemCategory(e.target.value)}
+                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
+                >
+                  <option value="All">All Categories</option>
+                  {itemCategories.map((c) => (
+                    <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
               </div>
@@ -447,23 +468,25 @@ export function StockValuationRegisterPage() {
           {/* Table */}
           <div className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-xs">
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-              <table className="w-full text-xs text-left border-collapse min-w-[1050px]">
+              <table className="w-full text-xs text-left border-collapse min-w-[1200px]">
                 <thead className="bg-muted/80 text-muted-foreground font-semibold uppercase text-[10.5px] sticky top-0 z-10 backdrop-blur-xs border-b border-border">
                   <tr>
                     <th className="py-2.5 px-3">Item Code & Name</th>
+                    <th className="py-2.5 px-3">Specification</th>
+                    <th className="py-2.5 px-3">Brand</th>
+                    <th className="py-2.5 px-3">Origin</th>
                     <th className="py-2.5 px-3">Store</th>
                     <th className="py-2.5 px-3">Batch</th>
                     <th className="py-2.5 px-3">UOM</th>
                     <th className="py-2.5 px-3 text-right">Quantity</th>
                     <th className="py-2.5 px-3 text-right">Unit Cost</th>
                     <th className="py-2.5 px-3 text-right">Stock Value</th>
-                    <th className="py-2.5 px-3 text-center">Drill-down</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {filteredRows.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="py-8 text-center text-muted-foreground">
+                      <td colSpan={10} className="py-8 text-center text-muted-foreground">
                         No valuation records found.
                       </td>
                     </tr>
@@ -473,6 +496,9 @@ export function StockValuationRegisterPage() {
                         <td className="py-2 px-3 font-semibold text-foreground whitespace-nowrap">
                           {row.itemName} <span className="font-mono text-muted-foreground text-[11px]">({row.itemCode})</span>
                         </td>
+                        <td className="py-2 px-3 text-muted-foreground">{row.specification || "-"}</td>
+                        <td className="py-2 px-3 text-foreground whitespace-nowrap">{row.brand || "-"}</td>
+                        <td className="py-2 px-3 text-foreground whitespace-nowrap">{row.origin || "-"}</td>
                         <td className="py-2 px-3 text-foreground whitespace-nowrap">{row.store}</td>
                         <td className="py-2 px-3 font-mono text-[11px] text-purple-600 dark:text-purple-400">{row.batch || "-"}</td>
                         <td className="py-2 px-3 text-muted-foreground">{row.uom}</td>
@@ -485,19 +511,24 @@ export function StockValuationRegisterPage() {
                         <td className="py-2 px-3 text-right font-mono font-black text-primary">
                           {formatAmount(row.stockValue)}
                         </td>
-                        <td className="py-2 px-3 text-center">
-                          <button
-                            onClick={() => setSelectedValuationDrilldown(row)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/10 hover:bg-primary/20 text-primary text-[11px] font-bold transition cursor-pointer"
-                          >
-                            <Calculator className="size-3" />
-                            <span>Drill-down</span>
-                          </button>
-                        </td>
                       </tr>
                     ))
                   )}
                 </tbody>
+                <tfoot className="bg-muted/60 font-semibold border-t border-border sticky bottom-0">
+                  <tr>
+                    <td colSpan={7} className="py-2.5 px-3 text-right uppercase tracking-wider text-[11px] text-muted-foreground font-bold">
+                      Total
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-foreground">
+                      {kpis.totalQty.toLocaleString()}
+                    </td>
+                    <td></td>
+                    <td className="py-2.5 px-3 text-right font-mono font-black text-primary">
+                      {formatAmount(kpis.totalValue, undefined, true)}
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>
