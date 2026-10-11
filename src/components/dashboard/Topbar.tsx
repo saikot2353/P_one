@@ -336,6 +336,18 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Track all pending requisitions and see who each approval is currently pending to",
   },
   {
+    label: "Work Flow",
+    parent: "Approvals",
+    to: "/work-flows",
+    description: "Multi-level approval workflow configuration, layer points, and approver assignment",
+  },
+  {
+    label: "Sync Requisition",
+    parent: "Approvals",
+    to: "/sync-requisition",
+    description: "Synchronize requisition workflow layers and re-bind approvals to active organizational layers",
+  },
+  {
     label: "Salary Submit",
     parent: "Payroll",
     to: "/payroll-salary-submit",

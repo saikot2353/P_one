@@ -21,12 +21,68 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
+<<<<<<< HEAD
     const saved = localStorage.getItem("system_changes_v570");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
       setRecords(DEFAULT_CHANGE_RECORDS);
       localStorage.setItem("system_changes_v570", JSON.stringify(DEFAULT_CHANGE_RECORDS));
+=======
+    const saved = localStorage.getItem("system_changes_v573");
+    if (saved) {
+      setRecords(JSON.parse(saved));
+    } else {
+      const updatedRecords: ChangeRecord[] = [
+        {
+          id: "573",
+          date: "2026-10-11T13:45",
+          type: "UI Refinement",
+          module: "Approvals - Sync Requisition",
+          link: "/sync-requisition",
+          descriptionEn:
+            "Compacted the layout of the Sync Requisition page, constraining the requisition input field to a balanced width, reducing padding, and making the controls and workflow layer cards clean and compact.",
+          descriptionBn:
+            "Sync Requisition পেজটির ডিজাইন কমপ্যাক্ট করা হয়েছে, যাতে রিকুইজিশন ইনপুট ফিল্ডটি অতিরিক্ত বড় না দেখায় এবং সম্পূর্ণ ইন্টারফেস পরিচ্ছন্ন ও সংকুচিত থাকে।",
+        },
+        {
+          id: "572",
+          date: "2026-10-11T13:35",
+          type: "UI Refinement",
+          module: "Approvals - Sync Requisition",
+          link: "/sync-requisition",
+          descriptionEn:
+            "Streamlined the Sync Requisition page by removing the lower detailed data table while retaining the clean visual stepper cards for workflow layers.",
+          descriptionBn:
+            "Sync Requisition পেজটি পরিচ্ছন্ন করতে নিচের বিস্তারিত ডেটা টেবিলটি সরিয়ে দেওয়া হয়েছে এবং উপরের ভিজ্যুয়াল স্টেপার কার্ডগুলো বহাল রাখা হয়েছে।",
+        },
+        {
+          id: "571",
+          date: "2026-10-11T13:30",
+          type: "New Addition",
+          module: "Approvals - Sync Requisition",
+          link: "/sync-requisition",
+          descriptionEn:
+            "Added new 'Sync Requisition' (/sync-requisition) submenu under Approvals with requisition number lookup, interactive sync confirmation, and live display of dynamic workflow layers the requisition goes through.",
+          descriptionBn:
+            "Approvals মেনুর অধীনে নতুন 'Sync Requisition' (/sync-requisition) সাবমেনু ও পেজ যুক্ত করা হয়েছে, যেখানে রিকুইজিশন নম্বর দিয়ে Sync ও Confirm করার পর রিকুইজিশনটি বর্তমানে কোন কোন ওয়ার্কফ্লো লেয়ার অতিক্রম করছে তা সরাসরি দেখা যাবে।",
+        },
+        {
+          id: "570",
+          date: "2026-10-11T13:05",
+          type: "New Addition",
+          module: "Approvals - Work Flow",
+          link: "/work-flows",
+          descriptionEn:
+            "Added new 'Work Flow' (/work-flows) submenu under Approvals with complete approval workflows dashboard, multi-layer approval flow configuration modal, user assigner, and layer manager matching user design.",
+          descriptionBn:
+            "Approvals মেনুর অধীনে নতুন 'Work Flow' (/work-flows) সাবমেনু ও পেজ তৈরি করা হয়েছে, যেখান থেকে বিভিন্ন ধরনের ওয়ার্কফ্লো তৈরি, মাল্টি-লেয়ার অনুমোদন চেইন কনফিগারেশন, লেয়ারে ইউজার যুক্ত ও অনুমোদন পরিচালনা করা যাবে।",
+        },
+        ...DEFAULT_CHANGE_RECORDS,
+      ];
+      setRecords(updatedRecords);
+      localStorage.setItem("system_changes_v571", JSON.stringify(updatedRecords));
+>>>>>>> ef80540692f977a6537bd0098aa898b78ab2f5ae
     }
   }, []);
 
