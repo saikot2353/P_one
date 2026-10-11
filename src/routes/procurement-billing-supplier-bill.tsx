@@ -41,6 +41,8 @@ import {
   setStoredSupplierBills,
   getStoredMaterialReceipts,
   getStoredPurchaseOrders,
+  getStoredPoItems,
+  getStoredWoItems,
 } from "@/lib/procurement-order-inventory-data";
 import {
   DEFAULT_ITEMS,
@@ -128,12 +130,10 @@ export function SupplierBillPage() {
     setSelectedServiceItemIds((prev) => {
       const exists = prev.includes(serviceId);
       const next = exists ? prev.filter((id) => id !== serviceId) : [...prev, serviceId];
-      const item = availableServiceItems.find((s) => s.id === serviceId);
-      const defaultPrice = item?.standardPurchasePrice || 1200;
 
       const newAmounts = { ...serviceItemAmounts };
       if (!exists) {
-        newAmounts[serviceId] = newAmounts[serviceId] ?? defaultPrice;
+        newAmounts[serviceId] = newAmounts[serviceId] ?? 0;
       } else {
         delete newAmounts[serviceId];
       }
@@ -141,7 +141,7 @@ export function SupplierBillPage() {
 
       let total = 0;
       next.forEach((id) => {
-        total += newAmounts[id] ?? (availableServiceItems.find((s) => s.id === id)?.standardPurchasePrice || 1200);
+        total += newAmounts[id] ?? 0;
       });
       setOtherCharges(total);
       return next;
@@ -217,8 +217,11 @@ export function SupplierBillPage() {
       currentBillQty: 5,
       unitPrice: 82000,
       discount: 4000,
+      vatRate: 5,
       vatAmount: 20300,
-      lineAmount: 426300,
+      taxRate: 3,
+      taxAmount: 12180,
+      lineAmount: 438480,
     },
     {
       id: "sbi-2",
@@ -234,8 +237,11 @@ export function SupplierBillPage() {
       currentBillQty: 1,
       unitPrice: 47500,
       discount: 1000,
+      vatRate: 5,
       vatAmount: 2325,
-      lineAmount: 48825,
+      taxRate: 2,
+      taxAmount: 930,
+      lineAmount: 49755,
     },
   ]);
 
@@ -294,17 +300,40 @@ export function SupplierBillPage() {
     }
   }, [searchParams.action, searchParams.id, bills]);
 
-  // Helper to populate items from MRRs
+  // Helper to populate items from MRRs with Work Order / PO tax carry-forward
   const populateBillItemsFromMrrs = (mrrNos: string[]) => {
     const matchedMRRs = materialReceipts.filter((m) => mrrNos.includes(m.receiveNumber));
     const consolidatedItems: SupplierBillItem[] = [];
     let sl = 1;
 
+    const poItemsMap = getStoredPoItems();
+    const woItemsMap = getStoredWoItems();
+    const poOrder = purchaseOrders.find((p) => p.orderNumber === selectedPoNumber);
+    const poItems = poItemsMap[selectedPoNumber] || poOrder?.items || [];
+    const woItems = woItemsMap[selectedPoNumber] || [];
+
     matchedMRRs.forEach((mrr) => {
       (mrr.items || []).forEach((item) => {
         const received = item.acceptedQty || item.currentReceiveQty || item.orderedQty || 1;
         const lineBase = received * item.unitPrice;
-        const lineVat = lineBase * 0.05;
+
+        // Carry forward Tax % from Work Order or Purchase Order
+        const matchedWo = woItems.find(
+          (w) =>
+            w.serviceCode === item.itemCode ||
+            w.serviceName.toLowerCase() === item.itemName.toLowerCase()
+        );
+        const matchedPo = poItems.find(
+          (p) =>
+            p.itemCode === item.itemCode ||
+            p.itemName.toLowerCase() === item.itemName.toLowerCase()
+        );
+
+        const vatRate = matchedWo?.vatRate ?? matchedPo?.vatRate ?? 5;
+        const taxRate = matchedWo?.taxRate ?? matchedPo?.taxRate ?? 0;
+        const lineVat = (lineBase * vatRate) / 100;
+        const lineTax = (lineBase * taxRate) / 100;
+
         consolidatedItems.push({
           id: `sbi-${Date.now()}-${sl}`,
           sl: sl++,
@@ -319,8 +348,11 @@ export function SupplierBillPage() {
           currentBillQty: received,
           unitPrice: item.unitPrice,
           discount: 0,
+          vatRate,
           vatAmount: lineVat,
-          lineAmount: lineBase + lineVat,
+          taxRate,
+          taxAmount: lineTax,
+          lineAmount: lineBase + lineVat + lineTax,
         });
       });
     });
@@ -384,12 +416,38 @@ export function SupplierBillPage() {
 
           const base = newQty * item.unitPrice;
           const afterDisc = Math.max(0, base - item.discount);
-          const vat = afterDisc * 0.05;
+          const vatRate = item.vatRate ?? 5;
+          const taxRate = item.taxRate ?? 0;
+          const vat = (afterDisc * vatRate) / 100;
+          const tax = (afterDisc * taxRate) / 100;
           return {
             ...item,
             currentBillQty: newQty,
             vatAmount: vat,
-            lineAmount: afterDisc + vat,
+            taxAmount: tax,
+            lineAmount: afterDisc + vat + tax,
+          };
+        }
+        return item;
+      })
+    );
+  };
+
+  const handleUpdateItemTaxRate = (id: string, newTaxRate: number) => {
+    if (formMode === "view") return;
+
+    setBillItems((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const base = item.currentBillQty * item.unitPrice;
+          const afterDisc = Math.max(0, base - item.discount);
+          const taxRate = Math.max(0, newTaxRate);
+          const tax = (afterDisc * taxRate) / 100;
+          return {
+            ...item,
+            taxRate,
+            taxAmount: tax,
+            lineAmount: afterDisc + item.vatAmount + tax,
           };
         }
         return item;
@@ -398,23 +456,24 @@ export function SupplierBillPage() {
   };
 
   // Financial Summary Totals:
-  // VAT Amount (৳) entered adds to item-level VAT and reflects in final VAT field
-  // Disallows negative values
+  // Item-level Tax carried forward + any manual tax adjustments
   const summary = useMemo(() => {
     let sub = 0;
     let autoItemsDisc = 0;
     let autoItemsVat = 0;
+    let autoItemsTax = 0;
     billItems.forEach((i) => {
       sub += i.currentBillQty * i.unitPrice;
       autoItemsDisc += i.discount;
       autoItemsVat += i.vatAmount;
+      autoItemsTax += i.taxAmount ?? 0;
     });
 
     const extraDisc = manualDiscount !== "" ? Math.max(0, Number(manualDiscount)) : 0;
     const disc = autoItemsDisc + extraDisc;
     const extraVat = manualVatAmount !== "" ? Math.max(0, Number(manualVatAmount)) : 0;
     const vat = autoItemsVat + extraVat;
-    const tax = Math.max(0, Number(taxAmount) || 0);
+    const tax = autoItemsTax + (taxAmount !== "" ? Math.max(0, Number(taxAmount)) : 0);
     const others = Math.max(0, Number(otherCharges) || 0);
     const adj = Number(adjustment) || 0;
     const net = Math.max(0, sub - disc + vat + tax + others + adj);
@@ -425,6 +484,7 @@ export function SupplierBillPage() {
       discount: disc,
       vat: vat,
       tax: tax,
+      autoItemsTax: autoItemsTax,
       otherCharges: others,
       adjustment: adj,
       netBillAmount: Math.round(net),
@@ -954,6 +1014,7 @@ export function SupplierBillPage() {
                       </th>
                       <th className="py-2.5 px-3 text-right font-bold">Unit Price (৳)</th>
                       <th className="py-2.5 px-3 text-right font-bold">VAT</th>
+                      <th className="py-2.5 px-3 text-right font-bold text-amber-600">Tax</th>
                       <th className="py-2.5 px-3 text-right font-bold">Line Total (৳)</th>
                     </tr>
                   </thead>
@@ -1004,6 +1065,16 @@ export function SupplierBillPage() {
                         </td>
                         <td className="py-2 px-3 text-right font-mono text-muted-foreground">
                           ৳ {item.vatAmount.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono">
+                          <div className="font-bold text-foreground">
+                            ৳ {(item.taxAmount ?? Math.round(((item.currentBillQty * item.unitPrice - item.discount) * (item.taxRate || 0)) / 100)).toLocaleString()}
+                          </div>
+                          {item.taxRate !== undefined && item.taxRate > 0 && (
+                            <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block">
+                              ({item.taxRate}%)
+                            </span>
+                          )}
                         </td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
                           ৳ {item.lineAmount.toLocaleString()}
@@ -1095,7 +1166,7 @@ export function SupplierBillPage() {
                                       <div className="truncate">
                                         <div className="font-semibold">{service.itemName}</div>
                                         <div className="text-[10px] text-muted-foreground font-mono">
-                                          {service.itemCode} • ৳{(service.standardPurchasePrice || 1200).toLocaleString()}
+                                          {service.itemCode}
                                         </div>
                                       </div>
                                       <input
@@ -1144,7 +1215,7 @@ export function SupplierBillPage() {
                         </div>
                         {selectedServiceItemIds.map((id) => {
                           const item = availableServiceItems.find((s) => s.id === id);
-                          const currentAmt = serviceItemAmounts[id] ?? item?.standardPurchasePrice ?? 1200;
+                          const currentAmt = serviceItemAmounts[id] ?? "";
                           return (
                             <div
                               key={id}

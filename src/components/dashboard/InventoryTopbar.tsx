@@ -235,7 +235,6 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Stock Balance Register", parent: "Inventory Reports", to: "/inv-report-stock-balance", description: "Master stock balance register with KPI cards and valuation" },
   { label: "Item Stock Register", parent: "Inventory Reports", to: "/inv-report-item-stock", description: "Single item stock focal register and drilldown" },
   { label: "Item Transaction Ledger", parent: "Inventory Reports", to: "/inv-report-transaction-ledger", description: "Accounting-style stock ledger with running balance" },
-  { label: "Item Movement Register", parent: "Inventory Reports", to: "/inv-report-item-movement", description: "Stock movement register with movement timeline" },
   { label: "Batch Stock Register", parent: "Inventory Reports", to: "/inv-report-batch-stock", description: "Batch-controlled stock register with expiry KPIs" },
   { label: "Location Stock Register", parent: "Inventory Reports", to: "/inv-report-location-stock", description: "Rack, shelf, bin-wise stock register" },
   { label: "Item Receipt Register", parent: "Inventory Reports", to: "/inv-report-receipt-register", description: "All incoming inventory receipts" },

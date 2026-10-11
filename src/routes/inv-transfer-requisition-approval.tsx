@@ -431,13 +431,14 @@ function TransferRequisitionApprovalPage() {
                           {idx + 1}
                         </td>
                         <td className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => setInspectedReq(req)}
+                          <Link
+                            to="/inv-transfer-requisition"
+                            search={{ id: req.id, mode: "approval" } as any}
                             className="font-bold text-blue-600 hover:underline cursor-pointer text-left block"
+                            title="Open requisition details in new page"
                           >
                             {req.requisitionNumber}
-                          </button>
+                          </Link>
                           <div className="text-[10px] text-slate-400">
                             By {req.requestedBy.split("(")[0]}
                           </div>
@@ -485,15 +486,15 @@ function TransferRequisitionApprovalPage() {
                         </td>
                         <td className="py-3 px-3 text-center">
                           <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                            <button
-                              type="button"
-                              onClick={() => setInspectedReq(req)}
-                              className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10.5px] transition cursor-pointer"
-                              title="Inspect line items"
+                            <Link
+                              to="/inv-transfer-requisition"
+                              search={{ id: req.id, mode: "approval" } as any}
+                              className="px-2.5 py-1 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-[10.5px] transition cursor-pointer inline-flex items-center"
+                              title="Open complete details and approval actions in new page"
                             >
                               <Eye className="size-3.5 inline mr-1" />
                               View
-                            </button>
+                            </Link>
 
                             {req.status === "Approval Pending" && (
                               <>
@@ -541,7 +542,7 @@ function TransferRequisitionApprovalPage() {
                             {req.status === "Approved" && (
                               <Link
                                 to="/inv-intercompany-transfer"
-                                search={{ transferId: undefined }}
+                                search={{ transferId: undefined } as any}
                                 className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10.5px] transition cursor-pointer"
                               >
                                 Issue Goods →
@@ -837,9 +838,9 @@ function TransferRequisitionApprovalPage() {
       {/* Report Modal */}
       {previewReportOpen && reportTarget && (
         <StandardPreviewReportModal
-          open={previewReportOpen}
-          onOpenChange={setPreviewReportOpen}
-          reportData={reportData}
+          isOpen={previewReportOpen}
+          onClose={() => setPreviewReportOpen(false)}
+          data={reportData}
         />
       )}
     </div>
