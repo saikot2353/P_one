@@ -441,6 +441,7 @@ export function PurchaseOrderWorkOrderPage() {
     let sub = 0;
     let disc = 0;
     let vat = 0;
+    let tax = 0;
 
     poItems.forEach((item) => {
       // 8. Order Quantity x MU Unit Price

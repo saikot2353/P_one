@@ -15,6 +15,7 @@ import {
   Layers,
   Building2,
   X,
+  History,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -339,18 +340,35 @@ export function LocationStockRegisterPage() {
               </div>
 
               <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <input
-                  type="text"
-                  list="loc-items-list"
-                  placeholder="Search item name/code..."
-                  value={filterItem === "All" ? "" : filterItem}
-                  onChange={(e) => setFilterItem(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                />
+                <div className="flex items-center justify-between">
+                  <label className="text-[10.5px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                    <Search className="size-3 text-primary" />
+                    <span>Item</span>
+                  </label>
+                  {filterItem && filterItem !== "All" && (
+                    <button
+                      type="button"
+                      onClick={() => setFilterItem("All")}
+                      className="text-[10px] text-primary hover:underline cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className="relative mt-1">
+                  <input
+                    type="text"
+                    list="loc-items-list"
+                    placeholder="Search item name/code..."
+                    value={filterItem === "All" ? "" : filterItem}
+                    onChange={(e) => setFilterItem(e.target.value)}
+                    className="w-full h-8 pl-7 pr-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
+                  />
+                  <Search className="size-3.5 absolute left-2 top-2.5 text-muted-foreground pointer-events-none" />
+                </div>
                 <datalist id="loc-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i} />
+                    <option key={String(i)} value={String(i)} />
                   ))}
                 </datalist>
               </div>
@@ -367,7 +385,7 @@ export function LocationStockRegisterPage() {
                 />
                 <datalist id="loc-locations-list">
                   {locations.map((loc) => (
-                    <option key={loc} value={loc} />
+                    <option key={String(loc)} value={String(loc)} />
                   ))}
                 </datalist>
               </div>

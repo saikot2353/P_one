@@ -24,7 +24,7 @@ export function getActiveCurrencyConfig(): {
     const currencies = getStoredData<CurrencyMaster[]>("proc_currencies_v2", []);
     // Find active base currency or first active currency
     const active =
-      currencies.find((c) => c.status === "Active" && (c.isBaseCurrency || c.currencyCode === "BDT")) ||
+      currencies.find((c) => c.status === "Active" && (c.baseCurrency || (c as any).isBaseCurrency || c.currencyCode === "BDT")) ||
       currencies.find((c) => c.status === "Active") ||
       currencies[0];
 

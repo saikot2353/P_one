@@ -545,28 +545,50 @@ function MaterialRequisitionPage() {
         { label: "Warehouse / Store", value: warehouseStore },
         { label: "Purpose", value: purpose || "General Inventory Requisition" },
       ],
-      tableHeaders: [
-        "SL",
-        "ITEM CODE",
-        "ITEM DESCRIPTION",
-        "SPECIFICATION",
-        "UOM",
-        "REQ QTY",
-        "AVL STOCK",
-        "SHORTAGE",
-        "REMARKS",
-      ],
-      tableRows: items.map((it, idx) => [
-        String(idx + 1),
-        it.itemCode,
-        it.itemName,
-        it.specification || "-",
-        it.uom,
-        String(it.requestedQuantity),
-        String(it.availableStock),
-        String(it.shortageQuantity),
-        it.remarks || "-",
-      ]),
+      tableHeaders: isAvailableStockPolicyEnabled
+        ? [
+            "SL",
+            "ITEM CODE",
+            "ITEM DESCRIPTION",
+            "SPECIFICATION",
+            "UOM",
+            "REQ QTY",
+            "AVL STOCK",
+            "SHORTAGE",
+            "REMARKS",
+          ]
+        : [
+            "SL",
+            "ITEM CODE",
+            "ITEM DESCRIPTION",
+            "SPECIFICATION",
+            "UOM",
+            "REQ QTY",
+            "REMARKS",
+          ],
+      tableRows: items.map((it, idx) =>
+        isAvailableStockPolicyEnabled
+          ? [
+              String(idx + 1),
+              it.itemCode,
+              it.itemName,
+              it.specification || "-",
+              it.uom,
+              String(it.requestedQuantity),
+              String(it.availableStock),
+              String(it.shortageQuantity),
+              it.remarks || "-",
+            ]
+          : [
+              String(idx + 1),
+              it.itemCode,
+              it.itemName,
+              it.specification || "-",
+              it.uom,
+              String(it.requestedQuantity),
+              it.remarks || "-",
+            ]
+      ),
       summaryCards: [
         { label: "Total Items", value: String(items.length) },
         { label: "Requested Qty", value: String(totalRequestedQty) },

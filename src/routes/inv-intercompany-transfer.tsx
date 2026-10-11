@@ -21,6 +21,7 @@ import {
   FileCheck2,
   Tag,
   ShieldCheck,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -715,7 +716,7 @@ function InterCompanyTransferFormPage() {
                           sameCompanyStores.find((s) => (s.storeName || s.name) !== fromStore) ||
                           sameCompanyStores[0];
                         if (otherStore) {
-                          setToStore(otherStore.storeName || otherStore.name);
+                          setToStore(otherStore.storeName || otherStore.name || "");
                         }
                       }}
                       className={`px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer ${

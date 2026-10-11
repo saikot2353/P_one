@@ -42,28 +42,41 @@ export interface StandardReportData {
 }
 
 interface StandardPreviewReportModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  data: StandardReportData | null;
+  isOpen?: boolean;
+  open?: boolean;
+  onClose?: () => void;
+  onOpenChange?: (open: boolean) => void;
+  data?: StandardReportData | null;
+  reportData?: StandardReportData | null;
 }
 
 export function StandardPreviewReportModal({
   isOpen,
+  open,
   onClose,
+  onOpenChange,
   data,
+  reportData,
 }: StandardPreviewReportModalProps) {
-  if (!isOpen || !data) return null;
+  const visible = isOpen ?? open ?? false;
+  const activeData = data || reportData || null;
+  const handleClose = () => {
+    if (onClose) onClose();
+    if (onOpenChange) onOpenChange(false);
+  };
 
-  const docTitle = data.title || data.reportTitle || "TRANSACTION REPORT";
-  const docNo = data.documentNumber || data.documentNo || data.reportNumber || "DOC-PREVIEW";
-  const docDate = data.documentDate || data.reportDate || new Date().toISOString().slice(0, 10);
-  const metadataList = data.metadata || data.metaFields || [];
+  if (!visible || !activeData) return null;
+
+  const docTitle = activeData.title || activeData.reportTitle || "TRANSACTION REPORT";
+  const docNo = activeData.documentNumber || activeData.documentNo || activeData.reportNumber || "DOC-PREVIEW";
+  const docDate = activeData.documentDate || activeData.reportDate || new Date().toISOString().slice(0, 10);
+  const metadataList = activeData.metadata || activeData.metaFields || [];
 
   // Generate table headers & rows if items are provided directly
-  let headers = data.tableHeaders || [];
-  let rows = data.tableRows || [];
+  let headers = activeData.tableHeaders || [];
+  let rows = activeData.tableRows || [];
 
-  if (rows.length === 0 && data.items && data.items.length > 0) {
+  if (rows.length === 0 && activeData.items && activeData.items.length > 0) {
     headers = [
       "SL",
       "Item Description & Spec",
@@ -74,7 +87,7 @@ export function StandardPreviewReportModal({
       "Total Amount",
       "Remarks / Tracking",
     ];
-    rows = data.items.map((it, idx) => [
+    rows = activeData.items.map((it, idx) => [
       it.sl || idx + 1,
       React.createElement(
         "div",
@@ -92,16 +105,16 @@ export function StandardPreviewReportModal({
   }
 
   // Summary cards fallback from financials
-  const summaryList = data.summaryCards || (data.financials ? data.financials.map(f => ({
+  const summaryList = activeData.summaryCards || (activeData.financials ? activeData.financials.map(f => ({
     label: f.label,
     value: f.value,
     isBold: f.isTotal,
     isHighlight: f.isTotal || f.highlight,
   })) : []);
 
-  const noteText = data.notes || data.remarks;
+  const noteText = activeData.notes || activeData.remarks;
 
-  const defaultSignatures = data.signatures || [
+  const defaultSignatures = activeData.signatures || [
     { role: "Prepared By", name: "Store Officer / Executive", designation: "Inventory & Logistics" },
     { role: "Checked By", name: "Quality Inspector", designation: "QA / Audit" },
     { role: "Verified By", name: "Store Manager", designation: "Central Store Operations" },
@@ -130,7 +143,7 @@ export function StandardPreviewReportModal({
             </button>
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer transition-colors"
             >
               <X className="size-4.5" />
@@ -153,10 +166,10 @@ export function StandardPreviewReportModal({
 
               <div className="text-center flex-1">
                 <h1 className="text-lg font-black tracking-wide uppercase text-slate-950">
-                  {data.companyName || "PAKIZA KNIT COMPOSITE LTD."}
+                  {activeData.companyName || "PAKIZA KNIT COMPOSITE LTD."}
                 </h1>
                 <p className="text-[11px] text-slate-600 font-medium">
-                  {data.companyAddress || "Khan ABC Tradeplex, House #37, Road #2, Dhanmondi, Dhaka-1205"}
+                  {activeData.companyAddress || "Khan ABC Tradeplex, House #37, Road #2, Dhanmondi, Dhaka-1205"}
                 </p>
                 <div className="mt-1">
                   <span className="inline-block px-4 py-0.5 bg-slate-900 text-white font-mono font-black text-xs uppercase tracking-widest rounded-xs shadow-xs">

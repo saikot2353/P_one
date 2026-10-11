@@ -20,16 +20,22 @@ import {
   X,
   FileCheck2,
   Info,
+  XCircle,
+  RotateCcw,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   TransferRequisition,
   TransferRequisitionItem,
   TransferType,
+  TransferRequisitionStatus,
   MASTER_COMPANIES,
   getStoredTransferRequisitions,
+  saveStoredTransferRequisitions,
   saveTransferRequisition,
 } from "@/lib/inventory-stock-management-data";
+import { getAvailableStockForItem } from "@/lib/inventory-requisition-issue-data";
 import {
   DEFAULT_WAREHOUSES,
   DEFAULT_ITEMS,
@@ -45,9 +51,9 @@ import {
 export const Route = createFileRoute("/inv-transfer-requisition")({
   validateSearch: (
     search: Record<string, unknown>
-  ): { id?: string; mode?: "view" | "edit" } => ({
+  ): { id?: string; mode?: "view" | "edit" | "approval" } => ({
     id: search.id as string | undefined,
-    mode: search.mode as "view" | "edit" | undefined,
+    mode: search.mode as "view" | "edit" | "approval" | undefined,
   }),
   head: () => ({
     meta: [
@@ -64,8 +70,12 @@ export const Route = createFileRoute("/inv-transfer-requisition")({
 function TransferRequisitionFormPage() {
   const navigate = useNavigate();
   const searchParams = Route.useSearch();
-  const isViewMode = searchParams.mode === "view";
+  const isApprovalMode = searchParams.mode === "approval";
+  const isViewMode = searchParams.mode === "view" || isApprovalMode;
   const editingRequisitionId = searchParams.id;
+
+  const [approvalActionModal, setApprovalActionModal] = useState<"Approve" | "Reject" | "Return" | null>(null);
+  const [approvalComment, setApprovalComment] = useState("");
 
   const rawWarehouses = getStoredData<WarehouseStore[]>("proc_warehouses_v2", DEFAULT_WAREHOUSES);
   const warehouses = useMemo(() => {
@@ -301,6 +311,57 @@ function TransferRequisitionFormPage() {
     navigate({ to: "/inv-transfer-requisition-list" });
   };
 
+  // Approval Execution Handler
+  const handleExecuteApproval = () => {
+    if (!approvalActionModal || !existingReq) return;
+
+    if ((approvalActionModal === "Reject" || approvalActionModal === "Return") && !approvalComment.trim()) {
+      toast.error(`Please provide remarks/justification to ${approvalActionModal === "Reject" ? "reject" : "return"} this requisition.`);
+      return;
+    }
+
+    const all = getStoredTransferRequisitions();
+    const updated = all.map((r) => {
+      if (r.id !== existingReq.id && r.requisitionNumber !== existingReq.requisitionNumber) return r;
+      if (approvalActionModal === "Approve") {
+        return {
+          ...r,
+          status: "Approved" as const,
+          approvedBy: "Engr. Tanvir Ahmed (Authorized Operations Approver)",
+          approvalDate: new Date().toISOString().slice(0, 10),
+          approvalRemarks: approvalComment.trim() || "Approved for Transfer Issue fulfillment.",
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      if (approvalActionModal === "Reject") {
+        return {
+          ...r,
+          status: "Rejected" as const,
+          rejectedRemarks: approvalComment.trim(),
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      if (approvalActionModal === "Return") {
+        return {
+          ...r,
+          status: "Returned for Correction" as const,
+          returnedRemarks: approvalComment.trim(),
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      return r;
+    });
+
+    saveStoredTransferRequisitions(updated);
+    toast.success(
+      `Requisition ${existingReq.requisitionNumber} ${
+        approvalActionModal === "Approve" ? "Approved" : approvalActionModal === "Reject" ? "Rejected" : "Returned for correction"
+      } successfully.`
+    );
+    setApprovalActionModal(null);
+    navigate({ to: "/inv-transfer-requisition-approval" });
+  };
+
   // Preview Report Modal
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
   const previewReportData: StandardReportData = useMemo(() => {
@@ -374,16 +435,16 @@ function TransferRequisitionFormPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200">
             <div className="flex items-center gap-3">
               <Link
-                to="/inv-transfer-requisition-list"
+                to={isApprovalMode ? "/inv-transfer-requisition-approval" : "/inv-transfer-requisition-list"}
                 className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition shadow-xs"
-                title="Back to Requisition Register"
+                title={isApprovalMode ? "Back to Approval Desk" : "Back to Requisition Register"}
               >
                 <ArrowLeft className="size-4" />
               </Link>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-slate-500">
-                    Stock Transfers / Transfer Requisition
+                    Stock Transfers / {isApprovalMode ? "Requisition Approval Review" : "Transfer Requisition"}
                   </span>
                   <span className="text-slate-300">•</span>
                   <span
@@ -414,11 +475,13 @@ function TransferRequisitionFormPage() {
                   )}
                 </div>
                 <h1 className="text-xl font-black text-slate-900 tracking-tight mt-0.5">
-                  {isViewMode
-                    ? `Transfer Requisition Dossier — ${requisitionNumber}`
-                    : existingReq
-                      ? `Edit Transfer Requisition — ${requisitionNumber}`
-                      : "New Transfer Requisition"}
+                  {isApprovalMode
+                    ? `Transfer Requisition Approval — ${requisitionNumber}`
+                    : isViewMode
+                      ? `Transfer Requisition Dossier — ${requisitionNumber}`
+                      : existingReq
+                        ? `Edit Transfer Requisition — ${requisitionNumber}`
+                        : "New Transfer Requisition"}
                 </h1>
               </div>
             </div>
@@ -433,13 +496,53 @@ function TransferRequisitionFormPage() {
                 <span>Preview Report</span>
               </button>
 
-              <Link
-                to="/inv-transfer-requisition-approval"
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition cursor-pointer"
-              >
-                <FileCheck2 className="size-3.5" />
-                <span>Approval Desk</span>
-              </Link>
+              {!isApprovalMode && (
+                <Link
+                  to="/inv-transfer-requisition-approval"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition cursor-pointer"
+                >
+                  <FileCheck2 className="size-3.5" />
+                  <span>Approval Desk</span>
+                </Link>
+              )}
+
+              {isApprovalMode && existingReq && (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setApprovalActionModal("Approve");
+                      setApprovalComment("Approved for warehouse transfer dispatch.");
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  >
+                    <CheckCircle2 className="size-3.5" />
+                    <span>Approve</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setApprovalActionModal("Return");
+                      setApprovalComment("");
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  >
+                    <RotateCcw className="size-3.5" />
+                    <span>Return</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setApprovalActionModal("Reject");
+                      setApprovalComment("");
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  >
+                    <XCircle className="size-3.5" />
+                    <span>Reject</span>
+                  </button>
+                </div>
+              )}
 
               {!isViewMode && (
                 <>
@@ -700,10 +803,11 @@ function TransferRequisitionFormPage() {
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-100 font-semibold text-slate-700 text-[11px]">
                     <th className="py-2.5 px-3 w-10 text-center">#</th>
-                    <th className="py-2.5 px-3 min-w-[240px]">Item Description</th>
-                    <th className="py-2.5 px-3 min-w-[200px]">Specification</th>
+                    <th className="py-2.5 px-3 min-w-[220px]">Item Description</th>
+                    <th className="py-2.5 px-3 min-w-[180px]">Specification</th>
                     <th className="py-2.5 px-3 w-28">Brand / Origin</th>
-                    <th className="py-2.5 px-3 w-20 text-center">UOM</th>
+                    <th className="py-2.5 px-3 w-16 text-center">UOM</th>
+                    <th className="py-2.5 px-3 w-28 text-right bg-blue-50/60 text-blue-900 font-bold">Available Stock</th>
                     <th className="py-2.5 px-3 w-28 text-right">Required Qty</th>
                     <th className="py-2.5 px-3 min-w-[150px]">Remarks</th>
                     {!isViewMode && <th className="py-2.5 px-3 w-12 text-center">Action</th>}
@@ -727,6 +831,12 @@ function TransferRequisitionFormPage() {
                       </td>
                       <td className="py-2.5 px-3 text-center font-bold text-slate-700">
                         {it.uom}
+                      </td>
+                      <td className="py-2.5 px-3 text-right bg-blue-50/30">
+                        <span className="font-bold text-blue-900">
+                          {(getAvailableStockForItem(requestedFromStore, it.itemCode) || it.availableStock || 0).toLocaleString()}
+                        </span>
+                        <span className="text-[10px] text-slate-400 block font-normal">at source depot</span>
                       </td>
                       <td className="py-2.5 px-3 text-right">
                         {isViewMode ? (
@@ -793,7 +903,7 @@ function TransferRequisitionFormPage() {
       {/* Catalog Item Search Modal */}
       {itemSearchOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[80vh] animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
@@ -801,7 +911,7 @@ function TransferRequisitionFormPage() {
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-slate-900">Add Item from Catalog</h2>
-                  <p className="text-xs text-slate-500">Select an item to add to this Transfer Requisition</p>
+                  <p className="text-xs text-slate-500">Select items to add to this Transfer Requisition</p>
                 </div>
               </div>
               <button
@@ -813,57 +923,79 @@ function TransferRequisitionFormPage() {
               </button>
             </div>
 
-            <div className="p-4 border-b border-slate-200 bg-slate-50/60">
-              <div className="relative">
+            <div className="p-4 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-4">
+              <div className="relative flex-1">
                 <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   value={itemSearchQuery}
                   onChange={(e) => setItemSearchQuery(e.target.value)}
-                  placeholder="Search item by name, code, specification, brand, origin..."
+                  placeholder="Search item by code, name, specification, brand, origin..."
                   className="w-full h-9 pl-9 pr-4 rounded-xl border border-slate-200 bg-white text-xs text-slate-900 focus:border-blue-500 outline-none"
                   autoFocus
                 />
               </div>
+              <div className="text-xs font-semibold text-slate-500 shrink-0">
+                Found {filteredCatalogItems.length} items
+              </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 divide-y divide-slate-100">
-              {filteredCatalogItems.map((cat) => {
-                const isAlready = items.some((i) => i.itemCode === cat.itemCode);
-                return (
-                  <div
-                    key={cat.id}
-                    className="py-3 px-2 flex items-center justify-between hover:bg-slate-50 rounded-lg transition"
-                  >
-                    <div className="space-y-1">
-                      <div className="font-bold text-xs text-slate-900">{cat.itemName}</div>
-                      <div className="text-[11px] text-slate-600">
-                        <span className="font-semibold text-slate-700">Specification:</span> {cat.specification || "Standard"}
-                      </div>
-                      <div className="text-[11px] text-slate-600 flex items-center gap-3">
-                        <span><span className="font-semibold text-slate-700">Brand:</span> {cat.brand || "—"}</span>
-                        <span>•</span>
-                        <span><span className="font-semibold text-slate-700">Origin:</span> {cat.origin || "—"}</span>
-                        <span>•</span>
-                        <span className="font-mono text-[10px] text-slate-400">{cat.itemCode} ({cat.stockUOM})</span>
-                      </div>
-                    </div>
-                    {isAlready ? (
-                      <span className="px-2 py-1 rounded text-[11px] font-bold bg-slate-100 text-slate-400 shrink-0">
-                        Already Added
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleAddCatalogItem(cat)}
-                        className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition cursor-pointer shrink-0"
-                      >
-                        + Select
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
+            <div className="flex-1 overflow-y-auto p-4">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-100 font-semibold text-slate-700 text-[11px]">
+                    <th className="py-2.5 px-3 w-28">Code</th>
+                    <th className="py-2.5 px-3 min-w-[200px]">Item</th>
+                    <th className="py-2.5 px-3 min-w-[220px]">Specification</th>
+                    <th className="py-2.5 px-3 w-16 text-center">UOM</th>
+                    <th className="py-2.5 px-3 w-24">Brand</th>
+                    <th className="py-2.5 px-3 w-24">Origin</th>
+                    <th className="py-2.5 px-3 w-24 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredCatalogItems.map((cat) => {
+                    const isAlready = items.some((i) => i.itemCode === cat.itemCode);
+                    return (
+                      <tr key={cat.id} className="hover:bg-slate-50/70 transition">
+                        <td className="py-2.5 px-3 font-mono font-bold text-blue-600 text-[11px]">
+                          {cat.itemCode}
+                        </td>
+                        <td className="py-2.5 px-3 font-bold text-slate-900">
+                          {cat.itemName}
+                        </td>
+                        <td className="py-2.5 px-3 text-slate-600 text-[11px]">
+                          {cat.specification || "-"}
+                        </td>
+                        <td className="py-2.5 px-3 text-center font-bold text-slate-700">
+                          {cat.stockUOM || "PCS"}
+                        </td>
+                        <td className="py-2.5 px-3 text-slate-600 text-[11px]">
+                          {cat.brand || "-"}
+                        </td>
+                        <td className="py-2.5 px-3 text-slate-600 text-[11px]">
+                          {cat.origin || "-"}
+                        </td>
+                        <td className="py-2.5 px-3 text-center">
+                          {isAlready ? (
+                            <span className="px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-400">
+                              Added
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleAddCatalogItem(cat)}
+                              className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition cursor-pointer"
+                            >
+                              + Select
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
 
             <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex justify-end">
@@ -879,12 +1011,91 @@ function TransferRequisitionFormPage() {
         </div>
       )}
 
+      {/* Approval Action Confirmation Modal */}
+      {approvalActionModal && existingReq && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck
+                  className={`size-5 ${
+                    approvalActionModal === "Approve"
+                      ? "text-emerald-600"
+                      : approvalActionModal === "Reject"
+                        ? "text-rose-600"
+                        : "text-orange-600"
+                  }`}
+                />
+                <h3 className="text-sm font-bold text-slate-900">
+                  {approvalActionModal} Transfer Requisition
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setApprovalActionModal(null)}
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4 text-xs">
+              <p className="text-slate-600 leading-relaxed">
+                You are about to <strong>{approvalActionModal.toLowerCase()}</strong> Transfer Requisition{" "}
+                <span className="font-mono font-bold text-blue-700">{existingReq.requisitionNumber}</span>.
+              </p>
+
+              <div>
+                <label className="block text-xs font-bold mb-1 text-slate-700">
+                  Remarks / Justification {approvalActionModal !== "Approve" && <span className="text-rose-500">*</span>}
+                </label>
+                <textarea
+                  rows={3}
+                  value={approvalComment}
+                  onChange={(e) => setApprovalComment(e.target.value)}
+                  placeholder={
+                    approvalActionModal === "Approve"
+                      ? "Enter approval notes (optional)..."
+                      : `Enter reason to ${approvalActionModal.toLowerCase()} this requisition...`
+                  }
+                  className="w-full p-2.5 rounded-xl border border-slate-200 bg-white text-xs resize-none outline-none focus:border-indigo-500"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setApprovalActionModal(null)}
+                className="px-4 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleExecuteApproval}
+                className={`px-5 py-1.5 rounded-lg text-white font-bold text-xs transition shadow-xs cursor-pointer ${
+                  approvalActionModal === "Approve"
+                    ? "bg-emerald-600 hover:bg-emerald-700"
+                    : approvalActionModal === "Reject"
+                      ? "bg-rose-600 hover:bg-rose-700"
+                      : "bg-orange-600 hover:bg-orange-700"
+                }`}
+              >
+                Confirm {approvalActionModal}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Standard Preview Report Modal */}
       {previewReportOpen && (
         <StandardPreviewReportModal
-          open={previewReportOpen}
-          onOpenChange={setPreviewReportOpen}
-          reportData={previewReportData}
+          isOpen={previewReportOpen}
+          onClose={() => setPreviewReportOpen(false)}
+          data={previewReportData}
         />
       )}
     </div>

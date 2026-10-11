@@ -1641,6 +1641,8 @@ export interface CSItemQuote {
   quantity: number;
   estimatedUnitPrice: number;
   estimatedTotalPrice: number;
+  targetPrice?: number;
+  estimatedPrice?: number;
   prId?: string;
   prNumber?: string;
   assignedSupplierId?: string;

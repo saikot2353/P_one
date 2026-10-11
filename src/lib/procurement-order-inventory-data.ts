@@ -226,7 +226,10 @@ export interface SupplierBillItem {
   currentBillQty: number;
   unitPrice: number;
   discount: number;
+  vatRate?: number;
   vatAmount: number;
+  taxRate?: number;
+  taxAmount?: number;
   lineAmount: number;
 }
 
@@ -994,14 +997,15 @@ export const DEFAULT_SUPPLIER_BILLS: SupplierBill[] = [
     subtotal: 457500,
     discount: 5000,
     vat: 22625,
-    otherCharges: 1500,
+    tax: 13110,
+    otherCharges: 0,
     adjustment: 0,
-    netBillAmount: 476625,
+    netBillAmount: 488235,
     roundOff: 0,
     paymentStatus: "Unpaid",
     paymentDueDate: "2026-10-24",
     paidAmount: 0,
-    outstandingAmount: 476625,
+    outstandingAmount: 488235,
     approvalStatus: "Approved",
     submittedBy: "Tahmid Afsar Shapno",
     submittedDate: "2026-09-25",
@@ -1032,8 +1036,11 @@ export const DEFAULT_SUPPLIER_BILLS: SupplierBill[] = [
         currentBillQty: 5,
         unitPrice: 82000,
         discount: 4000,
+        vatRate: 5,
         vatAmount: 20300,
-        lineAmount: 426300,
+        taxRate: 3,
+        taxAmount: 12180,
+        lineAmount: 438480,
       },
       {
         id: "sbi-2",
@@ -1049,8 +1056,11 @@ export const DEFAULT_SUPPLIER_BILLS: SupplierBill[] = [
         currentBillQty: 1,
         unitPrice: 47500,
         discount: 1000,
+        vatRate: 5,
         vatAmount: 2325,
-        lineAmount: 48825,
+        taxRate: 2,
+        taxAmount: 930,
+        lineAmount: 49755,
       },
     ],
   },

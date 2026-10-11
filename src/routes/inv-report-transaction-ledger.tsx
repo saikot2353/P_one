@@ -91,7 +91,7 @@ export function ItemTransactionLedgerPage() {
 
   // Filtered dataset
   const filteredRows = useMemo(() => {
-    return INITIAL_TRANSACTION_LEDGER_DATA.filter((row) => {
+    return INITIAL_LEDGER_DATA.filter((row: TransactionLedgerRow) => {
       if (filterItem.trim() && filterItem !== "All") {
         const q = filterItem.toLowerCase().trim();
         if (!row.itemName.toLowerCase().includes(q) && !row.itemCode.toLowerCase().includes(q)) return false;
@@ -133,8 +133,8 @@ export function ItemTransactionLedgerPage() {
   ]);
 
   // Overall inflow and outflow sums
-  const totalIn = useMemo(() => filteredRows.reduce((s, r) => s + r.inQty, 0), [filteredRows]);
-  const totalOut = useMemo(() => filteredRows.reduce((s, r) => s + r.outQty, 0), [filteredRows]);
+  const totalIn = useMemo(() => filteredRows.reduce((s: number, r: TransactionLedgerRow) => s + r.inQty, 0), [filteredRows]);
+  const totalOut = useMemo(() => filteredRows.reduce((s: number, r: TransactionLedgerRow) => s + r.outQty, 0), [filteredRows]);
 
   const handleResetFilters = () => {
     setFilterItem("All");
@@ -165,7 +165,7 @@ export function ItemTransactionLedgerPage() {
       "Remarks",
     ];
 
-    const rows = filteredRows.map((r) => [
+    const rows = filteredRows.map((r: TransactionLedgerRow) => [
       r.date,
       r.transactionType,
       r.referenceNo,
@@ -200,7 +200,7 @@ export function ItemTransactionLedgerPage() {
       "Remarks",
     ];
 
-    const rows = filteredRows.map((r) => [
+    const rows = filteredRows.map((r: TransactionLedgerRow) => [
       r.date,
       r.transactionType,
       r.referenceNo,
@@ -243,7 +243,7 @@ export function ItemTransactionLedgerPage() {
       "Balance",
     ];
 
-    const tableRows = filteredRows.map((r, idx) => [
+    const tableRows = filteredRows.map((r: TransactionLedgerRow, idx: number) => [
       idx + 1,
       r.date,
       r.transactionType,
@@ -369,18 +369,35 @@ export function ItemTransactionLedgerPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
               {/* Item Search */}
               <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Item</label>
-                <input
-                  type="text"
-                  list="ledger-items-list"
-                  placeholder="Search Item..."
-                  value={filterItem === "All" ? "" : filterItem}
-                  onChange={(e) => setFilterItem(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                />
+                <div className="flex items-center justify-between">
+                  <label className="text-[10.5px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                    <Search className="size-3 text-primary" />
+                    <span>Item</span>
+                  </label>
+                  {filterItem && filterItem !== "All" && (
+                    <button
+                      type="button"
+                      onClick={() => setFilterItem("All")}
+                      className="text-[10px] text-primary hover:underline cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className="relative mt-1">
+                  <input
+                    type="text"
+                    list="ledger-items-list"
+                    placeholder="Search Item..."
+                    value={filterItem === "All" ? "" : filterItem}
+                    onChange={(e) => setFilterItem(e.target.value)}
+                    className="w-full h-8 pl-7 pr-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
+                  />
+                  <Search className="size-3.5 absolute left-2 top-2.5 text-muted-foreground pointer-events-none" />
+                </div>
                 <datalist id="ledger-items-list">
                   {items.map((i) => (
-                    <option key={i} value={i} />
+                    <option key={String(i)} value={String(i)} />
                   ))}
                 </datalist>
               </div>
@@ -395,7 +412,7 @@ export function ItemTransactionLedgerPage() {
                 >
                   <option value="All">All Stores</option>
                   {stores.map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={String(s)} value={String(s)}>{String(s)}</option>
                   ))}
                 </select>
               </div>
@@ -502,7 +519,7 @@ export function ItemTransactionLedgerPage() {
                       </td>
                     </tr>
                   ) : (
-                    filteredRows.map((row) => (
+                    filteredRows.map((row: TransactionLedgerRow) => (
                       <tr
                         key={row.id}
                         onClick={() => setSelectedTxModal(row)}

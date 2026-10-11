@@ -514,6 +514,7 @@ export function SupplierBillApprovalPage() {
                         </th>
                         <th className="py-2.5 px-3 text-right font-bold">Unit Price (৳)</th>
                         <th className="py-2.5 px-3 text-right font-bold">VAT</th>
+                        <th className="py-2.5 px-3 text-right font-bold text-amber-600">Tax</th>
                         <th className="py-2.5 px-3 text-right font-bold">Line Total (৳)</th>
                       </tr>
                     </thead>
@@ -549,6 +550,16 @@ export function SupplierBillApprovalPage() {
                           </td>
                           <td className="py-2.5 px-3 text-right font-mono text-muted-foreground">
                             ৳ {item.vatAmount.toLocaleString()}
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono">
+                            <div className="font-bold text-foreground">
+                              ৳ {(item.taxAmount ?? Math.round(((item.currentBillQty * item.unitPrice - item.discount) * (item.taxRate || 0)) / 100)).toLocaleString()}
+                            </div>
+                            {item.taxRate !== undefined && item.taxRate > 0 && (
+                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block">
+                                ({item.taxRate}%)
+                              </span>
+                            )}
                           </td>
                           <td className="py-2.5 px-3 text-right font-mono font-bold text-foreground">
                             ৳ {item.lineAmount.toLocaleString()}

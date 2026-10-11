@@ -288,10 +288,6 @@ export const nav: NavItem[] = [
         to: "/inv-report-transaction-ledger",
       },
       {
-        label: "Item Movement Register",
-        to: "/inv-report-item-movement",
-      },
-      {
         label: "Batch Stock Register",
         to: "/inv-report-batch-stock",
       },
