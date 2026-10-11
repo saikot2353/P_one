@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useState, useMemo, useEffect } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { InventorySidebar } from "@/components/dashboard/InventorySidebar";
 import { InventoryTopbar } from "@/components/dashboard/InventoryTopbar";
 import {
@@ -10,10 +10,10 @@ import {
   Filter,
   Eye,
   RotateCcw,
-  RotateLeft,
   Calendar,
   X,
   Building2,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -42,7 +42,10 @@ export const Route = createFileRoute("/inv-report-monthly-supplier-return")({
 });
 
 export function MonthWiseSupplierStockReturnReportPage() {
-  const currencyCfg = getActiveCurrencyConfig();  // Filters
+  const navigate = useNavigate();
+  const currencyCfg = getActiveCurrencyConfig();
+
+  // Filters
   const [filterCompany, setFilterCompany] = useState("All");
   const [filterStore, setFilterStore] = useState("All");
   const [filterSupplier, setFilterSupplier] = useState("All");
@@ -54,6 +57,59 @@ export function MonthWiseSupplierStockReturnReportPage() {
   const [fromMonth, setFromMonth] = useState("2026-08");
   const [toMonth, setToMonth] = useState("2026-10");
   const [searchQuery, setSearchQuery] = useState("");
+  const [returnTo, setReturnTo] = useState<string | null>(null);
+  const [drillDownInfo, setDrillDownInfo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const comp = sp.get("company") || sp.get("org");
+    const supp = sp.get("supplier");
+    const cat = sp.get("category");
+    const fromM = sp.get("fromMonth");
+    const toM = sp.get("toMonth");
+    const month = sp.get("month");
+    const ret = sp.get("returnTo");
+
+    const activeBadges: string[] = [];
+
+    if (comp && comp !== "All" && comp !== "All Organizations") {
+      setFilterCompany(comp);
+      activeBadges.push(`Org: ${comp}`);
+    }
+    if (supp && supp !== "All" && supp !== "All Suppliers") {
+      setFilterSupplier(supp);
+      activeBadges.push(`Supplier: ${supp}`);
+    }
+    if (cat && cat !== "All") {
+      setFilterItemCategory(cat);
+      activeBadges.push(`Category: ${cat}`);
+    }
+    if (fromM) setFromMonth(fromM);
+    if (toM) setToMonth(toM);
+
+    if (month) {
+      if (/^\d{4}-\d{2}$/.test(month)) {
+        setFromMonth(month);
+        setToMonth(month);
+        activeBadges.push(`Month: ${month}`);
+      } else {
+        const match = INITIAL_SUPPLIER_RETURN_REPORT_DATA.find(
+          (r) => r.month === month || r.monthLabel.toLowerCase().includes(month.toLowerCase())
+        );
+        if (match) {
+          setFromMonth(match.month);
+          setToMonth(match.month);
+          activeBadges.push(`Month: ${match.monthLabel}`);
+        }
+      }
+    }
+
+    if (ret) setReturnTo(ret);
+    if (activeBadges.length > 0) {
+      setDrillDownInfo(activeBadges.join(" • "));
+    }
+  }, []);
 
   // Modals
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
@@ -239,6 +295,37 @@ export function MonthWiseSupplierStockReturnReportPage() {
         <InventoryTopbar />
 
         <main className="flex-1 overflow-y-auto px-4 lg:px-7 py-5 space-y-4">
+          {returnTo && (
+            <div className="bg-gradient-to-r from-rose-50 via-amber-50 to-rose-50 border border-rose-200 text-rose-950 px-4 py-3 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-rose-600 text-white shadow-xs">
+                  <ArrowLeft className="size-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-rose-900">
+                      Procurement Dashboard Drill-Down
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                      Active Filter Applied
+                    </span>
+                  </div>
+                  <p className="text-xs text-rose-700 font-medium mt-0.5">
+                    {drillDownInfo ? drillDownInfo : "Detailed supplier return debit notes linked from the dashboard."}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate({ to: returnTo as any })}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer self-start sm:self-auto shrink-0"
+              >
+                <ArrowLeft className="size-3.5" /> Back to Dashboard
+              </button>
+            </div>
+          )}
+
           {/* Header & Export Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border/60">
             <div>

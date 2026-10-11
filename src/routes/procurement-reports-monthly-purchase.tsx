@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ProcurementSidebar } from "@/components/dashboard/ProcurementSidebar";
 import { ProcurementTopbar } from "@/components/dashboard/ProcurementTopbar";
@@ -19,6 +19,7 @@ import {
   Package,
   CheckCircle2,
   X,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -62,6 +63,77 @@ export function MonthWisePurchaseReportPage() {
   const [fromDate, setFromDate] = useState("2026-01-01");
   const [toDate, setToDate] = useState("2026-12-31");
   const [searchQuery, setSearchQuery] = useState("");
+  const [returnTo, setReturnTo] = useState<string | null>(null);
+  const [drillDownInfo, setDrillDownInfo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const comp = sp.get("company") || sp.get("org");
+    const supp = sp.get("supplier");
+    const cat = sp.get("category");
+    const from = sp.get("from");
+    const to = sp.get("to");
+    const month = sp.get("month");
+    const ret = sp.get("returnTo");
+
+    const activeBadges: string[] = [];
+
+    if (comp && comp !== "All" && comp !== "All Organizations") {
+      setFilterCompany(comp);
+      activeBadges.push(`Org: ${comp}`);
+    }
+    if (supp && supp !== "All" && supp !== "All Suppliers") {
+      setFilterSupplier(supp);
+      activeBadges.push(`Supplier: ${supp}`);
+    }
+    if (cat && cat !== "All") {
+      setFilterItemCategory(cat);
+      activeBadges.push(`Category: ${cat}`);
+    }
+    const itm = sp.get("item");
+    if (itm && itm !== "All") {
+      setFilterItem(itm);
+      activeBadges.push(`Item: ${itm}`);
+    }
+    const countryParam = sp.get("country") || sp.get("origin");
+    if (countryParam && countryParam !== "All") {
+      setFilterOrigin(countryParam);
+      activeBadges.push(`Country: ${countryParam}`);
+    }
+    if (from) setFromDate(from);
+    if (to) setToDate(to);
+
+    if (month) {
+      if (/^\d{4}-\d{2}$/.test(month)) {
+        const [y, m] = month.split("-").map(Number);
+        const lastDay = new Date(y, m, 0).getDate();
+        const start = `${month}-01`;
+        const end = `${month}-${String(lastDay).padStart(2, "0")}`;
+        setFromDate(start);
+        setToDate(end);
+        activeBadges.push(`Month: ${month}`);
+      } else {
+        const match = INITIAL_PURCHASE_REPORT_DATA.find(
+          (r) => r.month === month || r.monthLabel.toLowerCase().includes(month.toLowerCase())
+        );
+        if (match) {
+          const [y, m] = match.month.split("-").map(Number);
+          const lastDay = new Date(y, m, 0).getDate();
+          const start = `${match.month}-01`;
+          const end = `${match.month}-${String(lastDay).padStart(2, "0")}`;
+          setFromDate(start);
+          setToDate(end);
+          activeBadges.push(`Month: ${match.monthLabel}`);
+        }
+      }
+    }
+
+    if (ret) setReturnTo(ret);
+    if (activeBadges.length > 0) {
+      setDrillDownInfo(activeBadges.join(" • "));
+    }
+  }, []);
 
   // Pagination & Sorting
   const [currentPage, setCurrentPage] = useState(1);
@@ -366,6 +438,37 @@ export function MonthWisePurchaseReportPage() {
         <ProcurementTopbar />
 
         <main className="flex-1 overflow-y-auto px-4 lg:px-7 py-5 space-y-4">
+          {returnTo && (
+            <div className="bg-gradient-to-r from-indigo-50 via-blue-50 to-indigo-50 border border-indigo-200 text-indigo-950 px-4 py-3 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-indigo-600 text-white shadow-xs">
+                  <ArrowLeft className="size-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-900">
+                      Procurement Dashboard Drill-Down
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                      Active Filter Applied
+                    </span>
+                  </div>
+                  <p className="text-xs text-indigo-700 font-medium mt-0.5">
+                    {drillDownInfo ? drillDownInfo : "Detailed purchase transactions linked from the dashboard."}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate({ to: returnTo as any })}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer self-start sm:self-auto shrink-0"
+              >
+                <ArrowLeft className="size-3.5" /> Back to Dashboard
+              </button>
+            </div>
+          )}
+
           {/* Header & Export Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border/60">
             <div>

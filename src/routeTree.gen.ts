@@ -336,12 +336,18 @@ import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-req
 import { Route as SspSimRequisitionRouteImport } from './routes/ssp-sim-requisition'
 import { Route as SspSimRequisitionViewRouteImport } from './routes/ssp-sim-requisition-view'
 import { Route as SummarySalarySheetRouteImport } from './routes/summary-salary-sheet'
+<<<<<<< HEAD
 import { Route as SyncRequisitionRouteImport } from './routes/sync-requisition'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
 import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as WelfareVerificationRouteImport } from './routes/welfare-verification'
 import { Route as WorkFlowRouteImport } from './routes/work-flow'
 import { Route as WorkFlowsRouteImport } from './routes/work-flows'
+=======
+import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
+import { Route as UserManagementRouteImport } from './routes/user-management'
+import { Route as WelfareVerificationRouteImport } from './routes/welfare-verification'
+>>>>>>> ac85de0798961ec2abb8c517730e04c23ac406ae
 import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
 import { Route as YearlyBonusReportRouteImport } from './routes/yearly-bonus-report'
 import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
@@ -2088,11 +2094,14 @@ const SummarySalarySheetRoute = SummarySalarySheetRouteImport.update({
   path: '/summary-salary-sheet',
   getParentRoute: () => rootRouteImport,
 } as any)
+<<<<<<< HEAD
 const SyncRequisitionRoute = SyncRequisitionRouteImport.update({
   id: '/sync-requisition',
   path: '/sync-requisition',
   getParentRoute: () => rootRouteImport,
 } as any)
+=======
+>>>>>>> ac85de0798961ec2abb8c517730e04c23ac406ae
 const TransferControlCenterRoute = TransferControlCenterRouteImport.update({
   id: '/transfer-control-center',
   path: '/transfer-control-center',
@@ -2108,6 +2117,7 @@ const WelfareVerificationRoute = WelfareVerificationRouteImport.update({
   path: '/welfare-verification',
   getParentRoute: () => rootRouteImport,
 } as any)
+<<<<<<< HEAD
 const WorkFlowRoute = WorkFlowRouteImport.update({
   id: '/work-flow',
   path: '/work-flow',
@@ -2118,6 +2128,8 @@ const WorkFlowsRoute = WorkFlowsRouteImport.update({
   path: '/work-flows',
   getParentRoute: () => rootRouteImport,
 } as any)
+=======
+>>>>>>> ac85de0798961ec2abb8c517730e04c23ac406ae
 const YearlyBonusProcessRoute = YearlyBonusProcessRouteImport.update({
   id: '/yearly-bonus-process',
   path: '/yearly-bonus-process',
@@ -6859,6 +6871,7 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SummarySalarySheetRouteImport
       parentRoute: typeof rootRouteImport
     }
+<<<<<<< HEAD
     '/sync-requisition': {
       id: '/sync-requisition'
       path: '/sync-requisition'
@@ -6866,6 +6879,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SyncRequisitionRouteImport
       parentRoute: typeof rootRouteImport
     }
+=======
+>>>>>>> ac85de0798961ec2abb8c517730e04c23ac406ae
     '/transfer-control-center': {
       id: '/transfer-control-center'
       path: '/transfer-control-center'
@@ -6887,6 +6902,7 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WelfareVerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
+<<<<<<< HEAD
     '/work-flow': {
       id: '/work-flow'
       path: '/work-flow'
@@ -6901,6 +6917,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkFlowsRouteImport
       parentRoute: typeof rootRouteImport
     }
+=======
+>>>>>>> ac85de0798961ec2abb8c517730e04c23ac406ae
     '/yearly-bonus-process': {
       id: '/yearly-bonus-process'
       path: '/yearly-bonus-process'
