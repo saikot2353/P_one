@@ -2,7 +2,6 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
-<<<<<<< HEAD
     "id": "573",
     "date": "2026-10-11T13:45",
     "type": "UI Refinement",
@@ -64,7 +63,8 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     "link": "/yearly-bonus-process",
     "descriptionEn": "Enhanced the Yearly Bonus Process page: (1) Added inline editing directly in the list view for Req(%), Net Pay, and Notes with instant recalculation of Net Pay upon changing Req(%); (2) Redesigned the Bonus Process Modal to be professional and comprehensive, including festival selection, tenure cut-off date, salary basis toggle (Basic vs Gross), active tenure slab matrix preview, and animated processing feedback; (3) Added bulk actions for Req% adjustment and approval submission.",
     "descriptionBn": "ইয়ারলি বোনাস প্রসেস পেজে গুরুত্বপূর্ণ উন্নতি করা হয়েছে: (১) প্রসেসের পর লিস্ট ভিউ থেকেই সরাসরি Req(%), Net Pay এবং Notes এডিট করার সুবিধা যুক্ত করা হয়েছে, যেখানে Req(%) পরিবর্তন করলে স্বয়ংক্রিয়ভাবে Net Pay রিক্যালকুলেট হয়; (২) প্রসেস মোডালটি অত্যন্ত প্রফেশনাল ও আধুনিক করা হয়েছে যাতে ফেস্টিভাল নির্বাচন, টেনিউর কাট-অফ ডেট, বেসিক/গ্রস স্যালারি ভিত্তি নির্বাচন এবং কোম্পানির অ্যাক্টিভ স্ল্যাব প্রিভিউ যুক্ত রয়েছে; (৩) একাধিক কর্মীর বোনাস একসাথে আপডেট ও সাবমিট করার বাল্ক অ্যাকশন যোগ করা হয়েছে।"
-=======
+  },
+  {
     "id": "555",
     "date": "2026-10-11T17:45",
     "type": "Authentic Geopolitical World Map Procurement Spend Map & Interactive Geometry",
@@ -99,7 +99,6 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     "link": "/procurement-dashboard",
     "descriptionEn": "Redesigned the Procurement Management Dashboard into a clean, modern, chart-driven executive decision-making command center: (1) Dynamic Filters: Added dynamic filtering for Fiscal Period / Date Range (FY 2026, Q3-Q4, Last 6 Months, Monthly, and Custom Range), Company/Organization, Department, and Supplier/Vendor with live automatic recalculation across all visual metrics; (2) Key Metrics: Replaced redundant KPIs with 3 essential executive cards strictly displaying Total Purchase Amount, Total Supplier Bill Amount, and Total Supplier Return Amount with ratio indicators and direct report links, eliminating budget metrics, pending approvals, and pending bills; (3) Interactive Charts & Analytics: Built 6 interactive charts including Monthly Purchase Trend (with clickable month drill-down into Item-wise Purchase Report), Purchase by Category (donut chart with category drill-down), Supplier Performance (grouped bar comparing PO, Bill, and Return amounts per vendor with multi-link quick drills), Monthly Purchase vs Supplier Bill Trend (dual bar-line trend), Monthly Supplier Return Trend (area chart with month drill-down to Supplier Return Report), and Procurement Workflow Funnel (tracking volumes and values across PR, PO/WO, MRR, and Supplier Bill with stage list navigation); (4) Dynamic Management Alerts: Added compact procurement risk cards for elevated supplier return rates, spend concentration risk, invoice-to-PO variances, and high-commitment purchase orders with direct links to records; (5) End-to-End Drill-Down Integration: Implemented functional drill-downs across all chart series and workflow stages preserving dashboard filters and providing intuitive 'Back to Dashboard' return navigation across all destination reports.",
     "descriptionBn": "প্রকিউরমেন্ট ম্যানেজমেন্ট ড্যাশবোর্ডটিকে আধুনিক, চার্ট-নির্ভর এবং এক্সিকিউটিভ সিদ্ধান্ত গ্রহণের উপযোগী কমান্ড সেন্টারে রূপান্তর করা হয়েছে: (১) ডায়নামিক ফিল্টার: ফিসকাল পিরিয়ড/তারিখ রেঞ্জ (চলতি অর্থবছর, কোয়ার্টার, বিগত ৬ মাস, মাসভিত্তিক এবং কাস্টম রেঞ্জ), কোম্পানি/প্রতিষ্ঠান, বিভাগ ও সাপ্লায়ার/ভেন্ডর ফিল্টারিং যুক্ত করা হয়েছে যা পরিবর্তনের সাথে সাথে সমস্ত চার্ট ও কেপিআই স্বয়ংক্রিয়ভাবে আপডেট হয়; (২) ৩টি প্রধান কেপিআই কার্ড: অপ্রয়োজনীয় ও বাজেট/অ্যাপ্রুভাল সংক্রান্ত মেট্রিক্স বাদ দিয়ে শুধুমাত্র ৩টি প্রধান কার্ড—মোট পারচেজ অ্যামাউন্ট, মোট সাপ্লায়ার বিল অ্যামাউন্ট এবং মোট সাপ্লায়ার রিটার্ন অ্যামাউন্ট সুনির্দিষ্ট হিসাব ও রিপোর্ট লিংকসহ প্রদর্শন করা হয়েছে; (৩) ৬টি ইন্টারঅ্যাক্টিভ চার্ট: মাসিক পারচেজ ট্রেন্ড (মাস ক্লিকে পারচেজ রিপোর্টে ড্রিল-ডাউন), ক্যাটাগরিভিত্তিক পারচেজ ডোনাট চার্ট, সাপ্লায়ার পারফরম্যান্স তুলনামূলক বার চার্ট (পিও, বিল ও রিটার্ন তুলনাসহ), পারচেজ বনাম সাপ্লায়ার বিল মাসিক ট্রেন্ড, মাসিক সাপ্লায়ার রিটার্ন এরিয়া চার্ট এবং ৪-ধাপের প্রকিউরমেন্ট ওয়ার্কফ্লো প্রসেস চার্ট (পিআর, পিও, এমআরআর ও বিল); (৪) ডায়নামিক রিস্ক অ্যালার্ট: অতিরিক্ত সাপ্লায়ার রিটার্ন, একক ভেন্ডর নির্ভরতা ঝুঁকি, বিল বনাম পিও তারতম্য এবং বড় অংকের ক্রয় আদেশের জন্য সরাসরি লিংকযুক্ত অ্যালার্ট কার্ড; (৫) নির্বিঘ্ন ড্রিল-ডাউন ও রিটার্ন ব্যবস্থা: প্রতিটি চার্ট এলিমেন্ট থেকে ফিল্টার অক্ষুণ্ণ রেখে সংশ্লিষ্ট বিস্তারিত রিপোর্টে যাওয়া এবং সেখান থেকে সহজেই 'Back to Dashboard' বাটনের মাধ্যমে ফিরে আসার পূর্ণ সুবিধা নিশ্চিত করা হয়েছে।"
->>>>>>> ac85de0798961ec2abb8c517730e04c23ac406ae
   },
   {
     "id": "551",

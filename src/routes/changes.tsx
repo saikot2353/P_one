@@ -21,20 +21,12 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-<<<<<<< HEAD
-    const saved = localStorage.getItem("system_changes_v574");
-=======
-    const saved = localStorage.getItem("system_changes_v572");
->>>>>>> ac85de0798961ec2abb8c517730e04c23ac406ae
+    const saved = localStorage.getItem("system_changes_v575");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
       setRecords(DEFAULT_CHANGE_RECORDS);
-<<<<<<< HEAD
-      localStorage.setItem("system_changes_v574", JSON.stringify(DEFAULT_CHANGE_RECORDS));
-=======
-      localStorage.setItem("system_changes_v572", JSON.stringify(DEFAULT_CHANGE_RECORDS));
->>>>>>> ac85de0798961ec2abb8c517730e04c23ac406ae
+      localStorage.setItem("system_changes_v575", JSON.stringify(DEFAULT_CHANGE_RECORDS));
     }
   }, []);
 
