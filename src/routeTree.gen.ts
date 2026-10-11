@@ -13,9 +13,12 @@ import { Route as ZakatListRouteImport } from './routes/zakat-list'
 import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
 import { Route as YearlyBonusReportRouteImport } from './routes/yearly-bonus-report'
 import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
+import { Route as WorkFlowsRouteImport } from './routes/work-flows'
+import { Route as WorkFlowRouteImport } from './routes/work-flow'
 import { Route as WelfareVerificationRouteImport } from './routes/welfare-verification'
 import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
+import { Route as SyncRequisitionRouteImport } from './routes/sync-requisition'
 import { Route as SummarySalarySheetRouteImport } from './routes/summary-salary-sheet'
 import { Route as SspSimRequisitionViewRouteImport } from './routes/ssp-sim-requisition-view'
 import { Route as SspSimRequisitionRouteImport } from './routes/ssp-sim-requisition'
@@ -369,6 +372,16 @@ const YearlyBonusProcessRoute = YearlyBonusProcessRouteImport.update({
   path: '/yearly-bonus-process',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkFlowsRoute = WorkFlowsRouteImport.update({
+  id: '/work-flows',
+  path: '/work-flows',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkFlowRoute = WorkFlowRouteImport.update({
+  id: '/work-flow',
+  path: '/work-flow',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WelfareVerificationRoute = WelfareVerificationRouteImport.update({
   id: '/welfare-verification',
   path: '/welfare-verification',
@@ -382,6 +395,11 @@ const UserManagementRoute = UserManagementRouteImport.update({
 const TransferControlCenterRoute = TransferControlCenterRouteImport.update({
   id: '/transfer-control-center',
   path: '/transfer-control-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SyncRequisitionRoute = SyncRequisitionRouteImport.update({
+  id: '/sync-requisition',
+  path: '/sync-requisition',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SummarySalarySheetRoute = SummarySalarySheetRouteImport.update({
@@ -2472,9 +2490,12 @@ export interface FileRoutesByFullPath {
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
   '/summary-salary-sheet': typeof SummarySalarySheetRoute
+  '/sync-requisition': typeof SyncRequisitionRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
+  '/work-flow': typeof WorkFlowRoute
+  '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
@@ -2812,9 +2833,12 @@ export interface FileRoutesByTo {
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
   '/summary-salary-sheet': typeof SummarySalarySheetRoute
+  '/sync-requisition': typeof SyncRequisitionRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
+  '/work-flow': typeof WorkFlowRoute
+  '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
@@ -3153,9 +3177,12 @@ export interface FileRoutesById {
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
   '/summary-salary-sheet': typeof SummarySalarySheetRoute
+  '/sync-requisition': typeof SyncRequisitionRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/welfare-verification': typeof WelfareVerificationRoute
+  '/work-flow': typeof WorkFlowRoute
+  '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
@@ -3495,9 +3522,12 @@ export interface FileRouteTypes {
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
     | '/summary-salary-sheet'
+    | '/sync-requisition'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
+    | '/work-flow'
+    | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
@@ -3835,9 +3865,12 @@ export interface FileRouteTypes {
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
     | '/summary-salary-sheet'
+    | '/sync-requisition'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
+    | '/work-flow'
+    | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
@@ -4175,9 +4208,12 @@ export interface FileRouteTypes {
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
     | '/summary-salary-sheet'
+    | '/sync-requisition'
     | '/transfer-control-center'
     | '/user-management'
     | '/welfare-verification'
+    | '/work-flow'
+    | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
@@ -4516,9 +4552,12 @@ export interface RootRouteChildren {
   SspSimRequisitionRoute: typeof SspSimRequisitionRoute
   SspSimRequisitionViewRoute: typeof SspSimRequisitionViewRoute
   SummarySalarySheetRoute: typeof SummarySalarySheetRoute
+  SyncRequisitionRoute: typeof SyncRequisitionRoute
   TransferControlCenterRoute: typeof TransferControlCenterRoute
   UserManagementRoute: typeof UserManagementRoute
   WelfareVerificationRoute: typeof WelfareVerificationRoute
+  WorkFlowRoute: typeof WorkFlowRoute
+  WorkFlowsRoute: typeof WorkFlowsRoute
   YearlyBonusProcessRoute: typeof YearlyBonusProcessRoute
   YearlyBonusReportRoute: typeof YearlyBonusReportRoute
   ZakatBudgetConfigurationRoute: typeof ZakatBudgetConfigurationRoute
@@ -4559,6 +4598,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof YearlyBonusProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/work-flows': {
+      id: '/work-flows'
+      path: '/work-flows'
+      fullPath: '/work-flows'
+      preLoaderRoute: typeof WorkFlowsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/work-flow': {
+      id: '/work-flow'
+      path: '/work-flow'
+      fullPath: '/work-flow'
+      preLoaderRoute: typeof WorkFlowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/welfare-verification': {
       id: '/welfare-verification'
       path: '/welfare-verification'
@@ -4578,6 +4631,13 @@ declare module '@tanstack/react-router' {
       path: '/transfer-control-center'
       fullPath: '/transfer-control-center'
       preLoaderRoute: typeof TransferControlCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sync-requisition': {
+      id: '/sync-requisition'
+      path: '/sync-requisition'
+      fullPath: '/sync-requisition'
+      preLoaderRoute: typeof SyncRequisitionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/summary-salary-sheet': {
@@ -7240,9 +7300,12 @@ const rootRouteChildren: RootRouteChildren = {
   SspSimRequisitionRoute: SspSimRequisitionRoute,
   SspSimRequisitionViewRoute: SspSimRequisitionViewRoute,
   SummarySalarySheetRoute: SummarySalarySheetRoute,
+  SyncRequisitionRoute: SyncRequisitionRoute,
   TransferControlCenterRoute: TransferControlCenterRoute,
   UserManagementRoute: UserManagementRoute,
   WelfareVerificationRoute: WelfareVerificationRoute,
+  WorkFlowRoute: WorkFlowRoute,
+  WorkFlowsRoute: WorkFlowsRoute,
   YearlyBonusProcessRoute: YearlyBonusProcessRoute,
   YearlyBonusReportRoute: YearlyBonusReportRoute,
   ZakatBudgetConfigurationRoute: ZakatBudgetConfigurationRoute,

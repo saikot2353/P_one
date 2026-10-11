@@ -112,6 +112,8 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "All Approvals", to: "/all-approvals" },
       { label: "All Pending Approval List", to: "/pending-approvals", count: 5 },
+      { label: "Work Flow", to: "/work-flows", count: 6 },
+      { label: "Sync Requisition", to: "/sync-requisition" },
       {
         label: "HR Approvals",
         count: 28,
