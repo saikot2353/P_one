@@ -1256,7 +1256,7 @@ function InventoryConfigurationPage() {
                             const isGrpSelected = selectedGroupId === grp.id && !selectedSubGroupTreeId;
                             const grpItemCount = items.filter((it) => {
                               const sg = itemSubGroups.find((s) => s.id === it.subGroupId);
-                              return it.groupId === grp.id || sg?.itemGroupId === grp.id;
+                              return (it.itemGroupId || it.groupId) === grp.id || sg?.itemGroupId === grp.id;
                             }).length;
 
                             return (
@@ -1402,7 +1402,7 @@ function InventoryConfigurationPage() {
                           {(() => {
                             const subGroupItems = items.filter((it) => {
                               const matchesGroup = selectedGroupId
-                                ? it.groupId === selectedGroupId ||
+                                ? (it.itemGroupId || it.groupId) === selectedGroupId ||
                                   itemSubGroups.find((s) => s.id === it.subGroupId)?.itemGroupId === selectedGroupId
                                 : true;
                               const matchesSub = selectedSubGroupTreeId ? it.subGroupId === selectedSubGroupTreeId : true;

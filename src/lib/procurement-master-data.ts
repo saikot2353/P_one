@@ -329,6 +329,7 @@ export interface ItemProductMaster {
   itemCode: string;
   itemName: string;
   itemGroupId?: string;
+  groupId?: string;
   itemGroupName?: string;
   subGroupId?: string;
   subGroupName?: string;

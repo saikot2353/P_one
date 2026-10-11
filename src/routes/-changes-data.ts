@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "551",
+    "date": "2026-10-11T10:25",
+    "type": "TypeScript Compilation and Interface Consistency Fixes",
+    "module": "Procurement & Inventory Management / Master Data, Configuration & CS",
+    "link": "/procurement-master-data",
+    "descriptionEn": "Resolved TypeScript typing and reference errors across Inventory and Procurement modules: (1) Added optional groupId to ItemProductMaster interface and updated Item Group filters in Inventory Configuration (/inventory-configuration) to support both itemGroupId and groupId; (2) Added optional targetPrice and estimatedPrice fields to CSItemQuote interface and provided fallback to estimatedUnitPrice in Comparative Statement (/procurement-comparative-statement) purchase history calculation and rate display modal; (3) Added handleOpenAddChildSubGroup and handleOpenCreateItem tree action handlers in Procurement Master Data (/procurement-master-data) to ensure sub-group tree child additions and item creations trigger reliably.",
+    "descriptionBn": "ইনভেনটরি এবং প্রকিউরমেন্ট মডিউলের টাইপস্ক্রিপ্ট কম্পাইলেশন ও ইন্টারফেস সংক্রান্ত ত্রুটি সমাধান করা হয়েছে: (১) ItemProductMaster ইন্টারফেসে groupId যোগ এবং ইনভেনটরি কনফিগারেশন পেজে আইটেম গ্রুপ ফিল্টারিংয়ে itemGroupId ও groupId উভয়ের সাপোর্ট নিশ্চিত করা হয়েছে; (২) CSItemQuote ইন্টারফেসে targetPrice ও estimatedPrice যোগ এবং কম্প্যারেটিভ স্টেটমেন্ট পেজে দর ইতিহাস ও মডালে estimatedUnitPrice এর ব্যাকওয়ার্ড সাপোর্ট নিশ্চিত করা হয়েছে; (৩) প্রকিউরমেন্ট মাস্টার ডাটা পেজে সাব-গ্রুপ ট্রি থেকে চাইল্ড সাব-গ্রুপ ও সরাসরি আইটেম তৈরির জন্য handleOpenAddChildSubGroup ও handleOpenCreateItem হ্যান্ডলার সঠিকভাবে সংযুক্ত করা হয়েছে।"
+  },
+  {
     "id": "550",
     "date": "2026-10-08T10:30",
     "type": "Procurement & Inventory Management Workflow Fixes & Feature Enhancements",

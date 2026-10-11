@@ -44,7 +44,7 @@ import {
 } from "lucide-react";
 
 function getItemPurchaseHistory(item: CSItemQuote) {
-  const basePrice = item.targetPrice || item.estimatedPrice || 350;
+  const basePrice = item.targetPrice || item.estimatedPrice || item.estimatedUnitPrice || 350;
   return [
     {
       poNumber: "PO-2026-0042",
@@ -2658,10 +2658,10 @@ export default function ComparativeStatementPage() {
                     <span className="text-slate-500">Current Required Qty:</span>{" "}
                     <span className="font-bold text-slate-800">{historyModalItem.quantity} {historyModalItem.uom}</span>
                   </div>
-                  {historyModalItem.targetPrice ? (
+                  {(historyModalItem.targetPrice ?? historyModalItem.estimatedUnitPrice) ? (
                     <div>
                       <span className="text-slate-500">Target / Budget Rate:</span>{" "}
-                      <span className="font-bold text-indigo-600">৳ {historyModalItem.targetPrice.toLocaleString()}</span>
+                      <span className="font-bold text-indigo-600">৳ {(historyModalItem.targetPrice ?? historyModalItem.estimatedUnitPrice ?? 0).toLocaleString()}</span>
                     </div>
                   ) : null}
                 </div>

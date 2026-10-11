@@ -828,6 +828,10 @@ function ProcurementMasterDataPage() {
     setPageMode("create");
   };
 
+  const handleOpenCreateItem = (node: ItemSubGroup) => {
+    handleOpenCreateItemForSubGroup(node);
+  };
+
   // Sub Group modal handling (Add/Edit tree node)
   const handleOpenAddSubGroupChild = (parentSubId: string, parentGroupId: string) => {
     setSubGroupModalMode("create");
@@ -841,6 +845,10 @@ function ProcurementMasterDataPage() {
     });
     setSubGroupFormErrors({});
     setIsSubGroupModalOpen(true);
+  };
+
+  const handleOpenAddChildSubGroup = (node: ItemSubGroup) => {
+    handleOpenAddSubGroupChild(node.id, node.itemGroupId);
   };
 
   const handleOpenAddRootSubGroup = () => {
