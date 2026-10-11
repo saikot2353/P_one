@@ -456,10 +456,12 @@ export interface Currency {
   exchangeRate: number;
   rateDate: string;
   baseCurrency: boolean;
+  isBaseCurrency?: boolean;
   subUnit?: string;
   amountFormat?: string;
   status: "Active" | "Inactive";
 }
+export type CurrencyMaster = Currency;
 
 // -------------------------------------------------------------
 // Form 16: Budget Management
