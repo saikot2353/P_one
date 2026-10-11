@@ -185,6 +185,7 @@ export interface MaterialReceive {
   supplierId: string;
   supplierName: string;
   supplierCode?: string;
+  company?: string;
   department: string;
   warehouseStore: string;
   receiveLocation?: string;
@@ -202,6 +203,7 @@ export interface MaterialReceive {
   totalAcceptedQty: number;
   totalRejectedQty: number;
   totalAmount: number;
+  grandTotal?: number;
   // Status & Attachments
   receiveStatus: ReceiveStatus;
   attachments?: { name: string; url?: string; size?: string }[];

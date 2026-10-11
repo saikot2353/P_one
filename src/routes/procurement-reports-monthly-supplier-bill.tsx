@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ProcurementSidebar } from "@/components/dashboard/ProcurementSidebar";
 import { ProcurementTopbar } from "@/components/dashboard/ProcurementTopbar";
@@ -15,6 +15,7 @@ import {
   X,
   CreditCard,
   Building2,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -55,6 +56,54 @@ export function MonthWiseSupplierBillReportPage() {
   const [fromMonth, setFromMonth] = useState("2026-01");
   const [toMonth, setToMonth] = useState("2026-12");
   const [searchQuery, setSearchQuery] = useState("");
+  const [returnTo, setReturnTo] = useState<string | null>(null);
+  const [drillDownInfo, setDrillDownInfo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const comp = sp.get("company") || sp.get("org");
+    const supp = sp.get("supplier");
+    const fromM = sp.get("fromMonth");
+    const toM = sp.get("toMonth");
+    const month = sp.get("month");
+    const ret = sp.get("returnTo");
+
+    const activeBadges: string[] = [];
+
+    if (comp && comp !== "All" && comp !== "All Organizations") {
+      setFilterCompany(comp);
+      activeBadges.push(`Org: ${comp}`);
+    }
+    if (supp && supp !== "All" && supp !== "All Suppliers") {
+      setFilterSupplier(supp);
+      activeBadges.push(`Supplier: ${supp}`);
+    }
+    if (fromM) setFromMonth(fromM);
+    if (toM) setToMonth(toM);
+
+    if (month) {
+      if (/^\d{4}-\d{2}$/.test(month)) {
+        setFromMonth(month);
+        setToMonth(month);
+        activeBadges.push(`Month: ${month}`);
+      } else {
+        const match = INITIAL_SUPPLIER_BILL_REPORT_DATA.find(
+          (r) => r.month === month || r.monthLabel.toLowerCase().includes(month.toLowerCase())
+        );
+        if (match) {
+          setFromMonth(match.month);
+          setToMonth(match.month);
+          activeBadges.push(`Month: ${match.monthLabel}`);
+        }
+      }
+    }
+
+    if (ret) setReturnTo(ret);
+    if (activeBadges.length > 0) {
+      setDrillDownInfo(activeBadges.join(" • "));
+    }
+  }, []);
 
   // Modals
   const [selectedBillModal, setSelectedBillModal] = useState<SupplierBillReportRow | null>(null);
@@ -315,6 +364,37 @@ export function MonthWiseSupplierBillReportPage() {
         <ProcurementTopbar />
 
         <main className="flex-1 overflow-y-auto px-4 lg:px-7 py-5 space-y-4">
+          {returnTo && (
+            <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border border-blue-200 text-blue-950 px-4 py-3 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-blue-600 text-white shadow-xs">
+                  <ArrowLeft className="size-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-900">
+                      Procurement Dashboard Drill-Down
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                      Active Filter Applied
+                    </span>
+                  </div>
+                  <p className="text-xs text-blue-700 font-medium mt-0.5">
+                    {drillDownInfo ? drillDownInfo : "Detailed supplier bill invoices linked from the dashboard."}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate({ to: returnTo as any })}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer self-start sm:self-auto shrink-0"
+              >
+                <ArrowLeft className="size-3.5" /> Back to Dashboard
+              </button>
+            </div>
+          )}
+
           {/* Header & Export Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border/60">
             <div>

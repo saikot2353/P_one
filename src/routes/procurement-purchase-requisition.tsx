@@ -59,6 +59,7 @@ import { employeesData } from "@/routes/personnel-list";
 interface PRSearch {
   action?: "list" | "create" | "edit" | "view";
   id?: string;
+  returnTo?: string;
 }
 
 export const Route = createFileRoute("/procurement-purchase-requisition")({
@@ -66,6 +67,7 @@ export const Route = createFileRoute("/procurement-purchase-requisition")({
     return {
       action: search.action as any,
       id: search.id as string | undefined,
+      returnTo: search.returnTo as string | undefined,
     };
   },
   head: () => ({
@@ -578,6 +580,37 @@ function PurchaseRequisitionPage() {
         <ProcurementTopbar />
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-6">
+          {searchParams.returnTo && (
+            <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200 text-amber-950 px-4 py-3 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-amber-600 text-white shadow-xs">
+                  <ArrowLeft className="size-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-900">
+                      Procurement Dashboard Drill-Down
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                      Stage: Purchase Requisition (PR)
+                    </span>
+                  </div>
+                  <p className="text-xs text-amber-700 font-medium mt-0.5">
+                    Viewing purchase requisitions from the Procurement Workflow.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate({ to: searchParams.returnTo as any })}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer self-start sm:self-auto shrink-0"
+              >
+                <ArrowLeft className="size-3.5" /> Back to Dashboard
+              </button>
+            </div>
+          )}
+
           {/* Header Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-card p-4 rounded-2xl border border-border/80 shadow-2xs">
             <div className="flex items-center gap-3">

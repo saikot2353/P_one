@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ProcurementSidebar } from "@/components/dashboard/ProcurementSidebar";
 import { ProcurementTopbar } from "@/components/dashboard/ProcurementTopbar";
@@ -22,6 +22,7 @@ import {
   Clock,
   RotateCcw,
   XCircle,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -64,6 +65,38 @@ export function PurchaseOrderListPage() {
   const [filterDocType, setFilterDocType] = useState("All");
   const [filterMethod, setFilterMethod] = useState("All");
   const [filterPaymentMode, setFilterPaymentMode] = useState("All");
+  const [returnTo, setReturnTo] = useState<string | null>(null);
+  const [drillDownInfo, setDrillDownInfo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const supp = sp.get("supplier");
+    const statusParam = sp.get("status");
+    const q = sp.get("search");
+    const ret = sp.get("returnTo");
+
+    const badges: string[] = [];
+
+    if (supp && supp !== "All" && supp !== "All Suppliers") {
+      setSearchQuery(supp);
+      badges.push(`Supplier: ${supp}`);
+    } else if (q) {
+      setSearchQuery(q);
+      badges.push(`Search: ${q}`);
+    }
+
+    if (statusParam && statusParam !== "All") {
+      setFilterStatus(statusParam);
+      badges.push(`Status: ${statusParam}`);
+    }
+
+    if (badges.length > 0) {
+      setDrillDownInfo(badges.join(" • "));
+    }
+
+    if (ret) setReturnTo(ret);
+  }, []);
 
   // Document Viewer Modal State
   const [viewingPo, setViewingPo] = useState<PurchaseOrder | null>(null);
@@ -221,6 +254,37 @@ export function PurchaseOrderListPage() {
         <ProcurementTopbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-5 w-full max-w-[1600px] mx-auto">
+          {returnTo && (
+            <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border border-blue-200 text-blue-950 px-4 py-3 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-blue-600 text-white shadow-xs">
+                  <ArrowLeft className="size-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-900">
+                      Procurement Dashboard Drill-Down
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                      Stage: Purchase Order / Work Order
+                    </span>
+                  </div>
+                  <p className="text-xs text-blue-700 font-medium mt-0.5">
+                    {drillDownInfo ? drillDownInfo : "Viewing purchase order transactions from the Procurement Workflow."}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate({ to: returnTo as any })}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer self-start sm:self-auto shrink-0"
+              >
+                <ArrowLeft className="size-3.5" /> Back to Dashboard
+              </button>
+            </div>
+          )}
+
           {/* Breadcrumb Header Bar */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-card p-4 rounded-2xl border border-border shadow-2xs">
             <div>
