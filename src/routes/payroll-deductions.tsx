@@ -36,7 +36,13 @@ import {
   Copy,
   Moon,
   ArrowRight,
-  UserCheck
+  UserCheck,
+  Utensils,
+  UploadCloud,
+  Check,
+  CheckSquare,
+  Square,
+  Users2
 } from "lucide-react";
 
 // Define Deduction Template Interface
@@ -59,6 +65,11 @@ interface DeductionTemplate {
   prorataDateThreshold: number; // joining day threshold (e.g. 10th)
   prorataReductionType: "percent" | "flat"; // discount type: percentage or fixed flat Tk
   prorataReductionValue: number; // discount value (e.g. 50% or 500 Tk flat discount)
+  // Smart Lunch Engine Extensions
+  billingMode?: "prepaid" | "postpaid"; // Prepaid (next month upfront) vs Postpaid
+  newJoinerCatchupEnabled?: boolean; // If prepaid: charge current month prorated arrear + next month full advance
+  religionExemptions?: ("Muslim" | "Hindu" | "Christian" | "Buddhist" | "Other")[]; // Exclude specific religions during seasonal periods (e.g. Muslims in Ramadan)
+  optInRequired?: boolean; // If true, only employees with lunch subscription active get charged (defaults to 0 for non-consumers)
 }
 
 export const Route = createFileRoute("/payroll-deductions")({
@@ -96,13 +107,21 @@ const checkDeductionStatus = (
   year: number,
   monthStr: string,
   designatedRamadanMonth?: string,
-  empId?: string
+  empInput?: EmployeeRecord | string
 ): { isSkipped: boolean; reason?: string } => {
   if (template.status === "Inactive") {
     return { isSkipped: true, reason: "Inactive Template" };
   }
 
-  // 1. Employee-specific override exclusions (Checked first)
+  const emp = typeof empInput === "object" ? empInput : empInput ? MOCK_EMPLOYEES.find(e => e.empId === empInput) : undefined;
+  const empId = typeof empInput === "string" ? empInput : empInput?.empId;
+
+  // 0. High Volume Lunch Opt-In Verification (Case 3)
+  if (template.optInRequired && emp && emp.lunchAvailed === false) {
+    return { isSkipped: true, reason: "Not enrolled in Canteen (Opted Out / No Lunch)" };
+  }
+
+  // 1. Employee-specific override exclusions (Checked next)
   if (empId && template.employeeExclusions) {
     const empExcl = template.employeeExclusions.find(x => x.empId === empId);
     if (empExcl) {
@@ -123,9 +142,20 @@ const checkDeductionStatus = (
   }
 
   // 3. Monthly recurring rules evaluation
-  // A. Configured designated Ramadan Month override
-  if (template.excludeRamadan && designatedRamadanMonth === monthStr) {
-    return { isSkipped: true, reason: `Ramadan Exception Designated Month (${monthStr})` };
+  // A. Configured designated Ramadan Month override with Religion Exemption (Case 2)
+  if (designatedRamadanMonth === monthStr) {
+    if (template.excludeRamadan) {
+      // If religion exemptions are defined, only exempt listed religions (e.g. Muslims)
+      if (template.religionExemptions && template.religionExemptions.length > 0) {
+        if (emp && template.religionExemptions.includes(emp.religion)) {
+          return { isSkipped: true, reason: `Ramadan Exemption (${emp.religion} Staff Fasting/Canteen Closed)` };
+        }
+        // If not in exemption list (e.g. Hindu/Christian employee), do NOT skip!
+      } else {
+        // Universal Ramadan skip
+        return { isSkipped: true, reason: `Ramadan Exception Designated Month (${monthStr})` };
+      }
+    }
   }
 
   // B. Specific calendar month of year exclusion
@@ -145,25 +175,30 @@ const checkDeductionStatus = (
   return { isSkipped: false };
 };
 
-// Mock Employee DB with standardized early/late joining dates for testing
+// Mock Employee DB with standardized early/late joining dates and religion for smart testing
 interface EmployeeRecord {
   id: number;
   empId: string;
   name: string;
+  religion: "Muslim" | "Hindu" | "Christian" | "Buddhist" | "Other";
   empType: string;
   department: string;
   designation: string;
   basic: number;
   gross: number;
   joinDate: string; // Standard joining date
+  lunchAvailed?: boolean; // Lunch subscription opt-in (true = takes lunch, false = opted-out)
 }
 
 const MOCK_EMPLOYEES: EmployeeRecord[] = [
-  { id: 1, empId: "2025057068", name: "Riazul Islam", empType: "Office Executive", department: "Accounts & Vat", designation: "Asst. Manager", basic: 42000, gross: 70000, joinDate: "01/08/2023" },
-  { id: 2, empId: "2023046001", name: "Sohanur Rahman Sohan", empType: "Office Executive", department: "Admin", designation: "Executive", basic: 30000, gross: 50000, joinDate: "15/02/2023" },
-  { id: 3, empId: "2023043021", name: "Easin Mia", empType: "Office Executive", department: "Admin", designation: "Receptionist", basic: 15000, gross: 25000, joinDate: "05/07/2026" }, // early joiner
-  { id: 4, empId: "2026059411", name: "Jannatul Maowa", empType: "Office Executive", department: "Admin", designation: "Jr. Executive", basic: 18000, gross: 30000, joinDate: "15/07/2026" }, // late joiner (>10th)
-  { id: 5, empId: "2024049326", name: "Hanif Uddin", empType: "Office Executive", department: "APPS Team", designation: "Sr. Executive", basic: 36000, gross: 60000, joinDate: "10/11/2024" }
+  { id: 1, empId: "2025057068", name: "Riazul Islam", religion: "Muslim", empType: "Office Executive", department: "Accounts & Vat", designation: "Asst. Manager", basic: 42000, gross: 70000, joinDate: "01/08/2023", lunchAvailed: true },
+  { id: 2, empId: "2023046001", name: "Sohanur Rahman Sohan", religion: "Muslim", empType: "Office Executive", department: "Admin", designation: "Executive", basic: 30000, gross: 50000, joinDate: "15/02/2023", lunchAvailed: true },
+  { id: 3, empId: "2023043021", name: "Easin Mia", religion: "Muslim", empType: "Office Executive", department: "Admin", designation: "Receptionist", basic: 15000, gross: 25000, joinDate: "05/07/2026", lunchAvailed: true }, // new joiner <= 10th
+  { id: 4, empId: "2026059411", name: "Jannatul Maowa", religion: "Muslim", empType: "Office Executive", department: "Admin", designation: "Jr. Executive", basic: 18000, gross: 30000, joinDate: "15/07/2026", lunchAvailed: true }, // new joiner > 10th
+  { id: 5, empId: "2024049326", name: "Hanif Uddin", religion: "Muslim", empType: "Office Executive", department: "APPS Team", designation: "Sr. Executive", basic: 36000, gross: 60000, joinDate: "10/11/2024", lunchAvailed: false }, // 60% non-consumer (opted out)
+  { id: 6, empId: "2022035599", name: "Dipon Saha", religion: "Hindu", empType: "Office Executive", department: "Business Automation", designation: "Manager", basic: 40200, gross: 67000, joinDate: "07/05/2022", lunchAvailed: true }, // Hindu employee (eats during Ramadan)
+  { id: 7, empId: "2024052410", name: "Dipan Kumar Kundu", religion: "Hindu", empType: "Office Executive", department: "Core Development", designation: "Sr. Executive", basic: 24600, gross: 41000, joinDate: "18/07/2026", lunchAvailed: true }, // Hindu new joiner > 10th
+  { id: 8, empId: "2025057067", name: "Sunit Corneleous Sarker", religion: "Christian", empType: "Office Executive", department: "Business Automation", designation: "Executive", basic: 18000, gross: 30000, joinDate: "01/10/2025", lunchAvailed: false } // Non-consumer (opted out)
 ];
 
 // Helper to evaluate final monetary value based on calculation type
@@ -176,6 +211,92 @@ const getEvaluatedAmount = (amount: string, amountType: "flat" | "percent-basic"
     return Math.round((numericVal / 100) * gross);
   }
   return numericVal;
+};
+
+// Smart Deduction Calculator with Prepaid Joining Catch-up (Case 1) and Ramadan logic (Case 2 & 3)
+export interface SmartCalculationResult {
+  finalAmount: number;
+  isSkipped: boolean;
+  skipReason?: string;
+  isProrated: boolean;
+  isPrepaidCatchup: boolean;
+  calculationBreakdown: string;
+}
+
+const evaluateSmartDeduction = (
+  template: DeductionTemplate,
+  emp: EmployeeRecord,
+  year: number,
+  monthStr: string,
+  designatedRamadanMonth?: string
+): SmartCalculationResult => {
+  const statusRes = checkDeductionStatus(template, year, monthStr, designatedRamadanMonth, emp);
+  if (statusRes.isSkipped) {
+    return {
+      finalAmount: 0,
+      isSkipped: true,
+      skipReason: statusRes.reason,
+      isProrated: false,
+      isPrepaidCatchup: false,
+      calculationBreakdown: statusRes.reason || "Skipped"
+    };
+  }
+
+  const baseRate = getEvaluatedAmount(template.amount, template.amountType, emp.basic, emp.gross);
+  const checkJoin = isJoiningMonth(emp.joinDate, year, monthStr);
+
+  // Case 1: Prepaid Mode + New Joiner Catch-up
+  if (template.billingMode === "prepaid" && template.newJoinerCatchupEnabled && checkJoin.matches) {
+    const isLate = checkJoin.joinDay > (template.prorataDateThreshold || 10);
+    // Prorated current month arrear
+    let currentMonthArrear = baseRate;
+    if (isLate) {
+      if (template.prorataReductionType === "percent") {
+        const factor = (100 - (template.prorataReductionValue || 50)) / 100;
+        currentMonthArrear = Math.round(baseRate * factor);
+      } else {
+        currentMonthArrear = Math.max(0, baseRate - (template.prorataReductionValue || 500));
+      }
+    }
+    const nextMonthAdvance = baseRate;
+    const totalCatchup = currentMonthArrear + nextMonthAdvance;
+
+    return {
+      finalAmount: totalCatchup,
+      isSkipped: false,
+      isProrated: isLate,
+      isPrepaidCatchup: true,
+      calculationBreakdown: isLate
+        ? `1st Mo Arrear: ৳${currentMonthArrear.toLocaleString()} (Prorated >${template.prorataDateThreshold}th) + Next Mo Adv: ৳${nextMonthAdvance.toLocaleString()} = ৳${totalCatchup.toLocaleString()}`
+        : `1st Mo Arrear: ৳${currentMonthArrear.toLocaleString()} (Full) + Next Mo Adv: ৳${nextMonthAdvance.toLocaleString()} = ৳${totalCatchup.toLocaleString()}`
+    };
+  }
+
+  // Standard Pro-rata rule for postpaid or regular templates
+  if (template.prorataEnabled && checkJoin.matches && checkJoin.joinDay > (template.prorataDateThreshold || 10)) {
+    let proratedAmt = baseRate;
+    if (template.prorataReductionType === "percent") {
+      const factor = (100 - (template.prorataReductionValue || 50)) / 100;
+      proratedAmt = Math.round(baseRate * factor);
+    } else {
+      proratedAmt = Math.max(0, baseRate - (template.prorataReductionValue || 500));
+    }
+    return {
+      finalAmount: proratedAmt,
+      isSkipped: false,
+      isProrated: true,
+      isPrepaidCatchup: false,
+      calculationBreakdown: `Pro-rated joined on ${emp.joinDate} (-${template.prorataReductionType === "percent" ? `${template.prorataReductionValue}%` : `৳${template.prorataReductionValue}`})`
+    };
+  }
+
+  return {
+    finalAmount: baseRate,
+    isSkipped: false,
+    isProrated: false,
+    isPrepaidCatchup: false,
+    calculationBreakdown: `Regular Rate: ৳${baseRate.toLocaleString()}`
+  };
 };
 
 // Default Templates Data
@@ -200,14 +321,15 @@ const DEFAULT_TEMPLATES: DeductionTemplate[] = [
   },
   {
     id: 2,
-    name: "Lunch Deduction",
+    name: "Lunch Deduction (Prepaid Canteen)",
     type: "Lunch Deduction",
-    amount: "1200",
+    amount: "1000",
     amountType: "flat",
     targetGroup: "All Staff",
     status: "Active" as "Active",
     recurrence: "monthly",
     excludeRamadan: true, // skipped during Ramadan
+    religionExemptions: ["Muslim"], // Only Muslim staff are exempted during Ramadan; Hindu/other staff continue canteen billing
     excludedMonths: [],
     customExcludedPeriods: [],
     employeeExclusions: [
@@ -216,7 +338,10 @@ const DEFAULT_TEMPLATES: DeductionTemplate[] = [
     prorataEnabled: true, // Pro-rata enabled for late joiners
     prorataDateThreshold: 10, // Joined after 10th gets half deduction
     prorataReductionType: "percent",
-    prorataReductionValue: 50
+    prorataReductionValue: 50,
+    billingMode: "prepaid", // Prepaid: 1st month pays current prorata + next month advance
+    newJoinerCatchupEnabled: true, // New joiner catch-up rule enabled
+    optInRequired: true // High volume opt-in: only employees enrolled (lunchAvailed = true) are charged
   },
   {
     id: 3,
@@ -316,6 +441,20 @@ function PayrollDeductionsPage() {
   const [formProrataReductionType, setFormProrataReductionType] = useState<"percent" | "flat">("percent");
   const [formProrataReductionValue, setFormProrataReductionValue] = useState("50");
 
+  // Case 1, 2, 3 Smart Canteen & Billing Engine States
+  const [formBillingMode, setFormBillingMode] = useState<"postpaid" | "prepaid">("postpaid");
+  const [formNewJoinerCatchupEnabled, setFormNewJoinerCatchupEnabled] = useState(false);
+  const [formReligionExemptions, setFormReligionExemptions] = useState<("Muslim" | "Hindu" | "Christian" | "Buddhist" | "Other")[]>(["Muslim"]);
+  const [formOptInRequired, setFormOptInRequired] = useState(false);
+
+  // Dynamic Canteen Roster state (Case 3: High Volume Management)
+  const [employeeRecords, setEmployeeRecords] = useState<EmployeeRecord[]>(MOCK_EMPLOYEES);
+  const [isCanteenSyncModalOpen, setIsCanteenSyncModalOpen] = useState(false);
+  const [canteenSearchQuery, setCanteenSearchQuery] = useState("");
+  const [canteenFilterDepartment, setCanteenFilterDepartment] = useState("ALL");
+  const [canteenFilterStatus, setCanteenFilterStatus] = useState<"all" | "availed" | "opted_out">("all");
+  const [canteenCsvInput, setCanteenCsvInput] = useState("");
+
   // Target preview audit period selector in Dialog
   const [dialogAuditMonth, setDialogAuditMonth] = useState("Jul");
   const [dialogAuditYear, setDialogAuditYear] = useState("2026");
@@ -368,7 +507,11 @@ function PayrollDeductionsPage() {
             prorataEnabled: !!t.prorataEnabled,
             prorataDateThreshold: t.prorataDateThreshold || 10,
             prorataReductionType: t.prorataReductionType || "percent",
-            prorataReductionValue: t.prorataReductionValue !== undefined ? t.prorataReductionValue : (t.prorataReductionPercent !== undefined ? t.prorataReductionPercent : 50)
+            prorataReductionValue: t.prorataReductionValue !== undefined ? t.prorataReductionValue : (t.prorataReductionPercent !== undefined ? t.prorataReductionPercent : 50),
+            billingMode: t.billingMode || (t.id === 2 ? "prepaid" : "postpaid"),
+            newJoinerCatchupEnabled: t.newJoinerCatchupEnabled !== undefined ? !!t.newJoinerCatchupEnabled : (t.id === 2 ? true : false),
+            religionExemptions: Array.isArray(t.religionExemptions) ? t.religionExemptions : (t.id === 2 || t.type === "Lunch Deduction" ? ["Muslim"] : []),
+            optInRequired: t.optInRequired !== undefined ? !!t.optInRequired : (t.id === 2 ? true : false)
           }));
           setTemplates(migrated as DeductionTemplate[]);
         }
@@ -389,6 +532,18 @@ function PayrollDeductionsPage() {
       }
     }
 
+    const storedRoster = localStorage.getItem("canteen_employee_roster");
+    if (storedRoster) {
+      try {
+        const parsed = JSON.parse(storedRoster);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setEmployeeRecords(parsed);
+        }
+      } catch (e) {
+        console.error("Failed to parse canteen_employee_roster from localStorage", e);
+      }
+    }
+
     setIsMounted(true);
   }, []);
 
@@ -398,6 +553,12 @@ function PayrollDeductionsPage() {
       localStorage.setItem("payroll_deduction_templates", JSON.stringify(templates));
     }
   }, [templates, isMounted]);
+
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem("canteen_employee_roster", JSON.stringify(employeeRecords));
+    }
+  }, [employeeRecords, isMounted]);
 
   useEffect(() => {
     if (isMounted) {
@@ -471,6 +632,10 @@ function PayrollDeductionsPage() {
     setFormProrataDateThreshold("10");
     setFormProrataReductionType("percent");
     setFormProrataReductionValue("50");
+    setFormBillingMode("postpaid");
+    setFormNewJoinerCatchupEnabled(false);
+    setFormReligionExemptions(["Muslim"]);
+    setFormOptInRequired(false);
     setIsPreviewLoaded(false);
     setActiveTab("general");
   };
@@ -504,6 +669,10 @@ function PayrollDeductionsPage() {
     setFormProrataDateThreshold(String(template.prorataDateThreshold || 10));
     setFormProrataReductionType(template.prorataReductionType || "percent");
     setFormProrataReductionValue(String(template.prorataReductionValue !== undefined ? template.prorataReductionValue : 50));
+    setFormBillingMode(template.billingMode || (template.id === 2 ? "prepaid" : "postpaid"));
+    setFormNewJoinerCatchupEnabled(template.newJoinerCatchupEnabled !== undefined ? !!template.newJoinerCatchupEnabled : (template.id === 2 ? true : false));
+    setFormReligionExemptions(template.religionExemptions || (template.type === "Lunch Deduction" ? ["Muslim"] : []));
+    setFormOptInRequired(template.optInRequired !== undefined ? !!template.optInRequired : (template.id === 2 ? true : false));
     
     setIsPreviewLoaded(false);
     setActiveTab("general");
@@ -602,6 +771,71 @@ function PayrollDeductionsPage() {
     }
   };
 
+  // Case 3: Canteen Roster handlers
+  const handleToggleCanteenOptIn = (empId: string) => {
+    setEmployeeRecords(prev =>
+      prev.map(emp => emp.empId === empId ? { ...emp, lunchAvailed: !emp.lunchAvailed } : emp)
+    );
+  };
+
+  const handleBulkSetCanteen = (mode: "simulate_40" | "all_enrolled" | "all_opted_out") => {
+    setEmployeeRecords(prev => {
+      if (mode === "all_enrolled") {
+        return prev.map(e => ({ ...e, lunchAvailed: true }));
+      }
+      if (mode === "all_opted_out") {
+        return prev.map(e => ({ ...e, lunchAvailed: false }));
+      }
+      // simulate_40: ~40% take lunch, ~60% opted-out
+      return prev.map((e, idx) => ({ ...e, lunchAvailed: idx % 5 < 2 }));
+    });
+  };
+
+  const handleApplyCanteenCsv = () => {
+    if (!canteenCsvInput.trim()) {
+      alert("Please paste or type CSV lines in the format: EmpID,Status (e.g. 2025057068,1 or 2024049326,0)");
+      return;
+    }
+    const lines = canteenCsvInput.trim().split("\n");
+    let updatedCount = 0;
+    const statusMap: Record<string, boolean> = {};
+
+    lines.forEach(line => {
+      const parts = line.split(",").map(p => p.trim());
+      if (parts.length >= 2) {
+        const id = parts[0];
+        const statusVal = parts[1].toLowerCase();
+        const isAvailed = statusVal === "1" || statusVal === "true" || statusVal === "yes" || statusVal === "enrolled";
+        statusMap[id] = isAvailed;
+      }
+    });
+
+    setEmployeeRecords(prev =>
+      prev.map(emp => {
+        if (statusMap[emp.empId] !== undefined) {
+          updatedCount++;
+          return { ...emp, lunchAvailed: statusMap[emp.empId] };
+        }
+        return emp;
+      })
+    );
+
+    alert(`Successfully synced canteen roster for ${updatedCount} employee(s).`);
+    setCanteenCsvInput("");
+  };
+
+  const handleDownloadSampleCsv = () => {
+    const csvContent = "data:text/csv;charset=utf-8," + 
+      ["EmpID,Status", ...employeeRecords.map(e => `${e.empId},${e.lunchAvailed ? "1" : "0"}`)].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "canteen_roster_sample.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleSaveTemplate = () => {
     if (!formName.trim()) {
       alert("Template Name is required.");
@@ -635,6 +869,10 @@ function PayrollDeductionsPage() {
       prorataDateThreshold: formRecurrence === "monthly" ? Number(formProrataDateThreshold) : 10,
       prorataReductionType: formRecurrence === "monthly" ? formProrataReductionType : "percent",
       prorataReductionValue: formRecurrence === "monthly" ? Number(formProrataReductionValue) : 50,
+      billingMode: formBillingMode,
+      newJoinerCatchupEnabled: formBillingMode === "prepaid" ? formNewJoinerCatchupEnabled : false,
+      religionExemptions: formExcludeRamadan ? formReligionExemptions : [],
+      optInRequired: formOptInRequired,
     };
 
     if (editingTemplate) {
@@ -669,7 +907,11 @@ function PayrollDeductionsPage() {
       prorataEnabled: formProrataEnabled,
       prorataDateThreshold: Number(formProrataDateThreshold),
       prorataReductionType: formProrataReductionType,
-      prorataReductionValue: Number(formProrataReductionValue)
+      prorataReductionValue: Number(formProrataReductionValue),
+      billingMode: formBillingMode,
+      newJoinerCatchupEnabled: formNewJoinerCatchupEnabled,
+      religionExemptions: formReligionExemptions,
+      optInRequired: formOptInRequired,
     };
 
     const results = [];
@@ -692,18 +934,18 @@ function PayrollDeductionsPage() {
     return results;
   };
 
-  // Run simulation calculations taking designated months, employee exclusions, and pro-rata rules into account
+  // Run simulation calculations taking designated months, employee exclusions, pro-rata, prepaid catch-up, and canteen opt-in rules into account
   const handleRunSimulation = () => {
     const results = templates.map((t) => {
       const designatedRamMonth = ramadanMonthMap[Number(simYear)] || "Feb";
       
-      // Check status for each mock employee to get exact count
-      const employeeStatuses = MOCK_EMPLOYEES.map(emp => {
-        return checkDeductionStatus(t, Number(simYear), simMonth, designatedRamMonth, emp.empId);
+      // Check status for each employee to get exact count and behavior
+      const employeeEvaluations = employeeRecords.map(emp => {
+        return evaluateSmartDeduction(t, emp, Number(simYear), simMonth, designatedRamMonth);
       });
       
-      const skippedCount = employeeStatuses.filter(s => s.isSkipped).length;
-      const totalCount = MOCK_EMPLOYEES.length;
+      const skippedCount = employeeEvaluations.filter(e => e.isSkipped).length;
+      const totalCount = employeeRecords.length;
       
       // Determine overall status for this template
       let overallStatus = { isSkipped: false, reason: "" };
@@ -711,7 +953,7 @@ function PayrollDeductionsPage() {
         overallStatus = { isSkipped: true, reason: "Inactive Template" };
       } else if (skippedCount === totalCount) {
         const generalStatus = checkDeductionStatus(t, Number(simYear), simMonth, designatedRamMonth);
-        overallStatus = { isSkipped: true, reason: generalStatus.reason || "All staff excluded" };
+        overallStatus = { isSkipped: true, reason: generalStatus.reason || "All staff excluded/opted-out" };
       }
 
       return { 
@@ -726,7 +968,7 @@ function PayrollDeductionsPage() {
 
   useEffect(() => {
     handleRunSimulation();
-  }, [templates, simMonth, simYear, ramadanMonthMap]);
+  }, [templates, simMonth, simYear, ramadanMonthMap, employeeRecords]);
 
   const filteredTemplates = templates.filter((t) =>
     t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -788,7 +1030,16 @@ function PayrollDeductionsPage() {
                 </p>
               </div>
 
-              <div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCanteenSyncModalOpen(true)}
+                  className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300 font-bold h-11 px-5 rounded-xl transition-all shadow-xs flex items-center gap-2 hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <Utensils className="size-4.5 text-emerald-600" />
+                  CANTEEN ROSTER &amp; SYNC
+                </Button>
                 <Button
                   onClick={handleCreateNewClick}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 px-6 rounded-xl transition-all shadow-md shadow-blue-500/10 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
@@ -1232,26 +1483,10 @@ function PayrollDeductionsPage() {
                         ৳ {simResults
                           .filter(r => r.template.status === "Active")
                           .reduce((sum, r) => {
-                            // Sum evaluating flat or percentage amounts across our mock employee list with exclusions and pro-rata adjustments
-                            const totalVal = MOCK_EMPLOYEES.reduce((empSum, emp) => {
-                              const status = checkDeductionStatus(r.template, Number(simYear), simMonth, ramadanMonthMap[Number(simYear)] || "Feb", emp.empId);
-                              if (status.isSkipped) return empSum;
-                              
-                              let amt = getEvaluatedAmount(r.template.amount, r.template.amountType, emp.basic, emp.gross);
-                              // Apply pro-rata reduction for late joiners
-                              if (r.template.prorataEnabled) {
-                                const checkJoin = isJoiningMonth(emp.joinDate, Number(simYear), simMonth);
-                                if (checkJoin.matches && checkJoin.joinDay > r.template.prorataDateThreshold) {
-                                  const val = r.template.prorataReductionValue || 0;
-                                  if (r.template.prorataReductionType === "percent") {
-                                    const factor = (100 - val) / 100;
-                                    amt = Math.round(amt * factor);
-                                  } else {
-                                    amt = Math.max(0, amt - val);
-                                  }
-                                }
-                              }
-                              return empSum + amt;
+                            // Sum evaluating flat or percentage amounts across our employee list with smart engine
+                            const totalVal = employeeRecords.reduce((empSum, emp) => {
+                              const smart = evaluateSmartDeduction(r.template, emp, Number(simYear), simMonth, ramadanMonthMap[Number(simYear)] || "Feb");
+                              return empSum + smart.finalAmount;
                             }, 0);
                             return sum + totalVal;
                           }, 0)
@@ -1272,26 +1507,10 @@ function PayrollDeductionsPage() {
                 
                 <div className="flex-1 overflow-x-auto divide-y divide-slate-100 max-h-[420px] overflow-y-auto">
                   {simResults.map(({ template, status, skippedCount, totalCount }) => {
-                    // Calculate exact running amount based on excluded staff members
-                    const totalVal = MOCK_EMPLOYEES.reduce((sum, emp) => {
-                      const indStatus = checkDeductionStatus(template, Number(simYear), simMonth, ramadanMonthMap[Number(simYear)] || "Feb", emp.empId);
-                      if (indStatus.isSkipped) return sum;
-                      
-                      let amt = getEvaluatedAmount(template.amount, template.amountType, emp.basic, emp.gross);
-                      // Apply pro-rata logic
-                      if (template.prorataEnabled) {
-                        const checkJoin = isJoiningMonth(emp.joinDate, Number(simYear), simMonth);
-                        if (checkJoin.matches && checkJoin.joinDay > template.prorataDateThreshold) {
-                          const val = template.prorataReductionValue || 0;
-                          if (template.prorataReductionType === "percent") {
-                            const factor = (100 - val) / 100;
-                            amt = Math.round(amt * factor);
-                          } else {
-                            amt = Math.max(0, amt - val);
-                          }
-                        }
-                      }
-                      return sum + amt;
+                    // Calculate exact running amount using evaluateSmartDeduction
+                    const totalVal = employeeRecords.reduce((sum, emp) => {
+                      const smart = evaluateSmartDeduction(template, emp, Number(simYear), simMonth, ramadanMonthMap[Number(simYear)] || "Feb");
+                      return sum + smart.finalAmount;
                     }, 0);
 
                     const runCount = totalCount - skippedCount;
@@ -1299,9 +1518,15 @@ function PayrollDeductionsPage() {
                     return (
                       <div key={template.id} className="p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-white/60 hover:bg-white transition-colors">
                         <div className="space-y-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bold text-slate-800 text-sm">{template.name}</span>
                             <span className="text-[10px] font-semibold bg-slate-100 text-slate-655 rounded px-1.5 py-0.5">{template.type}</span>
+                            {template.billingMode === "prepaid" && (
+                              <span className="text-[9px] font-bold bg-amber-100 text-amber-800 rounded px-1.5 py-0.5">⚡ Prepaid</span>
+                            )}
+                            {template.optInRequired && (
+                              <span className="text-[9px] font-bold bg-blue-100 text-blue-700 rounded px-1.5 py-0.5">🎯 Opt-in Roster</span>
+                            )}
                           </div>
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 font-medium font-sans">
                             {template.amountType === "flat" ? (
@@ -1582,6 +1807,133 @@ function PayrollDeductionsPage() {
                     </div>
                   </div>
 
+                  {/* Smart Canteen & Prepaid Engine Settings (Cases 1 & 3) */}
+                  <div className="bg-gradient-to-br from-amber-50/50 via-white to-amber-50/20 p-5 rounded-2xl border border-amber-200/80 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-amber-100 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <Utensils className="size-4.5 text-amber-600" />
+                        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+                          🍱 Smart Canteen & Billing Engine Settings
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-bold text-amber-700 bg-amber-100/70 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                        Cases 1 & 3 Configuration
+                      </span>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Billing Cycle Mode: Postpaid vs Prepaid */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-700 block">
+                          Canteen Billing Mode
+                        </label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <label
+                            onClick={() => setFormBillingMode("postpaid")}
+                            className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 select-none ${
+                              formBillingMode === "postpaid"
+                                ? "bg-blue-50/60 border-blue-400 text-blue-900 shadow-xs"
+                                : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="billingMode"
+                              checked={formBillingMode === "postpaid"}
+                              onChange={() => setFormBillingMode("postpaid")}
+                              className="mt-1 accent-blue-600 cursor-pointer"
+                            />
+                            <div className="space-y-0.5">
+                              <span className="text-xs font-extrabold block">Postpaid (End of Month)</span>
+                              <span className="text-[11px] text-slate-500 leading-tight block">
+                                Deduction taken at the end of the month for meals consumed during that month.
+                              </span>
+                            </div>
+                          </label>
+
+                          <label
+                            onClick={() => setFormBillingMode("prepaid")}
+                            className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 select-none ${
+                              formBillingMode === "prepaid"
+                                ? "bg-amber-50/80 border-amber-400 text-amber-950 shadow-xs"
+                                : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="billingMode"
+                              checked={formBillingMode === "prepaid"}
+                              onChange={() => setFormBillingMode("prepaid")}
+                              className="mt-1 accent-amber-600 cursor-pointer"
+                            />
+                            <div className="space-y-0.5">
+                              <span className="text-xs font-extrabold block flex items-center gap-1.5">
+                                ⚡ Prepaid (Advance Billing)
+                                <span className="text-[9px] bg-amber-200/90 text-amber-900 px-1.5 py-0.2 rounded font-extrabold">Case 1</span>
+                              </span>
+                              <span className="text-[11px] text-slate-600 leading-tight block">
+                                Charged in advance for next month. New joiners cannot pay prior to joining, requiring arrear catch-up.
+                              </span>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Case 1: Prepaid New Joiner Catch-up Setting */}
+                      {formBillingMode === "prepaid" && (
+                        <div className="bg-amber-100/35 border border-amber-200 p-4 rounded-xl space-y-2 animate-in fade-in duration-200">
+                          <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                            <input
+                              type="checkbox"
+                              checked={formNewJoinerCatchupEnabled}
+                              onChange={(e) => setFormNewJoinerCatchupEnabled(e.target.checked)}
+                              className="accent-amber-600 size-4.5 rounded cursor-pointer"
+                            />
+                            <span className="text-xs font-extrabold text-amber-950">
+                              🔄 Enable New Joiner 1st Month Catch-up (Current Arrear + Advance)
+                            </span>
+                          </label>
+                          <p className="text-[11px] text-amber-900/90 pl-7 leading-relaxed font-medium">
+                            In prepaid regions, a newly joined staff member cannot pay in advance before their join date. In their 1st month salary, charge: 
+                            <strong> 1st month arrear</strong> (Full ৳{(Number(formAmount) || 1000).toLocaleString()} if joined ≤{formProrataDateThreshold}th, or Prorated ৳{
+                              formProrataReductionType === "percent"
+                                ? Math.round((Number(formAmount) || 1000) * (100 - (Number(formProrataReductionValue) || 50)) / 100).toLocaleString()
+                                : Math.max(0, (Number(formAmount) || 1000) - (Number(formProrataReductionValue) || 500)).toLocaleString()
+                            } if joined &gt;{formProrataDateThreshold}th) + <strong>Next month advance</strong> (৳{(Number(formAmount) || 1000).toLocaleString()}) = 
+                            <span className="font-extrabold underline ml-1 text-amber-950">
+                              Total ৳{
+                                ((Number(formAmount) || 1000) + (
+                                  formProrataReductionType === "percent"
+                                    ? Math.round((Number(formAmount) || 1000) * (100 - (Number(formProrataReductionValue) || 50)) / 100)
+                                    : Math.max(0, (Number(formAmount) || 1000) - (Number(formProrataReductionValue) || 500))
+                                )).toLocaleString()
+                              } (if &gt;{formProrataDateThreshold}th) or ৳{((Number(formAmount) || 1000) * 2).toLocaleString()} (if ≤{formProrataDateThreshold}th)
+                            </span>. From 2nd month onwards: regular ৳{(Number(formAmount) || 1000).toLocaleString()}.
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Case 3: High Volume Opt-In Switch */}
+                      <div className="bg-slate-50/80 border border-slate-200/80 p-4 rounded-xl space-y-1.5">
+                        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={formOptInRequired}
+                            onChange={(e) => setFormOptInRequired(e.target.checked)}
+                            className="accent-blue-600 size-4.5 rounded cursor-pointer"
+                          />
+                          <span className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+                            🎯 High-Volume Opt-In Subscription Roster (Case 3: 60% No Lunch Support)
+                            <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.2 rounded font-bold">Auto-Zero</span>
+                          </span>
+                        </label>
+                        <p className="text-[11px] text-slate-500 pl-7 leading-relaxed font-medium">
+                          When enabled, only employees with an active Canteen Subscription (<code className="text-blue-600 font-bold bg-blue-50 px-1 py-0.5 rounded border border-blue-100">lunchAvailed = true</code>) will be charged. The ~60% non-consumers are automatically excluded (৳0) without needing manual monthly individual exceptions.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="bg-white p-5 rounded-2xl border border-slate-200/70 shadow-xs space-y-4">
                     <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 block border-b border-slate-100 pb-2">Target Group Filtering</span>
                     
@@ -1669,15 +2021,16 @@ function PayrollDeductionsPage() {
                           <thead className="text-[10px] font-bold tracking-wider text-slate-400 bg-slate-50 border-b border-slate-100 uppercase">
                             <tr>
                               <th className="px-4 py-3">Emp ID</th>
-                              <th className="px-4 py-3">Name</th>
+                              <th className="px-4 py-3">Employee & Profile</th>
                               <th className="px-4 py-3">Department</th>
-                              <th className="px-4 py-3 text-right">Basic Salary</th>
-                              <th className="px-4 py-3 text-right">Gross Salary</th>
-                              <th className="px-4 py-3 text-right pr-6 w-44">Deduction Status</th>
+                              <th className="px-4 py-3 text-center">Join Date & Religion</th>
+                              <th className="px-4 py-3 text-center">Canteen Status</th>
+                              <th className="px-4 py-3 text-right">Basic / Gross</th>
+                              <th className="px-4 py-3 text-right pr-6 min-w-56">Deduction & Breakdown</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100">
-                            {MOCK_EMPLOYEES.map((row) => {
+                            {employeeRecords.map((row) => {
                               const tempTemplate: DeductionTemplate = {
                                 id: 0,
                                 name: formName,
@@ -1696,50 +2049,85 @@ function PayrollDeductionsPage() {
                                 prorataEnabled: formProrataEnabled,
                                 prorataDateThreshold: Number(formProrataDateThreshold),
                                 prorataReductionType: formProrataReductionType,
-                                prorataReductionValue: Number(formProrataReductionValue)
+                                prorataReductionValue: Number(formProrataReductionValue),
+                                billingMode: formBillingMode,
+                                newJoinerCatchupEnabled: formNewJoinerCatchupEnabled,
+                                religionExemptions: formReligionExemptions,
+                                optInRequired: formOptInRequired
                               };
                               const auditRamadanMonth = ramadanMonthMap[Number(dialogAuditYear)] || "Feb";
-                              const statusRes = checkDeductionStatus(tempTemplate, Number(dialogAuditYear), dialogAuditMonth, auditRamadanMonth, row.empId);
-                              
-                              let finalVal = statusRes.isSkipped ? 0 : getEvaluatedAmount(formAmount, formAmountType, row.basic, row.gross);
-                              let isProratedApplied = false;
-
-                              // Apply pro-rata check in target audit
-                              if (!statusRes.isSkipped && formProrataEnabled) {
-                                const checkJoin = isJoiningMonth(row.joinDate, Number(dialogAuditYear), dialogAuditMonth);
-                                if (checkJoin.matches && checkJoin.joinDay > Number(formProrataDateThreshold)) {
-                                  const val = Number(formProrataReductionValue) || 0;
-                                  if (formProrataReductionType === "percent") {
-                                    const factor = (100 - val) / 100;
-                                    finalVal = Math.round(finalVal * factor);
-                                  } else {
-                                    finalVal = Math.max(0, finalVal - val);
-                                  }
-                                  isProratedApplied = true;
-                                }
-                              }
+                              const smartRes = evaluateSmartDeduction(tempTemplate, row, Number(dialogAuditYear), dialogAuditMonth, auditRamadanMonth);
 
                               return (
-                                <tr key={row.id} className="hover:bg-slate-50/50">
-                                  <td className="px-4 py-2.5 font-bold text-slate-700">{row.empId}</td>
-                                  <td className="px-4 py-2.5 font-bold text-slate-800">{row.name}</td>
+                                <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
+                                  <td className="px-4 py-2.5 font-bold text-slate-700 font-mono">{row.empId}</td>
+                                  <td className="px-4 py-2.5">
+                                    <div className="flex flex-col">
+                                      <span className="font-bold text-slate-800">{row.name}</span>
+                                      <span className="text-[10px] text-slate-400 font-medium">{row.designation}</span>
+                                    </div>
+                                  </td>
                                   <td className="px-4 py-2.5 text-slate-500">{row.department}</td>
-                                  <td className="px-4 py-2.5 text-right font-medium text-slate-655 font-mono">৳{row.basic.toLocaleString()}</td>
-                                  <td className="px-4 py-2.5 text-right font-medium text-slate-655 font-mono">৳{row.gross.toLocaleString()}</td>
-                                  <td className="px-4 py-2.5 text-right pr-6 font-extrabold font-mono">
-                                    {statusRes.isSkipped ? (
-                                      <span className="inline-flex items-center gap-1 text-[9px] text-amber-600 font-bold bg-amber-50 border border-amber-200/50 px-2 py-0.5 rounded" title={statusRes.reason}>
-                                        ⚠️ Excluded
+                                  <td className="px-4 py-2.5 text-center">
+                                    <div className="inline-flex flex-col items-center gap-0.5">
+                                      <span className="text-[10px] font-bold text-slate-700 font-mono">{row.joinDate}</span>
+                                      <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-full border ${
+                                        row.religion === "Muslim"
+                                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                          : row.religion === "Hindu"
+                                          ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                                          : "bg-purple-50 text-purple-700 border-purple-200"
+                                      }`}>
+                                        {row.religion}
                                       </span>
-                                    ) : isProratedApplied ? (
-                                      <div className="flex flex-col items-end">
-                                        <span className="text-blue-600">৳{finalVal.toLocaleString()}</span>
-                                        <span className="text-[8px] text-indigo-500 font-extrabold">
-                                          Pro-rated (-{formProrataReductionType === "percent" ? `${formProrataReductionValue}%` : `৳${formProrataReductionValue}`})
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-2.5 text-center">
+                                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                                      row.lunchAvailed
+                                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                        : "bg-slate-100 text-slate-500 border-slate-200"
+                                    }`}>
+                                      <span className={`size-1.5 rounded-full ${row.lunchAvailed ? "bg-emerald-500" : "bg-slate-400"}`} />
+                                      {row.lunchAvailed ? "Enrolled" : "Opted Out"}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-2.5 text-right font-medium text-slate-600 font-mono text-[11px]">
+                                    <div>৳{row.basic.toLocaleString()}</div>
+                                    <div className="text-[9px] text-slate-400">G: ৳{row.gross.toLocaleString()}</div>
+                                  </td>
+                                  <td className="px-4 py-2.5 text-right pr-6 font-sans">
+                                    {smartRes.isSkipped ? (
+                                      <div className="flex flex-col items-end gap-0.5">
+                                        <span className="font-extrabold font-mono text-slate-400">৳0</span>
+                                        <span className="inline-flex items-center gap-1 text-[9px] text-amber-700 font-bold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded leading-tight text-right" title={smartRes.skipReason}>
+                                          ⚠️ {smartRes.skipReason}
+                                        </span>
+                                      </div>
+                                    ) : smartRes.isPrepaidCatchup ? (
+                                      <div className="flex flex-col items-end gap-0.5">
+                                        <span className="font-extrabold text-amber-700 font-mono text-sm">৳{smartRes.finalAmount.toLocaleString()}</span>
+                                        <span className="text-[9px] text-amber-800 font-extrabold bg-amber-100/80 border border-amber-300 px-1.5 py-0.5 rounded leading-tight text-right">
+                                          ⚡ 1st Mo Catch-up (Arrear + Advance)
+                                        </span>
+                                        <span className="text-[8px] text-slate-400 font-mono">
+                                          {smartRes.calculationBreakdown}
+                                        </span>
+                                      </div>
+                                    ) : smartRes.isProrated ? (
+                                      <div className="flex flex-col items-end gap-0.5">
+                                        <span className="font-extrabold text-blue-600 font-mono text-sm">৳{smartRes.finalAmount.toLocaleString()}</span>
+                                        <span className="text-[9px] text-indigo-600 font-extrabold bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded leading-tight">
+                                          Pro-rated (Joined &gt;{formProrataDateThreshold}th)
                                         </span>
                                       </div>
                                     ) : (
-                                      <span className="text-blue-600">৳{finalVal.toLocaleString()}</span>
+                                      <div className="flex flex-col items-end gap-0.5">
+                                        <span className="font-extrabold text-blue-600 font-mono text-sm">৳{smartRes.finalAmount.toLocaleString()}</span>
+                                        <span className="text-[9px] text-emerald-600 font-bold bg-emerald-50 border border-emerald-100 px-1.5 py-0.2 rounded">
+                                          Regular Active
+                                        </span>
+                                      </div>
                                     )}
                                   </td>
                                 </tr>
@@ -1813,6 +2201,69 @@ function PayrollDeductionsPage() {
                     ) : (
                       /* Recurring calendar exclusions */
                       <div className="space-y-5">
+                        {/* Ramadan Exemption & Religion Discrimination (Case 2) */}
+                        <div className="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60 space-y-3.5">
+                          <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                checked={formExcludeRamadan}
+                                onChange={(e) => setFormExcludeRamadan(e.target.checked)}
+                                className="accent-amber-600 size-4.5 rounded cursor-pointer"
+                              />
+                              <span className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+                                🌙 Exclude During Designated Ramadan Month
+                              </span>
+                            </label>
+                            <span className="text-[10px] text-amber-800 font-bold bg-amber-100/70 border border-amber-200 px-2 py-0.5 rounded-md">
+                              🌙 Designated: {ramadanMonthMap[Number(activeProcessYear)] || "Feb"} {activeProcessYear}
+                            </span>
+                          </div>
+
+                          {formExcludeRamadan && (
+                            <div className="pl-7 space-y-3 pt-2 border-t border-slate-200/50 animate-in fade-in duration-200">
+                              <div className="space-y-0.5">
+                                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                  🕌 Religion Exemption Rules (Case 2: Fasting vs Dining Staff)
+                                </label>
+                                <p className="text-[11px] text-slate-500 leading-snug">
+                                  Select religious groups to <strong>exempt (৳0)</strong> during Ramadan because their canteen is closed / they fast. Unselected groups (e.g. Hindu / Christian staff) will continue normal canteen billing.
+                                </p>
+                              </div>
+
+                              <div className="flex flex-wrap gap-2 pt-1">
+                                {(["Muslim", "Hindu", "Christian", "Buddhist", "Other"] as const).map((rel) => {
+                                  const isSelected = formReligionExemptions.includes(rel);
+                                  return (
+                                    <button
+                                      key={rel}
+                                      type="button"
+                                      onClick={() => {
+                                        if (isSelected) {
+                                          setFormReligionExemptions(formReligionExemptions.filter((r) => r !== rel));
+                                        } else {
+                                          setFormReligionExemptions([...formReligionExemptions, rel]);
+                                        }
+                                      }}
+                                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 cursor-pointer select-none ${
+                                        isSelected
+                                          ? "bg-amber-100/90 border-amber-400 text-amber-900 shadow-xs"
+                                          : "bg-white border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-50"
+                                      }`}
+                                    >
+                                      <span className={`size-2 rounded-full ${isSelected ? "bg-amber-600" : "bg-slate-300"}`} />
+                                      {rel} {isSelected ? "✓ Exempted (৳0)" : "✕ Billed Normal"}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <p className="text-[10px] text-amber-800/90 font-medium italic">
+                                💡 Default recommendation: Muslim staff are exempt during Ramadan. Hindu and other staff continue normal lunch deduction.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
                         {/* General Annual Calendar Month Exclusion */}
                         <div className="space-y-2">
                           <div className="space-y-0.5">
@@ -2070,6 +2521,289 @@ function PayrollDeductionsPage() {
                   SAVE PROFILE
                 </Button>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* CANTEEN ROSTER & BULK SYNC MODAL (CASE 3) */}
+        <Dialog open={isCanteenSyncModalOpen} onOpenChange={setIsCanteenSyncModalOpen}>
+          <DialogContent className="sm:max-w-[950px] p-0 border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl bg-white max-h-[92vh] flex flex-col font-sans">
+            <DialogHeader className="p-6 border-b border-slate-100 bg-gradient-to-r from-emerald-50/70 via-white to-slate-50 flex flex-row items-center justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-emerald-100/70 text-emerald-800">
+                    <Utensils className="size-4" />
+                  </span>
+                  <DialogTitle className="text-xl font-extrabold text-slate-900 tracking-tight">
+                    Canteen Roster &amp; Excel Bulk Sync
+                  </DialogTitle>
+                </div>
+                <p className="text-xs text-slate-500 font-medium">
+                  Smart Solution for High-Volume Plants (Case 3): 60% of employees do not eat in the canteen. Manage opt-in roster to automatically zero out non-consumers without manual payroll editing.
+                </p>
+              </div>
+            </DialogHeader>
+
+            <div className="p-6 overflow-y-auto space-y-6 flex-1">
+              {/* Plant KPI Metric Highlights */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                    Total Workforce
+                  </span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-black text-slate-900 font-mono">
+                      {employeeRecords.length}
+                    </span>
+                    <span className="text-xs font-bold text-slate-400">staff</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-emerald-200/80 bg-emerald-50/30 space-y-1">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 block">
+                    Canteen Enrolled
+                  </span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-black text-emerald-700 font-mono">
+                      {employeeRecords.filter(e => e.lunchAvailed).length}
+                    </span>
+                    <span className="text-xs font-bold text-emerald-600">
+                      ({Math.round((employeeRecords.filter(e => e.lunchAvailed).length / employeeRecords.length) * 100)}%)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-amber-200/80 bg-amber-50/30 space-y-1">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 block">
+                    Opted-Out (No Lunch)
+                  </span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-black text-amber-800 font-mono">
+                      {employeeRecords.filter(e => !e.lunchAvailed).length}
+                    </span>
+                    <span className="text-xs font-bold text-amber-700">
+                      ({Math.round((employeeRecords.filter(e => !e.lunchAvailed).length / employeeRecords.length) * 100)}%)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-blue-200/80 bg-blue-50/30 space-y-1">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 block">
+                    Monthly Canteen Bill
+                  </span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-black text-blue-700 font-mono">
+                      ৳{(employeeRecords.filter(e => e.lunchAvailed).length * 1000).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Fast Action Simulation Presets */}
+              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-wrap items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-extrabold text-slate-800 block">
+                    ⚡ Fast Presets &amp; Simulation
+                  </span>
+                  <span className="text-[11px] text-slate-500 block">
+                    Apply realistic 60% opt-out plant ratio or reset roster in 1 click:
+                  </span>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleBulkSetCanteen("simulate_40")}
+                    className="h-8 text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300 rounded-lg cursor-pointer"
+                  >
+                    Set 40% Enrolled (60% Opt-out Plant Case)
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleBulkSetCanteen("all_enrolled")}
+                    className="h-8 text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300 rounded-lg cursor-pointer"
+                  >
+                    All Enrolled (100%)
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleBulkSetCanteen("all_opted_out")}
+                    className="h-8 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300 rounded-lg cursor-pointer"
+                  >
+                    All Opted-Out (0%)
+                  </Button>
+                </div>
+              </div>
+
+              {/* Search & Filter Toolbar */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div className="relative flex-1">
+                  <Search className="size-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by Employee ID or Name..."
+                    value={canteenSearchQuery}
+                    onChange={(e) => setCanteenSearchQuery(e.target.value)}
+                    className="w-full h-9 rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-xs font-semibold focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none placeholder:text-slate-400"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <select
+                    value={canteenFilterDepartment}
+                    onChange={(e) => setCanteenFilterDepartment(e.target.value)}
+                    className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 cursor-pointer"
+                  >
+                    <option value="ALL">All Departments</option>
+                    {Array.from(new Set(employeeRecords.map(e => e.department))).map(d => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={canteenFilterStatus}
+                    onChange={(e) => setCanteenFilterStatus(e.target.value as any)}
+                    className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 cursor-pointer"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="availed">Enrolled Only</option>
+                    <option value="opted_out">Opted-Out Only</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Employee Roster Table */}
+              <div className="border border-slate-200 rounded-xl overflow-hidden max-h-[280px] overflow-y-auto">
+                <table className="w-full text-xs text-left border-collapse">
+                  <thead className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 bg-slate-50 border-b border-slate-200 sticky top-0">
+                    <tr>
+                      <th className="px-4 py-2.5">Emp ID</th>
+                      <th className="px-4 py-2.5">Employee Name</th>
+                      <th className="px-4 py-2.5">Department</th>
+                      <th className="px-4 py-2.5 text-center">Religion</th>
+                      <th className="px-4 py-2.5 text-center">Join Date</th>
+                      <th className="px-4 py-2.5 text-center">Canteen Enrollment</th>
+                      <th className="px-4 py-2.5 text-right pr-4">Toggle Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {employeeRecords
+                      .filter(emp => {
+                        const matchesQuery = emp.name.toLowerCase().includes(canteenSearchQuery.toLowerCase()) ||
+                          emp.empId.includes(canteenSearchQuery);
+                        const matchesDept = canteenFilterDepartment === "ALL" || emp.department === canteenFilterDepartment;
+                        const matchesStatus = canteenFilterStatus === "all" ||
+                          (canteenFilterStatus === "availed" ? emp.lunchAvailed : !emp.lunchAvailed);
+                        return matchesQuery && matchesDept && matchesStatus;
+                      })
+                      .map((emp) => (
+                        <tr key={emp.id} className="hover:bg-slate-50/60 transition-colors">
+                          <td className="px-4 py-2.5 font-bold font-mono text-slate-700">{emp.empId}</td>
+                          <td className="px-4 py-2.5">
+                            <span className="font-bold text-slate-800 block">{emp.name}</span>
+                            <span className="text-[10px] text-slate-400">{emp.designation}</span>
+                          </td>
+                          <td className="px-4 py-2.5 text-slate-600">{emp.department}</td>
+                          <td className="px-4 py-2.5 text-center">
+                            <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-full border ${
+                              emp.religion === "Muslim"
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : emp.religion === "Hindu"
+                                ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                                : "bg-purple-50 text-purple-700 border-purple-200"
+                            }`}>
+                              {emp.religion}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2.5 text-center font-mono text-slate-600 font-semibold">{emp.joinDate}</td>
+                          <td className="px-4 py-2.5 text-center">
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+                              emp.lunchAvailed
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : "bg-slate-100 text-slate-500 border-slate-200"
+                            }`}>
+                              <span className={`size-1.5 rounded-full ${emp.lunchAvailed ? "bg-emerald-500" : "bg-slate-400"}`} />
+                              {emp.lunchAvailed ? "Enrolled (Takes Lunch)" : "Opted Out (No Lunch)"}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2.5 text-right pr-4">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleCanteenOptIn(emp.empId)}
+                              className={`px-3 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer select-none ${
+                                emp.lunchAvailed
+                                  ? "bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100"
+                                  : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                              }`}
+                            >
+                              {emp.lunchAvailed ? "Set Opt-Out" : "Enroll"}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bulk Excel / CSV Upload Accordion Box */}
+              <div className="bg-slate-50/70 p-4.5 rounded-xl border border-slate-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <UploadCloud className="size-4.5 text-blue-600" />
+                    <span className="text-xs font-extrabold text-slate-800">
+                      Excel / CSV Bulk Roster Sync (Plant High-Volume Upload)
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDownloadSampleCsv}
+                    className="h-7 text-xs font-bold text-blue-600 hover:bg-blue-50 cursor-pointer"
+                  >
+                    <FileDown className="size-3.5 mr-1" />
+                    Download Sample CSV
+                  </Button>
+                </div>
+                
+                <p className="text-[11px] text-slate-500 leading-snug">
+                  Paste employee roster records in CSV format (<code className="text-slate-800 font-bold bg-white px-1 py-0.5 rounded border border-slate-200">EmpID,Status</code>) where Status is <strong>1</strong> (Enrolled) or <strong>0</strong> (Opted-Out):
+                </p>
+
+                <textarea
+                  rows={3}
+                  value={canteenCsvInput}
+                  onChange={(e) => setCanteenCsvInput(e.target.value)}
+                  placeholder={`2025057068,1\n2024049326,0\n2022035599,1\n2025057067,0`}
+                  className="w-full rounded-xl border border-slate-200 bg-white p-3 text-xs font-mono focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none transition-all placeholder:text-slate-300"
+                />
+
+                <div className="flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    onClick={handleApplyCanteenCsv}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-9 px-4 text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Check className="size-3.5" />
+                    Apply CSV Sync
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+              <Button
+                type="button"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-10 px-6 rounded-xl text-xs cursor-pointer"
+                onClick={() => setIsCanteenSyncModalOpen(false)}
+              >
+                Done
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
