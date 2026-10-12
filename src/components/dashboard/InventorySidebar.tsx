@@ -70,11 +70,6 @@ export const nav: NavItem[] = [
         search: { tab: "store-location" },
       },
       {
-        label: "Item Group",
-        to: "/inventory-configuration",
-        search: { tab: "item-group" },
-      },
-      {
         label: "Item Creation",
         to: "/inventory-configuration",
         search: { tab: "item-sub-group" },

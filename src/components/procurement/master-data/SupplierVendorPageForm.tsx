@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { ArrowLeft, Save, Users, Building, CreditCard, FileText, Edit, Check, ChevronDown, X, Search, Globe } from "lucide-react";
-import { SupplierVendor, VendorCategory, Origin } from "@/lib/procurement-master-data";
+import { SupplierVendor, VendorCategory, Origin, BusinessType, DEFAULT_BUSINESS_TYPES, getStoredData } from "@/lib/procurement-master-data";
 
 interface SupplierVendorPageFormProps {
   mode: "create" | "edit" | "view";
   initialData?: SupplierVendor | null;
   vendorCategories: VendorCategory[];
+  businessTypes?: BusinessType[];
   origins: Origin[];
   onSave: (data: SupplierVendor) => void;
   onCancel: () => void;
@@ -16,6 +17,7 @@ export function SupplierVendorPageForm({
   mode,
   initialData,
   vendorCategories,
+  businessTypes,
   origins,
   onSave,
   onCancel,
@@ -51,6 +53,17 @@ export function SupplierVendorPageForm({
       termsConditionsDescription: "",
     };
   });
+
+  const [allBusinessTypes, setAllBusinessTypes] = useState<BusinessType[]>(() => {
+    if (businessTypes && businessTypes.length > 0) return businessTypes;
+    return getStoredData("proc_business_types", DEFAULT_BUSINESS_TYPES);
+  });
+
+  useEffect(() => {
+    if (businessTypes && businessTypes.length > 0) {
+      setAllBusinessTypes(businessTypes);
+    }
+  }, [businessTypes]);
 
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [categorySearchQuery, setCategorySearchQuery] = useState("");
@@ -326,18 +339,28 @@ export function SupplierVendorPageForm({
             </div>
 
             <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">Business Type</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-foreground">Business Type</label>
+                <span className="text-[10px] text-muted-foreground font-semibold">Master Data</span>
+              </div>
               <select
                 disabled={isView}
-                value={formData.businessType || "Manufacturing"}
+                value={
+                  formData.businessType ||
+                  (allBusinessTypes.length > 0 ? allBusinessTypes[0].businessTypeName : "Manufacturing")
+                }
                 onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
                 className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
               >
-                <option value="Manufacturing">Manufacturing</option>
-                <option value="Distributor">Distributor</option>
-                <option value="Trader / Indentor">Trader / Indentor</option>
-                <option value="Service Provider">Service Provider</option>
-                <option value="Contractor">Contractor</option>
+                {allBusinessTypes.map((bt) => (
+                  <option key={bt.id} value={bt.businessTypeName}>
+                    {bt.businessTypeName} ({bt.typeCode})
+                  </option>
+                ))}
+                {formData.businessType &&
+                  !allBusinessTypes.some((bt) => bt.businessTypeName === formData.businessType) && (
+                    <option value={formData.businessType}>{formData.businessType}</option>
+                  )}
               </select>
             </div>
 

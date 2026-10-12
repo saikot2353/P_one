@@ -46,9 +46,21 @@ export const Route = createFileRoute("/inv-report-stock-valuation")({
 export function StockValuationRegisterPage() {
   const currencyCfg = getActiveCurrencyConfig();
 
-  // Filters
-  const [filterCompany, setFilterCompany] = useState("All");
-  const [filterStore, setFilterStore] = useState("All");
+  // Filters (respects drill-down query params)
+  const [filterCompany, setFilterCompany] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      return p.get("company") || "All";
+    }
+    return "All";
+  });
+  const [filterStore, setFilterStore] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      return p.get("store") || "All";
+    }
+    return "All";
+  });
   const [filterItem, setFilterItem] = useState("All");
   const [filterItemGroup, setFilterItemGroup] = useState("All");
   const [filterItemCategory, setFilterItemCategory] = useState("All");

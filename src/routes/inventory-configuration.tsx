@@ -62,6 +62,7 @@ import {
   ExcelDataUploadModal,
   MasterUploadEntityType,
 } from "@/components/procurement/master-data/ExcelDataUploadModal";
+import { ItemGroupModal } from "@/components/procurement/master-data/ItemGroupModal";
 
 export type InventoryConfigTab =
   | "warehouse-store"
@@ -185,13 +186,6 @@ const TAB_GROUPS: TabGroup[] = [
     groupName: "Product Catalog & Hierarchy",
     tabs: [
       {
-        id: "item-group",
-        label: "Item Group",
-        icon: FolderTree,
-        countKey: "itemGroups",
-        desc: "Top-level item groups and classifications",
-      },
-      {
         id: "item-sub-group",
         label: "Item Creation",
         icon: Package,
@@ -232,7 +226,8 @@ const TAB_GROUPS: TabGroup[] = [
 
 function InventoryConfigurationPage() {
   const searchParams = Route.useSearch();
-  const activeTab: InventoryConfigTab = searchParams.tab || "warehouse-store";
+  const rawTab: InventoryConfigTab = searchParams.tab || "warehouse-store";
+  const activeTab = (rawTab === "item-group" ? "item-sub-group" : rawTab) as InventoryConfigTab;
 
   // Master Data State shared with Procurement via LocalStorage keys
   const [warehouses, setWarehouses] = useState<WarehouseStore[]>(() =>
@@ -274,6 +269,11 @@ function InventoryConfigurationPage() {
   const [pageMode, setPageMode] = useState<"list" | "create" | "edit" | "view">("list");
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
   const [activeTargetSubGroup, setActiveTargetSubGroup] = useState<ItemSubGroup | null>(null);
+
+  // Item Group Modal for adding/editing root item groups
+  const [isItemGroupModalOpen, setIsItemGroupModalOpen] = useState(false);
+  const [itemGroupModalMode, setItemGroupModalMode] = useState<"create" | "edit">("create");
+  const [itemGroupModalData, setItemGroupModalData] = useState<Partial<ItemGroup> | null>(null);
 
   // SubGroup Modal for adding/editing dynamic sub-groups in tree
   const [isSubGroupModalOpen, setIsSubGroupModalOpen] = useState(false);
@@ -625,9 +625,56 @@ function InventoryConfigurationPage() {
         break;
     }
 
+    if (itemToDelete._type === "item-group") {
+      setItemGroups((prev) => prev.filter((r) => r.id !== id));
+      setIsDeleteConfirmOpen(false);
+      setItemToDelete(null);
+      toast.success("Item Group deleted successfully.");
+      return;
+    }
+
     setIsDeleteConfirmOpen(false);
     setItemToDelete(null);
     toast.success("Record deleted successfully.");
+  };
+
+  // Item Group Handlers
+  const handleOpenAddItemGroup = () => {
+    setItemGroupModalMode("create");
+    setItemGroupModalData(null);
+    setIsItemGroupModalOpen(true);
+  };
+
+  const handleOpenEditItemGroup = (grp: ItemGroup) => {
+    setItemGroupModalMode("edit");
+    setItemGroupModalData(grp);
+    setIsItemGroupModalOpen(true);
+  };
+
+  const handleSaveItemGroup = (savedGroup: ItemGroup) => {
+    if (itemGroupModalMode === "create") {
+      setItemGroups((prev) => [savedGroup, ...prev]);
+      setExpandedSubGroupIds((prev) => ({ ...prev, [savedGroup.id]: true }));
+      toast.success("Main Item Group created successfully.");
+    } else {
+      setItemGroups((prev) => prev.map((g) => (g.id === savedGroup.id ? savedGroup : g)));
+      toast.success("Item Group updated successfully.");
+    }
+    setIsItemGroupModalOpen(false);
+  };
+
+  const handleOpenDeleteItemGroup = (grp: ItemGroup) => {
+    const hasSub = itemSubGroups.some((sg) => sg.itemGroupId === grp.id);
+    const hasItem = items.some((it) => {
+      const sg = itemSubGroups.find((s) => s.id === it.subGroupId);
+      return (it.itemGroupId || (it as any).groupId) === grp.id || sg?.itemGroupId === grp.id;
+    });
+    if (hasSub || hasItem) {
+      toast.error(`Cannot delete "${grp.groupName}" because it contains sub-groups or items.`);
+      return;
+    }
+    setItemToDelete({ ...grp, _type: "item-group" });
+    setIsDeleteConfirmOpen(true);
   };
 
   const handleOpenCreateItemForSubGroup = (node: ItemSubGroup) => {
@@ -841,6 +888,10 @@ function InventoryConfigurationPage() {
                   origins={origins}
                   uoms={uoms}
                   warehouses={warehouses}
+                  allItemGroups={itemGroups}
+                  allSubGroups={itemSubGroups}
+                  onItemGroupsChange={(updated) => setItemGroups(updated)}
+                  onItemSubGroupsChange={(updated) => setItemSubGroups(updated)}
                   onSave={(saved) => {
                     if (pageMode === "create") {
                       setItems((prev) => [saved, ...prev]);
@@ -1044,14 +1095,24 @@ function InventoryConfigurationPage() {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleOpenAddRootSubGroup}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-2xs cursor-pointer ml-auto"
-                    >
-                      <Plus className="size-3.5" />
-                      <span>+ Add Sub Group</span>
-                    </button>
+                    <div className="flex items-center gap-2 ml-auto flex-wrap">
+                      <button
+                        type="button"
+                        onClick={handleOpenAddItemGroup}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-2xs cursor-pointer"
+                      >
+                        <Plus className="size-3.5" />
+                        <span>+ Add Item Group</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleOpenAddRootSubGroup}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold transition shadow-2xs cursor-pointer"
+                      >
+                        <Plus className="size-3.5" />
+                        <span>+ Add Sub Group</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Selected Node Path Breadcrumbs */}
@@ -1317,11 +1378,27 @@ function InventoryConfigurationPage() {
                                     </span>
                                     <button
                                       type="button"
-                                      onClick={() => handleOpenAddRootSubGroup()}
+                                      onClick={() => handleOpenAddSubGroupChild(null as any, grp.id)}
                                       title={`Add sub group under ${grp.groupName}`}
                                       className="size-6 rounded flex items-center justify-center bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white transition cursor-pointer"
                                     >
                                       <Plus className="size-3" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenEditItemGroup(grp)}
+                                      title={`Edit group ${grp.groupName}`}
+                                      className="size-6 rounded flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                    >
+                                      <Edit className="size-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenDeleteItemGroup(grp)}
+                                      title={`Delete group ${grp.groupName}`}
+                                      className="size-6 rounded flex items-center justify-center hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 transition cursor-pointer"
+                                    >
+                                      <Trash2 className="size-3.5" />
                                     </button>
                                   </div>
                                 </div>
@@ -2046,6 +2123,15 @@ function InventoryConfigurationPage() {
           onImport={(rows) => handleExcelImport(EXCEL_UPLOAD_SUPPORTED_TABS[activeTab], rows)}
         />
       )}
+
+      {/* ITEM GROUP MODAL */}
+      <ItemGroupModal
+        isOpen={isItemGroupModalOpen}
+        mode={itemGroupModalMode}
+        initialData={itemGroupModalData}
+        onClose={() => setIsItemGroupModalOpen(false)}
+        onSave={handleSaveItemGroup}
+      />
     </div>
   );
 }

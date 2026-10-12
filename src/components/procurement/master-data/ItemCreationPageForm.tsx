@@ -13,25 +13,40 @@ import {
   Search,
   ChevronDown,
   Check,
+  ChevronRight,
+  X,
 } from "lucide-react";
 import {
   ItemProductMaster,
   ItemSubGroup,
   ItemGroup,
   DEFAULT_ITEM_GROUPS,
+  DEFAULT_ITEM_SUB_GROUPS,
   getStoredData,
+  setStoredData,
   ItemCategory,
   Brand,
   Origin,
   UOM,
   WarehouseStore,
 } from "@/lib/procurement-master-data";
+import { ItemGroupModal } from "@/components/procurement/master-data/ItemGroupModal";
+import {
+  buildSubGroupTreeNodes,
+  getSubGroupBreadcrumb,
+  SubGroupTreeNode,
+} from "@/routes/procurement-master-data";
+import { toast } from "sonner";
 
 interface ItemCreationPageFormProps {
   mode: "create" | "edit" | "view";
   initialData?: ItemProductMaster | null;
   targetSubGroup?: ItemSubGroup | null;
   subGroupBreadcrumb?: string;
+  allItemGroups?: ItemGroup[];
+  allSubGroups?: ItemSubGroup[];
+  onItemGroupsChange?: (groups: ItemGroup[]) => void;
+  onItemSubGroupsChange?: (subGroups: ItemSubGroup[]) => void;
   itemCategories: ItemCategory[];
   brands: Brand[];
   origins: Origin[];
@@ -183,6 +198,10 @@ export function ItemCreationPageForm({
   initialData,
   targetSubGroup,
   subGroupBreadcrumb,
+  allItemGroups,
+  allSubGroups,
+  onItemGroupsChange,
+  onItemSubGroupsChange,
   itemCategories,
   brands,
   origins,
@@ -192,8 +211,142 @@ export function ItemCreationPageForm({
   onCancel,
   onSwitchToEdit,
 }: ItemCreationPageFormProps) {
+  const [itemGroups, setItemGroups] = useState<ItemGroup[]>(() => {
+    if (allItemGroups && allItemGroups.length > 0) return allItemGroups;
+    return getStoredData("proc_item_groups", DEFAULT_ITEM_GROUPS);
+  });
+
+  const [itemSubGroups, setItemSubGroups] = useState<ItemSubGroup[]>(() => {
+    if (allSubGroups && allSubGroups.length > 0) return allSubGroups;
+    return getStoredData("proc_item_sub_groups_v2", DEFAULT_ITEM_SUB_GROUPS);
+  });
+
+  useEffect(() => {
+    if (allItemGroups && allItemGroups.length > 0) setItemGroups(allItemGroups);
+  }, [allItemGroups]);
+
+  useEffect(() => {
+    if (allSubGroups && allSubGroups.length > 0) setItemSubGroups(allSubGroups);
+  }, [allSubGroups]);
+
+  // Tree Explorer State
+  const [isTreeExpanded, setIsTreeExpanded] = useState(false);
+  const [treeSearch, setTreeSearch] = useState("");
+  const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
+
+  // Item Group Modal
+  const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  const [groupModalMode, setGroupModalMode] = useState<"create" | "edit">("create");
+  const [groupModalData, setGroupModalData] = useState<Partial<ItemGroup> | null>(null);
+
+  // Sub Group Modal
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
+  const [subModalMode, setSubModalMode] = useState<"create" | "edit">("create");
+  const [subModalValues, setSubModalValues] = useState<Partial<ItemSubGroup>>({});
+  const [subModalErrors, setSubModalErrors] = useState<Record<string, string>>({});
+
+  const handleOpenAddItemGroup = () => {
+    setGroupModalMode("create");
+    setGroupModalData(null);
+    setIsGroupModalOpen(true);
+  };
+
+  const handleOpenEditItemGroup = (grp: ItemGroup) => {
+    setGroupModalMode("edit");
+    setGroupModalData(grp);
+    setIsGroupModalOpen(true);
+  };
+
+  const handleSaveItemGroup = (savedGroup: ItemGroup) => {
+    const updated = [savedGroup, ...itemGroups.filter((g) => g.id !== savedGroup.id)];
+    setItemGroups(updated);
+    setStoredData("proc_item_groups", updated);
+    setStoredData("cripton_master_item_groups", updated);
+    onItemGroupsChange?.(updated);
+    setExpandedNodes((prev) => ({ ...prev, [savedGroup.id]: true }));
+    setIsGroupModalOpen(false);
+    toast.success(
+      groupModalMode === "create"
+        ? "Main Item Group created successfully."
+        : "Item Group updated successfully.",
+    );
+  };
+
+  const handleOpenAddSubGroupUnderGroup = (grp: ItemGroup) => {
+    setSubModalMode("create");
+    setSubModalValues({
+      subGroupCode: `SUB-${Math.floor(100 + Math.random() * 900)}`,
+      subGroupName: "",
+      itemGroupId: grp.id,
+      parentSubGroupId: null,
+      description: "",
+      status: "Active",
+    });
+    setSubModalErrors({});
+    setIsSubModalOpen(true);
+  };
+
+  const handleOpenAddChildSubGroup = (parentSub: ItemSubGroup) => {
+    setSubModalMode("create");
+    setSubModalValues({
+      subGroupCode: `SUB-${Math.floor(100 + Math.random() * 900)}`,
+      subGroupName: "",
+      itemGroupId: parentSub.itemGroupId,
+      parentSubGroupId: parentSub.id,
+      description: "",
+      status: "Active",
+    });
+    setSubModalErrors({});
+    setIsSubModalOpen(true);
+  };
+
+  const handleSelectSubGroup = (node: ItemSubGroup, currentSubs = itemSubGroups) => {
+    const parentGroup = itemGroups.find((g) => g.id === node.itemGroupId);
+    const bc = getSubGroupBreadcrumb(node.id, currentSubs, itemGroups);
+    setFormData((prev) => ({
+      ...prev,
+      subGroupId: node.id,
+      subGroupName: node.subGroupName,
+      subGroupBreadcrumb: bc,
+      serviceFlag: parentGroup ? !!parentGroup.serviceFlag : prev.serviceFlag,
+    }));
+    toast.info(`Assigned to "${node.subGroupName}"`);
+  };
+
+  const handleSaveSubGroupModal = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!subModalValues.subGroupName?.trim()) {
+      setSubModalErrors({ subGroupName: "Sub Group Name is required" });
+      return;
+    }
+
+    const newSub: ItemSubGroup = {
+      id: subModalValues.id || `sub-${Date.now()}`,
+      subGroupCode: subModalValues.subGroupCode || `SUB-${Date.now()}`,
+      subGroupName: subModalValues.subGroupName || "",
+      itemGroupId: subModalValues.itemGroupId || itemGroups[0]?.id || "",
+      parentSubGroupId: subModalValues.parentSubGroupId || null,
+      description: subModalValues.description || "",
+      status: (subModalValues.status as any) || "Active",
+    };
+
+    const updated =
+      subModalMode === "create"
+        ? [...itemSubGroups, newSub]
+        : itemSubGroups.map((s) => (s.id === newSub.id ? newSub : s));
+
+    setItemSubGroups(updated);
+    setStoredData("proc_item_sub_groups_v2", updated);
+    onItemSubGroupsChange?.(updated);
+
+    // Auto-select this newly created sub-group for current item
+    handleSelectSubGroup(newSub, updated);
+
+    setIsSubModalOpen(false);
+    toast.success("Sub Group created and assigned successfully.");
+  };
+
   const [formData, setFormData] = useState<Partial<ItemProductMaster>>(() => {
-    const itemGroups = getStoredData("cripton_master_item_groups", DEFAULT_ITEM_GROUPS) as ItemGroup[];
     const parentGroup = itemGroups.find((g) => g.id === targetSubGroup?.itemGroupId);
     const inheritedServiceFlag = !!parentGroup?.serviceFlag;
 
@@ -469,25 +622,417 @@ export function ItemCreationPageForm({
         </div>
       </div>
 
-      {/* Target Sub Group Breadcrumb Card */}
-      {(targetSubGroup || formData.subGroupName) && (
-        <div className="p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/5 flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-            <FolderTree className="size-4" />
+      {/* Integrated Item Group Hierarchy & Classification Console */}
+      <div className="bg-card rounded-2xl border border-border/80 shadow-2xs overflow-hidden">
+        {/* Active Classification Header Bar */}
+        <div className="p-3.5 sm:p-4 bg-muted/20 border-b border-border/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+              <FolderTree className="size-4.5" />
+            </div>
+            <div className="text-xs min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold uppercase text-[10px] text-amber-600 dark:text-amber-400 tracking-wider">
+                  Item Group Hierarchy
+                </span>
+                <span className="text-muted-foreground/40">•</span>
+                <span className="text-[11px] text-muted-foreground">
+                  Parent Classification
+                </span>
+              </div>
+              <div className="font-bold text-foreground text-sm font-mono truncate mt-0.5">
+                {formData.subGroupBreadcrumb ||
+                  subGroupBreadcrumb ||
+                  (formData.subGroupId
+                    ? getSubGroupBreadcrumb(formData.subGroupId, itemSubGroups, itemGroups)
+                    : "No Sub-Group Selected (Choose from Hierarchy)")}
+              </div>
+            </div>
           </div>
-          <div className="text-xs">
-            <span className="font-bold text-amber-700 dark:text-amber-400">
-              Assigned Parent Sub Group:
-            </span>
-            <span className="ml-2 font-mono font-bold text-foreground">
-              {subGroupBreadcrumb ||
-                formData.subGroupBreadcrumb ||
-                targetSubGroup?.subGroupName ||
-                formData.subGroupName}
-            </span>
-            <span className="ml-2 text-[10px] text-muted-foreground">
-              (Item is permanently classified under this tree node)
-            </span>
+
+          <div className="flex items-center gap-2 flex-wrap shrink-0">
+            <button
+              type="button"
+              onClick={handleOpenAddItemGroup}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-2xs cursor-pointer"
+            >
+              <Plus className="size-3.5" />
+              <span>+ Add Item Group</span>
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                handleOpenAddSubGroupUnderGroup(
+                  itemGroups[0] || { id: "grp-1", groupCode: "GRP-01", groupName: "General" } as ItemGroup,
+                )
+              }
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold transition cursor-pointer"
+            >
+              <Plus className="size-3.5" />
+              <span>+ Add Sub Group</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsTreeExpanded((prev) => !prev)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/80 bg-background hover:bg-muted text-foreground text-xs font-bold transition cursor-pointer"
+            >
+              <Layers className="size-3.5 text-amber-500" />
+              <span>{isTreeExpanded ? "Hide Hierarchy" : "View / Change Hierarchy"}</span>
+              <ChevronDown
+                className={`size-3.5 transition-transform ${isTreeExpanded ? "rotate-180" : ""}`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Expandable Hierarchy Tree Explorer */}
+        {isTreeExpanded && (
+          <div className="p-4 bg-background border-b border-border/70 space-y-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+              <div className="relative w-full sm:w-72">
+                <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={treeSearch}
+                  onChange={(e) => setTreeSearch(e.target.value)}
+                  placeholder="Search groups or sub-groups..."
+                  className="w-full pl-8.5 pr-7 h-8 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
+                />
+                {treeSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setTreeSearch("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    <X className="size-3" />
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const allExp: Record<string, boolean> = {};
+                    itemGroups.forEach((g) => (allExp[g.id] = true));
+                    itemSubGroups.forEach((s) => (allExp[s.id] = true));
+                    setExpandedNodes(allExp);
+                  }}
+                  className="px-2.5 py-1 rounded text-[11px] font-bold border border-border bg-card hover:bg-muted text-foreground transition cursor-pointer"
+                >
+                  Expand All
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setExpandedNodes({})}
+                  className="px-2.5 py-1 rounded text-[11px] font-bold border border-border bg-card hover:bg-muted text-foreground transition cursor-pointer"
+                >
+                  Collapse All
+                </button>
+              </div>
+            </div>
+
+            {/* Tree nodes list */}
+            <div className="rounded-xl border border-border/70 p-3 bg-card space-y-2 max-h-80 overflow-y-auto">
+              {itemGroups.map((grp) => {
+                const rootSubs = buildSubGroupTreeNodes(itemSubGroups, grp.id, null, 1);
+                const isExpanded = expandedNodes[grp.id] !== false;
+                const isGrpActive =
+                  formData.subGroupId &&
+                  itemSubGroups.find((s) => s.id === formData.subGroupId)?.itemGroupId === grp.id;
+
+                const renderTreeNodes = (nodes: SubGroupTreeNode[]) => (
+                  <div className="space-y-1">
+                    {nodes.map((node) => {
+                      const hasKids = node.children && node.children.length > 0;
+                      const isNodeExp = !!expandedNodes[node.id];
+                      const isSelected = formData.subGroupId === node.id;
+                      const matchesSearch =
+                        Boolean(treeSearch.trim()) &&
+                        (node.subGroupName.toLowerCase().includes(treeSearch.toLowerCase()) ||
+                          node.subGroupCode.toLowerCase().includes(treeSearch.toLowerCase()));
+
+                      return (
+                        <div key={node.id} className="space-y-1">
+                          <div
+                            style={{ paddingLeft: `${node.depth * 18 + 6}px` }}
+                            className={`flex items-center justify-between p-1.5 rounded-lg text-xs transition border ${
+                              isSelected
+                                ? "bg-amber-500/20 border-amber-500 font-bold"
+                                : matchesSearch
+                                  ? "bg-amber-500/10 border-amber-500/40"
+                                  : "hover:bg-muted/40 border-border/30 bg-background"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              {hasKids ? (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setExpandedNodes((prev) => ({
+                                      ...prev,
+                                      [node.id]: !prev[node.id],
+                                    }))
+                                  }
+                                  className="size-4.5 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
+                                >
+                                  {isNodeExp ? (
+                                    <ChevronDown className="size-3 text-amber-500" />
+                                  ) : (
+                                    <ChevronRight className="size-3" />
+                                  )}
+                                </button>
+                              ) : (
+                                <span className="w-4.5 text-center text-muted-foreground/30 font-mono text-[10px] shrink-0">
+                                  ─
+                                </span>
+                              )}
+                              <span className="font-semibold text-foreground truncate">
+                                {node.subGroupName}
+                              </span>
+                              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted/70 text-muted-foreground shrink-0">
+                                {node.subGroupCode}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenAddChildSubGroup(node)}
+                                title="Add child sub-group under this node"
+                                className="size-5 rounded flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                              >
+                                <Plus className="size-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleSelectSubGroup(node)}
+                                className={`px-2 py-0.5 rounded text-[10px] font-bold transition cursor-pointer ${
+                                  isSelected
+                                    ? "bg-amber-500 text-white shadow-2xs"
+                                    : "bg-muted hover:bg-amber-500/15 text-muted-foreground hover:text-amber-600"
+                                }`}
+                              >
+                                {isSelected ? "Selected" : "Select for Item"}
+                              </button>
+                            </div>
+                          </div>
+
+                          {hasKids && isNodeExp && (
+                            <div className="border-l-2 border-amber-500/20 ml-4 pl-1 space-y-1">
+                              {renderTreeNodes(node.children)}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+
+                return (
+                  <div key={grp.id} className="space-y-1">
+                    {/* Main Item Group Row */}
+                    <div
+                      className={`flex items-center justify-between p-2 rounded-xl text-xs border ${
+                        isGrpActive
+                          ? "bg-amber-500/15 border-amber-500/60"
+                          : "bg-muted/40 hover:bg-muted/70 border-border/80"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setExpandedNodes((prev) => ({
+                              ...prev,
+                              [grp.id]: !isExpanded,
+                            }))
+                          }
+                          className="size-5 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
+                        >
+                          {isExpanded ? (
+                            <ChevronDown className="size-3.5 text-amber-500" />
+                          ) : (
+                            <ChevronRight className="size-3.5" />
+                          )}
+                        </button>
+                        <Layers className="size-4 text-amber-500 shrink-0" />
+                        <span className="font-extrabold text-foreground truncate">
+                          {grp.groupName}
+                        </span>
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-background border border-border text-muted-foreground shrink-0">
+                          {grp.groupCode}
+                        </span>
+                        {grp.serviceFlag && (
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 shrink-0">
+                            SERVICE
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenAddSubGroupUnderGroup(grp)}
+                          title={`Add sub group under ${grp.groupName}`}
+                          className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white transition cursor-pointer"
+                        >
+                          <Plus className="size-3" />
+                          <span>+ Sub Group</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditItemGroup(grp)}
+                          title="Edit Group"
+                          className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                          <Edit className="size-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Sub Groups under this Main Group */}
+                    {isExpanded && rootSubs.length > 0 && (
+                      <div className="pl-3 border-l-2 border-amber-500/30 ml-3.5 my-1 space-y-1">
+                        {renderTreeNodes(rootSubs)}
+                      </div>
+                    )}
+                    {isExpanded && rootSubs.length === 0 && (
+                      <div className="pl-8 py-1 text-[11px] text-muted-foreground italic">
+                        No sub-groups configured under this group yet.
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Main Item Group Modal */}
+      <ItemGroupModal
+        isOpen={isGroupModalOpen}
+        mode={groupModalMode}
+        initialData={groupModalData}
+        onSave={handleSaveItemGroup}
+        onClose={() => setIsGroupModalOpen(false)}
+      />
+
+      {/* Sub Group Modal */}
+      {isSubModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-card w-full max-w-lg rounded-2xl border border-border shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95">
+            <div className="p-4 sm:p-5 border-b border-border/70 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <FolderTree className="size-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-extrabold text-foreground">
+                    {subModalMode === "create" ? "Create Sub Group" : "Edit Sub Group"}
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Classify items in the dynamic hierarchical tree
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsSubModalOpen(false)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveSubGroupModal} className="p-4 sm:p-5 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold mb-1 text-foreground">
+                    Parent Item Group <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={subModalValues.itemGroupId || ""}
+                    onChange={(e) =>
+                      setSubModalValues({ ...subModalValues, itemGroupId: e.target.value })
+                    }
+                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
+                  >
+                    {itemGroups.map((g) => (
+                      <option key={g.id} value={g.id}>
+                        {g.groupName} ({g.groupCode})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold mb-1 text-foreground">
+                    Sub Group Code <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={subModalValues.subGroupCode || ""}
+                    onChange={(e) =>
+                      setSubModalValues({ ...subModalValues, subGroupCode: e.target.value })
+                    }
+                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold mb-1 text-foreground">
+                    Sub Group Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={subModalValues.subGroupName || ""}
+                    onChange={(e) =>
+                      setSubModalValues({ ...subModalValues, subGroupName: e.target.value })
+                    }
+                    placeholder="e.g. Cotton Yarns, Circuit Boards"
+                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
+                  />
+                  {subModalErrors.subGroupName && (
+                    <p className="text-[10px] text-rose-500 mt-1">
+                      {subModalErrors.subGroupName}
+                    </p>
+                  )}
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold mb-1 text-foreground">
+                    Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={subModalValues.description || ""}
+                    onChange={(e) =>
+                      setSubModalValues({ ...subModalValues, description: e.target.value })
+                    }
+                    className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-border/70 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsSubModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex items-center gap-1.5 px-4.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                >
+                  <Save className="size-3.5" />
+                  <span>Save Sub Group</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -65,6 +65,11 @@ export const nav: NavItem[] = [
         search: { tab: "supplier-vendor" },
       },
       {
+        label: "Business Type",
+        to: "/procurement-master-data",
+        search: { tab: "business-type" },
+      },
+      {
         label: "Payment Terms",
         to: "/procurement-master-data",
         search: { tab: "payment-terms" },
