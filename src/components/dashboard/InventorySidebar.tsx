@@ -431,7 +431,7 @@ export function InventorySidebar() {
   }
 
   return (
-    <aside className="hidden lg:flex w-64 h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300">
+    <aside className="hidden lg:flex w-80 h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300">
       <Link
         to="/module-selection"
         className="px-5 py-4 flex items-center gap-2.5 border-b border-sidebar-border/80 group transition-all duration-300 hover:bg-sidebar-accent/30 cursor-pointer relative z-50"
@@ -520,7 +520,7 @@ export function InventorySidebar() {
                   ].join(" ")}
                 >
                   <Icon className="size-3.5 transition-transform duration-300 group-hover:scale-110 group-hover:text-sidebar-primary" />
-                  <span>{item.label}</span>
+                  <span className="truncate" title={item.label}>{item.label}</span>
                   {isPlaceholder ? (
                     <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
                       Soon
@@ -554,7 +554,7 @@ export function InventorySidebar() {
                     isParentActive ? "text-success font-black" : "text-sidebar-foreground/60",
                   ].join(" ")}
                 />
-                <span className="flex-1 truncate">{item.label}</span>
+                <span className="flex-1 truncate" title={item.label}>{item.label}</span>
                 {item.count !== undefined && item.count > 0 && (
                   <span className="bg-amber-500/10 text-amber-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md mr-1 leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
                     {item.count}
@@ -598,7 +598,7 @@ export function InventorySidebar() {
                                   : "text-sidebar-foreground/45",
                               ].join(" ")}
                             />
-                            <span className="truncate">{sub.label}</span>
+                            <span className="truncate" title={sub.label}>{sub.label}</span>
                           </div>
                           {sub.count !== undefined && sub.count > 0 && (
                             <span className="bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
@@ -613,7 +613,7 @@ export function InventorySidebar() {
                         </button>
                         <div
                           className={[
-                            "overflow-hidden transition-all duration-300 space-y-0.5 pl-6",
+                            "overflow-hidden transition-all duration-300 space-y-0.5 pl-4.5",
                             isSubOpen
                               ? "max-h-[300px] opacity-100 py-0.5 mt-0.5"
                               : "max-h-0 opacity-0",
@@ -638,7 +638,7 @@ export function InventorySidebar() {
                                     isNestedActive ? "bg-primary" : "bg-sidebar-foreground/20",
                                   ].join(" ")}
                                 />
-                                <span className="truncate">{nested.label}</span>
+                                <span className="truncate" title={nested.label}>{nested.label}</span>
                                 {nested.count !== undefined && nested.count > 0 && (
                                   <span className="ml-auto bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
                                     {nested.count}
@@ -679,7 +679,7 @@ export function InventorySidebar() {
                           isSubActive ? "text-primary font-black" : "text-sidebar-foreground/45",
                         ].join(" ")}
                       />
-                      <span className="truncate">{sub.label}</span>
+                      <span className="truncate" title={sub.label}>{sub.label}</span>
                       {sub.count !== undefined && sub.count > 0 && (
                         <span className="ml-auto bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
                           {sub.count}

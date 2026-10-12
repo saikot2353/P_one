@@ -296,7 +296,7 @@ export function ProcurementSidebar() {
   }
 
   return (
-    <aside className="hidden lg:flex w-64 h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300">
+    <aside className="hidden lg:flex w-80 h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300">
       <Link
         to="/module-selection"
         className="px-5 py-4 flex items-center gap-2.5 border-b border-sidebar-border/80 group transition-all duration-300 hover:bg-sidebar-accent/30 cursor-pointer relative z-50"
@@ -374,7 +374,7 @@ export function ProcurementSidebar() {
                   ].join(" ")}
                 >
                   <Icon className="size-3.5 transition-transform duration-300 group-hover:scale-110 group-hover:text-amber-500" />
-                  <span>{item.label}</span>
+                  <span className="truncate" title={item.label}>{item.label}</span>
                   {isPlaceholder ? (
                     <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                       Soon
@@ -408,7 +408,7 @@ export function ProcurementSidebar() {
                     isParentActive ? "text-amber-500 font-black" : "text-sidebar-foreground/60",
                   ].join(" ")}
                 />
-                <span className="flex-1 truncate">{item.label}</span>
+                <span className="flex-1 truncate" title={item.label}>{item.label}</span>
                 {isOpen ? (
                   <ChevronDown className="size-3.5 text-sidebar-foreground/45 transition-transform duration-300 rotate-180" />
                 ) : (
@@ -442,7 +442,7 @@ export function ProcurementSidebar() {
                           isSubActive ? "text-amber-500 font-black" : "text-sidebar-foreground/45",
                         ].join(" ")}
                       />
-                      <span className="truncate">{sub.label}</span>
+                      <span className="truncate" title={sub.label}>{sub.label}</span>
                     </Link>
                   );
                 })}
