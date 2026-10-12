@@ -94,6 +94,18 @@ export interface VendorCategory {
 }
 
 // -------------------------------------------------------------
+// Form 03B: Business Type
+// -------------------------------------------------------------
+export interface BusinessType {
+  id: string;
+  typeCode: string;
+  businessTypeName: string;
+  description?: string;
+  status: "Active" | "Inactive";
+}
+
+
+// -------------------------------------------------------------
 // Form 04: Supplier / Vendor Master
 // -------------------------------------------------------------
 export type VendorType =
@@ -870,6 +882,44 @@ export const DEFAULT_VENDOR_CATEGORIES: VendorCategory[] = [
     categoryCode: "VCAT-RAW",
     categoryName: "Raw Material Supplier",
     description: "Raw cotton, viscose fiber, elastane, dyestuff and chemical suppliers",
+    status: "Active",
+  },
+];
+
+export const DEFAULT_BUSINESS_TYPES: BusinessType[] = [
+  {
+    id: "bt-1",
+    typeCode: "BT-MFG",
+    businessTypeName: "Manufacturing",
+    description: "Industrial plants, factories and direct product manufacturers",
+    status: "Active",
+  },
+  {
+    id: "bt-2",
+    typeCode: "BT-DIST",
+    businessTypeName: "Distributor",
+    description: "Authorized wholesale and countrywide commercial distributors",
+    status: "Active",
+  },
+  {
+    id: "bt-3",
+    typeCode: "BT-TRD",
+    businessTypeName: "Trader / Indentor",
+    description: "Commercial trading agencies, indentors and merchant suppliers",
+    status: "Active",
+  },
+  {
+    id: "bt-4",
+    typeCode: "BT-SRV",
+    businessTypeName: "Service Provider",
+    description: "Technical, engineering, maintenance and consulting service providers",
+    status: "Active",
+  },
+  {
+    id: "bt-5",
+    typeCode: "BT-CON",
+    businessTypeName: "Contractor",
+    description: "Civil, electrical, mechanical and turnkey project contractors",
     status: "Active",
   },
 ];

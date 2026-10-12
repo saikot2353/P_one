@@ -72,13 +72,17 @@ import {
   BudgetApproval,
   ApprovalAuthority,
   DocumentNumberSeries,
+  BusinessType,
+  DEFAULT_BUSINESS_TYPES,
 } from "@/lib/procurement-master-data";
 import { employeesData } from "@/routes/personnel-list";
 
 // Import dedicated page forms
 import { WarehouseStorePageForm } from "@/components/procurement/master-data/WarehouseStorePageForm";
 import { SupplierVendorPageForm } from "@/components/procurement/master-data/SupplierVendorPageForm";
+import { BusinessTypePageForm } from "@/components/procurement/master-data/BusinessTypePageForm";
 import { ItemCreationPageForm } from "@/components/procurement/master-data/ItemCreationPageForm";
+import { ItemGroupModal } from "@/components/procurement/master-data/ItemGroupModal";
 import { BudgetManagementPageForm } from "@/components/procurement/master-data/BudgetManagementPageForm";
 import { BudgetApprovalPageForm } from "@/components/procurement/master-data/BudgetApprovalPageForm";
 import { ApprovalAuthorityPageForm } from "@/components/procurement/master-data/ApprovalAuthorityPageForm";
@@ -102,6 +106,7 @@ export type MasterDataTab =
   | "store-location"
   | "vendor-category"
   | "supplier-vendor"
+  | "business-type"
   | "item-group"
   | "item-sub-group"
   | "item-category"
@@ -222,6 +227,72 @@ const TAB_GROUPS: TabGroup[] = [
         countKey: "suppliers",
         desc: "Supplier directory, contacts, banking, and terms",
       },
+      {
+        id: "business-type",
+        label: "Business Type",
+        icon: Building2,
+        countKey: "businessTypes",
+        desc: "Commercial business classifications and vendor trade types",
+      },
+    ],
+  },
+  {
+    groupName: "Product Catalog & Hierarchy",
+    tabs: [
+      {
+        id: "item-sub-group",
+        label: "Item Creation",
+        icon: Package,
+        countKey: "itemSubGroups",
+        desc: "Item catalog, dynamic group & sub-group hierarchy, and item creation",
+      },
+      {
+        id: "item-category",
+        label: "Item Category",
+        icon: Tags,
+        countKey: "itemCategories",
+        desc: "Product categories with inventory, asset, consumable classifications",
+      },
+      {
+        id: "brand",
+        label: "Brand Master",
+        icon: Award,
+        countKey: "brands",
+        desc: "Manufacturer brands, origin countries and official websites",
+      },
+      {
+        id: "origin",
+        label: "Origin Master",
+        icon: Globe,
+        countKey: "origins",
+        desc: "Country of origin master codes and names",
+      },
+      {
+        id: "uom",
+        label: "Unit of Measurement (UOM)",
+        icon: Ruler,
+        countKey: "uoms",
+        desc: "Measurement units and multi-level conversion factors",
+      },
+    ],
+  },
+  {
+    groupName: "Warehouse & Storage",
+    tabs: [
+      {
+        id: "warehouse-store",
+        label: "Warehouse / Store",
+        icon: Building2,
+        countKey: "warehouses",
+        desc: "Warehouse facilities, managers, valuation & permissions",
+      },
+      {
+        id: "store-location",
+        label: "Store Location / Batch Configuration",
+        icon: Layers,
+        countKey: "locations",
+        desc: "Location tracking and batch configuration rules",
+      },
     ],
   },
   {
@@ -280,7 +351,9 @@ const TAB_GROUPS: TabGroup[] = [
 
 function ProcurementMasterDataPage() {
   const searchParams = Route.useSearch();
-  const activeTab: MasterDataTab = searchParams.tab || "vendor-category";
+  const rawTab: MasterDataTab = searchParams.tab || "vendor-category";
+  // Route legacy/direct item-group tab to item-sub-group (Item Creation)
+  const activeTab = (rawTab === "item-group" ? "item-sub-group" : rawTab) as MasterDataTab;
 
   // Master Data State with LocalStorage backing
   const [warehouses, setWarehouses] = useState<WarehouseStore[]>(() =>
@@ -330,12 +403,16 @@ function ProcurementMasterDataPage() {
   const [docSeries, setDocSeries] = useState<DocumentNumberSeries[]>(() =>
     getStoredData("proc_doc_series", DEFAULT_DOCUMENT_SERIES),
   );
+  const [businessTypes, setBusinessTypes] = useState<BusinessType[]>(() =>
+    getStoredData("proc_business_types", DEFAULT_BUSINESS_TYPES),
+  );
 
   // Sync to local storage
   useEffect(() => setStoredData("proc_warehouses_v2", warehouses), [warehouses]);
   useEffect(() => setStoredData("proc_locations_v2", locations), [locations]);
   useEffect(() => setStoredData("proc_vendor_categories", vendorCategories), [vendorCategories]);
   useEffect(() => setStoredData("proc_suppliers_v2", suppliers), [suppliers]);
+  useEffect(() => setStoredData("proc_business_types", businessTypes), [businessTypes]);
   useEffect(() => setStoredData("proc_item_groups", itemGroups), [itemGroups]);
   useEffect(() => setStoredData("proc_item_sub_groups_v2", itemSubGroups), [itemSubGroups]);
   useEffect(() => setStoredData("proc_item_categories", itemCategories), [itemCategories]);
@@ -354,6 +431,11 @@ function ProcurementMasterDataPage() {
   const [pageMode, setPageMode] = useState<"list" | "create" | "edit" | "view">("list");
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
   const [activeTargetSubGroup, setActiveTargetSubGroup] = useState<ItemSubGroup | null>(null);
+
+  // Item Group Modal for adding/editing root item groups
+  const [isItemGroupModalOpen, setIsItemGroupModalOpen] = useState(false);
+  const [itemGroupModalMode, setItemGroupModalMode] = useState<"create" | "edit">("create");
+  const [itemGroupModalData, setItemGroupModalData] = useState<Partial<ItemGroup> | null>(null);
 
   // SubGroup Modal for adding/editing dynamic sub-groups in tree
   const [isSubGroupModalOpen, setIsSubGroupModalOpen] = useState(false);
@@ -518,6 +600,7 @@ function ProcurementMasterDataPage() {
       locations: locations.length,
       vendorCategories: vendorCategories.length,
       suppliers: suppliers.length,
+      businessTypes: businessTypes.length,
       itemGroups: itemGroups.length,
       itemSubGroups: itemSubGroups.length,
       itemCategories: itemCategories.length,
@@ -537,6 +620,7 @@ function ProcurementMasterDataPage() {
       locations,
       vendorCategories,
       suppliers,
+      businessTypes,
       itemGroups,
       itemSubGroups,
       itemCategories,
@@ -577,6 +661,9 @@ function ProcurementMasterDataPage() {
         break;
       case "supplier-vendor":
         list = suppliers;
+        break;
+      case "business-type":
+        list = businessTypes;
         break;
       case "item-group":
         list = itemGroups;
@@ -632,6 +719,8 @@ function ProcurementMasterDataPage() {
         item.storeCode?.toLowerCase().includes(q) ||
         item.vendorName?.toLowerCase().includes(q) ||
         item.vendorCode?.toLowerCase().includes(q) ||
+        item.typeCode?.toLowerCase().includes(q) ||
+        item.businessTypeName?.toLowerCase().includes(q) ||
         item.groupName?.toLowerCase().includes(q) ||
         item.subGroupName?.toLowerCase().includes(q) ||
         item.categoryName?.toLowerCase().includes(q) ||
@@ -656,6 +745,7 @@ function ProcurementMasterDataPage() {
     locations,
     vendorCategories,
     suppliers,
+    businessTypes,
     itemGroups,
     itemSubGroups,
     itemCategories,
@@ -722,6 +812,11 @@ function ProcurementMasterDataPage() {
       case "supplier-vendor":
         setSuppliers((prev) => prev.map((s) => (s.id === record.id ? { ...s, status: newStatus } : s)));
         break;
+      case "business-type":
+        setBusinessTypes((prev) =>
+          prev.map((b) => (b.id === record.id ? { ...b, status: newStatus } : b)),
+        );
+        break;
       case "item-group":
         setItemGroups((prev) => prev.map((g) => (g.id === record.id ? { ...g, status: newStatus } : g)));
         break;
@@ -765,6 +860,14 @@ function ProcurementMasterDataPage() {
     if (!itemToDelete) return;
     const id = itemToDelete.id;
 
+    if (itemToDelete._type === "item-group") {
+      setItemGroups((prev) => prev.filter((g) => g.id !== id));
+      setIsDeleteConfirmOpen(false);
+      setItemToDelete(null);
+      toast.success("Item Group deleted successfully.");
+      return;
+    }
+
     switch (activeTab) {
       case "warehouse-store":
         setWarehouses((prev) => prev.filter((r) => r.id !== id));
@@ -777,6 +880,9 @@ function ProcurementMasterDataPage() {
         break;
       case "supplier-vendor":
         setSuppliers((prev) => prev.filter((r) => r.id !== id));
+        break;
+      case "business-type":
+        setBusinessTypes((prev) => prev.filter((r) => r.id !== id));
         break;
       case "item-group":
         setItemGroups((prev) => prev.filter((r) => r.id !== id));
@@ -819,6 +925,45 @@ function ProcurementMasterDataPage() {
     setIsDeleteConfirmOpen(false);
     setItemToDelete(null);
     toast.success("Record deleted successfully.");
+  };
+
+  // Item Group Handlers
+  const handleOpenAddItemGroup = () => {
+    setItemGroupModalMode("create");
+    setItemGroupModalData(null);
+    setIsItemGroupModalOpen(true);
+  };
+
+  const handleOpenEditItemGroup = (grp: ItemGroup) => {
+    setItemGroupModalMode("edit");
+    setItemGroupModalData(grp);
+    setIsItemGroupModalOpen(true);
+  };
+
+  const handleSaveItemGroup = (savedGroup: ItemGroup) => {
+    if (itemGroupModalMode === "create") {
+      setItemGroups((prev) => [savedGroup, ...prev]);
+      setExpandedSubGroupIds((prev) => ({ ...prev, [savedGroup.id]: true }));
+      toast.success("Main Item Group created successfully.");
+    } else {
+      setItemGroups((prev) => prev.map((g) => (g.id === savedGroup.id ? savedGroup : g)));
+      toast.success("Item Group updated successfully.");
+    }
+    setIsItemGroupModalOpen(false);
+  };
+
+  const handleOpenDeleteItemGroup = (grp: ItemGroup) => {
+    const hasSub = itemSubGroups.some((sg) => sg.itemGroupId === grp.id);
+    const hasItem = items.some((it) => {
+      const sg = itemSubGroups.find((s) => s.id === it.subGroupId);
+      return (it.itemGroupId || (it as any).groupId) === grp.id || sg?.itemGroupId === grp.id;
+    });
+    if (hasSub || hasItem) {
+      toast.error(`Cannot delete "${grp.groupName}" because it contains sub-groups or items.`);
+      return;
+    }
+    setItemToDelete({ ...grp, _type: "item-group" });
+    setIsDeleteConfirmOpen(true);
   };
 
   // Create Item button next to Add Child in Tree
@@ -1015,6 +1160,7 @@ function ProcurementMasterDataPage() {
                   mode={pageMode}
                   initialData={selectedRecord}
                   vendorCategories={vendorCategories}
+                  businessTypes={businessTypes}
                   origins={origins}
                   onSave={(saved) => {
                     if (pageMode === "create") {
@@ -1023,6 +1169,27 @@ function ProcurementMasterDataPage() {
                     } else {
                       setSuppliers((prev) => prev.map((s) => (s.id === saved.id ? saved : s)));
                       toast.success("Supplier updated successfully.");
+                    }
+                    setPageMode("list");
+                  }}
+                  onCancel={() => setPageMode("list")}
+                  onSwitchToEdit={() => setPageMode("edit")}
+                />
+              )}
+
+              {activeTab === "business-type" && (
+                <BusinessTypePageForm
+                  mode={pageMode}
+                  initialData={selectedRecord}
+                  onSave={(saved) => {
+                    if (pageMode === "create") {
+                      setBusinessTypes((prev) => [saved, ...prev]);
+                      toast.success("Business Type created successfully.");
+                    } else {
+                      setBusinessTypes((prev) =>
+                        prev.map((b) => (b.id === saved.id ? saved : b)),
+                      );
+                      toast.success("Business Type updated successfully.");
                     }
                     setPageMode("list");
                   }}
@@ -1041,6 +1208,10 @@ function ProcurementMasterDataPage() {
                       ? getSubGroupBreadcrumb(activeTargetSubGroup.id, itemSubGroups, itemGroups)
                       : ""
                   }
+                  allItemGroups={itemGroups}
+                  allSubGroups={itemSubGroups}
+                  onItemGroupsChange={setItemGroups}
+                  onItemSubGroupsChange={setItemSubGroups}
                   itemCategories={itemCategories}
                   brands={brands}
                   origins={origins}
@@ -1429,14 +1600,24 @@ function ProcurementMasterDataPage() {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleOpenAddRootSubGroup}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-2xs cursor-pointer ml-auto"
-                    >
-                      <Plus className="size-3.5" />
-                      <span>+ Add Sub Group</span>
-                    </button>
+                    <div className="flex items-center gap-2 ml-auto flex-wrap">
+                      <button
+                        type="button"
+                        onClick={handleOpenAddItemGroup}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-2xs cursor-pointer"
+                      >
+                        <Plus className="size-3.5" />
+                        <span>+ Add Item Group</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleOpenAddRootSubGroup}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold transition shadow-2xs cursor-pointer"
+                      >
+                        <Plus className="size-3.5" />
+                        <span>+ Add Sub Group</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Selected Node Path Breadcrumbs */}
@@ -1688,6 +1869,22 @@ function ProcurementMasterDataPage() {
                                       className="size-6 rounded flex items-center justify-center bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white transition cursor-pointer"
                                     >
                                       <Plus className="size-3" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenEditItemGroup(grp)}
+                                      title={`Edit group ${grp.groupName}`}
+                                      className="size-6 rounded flex items-center justify-center hover:bg-muted text-amber-500 hover:text-amber-600 transition cursor-pointer"
+                                    >
+                                      <Edit className="size-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenDeleteItemGroup(grp)}
+                                      title={`Delete group ${grp.groupName}`}
+                                      className="size-6 rounded flex items-center justify-center hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 transition cursor-pointer"
+                                    >
+                                      <Trash2 className="size-3.5" />
                                     </button>
                                   </div>
                                 </div>
@@ -1953,6 +2150,16 @@ function ProcurementMasterDataPage() {
                           </>
                         )}
 
+                        {/* BUSINESS TYPE */}
+                        {activeTab === "business-type" && (
+                          <>
+                            <th className="py-3 px-3.5">Type Code</th>
+                            <th className="py-3 px-3.5">Business Type Name</th>
+                            <th className="py-3 px-3.5">Description</th>
+                            <th className="py-3 px-3.5">Status</th>
+                          </>
+                        )}
+
                         {/* ITEM GROUP (Type / Category column REMOVED) */}
                         {activeTab === "item-group" && (
                           <>
@@ -2214,6 +2421,32 @@ function ProcurementMasterDataPage() {
                                   >
                                     {item.localForeignStatus || (item.country?.toLowerCase() === "bangladesh" ? "Local" : "Foreign")}
                                   </span>
+                                </td>
+                                <td className="py-2.5 px-3.5">
+                                  <span
+                                    className={`text-[9.5px] font-extrabold px-2 py-0.5 rounded-full border ${
+                                      item.status === "Active"
+                                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                                        : "bg-slate-500/10 text-slate-500 border-slate-500/20"
+                                    }`}
+                                  >
+                                    {item.status}
+                                  </span>
+                                </td>
+                              </>
+                            )}
+
+                            {/* BUSINESS TYPE */}
+                            {activeTab === "business-type" && (
+                              <>
+                                <td className="py-2.5 px-3.5 font-mono font-bold text-foreground">
+                                  {item.typeCode}
+                                </td>
+                                <td className="py-2.5 px-3.5 font-bold text-foreground">
+                                  {item.businessTypeName}
+                                </td>
+                                <td className="py-2.5 px-3.5 text-muted-foreground truncate max-w-xs">
+                                  {item.description || "—"}
                                 </td>
                                 <td className="py-2.5 px-3.5">
                                   <span
@@ -2815,6 +3048,15 @@ function ProcurementMasterDataPage() {
           onImport={(rows) => handleExcelImport(EXCEL_UPLOAD_SUPPORTED_TABS[activeTab], rows)}
         />
       )}
+
+      {/* ITEM GROUP MODAL */}
+      <ItemGroupModal
+        isOpen={isItemGroupModalOpen}
+        mode={itemGroupModalMode}
+        initialData={itemGroupModalData}
+        onSave={handleSaveItemGroup}
+        onClose={() => setIsItemGroupModalOpen(false)}
+      />
     </div>
   );
 }

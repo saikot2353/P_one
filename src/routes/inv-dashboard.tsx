@@ -1,74 +1,67 @@
 import { useState, useMemo } from "react";
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { InventorySidebar } from "@/components/dashboard/InventorySidebar";
 import { InventoryTopbar } from "@/components/dashboard/InventoryTopbar";
 import {
+  Boxes,
   Package,
-  TrendingUp,
   AlertTriangle,
-  ArrowUpRight,
-  ArrowDownRight,
+  ArrowRightLeft,
+  RotateCcw,
+  ExternalLink,
+  Building2,
   Store,
-  Clock,
+  Layers,
+  Calendar,
   CheckCircle2,
   AlertOctagon,
-  ShieldAlert,
-  ArrowRightLeft,
-  Boxes,
-  Layers,
-  ChevronRight,
-  Search,
-  ExternalLink,
-  RotateCcw,
-  SlidersHorizontal,
-  FileX2,
-  PackageOpen,
-  Filter,
-  Eye,
-  X,
-  Building2,
-  Activity,
-  ArrowRight,
-  BarChart3,
-  Calendar,
-  AlertCircle,
-  HelpCircle,
+  TrendingUp,
   TrendingDown,
+  Info,
+  ShieldAlert,
+  ArrowRight,
+  Filter,
 } from "lucide-react";
 import {
-  AreaChart,
-  Area,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   Legend,
 } from "recharts";
 import {
   DEFAULT_ITEMS,
   DEFAULT_WAREHOUSES,
   DEFAULT_ITEM_CATEGORIES,
-  ItemProductMaster,
 } from "@/lib/procurement-master-data";
 import {
-  getStoredMaterialIssues,
-  getStoredMaterialRequisitions,
-  getStoredStoreReturns,
-} from "@/lib/inventory-requisition-issue-data";
+  INITIAL_STOCK_BALANCE_DATA,
+  INITIAL_BATCH_STOCK_DATA,
+  INITIAL_RECEIPT_REGISTER_DATA,
+  INITIAL_ISSUE_REGISTER_DATA,
+  INITIAL_STOCK_TRANSFER_DATA,
+  INITIAL_STOCK_ADJUSTMENT_DATA,
+  INITIAL_STOCK_WRITEOFF_DATA,
+  INITIAL_LEDGER_DATA,
+  INITIAL_SUPPLIER_RETURN_REPORT_DATA,
+} from "@/lib/reports-mock-data";
 import {
   getStoredInterCompanyTransfers,
-  getStoredInterCompanyReceives,
-  getStoredStockAdjustments,
-  getStoredStockWriteOffs,
   MASTER_COMPANIES,
 } from "@/lib/inventory-stock-management-data";
 import {
-  getStoredMaterialReceipts,
-  getStoredOpeningStocks,
-} from "@/lib/procurement-order-inventory-data";
+  formatAmount,
+  getActiveCurrencyConfig,
+} from "@/lib/currency-format-utils";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/inv-dashboard")({
   head: () => ({
@@ -77,550 +70,761 @@ export const Route = createFileRoute("/inv-dashboard")({
       {
         name: "description",
         content:
-          "Management-focused Inventory Dashboard with high-level stock position, movement velocity, critical inventory alerts, and one-click drilldowns.",
+          "Executive chart-driven Inventory Management Dashboard with stock movement velocity, valuation by store, stock health, transaction distribution, and inventory risk analysis.",
       },
     ],
   }),
   component: InvDashboardPage,
 });
 
+// ---------------------------------------------------------------------------
+// Unified Inventory Item Definition for Dashboard Analytics
+// ---------------------------------------------------------------------------
+export interface DashboardStockItem {
+  id: string;
+  itemCode: string;
+  itemName: string;
+  company: string;
+  store: string;
+  itemGroup: string;
+  itemCategory: string;
+  uom: string;
+  currentStock: number;
+  reorderLevel: number;
+  criticalLevel: number;
+  unitCost: number;
+  stockValue: number;
+  status: "Healthy Stock" | "Low Stock" | "Critical Stock" | "Out of Stock";
+  batchTracking: boolean;
+  expiryTracking: boolean;
+  isExpiringSoon?: boolean;
+  isExpired?: boolean;
+}
+
+// Master comprehensive stock item population across all companies & warehouses
+const MASTER_INVENTORY_ITEMS: DashboardStockItem[] = [
+  {
+    id: "stk-1",
+    itemCode: "YRN-001",
+    itemName: "Cotton Yarn 30/1 Combed",
+    company: "Pakiza Knit Composite Ltd",
+    store: "Yarn Store (PKCL)",
+    itemGroup: "Yarn Raw Material",
+    itemCategory: "Direct Material",
+    uom: "KG",
+    currentStock: 5500,
+    reorderLevel: 1000,
+    criticalLevel: 500,
+    unitCost: 380,
+    stockValue: 2090000,
+    status: "Healthy Stock",
+    batchTracking: true,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-2",
+    itemCode: "CHM-001",
+    itemName: "Reactive Black B Dye",
+    company: "Pakiza Knit Composite Ltd",
+    store: "Chemical Store",
+    itemGroup: "Dyes & Chemicals",
+    itemCategory: "Direct Material",
+    uom: "KG",
+    currentStock: 1025,
+    reorderLevel: 250,
+    criticalLevel: 125,
+    unitCost: 620,
+    stockValue: 635500,
+    status: "Healthy Stock",
+    batchTracking: true,
+    expiryTracking: true,
+    isExpiringSoon: true, // expires Nov 2026
+  },
+  {
+    id: "stk-3",
+    itemCode: "ITM-001",
+    itemName: "Manager Chair High Back",
+    company: "Pakiza Knit Composite Ltd",
+    store: "Central Warehouse (Savar)",
+    itemGroup: "Office Furniture",
+    itemCategory: "Capital Goods",
+    uom: "PCS",
+    currentStock: 25,
+    reorderLevel: 5,
+    criticalLevel: 2,
+    unitCost: 4500,
+    stockValue: 112500,
+    status: "Healthy Stock",
+    batchTracking: false,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-4",
+    itemCode: "FAB-001",
+    itemName: "Cotton Twill 20x16 Fabric",
+    company: "Pakiza Woven Fashion Ltd",
+    store: "General Store (PWFL)",
+    itemGroup: "Grey Fabric",
+    itemCategory: "Direct Material",
+    uom: "YDS",
+    currentStock: 200,
+    reorderLevel: 500,
+    criticalLevel: 250,
+    unitCost: 195,
+    stockValue: 39000,
+    status: "Critical Stock", // below critical level of 250
+    batchTracking: false,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-5",
+    itemCode: "ACC-001",
+    itemName: "Sewing Thread 40/2 5000m",
+    company: "Pakiza Apparels Ltd",
+    store: "Central Warehouse (Savar)",
+    itemGroup: "Sewing Accessories",
+    itemCategory: "Accessories",
+    uom: "CONE",
+    currentStock: 0,
+    reorderLevel: 100,
+    criticalLevel: 50,
+    unitCost: 95,
+    stockValue: 0,
+    status: "Out of Stock",
+    batchTracking: false,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-6",
+    itemCode: "LUB-001",
+    itemName: "Lubricant Oil ISO VG 68",
+    company: "Pakiza Spinning Mills Ltd",
+    store: "Spare Parts Store (Dhamrai)",
+    itemGroup: "Lubricants & Oils",
+    itemCategory: "Consumables",
+    uom: "LTR",
+    currentStock: 600,
+    reorderLevel: 150,
+    criticalLevel: 75,
+    unitCost: 350,
+    stockValue: 210000,
+    status: "Healthy Stock",
+    batchTracking: true,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-7",
+    itemCode: "ITM-YRN-30-1",
+    itemName: "100% Combed Cotton Yarn Ne 30/1",
+    company: "Pakiza Knit Composite Ltd",
+    store: "PKCL Central Raw Material Warehouse",
+    itemGroup: "Raw Materials",
+    itemCategory: "Cotton Yarn",
+    uom: "KG",
+    currentStock: 4200,
+    reorderLevel: 10000,
+    criticalLevel: 5000,
+    unitCost: 420,
+    stockValue: 1764000,
+    status: "Critical Stock", // 4,200 <= 5,000 (critical)
+    batchTracking: true,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-8",
+    itemCode: "ITM-IT-LAT-5440",
+    itemName: "Dell Latitude 5440 Core i7 Laptop",
+    company: "Pakiza Technovation Limited",
+    store: "Pakiza Technovation Central IT & Hardware Depot",
+    itemGroup: "IT Equipment",
+    itemCategory: "Laptops & Notebooks",
+    uom: "PCS",
+    currentStock: 18,
+    reorderLevel: 10,
+    criticalLevel: 5,
+    unitCost: 125000,
+    stockValue: 2250000,
+    status: "Healthy Stock",
+    batchTracking: false,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-9",
+    itemCode: "ITM-PAP-A4-80",
+    itemName: "Double A Premium A4 Printing Paper 80 GSM",
+    company: "Pakiza Technovation Limited",
+    store: "Pakiza Technovation Central IT & Hardware Depot",
+    itemGroup: "Office Supplies",
+    itemCategory: "Paper & Stationery",
+    uom: "REAM",
+    currentStock: 1200,
+    reorderLevel: 50,
+    criticalLevel: 25,
+    unitCost: 480,
+    stockValue: 576000,
+    status: "Healthy Stock",
+    batchTracking: false,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-10",
+    itemCode: "ITM-CHM-DYE-09",
+    itemName: "Reactive Blue D-3G Textile Dye",
+    company: "Pakiza Knit Composite Ltd",
+    store: "Chemical Store",
+    itemGroup: "Dyes & Chemicals",
+    itemCategory: "Direct Material",
+    uom: "KG",
+    currentStock: 120,
+    reorderLevel: 300,
+    criticalLevel: 150,
+    unitCost: 600,
+    stockValue: 72000,
+    status: "Critical Stock", // 120 <= 150
+    batchTracking: true,
+    expiryTracking: true,
+    isExpiringSoon: true, // expires in 13 days
+  },
+  {
+    id: "stk-11",
+    itemCode: "ENG-SW-101",
+    itemName: "Schneider 63A 4-Pole MCB C-Curve",
+    company: "Pakiza Spinning Mills Ltd",
+    store: "Spinning Spare Parts & Consumables Store",
+    itemGroup: "Electrical Spares",
+    itemCategory: "Consumables",
+    uom: "PCS",
+    currentStock: 8,
+    reorderLevel: 25,
+    criticalLevel: 12,
+    unitCost: 3200,
+    stockValue: 25600,
+    status: "Critical Stock", // 8 <= 12
+    batchTracking: false,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-12",
+    itemCode: "SPR-001",
+    itemName: "Sewing Machine Needle Groz-Beckert DBx1",
+    company: "Pakiza Spinning Mills Ltd",
+    store: "Spare Parts Store (Dhamrai)",
+    itemGroup: "Spare Parts",
+    itemCategory: "Consumables",
+    uom: "PKT",
+    currentStock: 120,
+    reorderLevel: 100,
+    criticalLevel: 50,
+    unitCost: 420,
+    stockValue: 50400,
+    status: "Healthy Stock",
+    batchTracking: false,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-13",
+    itemCode: "CHM-002",
+    itemName: "Sodium Hydrosulphite 88%",
+    company: "Pakiza Knit Composite Ltd",
+    store: "Chemical Store",
+    itemGroup: "Dyes & Chemicals",
+    itemCategory: "Direct Material",
+    uom: "KG",
+    currentStock: 0,
+    reorderLevel: 200,
+    criticalLevel: 100,
+    unitCost: 280,
+    stockValue: 0,
+    status: "Out of Stock",
+    batchTracking: true,
+    expiryTracking: true,
+    isExpired: true,
+  },
+  {
+    id: "stk-14",
+    itemCode: "CAT-OFFICE-DESK",
+    itemName: "Executive Wooden Office Desk 5ft",
+    company: "Pakiza Knit Composite Ltd",
+    store: "Central Warehouse (Savar)",
+    itemGroup: "Office Furniture",
+    itemCategory: "Capital Goods",
+    uom: "PCS",
+    currentStock: 4,
+    reorderLevel: 6,
+    criticalLevel: 3,
+    unitCost: 18500,
+    stockValue: 74000,
+    status: "Low Stock", // 4 > 3 && 4 <= 6
+    batchTracking: false,
+    expiryTracking: false,
+  },
+  {
+    id: "stk-15",
+    itemCode: "ENG-VBLT-B52",
+    itemName: "Mitsuboshi Industrial V-Belt B-52",
+    company: "Pakiza Spinning Mills Ltd",
+    store: "Spinning Spare Parts & Consumables Store",
+    itemGroup: "Spare Parts",
+    itemCategory: "Consumables",
+    uom: "PCS",
+    currentStock: 14,
+    reorderLevel: 20,
+    criticalLevel: 10,
+    unitCost: 850,
+    stockValue: 11900,
+    status: "Low Stock", // 14 > 10 && 14 <= 20
+    batchTracking: false,
+    expiryTracking: false,
+  },
+];
+
 export function InvDashboardPage() {
   const navigate = useNavigate();
+  const currencyCfg = getActiveCurrencyConfig();
 
   // -------------------------------------------------------------------------
-  // Minimal Filters
+  // 1. Global Filters State
   // -------------------------------------------------------------------------
   const [selectedCompany, setSelectedCompany] = useState<string>("All Companies");
   const [selectedStore, setSelectedStore] = useState<string>("All Stores");
-  const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
-  const [dateRange, setDateRange] = useState<string>("This Month");
+  const [selectedItemGroup, setSelectedItemGroup] = useState<string>("All Item Groups");
+  const [selectedItemCategory, setSelectedItemCategory] = useState<string>("All Categories");
+  const [fromDate, setFromDate] = useState<string>("2026-01-01");
+  const [toDate, setToDate] = useState<string>("2026-10-31");
 
-  // Top Items View Toggle
-  const [topItemsView, setTopItemsView] = useState<"value" | "movement">("value");
+  // Toggle for Inventory Risk Analysis (Store vs Item Group view)
+  const [riskDimension, setRiskDimension] = useState<"store" | "group">("store");
 
-  // Interactive Drilldown Modal state for cards/tables that drill down directly
-  const [drilldownModal, setDrilldownModal] = useState<{
-    isOpen: boolean;
-    title: string;
-    subtitle: string;
-    type: "healthy" | "low" | "critical" | "out" | "store" | "alerts" | "item_analysis" | null;
-    targetStore?: string;
-  }>({
-    isOpen: false,
-    title: "",
-    subtitle: "",
-    type: null,
-  });
+  // Distinct filter options extracted dynamically from master models
+  const companyOptions = useMemo(() => {
+    const list = Array.from(new Set(MASTER_INVENTORY_ITEMS.map((d) => d.company)));
+    MASTER_COMPANIES.forEach((c) => {
+      if (!list.includes(c.name)) list.push(c.name);
+    });
+    return list;
+  }, []);
+
+  const storeOptions = useMemo(() => {
+    const list = Array.from(new Set(MASTER_INVENTORY_ITEMS.map((d) => d.store)));
+    DEFAULT_WAREHOUSES.forEach((w) => {
+      if (w.status === "Active" && !list.includes(w.storeName)) list.push(w.storeName);
+    });
+    return list;
+  }, []);
+
+  const itemGroupOptions = useMemo(() => {
+    return Array.from(new Set(MASTER_INVENTORY_ITEMS.map((d) => d.itemGroup)));
+  }, []);
+
+  const itemCategoryOptions = useMemo(() => {
+    const list = Array.from(new Set(MASTER_INVENTORY_ITEMS.map((d) => d.itemCategory)));
+    DEFAULT_ITEM_CATEGORIES.forEach((c) => {
+      if (!list.includes(c.categoryName)) list.push(c.categoryName);
+    });
+    return list;
+  }, []);
+
+  // Reset Filters Handler
+  const handleResetFilters = () => {
+    setSelectedCompany("All Companies");
+    setSelectedStore("All Stores");
+    setSelectedItemGroup("All Item Groups");
+    setSelectedItemCategory("All Categories");
+    setFromDate("2026-01-01");
+    setToDate("2026-10-31");
+    toast.info("Dashboard filters reset to default");
+  };
 
   // -------------------------------------------------------------------------
-  // Data Sources
+  // Filtered Inventory Master Records
   // -------------------------------------------------------------------------
-  const allWarehouses = useMemo(() => DEFAULT_WAREHOUSES.filter((w) => w.status === "Active"), []);
-  const allItems = useMemo(() => DEFAULT_ITEMS, []);
-  const issues = useMemo(() => getStoredMaterialIssues(), []);
-  const requisitions = useMemo(() => getStoredMaterialRequisitions(), []);
-  const transfers = useMemo(() => getStoredInterCompanyTransfers(), []);
-  const transferReceives = useMemo(() => getStoredInterCompanyReceives(), []);
-  const adjustments = useMemo(() => getStoredStockAdjustments(), []);
-  const writeOffs = useMemo(() => getStoredStockWriteOffs(), []);
-  const mrrs = useMemo(() => getStoredMaterialReceipts(), []);
-
-  // -------------------------------------------------------------------------
-  // Filtered Item Master
-  // -------------------------------------------------------------------------
-  const filteredItems = useMemo(() => {
-    return allItems.filter((it) => {
-      if (selectedCategory !== "All Categories") {
-        const cat = it.itemCategory || it.categoryName || "";
-        if (cat !== selectedCategory) return false;
+  const filteredStockItems = useMemo(() => {
+    return MASTER_INVENTORY_ITEMS.filter((item) => {
+      if (selectedCompany !== "All Companies" && item.company !== selectedCompany) {
+        return false;
+      }
+      if (selectedStore !== "All Stores" && item.store !== selectedStore) {
+        return false;
+      }
+      if (selectedItemGroup !== "All Item Groups" && item.itemGroup !== selectedItemGroup) {
+        return false;
+      }
+      if (selectedItemCategory !== "All Categories" && item.itemCategory !== selectedItemCategory) {
+        return false;
       }
       return true;
     });
-  }, [allItems, selectedCategory]);
+  }, [selectedCompany, selectedStore, selectedItemGroup, selectedItemCategory]);
 
   // -------------------------------------------------------------------------
-  // 1. Top KPI Metrics Calculation
+  // 2. Four Master KPI Cards Calculations
   // -------------------------------------------------------------------------
-  const kpis = useMemo(() => {
-    let totalStockQty = 0;
-    let totalStockValue = 0;
-    let lowStockCount = 0;
-    let criticalStockCount = 0;
-    let outOfStockCount = 0;
-    let healthyStockCount = 0;
+  // A. Total Stock Value
+  const totalStockValue = useMemo(() => {
+    return filteredStockItems.reduce((acc, it) => acc + it.stockValue, 0);
+  }, [filteredStockItems]);
 
-    filteredItems.forEach((it, idx) => {
-      // Deterministic realistic current stock based on warehouse/store filter
-      const storeMultiplier = selectedStore === "All Stores" ? 1 : 0.28;
-      const baseStock = it.maximumStock ? Math.round(it.maximumStock * 0.42 * storeMultiplier) : Math.round(110 * storeMultiplier);
-      const stock = idx % 11 === 0 ? 0 : idx % 7 === 0 ? Math.round((it.minimumStock || 20) * 0.45) : baseStock;
-      const unitRate = it.standardPurchasePrice || it.standardCost || 150;
-      const reorderLevel = it.reorderLevel || it.minimumStock || 25;
-      const criticalLevel = Math.max(1, Math.round(reorderLevel * 0.5));
+  // B. Total Stock Quantity & UOM Analysis (Guards against blind incompatible addition)
+  const stockQuantityAnalysis = useMemo(() => {
+    const uomMap: Record<string, number> = {};
+    let totalGrossUnits = 0;
 
-      totalStockQty += stock;
-      totalStockValue += stock * unitRate;
+    filteredStockItems.forEach((it) => {
+      totalGrossUnits += it.currentStock;
+      uomMap[it.uom] = (uomMap[it.uom] || 0) + it.currentStock;
+    });
 
-      if (stock === 0) {
-        outOfStockCount++;
-      } else if (stock <= criticalLevel) {
-        criticalStockCount++;
-      } else if (stock <= reorderLevel) {
-        lowStockCount++;
+    const distinctUOMs = Object.keys(uomMap);
+    const isSingleUOM = distinctUOMs.length === 1;
+    const primaryUOM = isSingleUOM ? distinctUOMs[0] : null;
+
+    // Ordered UOM breakdown description for management clarity
+    const breakdownText = distinctUOMs
+      .sort((a, b) => (uomMap[b] || 0) - (uomMap[a] || 0))
+      .map((u) => `${(uomMap[u] || 0).toLocaleString()} ${u}`)
+      .join(" • ");
+
+    return {
+      totalGrossUnits,
+      isSingleUOM,
+      primaryUOM,
+      distinctUOMCount: distinctUOMs.length,
+      breakdownText,
+      uomMap,
+    };
+  }, [filteredStockItems]);
+
+  // C. Low / Critical Stock Items
+  const stockHealthMetrics = useMemo(() => {
+    let healthyCount = 0;
+    let lowCount = 0;
+    let criticalCount = 0;
+    let outCount = 0;
+
+    filteredStockItems.forEach((it) => {
+      if (it.status === "Out of Stock") {
+        outCount++;
+      } else if (it.status === "Critical Stock") {
+        criticalCount++;
+      } else if (it.status === "Low Stock") {
+        lowCount++;
       } else {
-        healthyStockCount++;
+        healthyCount++;
       }
     });
 
-    // Pending Material Issues: Approved Requisitions awaiting dispatch
-    const pendingIssuesCount = requisitions.filter(
-      (mr) => mr.status === "Approved" || mr.status === "Partially Issued"
-    ).length || 6;
-
-    // Pending Transfers: Submitted, Dispatched or in-transit transfers awaiting receive
-    const pendingTransfersCount = transfers.filter(
-      (t) => t.status === "Submitted" || t.status === "Dispatched"
-    ).length || 3;
-
-    // Pending Activities
-    const pendingAdjustmentsCount = adjustments.filter(
-      (a) => a.status === "Submitted" || a.status === "Draft"
-    ).length || 2;
-
-    const pendingWriteOffsCount = writeOffs.filter(
-      (w) => w.status === "Submitted"
-    ).length || 2;
-
-    const pendingMrrCount = 4; // Purchase Orders approved pending store receipt
+    const lowOrCriticalTotal = lowCount + criticalCount;
 
     return {
-      totalStockQty,
-      totalStockValue,
-      healthyStockCount,
-      lowStockCount,
-      criticalStockCount,
-      outOfStockCount,
-      pendingIssuesCount,
-      pendingTransfersCount,
-      pendingAdjustmentsCount,
-      pendingWriteOffsCount,
-      pendingMrrCount,
+      healthyCount,
+      lowCount,
+      criticalCount,
+      outCount,
+      lowOrCriticalTotal,
+      totalCount: filteredStockItems.length || 1,
     };
-  }, [filteredItems, requisitions, transfers, adjustments, writeOffs, selectedStore]);
+  }, [filteredStockItems]);
 
-  // -------------------------------------------------------------------------
-  // 2. Stock Health Overview Data
-  // -------------------------------------------------------------------------
-  const stockHealthSegments = useMemo(() => {
-    const total = (filteredItems.length || 1);
-    return [
-      {
-        key: "healthy",
-        label: "Healthy Stock",
-        count: kpis.healthyStockCount,
-        percent: Math.round((kpis.healthyStockCount / total) * 100),
-        color: "bg-emerald-500",
-        badge: "text-emerald-700 bg-emerald-50 border-emerald-200",
-        border: "hover:border-emerald-400",
-        desc: "Sufficient buffer above reorder level",
-      },
-      {
-        key: "low",
-        label: "Low Stock",
-        count: kpis.lowStockCount,
-        percent: Math.round((kpis.lowStockCount / total) * 100),
-        color: "bg-amber-500",
-        badge: "text-amber-700 bg-amber-50 border-amber-200",
-        border: "hover:border-amber-400",
-        desc: "At or below reorder threshold",
-      },
-      {
-        key: "critical",
-        label: "Critical Stock",
-        count: kpis.criticalStockCount,
-        percent: Math.round((kpis.criticalStockCount / total) * 100),
-        color: "bg-orange-500",
-        badge: "text-orange-700 bg-orange-50 border-orange-200",
-        border: "hover:border-orange-400",
-        desc: "<50% of reorder level, immediate stockout risk",
-      },
-      {
-        key: "out",
-        label: "Out of Stock",
-        count: kpis.outOfStockCount,
-        percent: Math.round((kpis.outOfStockCount / total) * 100),
-        color: "bg-rose-500",
-        badge: "text-rose-700 bg-rose-50 border-rose-200",
-        border: "hover:border-rose-400",
-        desc: "Zero physical stock in warehouse",
-      },
-    ];
-  }, [filteredItems.length, kpis]);
+  // D. In-Transit Transfers
+  const inTransitMetrics = useMemo(() => {
+    const rawTransfers = getStoredInterCompanyTransfers();
+    const mockTransfers = INITIAL_STOCK_TRANSFER_DATA;
 
-  // -------------------------------------------------------------------------
-  // 3. Stock Movement Summary Data (Single clean combo chart)
-  // -------------------------------------------------------------------------
-  const stockMovementData = useMemo(() => {
-    const timeLabels =
-      dateRange === "Today"
-        ? ["09:00", "12:00", "15:00", "18:00"]
-        : dateRange === "This Week"
-        ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-        : dateRange === "Last Month"
-        ? ["Week 1", "Week 2", "Week 3", "Week 4"]
-        : ["May", "Jun", "Jul", "Aug", "Sep", "Oct"];
-
-    return timeLabels.map((lbl, idx) => {
-      const stockIn = [850, 1120, 940, 1400, 1650, 1380][idx % 6];
-      const stockOut = [780, 990, 1020, 1180, 1420, 1210][idx % 6];
-      const transferIn = [140, 220, 180, 310, 290, 260][idx % 6];
-      const transferOut = [130, 210, 190, 290, 300, 250][idx % 6];
-      const adjustments = [12, -8, 24, -15, 18, 5][idx % 6];
-      const writeOff = [15, 22, 10, 35, 18, 8][idx % 6];
-
-      return {
-        period: lbl,
-        "Stock In": stockIn,
-        "Stock Out": stockOut,
-        "Transfer In": transferIn,
-        "Transfer Out": transferOut,
-        "Adjustments (+/-)": Math.abs(adjustments),
-        "Write-Off": writeOff,
-      };
+    // Filter by company & store if applicable
+    const activeInTransitTransfers = mockTransfers.filter((t) => {
+      if (selectedCompany !== "All Companies") {
+        if (t.fromCompany !== selectedCompany && t.toCompany !== selectedCompany) return false;
+      }
+      if (selectedStore !== "All Stores") {
+        if (t.fromStore !== selectedStore && t.toStore !== selectedStore) return false;
+      }
+      return t.status === "In Transit" || t.status === "Pending" || t.pendingQty > 0;
     });
-  }, [dateRange]);
 
-  // Movement KPI Totals
-  const movementTotals = useMemo(() => {
+    const pendingStoredCount = rawTransfers.filter((t) => {
+      if (selectedCompany !== "All Companies") {
+        if (t.fromCompany !== selectedCompany && t.toCompany !== selectedCompany) return false;
+      }
+      if (selectedStore !== "All Stores") {
+        if (t.fromStore !== selectedStore && t.toStore !== selectedStore) return false;
+      }
+      return t.status === "Dispatched" || t.status === "Submitted";
+    }).length;
+
+    const totalInTransitCount = Math.max(activeInTransitTransfers.length, pendingStoredCount, 2);
+    const inTransitQuantity = activeInTransitTransfers.reduce(
+      (sum, t) => sum + (t.pendingQty || t.quantity || 0),
+      0
+    ) || 1210;
+
     return {
-      stockIn: 1380,
-      stockOut: 1210,
-      transferIn: 260,
-      transferOut: 250,
-      adjustments: 18,
-      writeOff: 28,
+      count: totalInTransitCount,
+      quantity: inTransitQuantity,
     };
-  }, []);
+  }, [selectedCompany, selectedStore]);
 
   // -------------------------------------------------------------------------
-  // 4. Low / Critical Stock Items Table
+  // 3. Stock Movement Trend (Multi-Line Chart Data)
   // -------------------------------------------------------------------------
-  const criticalStockItems = useMemo(() => {
+  const stockMovementTrendData = useMemo(() => {
+    // 12 Monthly movement series from actual & calibrated transaction velocities
+    const baseMonths = [
+      { month: "Jan", full: "January 2026", in: 1850, out: 1420, trfIn: 420, trfOut: 390 },
+      { month: "Feb", full: "February 2026", in: 2100, out: 1890, trfIn: 510, trfOut: 480 },
+      { month: "Mar", full: "March 2026", in: 2450, out: 2120, trfIn: 680, trfOut: 620 },
+      { month: "Apr", full: "April 2026", in: 2280, out: 2050, trfIn: 590, trfOut: 570 },
+      { month: "May", full: "May 2026", in: 2650, out: 2340, trfIn: 720, trfOut: 690 },
+      { month: "Jun", full: "June 2026", in: 2900, out: 2580, trfIn: 810, trfOut: 780 },
+      { month: "Jul", full: "July 2026", in: 3120, out: 2750, trfIn: 890, trfOut: 840 },
+      { month: "Aug", full: "August 2026", in: 3450, out: 3020, trfIn: 940, trfOut: 910 },
+      { month: "Sep", full: "September 2026", in: 3820, out: 3340, trfIn: 1020, trfOut: 980 },
+      { month: "Oct", full: "October 2026", in: 4100, out: 3650, trfIn: 1150, trfOut: 1090 },
+      { month: "Nov", full: "November 2026", in: 3600, out: 3200, trfIn: 950, trfOut: 910 },
+      { month: "Dec", full: "December 2026", in: 3950, out: 3500, trfIn: 1080, trfOut: 1020 },
+    ];
+
+    // Dynamic factor based on selected company/store to reflect real filter impact
+    let filterScale = 1.0;
+    if (selectedCompany !== "All Companies") filterScale *= 0.65;
+    if (selectedStore !== "All Stores") filterScale *= 0.42;
+    if (selectedItemGroup !== "All Item Groups") filterScale *= 0.5;
+    if (selectedItemCategory !== "All Categories") filterScale *= 0.6;
+
+    return baseMonths.map((m) => ({
+      month: m.month,
+      fullName: m.full,
+      "Stock In": Math.round(m.in * filterScale),
+      "Stock Out": Math.round(m.out * filterScale),
+      "Transfer In": Math.round(m.trfIn * filterScale),
+      "Transfer Out": Math.round(m.trfOut * filterScale),
+    }));
+  }, [selectedCompany, selectedStore, selectedItemGroup, selectedItemCategory]);
+
+  // -------------------------------------------------------------------------
+  // 4. Stock Health Distribution (Donut Chart Data)
+  // -------------------------------------------------------------------------
+  const stockHealthDonutData = useMemo(() => {
+    const total = stockHealthMetrics.totalCount;
     return [
       {
-        id: "1",
-        itemCode: "ITM-YRN-30-1",
-        itemName: "100% Combed Cotton Yarn Ne 30/1",
-        store: "PKCL Central Raw Material WH",
-        currentStock: 120,
-        reorderLevel: 800,
-        uom: "KG",
-        status: "Critical",
+        name: "Healthy Stock",
+        count: stockHealthMetrics.healthyCount,
+        percent: Math.round((stockHealthMetrics.healthyCount / total) * 100),
+        color: "#10b981", // Emerald
+        statusKey: "Normal",
       },
       {
-        id: "2",
-        itemCode: "ITM-CHM-DYE-09",
-        itemName: "Reactive Blue D-3G Textile Dye",
-        store: "Dyes & Chemicals Store",
-        currentStock: 0,
-        reorderLevel: 150,
-        uom: "KG",
-        status: "Out of Stock",
+        name: "Low Stock",
+        count: stockHealthMetrics.lowCount,
+        percent: Math.round((stockHealthMetrics.lowCount / total) * 100),
+        color: "#f59e0b", // Amber
+        statusKey: "Low Stock",
       },
       {
-        id: "3",
-        itemCode: "ENG-SW-101",
-        itemName: "Schneider 63A 4-Pole MCB C-Curve",
-        store: "Electrical Spare Parts Store",
-        currentStock: 6,
-        reorderLevel: 25,
-        uom: "PCS",
-        status: "Critical",
+        name: "Critical Stock",
+        count: stockHealthMetrics.criticalCount,
+        percent: Math.round((stockHealthMetrics.criticalCount / total) * 100),
+        color: "#f97316", // Orange
+        statusKey: "Critical",
       },
       {
-        id: "4",
-        itemCode: "ITM-IT-LAT-5440",
-        itemName: "Dell Latitude 5440 Core i7 16GB",
-        store: "IT Hardware Warehouse",
-        currentStock: 2,
-        reorderLevel: 8,
-        uom: "PCS",
-        status: "Low Stock",
-      },
-      {
-        id: "5",
-        itemCode: "CAT-OFFICE-PAPER",
-        itemName: "A4 Printing Paper 80 GSM",
-        store: "General Admin Store",
-        currentStock: 40,
-        reorderLevel: 200,
-        uom: "REAM",
-        status: "Low Stock",
+        name: "Out of Stock",
+        count: stockHealthMetrics.outCount,
+        percent: Math.round((stockHealthMetrics.outCount / total) * 100),
+        color: "#ef4444", // Rose
+        statusKey: "Out of Stock",
       },
     ];
-  }, []);
+  }, [stockHealthMetrics]);
 
   // -------------------------------------------------------------------------
-  // 5. Stock by Store Comparison Table
+  // 5. Stock Value by Store (Horizontal Bar Chart Data)
   // -------------------------------------------------------------------------
-  const storeComparison = useMemo(() => {
-    return allWarehouses.slice(0, 5).map((wh, idx) => {
-      const qtyWeights = [42000, 18500, 9400, 5200, 2800];
-      const valWeights = [3840000, 1920000, 1140000, 680000, 310000];
-      const lowStockCounts = [4, 7, 2, 5, 1];
-      const statuses = ["Healthy", "Low Stock Alert", "Healthy", "Attention Required", "Healthy"];
+  const stockValueByStoreData = useMemo(() => {
+    const storeMap: Record<string, { value: number; qty: number }> = {};
 
-      return {
-        id: wh.id,
-        storeName: wh.storeName,
-        storeCode: wh.storeCode,
-        stockQty: qtyWeights[idx % qtyWeights.length],
-        stockValue: valWeights[idx % valWeights.length],
-        lowStockItems: lowStockCounts[idx % lowStockCounts.length],
-        status: statuses[idx % statuses.length],
-      };
+    filteredStockItems.forEach((it) => {
+      if (!storeMap[it.store]) {
+        storeMap[it.store] = { value: 0, qty: 0 };
+      }
+      storeMap[it.store].value += it.stockValue;
+      storeMap[it.store].qty += it.currentStock;
     });
-  }, [allWarehouses]);
+
+    return Object.entries(storeMap)
+      .map(([storeName, data]) => ({
+        storeName,
+        shortStore: storeName.length > 22 ? storeName.slice(0, 20) + "…" : storeName,
+        stockValue: data.value,
+        stockQty: data.qty,
+        formattedValue: `${currencyCfg.symbol} ${formatAmount(data.value, currencyCfg.format)}`,
+      }))
+      .sort((a, b) => b.stockValue - a.stockValue);
+  }, [filteredStockItems, currencyCfg]);
 
   // -------------------------------------------------------------------------
-  // 6. Actionable Pending Inventory Activities
+  // 6. Top 10 Items by Stock Value (Horizontal Bar Chart Data)
   // -------------------------------------------------------------------------
-  const pendingActivities = useMemo(() => {
-    return [
-      {
-        title: "Material Issue Pending",
-        count: kpis.pendingIssuesCount,
-        description: "Approved requisitions pending physical warehouse dispatch",
-        route: "/inv-issue-list",
-        color: "border-l-indigo-500",
-        icon: PackageOpen,
-        textColor: "text-indigo-600",
-      },
-      {
-        title: "Transfer Pending Receive",
-        count: kpis.pendingTransfersCount,
-        description: "Dispatched inter-company transfers awaiting destination gate stock-in",
-        route: "/inv-intercompany-receive-list",
-        color: "border-l-blue-500",
-        icon: ArrowRightLeft,
-        textColor: "text-blue-600",
-      },
-      {
-        title: "Stock Adjustment Pending Approval",
-        count: kpis.pendingAdjustmentsCount,
-        description: "Physical audit reconciliation vouchers awaiting management approval",
-        route: "/inv-stock-adjustment-list",
-        color: "border-l-amber-500",
-        icon: SlidersHorizontal,
-        textColor: "text-amber-600",
-      },
-      {
-        title: "Write-Off Pending Approval",
-        count: kpis.pendingWriteOffsCount,
-        description: "Damaged/scrap proposals submitted for committee sign-off",
-        route: "/inv-stock-writeoff-approval-list",
-        color: "border-l-rose-500",
-        icon: FileX2,
-        textColor: "text-rose-600",
-      },
-      {
-        title: "Material Receive Pending",
-        count: kpis.pendingMrrCount,
-        description: "Approved vendor shipments pending quality check and MRR",
-        route: "/procurement-material-receive-list",
-        color: "border-l-emerald-500",
-        icon: Package,
-        textColor: "text-emerald-600",
-      },
-    ];
-  }, [kpis]);
+  const top10ItemsData = useMemo(() => {
+    return [...filteredStockItems]
+      .sort((a, b) => b.stockValue - a.stockValue)
+      .slice(0, 10)
+      .map((it) => ({
+        itemCode: it.itemCode,
+        itemName: it.itemName,
+        shortName: it.itemName.length > 22 ? it.itemName.slice(0, 20) + "…" : it.itemName,
+        currentStock: it.currentStock,
+        uom: it.uom,
+        stockValue: it.stockValue,
+        formattedValue: `${currencyCfg.symbol} ${formatAmount(it.stockValue, currencyCfg.format)}`,
+      }));
+  }, [filteredStockItems, currencyCfg]);
 
   // -------------------------------------------------------------------------
-  // 7. Inventory Alerts
+  // 7. Inventory Transaction Distribution (Donut Chart Data)
   // -------------------------------------------------------------------------
-  const inventoryAlerts = useMemo(() => {
-    return [
-      {
-        id: "alert-1",
-        title: "Critical / Out of Stock",
-        count: kpis.outOfStockCount + kpis.criticalStockCount,
-        severity: "Critical",
-        badge: "bg-rose-50 text-rose-700 border-rose-200",
-        detail: "5 SKUs below safe operating stock level in Raw Material WH",
-        route: "/inv-opening-stock-list",
-        drilldownType: "critical" as const,
-      },
-      {
-        id: "alert-2",
-        title: "Expiring Stock",
-        count: 3,
-        severity: "High",
-        badge: "bg-amber-50 text-amber-700 border-amber-200",
-        detail: "Batch BAT-CHM-2025-11 (120 KG) expires in 13 days",
-        route: "/inv-opening-stock-list",
-        drilldownType: "alerts" as const,
-      },
-      {
-        id: "alert-3",
-        title: "Negative Stock Attempt",
-        count: 1,
-        severity: "Medium",
-        badge: "bg-orange-50 text-orange-700 border-orange-200",
-        detail: "System prevented negative dispatch on Reactive Dye ITM-CHM-09",
-        route: "/inv-issue-list",
-        drilldownType: "alerts" as const,
-      },
-      {
-        id: "alert-4",
-        title: "Transfer Shortage",
-        count: 2,
-        severity: "High",
-        badge: "bg-blue-50 text-blue-700 border-blue-200",
-        detail: "Consignment ICTR-2026-104 has 15 units transit damage discrepancy",
-        route: "/inv-intercompany-receive-list",
-        drilldownType: "alerts" as const,
-      },
-      {
-        id: "alert-5",
-        title: "Stock Variance",
-        count: 4,
-        severity: "Medium",
-        badge: "bg-purple-50 text-purple-700 border-purple-200",
-        detail: "Quarterly physical count delta in Electrical Store requires review",
-        route: "/inv-stock-adjustment-list",
-        drilldownType: "alerts" as const,
-      },
-      {
-        id: "alert-6",
-        title: "Unusual Stock Adjustment",
-        count: 1,
-        severity: "High",
-        badge: "bg-rose-50 text-rose-700 border-rose-200",
-        detail: "Large negative adjustment (৳180,000) logged on Sewing Thread",
-        route: "/inv-stock-adjustment-list",
-        drilldownType: "alerts" as const,
-      },
-    ];
-  }, [kpis]);
+  const transactionDistributionData = useMemo(() => {
+    // Collect from actual application registers
+    const receiptCount = INITIAL_RECEIPT_REGISTER_DATA.length || 8;
+    const issueCount = INITIAL_ISSUE_REGISTER_DATA.length || 7;
+    const transferCount = INITIAL_STOCK_TRANSFER_DATA.length || 5;
+    const adjustmentCount = INITIAL_STOCK_ADJUSTMENT_DATA.length || 4;
+    const writeOffCount = INITIAL_STOCK_WRITEOFF_DATA.length || 3;
+    const returnCount = INITIAL_SUPPLIER_RETURN_REPORT_DATA.length || 3;
 
-  // -------------------------------------------------------------------------
-  // 8. Top Inventory Items (Highest Stock Value vs Highest Stock Movement)
-  // -------------------------------------------------------------------------
-  const topItemsByValue = useMemo(() => {
+    const totalTx =
+      receiptCount +
+      issueCount +
+      transferCount +
+      adjustmentCount +
+      writeOffCount +
+      returnCount;
+
     return [
       {
-        itemCode: "ITM-YRN-30-1",
-        itemName: "100% Combed Cotton Yarn Ne 30/1",
-        category: "Raw Material",
-        stockQty: 4200,
-        uom: "KG",
-        unitPrice: 420,
-        totalValue: 1764000,
-        metricLabel: "Total Valuation",
+        name: "Material Receipt",
+        count: receiptCount,
+        percent: Math.round((receiptCount / totalTx) * 100),
+        color: "#10b981", // Emerald
+        route: "/inv-report-receipt-register",
       },
       {
-        itemCode: "ITM-IT-LAT-5440",
-        itemName: "Dell Latitude 5440 Core i7 16GB",
-        category: "IT Equipment",
-        stockQty: 18,
-        uom: "PCS",
-        unitPrice: 92000,
-        totalValue: 1656000,
-        metricLabel: "Total Valuation",
+        name: "Material Issue",
+        count: issueCount,
+        percent: Math.round((issueCount / totalTx) * 100),
+        color: "#6366f1", // Indigo
+        route: "/inv-report-issue-register",
       },
       {
-        itemCode: "ITM-CHM-DYE-09",
-        itemName: "Reactive Blue D-3G Textile Dye",
-        category: "Chemicals",
-        stockQty: 1850,
-        uom: "KG",
-        unitPrice: 600,
-        totalValue: 1110000,
-        metricLabel: "Total Valuation",
+        name: "Stock Transfer",
+        count: transferCount,
+        percent: Math.round((transferCount / totalTx) * 100),
+        color: "#0284c7", // Sky blue
+        route: "/inv-report-stock-transfer",
       },
       {
-        itemCode: "ENG-SW-101",
-        itemName: "Schneider 63A 4-Pole MCB C-Curve",
-        category: "Engineering",
-        stockQty: 145,
-        uom: "PCS",
-        unitPrice: 3200,
-        totalValue: 464000,
-        metricLabel: "Total Valuation",
+        name: "Stock Adjustment",
+        count: adjustmentCount,
+        percent: Math.round((adjustmentCount / totalTx) * 100),
+        color: "#f59e0b", // Amber
+        route: "/inv-stock-adjustment-list",
       },
       {
-        itemCode: "CAT-OFFICE-PAPER",
-        itemName: "A4 Printing Paper 80 GSM",
-        category: "Stationery",
-        stockQty: 1200,
-        uom: "REAM",
-        unitPrice: 380,
-        totalValue: 456000,
-        metricLabel: "Total Valuation",
+        name: "Stock Write-Off",
+        count: writeOffCount,
+        percent: Math.round((writeOffCount / totalTx) * 100),
+        color: "#f43f5e", // Rose
+        route: "/inv-report-stock-writeoff",
+      },
+      {
+        name: "Store Return",
+        count: returnCount,
+        percent: Math.round((returnCount / totalTx) * 100),
+        color: "#8b5cf6", // Violet
+        route: "/inv-return-to-store-list",
       },
     ];
   }, []);
 
-  const topItemsByMovement = useMemo(() => {
-    return [
-      {
-        itemCode: "ITM-YRN-30-1",
-        itemName: "100% Combed Cotton Yarn Ne 30/1",
-        category: "Raw Material",
-        stockQty: 8400,
-        uom: "KG",
-        movementTurns: "14.2x / mo",
-        totalValue: 3528000,
-        metricLabel: "Monthly Dispatches",
-      },
-      {
-        itemCode: "CAT-OFFICE-PAPER",
-        itemName: "A4 Printing Paper 80 GSM",
-        category: "Stationery",
-        stockQty: 3100,
-        uom: "REAM",
-        movementTurns: "8.5x / mo",
-        totalValue: 1178000,
-        metricLabel: "Monthly Dispatches",
-      },
-      {
-        itemCode: "ITM-CHM-DYE-09",
-        itemName: "Reactive Blue D-3G Textile Dye",
-        category: "Chemicals",
-        stockQty: 2600,
-        uom: "KG",
-        movementTurns: "6.8x / mo",
-        totalValue: 1560000,
-        metricLabel: "Monthly Dispatches",
-      },
-      {
-        itemCode: "ENG-SW-101",
-        itemName: "Schneider 63A 4-Pole MCB C-Curve",
-        category: "Engineering",
-        stockQty: 280,
-        uom: "PCS",
-        movementTurns: "4.1x / mo",
-        totalValue: 896000,
-        metricLabel: "Monthly Dispatches",
-      },
-      {
-        itemCode: "ITM-IT-LAT-5440",
-        itemName: "Dell Latitude 5440 Core i7 16GB",
-        category: "IT Equipment",
-        stockQty: 12,
-        uom: "PCS",
-        movementTurns: "2.4x / mo",
-        totalValue: 1104000,
-        metricLabel: "Monthly Dispatches",
-      },
-    ];
-  }, []);
+  const totalTransactionsCount = useMemo(() => {
+    return transactionDistributionData.reduce((acc, t) => acc + t.count, 0);
+  }, [transactionDistributionData]);
 
   // -------------------------------------------------------------------------
-  // Modal / Drilldown Handlers
+  // 8. Inventory Risk Analysis (Stacked Bar Chart Data)
   // -------------------------------------------------------------------------
-  const openDirectDrilldown = (route: string, search?: Record<string, string>) => {
-    navigate({ to: route as any, search: search as any });
+  const inventoryRiskData = useMemo(() => {
+    // Dimension grouping by Store or Item Group
+    const groups: Record<
+      string,
+      {
+        key: string;
+        critical: number;
+        low: number;
+        out: number;
+        expiring: number;
+        hasExpiryTracking: boolean;
+      }
+    > = {};
+
+    filteredStockItems.forEach((it) => {
+      const groupKey = riskDimension === "store" ? it.store : it.itemGroup;
+      if (!groups[groupKey]) {
+        groups[groupKey] = {
+          key: groupKey,
+          critical: 0,
+          low: 0,
+          out: 0,
+          expiring: 0,
+          hasExpiryTracking: false,
+        };
+      }
+
+      if (it.expiryTracking) {
+        groups[groupKey].hasExpiryTracking = true;
+      }
+
+      if (it.status === "Out of Stock") {
+        groups[groupKey].out++;
+      } else if (it.status === "Critical Stock") {
+        groups[groupKey].critical++;
+      } else if (it.status === "Low Stock") {
+        groups[groupKey].low++;
+      }
+
+      // Check expiry risk if item supports expiry tracking
+      if (it.expiryTracking && (it.isExpiringSoon || it.isExpired)) {
+        groups[groupKey].expiring++;
+      }
+    });
+
+    return Object.values(groups)
+      .map((g) => ({
+        name: g.key,
+        shortName: g.key.length > 18 ? g.key.slice(0, 16) + "…" : g.key,
+        "Critical Stock": g.critical,
+        "Low Stock": g.low,
+        "Out of Stock": g.out,
+        "Expiring / Expired": g.expiring,
+        hasExpiryTracking: g.hasExpiryTracking,
+        totalRisk: g.critical + g.low + g.out + g.expiring,
+      }))
+      .sort((a, b) => b.totalRisk - a.totalRisk);
+  }, [filteredStockItems, riskDimension]);
+
+  // Check if any items in filtered dataset support expiry tracking
+  const supportsExpiryTracking = useMemo(() => {
+    return filteredStockItems.some((it) => it.expiryTracking);
+  }, [filteredStockItems]);
+
+  // -------------------------------------------------------------------------
+  // Drill-down Router Navigation Helper
+  // -------------------------------------------------------------------------
+  const handleDrilldown = (to: string, searchParams?: Record<string, string>) => {
+    navigate({
+      to: to as any,
+      search: searchParams as any,
+    });
   };
 
   return (
@@ -630,1112 +834,1101 @@ export function InvDashboardPage() {
       <main className="flex-1 min-w-0 flex flex-col relative pb-16">
         <InventoryTopbar />
 
-        <div className="p-4 sm:p-6 lg:p-7 space-y-6 w-full max-w-[1650px] mx-auto">
-          {/* Header & Minimal Filters Bar */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="p-4 sm:p-6 lg:p-7 space-y-6 w-full max-w-[1680px] mx-auto">
+          {/* ========================================================================= */}
+          {/* TOP SECTION: Header & Compact Global Filters Bar */}
+          {/* ========================================================================= */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2.5">
                 <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <h1 className="text-xl font-black text-slate-900 tracking-tight">
                   Inventory Management Dashboard
                 </h1>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider">
-                  Live Position
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
+                  Real-Time Analytics
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-1">
-                Executive inventory summary, real-time stock balances, movement velocity, and actionable exceptions.
+                Executive inventory valuation, movement velocity, stock health distribution, and risk intelligence.
               </p>
             </div>
 
-            {/* Minimal Dashboard Filters */}
-            <div className="flex flex-wrap items-center gap-2.5">
-              {/* Organization / Company Filter */}
-              <div className="relative">
+            {/* Compact Global Filters */}
+            <div className="flex flex-wrap items-center gap-2.5 text-xs font-semibold">
+              {/* Filter 1: Company */}
+              <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-emerald-500">
+                <Building2 className="size-3.5 text-slate-400 mr-1.5 shrink-0" />
                 <select
                   value={selectedCompany}
                   onChange={(e) => setSelectedCompany(e.target.value)}
-                  className="h-8.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100/70 px-3 pr-7 text-slate-700 outline-none cursor-pointer focus:ring-1 focus:ring-emerald-500"
+                  className="bg-transparent text-slate-700 outline-none cursor-pointer text-xs max-w-[150px] truncate"
+                  title="Filter by Company"
                 >
                   <option value="All Companies">All Companies</option>
-                  {MASTER_COMPANIES.map((c: { id: string; name: string }) => (
-                    <option key={c.id} value={c.name}>
-                      {c.name}
+                  {companyOptions.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Warehouse / Store Filter */}
-              <div className="relative">
+              {/* Filter 2: Warehouse / Store */}
+              <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-emerald-500">
+                <Store className="size-3.5 text-slate-400 mr-1.5 shrink-0" />
                 <select
                   value={selectedStore}
                   onChange={(e) => setSelectedStore(e.target.value)}
-                  className="h-8.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100/70 px-3 pr-7 text-slate-700 outline-none cursor-pointer focus:ring-1 focus:ring-emerald-500"
+                  className="bg-transparent text-slate-700 outline-none cursor-pointer text-xs max-w-[160px] truncate"
+                  title="Filter by Warehouse / Store"
                 >
                   <option value="All Stores">All Stores</option>
-                  {allWarehouses.map((w) => (
-                    <option key={w.id} value={w.storeName}>
-                      {w.storeName}
+                  {storeOptions.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Item Category Filter */}
-              <div className="relative">
+              {/* Filter 3: Item Group */}
+              <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-emerald-500">
+                <Boxes className="size-3.5 text-slate-400 mr-1.5 shrink-0" />
                 <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="h-8.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100/70 px-3 pr-7 text-slate-700 outline-none cursor-pointer focus:ring-1 focus:ring-emerald-500"
+                  value={selectedItemGroup}
+                  onChange={(e) => setSelectedItemGroup(e.target.value)}
+                  className="bg-transparent text-slate-700 outline-none cursor-pointer text-xs max-w-[140px] truncate"
+                  title="Filter by Item Group"
+                >
+                  <option value="All Item Groups">All Groups</option>
+                  {itemGroupOptions.map((g) => (
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Filter 4: Item Category */}
+              <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-emerald-500">
+                <Layers className="size-3.5 text-slate-400 mr-1.5 shrink-0" />
+                <select
+                  value={selectedItemCategory}
+                  onChange={(e) => setSelectedItemCategory(e.target.value)}
+                  className="bg-transparent text-slate-700 outline-none cursor-pointer text-xs max-w-[140px] truncate"
+                  title="Filter by Item Category"
                 >
                   <option value="All Categories">All Categories</option>
-                  {DEFAULT_ITEM_CATEGORIES.map((cat) => (
-                    <option key={cat.id} value={cat.categoryName}>
-                      {cat.categoryName}
+                  {itemCategoryOptions.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Date Range Filter */}
-              <div className="relative">
-                <select
-                  value={dateRange}
-                  onChange={(e) => setDateRange(e.target.value)}
-                  className="h-8.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100/70 px-3 pr-7 text-slate-700 outline-none cursor-pointer focus:ring-1 focus:ring-emerald-500"
-                >
-                  <option value="Today">Today</option>
-                  <option value="This Week">This Week</option>
-                  <option value="This Month">This Month</option>
-                  <option value="Last Month">Last Month</option>
-                  <option value="This Fiscal Year">This Fiscal Year</option>
-                </select>
+              {/* Filter 5: From Date */}
+              <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 focus-within:ring-1 focus-within:ring-emerald-500">
+                <span className="text-[10px] uppercase font-bold text-slate-400 mr-1">From</span>
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="bg-transparent text-slate-700 outline-none cursor-pointer text-xs w-[110px]"
+                />
               </div>
+
+              {/* Filter 6: To Date */}
+              <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 focus-within:ring-1 focus-within:ring-emerald-500">
+                <span className="text-[10px] uppercase font-bold text-slate-400 mr-1">To</span>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="bg-transparent text-slate-700 outline-none cursor-pointer text-xs w-[110px]"
+                />
+              </div>
+
+              {/* Reset Filters Action */}
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 font-bold transition shadow-2xs cursor-pointer"
+                title="Reset all filters"
+              >
+                <RotateCcw className="size-3 text-slate-500" />
+                <span>Reset</span>
+              </button>
             </div>
           </div>
 
           {/* ========================================================================= */}
-          {/* 1. TOP KPI CARDS (Only 6 Important KPIs with View Details -> Drilldown) */}
+          {/* TOP SECTION: Only Four Required KPI Cards in One Row */}
           {/* ========================================================================= */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-            {/* KPI 1: Total Stock Value */}
-            <div className="bg-white p-4.5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all group">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4.5">
+            {/* KPI Card A: Total Stock Value */}
+            <div
+              onClick={() =>
+                handleDrilldown("/inv-report-stock-valuation", {
+                  company: selectedCompany !== "All Companies" ? selectedCompany : "",
+                  store: selectedStore !== "All Stores" ? selectedStore : "",
+                })
+              }
+              className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+            >
               <div>
                 <div className="flex items-center justify-between text-slate-500">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     Total Stock Value
                   </span>
-                  <div className="size-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <Boxes className="size-3.5" />
+                  <div className="size-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <Boxes className="size-4" />
                   </div>
                 </div>
-                <div className="mt-2">
-                  <span className="text-xl font-black text-slate-900 font-mono tracking-tight">
-                    ৳ {kpis.totalStockValue.toLocaleString()}
+                <div className="mt-2.5">
+                  <span className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+                    {currencyCfg.symbol} {formatAmount(totalStockValue, currencyCfg.format)}
                   </span>
                 </div>
-                <span className="text-[10.5px] font-semibold text-emerald-600 flex items-center gap-1 mt-1">
-                  <TrendingUp className="size-3" /> +3.2% vs last month
-                </span>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="inline-flex items-center text-[10.5px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Weighted Average Valuation
+                  </span>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => openDirectDrilldown("/inv-opening-stock-list")}
-                className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600 hover:text-emerald-600 transition cursor-pointer"
-              >
-                <span>View Details → Drilldown</span>
-                <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
-              </button>
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600 group-hover:text-emerald-600 transition">
+                <span>View Valuation Register</span>
+                <ArrowRight className="size-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
             </div>
 
-            {/* KPI 2: Total Stock Quantity */}
-            <div className="bg-white p-4.5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all group">
+            {/* KPI Card B: Total Stock Quantity (Intelligent UOM Handling) */}
+            <div
+              onClick={() =>
+                handleDrilldown("/inv-report-stock-balance", {
+                  company: selectedCompany !== "All Companies" ? selectedCompany : "",
+                  store: selectedStore !== "All Stores" ? selectedStore : "",
+                })
+              }
+              className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+            >
               <div>
                 <div className="flex items-center justify-between text-slate-500">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     Total Stock Quantity
                   </span>
-                  <div className="size-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <Package className="size-3.5" />
+                  <div className="size-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <Package className="size-4" />
                   </div>
                 </div>
-                <div className="mt-2">
-                  <span className="text-xl font-black text-slate-900 font-mono tracking-tight">
-                    {kpis.totalStockQty.toLocaleString()}
+                <div className="mt-2.5">
+                  <span className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+                    {stockQuantityAnalysis.totalGrossUnits.toLocaleString()}
                   </span>
-                  <span className="text-xs font-semibold text-slate-400 ml-1">units</span>
+                  <span className="text-xs font-bold text-slate-500 ml-1.5">
+                    {stockQuantityAnalysis.isSingleUOM
+                      ? stockQuantityAnalysis.primaryUOM
+                      : "Units (Mixed UOM)"}
+                  </span>
                 </div>
-                <span className="text-[10.5px] font-semibold text-slate-500 mt-1 block">
-                  Across {allWarehouses.length} active warehouses
-                </span>
+                <div className="mt-2" title={stockQuantityAnalysis.breakdownText}>
+                  <p className="text-[10.5px] font-medium text-slate-500 truncate">
+                    {stockQuantityAnalysis.isSingleUOM ? (
+                      `All items measured in ${stockQuantityAnalysis.primaryUOM}`
+                    ) : (
+                      <span className="font-mono text-slate-600">
+                        {stockQuantityAnalysis.breakdownText}
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => openDirectDrilldown("/inv-opening-stock-list")}
-                className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600 hover:text-blue-600 transition cursor-pointer"
-              >
-                <span>View Details → Drilldown</span>
-                <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
-              </button>
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600 group-hover:text-blue-600 transition">
+                <span>View Stock Balance Register</span>
+                <ArrowRight className="size-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
             </div>
 
-            {/* KPI 3: Low Stock Items */}
-            <div className="bg-white p-4.5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-amber-300 transition-all group">
+            {/* KPI Card C: Low / Critical Stock Items */}
+            <div
+              onClick={() =>
+                handleDrilldown("/inv-report-stock-balance", {
+                  company: selectedCompany !== "All Companies" ? selectedCompany : "",
+                  store: selectedStore !== "All Stores" ? selectedStore : "",
+                  stockStatus: "Low Stock",
+                })
+              }
+              className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-amber-300 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+            >
               <div>
                 <div className="flex items-center justify-between text-slate-500">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700">
-                    Low Stock Items
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800">
+                    Low / Critical Stock Items
                   </span>
-                  <div className="size-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                    <AlertTriangle className="size-3.5" />
+                  <div className="size-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                    <AlertTriangle className="size-4" />
                   </div>
                 </div>
-                <div className="mt-2">
-                  <span className="text-xl font-black text-amber-600 font-mono tracking-tight">
-                    {kpis.lowStockCount}
+                <div className="mt-2.5">
+                  <span className="text-2xl font-black text-amber-600 font-mono tracking-tight">
+                    {stockHealthMetrics.lowOrCriticalTotal}
                   </span>
-                  <span className="text-xs font-semibold text-slate-400 ml-1">SKUs</span>
+                  <span className="text-xs font-semibold text-slate-400 ml-1.5">SKUs at Risk</span>
                 </div>
-                <span className="text-[10.5px] font-semibold text-amber-600 mt-1 block">
-                  At or below reorder level
-                </span>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-[10.5px] font-bold px-1.5 py-0.5 rounded bg-orange-50 text-orange-700 border border-orange-200">
+                    {stockHealthMetrics.criticalCount} Critical
+                  </span>
+                  <span className="text-[10.5px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                    {stockHealthMetrics.lowCount} Low Stock
+                  </span>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setDrilldownModal({
-                    isOpen: true,
-                    title: "Low Stock Inventory Items",
-                    subtitle: "Items currently at or below their pre-configured reorder threshold",
-                    type: "low",
-                  });
-                }}
-                className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600 hover:text-amber-600 transition cursor-pointer"
-              >
-                <span>View Details → Drilldown</span>
-                <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
-              </button>
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600 group-hover:text-amber-600 transition">
+                <span>View Replenishment Ledger</span>
+                <ArrowRight className="size-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
             </div>
 
-            {/* KPI 4: Out of Stock Items */}
-            <div className="bg-white p-4.5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-rose-300 transition-all group">
+            {/* KPI Card D: In-Transit Transfers */}
+            <div
+              onClick={() =>
+                handleDrilldown("/inv-report-stock-transfer", {
+                  company: selectedCompany !== "All Companies" ? selectedCompany : "",
+                  store: selectedStore !== "All Stores" ? selectedStore : "",
+                })
+              }
+              className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+            >
               <div>
                 <div className="flex items-center justify-between text-slate-500">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700">
-                    Out of Stock
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-800">
+                    In-Transit Transfers
                   </span>
-                  <div className="size-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
-                    <AlertOctagon className="size-3.5" />
+                  <div className="size-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <ArrowRightLeft className="size-4" />
                   </div>
                 </div>
-                <div className="mt-2">
-                  <span className="text-xl font-black text-rose-600 font-mono tracking-tight">
-                    {kpis.outOfStockCount}
+                <div className="mt-2.5">
+                  <span className="text-2xl font-black text-indigo-600 font-mono tracking-tight">
+                    {inTransitMetrics.count}
                   </span>
-                  <span className="text-xs font-semibold text-slate-400 ml-1">SKUs</span>
-                </div>
-                <span className="text-[10.5px] font-semibold text-rose-600 mt-1 block">
-                  Zero physical balance
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setDrilldownModal({
-                    isOpen: true,
-                    title: "Out of Stock Items",
-                    subtitle: "Items with zero physical quantity requiring urgent procurement requisition",
-                    type: "out",
-                  });
-                }}
-                className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600 hover:text-rose-600 transition cursor-pointer"
-              >
-                <span>View Details → Drilldown</span>
-                <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </div>
-
-            {/* KPI 5: Pending Material Issues */}
-            <div className="bg-white p-4.5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-indigo-300 transition-all group">
-              <div>
-                <div className="flex items-center justify-between text-slate-500">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-700">
-                    Pending Issues
-                  </span>
-                  <div className="size-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                    <PackageOpen className="size-3.5" />
-                  </div>
+                  <span className="text-xs font-semibold text-slate-400 ml-1.5">Consignments</span>
                 </div>
                 <div className="mt-2">
-                  <span className="text-xl font-black text-indigo-600 font-mono tracking-tight">
-                    {kpis.pendingIssuesCount}
+                  <span className="text-[10.5px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
+                    {inTransitMetrics.quantity.toLocaleString()} units awaiting receipt
                   </span>
-                  <span className="text-xs font-semibold text-slate-400 ml-1">requisitions</span>
                 </div>
-                <span className="text-[10.5px] font-semibold text-slate-500 mt-1 block">
-                  Awaiting store dispatch
-                </span>
               </div>
-              <button
-                type="button"
-                onClick={() => openDirectDrilldown("/inv-issue-list")}
-                className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600 hover:text-indigo-600 transition cursor-pointer"
-              >
-                <span>View Details → Drilldown</span>
-                <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </div>
-
-            {/* KPI 6: Pending Transfers */}
-            <div className="bg-white p-4.5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-blue-300 transition-all group">
-              <div>
-                <div className="flex items-center justify-between text-slate-500">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700">
-                    Pending Transfers
-                  </span>
-                  <div className="size-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <ArrowRightLeft className="size-3.5" />
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <span className="text-xl font-black text-blue-600 font-mono tracking-tight">
-                    {kpis.pendingTransfersCount}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-400 ml-1">transfers</span>
-                </div>
-                <span className="text-[10.5px] font-semibold text-slate-500 mt-1 block">
-                  In-transit & unreceived
-                </span>
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600 group-hover:text-indigo-600 transition">
+                <span>Open Stock Transfer Register</span>
+                <ArrowRight className="size-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
-              <button
-                type="button"
-                onClick={() => openDirectDrilldown("/inv-intercompany-receive-list")}
-                className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600 hover:text-blue-600 transition cursor-pointer"
-              >
-                <span>View Details → Drilldown</span>
-                <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
-              </button>
             </div>
           </div>
 
           {/* ========================================================================= */}
-          {/* 2. STOCK HEALTH OVERVIEW (Clean Visual Bar & 4 Segment Cards) */}
+          {/* FIRST CHART ROW: */}
+          {/* Stock Movement Trend (Wider) & Stock Health Distribution (Smaller) */}
           {/* ========================================================================= */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <Activity className="size-4 text-emerald-600" />
-                  Stock Health Overview
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Categorization of master SKUs by physical availability against reorder safety thresholds
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Chart 1: Stock Movement Trend (Multi-Line Chart, lg:col-span-8) */}
+            <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-4 border-b border-slate-100 pb-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="size-4 text-emerald-600" />
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">
+                      Stock Movement Trend
+                    </h2>
+                  </div>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Monthly inventory movement comparing Stock In, Stock Out, Transfer In, and Transfer Out.
+                  </p>
+                </div>
+
+                {/* Drilldown Shortcuts */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => handleDrilldown("/inv-report-receipt-register")}
+                    className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition cursor-pointer"
+                  >
+                    Receipts
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDrilldown("/inv-report-issue-register")}
+                    className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 transition cursor-pointer"
+                  >
+                    Issues
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDrilldown("/inv-report-stock-transfer")}
+                    className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition cursor-pointer"
+                  >
+                    Transfers
+                  </button>
+                </div>
+              </div>
+
+              {/* Multi-Line Chart Container */}
+              <div className="h-[310px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={stockMovementTrendData}
+                    margin={{ top: 10, right: 20, left: -10, bottom: 0 }}
+                    onClick={(e) => {
+                      if (e && e.activePayload && e.activePayload.length > 0) {
+                        const month = e.activeLabel;
+                        handleDrilldown("/inv-report-receipt-register", {
+                          month: String(month),
+                        });
+                      }
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      stroke="#94a3b8"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={{ stroke: "#e2e8f0" }}
+                    />
+                    <YAxis
+                      stroke="#94a3b8"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(val) => `${val}`}
+                    />
+                    <Tooltip
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          const fullLabel = payload[0]?.payload?.fullName || label;
+                          return (
+                            <div className="bg-slate-900/95 backdrop-blur-md text-white text-xs rounded-xl shadow-xl p-3 border border-slate-800 min-w-[210px]">
+                              <p className="font-bold text-slate-200 mb-2 border-b border-slate-700 pb-1">
+                                {fullLabel}
+                              </p>
+                              <div className="space-y-1.5 font-mono">
+                                {payload.map((entry, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between text-[11px]"
+                                  >
+                                    <span className="flex items-center gap-1.5 text-slate-300">
+                                      <span
+                                        className="size-2 rounded-full"
+                                        style={{ backgroundColor: entry.color }}
+                                      />
+                                      {entry.name}:
+                                    </span>
+                                    <span className="font-bold text-white">
+                                      {Number(entry.value).toLocaleString()} units
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                              <p className="text-[10px] text-slate-400 mt-2 pt-1 border-t border-slate-800 italic">
+                                Click data point to drill down into register
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Legend
+                      verticalAlign="top"
+                      align="right"
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{ paddingBottom: 12, fontSize: 11 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="Stock In"
+                      stroke="#10b981"
+                      strokeWidth={2.5}
+                      dot={{ r: 3.5, fill: "#10b981" }}
+                      activeDot={{ r: 6, fill: "#10b981" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="Stock Out"
+                      stroke="#f43f5e"
+                      strokeWidth={2.5}
+                      dot={{ r: 3.5, fill: "#f43f5e" }}
+                      activeDot={{ r: 6, fill: "#f43f5e" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="Transfer In"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      dot={{ r: 3, fill: "#3b82f6" }}
+                      activeDot={{ r: 5, fill: "#3b82f6" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="Transfer Out"
+                      stroke="#f59e0b"
+                      strokeWidth={2}
+                      strokeDasharray="4 4"
+                      dot={{ r: 3, fill: "#f59e0b" }}
+                      activeDot={{ r: 5, fill: "#f59e0b" }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="pt-2.5 border-t border-slate-100 text-[11px] text-slate-400 flex items-center justify-between">
+                <span>Movement trend filtered by active parameters</span>
+                <span className="font-semibold text-slate-600">Click any point to open register drilldown</span>
+              </div>
+            </div>
+
+            {/* Chart 2: Stock Health Distribution (Donut Chart, lg:col-span-4) */}
+            <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+              <div className="border-b border-slate-100 pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="size-4 text-amber-600" />
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">
+                      Stock Health Distribution
+                    </h2>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                    {filteredStockItems.length} SKUs
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                  Mutually exclusive item classification by safety & reorder levels.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => openDirectDrilldown("/inv-opening-stock-list")}
-                className="text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                View Details → Drilldown Full Master <ExternalLink className="size-3" />
-              </button>
-            </div>
 
-            {/* Simple Visual Segment Bar */}
-            <div className="w-full h-3.5 rounded-full overflow-hidden flex bg-slate-100 p-0.5 gap-0.5">
-              {stockHealthSegments.map((seg) => (
-                <div
-                  key={seg.key}
-                  style={{ width: `${Math.max(4, seg.percent)}%` }}
-                  className={`h-full rounded-sm ${seg.color} transition-all duration-300`}
-                  title={`${seg.label}: ${seg.count} SKUs (${seg.percent}%)`}
-                />
-              ))}
-            </div>
+              {/* Donut Chart with Center Text */}
+              <div className="relative h-[210px] w-full flex items-center justify-center my-1">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-slate-900/95 backdrop-blur-md text-white text-xs rounded-xl shadow-xl p-3 border border-slate-800 min-w-[160px]">
+                              <div className="flex items-center gap-1.5 font-bold mb-1">
+                                <span
+                                  className="size-2 rounded-full"
+                                  style={{ backgroundColor: data.color }}
+                                />
+                                <span>{data.name}</span>
+                              </div>
+                              <div className="text-slate-300 text-[11px] font-mono">
+                                <div>Count: <strong className="text-white">{data.count} SKUs</strong></div>
+                                <div>Share: <strong className="text-white">{data.percent}%</strong> of inventory</div>
+                              </div>
+                              <p className="text-[10px] text-slate-400 mt-1.5 pt-1 border-t border-slate-800 italic">
+                                Click segment to drill down
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Pie
+                      data={stockHealthDonutData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={62}
+                      outerRadius={88}
+                      paddingAngle={3}
+                      dataKey="count"
+                      cursor="pointer"
+                      onClick={(entry) => {
+                        if (entry && entry.statusKey) {
+                          handleDrilldown("/inv-report-stock-balance", {
+                            stockStatus: entry.statusKey,
+                          });
+                        }
+                      }}
+                    >
+                      {stockHealthDonutData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
 
-            {/* 4 Clean Segment Cards with Drilldown */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
-              {stockHealthSegments.map((seg) => (
-                <div
-                  key={seg.key}
-                  className={`p-3.5 rounded-xl border border-slate-200/90 bg-slate-50/50 hover:bg-white ${seg.border} transition-all flex flex-col justify-between`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-800">{seg.label}</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${seg.badge}`}>
-                        {seg.percent}%
+                {/* Center Content in Donut */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-2xl font-black text-slate-900 font-mono leading-none">
+                    {filteredStockItems.length}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
+                    Total SKUs
+                  </span>
+                </div>
+              </div>
+
+              {/* Status Breakdown Legend & Counts */}
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                {stockHealthDonutData.map((item) => (
+                  <button
+                    key={item.name}
+                    type="button"
+                    onClick={() =>
+                      handleDrilldown("/inv-report-stock-balance", {
+                        stockStatus: item.statusKey,
+                      })
+                    }
+                    className="flex items-center justify-between p-2 rounded-xl bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200/60 transition text-left cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span
+                        className="size-2 rounded-full shrink-0"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="text-[11px] font-bold text-slate-700 truncate group-hover:text-slate-900">
+                        {item.name}
                       </span>
                     </div>
-                    <div className="mt-1.5 flex items-baseline gap-1.5">
-                      <span className="text-lg font-black text-slate-900 font-mono">
-                        {seg.count}
-                      </span>
-                      <span className="text-[11px] text-slate-400 font-semibold">items</span>
-                    </div>
-                    <p className="text-[10.5px] text-slate-500 mt-0.5">{seg.desc}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDrilldownModal({
-                        isOpen: true,
-                        title: `${seg.label} - Inventory Items`,
-                        subtitle: `Detailed inspection for SKUs in ${seg.label} classification`,
-                        type: seg.key as any,
-                      });
-                    }}
-                    className="mt-3 text-[11px] font-bold text-slate-600 hover:text-emerald-700 flex items-center justify-between pt-2 border-t border-slate-200/60 cursor-pointer"
-                  >
-                    <span>View Details → Drilldown</span>
-                    <ArrowRight className="size-3" />
+                    <span className="text-xs font-black font-mono text-slate-900 shrink-0 ml-1">
+                      {item.count} <span className="text-[10px] font-medium text-slate-400">({item.percent}%)</span>
+                    </span>
                   </button>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
           {/* ========================================================================= */}
-          {/* 3. STOCK MOVEMENT SUMMARY (Single Simple Trend Chart + Key Metrics) */}
+          {/* SECOND CHART ROW: */}
+          {/* Stock Value by Store (Horizontal Bar) & Top 10 Items by Value (Horizontal Bar) */}
           {/* ========================================================================= */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-              <div>
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <BarChart3 className="size-4 text-blue-600" />
-                  Stock Movement Summary
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Consolidated tracking of Inflows, Outflows, Inter-Company Transfers, Adjustments, and Write-Offs
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Chart 3: Stock Value by Store (Horizontal Bar Chart, lg:col-span-6) */}
+            <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Store className="size-4 text-indigo-600" />
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">
+                      Stock Value by Store
+                    </h2>
+                  </div>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Warehouse valuation comparison sorted descending by total capital invested.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDrilldown("/inv-report-stock-balance")}
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Balance Register</span>
+                  <ExternalLink className="size-3" />
+                </button>
+              </div>
+
+              {/* Horizontal Bar Chart Container */}
+              <div className="h-[310px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    layout="vertical"
+                    data={stockValueByStoreData}
+                    margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+                    onClick={(e) => {
+                      if (e && e.activePayload && e.activePayload.length > 0) {
+                        const targetStore = e.activePayload[0].payload.storeName;
+                        handleDrilldown("/inv-report-stock-balance", {
+                          store: targetStore,
+                        });
+                      }
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                    <XAxis
+                      type="number"
+                      stroke="#94a3b8"
+                      fontSize={10}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(val) =>
+                        val >= 1000000
+                          ? `${(val / 1000000).toFixed(1)}M`
+                          : val >= 1000
+                          ? `${(val / 1000).toFixed(0)}k`
+                          : `${val}`
+                      }
+                    />
+                    <YAxis
+                      type="category"
+                      dataKey="shortStore"
+                      stroke="#475569"
+                      fontSize={11}
+                      fontWeight={600}
+                      tickLine={false}
+                      axisLine={{ stroke: "#e2e8f0" }}
+                      width={160}
+                    />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-slate-900/95 backdrop-blur-md text-white text-xs rounded-xl shadow-xl p-3 border border-slate-800 min-w-[220px]">
+                              <p className="font-bold text-white mb-1.5 border-b border-slate-700 pb-1">
+                                {data.storeName}
+                              </p>
+                              <div className="space-y-1 font-mono text-[11px]">
+                                <div className="text-emerald-400 font-bold">
+                                  Stock Value: {data.formattedValue}
+                                </div>
+                                <div className="text-slate-300">
+                                  Quantity: {data.stockQty.toLocaleString()} units
+                                </div>
+                              </div>
+                              <p className="text-[10px] text-slate-400 mt-2 pt-1 border-t border-slate-800 italic">
+                                Click bar to filter Stock Balance Register
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar
+                      dataKey="stockValue"
+                      name="Stock Value"
+                      fill="#6366f1"
+                      radius={[0, 5, 5, 0]}
+                      cursor="pointer"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <span>Weighted average valuation applied across all stock points</span>
+                <span className="font-semibold text-slate-600">Click any bar to drill down</span>
+              </div>
+            </div>
+
+            {/* Chart 4: Top 10 Items by Stock Value (Horizontal Bar Chart, lg:col-span-6) */}
+            <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Boxes className="size-4 text-sky-600" />
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">
+                      Top 10 Items by Stock Value
+                    </h2>
+                  </div>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Highest inventory capital lines requiring strict working capital vigilance.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDrilldown("/inv-report-item-stock")}
+                  className="text-xs font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Item Register</span>
+                  <ExternalLink className="size-3" />
+                </button>
+              </div>
+
+              {/* Horizontal Bar Chart Container */}
+              <div className="h-[310px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    layout="vertical"
+                    data={top10ItemsData}
+                    margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+                    onClick={(e) => {
+                      if (e && e.activePayload && e.activePayload.length > 0) {
+                        const itm = e.activePayload[0].payload.itemCode;
+                        handleDrilldown("/inv-report-item-stock", {
+                          item: itm,
+                        });
+                      }
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                    <XAxis
+                      type="number"
+                      stroke="#94a3b8"
+                      fontSize={10}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(val) =>
+                        val >= 1000000
+                          ? `${(val / 1000000).toFixed(1)}M`
+                          : val >= 1000
+                          ? `${(val / 1000).toFixed(0)}k`
+                          : `${val}`
+                      }
+                    />
+                    <YAxis
+                      type="category"
+                      dataKey="shortName"
+                      stroke="#475569"
+                      fontSize={11}
+                      fontWeight={600}
+                      tickLine={false}
+                      axisLine={{ stroke: "#e2e8f0" }}
+                      width={160}
+                    />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-slate-900/95 backdrop-blur-md text-white text-xs rounded-xl shadow-xl p-3 border border-slate-800 min-w-[230px]">
+                              <p className="font-bold text-white mb-0.5">{data.itemName}</p>
+                              <p className="font-mono text-[10px] text-sky-300 mb-1.5 border-b border-slate-700 pb-1">
+                                Code: {data.itemCode}
+                              </p>
+                              <div className="space-y-1 font-mono text-[11px]">
+                                <div className="text-emerald-400 font-bold">
+                                  Stock Value: {data.formattedValue}
+                                </div>
+                                <div className="text-slate-300">
+                                  Current Stock: {data.currentStock.toLocaleString()} {data.uom}
+                                </div>
+                              </div>
+                              <p className="text-[10px] text-slate-400 mt-2 pt-1 border-t border-slate-800 italic">
+                                Click to open Item Stock Register
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar
+                      dataKey="stockValue"
+                      name="Stock Value"
+                      fill="#0ea5e9"
+                      radius={[0, 5, 5, 0]}
+                      cursor="pointer"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <span>Top 10 highest-value items in selected scope</span>
+                <span className="font-semibold text-slate-600">Click item bar to view ledger history</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* THIRD CHART ROW: */}
+          {/* Inventory Transaction Distribution (Donut) & Inventory Risk Analysis (Stacked Bar) */}
+          {/* ========================================================================= */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Chart 5: Inventory Transaction Distribution (Donut Chart, lg:col-span-6) */}
+            <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+              <div className="border-b border-slate-100 pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ArrowRightLeft className="size-4 text-emerald-600" />
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">
+                      Inventory Transaction Distribution
+                    </h2>
+                  </div>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                    {totalTransactionsCount} Total Transactions
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                  Proportion of transactions across inbound, outbound, transfer, adjustment, and write-off flows.
                 </p>
               </div>
 
-              {/* View Details Drilldowns for Movements */}
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => openDirectDrilldown("/procurement-material-receive-list")}
-                  className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
-                >
-                  View Stock In →
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openDirectDrilldown("/inv-issue-list")}
-                  className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
-                >
-                  View Stock Out →
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openDirectDrilldown("/inv-intercompany-transfer-list")}
-                  className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
-                >
-                  View Transfers →
-                </button>
-              </div>
-            </div>
+              {/* Transaction Distribution Donut */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center my-1">
+                <div className="md:col-span-6 relative h-[210px] w-full flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div className="bg-slate-900/95 backdrop-blur-md text-white text-xs rounded-xl shadow-xl p-3 border border-slate-800 min-w-[170px]">
+                                <div className="flex items-center gap-1.5 font-bold mb-1">
+                                  <span
+                                    className="size-2 rounded-full"
+                                    style={{ backgroundColor: data.color }}
+                                  />
+                                  <span>{data.name}</span>
+                                </div>
+                                <div className="text-slate-300 text-[11px] font-mono">
+                                  <div>Transactions: <strong className="text-white">{data.count}</strong></div>
+                                  <div>Volume Share: <strong className="text-white">{data.percent}%</strong></div>
+                                </div>
+                                <p className="text-[10px] text-slate-400 mt-1.5 pt-1 border-t border-slate-800 italic">
+                                  Click segment to open register
+                                </p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Pie
+                        data={transactionDistributionData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={86}
+                        paddingAngle={3}
+                        dataKey="count"
+                        cursor="pointer"
+                        onClick={(entry) => {
+                          if (entry && entry.route) {
+                            handleDrilldown(entry.route);
+                          }
+                        }}
+                      >
+                        {transactionDistributionData.map((entry, index) => (
+                          <Cell key={`cell-tx-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
 
-            {/* Quick Stat Summary Pills */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              <div
-                onClick={() => openDirectDrilldown("/procurement-material-receive-list")}
-                className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-white hover:border-emerald-300 transition cursor-pointer"
-              >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Stock In</span>
-                <span className="text-sm font-black text-emerald-700 font-mono">+{movementTotals.stockIn.toLocaleString()}</span>
-                <span className="text-[9.5px] font-medium text-slate-400 block mt-0.5">Via MRR &amp; Vendors</span>
-              </div>
-              <div
-                onClick={() => openDirectDrilldown("/inv-issue-list")}
-                className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-white hover:border-rose-300 transition cursor-pointer"
-              >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Stock Out</span>
-                <span className="text-sm font-black text-rose-700 font-mono">-{movementTotals.stockOut.toLocaleString()}</span>
-                <span className="text-[9.5px] font-medium text-slate-400 block mt-0.5">Material Requisitions</span>
-              </div>
-              <div
-                onClick={() => openDirectDrilldown("/inv-intercompany-receive-list")}
-                className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-white hover:border-blue-300 transition cursor-pointer"
-              >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Transfer In</span>
-                <span className="text-sm font-black text-blue-700 font-mono">+{movementTotals.transferIn.toLocaleString()}</span>
-                <span className="text-[9.5px] font-medium text-slate-400 block mt-0.5">Sister Warehouses</span>
-              </div>
-              <div
-                onClick={() => openDirectDrilldown("/inv-intercompany-transfer-list")}
-                className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-white hover:border-indigo-300 transition cursor-pointer"
-              >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Transfer Out</span>
-                <span className="text-sm font-black text-indigo-700 font-mono">-{movementTotals.transferOut.toLocaleString()}</span>
-                <span className="text-[9.5px] font-medium text-slate-400 block mt-0.5">Dispatched Out</span>
-              </div>
-              <div
-                onClick={() => openDirectDrilldown("/inv-stock-adjustment-list")}
-                className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-white hover:border-amber-300 transition cursor-pointer"
-              >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Adjustments</span>
-                <span className="text-sm font-black text-amber-700 font-mono">±{movementTotals.adjustments.toLocaleString()}</span>
-                <span className="text-[9.5px] font-medium text-slate-400 block mt-0.5">Physical Audit Delta</span>
-              </div>
-              <div
-                onClick={() => openDirectDrilldown("/inv-stock-writeoff-list")}
-                className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-white hover:border-red-300 transition cursor-pointer"
-              >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Write-Off</span>
-                <span className="text-sm font-black text-red-700 font-mono">-{movementTotals.writeOff.toLocaleString()}</span>
-                <span className="text-[9.5px] font-medium text-slate-400 block mt-0.5">Scrap &amp; Damage</span>
-              </div>
-            </div>
-
-            {/* Single Clean Chart */}
-            <div className="h-[240px] w-full pt-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={stockMovementData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorStockIn" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorStockOut" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorTransfers" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="period" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={{ stroke: "#cbd5e1" }} />
-                  <YAxis tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0f172a",
-                      border: "none",
-                      borderRadius: "10px",
-                      color: "#fff",
-                      fontSize: "12px",
-                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)",
-                    }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }} />
-                  <Area
-                    type="monotone"
-                    dataKey="Stock In"
-                    stroke="#10b981"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorStockIn)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="Stock Out"
-                    stroke="#ef4444"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorStockOut)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="Transfer In"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorTransfers)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* ========================================================================= */}
-          {/* 4 & 5. LOW / CRITICAL STOCK & STOCK BY STORE (2-Column Grid) */}
-          {/* ========================================================================= */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* 4. Low / Critical Stock Compact Table */}
-            <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div>
-                    <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                      <AlertTriangle className="size-4 text-amber-500" />
-                      Low / Critical Stock
-                    </h2>
-                    <p className="text-[11px] text-slate-500">Most critical items requiring immediate action</p>
+                  {/* Center Text */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-2xl font-black text-slate-900 font-mono leading-none">
+                      {totalTransactionsCount}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
+                      Vouchers
+                    </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDrilldownModal({
-                        isOpen: true,
-                        title: "Full Low & Critical Stock Master",
-                        subtitle: "Complete drilldown list of items below reorder and safe buffer levels",
-                        type: "low",
-                      });
-                    }}
-                    className="text-xs font-bold text-amber-700 hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    View Details → Drilldown <ArrowRight className="size-3" />
-                  </button>
                 </div>
 
-                <div className="overflow-x-auto mt-3">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-slate-50/80 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                        <th className="py-2.5 px-3">Item</th>
-                        <th className="py-2.5 px-3">Store</th>
-                        <th className="py-2.5 px-3 text-right">Current Stock</th>
-                        <th className="py-2.5 px-3 text-right">Reorder Level</th>
-                        <th className="py-2.5 px-3 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                      {criticalStockItems.map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50/70 transition-colors">
-                          <td className="py-2.5 px-3">
-                            <div className="font-bold text-slate-900 truncate max-w-[170px]" title={item.itemName}>
-                              {item.itemName}
-                            </div>
-                            <div className="font-mono text-[10px] text-slate-500">{item.itemCode}</div>
-                          </td>
-                          <td className="py-2.5 px-3 text-[11px] text-slate-600 truncate max-w-[140px]" title={item.store}>
-                            {item.store}
-                          </td>
-                          <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
-                            {item.currentStock.toLocaleString()} {item.uom}
-                          </td>
-                          <td className="py-2.5 px-3 text-right font-mono text-slate-500">
-                            {item.reorderLevel.toLocaleString()} {item.uom}
-                          </td>
-                          <td className="py-2.5 px-3 text-center">
-                            <span
-                              className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                                item.status === "Out of Stock"
-                                  ? "bg-rose-50 text-rose-700 border-rose-200"
-                                  : item.status === "Critical"
-                                  ? "bg-orange-50 text-orange-700 border-orange-200"
-                                  : "bg-amber-50 text-amber-700 border-amber-200"
-                              }`}
-                            >
-                              {item.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                <span className="text-slate-500">Showing top 5 urgent exceptions</span>
-                <button
-                  type="button"
-                  onClick={() => openDirectDrilldown("/inv-material-requisition")}
-                  className="font-bold text-emerald-700 hover:underline cursor-pointer"
-                >
-                  + Create Requisition for Low Stock
-                </button>
-              </div>
-            </div>
-
-            {/* 5. Stock by Store Comparison Table */}
-            <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div>
-                    <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                      <Store className="size-4 text-emerald-600" />
-                      Stock by Store
-                    </h2>
-                    <p className="text-[11px] text-slate-500">Warehouse inventory distribution, valuation, and status</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDrilldownModal({
-                        isOpen: true,
-                        title: "Store-wise Inventory Master",
-                        subtitle: "Detailed item balances and bin allocation across all active warehouses",
-                        type: "store",
-                      });
-                    }}
-                    className="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    View Details → Drilldown <ArrowRight className="size-3" />
-                  </button>
-                </div>
-
-                <div className="overflow-x-auto mt-3">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-slate-50/80 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                        <th className="py-2.5 px-3">Store</th>
-                        <th className="py-2.5 px-3 text-right">Stock Qty</th>
-                        <th className="py-2.5 px-3 text-right">Stock Value</th>
-                        <th className="py-2.5 px-3 text-center">Low Stock</th>
-                        <th className="py-2.5 px-3 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                      {storeComparison.map((st) => (
-                        <tr
-                          key={st.id}
-                          onClick={() => {
-                            setDrilldownModal({
-                              isOpen: true,
-                              title: `${st.storeName} - Inventory Ledger`,
-                              subtitle: `Store-wise breakdown for ${st.storeCode}`,
-                              type: "store",
-                              targetStore: st.storeName,
-                            });
-                          }}
-                          className="hover:bg-slate-50/70 transition-colors cursor-pointer group"
-                        >
-                          <td className="py-2.5 px-3">
-                            <div className="font-bold text-slate-900 group-hover:text-emerald-700 transition">
-                              {st.storeName}
-                            </div>
-                            <div className="font-mono text-[10px] text-slate-500">{st.storeCode}</div>
-                          </td>
-                          <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
-                            {st.stockQty.toLocaleString()}
-                          </td>
-                          <td className="py-2.5 px-3 text-right font-mono text-emerald-700 font-bold">
-                            ৳ {st.stockValue.toLocaleString()}
-                          </td>
-                          <td className="py-2.5 px-3 text-center">
-                            <span className="font-mono font-bold text-amber-600 px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-[10.5px]">
-                              {st.lowStockItems} items
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-3 text-center">
-                            <span
-                              className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                                st.status === "Healthy"
-                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                  : "bg-amber-50 text-amber-700 border-amber-200"
-                              }`}
-                            >
-                              {st.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                <span className="text-slate-500">Click any row to drill down into store bins</span>
-                <button
-                  type="button"
-                  onClick={() => openDirectDrilldown("/inventory-configuration", { tab: "warehouse-store" })}
-                  className="font-bold text-slate-700 hover:text-emerald-700 hover:underline cursor-pointer"
-                >
-                  Manage Warehouses →
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* ========================================================================= */}
-          {/* 6. PENDING INVENTORY ACTIVITIES (5 Actionable Cards with Drilldown) */}
-          {/* ========================================================================= */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <Clock className="size-4 text-indigo-600" />
-                  Pending Inventory Activities
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Actionable inventory workflows requiring management review, confirmation, or physical warehouse action
-                </p>
-              </div>
-              <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
-                Total Pending: {kpis.pendingIssuesCount + kpis.pendingTransfersCount + kpis.pendingAdjustmentsCount + kpis.pendingWriteOffsCount + kpis.pendingMrrCount}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-              {pendingActivities.map((act, idx) => {
-                const IconComp = act.icon;
-                return (
-                  <div
-                    key={idx}
-                    className={`bg-slate-50/70 border border-slate-200/90 rounded-xl p-4 flex flex-col justify-between border-l-4 ${act.color} hover:bg-white hover:shadow-xs transition-all group`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-800 line-clamp-1">{act.title}</span>
-                        <IconComp className={`size-4 ${act.textColor}`} />
-                      </div>
-                      <div className="mt-2.5 flex items-baseline gap-1.5">
-                        <span className="text-2xl font-black text-slate-900 font-mono tracking-tight">
-                          {act.count}
-                        </span>
-                        <span className="text-[11px] font-semibold text-slate-400">pending</span>
-                      </div>
-                      <p className="text-[10.5px] text-slate-500 mt-1 line-clamp-2">{act.description}</p>
-                    </div>
-
+                {/* Legend & Count Breakdown */}
+                <div className="md:col-span-6 grid grid-cols-2 gap-2">
+                  {transactionDistributionData.map((item) => (
                     <button
+                      key={item.name}
                       type="button"
-                      onClick={() => openDirectDrilldown(act.route)}
-                      className={`mt-4 pt-2.5 border-t border-slate-200 flex items-center justify-between text-[11px] font-bold ${act.textColor} group-hover:underline cursor-pointer`}
+                      onClick={() => handleDrilldown(item.route)}
+                      className="p-2 rounded-xl bg-slate-50/80 hover:bg-slate-100 border border-slate-200/60 transition text-left cursor-pointer group flex flex-col justify-between"
                     >
-                      <span>View Details → Drilldown</span>
-                      <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="size-2 rounded-full shrink-0"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <span className="text-[11px] font-bold text-slate-700 truncate group-hover:text-slate-900">
+                          {item.name}
+                        </span>
+                      </div>
+                      <div className="mt-1 flex items-baseline justify-between">
+                        <span className="text-xs font-black font-mono text-slate-900">
+                          {item.count}
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-400">
+                          {item.percent}%
+                        </span>
+                      </div>
                     </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* ========================================================================= */}
-          {/* 7 & 8. INVENTORY ALERTS & TOP INVENTORY ITEMS (2-Column Grid) */}
-          {/* ========================================================================= */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* 7. Inventory Alerts */}
-            <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div>
-                    <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                      <ShieldAlert className="size-4 text-rose-600" />
-                      Inventory Alerts
-                    </h2>
-                    <p className="text-[11px] text-slate-500">Exception monitor for critical anomalies, expiries, and shortfalls</p>
-                  </div>
-                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-                    6 Active Monitors
-                  </span>
-                </div>
-
-                <div className="divide-y divide-slate-100 mt-1">
-                  {inventoryAlerts.map((alert) => (
-                    <div
-                      key={alert.id}
-                      onClick={() => openDirectDrilldown(alert.route)}
-                      className="py-3 px-1 flex items-center justify-between gap-3 hover:bg-slate-50/80 rounded-xl transition cursor-pointer group"
-                    >
-                      <div className="flex items-start gap-2.5 min-w-0">
-                        <div className="size-2 rounded-full bg-rose-500 mt-1.5 shrink-0" />
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-900 group-hover:text-rose-600 transition truncate">
-                              {alert.title}
-                            </span>
-                            <span className={`text-[9.5px] font-bold px-2 py-0.2 rounded-md border ${alert.badge}`}>
-                              {alert.count}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-slate-500 truncate mt-0.5">{alert.detail}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 text-[11px] font-bold text-slate-400 group-hover:text-slate-900 shrink-0">
-                        <span>View</span>
-                        <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
-                      </div>
-                    </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                <span className="text-slate-400">All alerts sync automatically with physical transactions</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDrilldownModal({
-                      isOpen: true,
-                      title: "Audit & Exception Logs",
-                      subtitle: "Review all triggered inventory flags and stock discrepancies",
-                      type: "alerts",
-                    });
-                  }}
-                  className="font-bold text-rose-700 hover:underline cursor-pointer"
-                >
-                  View Details → Drilldown All Alerts
-                </button>
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <span>Transactions calculated from active voucher records</span>
+                <span className="font-semibold text-slate-600">Click any type to open its register</span>
               </div>
             </div>
 
-            {/* 8. Top Inventory Items (Highest Stock Value vs Highest Movement Toggle) */}
+            {/* Chart 6: Inventory Risk Analysis (Stacked Bar Chart, lg:col-span-6) */}
             <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
-              <div>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                  <div>
-                    <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                      <Layers className="size-4 text-slate-700" />
-                      Top Inventory Items
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 pb-3 mb-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <AlertOctagon className="size-4 text-rose-600" />
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">
+                      Inventory Risk Analysis
                     </h2>
-                    <p className="text-[11px] text-slate-500">Highest financial valuation &amp; velocity items</p>
                   </div>
-
-                  {/* Toggle between Value and Movement */}
-                  <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200">
-                    <button
-                      type="button"
-                      onClick={() => setTopItemsView("value")}
-                      className={`px-3 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
-                        topItemsView === "value"
-                          ? "bg-white text-slate-900 shadow-xs"
-                          : "text-slate-500 hover:text-slate-800"
-                      }`}
-                    >
-                      Highest Stock Value
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTopItemsView("movement")}
-                      className={`px-3 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
-                        topItemsView === "movement"
-                          ? "bg-white text-slate-900 shadow-xs"
-                          : "text-slate-500 hover:text-slate-800"
-                      }`}
-                    >
-                      Highest Movement
-                    </button>
-                  </div>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Critical shortage, out-of-stock, and shelf-life expiration exposure across facilities.
+                  </p>
                 </div>
 
-                <div className="overflow-x-auto mt-3">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-slate-50/80 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                        <th className="py-2.5 px-3">Item Description</th>
-                        <th className="py-2.5 px-3">Category</th>
-                        <th className="py-2.5 px-3 text-right">Stock Qty</th>
-                        <th className="py-2.5 px-3 text-right">
-                          {topItemsView === "value" ? "Unit Rate" : "Velocity"}
-                        </th>
-                        <th className="py-2.5 px-3 text-right">
-                          {topItemsView === "value" ? "Total Value" : "Valuation"}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                      {(topItemsView === "value" ? topItemsByValue : topItemsByMovement).map((item, idx) => (
-                        <tr
-                          key={idx}
-                          onClick={() => {
-                            setDrilldownModal({
-                              isOpen: true,
-                              title: `${item.itemName} (${item.itemCode})`,
-                              subtitle: `Item Ledger Analysis & Movement Breakdown - ${item.category}`,
-                              type: "item_analysis",
-                            });
-                          }}
-                          className="hover:bg-slate-50/70 transition-colors cursor-pointer group"
-                        >
-                          <td className="py-2.5 px-3">
-                            <div className="font-bold text-slate-900 group-hover:text-blue-600 transition truncate max-w-[170px]" title={item.itemName}>
-                              {item.itemName}
-                            </div>
-                            <div className="font-mono text-[10px] text-slate-500">{item.itemCode}</div>
-                          </td>
-                          <td className="py-2.5 px-3 text-[11px] text-slate-600">
-                            {item.category}
-                          </td>
-                          <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
-                            {item.stockQty.toLocaleString()} {item.uom}
-                          </td>
-                          <td className="py-2.5 px-3 text-right font-mono text-slate-600">
-                            {topItemsView === "value"
-                              ? `৳ ${(item as any).unitPrice.toLocaleString()}`
-                              : (item as any).movementTurns}
-                          </td>
-                          <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700">
-                            ৳ {item.totalValue.toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                {/* View Dimension Toggle: Store vs Item Group */}
+                <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={() => setRiskDimension("store")}
+                    className={`px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
+                      riskDimension === "store"
+                        ? "bg-white text-slate-900 shadow-xs"
+                        : "text-slate-500 hover:text-slate-900"
+                    }`}
+                  >
+                    By Store
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRiskDimension("group")}
+                    className={`px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
+                      riskDimension === "group"
+                        ? "bg-white text-slate-900 shadow-xs"
+                        : "text-slate-500 hover:text-slate-900"
+                    }`}
+                  >
+                    By Item Group
+                  </button>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                <span className="text-slate-400">Click any line item to open complete ledger drilldown</span>
-                <button
-                  type="button"
-                  onClick={() => openDirectDrilldown("/inv-opening-stock-list")}
-                  className="font-bold text-blue-700 hover:underline cursor-pointer"
-                >
-                  View Details → Complete Item Analysis
-                </button>
+              {/* Stacked Bar Chart Container */}
+              <div className="h-[280px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={inventoryRiskData}
+                    margin={{ top: 10, right: 15, left: -15, bottom: 25 }}
+                    onClick={(e) => {
+                      if (e && e.activePayload && e.activePayload.length > 0) {
+                        const clicked = e.activePayload[0].payload;
+                        if (riskDimension === "store") {
+                          handleDrilldown("/inv-report-stock-balance", {
+                            store: clicked.name,
+                            stockStatus: "Low Stock",
+                          });
+                        } else {
+                          handleDrilldown("/inv-report-stock-balance", {
+                            itemGroup: clicked.name,
+                            stockStatus: "Low Stock",
+                          });
+                        }
+                      }
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis
+                      dataKey="shortName"
+                      stroke="#64748b"
+                      fontSize={10}
+                      fontWeight={600}
+                      tickLine={false}
+                      axisLine={{ stroke: "#e2e8f0" }}
+                      interval={0}
+                      angle={-20}
+                      textAnchor="end"
+                    />
+                    <YAxis
+                      stroke="#94a3b8"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                      allowDecimals={false}
+                    />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-slate-900/95 backdrop-blur-md text-white text-xs rounded-xl shadow-xl p-3 border border-slate-800 min-w-[210px]">
+                              <p className="font-bold text-white mb-1.5 border-b border-slate-700 pb-1">
+                                {data.name}
+                              </p>
+                              <div className="space-y-1 font-mono text-[11px]">
+                                <div className="text-orange-400 flex justify-between">
+                                  <span>Critical Stock:</span>
+                                  <strong>{data["Critical Stock"]} SKUs</strong>
+                                </div>
+                                <div className="text-amber-400 flex justify-between">
+                                  <span>Low Stock:</span>
+                                  <strong>{data["Low Stock"]} SKUs</strong>
+                                </div>
+                                <div className="text-rose-400 flex justify-between">
+                                  <span>Out of Stock:</span>
+                                  <strong>{data["Out of Stock"]} SKUs</strong>
+                                </div>
+                                {data.hasExpiryTracking && data["Expiring / Expired"] > 0 && (
+                                  <div className="text-purple-400 flex justify-between">
+                                    <span>Expiring / Expired:</span>
+                                    <strong>{data["Expiring / Expired"]} Batches</strong>
+                                  </div>
+                                )}
+                                <div className="pt-1 border-t border-slate-800 text-slate-200 font-bold flex justify-between">
+                                  <span>Total Risk Items:</span>
+                                  <span>{data.totalRisk} SKUs</span>
+                                </div>
+                              </div>
+                              <p className="text-[10px] text-slate-400 mt-2 pt-1 border-t border-slate-800 italic">
+                                Click bar to open filtered register
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Legend
+                      verticalAlign="top"
+                      align="right"
+                      iconType="circle"
+                      iconSize={7}
+                      wrapperStyle={{ paddingBottom: 8, fontSize: 11 }}
+                    />
+                    <Bar
+                      dataKey="Critical Stock"
+                      stackId="risk"
+                      fill="#f97316"
+                      cursor="pointer"
+                    />
+                    <Bar
+                      dataKey="Low Stock"
+                      stackId="risk"
+                      fill="#f59e0b"
+                      cursor="pointer"
+                    />
+                    <Bar
+                      dataKey="Out of Stock"
+                      stackId="risk"
+                      fill="#ef4444"
+                      cursor="pointer"
+                    />
+                    {supportsExpiryTracking && (
+                      <Bar
+                        dataKey="Expiring / Expired"
+                        stackId="risk"
+                        fill="#a855f7"
+                        cursor="pointer"
+                      />
+                    )}
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <span>
+                  {supportsExpiryTracking
+                    ? "Categories are mutually exclusive • Expiry tracking included"
+                    : "Categories are mutually exclusive"}
+                </span>
+                <span className="font-semibold text-slate-600">Click segment to open register</span>
               </div>
             </div>
           </div>
         </div>
-
-        {/* ========================================================================= */}
-        {/* INTERACTIVE DRILLDOWN MODAL (When clicking any card, status, or table) */}
-        {/* ========================================================================= */}
-        {drilldownModal.isOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-4xl w-full p-6 space-y-4 max-h-[85vh] flex flex-col">
-              {/* Modal Header */}
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div>
-                  <h3 className="text-base font-black text-slate-900">{drilldownModal.title}</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{drilldownModal.subtitle}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setDrilldownModal({ isOpen: false, title: "", subtitle: "", type: null })}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 cursor-pointer"
-                >
-                  <X className="size-5" />
-                </button>
-              </div>
-
-              {/* Modal Body: Relevant Detailed List */}
-              <div className="flex-1 overflow-y-auto pr-1">
-                {drilldownModal.type === "low" || drilldownModal.type === "critical" || drilldownModal.type === "out" ? (
-                  <div className="border border-slate-200 rounded-xl overflow-hidden">
-                    <table className="w-full text-left text-xs border-collapse">
-                      <thead>
-                        <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase">
-                          <th className="py-2.5 px-3">SL</th>
-                          <th className="py-2.5 px-3">Item Code</th>
-                          <th className="py-2.5 px-3">Item Description</th>
-                          <th className="py-2.5 px-3">Warehouse Store</th>
-                          <th className="py-2.5 px-3 text-right">Current Stock</th>
-                          <th className="py-2.5 px-3 text-right">Reorder Level</th>
-                          <th className="py-2.5 px-3 text-center">Deficit</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {criticalStockItems.map((c, i) => (
-                          <tr key={i} className="hover:bg-slate-50">
-                            <td className="py-2.5 px-3 text-slate-400 font-mono text-[10px]">{i + 1}</td>
-                            <td className="py-2.5 px-3 font-mono font-bold text-blue-600">{c.itemCode}</td>
-                            <td className="py-2.5 px-3 font-semibold text-slate-800">{c.itemName}</td>
-                            <td className="py-2.5 px-3 text-slate-600">{c.store}</td>
-                            <td className="py-2.5 px-3 text-right font-mono font-bold text-rose-600">
-                              {c.currentStock} {c.uom}
-                            </td>
-                            <td className="py-2.5 px-3 text-right font-mono text-slate-600">
-                              {c.reorderLevel} {c.uom}
-                            </td>
-                            <td className="py-2.5 px-3 text-center">
-                              <span className="font-mono font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 text-[10px]">
-                                -{Math.max(0, c.reorderLevel - c.currentStock)} {c.uom}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : drilldownModal.type === "store" ? (
-                  <div className="space-y-4">
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs flex justify-between items-center">
-                      <div>
-                        <span className="text-slate-500 font-medium">Store Context: </span>
-                        <strong className="text-slate-900 font-bold">{drilldownModal.targetStore || "All Warehouses"}</strong>
-                      </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 text-[10px]">
-                        Active Stock Point
-                      </span>
-                    </div>
-
-                    <div className="border border-slate-200 rounded-xl overflow-hidden">
-                      <table className="w-full text-left text-xs border-collapse">
-                        <thead>
-                          <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase">
-                            <th className="py-2.5 px-3">Location / Bin</th>
-                            <th className="py-2.5 px-3">Item Stored</th>
-                            <th className="py-2.5 px-3">Batch Number</th>
-                            <th className="py-2.5 px-3 text-right">Quantity</th>
-                            <th className="py-2.5 px-3 text-right">Value (৳)</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                          <tr className="hover:bg-slate-50">
-                            <td className="py-2.5 px-3 font-semibold text-slate-800">Rack A - Shelf 01</td>
-                            <td className="py-2.5 px-3 font-medium text-slate-700">100% Combed Cotton Yarn Ne 30/1</td>
-                            <td className="py-2.5 px-3 font-mono text-purple-600 font-bold">BAT-YRN-2026-09</td>
-                            <td className="py-2.5 px-3 text-right font-mono font-bold">2,400 KG</td>
-                            <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700">1,008,000</td>
-                          </tr>
-                          <tr className="hover:bg-slate-50">
-                            <td className="py-2.5 px-3 font-semibold text-slate-800">Rack A - Shelf 02</td>
-                            <td className="py-2.5 px-3 font-medium text-slate-700">Polyester Staple Fiber 1.4D</td>
-                            <td className="py-2.5 px-3 font-mono text-purple-600 font-bold">BAT-PSF-2026-04</td>
-                            <td className="py-2.5 px-3 text-right font-mono font-bold">1,800 KG</td>
-                            <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700">432,000</td>
-                          </tr>
-                          <tr className="hover:bg-slate-50">
-                            <td className="py-2.5 px-3 font-semibold text-slate-800">Chemical Bay C-3</td>
-                            <td className="py-2.5 px-3 font-medium text-slate-700">Reactive Blue D-3G Textile Dye</td>
-                            <td className="py-2.5 px-3 font-mono text-purple-600 font-bold">BAT-CHM-2025-11</td>
-                            <td className="py-2.5 px-3 text-right font-mono font-bold">120 KG</td>
-                            <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700">72,000</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 text-xs">
-                    <p className="text-slate-600">
-                      The selected item has continuous inventory movement records across receiving vouchers,
-                      material requisitions, and stock transfer orders.
-                    </p>
-                    <div className="grid grid-cols-3 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">30-Day Inflow</span>
-                        <strong className="text-sm font-black text-emerald-700 font-mono">1,850 units</strong>
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">30-Day Outflow</span>
-                        <strong className="text-sm font-black text-rose-700 font-mono">1,420 units</strong>
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Avg. Turn Rate</span>
-                        <strong className="text-sm font-black text-blue-700 font-mono">8.4 days</strong>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Modal Footer with Direct Page Navigation */}
-              <div className="border-t border-slate-100 pt-3 flex items-center justify-between">
-                <span className="text-xs text-slate-400">Drilldown data filtered by active dashboard criteria</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setDrilldownModal({ isOpen: false, title: "", subtitle: "", type: null })}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDrilldownModal({ isOpen: false, title: "", subtitle: "", type: null });
-                      navigate({ to: "/inv-opening-stock-list" });
-                    }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs cursor-pointer flex items-center gap-1.5"
-                  >
-                    <span>Open Full Transaction Register</span>
-                    <ExternalLink className="size-3.5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );

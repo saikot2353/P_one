@@ -51,17 +51,53 @@ export function StockBalanceRegisterPage() {
   const navigate = useNavigate();
   const currencyCfg = getActiveCurrencyConfig();
 
-  // Filters
-  const [filterCompany, setFilterCompany] = useState("All");
-  const [filterStore, setFilterStore] = useState("All");
-  const [filterItem, setFilterItem] = useState("All");
-  const [filterItemGroup, setFilterItemGroup] = useState("All");
-  const [filterItemCategory, setFilterItemCategory] = useState("All");
+  // Filters (initialized from URL search params for seamless drill-down support)
+  const [filterCompany, setFilterCompany] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      return p.get("company") || "All";
+    }
+    return "All";
+  });
+  const [filterStore, setFilterStore] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      return p.get("store") || "All";
+    }
+    return "All";
+  });
+  const [filterItem, setFilterItem] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      return p.get("item") || "All";
+    }
+    return "All";
+  });
+  const [filterItemGroup, setFilterItemGroup] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      return p.get("itemGroup") || "All";
+    }
+    return "All";
+  });
+  const [filterItemCategory, setFilterItemCategory] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      return p.get("itemCategory") || "All";
+    }
+    return "All";
+  });
   const [filterBrand, setFilterBrand] = useState("All");
   const [filterOrigin, setFilterOrigin] = useState("All");
   const [filterBatch, setFilterBatch] = useState("");
   const [filterLocation, setFilterLocation] = useState("");
-  const [filterStockStatus, setFilterStockStatus] = useState("All");
+  const [filterStockStatus, setFilterStockStatus] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      return p.get("stockStatus") || p.get("status") || "All";
+    }
+    return "All";
+  });
   const [asOfDate, setAsOfDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [searchQuery, setSearchQuery] = useState("");
 

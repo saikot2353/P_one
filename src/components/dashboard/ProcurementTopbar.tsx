@@ -66,18 +66,18 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Supplier directory, contacts, banking, and terms",
   },
   {
-    label: "Item Group",
+    label: "Business Type",
     parent: "Master Data",
     to: "/procurement-master-data",
-    search: { tab: "item-group" },
-    description: "Top-level item groups and classifications",
+    search: { tab: "business-type" },
+    description: "Commercial business classifications and vendor trade types",
   },
   {
     label: "Item Creation",
     parent: "Master Data",
     to: "/procurement-master-data",
     search: { tab: "item-sub-group" },
-    description: "Item catalog, dynamic sub-group tree hierarchy and item creation",
+    description: "Item catalog, dynamic group & sub-group hierarchy, and item creation",
   },
   {
     label: "Item Category",
