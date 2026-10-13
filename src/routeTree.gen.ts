@@ -318,6 +318,7 @@ import { Route as SeparationPaymentRouteImport } from './routes/separation-payme
 import { Route as SeparationResignationRequestRouteImport } from './routes/separation-resignation-request'
 import { Route as SetHodRouteImport } from './routes/set-hod'
 import { Route as SetManagerRouteImport } from './routes/set-manager'
+import { Route as ShapnocheckRouteImport } from './routes/shapnocheck'
 import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
 import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
 import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
@@ -1994,6 +1995,11 @@ const SetManagerRoute = SetManagerRouteImport.update({
   path: '/set-manager',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShapnocheckRoute = ShapnocheckRouteImport.update({
+  id: '/shapnocheck',
+  path: '/shapnocheck',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShiftControlCenterRoute = ShiftControlCenterRouteImport.update({
   id: '/shift-control-center',
   path: '/shift-control-center',
@@ -2472,6 +2478,7 @@ export interface FileRoutesByFullPath {
   '/separation-resignation-request': typeof SeparationResignationRequestRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
+  '/shapnocheck': typeof ShapnocheckRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -2815,6 +2822,7 @@ export interface FileRoutesByTo {
   '/separation-resignation-request': typeof SeparationResignationRequestRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
+  '/shapnocheck': typeof ShapnocheckRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -3159,6 +3167,7 @@ export interface FileRoutesById {
   '/separation-resignation-request': typeof SeparationResignationRequestRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
+  '/shapnocheck': typeof ShapnocheckRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -3504,6 +3513,7 @@ export interface FileRouteTypes {
     | '/separation-resignation-request'
     | '/set-hod'
     | '/set-manager'
+    | '/shapnocheck'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -3847,6 +3857,7 @@ export interface FileRouteTypes {
     | '/separation-resignation-request'
     | '/set-hod'
     | '/set-manager'
+    | '/shapnocheck'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -4190,6 +4201,7 @@ export interface FileRouteTypes {
     | '/separation-resignation-request'
     | '/set-hod'
     | '/set-manager'
+    | '/shapnocheck'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -4534,6 +4546,7 @@ export interface RootRouteChildren {
   SeparationResignationRequestRoute: typeof SeparationResignationRequestRoute
   SetHodRoute: typeof SetHodRoute
   SetManagerRoute: typeof SetManagerRoute
+  ShapnocheckRoute: typeof ShapnocheckRoute
   ShiftControlCenterRoute: typeof ShiftControlCenterRoute
   SspApprovalRoute: typeof SspApprovalRoute
   SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
@@ -6733,6 +6746,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SetManagerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shapnocheck': {
+      id: '/shapnocheck'
+      path: '/shapnocheck'
+      fullPath: '/shapnocheck'
+      preLoaderRoute: typeof ShapnocheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shift-control-center': {
       id: '/shift-control-center'
       path: '/shift-control-center'
@@ -7282,6 +7302,7 @@ const rootRouteChildren: RootRouteChildren = {
   SeparationResignationRequestRoute: SeparationResignationRequestRoute,
   SetHodRoute: SetHodRoute,
   SetManagerRoute: SetManagerRoute,
+  ShapnocheckRoute: ShapnocheckRoute,
   ShiftControlCenterRoute: ShiftControlCenterRoute,
   SspApprovalRoute: SspApprovalRoute,
   SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,
