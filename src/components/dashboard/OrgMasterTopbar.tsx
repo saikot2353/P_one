@@ -56,6 +56,14 @@ import {
   X,
   CheckCircle2,
   Menu,
+  Split,
+  Clock4,
+  Paintbrush,
+  CalendarRange,
+  Workflow,
+  FileSpreadsheet,
+  FileBadge,
+  ShieldCheck,
 } from "lucide-react";
 import { ModuleLauncher } from "./ModuleLauncher";
 
@@ -92,6 +100,14 @@ export const masterSearchableItems: MasterSearchItem[] = [
     icon: Factory,
   },
   {
+    label: "Production Floor & Line Management",
+    parent: "Organization & Structure",
+    tabKey: "floor-line-management",
+    description:
+      "Manage production floors, sewing lines, cutting tables, finishing sections, line capacities & line supervisors.",
+    icon: Split,
+  },
+  {
     label: "Location Management",
     parent: "Organization & Structure",
     tabKey: "location-management",
@@ -113,6 +129,14 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "designation-position",
     description: "Manage designations, job positions, grades, levels & organizational reporting.",
     icon: Award,
+  },
+  {
+    label: "Shift & Work Schedule Management",
+    parent: "People & Contacts",
+    tabKey: "shift-schedule",
+    description:
+      "Define factory shifts, general shifts, roster rotations, Ramzan timing, grace periods & overtime cutoff rules.",
+    icon: Clock4,
   },
   {
     label: "Contact Management",
@@ -190,6 +214,14 @@ export const masterSearchableItems: MasterSearchItem[] = [
     icon: Palette,
   },
   {
+    label: "Color Library & Size Matrix Management",
+    parent: "Product & Item Management",
+    tabKey: "color-size-matrix",
+    description:
+      "Standardized Pantone TCX/TPX shade library, color codes, size range breakdowns & dimension matrices.",
+    icon: Paintbrush,
+  },
+  {
     label: "Unit of Measurement Management",
     parent: "Product & Item Management",
     tabKey: "uom-management",
@@ -221,6 +253,14 @@ export const masterSearchableItems: MasterSearchItem[] = [
   },
 
   // 6. Finance & Payment References
+  {
+    label: "Fiscal Year & Financial Period Management",
+    parent: "Finance & Payment References",
+    tabKey: "fiscal-year-period",
+    description:
+      "Manage financial years, statutory tax years, fiscal quarters, monthly closing periods & accounting lock dates.",
+    icon: CalendarRange,
+  },
   {
     label: "Bank & Bank Branch Management",
     parent: "Finance & Payment References",
@@ -287,6 +327,14 @@ export const masterSearchableItems: MasterSearchItem[] = [
     icon: Scissors,
   },
   {
+    label: "Process & Operation Master",
+    parent: "Project & Business Operations",
+    tabKey: "process-operations",
+    description:
+      "Define standard garment production processes, routing steps, operation bulletins & SMV/SAM benchmarks.",
+    icon: Workflow,
+  },
+  {
     label: "Contract & Terms Management",
     parent: "Project & Business Operations",
     tabKey: "contract-terms",
@@ -302,8 +350,40 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description: "Shipping methods, ports, customs stations, classifications & Incoterms.",
     icon: Anchor,
   },
+  {
+    label: "HS Code & Customs Tariff Management",
+    parent: "Commercial & Logistics References",
+    tabKey: "hscode-customs-tariff",
+    description:
+      "Harmonized System (HS) codes, customs tariff classes, duty rates (CD, RD, SD, VAT, AIT) & import/export regulations.",
+    icon: FileSpreadsheet,
+  },
+  {
+    label: "Bond, License & Quota Management",
+    parent: "Commercial & Logistics References",
+    tabKey: "bond-license-quota",
+    description:
+      "Bonded warehouse license registers, BGMEA/BKMEA numbers, ERC/IRC certificates, UD authority & export quotas.",
+    icon: FileBadge,
+  },
 
   // 9. Common Reference & Configuration
+  {
+    label: "Approval Matrix & Delegation of Authority (DoA)",
+    parent: "Common Reference & Configuration",
+    tabKey: "approval-matrix-doa",
+    description:
+      "Delegation of authority rules, approval limit thresholds, hierarchical signing tiers & multi-level workflow controls.",
+    icon: ShieldCheck,
+  },
+  {
+    label: "Compliance & Audit Certification Management",
+    parent: "Common Reference & Configuration",
+    tabKey: "compliance-certifications",
+    description:
+      "Factory social and technical compliance standards (BSCI, WRAP, SEDEX, OEKO-TEX, GOTS, ISO) & audit validity.",
+    icon: BadgeCheck,
+  },
   {
     label: "Document Type Management",
     parent: "Common Reference & Configuration",

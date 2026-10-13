@@ -147,7 +147,7 @@ function OrgMasterSetupPage() {
                   className="inline-flex items-center gap-2 text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 transition-colors"
                 >
                   <ArrowLeft className="size-4" />
-                  <span>Back to Master Overview (All 36 Menus)</span>
+                  <span>Back to Master Overview (All {masterSearchableItems.length} Menus)</span>
                 </button>
 
                 <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-md">
@@ -292,13 +292,13 @@ function OrgMasterSetupPage() {
                   {/* Summary Metric Badges */}
                   <div className="flex items-center gap-2.5 shrink-0">
                     <div className="px-4 py-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-center min-w-[90px]">
-                      <div className="text-xl font-black text-white">9</div>
+                      <div className="text-xl font-black text-white">{orgMasterNavGroups.length}</div>
                       <div className="text-[9.5px] font-bold text-sky-200 uppercase tracking-wider">
                         Categories
                       </div>
                     </div>
                     <div className="px-4 py-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-center min-w-[90px]">
-                      <div className="text-xl font-black text-white">36</div>
+                      <div className="text-xl font-black text-white">{masterSearchableItems.length}</div>
                       <div className="text-[9.5px] font-bold text-sky-200 uppercase tracking-wider">
                         Master Menus
                       </div>

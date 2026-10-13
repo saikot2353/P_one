@@ -49,6 +49,14 @@ import {
   ChevronRight,
   ArrowLeft,
   X,
+  Split,
+  Clock4,
+  Paintbrush,
+  CalendarRange,
+  Workflow,
+  FileSpreadsheet,
+  FileBadge,
+  ShieldCheck,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -71,7 +79,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
   {
     label: "Organization & Structure",
     icon: Building2,
-    count: 4,
+    count: 5,
     subitems: [
       {
         label: "Company Management",
@@ -100,6 +108,15 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         description: "Manage head offices, branch offices, factories, plants & operational sites.",
       },
       {
+        label: "Production Floor & Line Management",
+        to: "/organization-master-setup",
+        search: { tab: "floor-line-management" },
+        tabKey: "floor-line-management",
+        icon: Split,
+        description:
+          "Manage production floors, sewing lines, cutting tables, finishing sections, line capacities & line supervisors.",
+      },
+      {
         label: "Location Management",
         to: "/organization-master-setup",
         search: { tab: "location-management" },
@@ -112,7 +129,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
   {
     label: "People & Contacts",
     icon: Users,
-    count: 3,
+    count: 4,
     subitems: [
       {
         label: "Employee Management",
@@ -130,6 +147,15 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         icon: Award,
         description:
           "Manage designations, job positions, grades, levels & organizational reporting.",
+      },
+      {
+        label: "Shift & Work Schedule Management",
+        to: "/organization-master-setup",
+        search: { tab: "shift-schedule" },
+        tabKey: "shift-schedule",
+        icon: Clock4,
+        description:
+          "Define factory shifts, general shifts, roster rotations, Ramzan timing, grace periods & overtime cutoff rules.",
       },
       {
         label: "Contact Management",
@@ -194,7 +220,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
   {
     label: "Product & Item Management",
     icon: Package,
-    count: 5,
+    count: 6,
     subitems: [
       {
         label: "Item Management",
@@ -227,6 +253,15 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         tabKey: "product-variants",
         icon: Palette,
         description: "Variations such as size, color, model, dimensions & attributes.",
+      },
+      {
+        label: "Color Library & Size Matrix Management",
+        to: "/organization-master-setup",
+        search: { tab: "color-size-matrix" },
+        tabKey: "color-size-matrix",
+        icon: Paintbrush,
+        description:
+          "Standardized Pantone TCX/TPX shade library, color codes, size range breakdowns & dimension matrices.",
       },
       {
         label: "Unit of Measurement Management",
@@ -272,8 +307,17 @@ export const orgMasterNavGroups: NavGroupItem[] = [
   {
     label: "Finance & Payment References",
     icon: Banknote,
-    count: 7,
+    count: 8,
     subitems: [
+      {
+        label: "Fiscal Year & Financial Period Management",
+        to: "/organization-master-setup",
+        search: { tab: "fiscal-year-period" },
+        tabKey: "fiscal-year-period",
+        icon: CalendarRange,
+        description:
+          "Manage financial years, statutory tax years, fiscal quarters, monthly closing periods & accounting lock dates.",
+      },
       {
         label: "Bank & Bank Branch Management",
         to: "/organization-master-setup",
@@ -335,7 +379,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
   {
     label: "Project & Business Operations",
     icon: Target,
-    count: 3,
+    count: 4,
     subitems: [
       {
         label: "Project & Order Management",
@@ -354,6 +398,15 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         description: "Garment styles, seasons, fashion collections & development references.",
       },
       {
+        label: "Process & Operation Master",
+        to: "/organization-master-setup",
+        search: { tab: "process-operations" },
+        tabKey: "process-operations",
+        icon: Workflow,
+        description:
+          "Define standard garment production processes, routing steps, operation bulletins & SMV/SAM benchmarks.",
+      },
+      {
         label: "Contract & Terms Management",
         to: "/organization-master-setup",
         search: { tab: "contract-terms" },
@@ -366,7 +419,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
   {
     label: "Commercial & Logistics References",
     icon: Ship,
-    count: 1,
+    count: 3,
     subitems: [
       {
         label: "Shipping & Trade Reference Management",
@@ -376,13 +429,49 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         icon: Anchor,
         description: "Shipping methods, ports, customs stations, classifications & Incoterms.",
       },
+      {
+        label: "HS Code & Customs Tariff Management",
+        to: "/organization-master-setup",
+        search: { tab: "hscode-customs-tariff" },
+        tabKey: "hscode-customs-tariff",
+        icon: FileSpreadsheet,
+        description:
+          "Harmonized System (HS) codes, customs tariff classes, duty rates (CD, RD, SD, VAT, AIT) & import/export regulations.",
+      },
+      {
+        label: "Bond, License & Quota Management",
+        to: "/organization-master-setup",
+        search: { tab: "bond-license-quota" },
+        tabKey: "bond-license-quota",
+        icon: FileBadge,
+        description:
+          "Bonded warehouse license registers, BGMEA/BKMEA numbers, ERC/IRC certificates, UD authority & export quotas.",
+      },
     ],
   },
   {
     label: "Common Reference & Configuration",
     icon: SlidersHorizontal,
-    count: 5,
+    count: 7,
     subitems: [
+      {
+        label: "Approval Matrix & Delegation of Authority (DoA)",
+        to: "/organization-master-setup",
+        search: { tab: "approval-matrix-doa" },
+        tabKey: "approval-matrix-doa",
+        icon: ShieldCheck,
+        description:
+          "Delegation of authority rules, approval limit thresholds, hierarchical signing tiers & multi-level workflow controls.",
+      },
+      {
+        label: "Compliance & Audit Certification Management",
+        to: "/organization-master-setup",
+        search: { tab: "compliance-certifications" },
+        tabKey: "compliance-certifications",
+        icon: BadgeCheck,
+        description:
+          "Factory social and technical compliance standards (BSCI, WRAP, SEDEX, OEKO-TEX, GOTS, ISO) & audit validity.",
+      },
       {
         label: "Document Type Management",
         to: "/organization-master-setup",
@@ -604,7 +693,7 @@ export function OrgMasterSidebar({ isMobileOpen = false, onCloseMobile }: OrgMas
           </Link>
         </div>
 
-        {/* 9 Organized Sections with 36 Submenus */}
+        {/* 9 Organized Sections with 45 Submenus */}
         {orgMasterNavGroups.map((group) => {
           const GroupIcon = group.icon;
           const isOpen = openMenus[group.label];
@@ -647,7 +736,7 @@ export function OrgMasterSidebar({ isMobileOpen = false, onCloseMobile }: OrgMas
               <div
                 className={[
                   "overflow-hidden transition-all duration-300 space-y-0.5 pl-3 bg-sidebar-accent/25 rounded-xl",
-                  isOpen ? "max-h-[600px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
+                  isOpen ? "max-h-[800px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
                 ].join(" ")}
               >
                 {group.subitems.map((sub) => {
