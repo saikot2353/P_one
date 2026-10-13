@@ -18,6 +18,7 @@ import {
   Moon,
   Store,
   ListChecks,
+  Building2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/module-selection")({
@@ -62,6 +63,15 @@ const modules = [
     color: "from-teal-500 to-emerald-600",
     shadow: "shadow-teal-500/20",
     path: "/merchandising-dashboard",
+  },
+  {
+    id: "org-master",
+    name: "Organization Master Setup",
+    description: "Centralized enterprise structures & master configurations",
+    icon: Building2,
+    color: "from-sky-500 to-blue-700",
+    shadow: "shadow-sky-500/20",
+    path: "/organization-master-setup",
   },
   {
     id: "finance",
