@@ -28,6 +28,14 @@ interface ModuleConfig {
 
 const modules: ModuleConfig[] = [
   {
+    id: "org-master",
+    name: "Org Master",
+    icon: Building2,
+    color: "from-sky-500 to-blue-700",
+    shadow: "shadow-sky-500/20",
+    path: "/organization-master-setup",
+  },
+  {
     id: "hris",
     name: "HRIS",
     icon: Users,
@@ -42,14 +50,6 @@ const modules: ModuleConfig[] = [
     color: "from-teal-500 to-emerald-600",
     shadow: "shadow-teal-500/20",
     path: "/merchandising-dashboard",
-  },
-  {
-    id: "org-master",
-    name: "Org Master",
-    icon: Building2,
-    color: "from-sky-500 to-blue-700",
-    shadow: "shadow-sky-500/20",
-    path: "/organization-master-setup",
   },
   {
     id: "finance",

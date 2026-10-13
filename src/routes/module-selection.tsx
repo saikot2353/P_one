@@ -47,6 +47,15 @@ function AnimatedBackground({ theme }: { theme: Theme }) {
 /* ─────────── Module Data ─────────── */
 const modules = [
   {
+    id: "org-master",
+    name: "Organization Master Setup",
+    description: "Centralized enterprise structures & master configurations",
+    icon: Building2,
+    color: "from-sky-500 to-blue-700",
+    shadow: "shadow-sky-500/20",
+    path: "/organization-master-setup",
+  },
+  {
     id: "hris",
     name: "HRIS",
     description: "Human Resource Information System",
@@ -63,15 +72,6 @@ const modules = [
     color: "from-teal-500 to-emerald-600",
     shadow: "shadow-teal-500/20",
     path: "/merchandising-dashboard",
-  },
-  {
-    id: "org-master",
-    name: "Organization Master Setup",
-    description: "Centralized enterprise structures & master configurations",
-    icon: Building2,
-    color: "from-sky-500 to-blue-700",
-    shadow: "shadow-sky-500/20",
-    path: "/organization-master-setup",
   },
   {
     id: "finance",
@@ -175,6 +175,7 @@ const modules = [
 ];
 
 const ACTIVE_MODULE_IDS = [
+  "org-master",
   "hris",
   "merchandising",
   "finance",
