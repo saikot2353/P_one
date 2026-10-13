@@ -335,7 +335,7 @@ function OrgMasterSetupPage() {
 
               {/* 9 Category Grid Sections - Full Width, 4 columns on large screens with minimum gap */}
               <div className="space-y-3.5">
-                {filteredGroups.map((group, groupIdx) => {
+                {filteredGroups.map((group) => {
                   const GroupIcon = group.icon;
                   return (
                     <div
@@ -347,20 +347,9 @@ function OrgMasterSetupPage() {
                           <div className="size-8 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
                             <GroupIcon className="size-4.5" />
                           </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest">
-                                Section {groupIdx + 1}
-                              </span>
-                              <span className="text-muted-foreground text-xs">•</span>
-                              <span className="text-xs font-bold text-muted-foreground">
-                                {group.subitems.length} menus
-                              </span>
-                            </div>
-                            <h3 className="text-sm sm:text-base font-black tracking-tight text-foreground">
-                              {group.label}
-                            </h3>
-                          </div>
+                          <h3 className="text-sm sm:text-base font-black tracking-tight text-foreground">
+                            {group.label}
+                          </h3>
                         </div>
                       </div>
 

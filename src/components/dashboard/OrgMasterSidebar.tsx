@@ -694,8 +694,8 @@ export function OrgMasterSidebar({ isMobileOpen = false, onCloseMobile }: OrgMas
 
   return (
     <>
-      {/* Desktop & Laptop Sidebar: Wider width (w-72 md:w-76 lg:w-80) */}
-      <aside className="hidden md:flex w-72 md:w-76 lg:w-80 h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 select-none shadow-sm">
+      {/* Desktop & Laptop Sidebar: Balanced width (w-76 md:w-[320px] lg:w-[330px]) */}
+      <aside className="hidden md:flex w-76 md:w-[320px] lg:w-[330px] h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 select-none shadow-sm">
         {sidebarContent}
       </aside>
 
@@ -706,7 +706,7 @@ export function OrgMasterSidebar({ isMobileOpen = false, onCloseMobile }: OrgMas
             className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
             onClick={onCloseMobile}
           />
-          <aside className="relative w-80 max-w-[85vw] h-full flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border shadow-2xl z-10 select-none animate-in slide-in-from-left duration-250">
+          <aside className="relative w-[310px] max-w-[85vw] h-full flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border shadow-2xl z-10 select-none animate-in slide-in-from-left duration-250">
             {sidebarContent}
           </aside>
         </div>
