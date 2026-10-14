@@ -6,6 +6,7 @@ import { CompanySetupView, type TabType as CompanySetupTabType } from "@/routes/
 import { StructureSetupView, type TabType as StructureTabType } from "@/routes/configure-structure";
 import { LocationManagementView, type LocationTabType } from "@/components/organization/LocationManagementView";
 import { PersonnelListView } from "@/routes/personnel-list";
+import { AddEmployeeView } from "@/routes/add-employee";
 import {
   Building2,
   FolderTree,
@@ -141,15 +142,33 @@ function OrgMasterSetupPage() {
           {/* Detail View for Selected Tab */}
           {currentActiveItem ? (
             currentActiveItem.tabKey === "employee-management" ? (
-              <PersonnelListView
-                embedded={true}
-                onBackToOverview={() =>
-                  navigate({
-                    to: "/organization-master-setup",
-                    search: {},
-                  })
-                }
-              />
+              subtab === "add" ? (
+                <AddEmployeeView
+                  embedded={true}
+                  onBackToEmployeeList={() =>
+                    navigate({
+                      to: "/organization-master-setup",
+                      search: { tab: "employee-management" },
+                    })
+                  }
+                />
+              ) : (
+                <PersonnelListView
+                  embedded={true}
+                  onAddEmployee={() =>
+                    navigate({
+                      to: "/organization-master-setup",
+                      search: { tab: "employee-management", subtab: "add" },
+                    })
+                  }
+                  onBackToOverview={() =>
+                    navigate({
+                      to: "/organization-master-setup",
+                      search: {},
+                    })
+                  }
+                />
+              )
             ) : currentActiveItem.tabKey === "location-management" ? (
               <LocationManagementView
                 embedded={true}

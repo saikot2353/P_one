@@ -559,11 +559,13 @@ const getColumnHeaderClass = (key: ColumnKey) => {
 export interface PersonnelListViewProps {
   embedded?: boolean;
   onBackToOverview?: () => void;
+  onAddEmployee?: () => void;
 }
 
 export function PersonnelListView({
   embedded = false,
   onBackToOverview,
+  onAddEmployee,
 }: PersonnelListViewProps) {
   const [employees, setEmployees] = useState<any[]>([]);
   const navigate = useNavigate();
@@ -1324,7 +1326,13 @@ export function PersonnelListView({
                 </div>
               </div>
               <button
-                onClick={() => window.open("/add-employee", "_blank")}
+                onClick={() => {
+                  if (onAddEmployee) {
+                    onAddEmployee();
+                  } else {
+                    window.open("/add-employee", "_blank");
+                  }
+                }}
                 className="h-9.5 px-4 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
               >
                 <UserPlus className="size-4" /> Add Employee
@@ -1369,7 +1377,13 @@ export function PersonnelListView({
               </div>
             </div>
             <button
-              onClick={() => window.open("/add-employee", "_blank")}
+              onClick={() => {
+                if (onAddEmployee) {
+                  onAddEmployee();
+                } else {
+                  window.open("/add-employee", "_blank");
+                }
+              }}
               className="h-9.5 px-4 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
             >
               <UserPlus className="size-4" /> Add Employee
