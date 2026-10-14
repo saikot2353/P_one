@@ -18,6 +18,7 @@ import {
   Moon,
   Store,
   ListChecks,
+  Building2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/module-selection")({
@@ -45,6 +46,15 @@ function AnimatedBackground({ theme }: { theme: Theme }) {
 
 /* ─────────── Module Data ─────────── */
 const modules = [
+  {
+    id: "org-master",
+    name: "Organization Master Setup",
+    description: "Centralized enterprise structures & master configurations",
+    icon: Building2,
+    color: "from-sky-500 to-blue-700",
+    shadow: "shadow-sky-500/20",
+    path: "/organization-master-setup",
+  },
   {
     id: "hris",
     name: "HRIS",
@@ -165,6 +175,7 @@ const modules = [
 ];
 
 const ACTIVE_MODULE_IDS = [
+  "org-master",
   "hris",
   "merchandising",
   "finance",

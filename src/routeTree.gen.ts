@@ -206,6 +206,7 @@ import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salar
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MyProfileRouteImport } from './routes/my-profile'
 import { Route as NoticeRouteImport } from './routes/notice'
+import { Route as OrganizationMasterSetupRouteImport } from './routes/organization-master-setup'
 import { Route as OtSheetHolidayRouteImport } from './routes/ot-sheet-holiday'
 import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
 import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
@@ -318,6 +319,7 @@ import { Route as SeparationPaymentRouteImport } from './routes/separation-payme
 import { Route as SeparationResignationRequestRouteImport } from './routes/separation-resignation-request'
 import { Route as SetHodRouteImport } from './routes/set-hod'
 import { Route as SetManagerRouteImport } from './routes/set-manager'
+import { Route as ShapnocheckRouteImport } from './routes/shapnocheck'
 import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
 import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
 import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
@@ -1376,6 +1378,11 @@ const NoticeRoute = NoticeRouteImport.update({
   path: '/notice',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizationMasterSetupRoute = OrganizationMasterSetupRouteImport.update({
+  id: '/organization-master-setup',
+  path: '/organization-master-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OtSheetHolidayRoute = OtSheetHolidayRouteImport.update({
   id: '/ot-sheet-holiday',
   path: '/ot-sheet-holiday',
@@ -1994,6 +2001,11 @@ const SetManagerRoute = SetManagerRouteImport.update({
   path: '/set-manager',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShapnocheckRoute = ShapnocheckRouteImport.update({
+  id: '/shapnocheck',
+  path: '/shapnocheck',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShiftControlCenterRoute = ShiftControlCenterRouteImport.update({
   id: '/shift-control-center',
   path: '/shift-control-center',
@@ -2360,6 +2372,7 @@ export interface FileRoutesByFullPath {
   '/my-dashboard': typeof MyDashboardRoute
   '/my-profile': typeof MyProfileRoute
   '/notice': typeof NoticeRoute
+  '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
@@ -2472,6 +2485,7 @@ export interface FileRoutesByFullPath {
   '/separation-resignation-request': typeof SeparationResignationRequestRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
+  '/shapnocheck': typeof ShapnocheckRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -2703,6 +2717,7 @@ export interface FileRoutesByTo {
   '/my-dashboard': typeof MyDashboardRoute
   '/my-profile': typeof MyProfileRoute
   '/notice': typeof NoticeRoute
+  '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
@@ -2815,6 +2830,7 @@ export interface FileRoutesByTo {
   '/separation-resignation-request': typeof SeparationResignationRequestRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
+  '/shapnocheck': typeof ShapnocheckRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -3047,6 +3063,7 @@ export interface FileRoutesById {
   '/my-dashboard': typeof MyDashboardRoute
   '/my-profile': typeof MyProfileRoute
   '/notice': typeof NoticeRoute
+  '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
@@ -3159,6 +3176,7 @@ export interface FileRoutesById {
   '/separation-resignation-request': typeof SeparationResignationRequestRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
+  '/shapnocheck': typeof ShapnocheckRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -3392,6 +3410,7 @@ export interface FileRouteTypes {
     | '/my-dashboard'
     | '/my-profile'
     | '/notice'
+    | '/organization-master-setup'
     | '/ot-sheet-holiday'
     | '/payroll-advance'
     | '/payroll-benefits'
@@ -3504,6 +3523,7 @@ export interface FileRouteTypes {
     | '/separation-resignation-request'
     | '/set-hod'
     | '/set-manager'
+    | '/shapnocheck'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -3735,6 +3755,7 @@ export interface FileRouteTypes {
     | '/my-dashboard'
     | '/my-profile'
     | '/notice'
+    | '/organization-master-setup'
     | '/ot-sheet-holiday'
     | '/payroll-advance'
     | '/payroll-benefits'
@@ -3847,6 +3868,7 @@ export interface FileRouteTypes {
     | '/separation-resignation-request'
     | '/set-hod'
     | '/set-manager'
+    | '/shapnocheck'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -4078,6 +4100,7 @@ export interface FileRouteTypes {
     | '/my-dashboard'
     | '/my-profile'
     | '/notice'
+    | '/organization-master-setup'
     | '/ot-sheet-holiday'
     | '/payroll-advance'
     | '/payroll-benefits'
@@ -4190,6 +4213,7 @@ export interface FileRouteTypes {
     | '/separation-resignation-request'
     | '/set-hod'
     | '/set-manager'
+    | '/shapnocheck'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -4422,6 +4446,7 @@ export interface RootRouteChildren {
   MyDashboardRoute: typeof MyDashboardRoute
   MyProfileRoute: typeof MyProfileRoute
   NoticeRoute: typeof NoticeRoute
+  OrganizationMasterSetupRoute: typeof OrganizationMasterSetupRoute
   OtSheetHolidayRoute: typeof OtSheetHolidayRoute
   PayrollAdvanceRoute: typeof PayrollAdvanceRoute
   PayrollBenefitsRoute: typeof PayrollBenefitsRoute
@@ -4534,6 +4559,7 @@ export interface RootRouteChildren {
   SeparationResignationRequestRoute: typeof SeparationResignationRequestRoute
   SetHodRoute: typeof SetHodRoute
   SetManagerRoute: typeof SetManagerRoute
+  ShapnocheckRoute: typeof ShapnocheckRoute
   ShiftControlCenterRoute: typeof ShiftControlCenterRoute
   SspApprovalRoute: typeof SspApprovalRoute
   SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
@@ -5949,6 +5975,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NoticeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/organization-master-setup': {
+      id: '/organization-master-setup'
+      path: '/organization-master-setup'
+      fullPath: '/organization-master-setup'
+      preLoaderRoute: typeof OrganizationMasterSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ot-sheet-holiday': {
       id: '/ot-sheet-holiday'
       path: '/ot-sheet-holiday'
@@ -6733,6 +6766,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SetManagerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shapnocheck': {
+      id: '/shapnocheck'
+      path: '/shapnocheck'
+      fullPath: '/shapnocheck'
+      preLoaderRoute: typeof ShapnocheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shift-control-center': {
       id: '/shift-control-center'
       path: '/shift-control-center'
@@ -7161,6 +7201,7 @@ const rootRouteChildren: RootRouteChildren = {
   MyDashboardRoute: MyDashboardRoute,
   MyProfileRoute: MyProfileRoute,
   NoticeRoute: NoticeRoute,
+  OrganizationMasterSetupRoute: OrganizationMasterSetupRoute,
   OtSheetHolidayRoute: OtSheetHolidayRoute,
   PayrollAdvanceRoute: PayrollAdvanceRoute,
   PayrollBenefitsRoute: PayrollBenefitsRoute,
@@ -7282,6 +7323,7 @@ const rootRouteChildren: RootRouteChildren = {
   SeparationResignationRequestRoute: SeparationResignationRequestRoute,
   SetHodRoute: SetHodRoute,
   SetManagerRoute: SetManagerRoute,
+  ShapnocheckRoute: ShapnocheckRoute,
   ShiftControlCenterRoute: ShiftControlCenterRoute,
   SspApprovalRoute: SspApprovalRoute,
   SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,
