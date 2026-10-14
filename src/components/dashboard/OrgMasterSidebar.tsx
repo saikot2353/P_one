@@ -66,6 +66,7 @@ export interface NavSubItem {
   icon: any;
   description?: string;
   tabKey?: string;
+  isSoon?: boolean;
 }
 
 export interface NavGroupItem {
@@ -105,6 +106,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "branch-factory" },
         tabKey: "branch-factory",
         icon: Factory,
+        isSoon: true,
         description: "Manage head offices, branch offices, factories, plants & operational sites.",
       },
       {
@@ -113,6 +115,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "floor-line-management" },
         tabKey: "floor-line-management",
         icon: Split,
+        isSoon: true,
         description:
           "Manage production floors, sewing lines, cutting tables, finishing sections, line capacities & line supervisors.",
       },
@@ -145,6 +148,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "designation-position" },
         tabKey: "designation-position",
         icon: Award,
+        isSoon: true,
         description:
           "Manage designations, job positions, grades, levels & organizational reporting.",
       },
@@ -154,6 +158,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "shift-schedule" },
         tabKey: "shift-schedule",
         icon: Clock4,
+        isSoon: true,
         description:
           "Define factory shifts, general shifts, roster rotations, Ramzan timing, grace periods & overtime cutoff rules.",
       },
@@ -163,6 +168,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "contact-management" },
         tabKey: "contact-management",
         icon: BookUser,
+        isSoon: true,
         description:
           "Maintain contact persons, designations, phones & emails for business partners.",
       },
@@ -179,6 +185,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "business-partners" },
         tabKey: "business-partners",
         icon: Briefcase,
+        isSoon: true,
         description:
           "Manage external entities: agents, distributors, dealers, contractors & consultants.",
       },
@@ -188,6 +195,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "supplier-management" },
         tabKey: "supplier-management",
         icon: Truck,
+        isSoon: true,
         description:
           "Supplier & vendor profiles, contact details, registrations & classifications.",
       },
@@ -197,6 +205,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "customer-management" },
         tabKey: "customer-management",
         icon: UserPlus,
+        isSoon: true,
         description: "Customer profiles, contact info, billing/shipping addresses & categories.",
       },
       {
@@ -205,6 +214,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "buyer-management" },
         tabKey: "buyer-management",
         icon: ShoppingBag,
+        isSoon: true,
         description: "Buyer profiles, buying houses, buyer contacts & merchandising details.",
       },
       {
@@ -213,6 +223,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "transporter-logistics" },
         tabKey: "transporter-logistics",
         icon: Navigation,
+        isSoon: true,
         description: "Freight forwarders, shipping agents, C&F partners & logistics providers.",
       },
     ],
@@ -220,7 +231,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
   {
     label: "Product & Item Management",
     icon: Package,
-    count: 6,
+    count: 5,
     subitems: [
       {
         label: "Item Management",
@@ -228,6 +239,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "item-management" },
         tabKey: "item-management",
         icon: PackageSearch,
+        isSoon: true,
         description: "Centralized item master: codes, names, specs, types & inventory tracking.",
       },
       {
@@ -236,6 +248,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "item-categories" },
         tabKey: "item-categories",
         icon: Layers,
+        isSoon: true,
         description: "Item categories, subcategories, product groups & families.",
       },
       {
@@ -244,6 +257,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "brand-manufacturer" },
         tabKey: "brand-manufacturer",
         icon: BadgeCheck,
+        isSoon: true,
         description: "Product brands, brand owners, manufacturers & identification.",
       },
       {
@@ -252,8 +266,10 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "product-variants" },
         tabKey: "product-variants",
         icon: Palette,
+        isSoon: true,
         description: "Variations such as size, color, model, dimensions & attributes.",
       },
+      /* Hidden as per requirement:
       {
         label: "Color Library & Size Matrix Management",
         to: "/organization-master-setup",
@@ -263,16 +279,19 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         description:
           "Standardized Pantone TCX/TPX shade library, color codes, size range breakdowns & dimension matrices.",
       },
+      */
       {
         label: "Unit of Measurement Management",
         to: "/organization-master-setup",
         search: { tab: "uom-management" },
         tabKey: "uom-management",
         icon: Scale,
+        isSoon: true,
         description: "Units of measurement (pcs, kg, mtr, yds, ltr) & conversion rules.",
       },
     ],
   },
+  /* Hidden as per requirement:
   {
     label: "Warehouse & Asset References",
     icon: Warehouse,
@@ -304,10 +323,11 @@ export const orgMasterNavGroups: NavGroupItem[] = [
       },
     ],
   },
+  */
   {
     label: "Finance & Payment References",
     icon: Banknote,
-    count: 8,
+    count: 6,
     subitems: [
       {
         label: "Fiscal Year & Financial Period Management",
@@ -315,6 +335,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "fiscal-year-period" },
         tabKey: "fiscal-year-period",
         icon: CalendarRange,
+        isSoon: true,
         description:
           "Manage financial years, statutory tax years, fiscal quarters, monthly closing periods & accounting lock dates.",
       },
@@ -324,6 +345,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "bank-branch" },
         tabKey: "bank-branch",
         icon: Landmark,
+        isSoon: true,
         description: "Bank & branch info for payments, payroll disbursement & accounts.",
       },
       {
@@ -332,6 +354,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "currency-exchange" },
         tabKey: "currency-exchange",
         icon: Coins,
+        isSoon: true,
         description: "Currencies, exchange rates, validity dates & international financial terms.",
       },
       {
@@ -340,6 +363,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "payment-terms" },
         tabKey: "payment-terms",
         icon: CalendarClock,
+        isSoon: true,
         description: "Payment conditions, credit periods, due-date rules & settlement terms.",
       },
       {
@@ -348,8 +372,10 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "payment-methods" },
         tabKey: "payment-methods",
         icon: CreditCard,
+        isSoon: true,
         description: "Payment channels: cash, bank transfer, cheque, digital wallets.",
       },
+      /* Hidden as per requirement:
       {
         label: "Tax & VAT Configuration",
         to: "/organization-master-setup",
@@ -366,12 +392,14 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         icon: Calculator,
         description: "Departmental, plant & project cost centers for expense tracking.",
       },
+      */
       {
         label: "Profit Center Management",
         to: "/organization-master-setup",
         search: { tab: "profit-centers" },
         tabKey: "profit-centers",
         icon: TrendingUp,
+        isSoon: true,
         description: "Revenue & profit centers for business unit performance evaluation.",
       },
     ],
@@ -387,6 +415,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "project-order" },
         tabKey: "project-order",
         icon: FolderKanban,
+        isSoon: true,
         description: "Common project & order master references across ERP modules.",
       },
       {
@@ -395,6 +424,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "style-season" },
         tabKey: "style-season",
         icon: Scissors,
+        isSoon: true,
         description: "Garment styles, seasons, fashion collections & development references.",
       },
       {
@@ -403,6 +433,7 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "process-operations" },
         tabKey: "process-operations",
         icon: Workflow,
+        isSoon: true,
         description:
           "Define standard garment production processes, routing steps, operation bulletins & SMV/SAM benchmarks.",
       },
@@ -412,10 +443,12 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "contract-terms" },
         tabKey: "contract-terms",
         icon: FileCheck,
+        isSoon: true,
         description: "Standard contract types, agreements & reusable business terms.",
       },
     ],
   },
+  /* Hidden as per requirement:
   {
     label: "Commercial & Logistics References",
     icon: Ship,
@@ -449,11 +482,13 @@ export const orgMasterNavGroups: NavGroupItem[] = [
       },
     ],
   },
+  */
   {
     label: "Common Reference & Configuration",
     icon: SlidersHorizontal,
-    count: 7,
+    count: 3,
     subitems: [
+      /* Hidden as per requirement:
       {
         label: "Approval Matrix & Delegation of Authority (DoA)",
         to: "/organization-master-setup",
@@ -463,12 +498,14 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         description:
           "Delegation of authority rules, approval limit thresholds, hierarchical signing tiers & multi-level workflow controls.",
       },
+      */
       {
         label: "Compliance & Audit Certification Management",
         to: "/organization-master-setup",
         search: { tab: "compliance-certifications" },
         tabKey: "compliance-certifications",
         icon: BadgeCheck,
+        isSoon: true,
         description:
           "Factory social and technical compliance standards (BSCI, WRAP, SEDEX, OEKO-TEX, GOTS, ISO) & audit validity.",
       },
@@ -478,8 +515,10 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "document-types" },
         tabKey: "document-types",
         icon: FileText,
+        isSoon: true,
         description: "Standard document types & classifications across HR, Accounts & Operations.",
       },
+      /* Hidden as per requirement:
       {
         label: "Calendar & Holiday Management",
         to: "/organization-master-setup",
@@ -504,12 +543,14 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         icon: Tag,
         description: "Universal classifications, categories & multi-module reference values.",
       },
+      */
       {
         label: "Document Numbering Management",
         to: "/organization-master-setup",
         search: { tab: "document-numbering" },
         tabKey: "document-numbering",
         icon: Hash,
+        isSoon: true,
         description: "Prefixes, numbering masks, sequences & centralized document rules.",
       },
     ],
@@ -761,6 +802,11 @@ export function OrgMasterSidebar({ isMobileOpen = false, onCloseMobile }: OrgMas
                     >
                       <SubIcon className="size-3.5 shrink-0 text-sidebar-foreground/55 group-hover/sub:text-sidebar-primary transition-colors" />
                       <span className="truncate flex-1">{sub.label}</span>
+                      {sub.isSoon && (
+                        <span className="px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 shrink-0">
+                          Soon
+                        </span>
+                      )}
                       {isSubActive && (
                         <span className="size-1.5 rounded-full bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)] animate-pulse shrink-0" />
                       )}

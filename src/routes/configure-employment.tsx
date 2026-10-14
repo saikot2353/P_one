@@ -117,7 +117,7 @@ interface JobNature {
   isActive: "Active" | "Inactive";
 }
 
-interface Country {
+export interface Country {
   sl: number;
   code: string;
   nameEng: string;
@@ -135,7 +135,7 @@ interface Religion {
   isActive: "Active" | "Inactive";
 }
 
-interface PlaceInBD {
+export interface PlaceInBD {
   sl: number;
   type: "Division" | "District" | "Upazila" | "Post Office";
   code: string;
@@ -1129,7 +1129,7 @@ const DEFAULT_NATURES: JobNature[] = [
   { sl: 20, name: "Support Service", isActive: "Active" },
 ];
 
-const DEFAULT_COUNTRIES: Country[] = [
+export const DEFAULT_COUNTRIES: Country[] = [
   {
     sl: 1,
     code: "BD",
@@ -1389,7 +1389,7 @@ const DEFAULT_RELIGIONS: Religion[] = [
   { sl: 20, code: "DR", religionName: "Druze", religionNameBng: "দ্রুজ ধর্ম", isActive: "Active" },
 ];
 
-const DEFAULT_PLACES: PlaceInBD[] = [
+export const DEFAULT_PLACES: PlaceInBD[] = [
   // Divisions (101 - 110)
   {
     sl: 101,

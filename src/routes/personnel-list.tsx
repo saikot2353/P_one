@@ -51,6 +51,7 @@ import {
   Trash2,
   RotateCcw,
   GripVertical,
+  ArrowLeft,
 } from "lucide-react";
 
 export const Route = createFileRoute("/personnel-list")({
@@ -555,7 +556,15 @@ const getColumnHeaderClass = (key: ColumnKey) => {
   return `px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] ${alignClass}`;
 };
 
-function PersonnelListPage() {
+export interface PersonnelListViewProps {
+  embedded?: boolean;
+  onBackToOverview?: () => void;
+}
+
+export function PersonnelListView({
+  embedded = false,
+  onBackToOverview,
+}: PersonnelListViewProps) {
   const [employees, setEmployees] = useState<any[]>([]);
   const navigate = useNavigate();
 
@@ -1267,32 +1276,35 @@ function PersonnelListPage() {
     setTimeout(() => setBulkActionMessage(null), 4500);
   };
 
-  return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
-      <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative">
-        <Topbar />
+  const content = (
+    <div className={embedded ? "space-y-4 w-full" : "p-4 md:p-6 xl:p-8 space-y-2"}>
+      {/* Breadcrumb and Page Header */}
+      {embedded ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => onBackToOverview?.()}
+              className="inline-flex items-center gap-2 text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="size-4" />
+              <span>Back to Master Overview</span>
+            </button>
+            <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-md">
+              Category: People & Contacts
+            </span>
+          </div>
 
-        {/* Main Content Area */}
-        <div className="p-4 md:p-6 xl:p-8 space-y-2">
-          {/* Breadcrumb and Page Header */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">
-                  Home
-                </Link>
-                <ChevronRight className="size-2.5" />
-                <span className="hover:text-primary transition-colors">Human Resource</span>
-                <ChevronRight className="size-2.5" />
-                <span className="text-foreground">Personnel List</span>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
+                <span>People & Contacts</span>
+                <ChevronRight className="size-3.5" />
+                <span className="text-primary font-bold">Employee Management</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
-                <h1 className="text-xl font-extrabold tracking-tight text-foreground">
-                  Personnel List
-                </h1>
-              </div>
+              <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                <UserCheck className="size-6 text-primary" />
+                Employee Management
+              </h1>
             </div>
 
             {/* Quick Metrics Bar */}
@@ -1313,12 +1325,58 @@ function PersonnelListPage() {
               </div>
               <button
                 onClick={() => window.open("/add-employee", "_blank")}
-                className="h-9.5 px-4 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-1.5"
+                className="h-9.5 px-4 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
               >
                 <UserPlus className="size-4" /> Add Employee
               </button>
             </div>
           </div>
+        </div>
+      ) : (
+        <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
+              <Link to="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+              <ChevronRight className="size-2.5" />
+              <span className="hover:text-primary transition-colors">Human Resource</span>
+              <ChevronRight className="size-2.5" />
+              <span className="text-foreground">Personnel List</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
+              <h1 className="text-xl font-extrabold tracking-tight text-foreground">
+                Personnel List
+              </h1>
+            </div>
+          </div>
+
+          {/* Quick Metrics Bar */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="bg-card border border-border/70 rounded-lg px-3.5 py-2 shadow-2xs hover:shadow-xs transition duration-200 flex items-center gap-2">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/85">
+                Total Employees:
+              </div>
+              <div className="text-xs font-extrabold text-foreground">{employees.length}</div>
+            </div>
+            <div className="bg-[oklch(0.98_0.02_160)] dark:bg-[oklch(0.20_0.035_165)] border border-[oklch(0.62_0.16_155/0.2)] rounded-lg px-3.5 py-2 shadow-2xs flex items-center gap-2">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-success/95">
+                Working:
+              </div>
+              <div className="text-xs font-extrabold text-success">
+                {employees.filter((e) => e.status === "Working").length}
+              </div>
+            </div>
+            <button
+              onClick={() => window.open("/add-employee", "_blank")}
+              className="h-9.5 px-4 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
+            >
+              <UserPlus className="size-4" /> Add Employee
+            </button>
+          </div>
+        </div>
+      )}
 
           {/* SPLIT LAYOUT WRAPPER */}
           <div className="flex flex-col xl:flex-row gap-4 items-start w-full">
@@ -2097,7 +2155,10 @@ function PersonnelListPage() {
 
           </div> {/* End Split Layout Wrapper */}
         </div>
+  );
 
+  const renderModals = () => (
+    <>
         {/* Column Arrangement Modal */}
         {isColSelectorOpen && (
           <div
@@ -3039,7 +3100,30 @@ function PersonnelListPage() {
             </div>
           </div>
         )}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="w-full relative">
+        {content}
+        {renderModals()}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
+      <Sidebar />
+      <main className="flex-1 min-w-0 flex flex-col relative">
+        <Topbar />
+        {content}
+        {renderModals()}
       </main>
     </div>
   );
+}
+
+export function PersonnelListPage() {
+  return <PersonnelListView />;
 }

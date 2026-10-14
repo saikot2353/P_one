@@ -2,6 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { OrgMasterSidebar, orgMasterNavGroups } from "@/components/dashboard/OrgMasterSidebar";
 import { OrgMasterTopbar, masterSearchableItems } from "@/components/dashboard/OrgMasterTopbar";
+import { CompanySetupView, type TabType as CompanySetupTabType } from "@/routes/company-setup";
+import { StructureSetupView, type TabType as StructureTabType } from "@/routes/configure-structure";
+import { LocationManagementView, type LocationTabType } from "@/components/organization/LocationManagementView";
+import { PersonnelListView } from "@/routes/personnel-list";
 import {
   Building2,
   FolderTree,
@@ -60,12 +64,14 @@ import {
 
 interface SearchParams {
   tab?: string;
+  subtab?: string;
 }
 
 export const Route = createFileRoute("/organization-master-setup")({
   validateSearch: (search: Record<string, unknown>): SearchParams => {
     return {
       tab: typeof search.tab === "string" ? search.tab : undefined,
+      subtab: typeof search.subtab === "string" ? search.subtab : undefined,
     };
   },
   head: () => ({
@@ -82,7 +88,7 @@ export const Route = createFileRoute("/organization-master-setup")({
 });
 
 function OrgMasterSetupPage() {
-  const { tab } = Route.useSearch();
+  const { tab, subtab } = Route.useSearch();
   const navigate = useNavigate();
   const [filterText, setFilterText] = useState("");
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -134,6 +140,68 @@ function OrgMasterSetupPage() {
         <div className="p-3 sm:p-4 lg:p-4.5 space-y-3.5 w-full">
           {/* Detail View for Selected Tab */}
           {currentActiveItem ? (
+            currentActiveItem.tabKey === "employee-management" ? (
+              <PersonnelListView
+                embedded={true}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "location-management" ? (
+              <LocationManagementView
+                embedded={true}
+                initialTab={(subtab as LocationTabType) || "country"}
+                onTabChange={(newSubTab) => {
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: { tab: "location-management", subtab: newSubTab },
+                  });
+                }}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "org-structure" ? (
+              <StructureSetupView
+                embedded={true}
+                initialTab={(subtab as StructureTabType) || "group"}
+                onTabChange={(newSubTab) => {
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: { tab: "org-structure", subtab: newSubTab },
+                  });
+                }}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "company-management" ? (
+              <CompanySetupView
+                embedded={true}
+                initialTab={(subtab as CompanySetupTabType) || "department"}
+                onTabChange={(newSubTab) => {
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: { tab: "company-management", subtab: newSubTab },
+                  });
+                }}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : (
             <div className="space-y-6 animate-in fade-in duration-200">
               {/* Breadcrumb / Back button */}
               <div className="flex items-center justify-between">
@@ -167,9 +235,15 @@ function OrgMasterSetupPage() {
                         <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
                           {currentActiveItem.label}
                         </h2>
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
-                          Active Master Setup
-                        </span>
+                        {currentActiveItem.isSoon ? (
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60">
+                            Coming Soon
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
+                            Active Master Setup
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm text-muted-foreground mt-1 max-w-2xl leading-relaxed">
                         {currentActiveItem.description}
@@ -256,9 +330,16 @@ function OrgMasterSetupPage() {
                             <IconComp className="size-4" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-xs font-bold text-foreground truncate">
-                              {item.label}
-                            </p>
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <p className="text-xs font-bold text-foreground truncate">
+                                {item.label}
+                              </p>
+                              {item.isSoon && (
+                                <span className="px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 shrink-0">
+                                  Soon
+                                </span>
+                              )}
+                            </div>
                             <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
                               {item.description}
                             </p>
@@ -269,6 +350,7 @@ function OrgMasterSetupPage() {
                 </div>
               </div>
             </div>
+            )
           ) : (
             /* Overview Hub View (When no tab is selected) - Full Width Minimum Gap */
             <div className="space-y-3.5 animate-in fade-in duration-200">
@@ -369,9 +451,16 @@ function OrgMasterSetupPage() {
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <div className="flex items-center justify-between gap-1">
-                                    <h4 className="text-xs font-bold text-foreground group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors truncate">
-                                      {sub.label}
-                                    </h4>
+                                    <div className="flex items-center gap-1.5 min-w-0">
+                                      <h4 className="text-xs font-bold text-foreground group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors truncate">
+                                        {sub.label}
+                                      </h4>
+                                      {sub.isSoon && (
+                                        <span className="px-1.5 py-0.5 rounded-full text-[8.5px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shrink-0">
+                                          Soon
+                                        </span>
+                                      )}
+                                    </div>
                                     <ChevronRight className="size-3 text-muted-foreground group-hover:text-sky-500 group-hover:translate-x-0.5 transition-all shrink-0" />
                                   </div>
                                   <p className="text-[10.5px] text-muted-foreground leading-relaxed line-clamp-2 mt-1">
@@ -382,9 +471,15 @@ function OrgMasterSetupPage() {
 
                               <div className="pt-2 border-t border-border/40 flex items-center justify-between text-[9.5px] font-semibold text-muted-foreground/80">
                                 <span className="truncate">Key: {sub.tabKey}</span>
-                                <span className="text-sky-600 dark:text-sky-400 font-bold group-hover:underline shrink-0 ml-1">
-                                  Select &rarr;
-                                </span>
+                                {sub.isSoon ? (
+                                  <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0 ml-1">
+                                    Coming Soon
+                                  </span>
+                                ) : (
+                                  <span className="text-sky-600 dark:text-sky-400 font-bold group-hover:underline shrink-0 ml-1">
+                                    Configure &rarr;
+                                  </span>
+                                )}
                               </div>
                             </button>
                           );

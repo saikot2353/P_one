@@ -73,6 +73,7 @@ export interface MasterSearchItem {
   tabKey: string;
   description: string;
   icon: any;
+  isSoon?: boolean;
 }
 
 export const masterSearchableItems: MasterSearchItem[] = [
@@ -98,6 +99,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "branch-factory",
     description: "Manage head offices, branch offices, factories, plants & operational sites.",
     icon: Factory,
+    isSoon: true,
   },
   {
     label: "Production Floor & Line Management",
@@ -106,6 +108,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description:
       "Manage production floors, sewing lines, cutting tables, finishing sections, line capacities & line supervisors.",
     icon: Split,
+    isSoon: true,
   },
   {
     label: "Location Management",
@@ -129,6 +132,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "designation-position",
     description: "Manage designations, job positions, grades, levels & organizational reporting.",
     icon: Award,
+    isSoon: true,
   },
   {
     label: "Shift & Work Schedule Management",
@@ -137,6 +141,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description:
       "Define factory shifts, general shifts, roster rotations, Ramzan timing, grace periods & overtime cutoff rules.",
     icon: Clock4,
+    isSoon: true,
   },
   {
     label: "Contact Management",
@@ -144,6 +149,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "contact-management",
     description: "Maintain contact persons, designations, phones & emails for business partners.",
     icon: BookUser,
+    isSoon: true,
   },
 
   // 3. Business Partner Management
@@ -154,6 +160,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description:
       "Manage external entities: agents, distributors, dealers, contractors & consultants.",
     icon: Briefcase,
+    isSoon: true,
   },
   {
     label: "Supplier Management",
@@ -161,6 +168,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "supplier-management",
     description: "Supplier & vendor profiles, contact details, registrations & classifications.",
     icon: Truck,
+    isSoon: true,
   },
   {
     label: "Customer Management",
@@ -168,6 +176,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "customer-management",
     description: "Customer profiles, contact info, billing/shipping addresses & categories.",
     icon: UserPlus,
+    isSoon: true,
   },
   {
     label: "Buyer Management",
@@ -175,6 +184,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "buyer-management",
     description: "Buyer profiles, buying houses, buyer contacts & merchandising details.",
     icon: ShoppingBag,
+    isSoon: true,
   },
   {
     label: "Transporter & Logistics Management",
@@ -182,6 +192,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "transporter-logistics",
     description: "Freight forwarders, shipping agents, C&F partners & logistics providers.",
     icon: Navigation,
+    isSoon: true,
   },
 
   // 4. Product & Item Management
@@ -191,6 +202,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "item-management",
     description: "Centralized item master: codes, names, specs, types & inventory tracking.",
     icon: PackageSearch,
+    isSoon: true,
   },
   {
     label: "Item Category Management",
@@ -198,6 +210,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "item-categories",
     description: "Item categories, subcategories, product groups & families.",
     icon: Layers,
+    isSoon: true,
   },
   {
     label: "Brand & Manufacturer Management",
@@ -205,6 +218,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "brand-manufacturer",
     description: "Product brands, brand owners, manufacturers & identification.",
     icon: BadgeCheck,
+    isSoon: true,
   },
   {
     label: "Product Variant Management",
@@ -212,7 +226,9 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "product-variants",
     description: "Variations such as size, color, model, dimensions & attributes.",
     icon: Palette,
+    isSoon: true,
   },
+  /* Hidden as per requirement:
   {
     label: "Color Library & Size Matrix Management",
     parent: "Product & Item Management",
@@ -221,14 +237,17 @@ export const masterSearchableItems: MasterSearchItem[] = [
       "Standardized Pantone TCX/TPX shade library, color codes, size range breakdowns & dimension matrices.",
     icon: Paintbrush,
   },
+  */
   {
     label: "Unit of Measurement Management",
     parent: "Product & Item Management",
     tabKey: "uom-management",
     description: "Units of measurement (pcs, kg, mtr, yds, ltr) & conversion rules.",
     icon: Scale,
+    isSoon: true,
   },
 
+  /* Hidden as per requirement:
   // 5. Warehouse & Asset References
   {
     label: "Warehouse & Store Management",
@@ -251,6 +270,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description: "Fixed asset categories, depreciation classes & classifications.",
     icon: Boxes,
   },
+  */
 
   // 6. Finance & Payment References
   {
@@ -260,6 +280,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description:
       "Manage financial years, statutory tax years, fiscal quarters, monthly closing periods & accounting lock dates.",
     icon: CalendarRange,
+    isSoon: true,
   },
   {
     label: "Bank & Bank Branch Management",
@@ -267,6 +288,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "bank-branch",
     description: "Bank & branch info for payments, payroll disbursement & accounts.",
     icon: Landmark,
+    isSoon: true,
   },
   {
     label: "Currency & Exchange Rate Management",
@@ -274,6 +296,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "currency-exchange",
     description: "Currencies, exchange rates, validity dates & international financial terms.",
     icon: Coins,
+    isSoon: true,
   },
   {
     label: "Payment Terms Management",
@@ -281,6 +304,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "payment-terms",
     description: "Payment conditions, credit periods, due-date rules & settlement terms.",
     icon: CalendarClock,
+    isSoon: true,
   },
   {
     label: "Payment Method Management",
@@ -288,7 +312,9 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "payment-methods",
     description: "Payment channels: cash, bank transfer, cheque, digital wallets.",
     icon: CreditCard,
+    isSoon: true,
   },
+  /* Hidden as per requirement:
   {
     label: "Tax & VAT Configuration",
     parent: "Finance & Payment References",
@@ -303,12 +329,14 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description: "Departmental, plant & project cost centers for expense tracking.",
     icon: Calculator,
   },
+  */
   {
     label: "Profit Center Management",
     parent: "Finance & Payment References",
     tabKey: "profit-centers",
     description: "Revenue & profit centers for business unit performance evaluation.",
     icon: TrendingUp,
+    isSoon: true,
   },
 
   // 7. Project & Business Operations
@@ -318,6 +346,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "project-order",
     description: "Common project & order master references across ERP modules.",
     icon: FolderKanban,
+    isSoon: true,
   },
   {
     label: "Buyer Style & Season Management",
@@ -325,6 +354,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "style-season",
     description: "Garment styles, seasons, fashion collections & development references.",
     icon: Scissors,
+    isSoon: true,
   },
   {
     label: "Process & Operation Master",
@@ -333,6 +363,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description:
       "Define standard garment production processes, routing steps, operation bulletins & SMV/SAM benchmarks.",
     icon: Workflow,
+    isSoon: true,
   },
   {
     label: "Contract & Terms Management",
@@ -340,8 +371,10 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "contract-terms",
     description: "Standard contract types, agreements & reusable business terms.",
     icon: FileCheck,
+    isSoon: true,
   },
 
+  /* Hidden as per requirement:
   // 8. Commercial & Logistics References
   {
     label: "Shipping & Trade Reference Management",
@@ -366,8 +399,10 @@ export const masterSearchableItems: MasterSearchItem[] = [
       "Bonded warehouse license registers, BGMEA/BKMEA numbers, ERC/IRC certificates, UD authority & export quotas.",
     icon: FileBadge,
   },
+  */
 
   // 9. Common Reference & Configuration
+  /* Hidden as per requirement:
   {
     label: "Approval Matrix & Delegation of Authority (DoA)",
     parent: "Common Reference & Configuration",
@@ -376,6 +411,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
       "Delegation of authority rules, approval limit thresholds, hierarchical signing tiers & multi-level workflow controls.",
     icon: ShieldCheck,
   },
+  */
   {
     label: "Compliance & Audit Certification Management",
     parent: "Common Reference & Configuration",
@@ -383,6 +419,7 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description:
       "Factory social and technical compliance standards (BSCI, WRAP, SEDEX, OEKO-TEX, GOTS, ISO) & audit validity.",
     icon: BadgeCheck,
+    isSoon: true,
   },
   {
     label: "Document Type Management",
@@ -390,7 +427,9 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "document-types",
     description: "Standard document types & classifications across HR, Accounts & Operations.",
     icon: FileText,
+    isSoon: true,
   },
+  /* Hidden as per requirement:
   {
     label: "Calendar & Holiday Management",
     parent: "Common Reference & Configuration",
@@ -412,12 +451,14 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description: "Universal classifications, categories & multi-module reference values.",
     icon: Tag,
   },
+  */
   {
     label: "Document Numbering Management",
     parent: "Common Reference & Configuration",
     tabKey: "document-numbering",
     description: "Configurable prefixes, formats, digit lengths & automatic sequence rules.",
     icon: Hash,
+    isSoon: true,
   },
 ];
 
@@ -621,26 +662,31 @@ export function OrgMasterTopbar({ onSelectTab, onToggleMobileSidebar }: OrgMaste
                           setSearchQuery("");
                           if (onSelectTab) onSelectTab(item.tabKey);
                         }}
-                        className={`w-full group text-left flex items-start gap-3 p-2.5 rounded-xl transition duration-150 border ${
-                          isFocused
-                            ? "bg-sky-50/80 dark:bg-sky-950/30 border-sky-300 dark:border-sky-800 shadow-xs"
-                            : "bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-slate-900/40"
-                        }`}
+                        className={`w-full group text-left flex items-start gap-3 p-2.5 rounded-xl transition duration-150 border ${isFocused
+                          ? "bg-sky-50/80 dark:bg-sky-950/30 border-sky-300 dark:border-sky-800 shadow-xs"
+                          : "bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-slate-900/40"
+                          }`}
                       >
                         <div
-                          className={`size-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
-                            isFocused
-                              ? "bg-sky-500 text-white shadow-xs"
-                              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-                          }`}
+                          className={`size-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${isFocused
+                            ? "bg-sky-500 text-white shadow-xs"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                            }`}
                         >
                           <IconComp className="size-4" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="text-xs font-bold text-foreground truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                              {item.label}
-                            </span>
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="text-xs font-bold text-foreground truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                                {item.label}
+                              </span>
+                              {item.isSoon && (
+                                <span className="px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 shrink-0">
+                                  Soon
+                                </span>
+                              )}
+                            </div>
                             <span className="text-[9px] font-semibold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded shrink-0">
                               {item.parent}
                             </span>
