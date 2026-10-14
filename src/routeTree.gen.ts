@@ -28,6 +28,7 @@ import { Route as BudgetRequisitionApprovalsRouteImport } from './routes/budget-
 import { Route as BudgetStatementRouteImport } from './routes/budget-statement'
 import { Route as BulkLeaveRouteImport } from './routes/bulk-leave'
 import { Route as CashSheetPrintRouteImport } from './routes/cash-sheet-print'
+import { Route as ChangeEmployeeStatusRouteImport } from './routes/change-employee-status'
 import { Route as ChangesRouteImport } from './routes/changes'
 import { Route as CheckApproveSalaryRouteImport } from './routes/check-approve-salary'
 import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
@@ -447,6 +448,11 @@ const BulkLeaveRoute = BulkLeaveRouteImport.update({
 const CashSheetPrintRoute = CashSheetPrintRouteImport.update({
   id: '/cash-sheet-print',
   path: '/cash-sheet-print',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangeEmployeeStatusRoute = ChangeEmployeeStatusRouteImport.update({
+  id: '/change-employee-status',
+  path: '/change-employee-status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChangesRoute = ChangesRouteImport.update({
@@ -2194,6 +2200,7 @@ export interface FileRoutesByFullPath {
   '/budget-statement': typeof BudgetStatementRoute
   '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
+  '/change-employee-status': typeof ChangeEmployeeStatusRoute
   '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
@@ -2539,6 +2546,7 @@ export interface FileRoutesByTo {
   '/budget-statement': typeof BudgetStatementRoute
   '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
+  '/change-employee-status': typeof ChangeEmployeeStatusRoute
   '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
@@ -2885,6 +2893,7 @@ export interface FileRoutesById {
   '/budget-statement': typeof BudgetStatementRoute
   '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
+  '/change-employee-status': typeof ChangeEmployeeStatusRoute
   '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
@@ -3232,6 +3241,7 @@ export interface FileRouteTypes {
     | '/budget-statement'
     | '/bulk-leave'
     | '/cash-sheet-print'
+    | '/change-employee-status'
     | '/changes'
     | '/check-approve-salary'
     | '/company-holiday'
@@ -3577,6 +3587,7 @@ export interface FileRouteTypes {
     | '/budget-statement'
     | '/bulk-leave'
     | '/cash-sheet-print'
+    | '/change-employee-status'
     | '/changes'
     | '/check-approve-salary'
     | '/company-holiday'
@@ -3922,6 +3933,7 @@ export interface FileRouteTypes {
     | '/budget-statement'
     | '/bulk-leave'
     | '/cash-sheet-print'
+    | '/change-employee-status'
     | '/changes'
     | '/check-approve-salary'
     | '/company-holiday'
@@ -4268,6 +4280,7 @@ export interface RootRouteChildren {
   BudgetStatementRoute: typeof BudgetStatementRoute
   BulkLeaveRoute: typeof BulkLeaveRoute
   CashSheetPrintRoute: typeof CashSheetPrintRoute
+  ChangeEmployeeStatusRoute: typeof ChangeEmployeeStatusRoute
   ChangesRoute: typeof ChangesRoute
   CheckApproveSalaryRoute: typeof CheckApproveSalaryRoute
   CompanyHolidayRoute: typeof CompanyHolidayRoute
@@ -4727,6 +4740,13 @@ declare module '@tanstack/react-router' {
       path: '/cash-sheet-print'
       fullPath: '/cash-sheet-print'
       preLoaderRoute: typeof CashSheetPrintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/change-employee-status': {
+      id: '/change-employee-status'
+      path: '/change-employee-status'
+      fullPath: '/change-employee-status'
+      preLoaderRoute: typeof ChangeEmployeeStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/changes': {
@@ -7020,6 +7040,7 @@ const rootRouteChildren: RootRouteChildren = {
   BudgetStatementRoute: BudgetStatementRoute,
   BulkLeaveRoute: BulkLeaveRoute,
   CashSheetPrintRoute: CashSheetPrintRoute,
+  ChangeEmployeeStatusRoute: ChangeEmployeeStatusRoute,
   ChangesRoute: ChangesRoute,
   CheckApproveSalaryRoute: CheckApproveSalaryRoute,
   CompanyHolidayRoute: CompanyHolidayRoute,
