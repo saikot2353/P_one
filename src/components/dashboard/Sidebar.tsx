@@ -162,6 +162,7 @@ export const nav: NavItem[] = [
       { label: "Employee Doc Issue", to: "/employee-doc-issue" },
       { label: "Set HOD", to: "/set-hod" },
       { label: "Set Manager", to: "/set-manager" },
+      { label: "Change Employee Status", to: "/change-employee-status" },
       { label: "Lefty", to: "/disciplinary-lefty" },
     ],
   },

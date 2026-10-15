@@ -92,6 +92,12 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/set-manager",
     description: "Bulk assign reporting managers to employees",
   },
+  {
+    label: "Change Employee Status",
+    parent: "Personnel Info",
+    to: "/change-employee-status",
+    description: "Manage employee probation status, confirmation dates, and make permanent",
+  },
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
   { label: "Personnel QR Scanner", parent: "Personnel Info", to: "/" },
