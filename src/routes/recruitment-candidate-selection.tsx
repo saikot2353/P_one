@@ -19,6 +19,8 @@ import {
   ChevronUp,
   Sparkles,
   ChevronRight,
+  ArrowRight,
+  ArrowLeft,
   Building2,
   DollarSign,
   Lock,
@@ -1206,6 +1208,7 @@ function CandidateSelectionPage() {
 
   // Create Job Modal
   const [showAddJobModal, setShowAddJobModal] = useState(false);
+  const [addJobModalStep, setAddJobModalStep] = useState<1 | 2>(1);
   const [newJobTitle, setNewJobTitle] = useState("");
   const [newJobDept, setNewJobDept] = useState("Merchandising");
   const [newJobDesig, setNewJobDesig] = useState("");
@@ -1214,6 +1217,18 @@ function CandidateSelectionPage() {
   const [newJobTargetDate, setNewJobTargetDate] = useState("2026-11-15");
   const [newJobBudgetMin, setNewJobBudgetMin] = useState(25000);
   const [newJobBudgetMax, setNewJobBudgetMax] = useState(35000);
+
+  const handleProceedToStep2 = () => {
+    if (!newJobTitle.trim()) {
+      toast.error("Please enter the Job Title before proceeding to Step 2.");
+      return;
+    }
+    if (!newJobDesig.trim()) {
+      toast.error("Please enter the Designation before proceeding to Step 2.");
+      return;
+    }
+    setAddJobModalStep(2);
+  };
 
   // Candidate draft state for Job Creation & Add Candidate
   const createDefaultCandidateDraft = () => ({
@@ -1530,12 +1545,17 @@ function CandidateSelectionPage() {
     toast.success(`Job ${closingJob.title} has been officially Closed!`);
   };
 
-  // Direct submit job (closes the job immediately when submit button is clicked)
+  // Direct approve & submit job (closes the job immediately when Approve and Submit button is clicked)
   const handleSubmitJob = (jobId: string) => {
     const targetJob = jobs.find((j) => j.id === jobId);
     if (!targetJob) return;
 
     const selectedCount = targetJob.candidates.filter((c) => c.selected).length;
+    if (selectedCount === 0) {
+      toast.error("Please select at least one candidate before approving and submitting.");
+      return;
+    }
+
     const updatedJobs = jobs.map((j) => {
       if (j.id === jobId) {
         return {
@@ -1543,14 +1563,14 @@ function CandidateSelectionPage() {
           status: "Closed" as const,
           closedAt: new Date().toLocaleDateString("en-GB"),
           closedBy: `${targetJob.assignedPerson || "Evaluator"} (${targetJob.assignedRole || "Lead"})`,
-          closeReason: `Selection submitted: ${selectedCount} of ${targetJob.vacancies} vacancies finalized.`,
+          closeReason: `Selection approved and submitted: ${selectedCount} of ${targetJob.vacancies} vacancies finalized.`,
         };
       }
       return j;
     });
 
     persistJobs(updatedJobs);
-    toast.success(`Job ${targetJob.id} submitted and closed successfully!`);
+    toast.success(`Job ${targetJob.id} approved and submitted successfully!`);
   };
 
   // Reopen Job
@@ -1841,12 +1861,15 @@ function CandidateSelectionPage() {
   }, [jobs]);
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
+    <div
+      className="min-h-screen flex bg-background text-foreground transition-colors duration-300 font-sans"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col relative">
         <Topbar />
 
-        <div className="p-4 md:p-6 lg:p-8 space-y-6">
+        <div className="p-4 md:p-6 lg:p-8 space-y-5">
           {/* Header & Breadcrumb */}
           <div className="bg-card rounded-xl border border-border/70 p-4 sm:p-5 shadow-2xs flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
             <div>
@@ -1864,15 +1887,11 @@ function CandidateSelectionPage() {
                   <UserCheck className="size-5" />
                 </div>
                 <div>
-                  <h1 className="text-base sm:text-lg font-medium text-foreground tracking-normal flex items-center gap-2">
-                    <span>Job Candidate Selection & Link Generator</span>
-                    <span className="text-[10px] font-normal px-2 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase">
-                      Live Workflow
-                    </span>
+                  <h1 className="text-base sm:text-lg font-medium text-foreground tracking-tight">
+                    Candidate Selection & Link Generator
                   </h1>
                   <p className="text-xs text-muted-foreground font-normal mt-0.5">
-                    Evaluate candidates per job post, compare agreed vs previous salary, review official PDF CVs,
-                    and auto-generate e-recruitment application links.
+                    Evaluate candidates per job requisition, review official PDF CVs, agree on compensation, and dispatch auto-generated e-recruitment links.
                   </p>
                 </div>
               </div>
@@ -1887,80 +1906,77 @@ function CandidateSelectionPage() {
                 <span>Application Queue ({stats.linksGenerated})</span>
               </Link>
               <button
-                onClick={() => setShowAddJobModal(true)}
+                onClick={() => {
+                  setAddJobModalStep(1);
+                  setShowAddJobModal(true);
+                }}
                 className="h-8.5 px-3.5 bg-primary hover:opacity-95 text-primary-foreground font-normal text-xs rounded-lg shadow-xs transition flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="size-3.5" />
-                <span>Post New Job</span>
+                <span>Create Position</span>
               </button>
             </div>
           </div>
 
-          {/* Quick Metrics Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <div className="bg-card rounded-xl border border-border/70 p-3 shadow-2xs">
-              <div className="flex items-center justify-between text-muted-foreground mb-1">
-                <span className="text-[10px] font-normal uppercase tracking-normal">Total Jobs</span>
-                <Briefcase className="size-3.5 text-blue-500" />
+          {/* Unified Executive Metrics Strip */}
+          <div className="bg-card rounded-xl border border-border/70 p-4 shadow-2xs grid grid-cols-2 lg:grid-cols-4 gap-4 divide-y lg:divide-y-0 lg:divide-x divide-border/50">
+            {/* Metric 1 */}
+            <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-3 first:pt-0 first:px-0">
+              <div className="size-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <Briefcase className="size-4.5" />
               </div>
-              <div className="text-xl font-semibold text-foreground">{stats.totalJobs}</div>
-              <div className="text-[10px] text-muted-foreground font-normal mt-0.5">Open & closed listings</div>
+              <div>
+                <div className="text-[11px] font-normal text-muted-foreground">Open Positions</div>
+                <div className="text-lg font-medium text-foreground">
+                  {stats.openJobs} <span className="text-xs font-normal text-muted-foreground">/ {stats.totalJobs} total</span>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-card rounded-xl border border-emerald-500/20 bg-emerald-500/[0.02] p-3 shadow-2xs">
-              <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 mb-1">
-                <span className="text-[10px] font-normal uppercase tracking-normal">Active Jobs</span>
-                <Clock className="size-3.5" />
+            {/* Metric 2 */}
+            <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
+              <div className="size-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <Users className="size-4.5" />
               </div>
-              <div className="text-xl font-semibold text-emerald-600 dark:text-emerald-400">
-                {stats.openJobs}
+              <div>
+                <div className="text-[11px] font-normal text-muted-foreground">Total Candidates</div>
+                <div className="text-lg font-medium text-foreground">
+                  {stats.totalCandidates} <span className="text-xs font-normal text-muted-foreground">in pipeline</span>
+                </div>
               </div>
-              <div className="text-[10px] text-emerald-600/80 font-normal mt-0.5">Ready for selection</div>
             </div>
 
-            <div className="bg-card rounded-xl border border-border/70 p-3 shadow-2xs">
-              <div className="flex items-center justify-between text-muted-foreground mb-1">
-                <span className="text-[10px] font-normal uppercase tracking-normal">Total Candidates</span>
-                <Users className="size-3.5 text-purple-500" />
+            {/* Metric 3 */}
+            <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
+              <div className="size-9 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <UserCheck className="size-4.5" />
               </div>
-              <div className="text-xl font-semibold text-foreground">{stats.totalCandidates}</div>
-              <div className="text-[10px] text-muted-foreground font-normal mt-0.5">Across all positions</div>
+              <div>
+                <div className="text-[11px] font-normal text-muted-foreground">Selected Candidates</div>
+                <div className="text-lg font-medium text-emerald-600 dark:text-emerald-400">
+                  {stats.selectedCandidates} <span className="text-xs font-normal text-muted-foreground">confirmed</span>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-card rounded-xl border border-primary/20 bg-primary/[0.03] p-3 shadow-2xs">
-              <div className="flex items-center justify-between text-primary mb-1">
-                <span className="text-[10px] font-normal uppercase tracking-normal">Selected</span>
-                <UserCheck className="size-3.5" />
+            {/* Metric 4 */}
+            <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
+              <div className="size-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <Link2 className="size-4.5" />
               </div>
-              <div className="text-xl font-semibold text-primary">{stats.selectedCandidates}</div>
-              <div className="text-[10px] text-primary/80 font-normal mt-0.5">Assigned & confirmed</div>
-            </div>
-
-            <div className="bg-card rounded-xl border border-indigo-500/20 bg-indigo-500/[0.02] p-3 shadow-2xs">
-              <div className="flex items-center justify-between text-indigo-600 dark:text-indigo-400 mb-1">
-                <span className="text-[10px] font-normal uppercase tracking-normal">Links Generated</span>
-                <Link2 className="size-3.5" />
+              <div>
+                <div className="text-[11px] font-normal text-muted-foreground">Links Generated</div>
+                <div className="text-lg font-medium text-foreground">
+                  {stats.linksGenerated} <span className="text-xs font-normal text-muted-foreground">dispatched</span>
+                </div>
               </div>
-              <div className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">
-                {stats.linksGenerated}
-              </div>
-              <div className="text-[10px] text-indigo-600/80 font-normal mt-0.5">Portal access links</div>
-            </div>
-
-            <div className="bg-card rounded-xl border border-slate-500/20 bg-slate-500/[0.02] p-3 shadow-2xs">
-              <div className="flex items-center justify-between text-muted-foreground mb-1">
-                <span className="text-[10px] font-normal uppercase tracking-normal">Closed Jobs</span>
-                <Lock className="size-3.5 text-slate-500" />
-              </div>
-              <div className="text-xl font-semibold text-foreground">{stats.closedJobs}</div>
-              <div className="text-[10px] text-muted-foreground font-normal mt-0.5">Selection finished</div>
             </div>
           </div>
 
           {/* Filters & Search Control Bar */}
-          <div className="bg-card rounded-xl border border-border/80 p-3 sm:p-3.5 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          <div className="bg-card rounded-xl border border-border/70 p-3 sm:p-3.5 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
-              {/* Status Tabs */}
+              {/* Status Segmented Tabs */}
               <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/40 text-xs font-normal">
                 <button
                   onClick={() => setStatusFilter("All")}
@@ -2017,25 +2033,32 @@ function CandidateSelectionPage() {
               <Search className="size-3.5 text-muted-foreground/60 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search by job title, code, candidate..."
+                placeholder="Search job title, code, candidate..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-8 pl-8.5 pr-3 rounded-lg bg-muted/50 border border-border/50 text-xs font-normal text-foreground outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+                className="w-full h-8 pl-8.5 pr-8 rounded-lg bg-muted/40 border border-border/60 text-xs font-normal text-foreground outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/60"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  <XCircle className="size-3.5" />
+                </button>
+              )}
             </div>
           </div>
 
           {/* List View of the Jobs */}
-          <div className="space-y-5">
+          <div className="space-y-4">
             {filteredJobs.length === 0 ? (
-              <div className="bg-card rounded-2xl border border-dashed border-border p-12 text-center space-y-3">
+              <div className="bg-card rounded-xl border border-dashed border-border p-12 text-center space-y-3">
                 <div className="size-12 mx-auto rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                   <Briefcase className="size-6" />
                 </div>
-                <h3 className="text-base font-bold text-foreground">No jobs match your filter criteria</h3>
-                <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                  Try adjusting the department filter or search query, or post a new job requisition to begin candidate
-                  selection.
+                <h3 className="text-sm font-medium text-foreground">No jobs match your filter criteria</h3>
+                <p className="text-xs text-muted-foreground max-w-md mx-auto font-normal">
+                  Try adjusting the department filter or search query, or post a new job requisition to begin candidate selection.
                 </p>
                 <button
                   onClick={() => {
@@ -2043,7 +2066,7 @@ function CandidateSelectionPage() {
                     setStatusFilter("All");
                     setDeptFilter("All");
                   }}
-                  className="px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl text-xs font-bold transition"
+                  className="px-3.5 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg text-xs font-medium transition cursor-pointer"
                 >
                   Reset All Filters
                 </button>
@@ -2063,89 +2086,90 @@ function CandidateSelectionPage() {
                         ? "border-slate-300/70 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-900/10"
                         : isFulfilled
                         ? "border-emerald-500/30 hover:border-emerald-500/50"
-                        : "border-border/80 hover:border-primary/40"
+                        : "border-border/70 hover:border-border"
                     }`}
                   >
                     {/* Job Card Header */}
-                    <div className="p-3.5 sm:p-4 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 border-b border-border/40 bg-muted/15">
-                      <div className="space-y-1">
+                    <div className="p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 border-b border-border/40 bg-muted/15">
+                      <div className="space-y-1 min-w-0">
+                        {/* Row 1: Badges & Department */}
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono text-[10px] font-normal text-muted-foreground px-1.5 py-0.2 rounded bg-muted/60 border border-border/50">
-                            {job.id}
-                          </span>
-
                           {/* Status Badge */}
                           {isClosed ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-normal uppercase bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-normal uppercase bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
                               <Lock className="size-2.5 text-slate-500" />
                               Closed
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-normal uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                              <Clock className="size-2.5 text-emerald-600" />
+                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-normal uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
                               Open Position
                             </span>
                           )}
 
+                          <span className="text-[10px] font-normal text-muted-foreground px-1.5 py-0.5 rounded bg-muted/60 border border-border/50">
+                            {job.id}
+                          </span>
+
                           <span className="text-[11px] font-normal text-muted-foreground flex items-center gap-1">
                             <Building2 className="size-3 text-muted-foreground/70" />
-                            {job.department}
-                          </span>
-
-                          <span className="text-[11px] font-normal text-muted-foreground/50">·</span>
-
-                          <span className="text-[11px] font-normal text-muted-foreground">
-                            Designation: <span className="text-foreground font-normal">{job.designation}</span>
+                            {job.department} · {job.designation}
                           </span>
                         </div>
 
+                        {/* Row 2: Title and Vacancy Count */}
                         <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                          <h2 className="text-sm sm:text-base font-medium text-foreground tracking-normal">
+                          <h2 className="text-sm sm:text-base font-medium text-foreground tracking-tight">
                             {job.title}
                           </h2>
-                          <div className="flex items-center gap-1 text-[11px] font-normal text-muted-foreground bg-muted/40 px-2 py-0.2 rounded border border-border/30">
-                            <span>Vacancies:</span>
-                            <span className="text-foreground font-medium">{job.vacancies}</span>
-                          </div>
+                          <span className="text-[11px] font-normal text-muted-foreground bg-muted/40 px-2 py-0.5 rounded border border-border/40">
+                            Vacancies: <span className="text-foreground font-medium">{job.vacancies}</span>
+                          </span>
                         </div>
 
-                        {/* Meta info tags */}
-                        <div className="flex flex-wrap items-center gap-y-1 gap-x-3.5 text-xs text-muted-foreground font-normal pt-0.5">
+                        {/* Row 3: Meta details */}
+                        <div className="flex flex-wrap items-center gap-y-1 gap-x-3 text-xs text-muted-foreground font-normal pt-0.5">
                           <span className="flex items-center gap-1">
-                            <User className="size-3 text-primary" />
-                            Assigned Evaluator:{" "}
-                            <span className="text-foreground font-normal">{job.assignedPerson}</span>
+                            <User className="size-3 text-primary/80" />
+                            Evaluator: <span className="text-foreground font-normal">{job.assignedPerson}</span>
                           </span>
+                          <span className="text-muted-foreground/40">·</span>
                           <span className="flex items-center gap-1">
                             <Calendar className="size-3 text-muted-foreground/70" />
-                            Target Closing: {job.targetDate}
+                            Target: {job.targetDate}
                           </span>
+                          <span className="text-muted-foreground/40">·</span>
                           <span className="flex items-center gap-1">
                             <DollarSign className="size-3 text-emerald-600" />
                             Budget: ৳{job.salaryBudgetMin.toLocaleString()} – ৳{job.salaryBudgetMax.toLocaleString()}
                           </span>
                           {isClosed && job.closedAt && (
-                            <span className="text-slate-600 dark:text-slate-400 font-normal bg-slate-100 dark:bg-slate-800 px-1.5 py-0.2 rounded text-[10px]">
-                              Closed on {job.closedAt} by {job.closedBy}
-                            </span>
+                            <>
+                              <span className="text-muted-foreground/40">·</span>
+                              <span className="text-slate-500 dark:text-slate-400 text-[11px]">
+                                Closed on {job.closedAt}
+                              </span>
+                            </>
                           )}
                         </div>
                       </div>
 
                       {/* Header Actions & Selection Counter */}
-                      <div className="flex flex-wrap items-center gap-2 pt-2 xl:pt-0 border-t xl:border-t-0 border-border/30">
+                      <div className="flex flex-wrap items-center gap-2 pt-2 lg:pt-0 border-t lg:border-t-0 border-border/30 shrink-0">
                         {/* Selection Progress Pill */}
-                        <div className="flex items-center gap-2 bg-card px-2.5 py-1 rounded-lg border border-border/60 shadow-2xs">
+                        <div className="flex items-center gap-2 bg-card px-2.5 py-1.5 rounded-lg border border-border/60 shadow-2xs">
                           <div className="text-right">
-                            <div className="text-[10px] uppercase font-normal text-muted-foreground">Selection Progress</div>
+                            <div className="text-[9px] uppercase font-normal text-muted-foreground tracking-normal">
+                              Selection
+                            </div>
                             <div className="text-xs font-normal text-foreground">
-                              <span className={selectedCount >= job.vacancies ? "text-emerald-600 font-medium" : "text-primary"}>
+                              <span className={selectedCount >= job.vacancies ? "text-emerald-600 font-medium" : "text-primary font-medium"}>
                                 {selectedCount}
                               </span>{" "}
-                              of {job.vacancies} Selected
+                              / {job.vacancies} Selected
                             </div>
                           </div>
-                          <div className="w-9 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div className="w-10 h-1.5 bg-muted rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all duration-300 ${
                                 selectedCount >= job.vacancies ? "bg-emerald-500" : "bg-primary"
@@ -2157,27 +2181,6 @@ function CandidateSelectionPage() {
                           </div>
                         </div>
 
-                        {/* Direct Submit & Close Button in Header */}
-                        {isClosed ? (
-                          <button
-                            onClick={() => handleReopenJob(job.id)}
-                            className="h-8 px-3 bg-muted hover:bg-muted/80 text-foreground border border-border/60 font-normal text-xs rounded-lg shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
-                            title="Reopen this job to make adjustments"
-                          >
-                            <Unlock className="size-3 text-emerald-600" />
-                            <span>Reopen</span>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleSubmitJob(job.id)}
-                            className="h-8 px-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 font-normal text-xs rounded-lg shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
-                            title="Submit candidate selection and close this job"
-                          >
-                            <Check className="size-3 stroke-[2]" />
-                            <span>Submit & Close</span>
-                          </button>
-                        )}
-
                         {/* Add Candidate Button */}
                         {!isClosed && (
                           <button
@@ -2186,10 +2189,10 @@ function CandidateSelectionPage() {
                               setAddingCandidateToJob(job);
                               setSingleCandidateDraft(createDefaultCandidateDraft());
                             }}
-                            className="h-8 px-2.5 bg-muted/60 hover:bg-muted text-foreground border border-border/60 font-normal text-xs rounded-lg shadow-2xs transition flex items-center gap-1 cursor-pointer"
+                            className="h-8 px-2.5 bg-card hover:bg-muted text-foreground border border-border/60 font-normal text-xs rounded-lg shadow-2xs transition flex items-center gap-1 cursor-pointer"
                             title="Add a candidate directly to this job"
                           >
-                            <Plus className="size-3" />
+                            <Plus className="size-3 text-primary" />
                             <span>Add Candidate</span>
                           </button>
                         )}
@@ -2197,54 +2200,53 @@ function CandidateSelectionPage() {
                         {/* Expand / Collapse Button */}
                         <button
                           onClick={() => toggleJobAccordion(job.id)}
-                          className="h-8 px-2.5 bg-card hover:bg-muted text-foreground border border-border/70 font-normal text-xs rounded-lg shadow-2xs transition flex items-center gap-1 cursor-pointer"
+                          className="h-8 px-2.5 bg-card hover:bg-muted text-foreground border border-border/60 font-normal text-xs rounded-lg shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
                         >
                           <Users className="size-3 text-primary" />
                           <span>{job.candidates.length} Candidates</span>
                           {isExpanded ? (
-                            <ChevronUp className="size-3.5 ml-0.5 text-muted-foreground" />
+                            <ChevronUp className="size-3.5 text-muted-foreground" />
                           ) : (
-                            <ChevronDown className="size-3.5 ml-0.5 text-muted-foreground" />
+                            <ChevronDown className="size-3.5 text-muted-foreground" />
                           )}
                         </button>
                       </div>
                     </div>
 
-                    {/* Expandable Candidates List for This Job */}
+                    {/* Expandable Candidates Table for This Job */}
                     {isExpanded && (
                       <div className="p-3.5 sm:p-4 space-y-3">
                         {/* Notice Banner if Job is Closed */}
                         {isClosed && (
-                          <div className="bg-slate-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 rounded-lg p-3 flex items-start sm:items-center justify-between gap-3 text-xs">
+                          <div className="bg-slate-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 sm:p-3 flex items-start sm:items-center justify-between gap-3 text-xs">
                             <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-normal">
                               <Lock className="size-3.5 text-slate-500 shrink-0" />
                               <span>
-                                Job is officially Closed. {job.closeReason || "Recruitment selection concluded."}
+                                Job position closed. {job.closeReason || "Candidate selection completed."}
                               </span>
                             </div>
                             <span className="text-[11px] text-muted-foreground shrink-0 font-normal">
-                              Selected candidates have active links preserved below.
+                              Application links remain active.
                             </span>
                           </div>
                         )}
 
                         {job.candidates.length === 0 ? (
-                          <div className="py-6 text-center text-xs text-muted-foreground font-normal">
+                          <div className="py-8 text-center text-xs text-muted-foreground font-normal">
                             No candidates currently queued for this job posting. Click "+ Add Candidate" above to attach applicant profiles.
                           </div>
                         ) : (
-                          <div className="overflow-x-auto rounded-lg border border-border/70">
+                          <div className="overflow-x-auto rounded-lg border border-border/60">
                             <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
                               <thead>
-                                <tr className="text-[10px] uppercase font-normal tracking-normal text-muted-foreground bg-muted/40 border-b border-border/60">
-                                  <th className="px-3 py-2 text-center w-12">Select</th>
-                                  <th className="px-3 py-2">Candidate Info</th>
-                                  <th className="px-3 py-2">Department & Desig</th>
-                                  <th className="px-3 py-2 text-right">Previous Salary</th>
-                                  <th className="px-3 py-2 text-right">Agreed Salary</th>
-                                  <th className="px-3 py-2 text-center">Curriculum Vitae</th>
-                                  <th className="px-3 py-2">Auto e-Recruitment Link</th>
-                                  <th className="px-3 py-2 text-center">Status</th>
+                                <tr className="text-[10px] uppercase font-normal tracking-normal text-muted-foreground bg-muted/30 border-b border-border/60">
+                                  <th className="px-3 py-2.5 text-center w-12">Select</th>
+                                  <th className="px-3 py-2.5">Candidate Info</th>
+                                  <th className="px-3 py-2.5">Experience & Notice</th>
+                                  <th className="px-3 py-2.5 text-right">Previous Salary</th>
+                                  <th className="px-3 py-2.5 text-right">Agreed Salary</th>
+                                  <th className="px-3 py-2.5 text-center">Curriculum Vitae</th>
+                                  <th className="px-3 py-2.5">Auto e-Recruitment Link</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-border/30 bg-card font-normal">
@@ -2254,7 +2256,7 @@ function CandidateSelectionPage() {
                                     className={`transition-colors duration-150 ${
                                       cand.selected
                                         ? "bg-primary/[0.03] dark:bg-primary/[0.05] hover:bg-primary/[0.06]"
-                                        : "hover:bg-muted/40"
+                                        : "hover:bg-muted/30"
                                     }`}
                                   >
                                     {/* Selection Checkbox */}
@@ -2280,10 +2282,10 @@ function CandidateSelectionPage() {
                                       </button>
                                     </td>
 
-                                    {/* Candidate Basic Information: Name, ID, Contact */}
+                                    {/* Candidate Basic Information */}
                                     <td className="px-3 py-2.5">
                                       <div className="flex items-center gap-2.5">
-                                        <div className="size-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-normal text-primary text-xs shrink-0">
+                                        <div className="size-7.5 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-normal text-primary text-xs shrink-0">
                                           {cand.name
                                             .split(" ")
                                             .filter((p) => p && !p.startsWith("Md"))
@@ -2292,15 +2294,10 @@ function CandidateSelectionPage() {
                                             .join("") || cand.name[0]}
                                         </div>
                                         <div>
-                                          <div className="font-normal text-foreground text-xs flex items-center gap-1.5">
-                                            <span>{cand.name}</span>
-                                            {cand.selected && (
-                                              <span className="inline-flex items-center gap-0.5 text-[9px] font-normal text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded border border-emerald-500/20">
-                                                <BadgeCheck className="size-2.5" /> Selected
-                                              </span>
-                                            )}
+                                          <div className="font-normal text-foreground text-xs">
+                                            {cand.name}
                                           </div>
-                                          <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-0.5 font-mono font-normal">
+                                          <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-0.5 font-normal">
                                             <span>{cand.id}</span>
                                             <span>·</span>
                                             <span className="flex items-center gap-0.5">
@@ -2312,28 +2309,25 @@ function CandidateSelectionPage() {
                                       </div>
                                     </td>
 
-                                    {/* Designation & Department */}
+                                    {/* Experience & Notice */}
                                     <td className="px-3 py-2.5">
-                                      <div className="font-normal text-foreground text-xs">{cand.designation}</div>
-                                      <div className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5 font-normal">
-                                        <span>{cand.department}</span>
-                                        <span>·</span>
-                                        <span>Exp: {cand.experience}</span>
+                                      <div className="font-normal text-foreground text-xs">{cand.experience} Exp</div>
+                                      <div className="text-[10px] text-muted-foreground mt-0.5 font-normal">
+                                        Notice: {cand.noticePeriod}
                                       </div>
                                     </td>
 
                                     {/* Previous Salary */}
-                                    <td className="px-3 py-2.5 text-right font-mono">
+                                    <td className="px-3 py-2.5 text-right">
                                       <div className="text-xs font-normal text-muted-foreground">
                                         ৳{cand.previousSalary.toLocaleString()}
                                       </div>
-                                      <div className="text-[9px] text-muted-foreground/60 uppercase font-normal">Previous CTC</div>
                                     </td>
 
-                                    {/* Agreed Salary */}
-                                    <td className="px-3 py-2.5 text-right font-mono">
+                                    {/* Agreed Salary with Clean Edit Trigger */}
+                                    <td className="px-3 py-2.5 text-right">
                                       <div className="flex items-center justify-end gap-1.5">
-                                        <span className="text-xs font-normal text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
+                                        <span className="text-xs font-normal text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                                           ৳{cand.agreedSalary.toLocaleString()}
                                         </span>
                                         {!isClosed && (
@@ -2352,12 +2346,9 @@ function CandidateSelectionPage() {
                                             className="p-1 text-muted-foreground hover:text-primary rounded hover:bg-muted transition cursor-pointer"
                                             title="Edit agreed salary"
                                           >
-                                            <DollarSign className="size-2.5" />
+                                            <DollarSign className="size-3" />
                                           </button>
                                         )}
-                                      </div>
-                                      <div className="text-[9px] text-muted-foreground/60 uppercase mt-0.5 font-normal">
-                                        Agreed Offer
                                       </div>
                                     </td>
 
@@ -2372,7 +2363,7 @@ function CandidateSelectionPage() {
                                             jobCode: job.id,
                                           })
                                         }
-                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-card hover:bg-muted text-primary border border-border/80 font-normal text-xs shadow-2xs transition cursor-pointer group"
+                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-card hover:bg-muted text-foreground border border-border/70 font-normal text-xs shadow-2xs transition cursor-pointer"
                                       >
                                         <FileText className="size-3 text-red-500" />
                                         <span>View PDF CV</span>
@@ -2384,7 +2375,7 @@ function CandidateSelectionPage() {
                                       {cand.generatedLink ? (
                                         <div className="flex items-center gap-1.5">
                                           <div
-                                            className="max-w-[200px] truncate font-mono text-[10px] bg-muted/60 px-2 py-0.5 rounded border border-border/50 text-foreground cursor-pointer hover:border-primary/40 font-normal"
+                                            className="max-w-[200px] truncate text-[10px] bg-muted/60 px-2 py-1 rounded border border-border/50 text-foreground cursor-pointer hover:border-primary/40 font-normal"
                                             title={cand.generatedLink}
                                             onClick={() => handleCopyLink(cand.generatedLink, cand.name)}
                                           >
@@ -2394,7 +2385,7 @@ function CandidateSelectionPage() {
                                             type="button"
                                             onClick={() => handleCopyLink(cand.generatedLink, cand.name)}
                                             className="p-1 rounded bg-card hover:bg-muted border border-border text-foreground transition cursor-pointer"
-                                            title="Copy e-recruitment link to clipboard"
+                                            title="Copy e-recruitment link"
                                           >
                                             <Copy className="size-3" />
                                           </button>
@@ -2410,21 +2401,7 @@ function CandidateSelectionPage() {
                                         </div>
                                       ) : (
                                         <span className="text-[10px] text-muted-foreground/60 italic font-normal">
-                                          Select candidate to auto-generate
-                                        </span>
-                                      )}
-                                    </td>
-
-                                    {/* Status Badge */}
-                                    <td className="px-3 py-2.5 text-center">
-                                      {cand.selected ? (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-normal bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                          <CheckCircle2 className="size-2.5" />
-                                          Selected
-                                        </span>
-                                      ) : (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-normal bg-muted text-muted-foreground border border-border/40">
-                                          {cand.status}
+                                          Select candidate to generate link
                                         </span>
                                       )}
                                     </td>
@@ -2438,19 +2415,24 @@ function CandidateSelectionPage() {
                     )}
 
                     {/* ─── BOTTOM SUBMIT BAR FOR EVERY JOB ───────────────────── */}
-                    <div className="p-3 sm:p-3.5 bg-muted/20 border-t border-border/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                      <div className="text-xs text-muted-foreground font-normal flex flex-wrap items-center gap-2">
+                    <div className="p-3 sm:p-3.5 bg-muted/20 border-t border-border/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div className="text-xs text-muted-foreground font-normal flex items-center gap-2">
                         <CheckCircle2 className={`size-3.5 ${isClosed ? "text-slate-400" : "text-emerald-600"}`} />
                         <span>
                           {isClosed ? (
                             <>
-                              Job is <span className="font-normal text-slate-700 dark:text-slate-300">Closed</span>.
+                              Requisition is <span className="font-normal text-slate-700 dark:text-slate-300">Closed</span>.
                               {job.closedAt && ` Submitted on ${job.closedAt}.`} {selectedCount} candidate(s) enrolled.
                             </>
                           ) : (
                             <>
                               Candidate Selection: <span className="font-normal text-foreground">{selectedCount}</span> of{" "}
                               <span className="font-normal text-foreground">{job.vacancies}</span> required vacancies selected.
+                              {selectedCount === 0 && (
+                                <span className="text-amber-600 dark:text-amber-400 font-normal ml-1.5">
+                                  (Select candidate to enable submit)
+                                </span>
+                              )}
                             </>
                           )}
                         </span>
@@ -2461,23 +2443,23 @@ function CandidateSelectionPage() {
                           <button
                             type="button"
                             onClick={() => handleReopenJob(job.id)}
-                            className="h-7.5 px-3 bg-muted hover:bg-muted/80 text-foreground border border-border/60 text-xs font-normal rounded-lg transition flex items-center gap-1.5 cursor-pointer"
+                            className="h-8 px-3 bg-muted hover:bg-muted/80 text-foreground border border-border/60 text-xs font-normal rounded-lg transition flex items-center gap-1.5 cursor-pointer"
                             title="Reopen this job to modify candidate selection"
                           >
                             <Unlock className="size-3 text-emerald-600" />
                             <span>Reopen Job</span>
                           </button>
-                        ) : (
+                        ) : selectedCount > 0 ? (
                           <button
                             type="button"
                             onClick={() => handleSubmitJob(job.id)}
-                            className="h-7.5 px-3.5 bg-primary hover:opacity-95 text-primary-foreground text-xs font-normal rounded-lg transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
-                            title="Submit selections and close this job"
+                            className="h-8 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-normal rounded-lg transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                            title="Approve candidate selection and submit this job"
                           >
-                            <Check className="size-3 stroke-[2]" />
-                            <span>Submit</span>
+                            <Check className="size-3.5 stroke-[2]" />
+                            <span>Approve and Submit</span>
                           </button>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -2508,7 +2490,7 @@ function CandidateSelectionPage() {
                     <div>
                       <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                         <span>Candidate CV Dossier — {liveCand.name}</span>
-                        <span className="text-[10px] font-normal px-1.5 py-0.2 rounded bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 uppercase font-mono">
+                        <span className="text-[10px] font-normal px-1.5 py-0.2 rounded bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 uppercase">
                           PDF View
                         </span>
                       </h3>
@@ -2524,7 +2506,7 @@ function CandidateSelectionPage() {
                       href={pdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="h-8.5 px-3 bg-card hover:bg-muted text-foreground border border-border/70 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
+                      className="h-8 px-3 bg-card hover:bg-muted text-foreground border border-border/70 rounded-lg text-xs font-normal transition flex items-center gap-1.5 shadow-2xs"
                       title="Open PDF in a new tab"
                     >
                       <ExternalLink className="size-3.5" />
@@ -2534,7 +2516,7 @@ function CandidateSelectionPage() {
                     <a
                       href={pdfUrl}
                       download="Tahmid Afsar Shapno-details_.pdf"
-                      className="h-8.5 px-3 bg-card hover:bg-muted text-foreground border border-border/70 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
+                      className="h-8 px-3 bg-card hover:bg-muted text-foreground border border-border/70 rounded-lg text-xs font-normal transition flex items-center gap-1.5 shadow-2xs"
                       title="Download PDF document"
                     >
                       <Download className="size-3.5" />
@@ -2543,10 +2525,10 @@ function CandidateSelectionPage() {
 
                     <button
                       onClick={() => setActiveCvCandidate(null)}
-                      className="size-8.5 rounded-xl border border-border/70 bg-card hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition cursor-pointer"
+                      className="size-8 rounded-lg border border-border/70 bg-card hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition cursor-pointer"
                       title="Close modal"
                     >
-                      <XCircle className="size-4.5" />
+                      <XCircle className="size-4" />
                     </button>
                   </div>
                 </div>
@@ -2577,7 +2559,7 @@ function CandidateSelectionPage() {
                                 ({liveCand.nameBng})
                               </span>
                             )}
-                            <span className="font-mono text-[10px] font-normal px-1.5 py-0.2 rounded bg-muted/60 border border-border/50 text-muted-foreground">
+                            <span className="text-[10px] font-normal px-1.5 py-0.2 rounded bg-muted/60 border border-border/50 text-muted-foreground">
                               {liveCand.id}
                             </span>
                             {liveCand.selected ? (
@@ -2633,7 +2615,7 @@ function CandidateSelectionPage() {
                           <DollarSign className="size-2.5" />
                           <span>Agreed Salary</span>
                         </div>
-                        <div className="text-base sm:text-lg font-semibold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
+                        <div className="text-base sm:text-lg font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">
                           ৳{liveCand.agreedSalary.toLocaleString()}
                         </div>
                         <div className="text-[10px] text-muted-foreground font-normal">Final agreed monthly offer</div>
@@ -2645,7 +2627,7 @@ function CandidateSelectionPage() {
                           <DollarSign className="size-2.5 text-muted-foreground/70" />
                           <span>Previous Salary</span>
                         </div>
-                        <div className="text-base sm:text-lg font-normal text-foreground font-mono mt-0.5">
+                        <div className="text-base sm:text-lg font-normal text-foreground mt-0.5">
                           ৳{liveCand.previousSalary.toLocaleString()}
                         </div>
                         <div className="text-[10px] text-muted-foreground font-normal">
@@ -2692,7 +2674,7 @@ function CandidateSelectionPage() {
                       <div className="flex flex-wrap items-center gap-y-1 gap-x-3.5 text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Phone className="size-3 text-muted-foreground/70" />
-                          <span className="font-mono text-foreground font-normal">{liveCand.phone}</span>
+                          <span className="text-foreground font-normal">{liveCand.phone}</span>
                         </span>
                         <span className="flex items-center gap-1">
                           <Mail className="size-3 text-muted-foreground/70" />
@@ -2710,7 +2692,7 @@ function CandidateSelectionPage() {
                             <Link2 className="size-2.5" /> Auto-Generated Link:
                           </span>
                           <span
-                            className="font-mono text-[10px] max-w-[200px] truncate text-foreground font-normal cursor-pointer"
+                            className="text-[10px] max-w-[200px] truncate text-foreground font-normal cursor-pointer"
                             title={liveCand.generatedLink}
                             onClick={() => handleCopyLink(liveCand.generatedLink, liveCand.name)}
                           >
@@ -2736,7 +2718,7 @@ function CandidateSelectionPage() {
                         <FileText className="size-3.5 text-red-500" />
                         <span>Curriculum Vitae Document — Tahmid Afsar Shapno-details_.pdf</span>
                       </div>
-                      <span className="text-[10px] text-muted-foreground font-mono font-normal">
+                      <span className="text-[10px] text-muted-foreground font-normal">
                         Source: /public/Tahmid Afsar Shapno-details_.pdf
                       </span>
                     </div>
@@ -2776,72 +2758,72 @@ function CandidateSelectionPage() {
         {/* ─── MODAL 2: CLOSE JOB CONFIRMATION MODAL ───────────────────────── */}
         {closingJob && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-            <div className="bg-card w-full max-w-lg rounded-2xl shadow-2xl border border-border/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-              <div className="p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between">
+            <div className="bg-card w-full max-w-lg rounded-xl shadow-2xl border border-border/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              <div className="p-4 sm:p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-red-500/10 text-red-500 rounded-xl">
-                    <Lock className="size-5" />
+                  <div className="p-2 bg-red-500/10 text-red-500 rounded-lg">
+                    <Lock className="size-4.5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-foreground">Close Job Requisition</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{closingJob.title}</p>
+                    <h3 className="text-sm font-medium text-foreground">Close Job Requisition</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5 font-normal">{closingJob.title}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setClosingJob(null)}
                   className="size-8 rounded-lg text-muted-foreground hover:bg-muted flex items-center justify-center cursor-pointer"
                 >
-                  <XCircle className="size-5" />
+                  <XCircle className="size-4.5" />
                 </button>
               </div>
 
-              <div className="p-6 space-y-4">
-                <div className="bg-muted/50 p-4 rounded-xl border border-border/60 space-y-2 text-xs">
+              <div className="p-5 sm:p-6 space-y-4">
+                <div className="bg-muted/40 p-3.5 rounded-lg border border-border/50 space-y-2 text-xs font-normal">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground font-semibold">Job ID:</span>
-                    <span className="font-mono font-bold text-foreground">{closingJob.id}</span>
+                    <span className="text-muted-foreground">Job ID:</span>
+                    <span className="text-foreground">{closingJob.id}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground font-semibold">Vacancies:</span>
-                    <span className="font-bold text-foreground">{closingJob.vacancies}</span>
+                    <span className="text-muted-foreground">Vacancies:</span>
+                    <span className="text-foreground font-medium">{closingJob.vacancies}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground font-semibold">Candidates Selected:</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                    <span className="text-muted-foreground">Candidates Selected:</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">
                       {closingJob.candidates.filter((c) => c.selected).length} Selected
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Closure Reason / Official Note</label>
+                  <label className="text-xs font-normal text-muted-foreground">Closure Reason / Official Note</label>
                   <textarea
                     rows={3}
                     value={closeReasonInput}
                     onChange={(e) => setCloseReasonInput(e.target.value)}
                     placeholder="e.g. Selection completed, required number of positions filled."
-                    className="w-full p-3 rounded-xl border border-border bg-background text-xs text-foreground outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+                    className="w-full p-2.5 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
                   />
-                  <p className="text-[10px] text-muted-foreground">
+                  <p className="text-[11px] text-muted-foreground font-normal">
                     Closing locks this job to mark recruitment as completed. You can reopen it at any time if required.
                   </p>
                 </div>
               </div>
 
-              <div className="p-4 border-t border-border/60 bg-muted/10 flex items-center justify-end gap-2.5">
+              <div className="p-3.5 sm:p-4 border-t border-border/60 bg-muted/10 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setClosingJob(null)}
-                  className="h-9 px-4 bg-muted hover:bg-muted/80 text-foreground text-xs font-bold rounded-xl transition cursor-pointer"
+                  className="h-8 px-3.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-normal rounded-lg transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmCloseJob}
-                  className="h-9 px-5 bg-red-600 hover:bg-red-700 text-white text-xs font-black rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  className="h-8 px-4 bg-red-600 hover:bg-red-700 text-white text-xs font-normal rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Lock className="size-3.5" />
+                  <Lock className="size-3" />
                   <span>Confirm & Close Job</span>
                 </button>
               </div>
@@ -2852,62 +2834,62 @@ function CandidateSelectionPage() {
         {/* ─── MODAL 3: EDIT AGREED SALARY MODAL ───────────────────────── */}
         {editingSalary && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-            <div className="bg-card w-full max-w-md rounded-2xl shadow-2xl border border-border/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-              <div className="p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between">
+            <div className="bg-card w-full max-w-md rounded-xl shadow-2xl border border-border/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              <div className="p-4 sm:p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
-                    <DollarSign className="size-5" />
+                  <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-lg">
+                    <DollarSign className="size-4.5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-foreground">Update Agreed Salary</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{editingSalary.candidateName}</p>
+                    <h3 className="text-sm font-medium text-foreground">Update Agreed Salary</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5 font-normal">{editingSalary.candidateName}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setEditingSalary(null)}
                   className="size-8 rounded-lg text-muted-foreground hover:bg-muted flex items-center justify-center cursor-pointer"
                 >
-                  <XCircle className="size-5" />
+                  <XCircle className="size-4.5" />
                 </button>
               </div>
 
-              <div className="p-6 space-y-4">
-                <div className="flex justify-between items-center text-xs p-3 bg-muted/40 rounded-xl border border-border/40">
-                  <span className="text-muted-foreground font-semibold">Previous Salary:</span>
-                  <span className="font-mono font-bold text-foreground">
+              <div className="p-5 sm:p-6 space-y-4">
+                <div className="flex justify-between items-center text-xs p-3 bg-muted/40 rounded-lg border border-border/40 font-normal">
+                  <span className="text-muted-foreground">Previous Salary:</span>
+                  <span className="text-foreground">
                     ৳{editingSalary.prevSalary.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Agreed Salary (BDT ৳)</label>
+                  <label className="text-xs font-normal text-muted-foreground">Agreed Salary (BDT ৳)</label>
                   <input
                     type="number"
                     value={tempAgreedSalary || ""}
                     onChange={(e) => setTempAgreedSalary(Number(e.target.value))}
-                    className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm font-mono font-bold text-foreground outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+                    className="w-full h-9 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
                     placeholder="Enter agreed salary"
                   />
-                  <p className="text-[10px] text-muted-foreground">
+                  <p className="text-[11px] text-muted-foreground font-normal">
                     This finalized agreed remuneration will be reflected on their official dossier and e-recruitment offer.
                   </p>
                 </div>
               </div>
 
-              <div className="p-4 border-t border-border/60 bg-muted/10 flex items-center justify-end gap-2.5">
+              <div className="p-3.5 sm:p-4 border-t border-border/60 bg-muted/10 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setEditingSalary(null)}
-                  className="h-9 px-4 bg-muted hover:bg-muted/80 text-foreground text-xs font-bold rounded-xl transition cursor-pointer"
+                  className="h-8 px-3.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-normal rounded-lg transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleSaveAgreedSalary}
-                  className="h-9 px-5 bg-primary hover:opacity-95 text-primary-foreground text-xs font-black rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  className="h-8 px-4 bg-primary hover:opacity-95 text-primary-foreground text-xs font-normal rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Check className="size-3.5 stroke-[3]" />
+                  <Check className="size-3.5 stroke-[2]" />
                   <span>Save Agreed Salary</span>
                 </button>
               </div>
@@ -2915,374 +2897,577 @@ function CandidateSelectionPage() {
           </div>
         )}
 
-        {/* ─── MODAL 4: POST NEW JOB WITH CANDIDATES & PDF CV UPLOAD ───────────── */}
+        {/* ─── MODAL 4: POST NEW JOB WITH CANDIDATES & PDF CV UPLOAD (2-STEP WIZARD) ───────────── */}
         {showAddJobModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-3 sm:p-5 overflow-y-auto">
-            <div className="bg-card w-full max-w-4xl max-h-[94vh] rounded-2xl shadow-2xl border border-border/80 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-card w-full max-w-4xl max-h-[94vh] rounded-xl shadow-2xl border border-border/80 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
               {/* Modal Header */}
-              <div className="p-4 sm:p-5 border-b border-border/60 bg-muted/30 flex items-center justify-between shrink-0">
+              <div className="p-4 sm:p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2.5 bg-primary/10 text-primary rounded-xl">
-                    <Briefcase className="size-5" />
+                  <div className="p-2 bg-primary/10 text-primary rounded-lg">
+                    <Briefcase className="size-4.5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-foreground flex items-center gap-2">
-                      <span>Post New Job Requisition & Enroll Candidates</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 uppercase font-mono">
-                        Step 1 & 2
-                      </span>
+                    <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <span>Create Position & Enroll Candidates</span>
                     </h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5 font-normal">
                       Define job requirements and attach candidate information with their PDF CV documents.
                     </p>
                   </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setShowAddJobModal(false)}
-                  className="size-8.5 rounded-xl border border-border/70 bg-card hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition cursor-pointer"
+                  onClick={() => {
+                    setShowAddJobModal(false);
+                    setAddJobModalStep(1);
+                  }}
+                  className="size-8 rounded-lg border border-border/70 bg-card hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition cursor-pointer"
                 >
                   <XCircle className="size-4.5" />
                 </button>
               </div>
 
-              {/* Scrollable Form Body */}
-              <form onSubmit={handleCreateJob} className="flex-1 flex flex-col overflow-hidden">
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 text-xs custom-scrollbar">
-                  {/* ─── SECTION 1: JOB REQUISITION DETAILS ───────────────────── */}
-                  <div className="bg-card rounded-2xl border border-border/70 p-4 sm:p-5 shadow-2xs space-y-4">
-                    <div className="flex items-center gap-2 pb-2 border-b border-border/40">
-                      <Briefcase className="size-4 text-primary" />
-                      <h4 className="text-xs font-black uppercase tracking-wider text-foreground">
-                        Job Position & Requirements
-                      </h4>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-1.5 sm:col-span-2">
-                        <label className="font-bold text-foreground">Job Title *</label>
-                        <input
-                          type="text"
-                          required
-                          value={newJobTitle}
-                          onChange={(e) => setNewJobTitle(e.target.value)}
-                          placeholder="e.g. Senior Merchandiser (Woven) or Quality Controller"
-                          className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="font-bold text-foreground">Department *</label>
-                        <select
-                          value={newJobDept}
-                          onChange={(e) => setNewJobDept(e.target.value)}
-                          className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                        >
-                          <option value="Merchandising">Merchandising</option>
-                          <option value="Quality Control">Quality Control</option>
-                          <option value="RMG Operation">RMG Operation</option>
-                          <option value="Industrial Engineering">Industrial Engineering</option>
-                          <option value="Production">Production</option>
-                          <option value="Human Resources">Human Resources</option>
-                          <option value="Maintenance">Maintenance</option>
-                        </select>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="font-bold text-foreground">Designation *</label>
-                        <input
-                          type="text"
-                          required
-                          value={newJobDesig}
-                          onChange={(e) => setNewJobDesig(e.target.value)}
-                          placeholder="e.g. Senior Merchandiser"
-                          className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="font-bold text-foreground">Vacancies Required</label>
-                        <input
-                          type="number"
-                          min={1}
-                          value={newJobVacancies}
-                          onChange={(e) => setNewJobVacancies(Number(e.target.value))}
-                          className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="font-bold text-foreground">Target Closing Date</label>
-                        <input
-                          type="date"
-                          value={newJobTargetDate}
-                          onChange={(e) => setNewJobTargetDate(e.target.value)}
-                          className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="font-bold text-foreground">Min Salary Budget (৳)</label>
-                        <input
-                          type="number"
-                          value={newJobBudgetMin}
-                          onChange={(e) => setNewJobBudgetMin(Number(e.target.value))}
-                          className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="font-bold text-foreground">Max Salary Budget (৳)</label>
-                        <input
-                          type="number"
-                          value={newJobBudgetMax}
-                          onChange={(e) => setNewJobBudgetMax(Number(e.target.value))}
-                          className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5 sm:col-span-2">
-                        <label className="font-bold text-foreground">Assigned Evaluator / Selector</label>
-                        <input
-                          type="text"
-                          value={newJobAssigned}
-                          onChange={(e) => setNewJobAssigned(e.target.value)}
-                          placeholder="e.g. Tanvir Ahmed (HR Manager)"
-                          className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                        />
-                      </div>
+              {/* Step Navigation Indicator Tabs */}
+              <div className="bg-muted/30 border-b border-border/60 px-4 sm:px-6 py-2.5 flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setAddJobModalStep(1)}
+                  className={`flex-1 flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition border cursor-pointer ${
+                    addJobModalStep === 1
+                      ? "bg-card border-primary/40 text-primary shadow-2xs font-medium"
+                      : "bg-transparent border-transparent text-muted-foreground hover:text-foreground hover:bg-card/50 font-normal"
+                  }`}
+                >
+                  <span
+                    className={`size-5 rounded-full flex items-center justify-center text-[10px] ${
+                      addJobModalStep === 1
+                        ? "bg-primary text-primary-foreground font-normal"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    1
+                  </span>
+                  <div className="text-left min-w-0">
+                    <div className="text-xs truncate">Step 1: Job Specifications</div>
+                    <div className="text-[10px] text-muted-foreground truncate hidden sm:block">
+                      Position, department, vacancies & budget
                     </div>
                   </div>
+                </button>
 
-                  {/* ─── SECTION 2: CANDIDATE INFORMATION & PDF CV UPLOAD ───── */}
-                  <div className="bg-card rounded-2xl border-2 border-primary/20 bg-primary/[0.01] p-4 sm:p-5 shadow-sm space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-border/40">
-                      <div className="flex items-center gap-2">
-                        <Users className="size-4 text-primary" />
-                        <div>
-                          <h4 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-2">
-                            <span>Candidate Profiles & PDF CV Attachments</span>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                              {newJobCandidates.length} {newJobCandidates.length === 1 ? "Candidate" : "Candidates"}
-                            </span>
-                          </h4>
-                          <p className="text-[11px] text-muted-foreground mt-0.5">
-                            Add candidate details and upload their PDF CV now, or attach additional profiles later.
-                          </p>
+                <ChevronRight className="size-4 text-muted-foreground/40 shrink-0" />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (addJobModalStep === 1) {
+                      handleProceedToStep2();
+                    }
+                  }}
+                  className={`flex-1 flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition border cursor-pointer ${
+                    addJobModalStep === 2
+                      ? "bg-card border-primary/40 text-primary shadow-2xs font-medium"
+                      : "bg-transparent border-transparent text-muted-foreground hover:text-foreground hover:bg-card/50 font-normal"
+                  }`}
+                >
+                  <span
+                    className={`size-5 rounded-full flex items-center justify-center text-[10px] ${
+                      addJobModalStep === 2
+                        ? "bg-primary text-primary-foreground font-normal"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    2
+                  </span>
+                  <div className="text-left min-w-0">
+                    <div className="text-xs truncate flex items-center gap-1.5">
+                      <span>Step 2: Candidate Profiles & CV</span>
+                      <span className="px-1.5 py-0.2 rounded-full bg-primary/10 text-primary text-[10px] font-normal">
+                        {newJobCandidates.length}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-muted-foreground truncate hidden sm:block">
+                      Salaries, contacts & PDF CV documents
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              {/* Scrollable Form Body */}
+              <form onSubmit={handleCreateJob} className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-xs custom-scrollbar">
+                  {/* ───────────────── STEP 1: JOB SPECIFICATIONS ───────────────── */}
+                  {addJobModalStep === 1 && (
+                    <div className="space-y-4 animate-in fade-in duration-150">
+                      <div className="bg-card rounded-xl border border-border/70 p-4 sm:p-5 shadow-2xs space-y-4">
+                        <div className="flex items-center justify-between pb-2 border-b border-border/40">
+                          <div className="flex items-center gap-2">
+                            <Briefcase className="size-4 text-primary" />
+                            <h4 className="text-xs font-medium text-foreground">
+                              Job Position & Requisition Requirements
+                            </h4>
+                          </div>
+                          <span className="text-[11px] text-muted-foreground font-normal">
+                            All * fields are required
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                          <div className="space-y-1.5 sm:col-span-2">
+                            <label className="font-normal text-muted-foreground flex items-center gap-1">
+                              <span>Job Title</span>
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={newJobTitle}
+                              onChange={(e) => setNewJobTitle(e.target.value)}
+                              placeholder="e.g. Senior Merchandiser (Woven) or Quality Controller"
+                              className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="font-normal text-muted-foreground flex items-center gap-1">
+                              <span>Department</span>
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                              value={newJobDept}
+                              onChange={(e) => setNewJobDept(e.target.value)}
+                              className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                            >
+                              <option value="Merchandising">Merchandising</option>
+                              <option value="Quality Control">Quality Control</option>
+                              <option value="RMG Operation">RMG Operation</option>
+                              <option value="Industrial Engineering">Industrial Engineering</option>
+                              <option value="Production">Production</option>
+                              <option value="Human Resources">Human Resources</option>
+                              <option value="Maintenance">Maintenance</option>
+                            </select>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="font-normal text-muted-foreground flex items-center gap-1">
+                              <span>Designation</span>
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={newJobDesig}
+                              onChange={(e) => setNewJobDesig(e.target.value)}
+                              placeholder="e.g. Senior Merchandiser"
+                              className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="font-normal text-muted-foreground">Vacancies Required</label>
+                            <input
+                              type="number"
+                              min={1}
+                              value={newJobVacancies}
+                              onChange={(e) => setNewJobVacancies(Number(e.target.value))}
+                              className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="font-normal text-muted-foreground">Target Closing Date</label>
+                            <input
+                              type="date"
+                              value={newJobTargetDate}
+                              onChange={(e) => setNewJobTargetDate(e.target.value)}
+                              className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="font-normal text-muted-foreground">Min Salary Budget (৳)</label>
+                            <input
+                              type="number"
+                              value={newJobBudgetMin}
+                              onChange={(e) => setNewJobBudgetMin(Number(e.target.value))}
+                              className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="font-normal text-muted-foreground">Max Salary Budget (৳)</label>
+                            <input
+                              type="number"
+                              value={newJobBudgetMax}
+                              onChange={(e) => setNewJobBudgetMax(Number(e.target.value))}
+                              className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5 sm:col-span-2">
+                            <label className="font-normal text-muted-foreground">Assigned Evaluator / Selector</label>
+                            <input
+                              type="text"
+                              value={newJobAssigned}
+                              onChange={(e) => setNewJobAssigned(e.target.value)}
+                              placeholder="e.g. Tanvir Ahmed (HR Manager)"
+                              className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Salary Budget Indicator Pill */}
+                        <div className="p-3 rounded-lg bg-muted/30 border border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                          <span className="text-muted-foreground font-normal">
+                            Approved Budget Range:
+                          </span>
+                          <span className="font-medium text-foreground">
+                            ৳{newJobBudgetMin.toLocaleString()} — ৳{newJobBudgetMax.toLocaleString()} / month
+                          </span>
                         </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={handleAddCandidateRow}
-                        className="h-8 px-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 font-bold text-xs rounded-xl transition flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
-                      >
-                        <Plus className="size-3.5" />
-                        <span>Add Another Candidate</span>
-                      </button>
-                    </div>
-
-                    {/* Candidate Cards List */}
-                    <div className="space-y-4">
-                      {newJobCandidates.map((draft, idx) => (
-                        <div
-                          key={draft.id}
-                          className="bg-muted/30 rounded-xl border border-border/80 p-4 space-y-3 relative group"
+                      {/* Hint for Next Step */}
+                      <div className="p-3 bg-primary/5 rounded-xl border border-primary/20 flex items-center justify-between gap-3 text-xs">
+                        <div className="flex items-center gap-2 text-muted-foreground font-normal">
+                          <Users className="size-4 text-primary shrink-0" />
+                          <span>
+                            Next step: Attach candidate basic information, agreed salary, and their PDF CV documents.
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleProceedToStep2}
+                          className="h-7.5 px-3 bg-primary hover:opacity-95 text-primary-foreground text-xs font-normal rounded-lg transition flex items-center gap-1.5 shrink-0 cursor-pointer"
                         >
-                          <div className="flex items-center justify-between pb-2 border-b border-border/40">
-                            <span className="font-bold text-xs text-foreground flex items-center gap-2">
-                              <span className="size-5 rounded-full bg-primary text-primary-foreground font-black text-[10px] flex items-center justify-center">
-                                {idx + 1}
-                              </span>
-                              <span>Candidate #{idx + 1}: {draft.name || "Pending Name"}</span>
+                          <span>Go to Step 2</span>
+                          <ArrowRight className="size-3" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ───────────────── STEP 2: CANDIDATE PROFILES & CV ─────────── */}
+                  {addJobModalStep === 2 && (
+                    <div className="space-y-4 animate-in fade-in duration-150">
+                      {/* Job Context Strip */}
+                      <div className="p-3 bg-muted/30 rounded-xl border border-border/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Briefcase className="size-4 text-primary shrink-0" />
+                          <div className="truncate">
+                            <span className="font-medium text-foreground">{newJobTitle || "Requisition"}</span>
+                            <span className="text-muted-foreground font-normal ml-2">
+                              ({newJobDept} • {newJobDesig} • {newJobVacancies} vacancy)
                             </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-[11px] text-muted-foreground font-normal">
+                            Budget: ৳{newJobBudgetMin.toLocaleString()} - ৳{newJobBudgetMax.toLocaleString()}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setAddJobModalStep(1)}
+                            className="text-[11px] text-primary hover:underline font-normal cursor-pointer"
+                          >
+                            Edit Job Details
+                          </button>
+                        </div>
+                      </div>
 
-                            {newJobCandidates.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveCandidateRow(idx)}
-                                className="p-1.5 text-muted-foreground hover:text-red-500 rounded-lg hover:bg-red-500/10 transition cursor-pointer"
-                                title="Remove this candidate draft"
+                      {/* Candidate Profiles List Container */}
+                      <div className="bg-card rounded-xl border border-primary/20 bg-primary/[0.01] p-4 sm:p-5 shadow-2xs space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-border/40">
+                          <div className="flex items-center gap-2">
+                            <Users className="size-4 text-primary" />
+                            <div>
+                              <h4 className="text-xs font-medium text-foreground flex items-center gap-2">
+                                <span>Candidate Profiles & PDF CV Attachments</span>
+                                <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                                  {newJobCandidates.length} {newJobCandidates.length === 1 ? "Candidate" : "Candidates"}
+                                </span>
+                              </h4>
+                              <p className="text-[11px] text-muted-foreground mt-0.5 font-normal">
+                                Review candidate salaries, phone, and attach their PDF CV document below.
+                              </p>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={handleAddCandidateRow}
+                            className="h-7.5 px-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 font-normal text-xs rounded-lg transition flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+                          >
+                            <Plus className="size-3" />
+                            <span>Add Another Candidate</span>
+                          </button>
+                        </div>
+
+                        {/* Candidate Cards */}
+                        <div className="space-y-3.5">
+                          {newJobCandidates.map((draft, idx) => {
+                            const prevSal = Number(draft.previousSalary) || 0;
+                            const agrSal = Number(draft.agreedSalary) || 0;
+                            const diffSal = agrSal - prevSal;
+                            const diffPercent = prevSal > 0 ? Math.round((diffSal / prevSal) * 100) : 0;
+
+                            return (
+                              <div
+                                key={draft.id}
+                                className="bg-muted/20 rounded-lg border border-border/70 p-3.5 space-y-3 relative group"
                               >
-                                <Trash2 className="size-3.5" />
-                              </button>
-                            )}
-                          </div>
+                                <div className="flex items-center justify-between pb-2 border-b border-border/40">
+                                  <span className="font-normal text-xs text-foreground flex items-center gap-2">
+                                    <span className="size-4.5 rounded-full bg-primary text-primary-foreground font-normal text-[10px] flex items-center justify-center">
+                                      {idx + 1}
+                                    </span>
+                                    <span>
+                                      Candidate #{idx + 1}:{" "}
+                                      <span className="font-medium">{draft.name || "Pending Name"}</span>
+                                    </span>
+                                  </span>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                            <div className="space-y-1 sm:col-span-2 md:col-span-1">
-                              <label className="font-bold text-foreground">Candidate Full Name *</label>
-                              <input
-                                type="text"
-                                value={draft.name}
-                                onChange={(e) => handleUpdateCandidateDraft(idx, "name", e.target.value)}
-                                placeholder="e.g. Md. Hasan Ali"
-                                className="w-full h-8.5 px-2.5 rounded-lg border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <label className="font-bold text-foreground">Previous Salary (৳)</label>
-                              <input
-                                type="number"
-                                value={draft.previousSalary || ""}
-                                onChange={(e) => handleUpdateCandidateDraft(idx, "previousSalary", e.target.value)}
-                                placeholder="e.g. 28000"
-                                className="w-full h-8.5 px-2.5 rounded-lg border border-border bg-background text-xs font-mono font-bold text-foreground outline-none focus:border-primary/50"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <label className="font-bold text-emerald-600 dark:text-emerald-400">
-                                Agreed Salary (৳)
-                              </label>
-                              <input
-                                type="number"
-                                value={draft.agreedSalary || ""}
-                                onChange={(e) => handleUpdateCandidateDraft(idx, "agreedSalary", e.target.value)}
-                                placeholder="e.g. 35000"
-                                className="w-full h-8.5 px-2.5 rounded-lg border border-emerald-500/40 bg-emerald-500/[0.03] text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 outline-none focus:border-emerald-500"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <label className="font-bold text-foreground">Phone Number</label>
-                              <input
-                                type="text"
-                                value={draft.phone}
-                                onChange={(e) => handleUpdateCandidateDraft(idx, "phone", e.target.value)}
-                                placeholder="e.g. +880 1711-000000"
-                                className="w-full h-8.5 px-2.5 rounded-lg border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <label className="font-bold text-foreground">Email Address</label>
-                              <input
-                                type="email"
-                                value={draft.email}
-                                onChange={(e) => handleUpdateCandidateDraft(idx, "email", e.target.value)}
-                                placeholder="e.g. hasan@example.com"
-                                className="w-full h-8.5 px-2.5 rounded-lg border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <label className="font-bold text-foreground">Experience & Notice</label>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                <input
-                                  type="text"
-                                  value={draft.experience}
-                                  onChange={(e) => handleUpdateCandidateDraft(idx, "experience", e.target.value)}
-                                  placeholder="4.0 Yrs"
-                                  className="w-full h-8.5 px-2 rounded-lg border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                                />
-                                <input
-                                  type="text"
-                                  value={draft.noticePeriod}
-                                  onChange={(e) => handleUpdateCandidateDraft(idx, "noticePeriod", e.target.value)}
-                                  placeholder="Immediate"
-                                  className="w-full h-8.5 px-2 rounded-lg border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* PDF CV Upload Component for Candidate */}
-                          <div className="pt-2">
-                            <label className="font-bold text-foreground block mb-1">
-                              Candidate Curriculum Vitae (.pdf upload)
-                            </label>
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl border border-dashed border-border bg-card/80 hover:border-primary/40 transition">
-                              <div className="flex items-center gap-2.5">
-                                <div className="p-2 bg-red-500/10 text-red-500 rounded-lg shrink-0">
-                                  <FileText className="size-4" />
-                                </div>
-                                <div className="min-w-0">
-                                  {draft.isCustomPdf ? (
-                                    <div className="flex items-center gap-1.5 font-bold text-emerald-700 dark:text-emerald-400 truncate">
-                                      <CheckCircle2 className="size-3.5 text-emerald-600 shrink-0" />
-                                      <span className="truncate">{draft.pdfFileName}</span>
-                                      <span className="text-[10px] text-muted-foreground font-mono">
-                                        ({draft.fileSizeLabel})
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    <div className="text-xs font-semibold text-foreground truncate">
-                                      <span>Attached Default: </span>
-                                      <strong className="text-primary font-mono">{draft.pdfFileName}</strong>
-                                      <span className="text-[10px] text-muted-foreground font-mono ml-1">
-                                        (809 KB verified template)
-                                      </span>
-                                    </div>
+                                  {newJobCandidates.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveCandidateRow(idx)}
+                                      className="p-1 text-muted-foreground hover:text-red-500 rounded hover:bg-red-500/10 transition cursor-pointer"
+                                      title="Remove candidate"
+                                    >
+                                      <Trash2 className="size-3.5" />
+                                    </button>
                                   )}
-                                  <div className="text-[10px] text-muted-foreground">
-                                    {draft.isCustomPdf
-                                      ? "Custom PDF CV loaded successfully for this applicant."
-                                      : "Click 'Upload Custom PDF' to replace with the applicant's official document."}
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                  <div className="space-y-1 sm:col-span-2 md:col-span-1">
+                                    <label className="font-normal text-muted-foreground flex items-center gap-1">
+                                      <span>Candidate Full Name</span>
+                                      <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={draft.name}
+                                      onChange={(e) => handleUpdateCandidateDraft(idx, "name", e.target.value)}
+                                      placeholder="e.g. Md. Hasan Ali"
+                                      className="w-full h-8 px-2.5 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                                    />
+                                  </div>
+
+                                  <div className="space-y-1">
+                                    <label className="font-normal text-muted-foreground">Previous Salary (৳)</label>
+                                    <input
+                                      type="number"
+                                      value={draft.previousSalary || ""}
+                                      onChange={(e) => handleUpdateCandidateDraft(idx, "previousSalary", e.target.value)}
+                                      placeholder="e.g. 28000"
+                                      className="w-full h-8 px-2.5 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                                    />
+                                  </div>
+
+                                  <div className="space-y-1">
+                                    <div className="flex items-center justify-between">
+                                      <label className="font-normal text-emerald-600 dark:text-emerald-400">
+                                        Agreed Salary (৳)
+                                      </label>
+                                      {prevSal > 0 && agrSal > 0 && (
+                                        <span className={`text-[10px] font-normal ${diffSal >= 0 ? "text-emerald-600" : "text-amber-600"}`}>
+                                          {diffSal >= 0 ? `+৳${diffSal.toLocaleString()} (+${diffPercent}%)` : `-৳${Math.abs(diffSal).toLocaleString()}`}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <input
+                                      type="number"
+                                      value={draft.agreedSalary || ""}
+                                      onChange={(e) => handleUpdateCandidateDraft(idx, "agreedSalary", e.target.value)}
+                                      placeholder="e.g. 35000"
+                                      className="w-full h-8 px-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/[0.02] text-xs font-normal text-emerald-700 dark:text-emerald-400 outline-none focus:border-emerald-500"
+                                    />
+                                  </div>
+
+                                  <div className="space-y-1">
+                                    <label className="font-normal text-muted-foreground">Phone Number</label>
+                                    <input
+                                      type="text"
+                                      value={draft.phone}
+                                      onChange={(e) => handleUpdateCandidateDraft(idx, "phone", e.target.value)}
+                                      placeholder="e.g. +880 1711-000000"
+                                      className="w-full h-8 px-2.5 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                                    />
+                                  </div>
+
+                                  <div className="space-y-1">
+                                    <label className="font-normal text-muted-foreground">Email Address</label>
+                                    <input
+                                      type="email"
+                                      value={draft.email}
+                                      onChange={(e) => handleUpdateCandidateDraft(idx, "email", e.target.value)}
+                                      placeholder="e.g. hasan@example.com"
+                                      className="w-full h-8 px-2.5 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                                    />
+                                  </div>
+
+                                  <div className="space-y-1">
+                                    <label className="font-normal text-muted-foreground">Experience & Notice</label>
+                                    <div className="grid grid-cols-2 gap-1.5">
+                                      <input
+                                        type="text"
+                                        value={draft.experience}
+                                        onChange={(e) => handleUpdateCandidateDraft(idx, "experience", e.target.value)}
+                                        placeholder="4.0 Yrs"
+                                        className="w-full h-8 px-2 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                                      />
+                                      <input
+                                        type="text"
+                                        value={draft.noticePeriod}
+                                        onChange={(e) => handleUpdateCandidateDraft(idx, "noticePeriod", e.target.value)}
+                                        placeholder="Immediate"
+                                        className="w-full h-8 px-2 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* PDF CV Document Attachment for Candidate */}
+                                <div className="pt-1.5">
+                                  <label className="font-normal text-muted-foreground block mb-1">
+                                    Attached Curriculum Vitae (.pdf document)
+                                  </label>
+                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-2.5 rounded-lg border border-dashed border-border bg-card/80 hover:border-primary/40 transition">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                      <div className="p-1.5 bg-red-500/10 text-red-500 rounded-md shrink-0">
+                                        <FileText className="size-3.5" />
+                                      </div>
+                                      <div className="min-w-0">
+                                        {draft.isCustomPdf ? (
+                                          <div className="flex items-center gap-1.5 font-normal text-emerald-700 dark:text-emerald-400 truncate">
+                                            <CheckCircle2 className="size-3 text-emerald-600 shrink-0" />
+                                            <span className="truncate">{draft.pdfFileName}</span>
+                                            <span className="text-[10px] text-muted-foreground">
+                                              ({draft.fileSizeLabel})
+                                            </span>
+                                          </div>
+                                        ) : (
+                                          <div className="text-xs font-normal text-foreground truncate">
+                                            <span>Default Template: </span>
+                                            <span className="text-primary">{draft.pdfFileName}</span>
+                                            <span className="text-[10px] text-muted-foreground ml-1">
+                                              (809 KB verified template)
+                                            </span>
+                                          </div>
+                                        )}
+                                        <div className="text-[10px] text-muted-foreground font-normal">
+                                          {draft.isCustomPdf
+                                            ? "Custom PDF CV attached and ready for evaluator review."
+                                            : "Tahmid Afsar Shapno PDF details loaded by default. You can upload applicant's specific CV."}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                                      <a
+                                        href={draft.pdfUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="h-7.5 px-2.5 rounded-lg bg-muted hover:bg-muted/80 text-foreground border border-border/60 text-xs font-normal transition flex items-center gap-1"
+                                        title="Preview PDF CV"
+                                      >
+                                        <Eye className="size-3 text-primary" />
+                                        <span>Preview PDF</span>
+                                      </a>
+
+                                      <label className="h-7.5 px-3 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-normal transition flex items-center gap-1.5 cursor-pointer">
+                                        <Upload className="size-3" />
+                                        <span>{draft.isCustomPdf ? "Change PDF" : "Upload Custom PDF"}</span>
+                                        <input
+                                          type="file"
+                                          accept=".pdf"
+                                          className="hidden"
+                                          onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) handleCandidateFileUpload(idx, file, false);
+                                          }}
+                                        />
+                                      </label>
+
+                                      {draft.isCustomPdf && (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            handleUpdateCandidateDraft(idx, "pdfFileName", "Tahmid Afsar Shapno-details_.pdf");
+                                            handleUpdateCandidateDraft(idx, "pdfUrl", "/Tahmid%20Afsar%20Shapno-details_.pdf");
+                                            handleUpdateCandidateDraft(idx, "isCustomPdf", false);
+                                            handleUpdateCandidateDraft(idx, "fileSizeLabel", "809 KB (Default)");
+                                            toast.info("Reset to default PDF CV template.");
+                                          }}
+                                          className="h-7.5 px-2.5 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground text-xs font-normal transition cursor-pointer"
+                                          title="Reset to default PDF"
+                                        >
+                                          Reset Default
+                                        </button>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-
-                              <div className="flex items-center gap-2 shrink-0">
-                                <label className="h-8 px-3 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
-                                  <Upload className="size-3" />
-                                  <span>{draft.isCustomPdf ? "Change PDF" : "Upload Custom PDF"}</span>
-                                  <input
-                                    type="file"
-                                    accept=".pdf"
-                                    className="hidden"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) handleCandidateFileUpload(idx, file, false);
-                                    }}
-                                  />
-                                </label>
-                                {draft.isCustomPdf && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      handleUpdateCandidateDraft(idx, "pdfFileName", "Tahmid Afsar Shapno-details_.pdf");
-                                      handleUpdateCandidateDraft(idx, "pdfUrl", "/Tahmid%20Afsar%20Shapno-details_.pdf");
-                                      handleUpdateCandidateDraft(idx, "isCustomPdf", false);
-                                      handleUpdateCandidateDraft(idx, "fileSizeLabel", "809 KB (Default)");
-                                      toast.info("Reset to default PDF CV.");
-                                    }}
-                                    className="h-8 px-2.5 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground text-xs font-semibold transition"
-                                    title="Reset to default PDF"
-                                  >
-                                    Reset Default
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          </div>
+                            );
+                          })}
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Modal Actions Footer */}
-                <div className="p-4 border-t border-border/60 bg-muted/20 flex items-center justify-between gap-3 shrink-0">
-                  <div className="text-xs text-muted-foreground">
-                    Candidates added here will be immediately enrolled and selectable under this job.
+                <div className="p-3.5 sm:p-4 border-t border-border/60 bg-muted/15 flex items-center justify-between gap-3 shrink-0">
+                  <div className="flex items-center gap-2">
+                    {addJobModalStep === 2 ? (
+                      <button
+                        type="button"
+                        onClick={() => setAddJobModalStep(1)}
+                        className="h-8 px-3 bg-muted hover:bg-muted/80 text-foreground text-xs font-normal rounded-lg transition flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <ArrowLeft className="size-3" />
+                        <span>Back to Job Details</span>
+                      </button>
+                    ) : (
+                      <span className="text-xs text-muted-foreground font-normal">
+                        Step 1 of 2: Define position & budget parameters
+                      </span>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2.5">
+
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setShowAddJobModal(false)}
-                      className="h-9 px-4 bg-muted hover:bg-muted/80 text-foreground text-xs font-bold rounded-xl transition cursor-pointer"
+                      onClick={() => {
+                        setShowAddJobModal(false);
+                        setAddJobModalStep(1);
+                      }}
+                      className="h-8 px-3.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-normal rounded-lg transition cursor-pointer"
                     >
                       Cancel
                     </button>
-                    <button
-                      type="submit"
-                      className="h-9 px-5 bg-primary hover:opacity-95 text-primary-foreground text-xs font-black rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Plus className="size-3.5" />
-                      <span>Create Job & Attach Candidates</span>
-                    </button>
+
+                    {addJobModalStep === 1 ? (
+                      <button
+                        type="button"
+                        onClick={handleProceedToStep2}
+                        className="h-8 px-4 bg-primary hover:opacity-95 text-primary-foreground text-xs font-normal rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <span>Next: Candidate Enrollment</span>
+                        <ArrowRight className="size-3.5" />
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="h-8 px-4 bg-primary hover:opacity-95 text-primary-foreground text-xs font-normal rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Check className="size-3.5" />
+                        <span>Create Position & Enroll Candidates</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </form>
@@ -3293,17 +3478,17 @@ function CandidateSelectionPage() {
         {/* ─── MODAL 5: ADD CANDIDATE DIRECTLY TO EXISTING JOB ────────────────── */}
         {addingCandidateToJob && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-4 overflow-y-auto">
-            <div className="bg-card w-full max-w-xl rounded-2xl shadow-2xl border border-border/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-              <div className="p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between">
+            <div className="bg-card w-full max-w-xl rounded-xl shadow-2xl border border-border/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              <div className="p-4 sm:p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2.5 bg-primary/10 text-primary rounded-xl">
-                    <UserCheck className="size-5" />
+                  <div className="p-2 bg-primary/10 text-primary rounded-lg">
+                    <UserCheck className="size-4.5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-foreground">
+                    <h3 className="text-sm font-medium text-foreground">
                       Add Candidate to {addingCandidateToJob.title}
                     </h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5 font-normal">
                       {addingCandidateToJob.id} · {addingCandidateToJob.department}
                     </p>
                   </div>
@@ -3313,14 +3498,14 @@ function CandidateSelectionPage() {
                   onClick={() => setAddingCandidateToJob(null)}
                   className="size-8 rounded-lg text-muted-foreground hover:bg-muted flex items-center justify-center cursor-pointer"
                 >
-                  <XCircle className="size-5" />
+                  <XCircle className="size-4.5" />
                 </button>
               </div>
 
               <form onSubmit={handleAddCandidateToExistingJob}>
-                <div className="p-6 space-y-4 text-xs">
+                <div className="p-5 sm:p-6 space-y-3.5 text-xs">
                   <div className="space-y-1.5">
-                    <label className="font-bold text-foreground">Candidate Full Name *</label>
+                    <label className="font-normal text-muted-foreground">Candidate Full Name *</label>
                     <input
                       type="text"
                       required
@@ -3329,13 +3514,13 @@ function CandidateSelectionPage() {
                         setSingleCandidateDraft((prev) => ({ ...prev, name: e.target.value }))
                       }
                       placeholder="e.g. Md. Zahid Hasan"
-                      className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
+                      className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div className="space-y-1.5">
-                      <label className="font-bold text-foreground">Previous Salary (BDT ৳)</label>
+                      <label className="font-normal text-muted-foreground">Previous Salary (BDT ৳)</label>
                       <input
                         type="number"
                         value={singleCandidateDraft.previousSalary || ""}
@@ -3346,12 +3531,12 @@ function CandidateSelectionPage() {
                           }))
                         }
                         placeholder="e.g. 30000"
-                        className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-mono font-bold text-foreground outline-none focus:border-primary/50"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-bold text-emerald-600 dark:text-emerald-400">
+                      <label className="font-normal text-emerald-600 dark:text-emerald-400">
                         Agreed Salary (BDT ৳)
                       </label>
                       <input
@@ -3364,14 +3549,14 @@ function CandidateSelectionPage() {
                           }))
                         }
                         placeholder="e.g. 38000"
-                        className="w-full h-9.5 px-3 rounded-xl border border-emerald-500/40 bg-emerald-500/[0.03] text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 outline-none focus:border-emerald-500"
+                        className="w-full h-8.5 px-3 rounded-lg border border-emerald-500/30 bg-emerald-500/[0.02] text-xs font-normal text-emerald-700 dark:text-emerald-400 outline-none focus:border-emerald-500"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div className="space-y-1.5">
-                      <label className="font-bold text-foreground">Phone Number</label>
+                      <label className="font-normal text-muted-foreground">Phone Number</label>
                       <input
                         type="text"
                         value={singleCandidateDraft.phone}
@@ -3379,12 +3564,12 @@ function CandidateSelectionPage() {
                           setSingleCandidateDraft((prev) => ({ ...prev, phone: e.target.value }))
                         }
                         placeholder="e.g. +880 1711-223344"
-                        className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-bold text-foreground">Email Address</label>
+                      <label className="font-normal text-muted-foreground">Email Address</label>
                       <input
                         type="email"
                         value={singleCandidateDraft.email}
@@ -3392,14 +3577,14 @@ function CandidateSelectionPage() {
                           setSingleCandidateDraft((prev) => ({ ...prev, email: e.target.value }))
                         }
                         placeholder="e.g. zahid@example.com"
-                        className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div className="space-y-1.5">
-                      <label className="font-bold text-foreground">Total Experience</label>
+                      <label className="font-normal text-muted-foreground">Total Experience</label>
                       <input
                         type="text"
                         value={singleCandidateDraft.experience}
@@ -3407,12 +3592,12 @@ function CandidateSelectionPage() {
                           setSingleCandidateDraft((prev) => ({ ...prev, experience: e.target.value }))
                         }
                         placeholder="e.g. 5.0 Years"
-                        className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-bold text-foreground">Notice Period</label>
+                      <label className="font-normal text-muted-foreground">Notice Period</label>
                       <input
                         type="text"
                         value={singleCandidateDraft.noticePeriod}
@@ -3420,22 +3605,22 @@ function CandidateSelectionPage() {
                           setSingleCandidateDraft((prev) => ({ ...prev, noticePeriod: e.target.value }))
                         }
                         placeholder="e.g. Immediate or 15 Days"
-                        className="w-full h-9.5 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary/50"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
                       />
                     </div>
                   </div>
 
                   {/* PDF CV Upload */}
                   <div className="space-y-1.5 pt-1">
-                    <label className="font-bold text-foreground">Curriculum Vitae (.pdf)</label>
-                    <div className="flex items-center justify-between gap-3 p-3 rounded-xl border border-dashed border-border bg-muted/30">
+                    <label className="font-normal text-muted-foreground">Curriculum Vitae (.pdf)</label>
+                    <div className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-dashed border-border bg-muted/20">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <FileText className="size-4 text-red-500 shrink-0" />
+                        <FileText className="size-3.5 text-red-500 shrink-0" />
                         <div className="min-w-0">
-                          <div className="font-bold text-foreground truncate">
+                          <div className="font-normal text-foreground truncate">
                             {singleCandidateDraft.pdfFileName}
                           </div>
-                          <div className="text-[10px] text-muted-foreground">
+                          <div className="text-[10px] text-muted-foreground font-normal">
                             {singleCandidateDraft.isCustomPdf
                               ? `Custom PDF Attached (${singleCandidateDraft.fileSizeLabel})`
                               : "Default PDF Template Loaded (809 KB)"}
@@ -3443,7 +3628,7 @@ function CandidateSelectionPage() {
                         </div>
                       </div>
 
-                      <label className="h-8 px-3 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0">
+                      <label className="h-7.5 px-3 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-normal transition flex items-center gap-1.5 cursor-pointer shrink-0">
                         <Upload className="size-3" />
                         <span>Upload PDF</span>
                         <input
@@ -3460,17 +3645,17 @@ function CandidateSelectionPage() {
                   </div>
                 </div>
 
-                <div className="p-4 border-t border-border/60 bg-muted/10 flex items-center justify-end gap-2.5">
+                <div className="p-3.5 sm:p-4 border-t border-border/60 bg-muted/15 flex items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => setAddingCandidateToJob(null)}
-                    className="h-9 px-4 bg-muted hover:bg-muted/80 text-foreground text-xs font-bold rounded-xl transition cursor-pointer"
+                    className="h-8 px-3.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-normal rounded-lg transition cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="h-9 px-5 bg-primary hover:opacity-95 text-primary-foreground text-xs font-black rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                    className="h-8 px-4 bg-primary hover:opacity-95 text-primary-foreground text-xs font-normal rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                   >
                     <Plus className="size-3.5" />
                     <span>Add Candidate to Job</span>
