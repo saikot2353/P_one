@@ -347,6 +347,12 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/recruitment-basic-list",
     description: "List of candidates",
   },
+  {
+    label: "Candidate Selection",
+    parent: "e-Recruitment",
+    to: "/recruitment-candidate-selection",
+    description: "Job-wise candidate review, selection & link generation",
+  },
   // {
   //   label: "Approved Candidates",
   //   parent: "e-Recruitment",

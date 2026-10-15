@@ -303,6 +303,7 @@ import { Route as RecruitmentBasicEntryRouteImport } from './routes/recruitment-
 import { Route as RecruitmentBasicInfoListRouteImport } from './routes/recruitment-basic-info-list'
 import { Route as RecruitmentBasicListRouteImport } from './routes/recruitment-basic-list'
 import { Route as RecruitmentBasicSetupRouteImport } from './routes/recruitment-basic-setup'
+import { Route as RecruitmentCandidateSelectionRouteImport } from './routes/recruitment-candidate-selection'
 import { Route as RecruitmentConfigurationRouteImport } from './routes/recruitment-configuration'
 import { Route as RecruitmentHrListRouteImport } from './routes/recruitment-hr-list'
 import { Route as RecruitmentIeListRouteImport } from './routes/recruitment-ie-list'
@@ -1916,6 +1917,12 @@ const RecruitmentBasicSetupRoute = RecruitmentBasicSetupRouteImport.update({
   path: '/recruitment-basic-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecruitmentCandidateSelectionRoute =
+  RecruitmentCandidateSelectionRouteImport.update({
+    id: '/recruitment-candidate-selection',
+    path: '/recruitment-candidate-selection',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const RecruitmentConfigurationRoute =
   RecruitmentConfigurationRouteImport.update({
     id: '/recruitment-configuration',
@@ -2475,6 +2482,7 @@ export interface FileRoutesByFullPath {
   '/recruitment-basic-info-list': typeof RecruitmentBasicInfoListRoute
   '/recruitment-basic-list': typeof RecruitmentBasicListRoute
   '/recruitment-basic-setup': typeof RecruitmentBasicSetupRoute
+  '/recruitment-candidate-selection': typeof RecruitmentCandidateSelectionRoute
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
@@ -2821,6 +2829,7 @@ export interface FileRoutesByTo {
   '/recruitment-basic-info-list': typeof RecruitmentBasicInfoListRoute
   '/recruitment-basic-list': typeof RecruitmentBasicListRoute
   '/recruitment-basic-setup': typeof RecruitmentBasicSetupRoute
+  '/recruitment-candidate-selection': typeof RecruitmentCandidateSelectionRoute
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
@@ -3168,6 +3177,7 @@ export interface FileRoutesById {
   '/recruitment-basic-info-list': typeof RecruitmentBasicInfoListRoute
   '/recruitment-basic-list': typeof RecruitmentBasicListRoute
   '/recruitment-basic-setup': typeof RecruitmentBasicSetupRoute
+  '/recruitment-candidate-selection': typeof RecruitmentCandidateSelectionRoute
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
@@ -3516,6 +3526,7 @@ export interface FileRouteTypes {
     | '/recruitment-basic-info-list'
     | '/recruitment-basic-list'
     | '/recruitment-basic-setup'
+    | '/recruitment-candidate-selection'
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
@@ -3862,6 +3873,7 @@ export interface FileRouteTypes {
     | '/recruitment-basic-info-list'
     | '/recruitment-basic-list'
     | '/recruitment-basic-setup'
+    | '/recruitment-candidate-selection'
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
@@ -4208,6 +4220,7 @@ export interface FileRouteTypes {
     | '/recruitment-basic-info-list'
     | '/recruitment-basic-list'
     | '/recruitment-basic-setup'
+    | '/recruitment-candidate-selection'
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
@@ -4555,6 +4568,7 @@ export interface RootRouteChildren {
   RecruitmentBasicInfoListRoute: typeof RecruitmentBasicInfoListRoute
   RecruitmentBasicListRoute: typeof RecruitmentBasicListRoute
   RecruitmentBasicSetupRoute: typeof RecruitmentBasicSetupRoute
+  RecruitmentCandidateSelectionRoute: typeof RecruitmentCandidateSelectionRoute
   RecruitmentConfigurationRoute: typeof RecruitmentConfigurationRoute
   RecruitmentHrListRoute: typeof RecruitmentHrListRoute
   RecruitmentIeListRoute: typeof RecruitmentIeListRoute
@@ -6667,6 +6681,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecruitmentBasicSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recruitment-candidate-selection': {
+      id: '/recruitment-candidate-selection'
+      path: '/recruitment-candidate-selection'
+      fullPath: '/recruitment-candidate-selection'
+      preLoaderRoute: typeof RecruitmentCandidateSelectionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/recruitment-configuration': {
       id: '/recruitment-configuration'
       path: '/recruitment-configuration'
@@ -7327,6 +7348,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecruitmentBasicInfoListRoute: RecruitmentBasicInfoListRoute,
   RecruitmentBasicListRoute: RecruitmentBasicListRoute,
   RecruitmentBasicSetupRoute: RecruitmentBasicSetupRoute,
+  RecruitmentCandidateSelectionRoute: RecruitmentCandidateSelectionRoute,
   RecruitmentConfigurationRoute: RecruitmentConfigurationRoute,
   RecruitmentHrListRoute: RecruitmentHrListRoute,
   RecruitmentIeListRoute: RecruitmentIeListRoute,

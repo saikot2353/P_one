@@ -249,6 +249,7 @@ export const nav: NavItem[] = [
     icon: UserPlus,
     subitems: [
       { label: "Application Queue", to: "/recruitment-basic-list" },
+      { label: "Candidate Selection", to: "/recruitment-candidate-selection" },
       // { label: "Settings", to: "/recruitment-settings" },
       // { label: "Approved List", to: "/recruitment-assessment-list" },
     ],
