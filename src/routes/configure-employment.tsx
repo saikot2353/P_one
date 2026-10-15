@@ -25,6 +25,7 @@ import {
   Calculator,
   DollarSign,
   Coins,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import { OtFormulaTab } from "@/components/ot/OtFormulaTab";
@@ -44,7 +45,7 @@ export const Route = createFileRoute("/configure-employment")({
   component: EmploymentSetupPage,
 });
 
-type TabType =
+export type TabType =
   | "designationGroup"
   | "jobTitle"
   | "empType"
@@ -55,6 +56,14 @@ type TabType =
   | "place"
   | "salaryStructure"
   | "otFormula";
+
+export interface EmploymentSetupViewProps {
+  initialTab?: TabType;
+  embedded?: boolean;
+  allowedTabs?: TabType[];
+  onTabChange?: (tab: TabType) => void;
+  onBackToOverview?: () => void;
+}
 
 // ----------------------------------------------------
 // Interfaces
@@ -1695,9 +1704,21 @@ export const DEFAULT_PLACES: PlaceInBD[] = [
   },
 ];
 
-function EmploymentSetupPage() {
-  const [activeTab, setActiveTab] = useState<TabType>("designationGroup");
+export function EmploymentSetupView({
+  initialTab = "designationGroup",
+  embedded = false,
+  allowedTabs,
+  onTabChange,
+  onBackToOverview,
+}: EmploymentSetupViewProps) {
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab || "designationGroup");
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   // Lists state
   const [designations, setDesignations] = useState<DesignationGroup[]>([]);
@@ -1766,7 +1787,7 @@ function EmploymentSetupPage() {
   const [triggerAddSalary, setTriggerAddSalary] = useState(0);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (!embedded && typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get("tab") as TabType;
       if (
@@ -2373,7 +2394,7 @@ function EmploymentSetupPage() {
     "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0 cursor-pointer";
 
   // Tab Header Items
-  const tabsList: { type: TabType; label: string; icon: any }[] = [
+  const allTabsList: { type: TabType; label: string; icon: any }[] = [
     { type: "designationGroup", label: "Designation Group", icon: Shield },
     { type: "empType", label: "Employee Type", icon: UserCheck },
     { type: "grade", label: "Grade", icon: Briefcase },
@@ -2386,96 +2407,133 @@ function EmploymentSetupPage() {
     { type: "otFormula", label: "OT Configuration (Formula)", icon: Calculator },
   ];
 
-  return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
-      <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative">
-        <Topbar />
+  const tabsList = allowedTabs
+    ? allTabsList.filter((t) => allowedTabs.includes(t.type))
+    : allTabsList;
 
-        <div className="p-4 md:p-6 lg:p-8 space-y-2 max-w-[1800px] mx-auto w-full">
-          {/* Breadcrumb & Header */}
+  const actionButtons = (
+    <div className="flex flex-col sm:flex-row gap-3">
+      {activeTab === "designationGroup" && (
+        <>
+          <button
+            onClick={() => {
+              setAvailableList(DEFAULT_DESIGNATIONS_POOL);
+              setOrderedList([]);
+              setAvailableSearchQuery("");
+              setIsFreshOrderModalOpen(true);
+            }}
+            className="h-10 px-5 rounded-lg border border-[#e2e8f0] dark:border-slate-800 bg-transparent hover:bg-[#cbd5e1] dark:hover:bg-slate-800 text-[#0f172a] dark:text-slate-200 font-extrabold text-xs transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer border-dashed"
+          >
+            <Briefcase className="size-4 text-primary" /> Fresh Designation Order
+          </button>
+          <button
+            onClick={() => {
+              setTempDesignations(designations);
+              setIsReorderModalOpen(true);
+            }}
+            className="h-10 px-5 rounded-lg border border-border/80 bg-card text-foreground font-black text-xs hover:bg-muted transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer"
+          >
+            <SlidersHorizontal className="size-4" /> Reorder Designations
+          </button>
+        </>
+      )}
+      <button
+        onClick={() => {
+          if (activeTab === "otFormula") {
+            setTriggerAddOt((prev) => prev + 1);
+          } else if (activeTab === "salaryStructure") {
+            setTriggerAddSalary((prev) => prev + 1);
+          } else {
+            openForm(null);
+          }
+        }}
+        className="h-10 px-5 rounded-lg bg-primary text-primary-foreground font-black text-xs hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer"
+      >
+        <Plus className="size-4.5" /> Add New Record
+      </button>
+    </div>
+  );
+
+  const content = (
+    <div className={embedded ? "space-y-4 w-full" : "p-4 md:p-6 lg:p-8 space-y-2 max-w-[1800px] mx-auto w-full"}>
+      {/* Breadcrumb & Header */}
+      {embedded ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={onBackToOverview}
+              className="inline-flex items-center gap-2 text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="size-4" />
+              <span>Back to Master Overview</span>
+            </button>
+
+            <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-md">
+              Category: People & Contacts
+            </span>
+          </div>
+
           <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">
-                  Home
-                </Link>
+                <span>People & Contacts</span>
                 <ChevronRight className="size-3.5" />
-                <span>Configure</span>
-                <ChevronRight className="size-3.5" />
-                <span className="text-primary font-bold">Job & Employee Setup</span>
+                <span className="text-primary font-bold">Designation & Position Management</span>
               </div>
               <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-                <UserCheck className="size-6 text-primary" />
-                Job & Employee Configuration
+                <Award className="size-6 text-primary" />
+                Designation & Position Management
               </h1>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              {activeTab === "designationGroup" && (
-                <>
-                  <button
-                    onClick={() => {
-                      setAvailableList(DEFAULT_DESIGNATIONS_POOL);
-                      setOrderedList([]);
-                      setAvailableSearchQuery("");
-                      setIsFreshOrderModalOpen(true);
-                    }}
-                    className="h-10 px-5 rounded-lg border border-[#e2e8f0] dark:border-slate-800 bg-transparent hover:bg-[#cbd5e1] dark:hover:bg-slate-800 text-[#0f172a] dark:text-slate-200 font-extrabold text-xs transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer border-dashed"
-                  >
-                    <Briefcase className="size-4 text-primary" /> Fresh Designation Order
-                  </button>
-                  <button
-                    onClick={() => {
-                      setTempDesignations(designations);
-                      setIsReorderModalOpen(true);
-                    }}
-                    className="h-10 px-5 rounded-lg border border-border/80 bg-card text-foreground font-black text-xs hover:bg-muted transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer"
-                  >
-                    <SlidersHorizontal className="size-4" /> Reorder Designations
-                  </button>
-                </>
-              )}
-              <button
-                onClick={() => {
-                  if (activeTab === "otFormula") {
-                    setTriggerAddOt((prev) => prev + 1);
-                  } else if (activeTab === "salaryStructure") {
-                    setTriggerAddSalary((prev) => prev + 1);
-                  } else {
-                    openForm(null);
-                  }
-                }}
-                className="h-10 px-5 rounded-lg bg-primary text-primary-foreground font-black text-xs hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer"
-              >
-                <Plus className="size-4.5" /> Add New Record
-              </button>
+            {actionButtons}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
+              <Link to="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+              <ChevronRight className="size-3.5" />
+              <span>Configure</span>
+              <ChevronRight className="size-3.5" />
+              <span className="text-primary font-bold">Job & Employee Setup</span>
             </div>
+            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <UserCheck className="size-6 text-primary" />
+              Job & Employee Configuration
+            </h1>
           </div>
+          {actionButtons}
+        </div>
+      )}
 
-          {/* Horizontal Master Tabs */}
-          <div className="flex flex-wrap gap-2 pt-2 pb-5 border-b border-border/40 mb-4">
-            {tabsList.map((tab) => {
-              const TabIcon = tab.icon;
-              const isActive = activeTab === tab.type;
-              return (
-                <button
-                  key={tab.type}
-                  onClick={() => {
-                    setActiveTab(tab.type);
-                    setSearchQuery("");
-                  }}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                    isActive
-                      ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                      : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
-                  }`}
-                >
-                  <TabIcon className="size-4" />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+      {/* Horizontal Master Tabs */}
+      <div className="flex flex-wrap gap-2 pt-2 pb-5 border-b border-border/40 mb-4">
+        {tabsList.map((tab) => {
+          const TabIcon = tab.icon;
+          const isActive = activeTab === tab.type;
+          return (
+            <button
+              key={tab.type}
+              onClick={() => {
+                setActiveTab(tab.type);
+                setSearchQuery("");
+                onTabChange?.(tab.type);
+              }}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                isActive
+                  ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                  : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
+              }`}
+            >
+              <TabIcon className="size-4" />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
 
           {/* Search bar & Actions toolbar */}
           <div className="bg-card rounded-2xl border border-border/50 p-4 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
@@ -3252,8 +3310,11 @@ function EmploymentSetupPage() {
           </div>
           )}
         </div>
+  );
 
-        {/* Master Modal Router */}
+  const renderModals = () => (
+    <>
+      {/* Master Modal Router */}
         {isFormOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
             <div className="bg-card w-full max-w-2xl rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
@@ -4701,7 +4762,30 @@ function EmploymentSetupPage() {
               </div>
             );
           })()}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="w-full relative">
+        {content}
+        {renderModals()}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
+      <Sidebar />
+      <main className="flex-1 min-w-0 flex flex-col relative">
+        <Topbar />
+        {content}
+        {renderModals()}
       </main>
     </div>
   );
+}
+
+export function EmploymentSetupPage() {
+  return <EmploymentSetupView />;
 }

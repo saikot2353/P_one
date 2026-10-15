@@ -132,7 +132,6 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "designation-position",
     description: "Manage designations, job positions, grades, levels & organizational reporting.",
     icon: Award,
-    isSoon: true,
   },
   {
     label: "Shift & Work Schedule Management",
@@ -141,7 +140,6 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description:
       "Define factory shifts, general shifts, roster rotations, Ramzan timing, grace periods & overtime cutoff rules.",
     icon: Clock4,
-    isSoon: true,
   },
   {
     label: "Contact Management",
@@ -168,7 +166,6 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "supplier-management",
     description: "Supplier & vendor profiles, contact details, registrations & classifications.",
     icon: Truck,
-    isSoon: true,
   },
   {
     label: "Customer Management",
@@ -218,7 +215,6 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "brand-manufacturer",
     description: "Product brands, brand owners, manufacturers & identification.",
     icon: BadgeCheck,
-    isSoon: true,
   },
   {
     label: "Product Variant Management",
@@ -280,7 +276,6 @@ export const masterSearchableItems: MasterSearchItem[] = [
     description:
       "Manage financial years, statutory tax years, fiscal quarters, monthly closing periods & accounting lock dates.",
     icon: CalendarRange,
-    isSoon: true,
   },
   {
     label: "Bank & Bank Branch Management",
@@ -288,7 +283,6 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "bank-branch",
     description: "Bank & branch info for payments, payroll disbursement & accounts.",
     icon: Landmark,
-    isSoon: true,
   },
   {
     label: "Currency & Exchange Rate Management",
@@ -296,7 +290,6 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "currency-exchange",
     description: "Currencies, exchange rates, validity dates & international financial terms.",
     icon: Coins,
-    isSoon: true,
   },
   {
     label: "Payment Terms Management",
@@ -304,7 +297,6 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "payment-terms",
     description: "Payment conditions, credit periods, due-date rules & settlement terms.",
     icon: CalendarClock,
-    isSoon: true,
   },
   {
     label: "Payment Method Management",
@@ -312,7 +304,6 @@ export const masterSearchableItems: MasterSearchItem[] = [
     tabKey: "payment-methods",
     description: "Payment channels: cash, bank transfer, cheque, digital wallets.",
     icon: CreditCard,
-    isSoon: true,
   },
   /* Hidden as per requirement:
   {

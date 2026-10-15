@@ -4,7 +4,16 @@ import { OrgMasterSidebar, orgMasterNavGroups } from "@/components/dashboard/Org
 import { OrgMasterTopbar, masterSearchableItems } from "@/components/dashboard/OrgMasterTopbar";
 import { CompanySetupView, type TabType as CompanySetupTabType } from "@/routes/company-setup";
 import { StructureSetupView, type TabType as StructureTabType } from "@/routes/configure-structure";
+import { TimeSetupView, type TabType as TimeSetupTabType } from "@/routes/configure-time";
+import { EmploymentSetupView, type TabType as EmploymentTabType } from "@/routes/configure-employment";
 import { LocationManagementView, type LocationTabType } from "@/components/organization/LocationManagementView";
+import { SupplierManagementView, type SupplierTabType } from "@/components/organization/SupplierManagementView";
+import { FinancialPeriodSetupView } from "@/components/organization/FinancialPeriodSetupView";
+import { BankBranchSetupView, type BankBranchTabType } from "@/components/organization/BankBranchSetupView";
+import { CurrencySetupView } from "@/components/organization/CurrencySetupView";
+import { PaymentTermsSetupView } from "@/components/organization/PaymentTermsSetupView";
+import { PaymentMethodsSetupView } from "@/components/organization/PaymentMethodsSetupView";
+import { BrandManufacturerSetupView } from "@/components/organization/BrandManufacturerSetupView";
 import { PersonnelListView } from "@/routes/personnel-list";
 import { AddEmployeeView } from "@/routes/add-employee";
 import {
@@ -213,6 +222,133 @@ function OrgMasterSetupPage() {
                     search: { tab: "company-management", subtab: newSubTab },
                   });
                 }}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "shift-schedule" ? (
+              <TimeSetupView
+                embedded={true}
+                initialTab={(subtab as TimeSetupTabType) || "shift"}
+                onTabChange={(newSubTab) => {
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: { tab: "shift-schedule", subtab: newSubTab },
+                  });
+                }}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "designation-position" ? (
+              <EmploymentSetupView
+                embedded={true}
+                allowedTabs={[
+                  "designationGroup",
+                  "empType",
+                  "grade",
+                  "nature",
+                  "jobTitle",
+                  "salaryStructure",
+                  "otFormula",
+                ]}
+                initialTab={(subtab as EmploymentTabType) || "designationGroup"}
+                onTabChange={(newSubTab) => {
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: { tab: "designation-position", subtab: newSubTab },
+                  });
+                }}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "supplier-management" ? (
+              <SupplierManagementView
+                embedded={true}
+                initialTab={(subtab as SupplierTabType) || "vendor-category"}
+                onTabChange={(newSubTab) => {
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: { tab: "supplier-management", subtab: newSubTab },
+                  });
+                }}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "fiscal-year-period" ? (
+              <FinancialPeriodSetupView
+                embedded={true}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "bank-branch" ? (
+              <BankBranchSetupView
+                embedded={true}
+                initialTab={(subtab as BankBranchTabType) || "branches"}
+                onTabChange={(newSubTab) => {
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: { tab: "bank-branch", subtab: newSubTab },
+                  });
+                }}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "currency-exchange" ? (
+              <CurrencySetupView
+                embedded={true}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "payment-terms" ? (
+              <PaymentTermsSetupView
+                embedded={true}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "payment-methods" ? (
+              <PaymentMethodsSetupView
+                embedded={true}
+                onBackToOverview={() =>
+                  navigate({
+                    to: "/organization-master-setup",
+                    search: {},
+                  })
+                }
+              />
+            ) : currentActiveItem.tabKey === "brand-manufacturer" ? (
+              <BrandManufacturerSetupView
+                embedded={true}
                 onBackToOverview={() =>
                   navigate({
                     to: "/organization-master-setup",

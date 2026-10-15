@@ -21,6 +21,7 @@ import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-inc
 import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increment-hr'
 import { Route as ApproveOvertimeRouteImport } from './routes/approve-overtime'
 import { Route as BankSheetExecRouteImport } from './routes/bank-sheet-exec'
+import { Route as BanksRouteImport } from './routes/banks'
 import { Route as BudgetMyRequisitionsRouteImport } from './routes/budget-my-requisitions'
 import { Route as BudgetOvertimeRouteImport } from './routes/budget-overtime'
 import { Route as BudgetPlanningRouteImport } from './routes/budget-planning'
@@ -46,6 +47,7 @@ import { Route as ConfigureStructureRouteImport } from './routes/configure-struc
 import { Route as ConfigureTaxRouteImport } from './routes/configure-tax'
 import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
+import { Route as CurrencySetupRouteImport } from './routes/currency-setup'
 import { Route as DeptWiseSalarySheetRouteImport } from './routes/dept-wise-salary-sheet'
 import { Route as DisciplinaryCaseFilesRouteImport } from './routes/disciplinary-case-files'
 import { Route as DisciplinaryLeftyRouteImport } from './routes/disciplinary-lefty'
@@ -349,6 +351,7 @@ import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-pr
 import { Route as YearlyBonusReportRouteImport } from './routes/yearly-bonus-report'
 import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
 import { Route as ZakatListRouteImport } from './routes/zakat-list'
+import { Route as AccountsConfigFinancialPeriodSetupRouteImport } from './routes/accounts-config.financial-period-setup'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
 import { Route as RecruitmentDetailIdRouteImport } from './routes/recruitment-detail.$id'
 import { Route as RecruitmentHrAssessmentIdRouteImport } from './routes/recruitment-hr-assessment.$id'
@@ -412,6 +415,11 @@ const ApproveOvertimeRoute = ApproveOvertimeRouteImport.update({
 const BankSheetExecRoute = BankSheetExecRouteImport.update({
   id: '/bank-sheet-exec',
   path: '/bank-sheet-exec',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BanksRoute = BanksRouteImport.update({
+  id: '/banks',
+  path: '/banks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BudgetMyRequisitionsRoute = BudgetMyRequisitionsRouteImport.update({
@@ -539,6 +547,11 @@ const ConfigureTimeRoute = ConfigureTimeRouteImport.update({
 const CreateRosterRoute = CreateRosterRouteImport.update({
   id: '/create-roster',
   path: '/create-roster',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CurrencySetupRoute = CurrencySetupRouteImport.update({
+  id: '/currency-setup',
+  path: '/currency-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeptWiseSalarySheetRoute = DeptWiseSalarySheetRouteImport.update({
@@ -2157,6 +2170,12 @@ const ZakatListRoute = ZakatListRouteImport.update({
   path: '/zakat-list',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountsConfigFinancialPeriodSetupRoute =
+  AccountsConfigFinancialPeriodSetupRouteImport.update({
+    id: '/accounts-config/financial-period-setup',
+    path: '/accounts-config/financial-period-setup',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EmployeeDetailIdRoute = EmployeeDetailIdRouteImport.update({
   id: '/employee-detail/$id',
   path: '/employee-detail/$id',
@@ -2193,6 +2212,7 @@ export interface FileRoutesByFullPath {
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/approve-overtime': typeof ApproveOvertimeRoute
   '/bank-sheet-exec': typeof BankSheetExecRoute
+  '/banks': typeof BanksRoute
   '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
   '/budget-overtime': typeof BudgetOvertimeRoute
   '/budget-planning': typeof BudgetPlanningRoute
@@ -2218,6 +2238,7 @@ export interface FileRoutesByFullPath {
   '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/currency-setup': typeof CurrencySetupRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
@@ -2521,6 +2542,7 @@ export interface FileRoutesByFullPath {
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
+  '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -2539,6 +2561,7 @@ export interface FileRoutesByTo {
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/approve-overtime': typeof ApproveOvertimeRoute
   '/bank-sheet-exec': typeof BankSheetExecRoute
+  '/banks': typeof BanksRoute
   '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
   '/budget-overtime': typeof BudgetOvertimeRoute
   '/budget-planning': typeof BudgetPlanningRoute
@@ -2564,6 +2587,7 @@ export interface FileRoutesByTo {
   '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/currency-setup': typeof CurrencySetupRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
@@ -2867,6 +2891,7 @@ export interface FileRoutesByTo {
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
+  '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -2886,6 +2911,7 @@ export interface FileRoutesById {
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/approve-overtime': typeof ApproveOvertimeRoute
   '/bank-sheet-exec': typeof BankSheetExecRoute
+  '/banks': typeof BanksRoute
   '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
   '/budget-overtime': typeof BudgetOvertimeRoute
   '/budget-planning': typeof BudgetPlanningRoute
@@ -2911,6 +2937,7 @@ export interface FileRoutesById {
   '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/currency-setup': typeof CurrencySetupRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
@@ -3214,6 +3241,7 @@ export interface FileRoutesById {
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-list': typeof ZakatListRoute
+  '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -3234,6 +3262,7 @@ export interface FileRouteTypes {
     | '/approve-increment-hr'
     | '/approve-overtime'
     | '/bank-sheet-exec'
+    | '/banks'
     | '/budget-my-requisitions'
     | '/budget-overtime'
     | '/budget-planning'
@@ -3259,6 +3288,7 @@ export interface FileRouteTypes {
     | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
+    | '/currency-setup'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
@@ -3562,6 +3592,7 @@ export interface FileRouteTypes {
     | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
     | '/zakat-list'
+    | '/accounts-config/financial-period-setup'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -3580,6 +3611,7 @@ export interface FileRouteTypes {
     | '/approve-increment-hr'
     | '/approve-overtime'
     | '/bank-sheet-exec'
+    | '/banks'
     | '/budget-my-requisitions'
     | '/budget-overtime'
     | '/budget-planning'
@@ -3605,6 +3637,7 @@ export interface FileRouteTypes {
     | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
+    | '/currency-setup'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
@@ -3908,6 +3941,7 @@ export interface FileRouteTypes {
     | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
     | '/zakat-list'
+    | '/accounts-config/financial-period-setup'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -3926,6 +3960,7 @@ export interface FileRouteTypes {
     | '/approve-increment-hr'
     | '/approve-overtime'
     | '/bank-sheet-exec'
+    | '/banks'
     | '/budget-my-requisitions'
     | '/budget-overtime'
     | '/budget-planning'
@@ -3951,6 +3986,7 @@ export interface FileRouteTypes {
     | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
+    | '/currency-setup'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
@@ -4254,6 +4290,7 @@ export interface FileRouteTypes {
     | '/yearly-bonus-report'
     | '/zakat-budget-configuration'
     | '/zakat-list'
+    | '/accounts-config/financial-period-setup'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -4273,6 +4310,7 @@ export interface RootRouteChildren {
   ApproveIncrementHrRoute: typeof ApproveIncrementHrRoute
   ApproveOvertimeRoute: typeof ApproveOvertimeRoute
   BankSheetExecRoute: typeof BankSheetExecRoute
+  BanksRoute: typeof BanksRoute
   BudgetMyRequisitionsRoute: typeof BudgetMyRequisitionsRoute
   BudgetOvertimeRoute: typeof BudgetOvertimeRoute
   BudgetPlanningRoute: typeof BudgetPlanningRoute
@@ -4298,6 +4336,7 @@ export interface RootRouteChildren {
   ConfigureTaxRoute: typeof ConfigureTaxRoute
   ConfigureTimeRoute: typeof ConfigureTimeRoute
   CreateRosterRoute: typeof CreateRosterRoute
+  CurrencySetupRoute: typeof CurrencySetupRoute
   DeptWiseSalarySheetRoute: typeof DeptWiseSalarySheetRoute
   DisciplinaryCaseFilesRoute: typeof DisciplinaryCaseFilesRoute
   DisciplinaryLeftyRoute: typeof DisciplinaryLeftyRoute
@@ -4601,6 +4640,7 @@ export interface RootRouteChildren {
   YearlyBonusReportRoute: typeof YearlyBonusReportRoute
   ZakatBudgetConfigurationRoute: typeof ZakatBudgetConfigurationRoute
   ZakatListRoute: typeof ZakatListRoute
+  AccountsConfigFinancialPeriodSetupRoute: typeof AccountsConfigFinancialPeriodSetupRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
   RecruitmentDetailIdRoute: typeof RecruitmentDetailIdRoute
   RecruitmentHrAssessmentIdRoute: typeof RecruitmentHrAssessmentIdRoute
@@ -4691,6 +4731,13 @@ declare module '@tanstack/react-router' {
       path: '/bank-sheet-exec'
       fullPath: '/bank-sheet-exec'
       preLoaderRoute: typeof BankSheetExecRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/banks': {
+      id: '/banks'
+      path: '/banks'
+      fullPath: '/banks'
+      preLoaderRoute: typeof BanksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/budget-my-requisitions': {
@@ -4866,6 +4913,13 @@ declare module '@tanstack/react-router' {
       path: '/create-roster'
       fullPath: '/create-roster'
       preLoaderRoute: typeof CreateRosterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/currency-setup': {
+      id: '/currency-setup'
+      path: '/currency-setup'
+      fullPath: '/currency-setup'
+      preLoaderRoute: typeof CurrencySetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dept-wise-salary-sheet': {
@@ -6989,6 +7043,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ZakatListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accounts-config/financial-period-setup': {
+      id: '/accounts-config/financial-period-setup'
+      path: '/accounts-config/financial-period-setup'
+      fullPath: '/accounts-config/financial-period-setup'
+      preLoaderRoute: typeof AccountsConfigFinancialPeriodSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/employee-detail/$id': {
       id: '/employee-detail/$id'
       path: '/employee-detail/$id'
@@ -7033,6 +7094,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApproveIncrementHrRoute: ApproveIncrementHrRoute,
   ApproveOvertimeRoute: ApproveOvertimeRoute,
   BankSheetExecRoute: BankSheetExecRoute,
+  BanksRoute: BanksRoute,
   BudgetMyRequisitionsRoute: BudgetMyRequisitionsRoute,
   BudgetOvertimeRoute: BudgetOvertimeRoute,
   BudgetPlanningRoute: BudgetPlanningRoute,
@@ -7058,6 +7120,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfigureTaxRoute: ConfigureTaxRoute,
   ConfigureTimeRoute: ConfigureTimeRoute,
   CreateRosterRoute: CreateRosterRoute,
+  CurrencySetupRoute: CurrencySetupRoute,
   DeptWiseSalarySheetRoute: DeptWiseSalarySheetRoute,
   DisciplinaryCaseFilesRoute: DisciplinaryCaseFilesRoute,
   DisciplinaryLeftyRoute: DisciplinaryLeftyRoute,
@@ -7373,6 +7436,8 @@ const rootRouteChildren: RootRouteChildren = {
   YearlyBonusReportRoute: YearlyBonusReportRoute,
   ZakatBudgetConfigurationRoute: ZakatBudgetConfigurationRoute,
   ZakatListRoute: ZakatListRoute,
+  AccountsConfigFinancialPeriodSetupRoute:
+    AccountsConfigFinancialPeriodSetupRoute,
   EmployeeDetailIdRoute: EmployeeDetailIdRoute,
   RecruitmentDetailIdRoute: RecruitmentDetailIdRoute,
   RecruitmentHrAssessmentIdRoute: RecruitmentHrAssessmentIdRoute,

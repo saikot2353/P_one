@@ -148,7 +148,6 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "designation-position" },
         tabKey: "designation-position",
         icon: Award,
-        isSoon: true,
         description:
           "Manage designations, job positions, grades, levels & organizational reporting.",
       },
@@ -158,7 +157,6 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "shift-schedule" },
         tabKey: "shift-schedule",
         icon: Clock4,
-        isSoon: true,
         description:
           "Define factory shifts, general shifts, roster rotations, Ramzan timing, grace periods & overtime cutoff rules.",
       },
@@ -195,7 +193,6 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "supplier-management" },
         tabKey: "supplier-management",
         icon: Truck,
-        isSoon: true,
         description:
           "Supplier & vendor profiles, contact details, registrations & classifications.",
       },
@@ -257,7 +254,6 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "brand-manufacturer" },
         tabKey: "brand-manufacturer",
         icon: BadgeCheck,
-        isSoon: true,
         description: "Product brands, brand owners, manufacturers & identification.",
       },
       {
@@ -335,7 +331,6 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "fiscal-year-period" },
         tabKey: "fiscal-year-period",
         icon: CalendarRange,
-        isSoon: true,
         description:
           "Manage financial years, statutory tax years, fiscal quarters, monthly closing periods & accounting lock dates.",
       },
@@ -345,7 +340,6 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "bank-branch" },
         tabKey: "bank-branch",
         icon: Landmark,
-        isSoon: true,
         description: "Bank & branch info for payments, payroll disbursement & accounts.",
       },
       {
@@ -354,7 +348,6 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "currency-exchange" },
         tabKey: "currency-exchange",
         icon: Coins,
-        isSoon: true,
         description: "Currencies, exchange rates, validity dates & international financial terms.",
       },
       {
@@ -363,7 +356,6 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "payment-terms" },
         tabKey: "payment-terms",
         icon: CalendarClock,
-        isSoon: true,
         description: "Payment conditions, credit periods, due-date rules & settlement terms.",
       },
       {
@@ -372,7 +364,6 @@ export const orgMasterNavGroups: NavGroupItem[] = [
         search: { tab: "payment-methods" },
         tabKey: "payment-methods",
         icon: CreditCard,
-        isSoon: true,
         description: "Payment channels: cash, bank transfer, cheque, digital wallets.",
       },
       /* Hidden as per requirement:
