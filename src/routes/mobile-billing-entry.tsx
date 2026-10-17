@@ -525,22 +525,87 @@ export function MobileBillEntryPage() {
   };
 
   // DOWNLOAD REAL EXCEL TEMPLATE (.xlsx)
-  const handleDownloadExcelTemplate = () => {
-    const samplePool = generateSeedEmployeeBills().slice(0, 20);
-    const templateData = samplePool.map((s) => ({
+  const handleDownloadExcelTemplate = (mode: "prefilled" | "blank" = "prefilled") => {
+    // If user has filtered records, use those; otherwise use all seed staff SIMs
+    const baseStaff = activeRecords.length > 0 ? activeRecords : generateSeedEmployeeBills();
+    const recordsToExport = mode === "blank" ? baseStaff.slice(0, 5) : baseStaff;
+
+    const templateRows = recordsToExport.map((s, idx) => ({
+      "SL": idx + 1,
       "Mobile No": s.simNo,
-      "Actual Bill": s.actualBill || 500,
+      "Actual Bill": mode === "blank" ? "" : (s.actualBill > 0 ? s.actualBill : ""),
       "Emp ID": s.empId,
       "Employee Name": s.empName,
+      "Company": s.companyCode,
+      "Location": s.location,
       "Department": s.department,
+      "Designation": s.designation,
       "Approved Limit": s.limit,
     }));
 
-    const worksheet = XLSX.utils.json_to_sheet(templateData);
+    const worksheet = XLSX.utils.json_to_sheet(templateRows);
+
+    // Set nice column widths for Excel
+    worksheet["!cols"] = [
+      { wch: 6 },  // SL
+      { wch: 16 }, // Mobile No
+      { wch: 16 }, // Actual Bill
+      { wch: 14 }, // Emp ID
+      { wch: 24 }, // Employee Name
+      { wch: 16 }, // Company
+      { wch: 18 }, // Location
+      { wch: 20 }, // Department
+      { wch: 22 }, // Designation
+      { wch: 16 }, // Approved Limit
+    ];
+
+    // Instructions sheet for user convenience
+    const instructions = [
+      {
+        "Step": "1",
+        "Guidelines": "Enter the operator's actual billed amount in the 'Actual Bill' column for each corporate SIM.",
+      },
+      {
+        "Step": "2",
+        "Guidelines": "Do not alter the 'Mobile No' or 'Emp ID' columns, as the parser uses them to auto-match staff.",
+      },
+      {
+        "Step": "3",
+        "Guidelines": "If an employee's bill exceeds their approved limit, CRIPTON HRIS will automatically calculate excess salary deductions.",
+      },
+      {
+        "Step": "4",
+        "Guidelines": "Save this file (.xlsx, .xls, or .csv) and click 'Upload Excel' on the Mobile Bill Entry screen.",
+      },
+      {
+        "Step": "5",
+        "Guidelines": "Review the auto-populated bill sheet and click 'Submit' to commit and lock the monthly billing data.",
+      },
+    ];
+    const instructionsSheet = XLSX.utils.json_to_sheet(instructions);
+    instructionsSheet["!cols"] = [
+      { wch: 8 },
+      { wch: 90 },
+    ];
+
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Mobile Bills");
-    XLSX.writeFile(workbook, `Mobile_Bill_Upload_Template_${selectedMonth}_${selectedYear}.xlsx`);
-    toast.info("Excel template downloaded with sample corporate SIM numbers!");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Mobile Bill Entry");
+    XLSX.utils.book_append_sheet(workbook, instructionsSheet, "Upload Instructions");
+
+    const fileName =
+      mode === "blank"
+        ? `Mobile_Bill_Blank_Template_${selectedMonth}_${selectedYear}.xlsx`
+        : `Mobile_Bill_Template_${selectedMonth}_${selectedYear}.xlsx`;
+
+    XLSX.writeFile(workbook, fileName);
+    toast.success(
+      mode === "blank"
+        ? "Blank Excel template downloaded successfully!"
+        : `Excel template downloaded with ${recordsToExport.length} corporate SIMs!`,
+      {
+        description: "Open the file, fill in the 'Actual Bill' column, and upload it back.",
+      }
+    );
   };
 
   // Filtered by search within active records
@@ -700,12 +765,13 @@ export function MobileBillEntryPage() {
                 <span>Upload Excel</span>
               </button>
 
+              {/* DOWNLOAD EXCEL TEMPLATE BUTTON */}
               <button
-                onClick={handleDownloadExcelTemplate}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all cursor-pointer"
-                title="Download formatted Excel template"
+                onClick={() => handleDownloadExcelTemplate("prefilled")}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                title="Download formatted Excel template pre-filled with corporate SIM numbers"
               >
-                <Download className="size-3.5" />
+                <Download className="size-3.5 text-blue-600 dark:text-blue-400" />
                 <span>Excel Template</span>
               </button>
 
