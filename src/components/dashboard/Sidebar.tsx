@@ -38,6 +38,7 @@ import {
   Megaphone,
   DoorOpen,
   FileSpreadsheet,
+  Smartphone,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -462,6 +463,15 @@ export const nav: NavItem[] = [
           { label: "Final Settlement Report", to: "/final-settlement-report" },
         ],
       },
+    ],
+  },
+  {
+    label: "Mobile Billing",
+    icon: Smartphone,
+    subitems: [
+      { label: "Bill Entry", to: "/mobile-billing-entry" },
+      { label: "Department wise billing", to: "/mobile-billing-department" },
+      { label: "Employee wise billing", to: "/mobile-billing-employee" },
     ],
   },
   {
