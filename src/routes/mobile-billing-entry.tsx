@@ -906,6 +906,15 @@ export function MobileBillEntryPage() {
 
                 <div className="flex items-center gap-2">
                   <button
+                    onClick={() => handleDownloadExcelTemplate("prefilled")}
+                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                    title="Download Excel template pre-filled with staff SIMs"
+                  >
+                    <Download className="size-3.5 text-blue-600" />
+                    <span>Excel Template</span>
+                  </button>
+
+                  <button
                     onClick={() => fileInputRef.current?.click()}
                     className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold transition-all cursor-pointer"
                   >
@@ -938,20 +947,28 @@ export function MobileBillEntryPage() {
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   Select your desired <strong>Year</strong>, <strong>Month</strong>, <strong>Company</strong>, and <strong>Department</strong> above and click <strong>"Filter / Load List"</strong>, or upload an operator Excel file to auto-populate the amounts.
                 </p>
-                <div className="pt-2 flex items-center justify-center gap-2">
+                <div className="pt-2 flex items-center justify-center gap-2.5 flex-wrap">
                   <button
                     onClick={handleApplyFilter}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
                   >
                     <Filter className="size-3.5" />
                     <span>Filter / Load List</span>
                   </button>
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
                   >
                     <FileSpreadsheet className="size-3.5" />
                     <span>Upload Excel</span>
+                  </button>
+                  <button
+                    onClick={() => handleDownloadExcelTemplate("prefilled")}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 shadow-2xs transition-all cursor-pointer"
+                    title="Download Excel template pre-filled with all corporate SIM numbers"
+                  >
+                    <Download className="size-3.5 text-blue-600" />
+                    <span>Download Excel Template</span>
                   </button>
                 </div>
               </div>
