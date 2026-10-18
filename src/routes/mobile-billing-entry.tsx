@@ -992,6 +992,14 @@ export function MobileBillEntryPage() {
 
                 <div className="flex items-center gap-2">
                   <button
+                    onClick={() => handleDownloadExcelTemplate("prefilled")}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-bold transition-all cursor-pointer"
+                    title="Download Excel template for this staff list"
+                  >
+                    <Download className="size-3.5 text-blue-600" />
+                    <span>Excel Template</span>
+                  </button>
+                  <button
                     onClick={() => fileInputRef.current?.click()}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold transition-all cursor-pointer"
                   >
@@ -1257,6 +1265,21 @@ export function MobileBillEntryPage() {
 
             {/* Modal Body / Preview */}
             <div className="p-6 overflow-y-auto space-y-4 flex-1">
+              {/* Template Download Notification / Quick Access */}
+              <div className="flex items-center justify-between p-3.5 bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl gap-3 flex-wrap sm:flex-nowrap">
+                <div className="flex items-center gap-2.5 text-xs text-blue-900 dark:text-blue-200">
+                  <FileSpreadsheet className="size-4 text-emerald-600 shrink-0" />
+                  <span>Looking for the standard template? Download pre-filled corporate SIM list.</span>
+                </div>
+                <button
+                  onClick={() => handleDownloadExcelTemplate("prefilled")}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-700 hover:bg-blue-50 text-xs font-bold text-blue-700 dark:text-blue-300 shadow-2xs cursor-pointer shrink-0"
+                >
+                  <Download className="size-3 text-blue-600" />
+                  <span>Download Template (.xlsx)</span>
+                </button>
+              </div>
+
               {/* Match Stats */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
