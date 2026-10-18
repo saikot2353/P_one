@@ -325,6 +325,7 @@ import { Route as SetHodRouteImport } from './routes/set-hod'
 import { Route as SetManagerRouteImport } from './routes/set-manager'
 import { Route as ShapnocheckRouteImport } from './routes/shapnocheck'
 import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
+import { Route as ShiftRosterAssignmentRouteImport } from './routes/shift-roster-assignment'
 import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
 import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
 import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
@@ -2037,6 +2038,11 @@ const ShiftControlCenterRoute = ShiftControlCenterRouteImport.update({
   path: '/shift-control-center',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShiftRosterAssignmentRoute = ShiftRosterAssignmentRouteImport.update({
+  id: '/shift-roster-assignment',
+  path: '/shift-roster-assignment',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SspApprovalRoute = SspApprovalRouteImport.update({
   id: '/ssp-approval',
   path: '/ssp-approval',
@@ -2523,6 +2529,7 @@ export interface FileRoutesByFullPath {
   '/set-manager': typeof SetManagerRoute
   '/shapnocheck': typeof ShapnocheckRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
+  '/shift-roster-assignment': typeof ShiftRosterAssignmentRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
@@ -2873,6 +2880,7 @@ export interface FileRoutesByTo {
   '/set-manager': typeof SetManagerRoute
   '/shapnocheck': typeof ShapnocheckRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
+  '/shift-roster-assignment': typeof ShiftRosterAssignmentRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
@@ -3224,6 +3232,7 @@ export interface FileRoutesById {
   '/set-manager': typeof SetManagerRoute
   '/shapnocheck': typeof ShapnocheckRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
+  '/shift-roster-assignment': typeof ShiftRosterAssignmentRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
@@ -3576,6 +3585,7 @@ export interface FileRouteTypes {
     | '/set-manager'
     | '/shapnocheck'
     | '/shift-control-center'
+    | '/shift-roster-assignment'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
@@ -3926,6 +3936,7 @@ export interface FileRouteTypes {
     | '/set-manager'
     | '/shapnocheck'
     | '/shift-control-center'
+    | '/shift-roster-assignment'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
@@ -4276,6 +4287,7 @@ export interface FileRouteTypes {
     | '/set-manager'
     | '/shapnocheck'
     | '/shift-control-center'
+    | '/shift-roster-assignment'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
@@ -4627,6 +4639,7 @@ export interface RootRouteChildren {
   SetManagerRoute: typeof SetManagerRoute
   ShapnocheckRoute: typeof ShapnocheckRoute
   ShiftControlCenterRoute: typeof ShiftControlCenterRoute
+  ShiftRosterAssignmentRoute: typeof ShiftRosterAssignmentRoute
   SspApprovalRoute: typeof SspApprovalRoute
   SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
   SspAttendanceRoute: typeof SspAttendanceRoute
@@ -6875,6 +6888,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShiftControlCenterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shift-roster-assignment': {
+      id: '/shift-roster-assignment'
+      path: '/shift-roster-assignment'
+      fullPath: '/shift-roster-assignment'
+      preLoaderRoute: typeof ShiftRosterAssignmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ssp-approval': {
       id: '/ssp-approval'
       path: '/ssp-approval'
@@ -7431,6 +7451,7 @@ const rootRouteChildren: RootRouteChildren = {
   SetManagerRoute: SetManagerRoute,
   ShapnocheckRoute: ShapnocheckRoute,
   ShiftControlCenterRoute: ShiftControlCenterRoute,
+  ShiftRosterAssignmentRoute: ShiftRosterAssignmentRoute,
   SspApprovalRoute: SspApprovalRoute,
   SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,
   SspAttendanceRoute: SspAttendanceRoute,

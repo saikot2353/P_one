@@ -270,7 +270,10 @@ export const nav: NavItem[] = [
   {
     label: "Manage Shift",
     icon: Clock,
-    to: "/shift-control-center",
+    subitems: [
+      { label: "Initial Shift Setup", to: "/shift-control-center" },
+      { label: "Shift Roster Assignment", to: "/shift-roster-assignment" },
+    ],
   },
   {
     label: "Manpower Budget",
