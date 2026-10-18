@@ -932,7 +932,6 @@ function ShiftControlCenterPage() {
                           <th className="px-4 py-3">Department & Section</th>
                           <th className="px-4 py-3">Unit</th>
                           <th className="px-4 py-3">Assigned Shift</th>
-                          <th className="px-4 py-3">Previous Shift</th>
                           <th className="px-4 py-3">Start Date</th>
                           <th className="px-4 py-3 text-center">Actions</th>
                         </tr>
@@ -992,9 +991,6 @@ function ShiftControlCenterPage() {
                                   {rec.assignedShift}
                                 </span>
                               </td>
-                              <td className="px-4 py-3 text-muted-foreground font-normal">
-                                {rec.previousShift}
-                              </td>
                               <td className="px-4 py-3">
                                 <span className="font-mono text-foreground text-xs">
                                   {rec.effectiveDate}
@@ -1024,7 +1020,7 @@ function ShiftControlCenterPage() {
 
                         {filteredRecords.length === 0 && (
                           <tr>
-                            <td colSpan={8} className="py-12 text-center">
+                            <td colSpan={7} className="py-12 text-center">
                               <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                                 <AlertCircle className="size-5" />
                                 <div className="space-y-0.5">
