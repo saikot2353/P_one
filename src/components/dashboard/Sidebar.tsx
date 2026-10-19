@@ -104,6 +104,7 @@ export const nav: NavItem[] = [
       { label: "Leave & Policies", to: "/configure-policies" },
       { label: "Maternity Configuration", to: "/maternity-configuration" },
       { label: "Letter Setup", to: "/configure-letter" },
+      { label: "Lunch rate festival", to: "/lunch-rate-festival" },
     ],
   },
   {
@@ -121,6 +122,7 @@ export const nav: NavItem[] = [
         subitems: [
           { label: "SSP Approval", to: "/ssp-approval", count: 5 },
           { label: "Personnel Approval", to: "/personnel-approval", count: 2 },
+          { label: "Personal Info Approval", to: "/personal-info-approval", count: 2 },
           { label: "Employee Doc Verification", to: "/employee-doc-verification", count: 4 },
           { label: "Manual Attendance", to: "/pending-manual-attendance", count: 7 },
           {
@@ -141,6 +143,8 @@ export const nav: NavItem[] = [
             count: 2,
           },
           { label: "Overtime Requisitions", to: "/approve-overtime", count: 1 },
+          { label: "Lunce Requisition approval", to: "/lunch-requisition-approval", count: 2 },
+          { label: "Festival Allowance Approval", to: "/festival-allowance-approval", count: 1 },
         ],
       },
       {
@@ -374,6 +378,8 @@ export const nav: NavItem[] = [
       { label: "Submit OT Req", to: "/manage-overtime", search: { tab: "submit" } },
       { label: "Submitted OT List", to: "/manage-overtime", search: { tab: "submitted-list" } },
       { label: "Individual OT Review", to: "/manage-overtime", search: { tab: "individual-review" } },
+      { label: "Lunce Requisition", to: "/lunch-requisition" },
+      { label: "Festival Allowance", to: "/festival-allowance" },
     ],
   },
   {
@@ -795,7 +801,7 @@ export function Sidebar() {
               <div
                 className={[
                   "overflow-hidden transition-all duration-300 space-y-0.5 pl-3.5 bg-sidebar-accent/25 rounded-xl",
-                  isOpen ? "max-h-[600px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
+                  isOpen ? "max-h-[2500px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
                 ].join(" ")}
               >
                 {item.subitems.map((sub) => {
@@ -847,7 +853,7 @@ export function Sidebar() {
                           className={[
                             "overflow-hidden transition-all duration-300 space-y-0.5 pl-6",
                             isSubOpen
-                              ? "max-h-[300px] opacity-100 py-0.5 mt-0.5"
+                              ? "max-h-[1500px] opacity-100 py-0.5 mt-0.5"
                               : "max-h-0 opacity-0",
                           ].join(" ")}
                         >

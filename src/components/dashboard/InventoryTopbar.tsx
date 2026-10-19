@@ -439,6 +439,12 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/kpi-approval",
     description: "HRD final evaluation & pending KPI approvals workflow dashboard",
   },
+  {
+    label: "Personal Info Approval",
+    parent: "HR Approvals",
+    to: "/personal-info-approval",
+    description: "Review and approve employee personal info changes with before/after diff",
+  },
   // Configure
   {
     label: "Company Settings Setup",

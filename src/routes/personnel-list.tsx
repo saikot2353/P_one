@@ -5,6 +5,13 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { EmployeeDetailTabs } from "@/components/dashboard/employee-detail-tabs";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { toast } from "sonner";
+import {
+  type PersonalInfoApprovalRequest,
+  type FieldChange,
+  getPersonalInfoApprovalRequests,
+  createPersonalInfoApprovalRequest,
+} from "@/lib/personalInfoApprovalStore";
 import {
   Search,
   FileDown,
@@ -570,7 +577,10 @@ export function PersonnelListView({
   const [employees, setEmployees] = useState<any[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  // Pending Personal Info Approvals Tracking
+  const [pendingRequests, setPendingRequests] = useState<PersonalInfoApprovalRequest[]>([]);
+
+  const loadSyncedEmployees = () => {
     if (typeof window !== "undefined") {
       const synced = localStorage.getItem("recruitment_synced_employees");
       if (synced) {
@@ -598,7 +608,134 @@ export function PersonnelListView({
         setEmployees(employeesData);
       }
     }
+  };
+
+  const refreshPendingRequests = () => {
+    const reqs = getPersonalInfoApprovalRequests();
+    setPendingRequests(reqs);
+  };
+
+  useEffect(() => {
+    loadSyncedEmployees();
+    refreshPendingRequests();
+
+    const handleEmployeeUpdated = () => {
+      loadSyncedEmployees();
+      refreshPendingRequests();
+    };
+
+    window.addEventListener("employee_info_updated", handleEmployeeUpdated);
+    window.addEventListener("personal_info_approvals_changed", handleEmployeeUpdated);
+    return () => {
+      window.removeEventListener("employee_info_updated", handleEmployeeUpdated);
+      window.removeEventListener("personal_info_approvals_changed", handleEmployeeUpdated);
+    };
   }, []);
+
+  const pendingApprovalsByEmpId = useMemo(() => {
+    const map: Record<string, PersonalInfoApprovalRequest> = {};
+    pendingRequests
+      .filter((r) => r.status === "Pending")
+      .forEach((r) => {
+        map[r.empId] = r;
+      });
+    return map;
+  }, [pendingRequests]);
+
+  const totalPendingApprovals = Object.keys(pendingApprovalsByEmpId).length;
+
+  // Personal Info Edit Modal State
+  const [editEmpModal, setEditEmpModal] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState<Record<string, string>>({});
+  const [editRemarks, setEditRemarks] = useState("");
+  const [editTab, setEditTab] = useState<"identity" | "contact" | "job" | "financial">("identity");
+
+  const handleOpenEditModal = (emp: any) => {
+    setEditEmpModal(emp);
+    setEditForm({
+      name: emp.name || "",
+      title: emp.title || "",
+      dept: emp.dept || "",
+      sect: emp.sect || "",
+      unit: emp.unit || "PSL",
+      grade: emp.grade || "None",
+      shift: emp.shift || "General Shift",
+      type: emp.type || "Permanent",
+      blood: emp.blood || "",
+      officeMob: emp.officeMob && emp.officeMob !== "—" ? emp.officeMob : "",
+      personalContact: emp.personalContact && emp.personalContact !== "—" ? emp.personalContact : "",
+      email: emp.email || "",
+      gender: emp.gender || "Male",
+      dob: emp.dob || "",
+      basic: emp.basic || "",
+      gross: emp.gross || "",
+      village: emp.village && emp.village !== "—" ? emp.village : "",
+    });
+    setEditRemarks("");
+    setEditTab("identity");
+  };
+
+  const editFieldLabels: Record<string, string> = {
+    name: "Full Name",
+    title: "Designation / Title",
+    dept: "Department",
+    sect: "Section",
+    blood: "Blood Group",
+    officeMob: "Office Mobile",
+    personalContact: "Personal Contact",
+    email: "Email Address",
+    gender: "Gender",
+    dob: "Date of Birth",
+    basic: "Basic Salary",
+    gross: "Gross Salary",
+    village: "Present Address / Village",
+    type: "Employment Type",
+    shift: "Work Shift",
+  };
+
+  // Compute live changed fields
+  const changedFieldsList: FieldChange[] = useMemo(() => {
+    if (!editEmpModal) return [];
+    const diffs: FieldChange[] = [];
+    Object.keys(editFieldLabels).forEach((key) => {
+      const oldVal = (editEmpModal[key] || "").toString().trim();
+      const newVal = (editForm[key] || "").toString().trim();
+      if (oldVal !== newVal) {
+        diffs.push({
+          field: key,
+          fieldLabel: editFieldLabels[key],
+          oldValue: oldVal || "—",
+          newValue: newVal || "—",
+        });
+      }
+    });
+    return diffs;
+  }, [editEmpModal, editForm]);
+
+  const handleSaveEditSubmission = () => {
+    if (!editEmpModal) return;
+
+    if (changedFieldsList.length === 0) {
+      toast.info("No modifications detected. Please change at least one field before submitting.");
+      return;
+    }
+
+    createPersonalInfoApprovalRequest({
+      empId: editEmpModal.id,
+      empName: editEmpModal.name,
+      department: editEmpModal.dept,
+      designation: editEmpModal.title,
+      reason: editRemarks.trim() || "Profile details revision submitted from Personnel List",
+      requestedBy: "HR Officer (Current User)",
+      changes: changedFieldsList,
+    });
+
+    toast.success(
+      `Modifications for ${editEmpModal.name} have been submitted for HR Approval! The information will be updated once approved in Personal Info Approval.`
+    );
+    setEditEmpModal(null);
+    refreshPendingRequests();
+  };
 
   // Rejoin & Resign/Terminate States
   const [resignModalEmp, setResignModalEmp] = useState<any | null>(null);
@@ -1325,6 +1462,18 @@ export function PersonnelListView({
                   {employees.filter((e) => e.status === "Working").length}
                 </div>
               </div>
+              <Link
+                to="/personal-info-approval"
+                className="h-9.5 px-3.5 rounded-xl border border-blue-500/30 bg-blue-50/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all flex items-center gap-1.5 shadow-2xs"
+              >
+                <Clock className="size-3.5 text-blue-600" />
+                <span>Info Approvals</span>
+                {totalPendingApprovals > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
+                    {totalPendingApprovals}
+                  </span>
+                )}
+              </Link>
               <button
                 onClick={() => {
                   if (onAddEmployee) {
@@ -1376,6 +1525,18 @@ export function PersonnelListView({
                 {employees.filter((e) => e.status === "Working").length}
               </div>
             </div>
+            <Link
+              to="/personal-info-approval"
+              className="h-9.5 px-3.5 rounded-xl border border-blue-500/30 bg-blue-50/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all flex items-center gap-1.5 shadow-2xs"
+            >
+              <Clock className="size-3.5 text-blue-600" />
+              <span>Info Approvals</span>
+              {totalPendingApprovals > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
+                  {totalPendingApprovals}
+                </span>
+              )}
+            </Link>
             <button
               onClick={() => {
                 if (onAddEmployee) {
@@ -1754,6 +1915,16 @@ export function PersonnelListView({
                             >
                               <Eye className="size-3" />
                             </button>
+                            <button
+                              className="size-6 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20 hover:bg-blue-600 hover:text-white transition flex items-center justify-center shadow-3xs"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleOpenEditModal(e);
+                              }}
+                              title="Edit Personal Info (Requires HR Approval)"
+                            >
+                              <Edit3 className="size-3" />
+                            </button>
 
                             {!e.status || e.status === "Working" || e.status === "On Leave" ? (
                               <button
@@ -1823,6 +1994,17 @@ export function PersonnelListView({
                                 {e.name}
                               </span>
                               <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                                {pendingApprovalsByEmpId[e.id] && (
+                                  <Link
+                                    to="/personal-info-approval"
+                                    onClick={(event) => event.stopPropagation()}
+                                    className="text-[8px] font-bold px-1.5 py-0.5 rounded leading-none bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-colors flex items-center gap-0.5"
+                                    title="Personal info modifications are pending HR approval. Click to view."
+                                  >
+                                    <Clock className="size-2" />
+                                    Edit Pending
+                                  </Link>
+                                )}
                                 {e.status && e.status !== "Working" && (
                                   <span
                                     className={`text-[8px] px-1.5 py-0.5 rounded leading-none ${
@@ -3109,6 +3291,385 @@ export function PersonnelListView({
                   className="px-6 py-2.5 rounded bg-[#71b340] hover:bg-[#5ea030] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
                 >
                   SUBMIT
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Personal Information Modal */}
+        {editEmpModal && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setEditEmpModal(null);
+            }}
+          >
+            <div className="bg-card w-full max-w-3xl rounded-2xl border border-border/80 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] text-foreground animate-in zoom-in-95 duration-200">
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b border-border/60 bg-muted/20 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center font-bold">
+                    <Edit3 className="size-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-base sm:text-lg font-bold text-foreground">
+                        Edit Personal Information
+                      </h2>
+                      <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary font-mono font-bold">
+                        ID: {editEmpModal.id}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {editEmpModal.name} • {editEmpModal.title || "No Title"} • {editEmpModal.dept || "No Dept"}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setEditEmpModal(null)}
+                  className="size-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/40 flex items-center justify-center transition"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              {/* Sub-Tabs within Modal */}
+              <div className="flex items-center gap-1 px-6 pt-3 border-b border-border/40 bg-muted/10 text-xs font-semibold overflow-x-auto">
+                <button
+                  onClick={() => setEditTab("identity")}
+                  className={`pb-2.5 px-3 border-b-2 transition-all flex items-center gap-1.5 ${
+                    editTab === "identity"
+                      ? "border-primary text-primary font-bold"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <User className="size-3.5" />
+                  <span>Personal & Identity</span>
+                </button>
+                <button
+                  onClick={() => setEditTab("contact")}
+                  className={`pb-2.5 px-3 border-b-2 transition-all flex items-center gap-1.5 ${
+                    editTab === "contact"
+                      ? "border-primary text-primary font-bold"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Phone className="size-3.5" />
+                  <span>Contact & Address</span>
+                </button>
+                <button
+                  onClick={() => setEditTab("job")}
+                  className={`pb-2.5 px-3 border-b-2 transition-all flex items-center gap-1.5 ${
+                    editTab === "job"
+                      ? "border-primary text-primary font-bold"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Briefcase className="size-3.5" />
+                  <span>Job & Placement</span>
+                </button>
+                <button
+                  onClick={() => setEditTab("financial")}
+                  className={`pb-2.5 px-3 border-b-2 transition-all flex items-center gap-1.5 ${
+                    editTab === "financial"
+                      ? "border-primary text-primary font-bold"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <DollarSign className="size-3.5" />
+                  <span>Compensation</span>
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 overflow-y-auto space-y-5 flex-1">
+                {/* Notice Alert */}
+                <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-700 dark:text-blue-300 flex items-start gap-2.5">
+                  <Info className="size-4 shrink-0 mt-0.5 text-blue-600" />
+                  <p>
+                    <strong>Workflow Notice:</strong> Modifications made here will <em>not</em> directly overwrite the live Personnel List. They will be submitted as an approval ticket to <strong>HR Approvals &gt; Personal Info Approval</strong>. Once an authorized approver reviews the previous vs proposed values and approves them, the live record will update automatically.
+                  </p>
+                </div>
+
+                {/* Tab 1: Personal & Identity */}
+                {editTab === "identity" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Full Name *</label>
+                      <input
+                        type="text"
+                        value={editForm.name || ""}
+                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Gender</label>
+                      <select
+                        value={editForm.gender || "Male"}
+                        onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Date of Birth (DD/MM/YYYY)</label>
+                      <input
+                        type="text"
+                        value={editForm.dob || ""}
+                        onChange={(e) => setEditForm({ ...editForm, dob: e.target.value })}
+                        placeholder="12/07/1999"
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Blood Group</label>
+                      <select
+                        value={editForm.blood || ""}
+                        onChange={(e) => setEditForm({ ...editForm, blood: e.target.value })}
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      >
+                        <option value="">Select Blood Group</option>
+                        <option value="A (+ve)">A (+ve)</option>
+                        <option value="A (-ve)">A (-ve)</option>
+                        <option value="B (+ve)">B (+ve)</option>
+                        <option value="B (-ve)">B (-ve)</option>
+                        <option value="O (+ve)">O (+ve)</option>
+                        <option value="O (-ve)">O (-ve)</option>
+                        <option value="AB (+ve)">AB (+ve)</option>
+                        <option value="AB (-ve)">AB (-ve)</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {/* Tab 2: Contact & Address */}
+                {editTab === "contact" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Office Mobile</label>
+                      <input
+                        type="text"
+                        value={editForm.officeMob || ""}
+                        onChange={(e) => setEditForm({ ...editForm, officeMob: e.target.value })}
+                        placeholder="01750021154"
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Personal / Alternative Contact</label>
+                      <input
+                        type="text"
+                        value={editForm.personalContact || ""}
+                        onChange={(e) => setEditForm({ ...editForm, personalContact: e.target.value })}
+                        placeholder="01827394852"
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1 sm:col-span-2">
+                      <label className="text-xs font-semibold text-muted-foreground">Official Email</label>
+                      <input
+                        type="email"
+                        value={editForm.email || ""}
+                        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                        placeholder="name@pakizasoftware.com"
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1 sm:col-span-2">
+                      <label className="text-xs font-semibold text-muted-foreground">Present Address / Village</label>
+                      <textarea
+                        rows={2}
+                        value={editForm.village || ""}
+                        onChange={(e) => setEditForm({ ...editForm, village: e.target.value })}
+                        placeholder="House / Road / Village details"
+                        className="w-full p-2.5 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Tab 3: Job & Placement */}
+                {editTab === "job" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Designation / Title</label>
+                      <input
+                        type="text"
+                        value={editForm.title || ""}
+                        onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Department</label>
+                      <input
+                        type="text"
+                        value={editForm.dept || ""}
+                        onChange={(e) => setEditForm({ ...editForm, dept: e.target.value })}
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Section</label>
+                      <input
+                        type="text"
+                        value={editForm.sect || ""}
+                        onChange={(e) => setEditForm({ ...editForm, sect: e.target.value })}
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Employment Type</label>
+                      <select
+                        value={editForm.type || "Permanent"}
+                        onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      >
+                        <option value="Permanent">Permanent</option>
+                        <option value="Probation">Probation</option>
+                        <option value="Office Executive">Office Executive</option>
+                        <option value="Contractual">Contractual</option>
+                        <option value="Temporary">Temporary</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Shift</label>
+                      <select
+                        value={editForm.shift || "General Shift"}
+                        onChange={(e) => setEditForm({ ...editForm, shift: e.target.value })}
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      >
+                        <option value="General Shift">General Shift</option>
+                        <option value="General-Exec">General-Exec</option>
+                        <option value="Exe-Ptvl">Exe-Ptvl</option>
+                        <option value="Night Shift">Night Shift</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Unit</label>
+                      <input
+                        type="text"
+                        value={editForm.unit || "PSL"}
+                        onChange={(e) => setEditForm({ ...editForm, unit: e.target.value })}
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Tab 4: Compensation */}
+                {editTab === "financial" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Basic Salary (BDT)</label>
+                      <input
+                        type="text"
+                        value={editForm.basic || ""}
+                        onChange={(e) => setEditForm({ ...editForm, basic: e.target.value })}
+                        placeholder="91200.00"
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-mono"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-muted-foreground">Gross Salary (BDT)</label>
+                      <input
+                        type="text"
+                        value={editForm.gross || ""}
+                        onChange={(e) => setEditForm({ ...editForm, gross: e.target.value })}
+                        placeholder="152000.00"
+                        className="w-full h-9 px-3 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-mono"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Realtime Changes Diff Pill Container */}
+                <div className="p-3 rounded-xl border border-border/60 bg-muted/15 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-foreground flex items-center gap-1.5">
+                      <Sparkles className="size-3.5 text-amber-500" />
+                      <span>Detected Changes ({changedFieldsList.length})</span>
+                    </span>
+                    <span className="text-[11px] text-muted-foreground">
+                      Only these changes will be sent to the Approver
+                    </span>
+                  </div>
+
+                  {changedFieldsList.length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic">
+                      No fields modified yet. Edit values in the tabs above to create an approval request.
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {changedFieldsList.map((ch, idx) => (
+                        <div
+                          key={idx}
+                          className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-700 dark:text-amber-300 flex items-center gap-1.5"
+                        >
+                          <span className="font-bold">{ch.fieldLabel}:</span>
+                          <span className="line-through opacity-70 text-rose-500">{ch.oldValue}</span>
+                          <span>→</span>
+                          <span className="font-bold text-emerald-600 dark:text-emerald-400">{ch.newValue}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Reason / Notes for Approval */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-foreground flex items-center gap-1">
+                    <span>Reason for Modification / Requester Notes</span>
+                    <span className="text-rose-500">*</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={editRemarks}
+                    onChange={(e) => setEditRemarks(e.target.value)}
+                    placeholder="e.g. Employee submitted revised contact info and address update with supporting documents."
+                    className="w-full p-2.5 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-6 py-4 bg-muted/20 border-t border-border/60 flex items-center justify-between">
+                <button
+                  onClick={() => setEditEmpModal(null)}
+                  className="px-4 py-2 rounded-lg border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleSaveEditSubmission}
+                  disabled={changedFieldsList.length === 0}
+                  className={`px-5 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-xs ${
+                    changedFieldsList.length > 0
+                      ? "bg-primary text-primary-foreground hover:opacity-90 cursor-pointer"
+                      : "bg-muted text-muted-foreground cursor-not-allowed opacity-60"
+                  }`}
+                >
+                  <Clock className="size-4" />
+                  <span>Submit for HR Approval ({changedFieldsList.length})</span>
                 </button>
               </div>
             </div>

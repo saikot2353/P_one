@@ -64,6 +64,8 @@ import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EmployeeSalaryHistoryRouteImport } from './routes/employee-salary-history'
 import { Route as EmployeeTaxPayRouteImport } from './routes/employee-tax-pay'
 import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
+import { Route as FestivalAllowanceRouteImport } from './routes/festival-allowance'
+import { Route as FestivalAllowanceApprovalRouteImport } from './routes/festival-allowance-approval'
 import { Route as FestivalAllowancePaymentSheetRouteImport } from './routes/festival-allowance-payment-sheet'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
@@ -176,6 +178,11 @@ import { Route as LeaveListRouteImport } from './routes/leave-list'
 import { Route as LoanApplicationRouteImport } from './routes/loan-application'
 import { Route as LoanApprovalRouteImport } from './routes/loan-approval'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LunceRequisitionRouteImport } from './routes/lunce-requisition'
+import { Route as LunceRequisitionApprovalRouteImport } from './routes/lunce-requisition-approval'
+import { Route as LunchRateFestivalRouteImport } from './routes/lunch-rate-festival'
+import { Route as LunchRequisitionRouteImport } from './routes/lunch-requisition'
+import { Route as LunchRequisitionApprovalRouteImport } from './routes/lunch-requisition-approval'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as MaternityConfigurationRouteImport } from './routes/maternity-configuration'
@@ -240,6 +247,7 @@ import { Route as PayslipPrintRouteImport } from './routes/payslip-print'
 import { Route as PendingApprovalsRouteImport } from './routes/pending-approvals'
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
 import { Route as PermissionManagementRouteImport } from './routes/permission-management'
+import { Route as PersonalInfoApprovalRouteImport } from './routes/personal-info-approval'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
 import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PhonebookRouteImport } from './routes/phonebook'
@@ -641,6 +649,17 @@ const EnrollFingerprintRoute = EnrollFingerprintRouteImport.update({
   path: '/enroll-fingerprint',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FestivalAllowanceRoute = FestivalAllowanceRouteImport.update({
+  id: '/festival-allowance',
+  path: '/festival-allowance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FestivalAllowanceApprovalRoute =
+  FestivalAllowanceApprovalRouteImport.update({
+    id: '/festival-allowance-approval',
+    path: '/festival-allowance-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const FestivalAllowancePaymentSheetRoute =
   FestivalAllowancePaymentSheetRouteImport.update({
     id: '/festival-allowance-payment-sheet',
@@ -1227,6 +1246,33 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LunceRequisitionRoute = LunceRequisitionRouteImport.update({
+  id: '/lunce-requisition',
+  path: '/lunce-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LunceRequisitionApprovalRoute =
+  LunceRequisitionApprovalRouteImport.update({
+    id: '/lunce-requisition-approval',
+    path: '/lunce-requisition-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LunchRateFestivalRoute = LunchRateFestivalRouteImport.update({
+  id: '/lunch-rate-festival',
+  path: '/lunch-rate-festival',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LunchRequisitionRoute = LunchRequisitionRouteImport.update({
+  id: '/lunch-requisition',
+  path: '/lunch-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LunchRequisitionApprovalRoute =
+  LunchRequisitionApprovalRouteImport.update({
+    id: '/lunch-requisition-approval',
+    path: '/lunch-requisition-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ManageOvertimeRoute = ManageOvertimeRouteImport.update({
   id: '/manage-overtime',
   path: '/manage-overtime',
@@ -1561,6 +1607,11 @@ const PendingManualAttendanceRoute = PendingManualAttendanceRouteImport.update({
 const PermissionManagementRoute = PermissionManagementRouteImport.update({
   id: '/permission-management',
   path: '/permission-management',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonalInfoApprovalRoute = PersonalInfoApprovalRouteImport.update({
+  id: '/personal-info-approval',
+  path: '/personal-info-approval',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PersonnelApprovalRoute = PersonnelApprovalRouteImport.update({
@@ -2286,6 +2337,8 @@ export interface FileRoutesByFullPath {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/festival-allowance': typeof FestivalAllowanceRoute
+  '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
   '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
@@ -2398,6 +2451,11 @@ export interface FileRoutesByFullPath {
   '/loan-application': typeof LoanApplicationRoute
   '/loan-approval': typeof LoanApprovalRoute
   '/login': typeof LoginRoute
+  '/lunce-requisition': typeof LunceRequisitionRoute
+  '/lunce-requisition-approval': typeof LunceRequisitionApprovalRoute
+  '/lunch-rate-festival': typeof LunchRateFestivalRoute
+  '/lunch-requisition': typeof LunchRequisitionRoute
+  '/lunch-requisition-approval': typeof LunchRequisitionApprovalRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
@@ -2462,6 +2520,7 @@ export interface FileRoutesByFullPath {
   '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
+  '/personal-info-approval': typeof PersonalInfoApprovalRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/phonebook': typeof PhonebookRoute
@@ -2640,6 +2699,8 @@ export interface FileRoutesByTo {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/festival-allowance': typeof FestivalAllowanceRoute
+  '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
   '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
@@ -2752,6 +2813,11 @@ export interface FileRoutesByTo {
   '/loan-application': typeof LoanApplicationRoute
   '/loan-approval': typeof LoanApprovalRoute
   '/login': typeof LoginRoute
+  '/lunce-requisition': typeof LunceRequisitionRoute
+  '/lunce-requisition-approval': typeof LunceRequisitionApprovalRoute
+  '/lunch-rate-festival': typeof LunchRateFestivalRoute
+  '/lunch-requisition': typeof LunchRequisitionRoute
+  '/lunch-requisition-approval': typeof LunchRequisitionApprovalRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
@@ -2816,6 +2882,7 @@ export interface FileRoutesByTo {
   '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
+  '/personal-info-approval': typeof PersonalInfoApprovalRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/phonebook': typeof PhonebookRoute
@@ -2995,6 +3062,8 @@ export interface FileRoutesById {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/festival-allowance': typeof FestivalAllowanceRoute
+  '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
   '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
@@ -3107,6 +3176,11 @@ export interface FileRoutesById {
   '/loan-application': typeof LoanApplicationRoute
   '/loan-approval': typeof LoanApprovalRoute
   '/login': typeof LoginRoute
+  '/lunce-requisition': typeof LunceRequisitionRoute
+  '/lunce-requisition-approval': typeof LunceRequisitionApprovalRoute
+  '/lunch-rate-festival': typeof LunchRateFestivalRoute
+  '/lunch-requisition': typeof LunchRequisitionRoute
+  '/lunch-requisition-approval': typeof LunchRequisitionApprovalRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
@@ -3171,6 +3245,7 @@ export interface FileRoutesById {
   '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
+  '/personal-info-approval': typeof PersonalInfoApprovalRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/phonebook': typeof PhonebookRoute
@@ -3351,6 +3426,8 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/festival-allowance'
+    | '/festival-allowance-approval'
     | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
@@ -3463,6 +3540,11 @@ export interface FileRouteTypes {
     | '/loan-application'
     | '/loan-approval'
     | '/login'
+    | '/lunce-requisition'
+    | '/lunce-requisition-approval'
+    | '/lunch-rate-festival'
+    | '/lunch-requisition'
+    | '/lunch-requisition-approval'
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
@@ -3527,6 +3609,7 @@ export interface FileRouteTypes {
     | '/pending-approvals'
     | '/pending-manual-attendance'
     | '/permission-management'
+    | '/personal-info-approval'
     | '/personnel-approval'
     | '/personnel-list'
     | '/phonebook'
@@ -3705,6 +3788,8 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/festival-allowance'
+    | '/festival-allowance-approval'
     | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
@@ -3817,6 +3902,11 @@ export interface FileRouteTypes {
     | '/loan-application'
     | '/loan-approval'
     | '/login'
+    | '/lunce-requisition'
+    | '/lunce-requisition-approval'
+    | '/lunch-rate-festival'
+    | '/lunch-requisition'
+    | '/lunch-requisition-approval'
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
@@ -3881,6 +3971,7 @@ export interface FileRouteTypes {
     | '/pending-approvals'
     | '/pending-manual-attendance'
     | '/permission-management'
+    | '/personal-info-approval'
     | '/personnel-approval'
     | '/personnel-list'
     | '/phonebook'
@@ -4059,6 +4150,8 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/festival-allowance'
+    | '/festival-allowance-approval'
     | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
@@ -4171,6 +4264,11 @@ export interface FileRouteTypes {
     | '/loan-application'
     | '/loan-approval'
     | '/login'
+    | '/lunce-requisition'
+    | '/lunce-requisition-approval'
+    | '/lunch-rate-festival'
+    | '/lunch-requisition'
+    | '/lunch-requisition-approval'
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
@@ -4235,6 +4333,7 @@ export interface FileRouteTypes {
     | '/pending-approvals'
     | '/pending-manual-attendance'
     | '/permission-management'
+    | '/personal-info-approval'
     | '/personnel-approval'
     | '/personnel-list'
     | '/phonebook'
@@ -4414,6 +4513,8 @@ export interface RootRouteChildren {
   EmployeeSalaryHistoryRoute: typeof EmployeeSalaryHistoryRoute
   EmployeeTaxPayRoute: typeof EmployeeTaxPayRoute
   EnrollFingerprintRoute: typeof EnrollFingerprintRoute
+  FestivalAllowanceRoute: typeof FestivalAllowanceRoute
+  FestivalAllowanceApprovalRoute: typeof FestivalAllowanceApprovalRoute
   FestivalAllowancePaymentSheetRoute: typeof FestivalAllowancePaymentSheetRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
   FinalSettlementRoute: typeof FinalSettlementRoute
@@ -4526,6 +4627,11 @@ export interface RootRouteChildren {
   LoanApplicationRoute: typeof LoanApplicationRoute
   LoanApprovalRoute: typeof LoanApprovalRoute
   LoginRoute: typeof LoginRoute
+  LunceRequisitionRoute: typeof LunceRequisitionRoute
+  LunceRequisitionApprovalRoute: typeof LunceRequisitionApprovalRoute
+  LunchRateFestivalRoute: typeof LunchRateFestivalRoute
+  LunchRequisitionRoute: typeof LunchRequisitionRoute
+  LunchRequisitionApprovalRoute: typeof LunchRequisitionApprovalRoute
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
   MaternityConfigurationRoute: typeof MaternityConfigurationRoute
@@ -4590,6 +4696,7 @@ export interface RootRouteChildren {
   PendingApprovalsRoute: typeof PendingApprovalsRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
   PermissionManagementRoute: typeof PermissionManagementRoute
+  PersonalInfoApprovalRoute: typeof PersonalInfoApprovalRoute
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
   PersonnelListRoute: typeof PersonnelListRoute
   PhonebookRoute: typeof PhonebookRoute
@@ -5098,6 +5205,20 @@ declare module '@tanstack/react-router' {
       path: '/enroll-fingerprint'
       fullPath: '/enroll-fingerprint'
       preLoaderRoute: typeof EnrollFingerprintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/festival-allowance': {
+      id: '/festival-allowance'
+      path: '/festival-allowance'
+      fullPath: '/festival-allowance'
+      preLoaderRoute: typeof FestivalAllowanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/festival-allowance-approval': {
+      id: '/festival-allowance-approval'
+      path: '/festival-allowance-approval'
+      fullPath: '/festival-allowance-approval'
+      preLoaderRoute: typeof FestivalAllowanceApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/festival-allowance-payment-sheet': {
@@ -5884,6 +6005,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lunce-requisition': {
+      id: '/lunce-requisition'
+      path: '/lunce-requisition'
+      fullPath: '/lunce-requisition'
+      preLoaderRoute: typeof LunceRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lunce-requisition-approval': {
+      id: '/lunce-requisition-approval'
+      path: '/lunce-requisition-approval'
+      fullPath: '/lunce-requisition-approval'
+      preLoaderRoute: typeof LunceRequisitionApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lunch-rate-festival': {
+      id: '/lunch-rate-festival'
+      path: '/lunch-rate-festival'
+      fullPath: '/lunch-rate-festival'
+      preLoaderRoute: typeof LunchRateFestivalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lunch-requisition': {
+      id: '/lunch-requisition'
+      path: '/lunch-requisition'
+      fullPath: '/lunch-requisition'
+      preLoaderRoute: typeof LunchRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lunch-requisition-approval': {
+      id: '/lunch-requisition-approval'
+      path: '/lunch-requisition-approval'
+      fullPath: '/lunch-requisition-approval'
+      preLoaderRoute: typeof LunchRequisitionApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/manage-overtime': {
       id: '/manage-overtime'
       path: '/manage-overtime'
@@ -6330,6 +6486,13 @@ declare module '@tanstack/react-router' {
       path: '/permission-management'
       fullPath: '/permission-management'
       preLoaderRoute: typeof PermissionManagementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/personal-info-approval': {
+      id: '/personal-info-approval'
+      path: '/personal-info-approval'
+      fullPath: '/personal-info-approval'
+      preLoaderRoute: typeof PersonalInfoApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/personnel-approval': {
@@ -7238,6 +7401,8 @@ const rootRouteChildren: RootRouteChildren = {
   EmployeeSalaryHistoryRoute: EmployeeSalaryHistoryRoute,
   EmployeeTaxPayRoute: EmployeeTaxPayRoute,
   EnrollFingerprintRoute: EnrollFingerprintRoute,
+  FestivalAllowanceRoute: FestivalAllowanceRoute,
+  FestivalAllowanceApprovalRoute: FestivalAllowanceApprovalRoute,
   FestivalAllowancePaymentSheetRoute: FestivalAllowancePaymentSheetRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
   FinalSettlementRoute: FinalSettlementRoute,
@@ -7352,6 +7517,11 @@ const rootRouteChildren: RootRouteChildren = {
   LoanApplicationRoute: LoanApplicationRoute,
   LoanApprovalRoute: LoanApprovalRoute,
   LoginRoute: LoginRoute,
+  LunceRequisitionRoute: LunceRequisitionRoute,
+  LunceRequisitionApprovalRoute: LunceRequisitionApprovalRoute,
+  LunchRateFestivalRoute: LunchRateFestivalRoute,
+  LunchRequisitionRoute: LunchRequisitionRoute,
+  LunchRequisitionApprovalRoute: LunchRequisitionApprovalRoute,
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
   MaternityConfigurationRoute: MaternityConfigurationRoute,
@@ -7417,6 +7587,7 @@ const rootRouteChildren: RootRouteChildren = {
   PendingApprovalsRoute: PendingApprovalsRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,
   PermissionManagementRoute: PermissionManagementRoute,
+  PersonalInfoApprovalRoute: PersonalInfoApprovalRoute,
   PersonnelApprovalRoute: PersonnelApprovalRoute,
   PersonnelListRoute: PersonnelListRoute,
   PhonebookRoute: PhonebookRoute,
