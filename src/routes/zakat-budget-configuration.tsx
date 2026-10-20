@@ -16,13 +16,15 @@ export const Route = createFileRoute("/zakat-budget-configuration")({
 
 interface ZakatRecord {
   id: string;
-  employeeName: string;
-  employeeId: string;
+  employeeName?: string;
+  employeeId?: string;
   amount: number;
-  recipientName: string;
-  recipientDetails: string;
-  asnafCategory: "Al-Fuqara" | "Al-Masakin" | "Al-Gharimin" | "Fi Sabilillah" | "Ibnus-Sabil";
-  distributionDeadline: string;
+  recipientName?: string;
+  beneficiaryName?: string;
+  recipientDetails?: string;
+  justificationDetails?: string;
+  asnafCategory?: string;
+  distributionDeadline?: string;
   assignedDate: string;
   agencyStatus: "Assigned" | "Acknowledged" | "Distributed" | "Verified";
   proofDetails?: {
