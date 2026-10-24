@@ -341,7 +341,7 @@ export const nav: NavItem[] = [
           { label: "Budget Configuration", to: "/zakat-budget-configuration" },
           { label: "Zakat List", to: "/zakat-list" },
           { label: "Asset Master Data", to: "/zakat-asset-master" },
-          { label: "Executive Multi-Dimensional Report", to: "/zakat-executive-report" },
+          { label: "Zakat Report Report", to: "/zakat-executive-report" },
         ]
       },
       {
@@ -465,7 +465,7 @@ export const nav: NavItem[] = [
           { label: "Monthly Salary Details", to: "/monthly-salary-details" },
           { label: "Monthly Lefty Salary Sheet", to: "/monthly-lefty-salary-sheet" },
           { label: "Employee Salary History", to: "/employee-salary-history" },
-          {label: "Monthly Advance Salary Sheet", to: "/monthly-advance-salary-sheet" },
+          { label: "Monthly Advance Salary Sheet", to: "/monthly-advance-salary-sheet" },
           { label: "Summary Salary Sheet", to: "/summary-salary-sheet" },
           { label: "Holiday Summary Sheet", to: "/holiday-summary-sheet" },
           { label: "Yearly Bonus Report", to: "/yearly-bonus-report" },
@@ -615,7 +615,7 @@ export function Sidebar() {
         try {
           const parsed = JSON.parse(saved);
           return { ...parsed, ...initial };
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     return initial;
@@ -704,7 +704,7 @@ export function Sidebar() {
             </div>
           </div>
         </div>
-        
+
         <div className="leading-tight">
           <div className="font-extrabold tracking-tight text-[13px] text-sidebar-foreground group-hover:text-primary transition-colors duration-300">
             CRIPTON

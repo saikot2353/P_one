@@ -48,6 +48,8 @@ import {
   FileUp,
   Zap,
   CreditCard,
+  MoreVertical,
+  ChevronDown,
 } from "lucide-react";
 
 export const Route = createFileRoute("/zakat-list")({
@@ -134,7 +136,7 @@ export function getActiveZakatAssetMasterList(): ZakatAssetMasterItem[] {
             suggestedPurpose: (it.suggestedPurpose as ZakatPurposeCategory) || "Business Setup",
           }));
         }
-      } catch (e) {}
+      } catch (e) { }
     }
   }
   return ZAKAT_ASSET_MASTER_DATA;
@@ -325,14 +327,14 @@ export interface RecurringZakatSchedule {
   purposeCategory: ZakatPurposeCategory;
   otherPurposeDetails?: string;
   purposeDescription: string;
-  
+
   // Cadence & Advance Settlement
   cadence?: DisbursementCadence; // Monthly, Quarterly, Bi-Annual, Annual Lump Sum
   settlementType?: DisbursementSettlementType; // Periodic Installments vs 1-Year Full Advance
   isUpfrontFullYearPaid?: boolean;
   disbursementMethod?: "Bank Transfer" | "Mobile Financial Service" | "Cash Handover" | "In-Kind Delivery";
   paymentDetails?: string;
-  
+
   // Beneficiary Identity
   employeeId?: string;
   employeeName?: string;
@@ -345,7 +347,7 @@ export interface RecurringZakatSchedule {
   institutionType?: "Madrasa" | "Mosque" | "Orphanage" | "Hospital" | "Trust/NGO" | "Other";
   institutionRepresentative?: string;
   institutionContactPhone?: string;
-  
+
   asnafCategory: "Al-Fuqara" | "Al-Masakin" | "Al-Gharimin" | "Fi Sabilillah" | "Ibnus-Sabil";
   monthlyAmount: number; // Fully flexible (not hardcoded to 10k)
   disbursementDayOfMonth: number;
@@ -368,19 +370,19 @@ export interface ZakatRecord {
   assignedDate: string;
   distributionDeadline: string;
   amount: number;
-  
+
   // Three Core Governance Axes:
   disbursementChannel: ZakatDisbursementChannel;
   disbursementMode: ZakatDisbursementMode;
   purposeCategory: ZakatPurposeCategory;
-  
+
   // Asset specifications (when mode === "Asset Purchased")
   assetDetails?: ZakatAssetDetails;
-  
+
   // Custom purpose text (when purposeCategory === "Others")
   otherPurposeDetails?: string;
   purposeSpecificDescription?: string;
-  
+
   // Recurring linkage & Advance Settlement
   isRecurring?: boolean;
   recurringScheduleId?: string;
@@ -388,7 +390,7 @@ export interface ZakatRecord {
   installmentTotal?: number;
   isAdvanceLumpSum?: boolean;
   advancePeriodCovered?: string;
-  
+
   // Beneficiary & Agent Identity
   employeeId?: string;
   employeeName?: string;
@@ -402,7 +404,7 @@ export interface ZakatRecord {
   institutionType?: "Madrasa" | "Mosque" | "Orphanage" | "Hospital" | "Trust/NGO" | "Other";
   institutionRepresentative?: string;
   institutionContactPhone?: string;
-  
+
   asnafCategory: "Al-Fuqara" | "Al-Masakin" | "Al-Gharimin" | "Fi Sabilillah" | "Ibnus-Sabil";
   justificationDetails: string;
   agencyStatus: "Assigned" | "Acknowledged" | "Distributed" | "Verified";
@@ -414,7 +416,7 @@ export interface ZakatRecord {
     submittedAt: string;
   };
   attachments?: ZakatAttachment[]; // Uploaded supporting documents
-  
+
   // Legacy compatibility fields
   recipientType?: string;
   recipientName?: string;
@@ -425,7 +427,7 @@ export interface ZakatRecord {
 // 2. BASELINE SAMPLE RECORDS
 // ==========================================
 
-const defaultZakatRecords: ZakatRecord[] = [
+export const defaultZakatRecords: ZakatRecord[] = [
   {
     id: "ZK-2026-01",
     budgetYear: 2026,
@@ -884,7 +886,9 @@ const defaultZakatRecords: ZakatRecord[] = [
   },
 ];
 
-const defaultRecurringSchedules: RecurringZakatSchedule[] = [
+export const INITIAL_ZAKAT_DATA = defaultZakatRecords;
+
+export const defaultRecurringSchedules: RecurringZakatSchedule[] = [
   {
     id: "REC-ZK-2026-01",
     title: "Monthly Medical Treatment Stipend for Easin Mia",
@@ -1015,6 +1019,12 @@ const defaultRecurringSchedules: RecurringZakatSchedule[] = [
   },
 ];
 
+export const INITIAL_RECURRING_SCHEDULES = defaultRecurringSchedules;
+export const INITIAL_BUDGET_POOLS = [
+  { year: 2026, amount: 800000 },
+  { year: 2025, amount: 650000 },
+];
+
 // Helper to convert BDT amounts to words for formal receipts
 function numberToWordsBDT(amount: number): string {
   if (!amount || isNaN(amount)) return "Zero Taka Only";
@@ -1069,7 +1079,7 @@ function normalizeRecords(raw: any[]): ZakatRecord[] {
   const parsed = raw.map((r, idx) => {
     const beneficiary = r.beneficiaryName || r.recipientName || "Beneficiary";
     const justification = r.justificationDetails || r.recipientDetails || "Zakat support";
-    
+
     // Resolve channel
     let channel: ZakatDisbursementChannel = "Direct External";
     if (r.disbursementChannel) {
@@ -1171,7 +1181,7 @@ function ZakatManagementPage() {
       if (saved) {
         try {
           return normalizeRecords(JSON.parse(saved));
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     return defaultZakatRecords;
@@ -1184,7 +1194,7 @@ function ZakatManagementPage() {
         try {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) return normalizeSchedules(parsed);
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     return defaultRecurringSchedules;
@@ -1196,7 +1206,7 @@ function ZakatManagementPage() {
       if (saved) {
         try {
           return JSON.parse(saved);
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     return [{ year: new Date().getFullYear(), amount: 800000 }];
@@ -1204,6 +1214,17 @@ function ZakatManagementPage() {
 
   const [selectedBudgetYear, setSelectedBudgetYear] = useState<number>(new Date().getFullYear());
   const [autoGenNotice, setAutoGenNotice] = useState<string | null>(null);
+  const [activeActionMenuId, setActiveActionMenuId] = useState<string | null>(null);
+
+  // Close dropdowns on window click
+  useEffect(() => {
+    const handleWindowClick = () => {
+      setActiveActionMenuId(null);
+      setIsEmpDropdownOpen(false);
+    };
+    window.addEventListener("click", handleWindowClick);
+    return () => window.removeEventListener("click", handleWindowClick);
+  }, []);
 
   // Sync to LocalStorage
   useEffect(() => {
@@ -1341,7 +1362,7 @@ function ZakatManagementPage() {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [modalChannel, setModalChannel] = useState<ZakatDisbursementChannel>("Direct Employee");
   const [modalMode, setModalMode] = useState<ZakatDisbursementMode>("Cash Grant");
-  
+
   // Asset Fields (when modalMode === "Asset Purchased")
   const [modalAssetMasterId, setModalAssetMasterId] = useState("");
   const [modalAssetType, setModalAssetType] = useState("");
@@ -1362,7 +1383,7 @@ function ZakatManagementPage() {
   const [newInstitutionType, setNewInstitutionType] = useState<"Madrasa" | "Mosque" | "Orphanage" | "Hospital" | "Trust/NGO" | "Other">("Madrasa");
   const [newInstitutionRep, setNewInstitutionRep] = useState("");
   const [newInstitutionPhone, setNewInstitutionPhone] = useState("");
-  
+
   // Purpose & Financials
   const [newPurposeCategory, setNewPurposeCategory] = useState<ZakatPurposeCategory>("Medical Treatment");
   const [newOtherPurposeDetails, setNewOtherPurposeDetails] = useState("");
@@ -1569,7 +1590,7 @@ function ZakatManagementPage() {
         try {
           const parsed = JSON.parse(synced);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     return [
@@ -1640,10 +1661,13 @@ function ZakatManagementPage() {
   }, []);
 
   const filteredEmployeesForDropdown = useMemo(() => {
-    if (!empSearchInput.trim()) return [];
+    if (!empSearchInput.trim()) return employeesList;
     const q = empSearchInput.toLowerCase();
     return employeesList.filter(
-      (emp) => emp.name.toLowerCase().includes(q) || emp.id.toLowerCase().includes(q)
+      (emp) =>
+        emp.name.toLowerCase().includes(q) ||
+        emp.id.toLowerCase().includes(q) ||
+        (emp.dept && emp.dept.toLowerCase().includes(q))
     );
   }, [employeesList, empSearchInput]);
 
@@ -1666,7 +1690,7 @@ function ZakatManagementPage() {
               .filter((r: any) => r.employeeId === empId && r.agencyStatus === "Verified")
               .reduce((sum, r) => sum + (r.amount || 0), 0);
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       const savedAid = localStorage.getItem("cripton_financial_aid");
@@ -1678,7 +1702,7 @@ function ZakatManagementPage() {
               .filter((r: any) => r.employeeId === empId && r.status === "Approved")
               .reduce((sum, r) => sum + (r.amount || 0), 0);
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     return { totalZakat, totalAid };
@@ -1881,8 +1905,8 @@ function ZakatManagementPage() {
       modalChannel === "Direct Employee"
         ? `${newEmpName} (Staff Self)`
         : modalChannel === "Direct External" && newInstitutionName.trim()
-        ? newInstitutionName
-        : newBeneficiaryName;
+          ? newInstitutionName
+          : newBeneficiaryName;
 
     const newRecord: ZakatRecord = {
       id: `ZK-${selectedBudgetYear}-${String(records.length + 1).padStart(2, "0")}`,
@@ -1896,13 +1920,13 @@ function ZakatManagementPage() {
       assetDetails:
         modalMode === "Asset Purchased"
           ? {
-              assetType: modalAssetType || undefined,
-              assetName: modalAssetName,
-              assetQuantity: modalAssetQty || "1 Unit",
-              vendorOrMarket: modalAssetVendor,
-              invoiceRef: modalAssetInvoice,
-              remarks: modalAssetRemarks || undefined,
-            }
+            assetType: modalAssetType || undefined,
+            assetName: modalAssetName,
+            assetQuantity: modalAssetQty || "1 Unit",
+            vendorOrMarket: modalAssetVendor,
+            invoiceRef: modalAssetInvoice,
+            remarks: modalAssetRemarks || undefined,
+          }
           : undefined,
       purposeCategory: newPurposeCategory,
       otherPurposeDetails: newPurposeCategory === "Others" ? newOtherPurposeDetails : undefined,
@@ -1911,8 +1935,8 @@ function ZakatManagementPage() {
         (modalMode === "Asset Purchased"
           ? `Asset: ${modalAssetName}`
           : newPurposeCategory === "Others"
-          ? newOtherPurposeDetails
-          : `${newPurposeCategory} Grant`),
+            ? newOtherPurposeDetails
+            : `${newPurposeCategory} Grant`),
       employeeId: modalChannel === "Direct Employee" || modalChannel === "Via Employee Agent" ? newEmpId : undefined,
       employeeName: modalChannel === "Direct Employee" || modalChannel === "Via Employee Agent" ? newEmpName : undefined,
       employeeDept: selectedEmpDetails?.dept,
@@ -1972,8 +1996,8 @@ function ZakatManagementPage() {
       recChannel === "Direct Employee"
         ? `${recEmpName} (Staff)`
         : recChannel === "Direct External" && recInstitutionName
-        ? recInstitutionName
-        : recBeneficiaryName;
+          ? recInstitutionName
+          : recBeneficiaryName;
 
     const isAdvance = recSettlementType === "1-Year Full Advance";
     const plannedMonths = isAdvance ? (parseInt(recTotalMonths) || 12) : (parseInt(recTotalMonths) || undefined);
@@ -1988,13 +2012,13 @@ function ZakatManagementPage() {
       assetDetails:
         recMode === "Asset Purchased"
           ? {
-              assetType: recAssetType || undefined,
-              assetName: recAssetName || recTitle,
-              assetQuantity: recAssetQty || "1 Unit",
-              vendorOrMarket: recAssetVendor,
-              invoiceRef: recAssetInvoice,
-              remarks: recAssetRemarks || undefined,
-            }
+            assetType: recAssetType || undefined,
+            assetName: recAssetName || recTitle,
+            assetQuantity: recAssetQty || "1 Unit",
+            vendorOrMarket: recAssetVendor,
+            invoiceRef: recAssetInvoice,
+            remarks: recAssetRemarks || undefined,
+          }
           : undefined,
       employeeId: recChannel === "Direct Employee" || recChannel === "Via Employee Agent" ? recEmpId : undefined,
       employeeName: recChannel === "Direct Employee" || recChannel === "Via Employee Agent" ? recEmpName : undefined,
@@ -2472,129 +2496,14 @@ function ZakatManagementPage() {
             </div>
           )}
 
-          {/* Tier 1: Macro Budget & 3-Way Channel Segregation Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 print:hidden">
-            {/* Total Budget */}
-            <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col justify-between">
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                {selectedBudgetYear} Budget Pool
-              </span>
-              <div className="text-lg font-black text-slate-900 mt-1 font-mono">
-                ৳ {stats.currentBudget.toLocaleString()}
-              </div>
-              <div className="text-[10px] text-slate-500 font-semibold mt-0.5">Corporate Allocation</div>
-            </div>
-
-            {/* Channel 1: Direct Employee */}
-            <div 
-              onClick={() => openDrillDownForChannel("Direct Employee", "ALL")}
-              className="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-200/80 shadow-xs flex flex-col justify-between cursor-pointer hover:shadow-md hover:border-purple-300 transition-all group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[9px] font-bold text-purple-700 uppercase tracking-widest group-hover:underline">
-                  1. Direct Employee
-                </span>
-              </div>
-              <div className="text-lg font-black text-purple-800 mt-1 font-mono">
-                ৳ {stats.totalDirectEmployee.toLocaleString()}
-              </div>
-              <div className="text-[10px] text-purple-600 font-medium mt-0.5">
-                {stats.countDirectEmployee} Staff Beneficiaries &rarr;
-              </div>
-            </div>
-
-            {/* Channel 2: Via Employee Agent */}
-            <div 
-              onClick={() => openDrillDownForChannel("Via Employee Agent", "ALL")}
-              className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200/80 shadow-xs flex flex-col justify-between cursor-pointer hover:shadow-md hover:border-blue-300 transition-all group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[9px] font-bold text-blue-700 uppercase tracking-widest group-hover:underline">
-                  2. Via Staff Agent
-                </span>
-              </div>
-              <div className="text-lg font-black text-blue-800 mt-1 font-mono">
-                ৳ {stats.totalViaAgent.toLocaleString()}
-              </div>
-              <div className="text-[10px] text-blue-600 font-medium mt-0.5">
-                {stats.countViaAgent} Distributed in Villages &rarr;
-              </div>
-            </div>
-
-            {/* Channel 3: Direct External */}
-            <div 
-              onClick={() => openDrillDownForChannel("Direct External", "ALL")}
-              className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 shadow-xs flex flex-col justify-between cursor-pointer hover:shadow-md hover:border-amber-300 transition-all group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[9px] font-bold text-amber-700 uppercase tracking-widest group-hover:underline">
-                  3. Direct External
-                </span>
-              </div>
-              <div className="text-lg font-black text-amber-800 mt-1 font-mono">
-                ৳ {stats.totalDirectExternal.toLocaleString()}
-              </div>
-              <div className="text-[10px] text-amber-600 font-medium mt-0.5">
-                {stats.countDirectExternal} Madrasa / Public &rarr;
-              </div>
-            </div>
-
-            {/* Mode Split: Cash vs. Asset Purchased */}
-            <div 
-              onClick={() => {
-                setDrillDownState({
-                  isOpen: true,
-                  title: "All Aid Modes — Cash & Asset Distribution Portfolio",
-                  subtitle: `Complete breakdown of in-kind asset purchases vs. cash grants (${selectedBudgetYear})`,
-                  purpose: "ALL",
-                  channel: "ALL",
-                  mode: "ALL",
-                });
-                setDrillDownModeFilter("ALL");
-                setDrillDownChannelFilter("ALL");
-                setDrillDownSearch("");
-              }}
-              className="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-200/80 shadow-xs flex flex-col justify-between cursor-pointer hover:shadow-md hover:border-indigo-300 transition-all group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[9px] font-bold text-indigo-700 uppercase tracking-widest group-hover:underline">
-                  Asset vs. Cash Split
-                </span>
-              </div>
-              <div className="text-xs font-black text-indigo-900 mt-1 font-mono space-y-0.5">
-                <div>Asset: ৳{stats.totalAssetPurchased.toLocaleString()}</div>
-                <div className="text-slate-600 font-medium">Cash: ৳{stats.totalCashGrants.toLocaleString()}</div>
-              </div>
-              <div className="text-[10px] text-indigo-600 font-semibold mt-0.5">
-                {stats.countAssetPurchased} Assets (Van, Cow, Dokan) &rarr;
-              </div>
-            </div>
-
-            {/* Remaining Balance */}
-            <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 shadow-xs flex flex-col justify-between">
-              <span className="text-[9px] font-bold text-emerald-700 uppercase tracking-widest">
-                Remaining Balance
-              </span>
-              <div className="text-lg font-black text-emerald-800 mt-1 font-mono">
-                ৳ {stats.remainingBudget.toLocaleString()}
-              </div>
-              <div className="text-[10px] text-emerald-600 font-medium mt-0.5">
-                {stats.totalAssigned > 0
-                  ? `${((stats.totalAssigned / stats.currentBudget) * 100).toFixed(1)}% disbursed`
-                  : "0% disbursed"}
-              </div>
-            </div>
-          </div>
-
           {/* Sub-Navigation Tabs */}
           <div className="flex items-center gap-2 border-b border-slate-200 pb-2 print:hidden">
             <button
               onClick={() => setActiveTab("ledger")}
-              className={`h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer ${
-                activeTab === "ledger"
+              className={`h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer ${activeTab === "ledger"
                   ? "bg-slate-900 text-white shadow-xs"
                   : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-              }`}
+                }`}
             >
               <span>All Detailed Report</span>
               <span className="px-1.5 py-0.5 rounded-full bg-slate-800 text-[10px] text-white font-bold">
@@ -2604,11 +2513,10 @@ function ZakatManagementPage() {
 
             <button
               onClick={() => setActiveTab("recurring")}
-              className={`h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer ${
-                activeTab === "recurring"
+              className={`h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer ${activeTab === "recurring"
                   ? "bg-emerald-700 text-white shadow-xs"
                   : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-              }`}
+                }`}
             >
               <span>Monthly Recurring Stipends</span>
               <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
@@ -2619,9 +2527,9 @@ function ZakatManagementPage() {
             <Link
               to="/zakat-executive-report"
               className="h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-              title="Open Executive Multi-Dimensional Report sub-menu"
+              title="Open Zakat Report Report sub-menu"
             >
-              <span>Executive Multi-Dimensional Report</span>
+              <span>Zakat Report Report</span>
               <ExternalLink className="size-3 text-blue-600" />
             </Link>
           </div>
@@ -2758,7 +2666,7 @@ function ZakatManagementPage() {
 
               {/* Regular, Simple, Professional Corporate Table */}
               <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto min-h-[280px]">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
@@ -2778,11 +2686,10 @@ function ZakatManagementPage() {
                         const isSelected = row.id === selectedRecordId;
                         return (
                           <tr
-                            key={row.id}
+                            key={`${row.id}-${index}`}
                             onClick={() => setSelectedRecordId(row.id)}
-                            className={`cursor-pointer transition-colors hover:bg-slate-50/75 ${
-                              isSelected ? "bg-slate-100/60" : ""
-                            }`}
+                            className={`cursor-pointer transition-colors hover:bg-slate-50/75 ${isSelected ? "bg-slate-100/60" : ""
+                              }`}
                           >
                             <td className="px-4 py-3 text-xs text-slate-400 text-center font-medium">
                               {index + 1}
@@ -2869,47 +2776,82 @@ function ZakatManagementPage() {
                             {/* Status */}
                             <td className="px-4 py-3 align-top text-center whitespace-nowrap">
                               <span
-                                className={`inline-block px-2 py-0.5 rounded text-[11px] font-medium border ${
-                                  row.agencyStatus === "Verified"
+                                className={`inline-block px-2 py-0.5 rounded text-[11px] font-medium border ${row.agencyStatus === "Verified"
                                     ? "bg-emerald-50 text-emerald-800 border-emerald-200"
                                     : row.agencyStatus === "Distributed"
-                                    ? "bg-amber-50 text-amber-800 border-amber-200"
-                                    : "bg-slate-100 text-slate-700 border-slate-200"
-                                }`}
+                                      ? "bg-amber-50 text-amber-800 border-amber-200"
+                                      : "bg-slate-100 text-slate-700 border-slate-200"
+                                  }`}
                               >
                                 {row.agencyStatus}
                               </span>
                             </td>
 
-                            {/* Actions */}
-                            <td className="px-4 py-3 align-top text-center whitespace-nowrap print:hidden" onClick={(e) => e.stopPropagation()}>
-                              <div className="flex items-center justify-center gap-1.5">
+                            {/* Actions (Three-dot dropdown) */}
+                            <td className="px-4 py-3 align-top text-center whitespace-nowrap print:hidden relative" onClick={(e) => e.stopPropagation()}>
+                              <div className="relative inline-block text-left">
                                 <button
                                   type="button"
-                                  onClick={() => setSelectedRecordId(row.id)}
-                                  className="px-2.5 py-1 rounded border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium cursor-pointer transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveActionMenuId((prev) => (prev === row.id ? null : row.id));
+                                  }}
+                                  className="p-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer shadow-2xs focus:outline-none"
+                                  title="Actions"
                                 >
-                                  Inspect
+                                  <MoreVertical className="size-4" />
                                 </button>
-                                {row.agencyStatus !== "Verified" && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setSelectedRecordId(row.id);
-                                      setIsProofModalOpen(true);
-                                    }}
-                                    className="px-2.5 py-1 rounded border border-slate-300 bg-white hover:bg-slate-50 text-emerald-700 text-xs font-medium cursor-pointer transition-colors"
+
+                                {activeActionMenuId === row.id && (
+                                  <div
+                                    className={`absolute right-0 w-32 bg-white rounded-lg shadow-xl border border-slate-200 py-1 z-50 animate-in fade-in zoom-in-95 duration-100 ${index >= Math.max(0, filteredRecords.length - 2) && filteredRecords.length > 2
+                                        ? "bottom-full mb-1"
+                                        : "top-full mt-1"
+                                      }`}
+                                    onClick={(e) => e.stopPropagation()}
                                   >
-                                    Proof
-                                  </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedRecordId(row.id);
+                                        setActiveActionMenuId(null);
+                                      }}
+                                      className="w-full px-3 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-2 cursor-pointer transition-colors"
+                                    >
+                                      <Eye className="size-3.5 text-slate-500" />
+                                      <span>Inspect</span>
+                                    </button>
+
+                                    {row.agencyStatus !== "Verified" && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedRecordId(row.id);
+                                          setIsProofModalOpen(true);
+                                          setActiveActionMenuId(null);
+                                        }}
+                                        className="w-full px-3 py-1.5 text-left text-xs font-medium text-emerald-700 hover:bg-emerald-50 flex items-center gap-2 cursor-pointer transition-colors"
+                                      >
+                                        <Paperclip className="size-3.5 text-emerald-600" />
+                                        <span>Proof</span>
+                                      </button>
+                                    )}
+
+                                    <div className="my-1 border-t border-slate-100" />
+
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        setActiveActionMenuId(null);
+                                        handleDeleteRecord(row.id, e);
+                                      }}
+                                      className="w-full px-3 py-1.5 text-left text-xs font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer transition-colors"
+                                    >
+                                      <Trash2 className="size-3.5 text-red-500" />
+                                      <span>Delete</span>
+                                    </button>
+                                  </div>
                                 )}
-                                <button
-                                  type="button"
-                                  onClick={(e) => handleDeleteRecord(row.id, e)}
-                                  className="px-2.5 py-1 rounded border border-slate-200 bg-white hover:bg-red-50 text-red-600 text-xs font-medium cursor-pointer transition-colors"
-                                >
-                                  Delete
-                                </button>
                               </div>
                             </td>
                           </tr>
@@ -2987,9 +2929,8 @@ function ZakatManagementPage() {
                   return (
                     <div
                       key={schedule.id}
-                      className={`bg-white rounded-2xl p-4 border shadow-xs space-y-3 relative hover:border-slate-300 transition-colors ${
-                        isUpfrontPaid ? "border-emerald-300/80 bg-gradient-to-br from-white via-emerald-50/20 to-white" : "border-slate-200/80"
-                      }`}
+                      className={`bg-white rounded-2xl p-4 border shadow-xs space-y-3 relative hover:border-slate-300 transition-colors ${isUpfrontPaid ? "border-emerald-300/80 bg-gradient-to-br from-white via-emerald-50/20 to-white" : "border-slate-200/80"
+                        }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
@@ -3002,9 +2943,8 @@ function ZakatManagementPage() {
                             ) : (
                               <>
                                 <span
-                                  className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                                    isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-600"
-                                  }`}
+                                  className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-600"
+                                    }`}
                                 >
                                   {schedule.status}
                                 </span>
@@ -3087,13 +3027,12 @@ function ZakatManagementPage() {
                           <div
                             className="h-full bg-emerald-500 rounded-full transition-all duration-300"
                             style={{
-                              width: `${
-                                isUpfrontPaid
+                              width: `${isUpfrontPaid
                                   ? 100
                                   : schedule.totalPlannedMonths
-                                  ? Math.min(100, (schedule.installmentsGenerated / schedule.totalPlannedMonths) * 100)
-                                  : 50
-                              }%`,
+                                    ? Math.min(100, (schedule.installmentsGenerated / schedule.totalPlannedMonths) * 100)
+                                    : 50
+                                }%`,
                             }}
                           ></div>
                         </div>
@@ -3112,11 +3051,10 @@ function ZakatManagementPage() {
                             <>
                               <button
                                 onClick={() => handleToggleScheduleStatus(schedule.id, schedule.status)}
-                                className={`h-7 px-2.5 rounded-lg font-bold text-[10px] flex items-center gap-1 cursor-pointer transition-colors ${
-                                  isActive
+                                className={`h-7 px-2.5 rounded-lg font-bold text-[10px] flex items-center gap-1 cursor-pointer transition-colors ${isActive
                                     ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
                                     : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-                                }`}
+                                  }`}
                               >
                                 {isActive ? <Pause className="size-3" /> : <Play className="size-3" />}
                                 <span>{isActive ? "Pause" : "Resume"}</span>
@@ -3163,390 +3101,6 @@ function ZakatManagementPage() {
             </div>
           )}
 
-          {/* ========================================================= */}
-          {/* TAB 3: EXECUTIVE MULTI-DIMENSIONAL AUDIT REPORT           */}
-          {/* ========================================================= */}
-          {activeTab === "audit" && (
-            <div className="space-y-5">
-              {/* Report Header */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-base font-bold text-slate-900">
-                    Executive Multi-Dimensional Zakat Governance Report ({selectedBudgetYear})
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Audited cross-tabulation of funds disbursed by Beneficiary Channel (Direct Staff vs. Agent vs. Outside) and Aid Mode (Cash vs. Asset Purchases).
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 print:hidden">
-                  <button
-                    onClick={() => {
-                      setDrillDownState({
-                        isOpen: true,
-                        title: "All Purpose Categories — Complete Portfolio Breakdown",
-                        subtitle: `Complete audit trail of all allocations and cases across all channels and categories (${selectedBudgetYear})`,
-                        purpose: "ALL",
-                        channel: "ALL",
-                        mode: "ALL",
-                      });
-                      setDrillDownModeFilter("ALL");
-                      setDrillDownChannelFilter("ALL");
-                      setDrillDownSearch("");
-                    }}
-                    className="h-8 px-3.5 bg-slate-900 hover:bg-black text-white font-medium text-xs rounded border border-slate-900 transition-colors cursor-pointer shadow-xs"
-                  >
-                    View All Detailed Report
-                  </button>
-                  <button
-                    onClick={handlePrint}
-                    className="h-8 px-3.5 bg-white hover:bg-slate-50 text-slate-700 font-medium text-xs rounded border border-slate-300 transition-colors cursor-pointer shadow-xs"
-                  >
-                    Print Executive Statement
-                  </button>
-                </div>
-              </div>
-
-              {/* REPORT 1: CHANNEL SEGREGATION MATRIX */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">
-                      Report 1: Beneficiary Channel Segregation (Staff vs. Agent vs. Outside)
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Segregates funds distributed directly to staff, channeled through staff proxies for village handovers, or paid to external parties.
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider self-start sm:self-auto">
-                    Staff vs. Staff Agent vs. Outside
-                  </span>
-                </div>
-
-                {/* Explanatory Notice */}
-                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between text-xs text-slate-700">
-                  <div>
-                    <strong>Clickable Audit Trail:</strong> Click any channel row or disbursement figure to view the itemized list of beneficiaries, locations, agent handover chains, and receipts.
-                  </div>
-                  <span className="hidden md:inline-block text-[10px] font-semibold uppercase tracking-wider text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded">
-                    Clickable Drill-Down
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto rounded-lg border border-slate-200">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
-                        <th className="px-4 py-3">Disbursement Channel</th>
-                        <th className="px-4 py-3 text-right">Cash Grants (৳)</th>
-                        <th className="px-4 py-3 text-right">Asset Purchased (৳)</th>
-                        <th className="px-4 py-3 text-right font-bold text-slate-900">Total Disbursed (৳)</th>
-                        <th className="px-4 py-3 text-center">Cases</th>
-                        <th className="px-4 py-3 text-right">Share of Zakat (%)</th>
-                        <th className="px-4 py-3 text-center">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 bg-white">
-                      {[
-                        {
-                          channel: "Direct Employee" as ZakatDisbursementChannel,
-                          label: "Direct Employee (Company Staff)",
-                          desc: "Disbursed directly to eligible company staff in need",
-                        },
-                        {
-                          channel: "Via Employee Agent" as ZakatDisbursementChannel,
-                          label: "Via Staff Agent (Village Handover)",
-                          desc: "Handed to employee to distribute to verified village poor",
-                        },
-                        {
-                          channel: "Direct External" as ZakatDisbursementChannel,
-                          label: "Direct External (Outside Person / Madrasa)",
-                          desc: "Given directly to outside needy people, mosques, or madrasas",
-                        },
-                      ].map((item) => {
-                        const channelRecords = records.filter(
-                          (r) =>
-                            (r.budgetYear === selectedBudgetYear || r.assignedDate.startsWith(selectedBudgetYear.toString())) &&
-                            r.disbursementChannel === item.channel
-                        );
-
-                        const cashTotal = channelRecords
-                          .filter((r) => r.disbursementMode !== "Asset Purchased")
-                          .reduce((sum, r) => sum + r.amount, 0);
-
-                        const assetTotal = channelRecords
-                          .filter((r) => r.disbursementMode === "Asset Purchased")
-                          .reduce((sum, r) => sum + r.amount, 0);
-
-                        const total = cashTotal + assetTotal;
-                        const share =
-                          stats.totalAssigned > 0 ? ((total / stats.totalAssigned) * 100).toFixed(1) : "0.0";
-
-                        return (
-                          <tr key={item.channel} className="hover:bg-slate-50/75 transition-colors">
-                            <td 
-                              onClick={() => openDrillDownForChannel(item.channel, "ALL")}
-                              className="px-4 py-3 cursor-pointer"
-                            >
-                              <div className="font-semibold text-slate-900 hover:text-blue-700 transition-colors">{item.label}</div>
-                              <div className="text-[11px] text-slate-500 mt-0.5">{item.desc}</div>
-                            </td>
-                            <td 
-                              onClick={() => openDrillDownForChannel(item.channel, "Cash Grant")}
-                              title="Click to view Cash Grants for this channel"
-                              className="px-4 py-3 font-mono text-right text-slate-900 font-medium cursor-pointer hover:bg-slate-100 transition-colors"
-                            >
-                              ৳ {cashTotal.toLocaleString()}
-                            </td>
-                            <td 
-                              onClick={() => openDrillDownForChannel(item.channel, "Asset Purchased")}
-                              title="Click to view Assets Purchased for this channel"
-                              className="px-4 py-3 font-mono text-right text-slate-900 font-medium cursor-pointer hover:bg-slate-100 transition-colors"
-                            >
-                              ৳ {assetTotal.toLocaleString()}
-                            </td>
-                            <td 
-                              onClick={() => openDrillDownForChannel(item.channel, "ALL")}
-                              title="Click to view all cases for this channel"
-                              className="px-4 py-3 font-mono text-right font-bold text-slate-900 cursor-pointer hover:bg-slate-100 transition-colors"
-                            >
-                              ৳ {total.toLocaleString()}
-                            </td>
-                            <td 
-                              onClick={() => openDrillDownForChannel(item.channel, "ALL")}
-                              className="px-4 py-3 text-center font-medium text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
-                            >
-                              {channelRecords.length}
-                            </td>
-                            <td className="px-4 py-3 text-right font-mono font-medium text-slate-700">
-                              {share}%
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <button
-                                type="button"
-                                onClick={() => openDrillDownForChannel(item.channel, "ALL")}
-                                className="px-2.5 py-1 rounded border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
-                              >
-                                Inspect ({channelRecords.length})
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-
-                      {/* Total Row */}
-                      <tr 
-                        onClick={() => {
-                          setDrillDownState({
-                            isOpen: true,
-                            title: "All Disbursement Channels — Executive Breakdown",
-                            subtitle: `Audited breakdown of all cases across all channels (${selectedBudgetYear})`,
-                            purpose: "ALL",
-                            channel: "ALL",
-                            mode: "ALL",
-                          });
-                          setDrillDownModeFilter("ALL");
-                          setDrillDownChannelFilter("ALL");
-                          setDrillDownSearch("");
-                        }}
-                        className="bg-slate-100/80 font-bold border-t-2 border-slate-300 hover:bg-slate-200/70 cursor-pointer transition-colors"
-                      >
-                        <td className="px-4 py-3 uppercase text-slate-800">
-                          Total All Channels
-                        </td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-900 font-bold">
-                          ৳ {stats.totalCashGrants.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-900 font-bold">
-                          ৳ {stats.totalAssetPurchased.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-900 font-bold text-sm">
-                          ৳ {stats.totalAssigned.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-center text-slate-900">{stats.totalRecords}</td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-900">100.0%</td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            type="button"
-                            className="px-3 py-1 rounded bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium cursor-pointer"
-                          >
-                            View All
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* REPORT 2: PURPOSE & ASSET PURCHASE MATRIX */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">
-                      Report 2: Purpose & Asset Purchase Matrix (Cash Grants vs. Physical Assets Purchased)
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Cross-tabulates funds by objective (Medical, Mosque/Madrasa, Vehicle, Cow/Goat, Tea stall/Store) and aid medium (Direct Cash vs. Physical Asset Purchased).
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider self-start sm:self-auto">
-                    Cash vs. Physical Assets
-                  </span>
-                </div>
-
-                {/* Explanatory Notice */}
-                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between text-xs text-slate-700">
-                  <div>
-                    <strong>Clickable Purpose Breakdown:</strong> Click any category or amount below to inspect individual cases, vendors, equipment, and receipts.
-                  </div>
-                  <span className="hidden md:inline-block text-[10px] font-semibold uppercase tracking-wider text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded">
-                    Detailed Breakdown
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto rounded-lg border border-slate-200">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
-                        <th className="px-4 py-3">Purpose Category</th>
-                        <th className="px-4 py-3 text-right">Cash Given (৳)</th>
-                        <th className="px-4 py-3 text-right">Asset / Item Bought (৳)</th>
-                        <th className="px-4 py-3 text-right font-bold text-slate-900">Total (৳)</th>
-                        <th className="px-4 py-3 text-center">Cases</th>
-                        <th className="px-4 py-3">Sample Physical Assets Provided</th>
-                        <th className="px-4 py-3 text-center">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 bg-white">
-                      {(
-                        [
-                          "Mosque/Madrasa",
-                          "Medical Treatment",
-                          "Vehicle",
-                          "Farm Animal",
-                          "Business Setup",
-                          "Others",
-                        ] as ZakatPurposeCategory[]
-                      ).map((purpose) => {
-                        const purposeRecords = records.filter(
-                          (r) =>
-                            (r.budgetYear === selectedBudgetYear || r.assignedDate.startsWith(selectedBudgetYear.toString())) &&
-                            r.purposeCategory === purpose
-                        );
-
-                        const cashAmt = purposeRecords
-                          .filter((r) => r.disbursementMode !== "Asset Purchased")
-                          .reduce((sum, r) => sum + r.amount, 0);
-
-                        const assetAmt = purposeRecords
-                          .filter((r) => r.disbursementMode === "Asset Purchased")
-                          .reduce((sum, r) => sum + r.amount, 0);
-
-                        const total = cashAmt + assetAmt;
-
-                        const sampleAssets = purposeRecords
-                          .filter((r) => r.assetDetails?.assetName)
-                          .map((r) => r.assetDetails!.assetName)
-                          .slice(0, 2)
-                          .join(", ");
-
-                        return (
-                          <tr key={purpose} className="hover:bg-slate-50/75 transition-colors">
-                            <td 
-                              onClick={() => openDrillDownForPurpose(purpose, "ALL")}
-                              className="px-4 py-3 font-semibold text-slate-900 cursor-pointer hover:text-blue-700 transition-colors"
-                            >
-                              {purpose}
-                            </td>
-                            <td 
-                              onClick={() => openDrillDownForPurpose(purpose, "Cash Grant")}
-                              title={`Click to inspect Cash Grants for ${purpose}`}
-                              className="px-4 py-3 font-mono text-right text-slate-900 font-medium cursor-pointer hover:bg-slate-100 transition-colors"
-                            >
-                              ৳ {cashAmt.toLocaleString()}
-                            </td>
-                            <td 
-                              onClick={() => openDrillDownForPurpose(purpose, "Asset Purchased")}
-                              title={`Click to inspect Assets Purchased for ${purpose}`}
-                              className="px-4 py-3 font-mono text-right text-slate-900 font-medium cursor-pointer hover:bg-slate-100 transition-colors"
-                            >
-                              ৳ {assetAmt.toLocaleString()}
-                            </td>
-                            <td 
-                              onClick={() => openDrillDownForPurpose(purpose, "ALL")}
-                              title={`Click to inspect all ${purpose} cases`}
-                              className="px-4 py-3 font-mono text-right font-bold text-slate-900 cursor-pointer hover:bg-slate-100 transition-colors"
-                            >
-                              ৳ {total.toLocaleString()}
-                            </td>
-                            <td 
-                              onClick={() => openDrillDownForPurpose(purpose, "ALL")}
-                              className="px-4 py-3 text-center font-medium text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
-                            >
-                              {purposeRecords.length}
-                            </td>
-                            <td className="px-4 py-3 text-slate-600 text-xs">
-                              {sampleAssets || (purpose === "Mosque/Madrasa" ? "Quran & Madrasa food grant" : "Direct financial grant")}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <button
-                                type="button"
-                                onClick={() => openDrillDownForPurpose(purpose, "ALL")}
-                                className="px-2.5 py-1 rounded border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
-                              >
-                                Inspect ({purposeRecords.length})
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-
-                      {/* Total Row */}
-                      <tr 
-                        onClick={() => {
-                          setDrillDownState({
-                            isOpen: true,
-                            title: "All Purpose Categories — Complete Portfolio Breakdown",
-                            subtitle: `Audited breakdown of all cases across all purposes (${selectedBudgetYear})`,
-                            purpose: "ALL",
-                            channel: "ALL",
-                            mode: "ALL",
-                          });
-                          setDrillDownModeFilter("ALL");
-                          setDrillDownChannelFilter("ALL");
-                          setDrillDownSearch("");
-                        }}
-                        className="bg-slate-100/80 font-bold border-t-2 border-slate-300 hover:bg-slate-200/70 cursor-pointer transition-colors"
-                      >
-                        <td className="px-4 py-3 uppercase text-slate-800">
-                          Total All Purposes
-                        </td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-900 font-bold">
-                          ৳ {stats.totalCashGrants.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-900 font-bold">
-                          ৳ {stats.totalAssetPurchased.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-900 font-bold text-sm">
-                          ৳ {stats.totalAssigned.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-center text-slate-900">{stats.totalRecords}</td>
-                        <td className="px-4 py-3 text-slate-600 text-xs">All portfolio grants and physical assets</td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            type="button"
-                            className="px-3 py-1 rounded bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium cursor-pointer"
-                          >
-                            View All
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </main>
 
@@ -3578,107 +3132,388 @@ function ZakatManagementPage() {
 
             <form onSubmit={handleAssignZakat} className="flex flex-col">
               <div className="p-6 md:p-8 space-y-6 max-h-[80vh] overflow-y-auto">
-                {/* 1. Beneficiary Channel Selector (3-way) */}
-                <div className="space-y-2.5">
-                  <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1 whitespace-nowrap">
-                    <span>1. Beneficiary Channel (Internal Staff, Village Proxy, or External)</span> <span className="text-red-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {[
-                      {
-                        type: "Direct Employee" as ZakatDisbursementChannel,
-                        label: "Direct Employee",
-                        subTitle: "Internal Company Staff",
-                        sub: "Direct Staff Beneficiary in Need",
-                        icon: User,
-                      },
-                      {
-                        type: "Via Employee Agent" as ZakatDisbursementChannel,
-                        label: "Via Staff Agent",
-                        subTitle: "Staff Village Handover",
-                        sub: "Employee Acts as Local Proxy",
-                        icon: HeartHandshake,
-                      },
-                      {
-                        type: "Direct External" as ZakatDisbursementChannel,
-                        label: "Direct External",
-                        subTitle: "Outside Person / Institution",
-                        sub: "Madrasa, Mosque, or Destitute Public",
-                        icon: Building,
-                      },
-                    ].map((c) => {
-                      const isSel = modalChannel === c.type;
-                      const Icon = c.icon;
-                      return (
-                        <button
-                          type="button"
-                          key={c.type}
-                          onClick={() => setModalChannel(c.type)}
-                          className={`p-4 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between h-full ${
-                            isSel
-                              ? "bg-blue-50/80 border-blue-600 ring-2 ring-blue-600/20 shadow-xs"
-                              : "bg-slate-50/70 border-slate-200 hover:border-slate-300 hover:bg-slate-100/60"
-                          }`}
-                        >
-                          <div>
-                            <div className={`flex items-center gap-2 font-bold text-xs ${isSel ? "text-blue-700" : "text-slate-800"}`}>
-                              <Icon className="size-4 shrink-0" />
-                              <span className="text-sm font-black">{c.label}</span>
+                {/* 1 & 2: Beneficiary Channel & Aid Mode Selector (Side-by-side dropdowns) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1.5 whitespace-nowrap">
+                      <span>1. Beneficiary Channel</span> <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={modalChannel}
+                      onChange={(e) => setModalChannel(e.target.value as ZakatDisbursementChannel)}
+                      className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-800 outline-none focus:border-blue-600 shadow-xs"
+                    >
+                      <option value="Direct Employee">Direct Employee (Internal Company Staff)</option>
+                      <option value="Via Employee Agent">Via Staff Agent (Staff Village Handover)</option>
+                      <option value="Direct External">Direct External (Outside Person / Institution / Madrasa)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1.5 whitespace-nowrap">
+                      <span>2. Aid Mode / Form</span> <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={modalMode}
+                      onChange={(e) => setModalMode(e.target.value as ZakatDisbursementMode)}
+                      className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-800 outline-none focus:border-emerald-600 shadow-xs"
+                    >
+                      <option value="Cash Grant">Direct Cash / Financial Grant</option>
+                      <option value="Asset Purchased">In-Kind Asset / Item Purchased</option>
+                    </select>
+                  </div>
+                </div>
+
+
+                {/* 3. Beneficiary Details (Directly following Aid Mode) */}
+                {modalChannel === "Direct Employee" && (
+                  <div className="p-5 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-3.5 animate-in fade-in">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block">
+                      Select Beneficiary Employee <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative" onClick={(e) => e.stopPropagation()}>
+                      <div className="relative flex items-center">
+                        <Search className="size-4 text-slate-400 absolute left-3 pointer-events-none" />
+                        <input
+                          type="text"
+                          required
+                          placeholder="Search or select employee (name, ID, department)..."
+                          value={empSearchInput}
+                          onChange={(e) => {
+                            setEmpSearchInput(e.target.value);
+                            setIsEmpDropdownOpen(true);
+                            if (!e.target.value) {
+                              setNewEmpId("");
+                              setNewEmpName("");
+                            }
+                          }}
+                          onFocus={() => setIsEmpDropdownOpen(true)}
+                          className="w-full h-10 pl-9 pr-16 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-blue-600 text-slate-800 shadow-xs"
+                        />
+                        <div className="absolute right-2.5 flex items-center gap-1">
+                          {empSearchInput && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEmpSearchInput("");
+                                setNewEmpId("");
+                                setNewEmpName("");
+                                setIsEmpDropdownOpen(true);
+                              }}
+                              className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer"
+                              title="Clear selection"
+                            >
+                              <X className="size-3.5" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsEmpDropdownOpen((prev) => !prev);
+                            }}
+                            className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          >
+                            <ChevronDown className={`size-3.5 transition-transform ${isEmpDropdownOpen ? "rotate-180" : ""}`} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {isEmpDropdownOpen && (
+                        <div className="absolute left-0 right-0 mt-1 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-2xl z-50 divide-y divide-slate-100">
+                          {filteredEmployeesForDropdown.length > 0 ? (
+                            filteredEmployeesForDropdown.map((emp) => {
+                              const totals = getPreviousHelpTotals(emp.id);
+                              const isSelected = newEmpId === emp.id;
+                              return (
+                                <div
+                                  key={emp.id}
+                                  onClick={() => {
+                                    setNewEmpId(emp.id);
+                                    setNewEmpName(emp.name);
+                                    setEmpSearchInput(`${emp.name} (${emp.id})`);
+                                    setIsEmpDropdownOpen(false);
+                                  }}
+                                  className={`p-2.5 cursor-pointer flex items-center justify-between text-xs transition-colors ${isSelected ? "bg-blue-50/90 text-blue-900 font-bold" : "hover:bg-slate-50 text-slate-800"
+                                    }`}
+                                >
+                                  <div>
+                                    <div className="font-bold flex items-center gap-1.5">
+                                      <span>{emp.name}</span>
+                                      <span className="text-[10px] text-slate-500 font-mono">({emp.id})</span>
+                                    </div>
+                                    <div className="text-[10px] text-slate-400">
+                                      {emp.dept} &middot; {emp.title} &middot; Gross: ৳{parseFloat(emp.gross || "0").toLocaleString()}
+                                    </div>
+                                  </div>
+                                  {(totals.totalZakat > 0 || totals.totalAid > 0) && (
+                                    <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                      Prior Zakat: ৳{totals.totalZakat.toLocaleString()}
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })
+                          ) : (
+                            <div className="p-3 text-center text-xs text-slate-400">
+                              No employees found matching "{empSearchInput}"
                             </div>
-                            <div className="text-xs font-semibold text-slate-700 mt-1.5">{c.subTitle}</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {newEmpId && selectedEmpDetails && (
+                      <div className="p-3.5 bg-white rounded-xl border border-emerald-200 text-xs flex items-center gap-3.5 shadow-xs">
+                        <div className="size-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-sm">
+                          {newEmpName.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]">
+                          <div>
+                            <span className="text-slate-400 font-bold uppercase block text-[9px]">Employee</span>
+                            <span className="font-bold text-slate-900">{newEmpName}</span>
                           </div>
-                          <div className="text-[10px] text-slate-400 mt-2 pt-2 border-t border-slate-200/60">{c.sub}</div>
-                        </button>
-                      );
-                    })}
+                          <div>
+                            <span className="text-slate-400 font-bold uppercase block text-[9px]">Designation</span>
+                            <span className="text-slate-700 font-medium">{selectedEmpDetails.title}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400 font-bold uppercase block text-[9px]">Department</span>
+                            <span className="text-slate-700 font-medium">{selectedEmpDetails.dept}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400 font-bold uppercase block text-[9px]">Salary</span>
+                            <span className="font-bold text-emerald-700 font-mono">
+                              ৳ {parseFloat(selectedEmpDetails.gross).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                )}
 
-                {/* 2. Disbursement Mode Selector (Cash vs Asset) */}
-                <div className="space-y-2.5">
-                  <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1 whitespace-nowrap">
-                    <span>2. Aid Mode / Form (Cash Grant vs. Physical Asset Purchase)</span> <span className="text-red-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setModalMode("Cash Grant")}
-                      className={`p-4 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between h-full ${
-                        modalMode === "Cash Grant"
-                          ? "bg-emerald-50/80 border-emerald-600 ring-2 ring-emerald-600/20 shadow-xs"
-                          : "bg-slate-50/70 border-slate-200 hover:border-slate-300 hover:bg-slate-100/60"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 font-bold text-sm text-emerald-800">
-                        <Banknote className="size-4.5 shrink-0 text-emerald-600" />
-                        <span>Direct Cash / Financial Grant</span>
-                      </div>
-                      <div className="text-xs text-slate-600 mt-2">
-                        Cash, bank transfer, or mobile financial service handed over directly to the recipient.
-                      </div>
-                    </button>
+                {modalChannel === "Via Employee Agent" && (
+                  <div className="p-5 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-4 animate-in fade-in">
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
+                        Select Staff Representative / Employee Agent <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative" onClick={(e) => e.stopPropagation()}>
+                        <div className="relative flex items-center">
+                          <Search className="size-4 text-slate-400 absolute left-3 pointer-events-none" />
+                          <input
+                            type="text"
+                            required
+                            placeholder="Search staff agent by name, ID, or department..."
+                            value={empSearchInput}
+                            onChange={(e) => {
+                              setEmpSearchInput(e.target.value);
+                              setIsEmpDropdownOpen(true);
+                              if (!e.target.value) {
+                                setNewEmpId("");
+                                setNewEmpName("");
+                              }
+                            }}
+                            onFocus={() => setIsEmpDropdownOpen(true)}
+                            className="w-full h-10 pl-9 pr-16 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-blue-600 text-slate-800 shadow-xs"
+                          />
+                          <div className="absolute right-2.5 flex items-center gap-1">
+                            {empSearchInput && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEmpSearchInput("");
+                                  setNewEmpId("");
+                                  setNewEmpName("");
+                                  setIsEmpDropdownOpen(true);
+                                }}
+                                className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer"
+                                title="Clear selection"
+                              >
+                                <X className="size-3.5" />
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsEmpDropdownOpen((prev) => !prev);
+                              }}
+                              className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer"
+                            >
+                              <ChevronDown className={`size-3.5 transition-transform ${isEmpDropdownOpen ? "rotate-180" : ""}`} />
+                            </button>
+                          </div>
+                        </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setModalMode("Asset Purchased")}
-                      className={`p-4 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between h-full ${
-                        modalMode === "Asset Purchased"
-                          ? "bg-indigo-50/80 border-indigo-600 ring-2 ring-indigo-600/20 shadow-xs"
-                          : "bg-slate-50/70 border-slate-200 hover:border-slate-300 hover:bg-slate-100/60"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 font-bold text-sm text-indigo-800">
-                        <ShoppingBag className="size-4.5 shrink-0 text-indigo-600" />
-                        <span>In-Kind Asset / Item Purchased</span>
+                        {isEmpDropdownOpen && (
+                          <div className="absolute left-0 right-0 mt-1 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-2xl z-50 divide-y divide-slate-100">
+                            {filteredEmployeesForDropdown.length > 0 ? (
+                              filteredEmployeesForDropdown.map((emp) => {
+                                const totals = getPreviousHelpTotals(emp.id);
+                                const isSelected = newEmpId === emp.id;
+                                return (
+                                  <div
+                                    key={emp.id}
+                                    onClick={() => {
+                                      setNewEmpId(emp.id);
+                                      setNewEmpName(emp.name);
+                                      setEmpSearchInput(`${emp.name} (${emp.id})`);
+                                      setIsEmpDropdownOpen(false);
+                                    }}
+                                    className={`p-2.5 cursor-pointer flex items-center justify-between text-xs transition-colors ${isSelected ? "bg-blue-50/90 text-blue-900 font-bold" : "hover:bg-slate-50 text-slate-800"
+                                      }`}
+                                  >
+                                    <div>
+                                      <div className="font-bold flex items-center gap-1.5">
+                                        <span>{emp.name}</span>
+                                        <span className="text-[10px] text-slate-500 font-mono">({emp.id})</span>
+                                      </div>
+                                      <div className="text-[10px] text-slate-400">
+                                        {emp.dept} &middot; {emp.title}
+                                      </div>
+                                    </div>
+                                    {(totals.totalZakat > 0 || totals.totalAid > 0) && (
+                                      <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                        Prior Zakat: ৳{totals.totalZakat.toLocaleString()}
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })
+                            ) : (
+                              <div className="p-3 text-center text-xs text-slate-400">
+                                No employees found matching "{empSearchInput}"
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      <div className="text-xs text-slate-600 mt-2">
-                        Procuring productive items: auto-van, rickshaw, cattle/livestock, tea stall setup, or medical gear.
+                    </div>
+
+                    <div className="border-t border-slate-200/80 pt-3">
+                      <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-2.5">
+                        Village Beneficiary Details (Recipient in Employee's Village) <span className="text-red-500">*</span>
+                      </label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                            Village Beneficiary Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={newBeneficiaryName}
+                            onChange={(e) => setNewBeneficiaryName(e.target.value)}
+                            placeholder="e.g. Jamil Mia"
+                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                            Beneficiary Contact Phone
+                          </label>
+                          <input
+                            type="text"
+                            value={newBeneficiaryPhone}
+                            onChange={(e) => setNewBeneficiaryPhone(e.target.value)}
+                            placeholder="e.g. 01712-345678"
+                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                            Village / Location Address
+                          </label>
+                          <input
+                            type="text"
+                            value={newBeneficiaryAddress}
+                            onChange={(e) => setNewBeneficiaryAddress(e.target.value)}
+                            placeholder="e.g. Village: Bhaluka, District: Mymensingh"
+                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                          />
+                        </div>
                       </div>
-                    </button>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* Conditional Asset Purchase Fields */}
+                {modalChannel === "Direct External" && (
+                  <div className="p-5 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-3.5 animate-in fade-in">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block">
+                      External Beneficiary / Institution Details <span className="text-red-500">*</span>
+                    </label>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                          Madrasa / Mosque / Org (If Institution)
+                        </label>
+                        <input
+                          type="text"
+                          value={newInstitutionName}
+                          onChange={(e) => setNewInstitutionName(e.target.value)}
+                          placeholder="e.g. Darul Uloom Madrasa"
+                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                          Representative / Imam
+                        </label>
+                        <input
+                          type="text"
+                          value={newInstitutionRep}
+                          onChange={(e) => setNewInstitutionRep(e.target.value)}
+                          placeholder="e.g. Maulana Mufti Harun"
+                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                          Beneficiary Person Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={newBeneficiaryName}
+                          onChange={(e) => setNewBeneficiaryName(e.target.value)}
+                          placeholder="e.g. Jamil Mia / Ayesha Begum"
+                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                          Beneficiary Contact Phone
+                        </label>
+                        <input
+                          type="text"
+                          value={newBeneficiaryPhone}
+                          onChange={(e) => setNewBeneficiaryPhone(e.target.value)}
+                          placeholder="e.g. 01712-345678"
+                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                        />
+                      </div>
+                      <div className="md:col-span-2 lg:col-span-4">
+                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                          Village / Address Location
+                        </label>
+                        <input
+                          type="text"
+                          value={newBeneficiaryAddress}
+                          onChange={(e) => setNewBeneficiaryAddress(e.target.value)}
+                          placeholder="e.g. Village: Bhaluka, District: Mymensingh"
+                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. Conditional Physical Asset Purchase Fields */}
                 {modalMode === "Asset Purchased" && (
                   <div className="p-5 bg-indigo-50/40 rounded-2xl border border-indigo-200 space-y-4 animate-in fade-in duration-150">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-indigo-100 pb-2">
@@ -3722,9 +3557,6 @@ function ZakatManagementPage() {
                           </optgroup>
                         ))}
                       </select>
-                      <p className="text-[10px] text-slate-500 mt-1">
-                        Selecting an asset type auto-populates description, default quantity, market hub, and automatically switches the Purpose Category.
-                      </p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
@@ -3782,7 +3614,7 @@ function ZakatManagementPage() {
                       </div>
                       <div className="sm:col-span-2">
                         <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Asset Remarks & Handover Notes <span className="text-slate-400 font-normal">(Condition, Warranty, Location)</span>
+                          Asset Remarks & Handover Notes
                         </label>
                         <input
                           type="text"
@@ -3796,249 +3628,23 @@ function ZakatManagementPage() {
                   </div>
                 )}
 
-                {/* Conditional Staff Agent / Employee Selection */}
-                {(modalChannel === "Direct Employee" || modalChannel === "Via Employee Agent") && (
-                  <div className="p-5 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-3.5">
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block">
-                      {modalChannel === "Direct Employee"
-                        ? "Select Beneficiary Employee *"
-                        : "Select Employee Agent (Staff Representative) *"}
-                    </label>
-                    <div className="relative">
-                      <Search className="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="text"
-                        placeholder="Search employee name or ID..."
-                        value={empSearchInput}
-                        onChange={(e) => {
-                          setEmpSearchInput(e.target.value);
-                          setIsEmpDropdownOpen(true);
-                          if (!e.target.value) {
-                            setNewEmpId("");
-                            setNewEmpName("");
-                          }
-                        }}
-                        onFocus={() => setIsEmpDropdownOpen(true)}
-                        className="w-full h-10 pl-9 pr-3 rounded-lg border border-slate-300 bg-white text-xs font-medium outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                      />
-                      {isEmpDropdownOpen && filteredEmployeesForDropdown.length > 0 && (
-                        <div className="absolute left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl z-50 divide-y divide-slate-100">
-                          {filteredEmployeesForDropdown.map((emp) => {
-                            const totals = getPreviousHelpTotals(emp.id);
-                            return (
-                              <div
-                                key={emp.id}
-                                onClick={() => {
-                                  setNewEmpId(emp.id);
-                                  setNewEmpName(emp.name);
-                                  setEmpSearchInput(`${emp.name} (${emp.id})`);
-                                  setIsEmpDropdownOpen(false);
-                                }}
-                                className="p-2.5 cursor-pointer hover:bg-blue-50 flex items-center justify-between text-xs"
-                              >
-                                <div>
-                                  <div className="font-bold text-slate-800">
-                                    {emp.name} <span className="text-slate-500">({emp.id})</span>
-                                  </div>
-                                  <div className="text-[10px] text-slate-400">
-                                    {emp.dept} &middot; {emp.title}
-                                  </div>
-                                </div>
-                                {(totals.totalZakat > 0 || totals.totalAid > 0) && (
-                                  <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                                    Prior Zakat: ৳{totals.totalZakat.toLocaleString()}
-                                  </span>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-
-                    {newEmpId && selectedEmpDetails && (
-                      <div className="p-3.5 bg-white rounded-xl border border-emerald-200 text-xs flex items-center gap-3.5 shadow-xs">
-                        <div className="size-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-sm">
-                          {newEmpName.slice(0, 2).toUpperCase()}
-                        </div>
-                        <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]">
-                          <div>
-                            <span className="text-slate-400 font-bold uppercase block text-[9px]">Employee</span>
-                            <span className="font-bold text-slate-900">{newEmpName}</span>
-                          </div>
-                          <div>
-                            <span className="text-slate-400 font-bold uppercase block text-[9px]">Designation</span>
-                            <span className="text-slate-700 font-medium">{selectedEmpDetails.title}</span>
-                          </div>
-                          <div>
-                            <span className="text-slate-400 font-bold uppercase block text-[9px]">Department</span>
-                            <span className="text-slate-700 font-medium">{selectedEmpDetails.dept}</span>
-                          </div>
-                          <div>
-                            <span className="text-slate-400 font-bold uppercase block text-[9px]">Salary</span>
-                            <span className="font-bold text-emerald-700 font-mono">
-                              ৳ {parseFloat(selectedEmpDetails.gross).toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Conditional Outside Beneficiary Details (for Via Agent or Direct External) */}
-                {(modalChannel === "Via Employee Agent" || modalChannel === "Direct External") && (
-                  <div className="p-5 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-3.5">
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block">
-                      {modalChannel === "Via Employee Agent"
-                        ? "Village Beneficiary Details (Recipient in Employee's Village) *"
-                        : "External Beneficiary / Institution *"}
-                    </label>
-
-                    {modalChannel === "Direct External" ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Madrasa / Mosque / Org (If Institution)
-                          </label>
-                          <input
-                            type="text"
-                            value={newInstitutionName}
-                            onChange={(e) => setNewInstitutionName(e.target.value)}
-                            placeholder="e.g. Darul Uloom Madrasa"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Representative / Imam
-                          </label>
-                          <input
-                            type="text"
-                            value={newInstitutionRep}
-                            onChange={(e) => setNewInstitutionRep(e.target.value)}
-                            placeholder="e.g. Maulana Mufti Harun"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Beneficiary Person Name <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={newBeneficiaryName}
-                            onChange={(e) => setNewBeneficiaryName(e.target.value)}
-                            placeholder="e.g. Jamil Mia / Ayesha Begum"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Beneficiary Contact Phone
-                          </label>
-                          <input
-                            type="text"
-                            value={newBeneficiaryPhone}
-                            onChange={(e) => setNewBeneficiaryPhone(e.target.value)}
-                            placeholder="e.g. 01712-345678"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
-                        </div>
-                        <div className="md:col-span-2 lg:col-span-4">
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Village / Address Location
-                          </label>
-                          <input
-                            type="text"
-                            value={newBeneficiaryAddress}
-                            onChange={(e) => setNewBeneficiaryAddress(e.target.value)}
-                            placeholder="e.g. Village: Bhaluka, District: Mymensingh"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Village Beneficiary Name <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={newBeneficiaryName}
-                            onChange={(e) => setNewBeneficiaryName(e.target.value)}
-                            placeholder="e.g. Jamil Mia"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Beneficiary Contact Phone
-                          </label>
-                          <input
-                            type="text"
-                            value={newBeneficiaryPhone}
-                            onChange={(e) => setNewBeneficiaryPhone(e.target.value)}
-                            placeholder="e.g. 01712-345678"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Village / Location Address
-                          </label>
-                          <input
-                            type="text"
-                            value={newBeneficiaryAddress}
-                            onChange={(e) => setNewBeneficiaryAddress(e.target.value)}
-                            placeholder="e.g. Village: Bhaluka, District: Mymensingh"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 {/* 3. Purpose Category */}
                 <div className="space-y-3">
                   <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1 whitespace-nowrap">
                     <span>3. Purpose Category</span> <span className="text-red-500">*</span>
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-                    {[
-                      { cat: "Mosque/Madrasa" as ZakatPurposeCategory, label: "Mosque / Madrasa", subTitle: "Islamic Education", icon: Landmark },
-                      { cat: "Medical Treatment" as ZakatPurposeCategory, label: "Medical Treatment", subTitle: "Healthcare & Surgery", icon: Activity },
-                      { cat: "Vehicle" as ZakatPurposeCategory, label: "Vehicle / Van", subTitle: "Transport Livelihood", icon: Truck },
-                      { cat: "Farm Animal" as ZakatPurposeCategory, label: "Farm Animal", subTitle: "Livestock & Dairy", icon: HeartHandshake },
-                      { cat: "Business Setup" as ZakatPurposeCategory, label: "Business Setup", subTitle: "Micro-Enterprise", icon: Store },
-                      { cat: "Others" as ZakatPurposeCategory, label: "Others", subTitle: "Custom Relief", icon: Layers },
-                    ].map((p) => {
-                      const isSel = newPurposeCategory === p.cat;
-                      const Icon = p.icon;
-                      return (
-                        <button
-                          type="button"
-                          key={p.cat}
-                          onClick={() => setNewPurposeCategory(p.cat)}
-                          className={`p-3 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between h-full ${
-                            isSel
-                              ? "bg-emerald-50/80 border-emerald-600 ring-2 ring-emerald-600/20 shadow-xs"
-                              : "bg-slate-50/70 border-slate-200 hover:border-slate-300 hover:bg-slate-100/60"
-                          }`}
-                        >
-                          <div className={`flex items-center gap-1.5 font-bold text-xs ${isSel ? "text-emerald-800" : "text-slate-800"}`}>
-                            <Icon className="size-4 shrink-0" />
-                            <span className="truncate">{p.label}</span>
-                          </div>
-                          <div className="text-[10px] text-slate-400 mt-1">{p.subTitle}</div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <select
+                    value={newPurposeCategory}
+                    onChange={(e) => setNewPurposeCategory(e.target.value as ZakatPurposeCategory)}
+                    className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-800 outline-none focus:border-emerald-600 shadow-xs"
+                  >
+                    <option value="Mosque/Madrasa">Mosque / Madrasa (Islamic Education & Reconstruction)</option>
+                    <option value="Medical Treatment">Medical Treatment (Healthcare, Surgery & Specialized Medicine)</option>
+                    <option value="Vehicle">Vehicle / Van (Electric Auto-Van, Rickshaw, Cargo Van)</option>
+                    <option value="Farm Animal">Farm Animal (Dairy Cow, Goat Pair, Poultry Kit)</option>
+                    <option value="Business Setup">Business Setup (Tea Stall, Grocery Lot, Sewing Machine)</option>
+                    <option value="Others">Others (Custom Relief / Debt / Scholarship)</option>
+                  </select>
 
                   {newPurposeCategory === "Others" && (
                     <div className="animate-in fade-in space-y-1">
@@ -4115,9 +3721,6 @@ function ZakatManagementPage() {
                       <option value="Fi Sabilillah">Fi Sabilillah (In the Cause of Allah)</option>
                       <option value="Ibnus-Sabil">Ibnus-Sabil (The Stranded Traveler)</option>
                     </select>
-                    <div className="text-[10px] text-slate-400 font-medium pt-0.5">
-                      Islamic eligibility compliance
-                    </div>
                   </div>
 
                   <div className="space-y-1.5">
@@ -4132,22 +3735,16 @@ function ZakatManagementPage() {
                       onChange={(e) => setNewDeadline(e.target.value)}
                       className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium outline-none focus:border-blue-500 shadow-xs text-slate-800"
                     />
-                    <div className="text-[10px] text-slate-400 font-medium pt-0.5">
-                      Target distribution completion date
-                    </div>
                   </div>
                 </div>
 
                 {/* 5. Supporting Attachments & Documents */}
                 <div className="p-5 bg-slate-50/90 rounded-2xl border border-slate-200 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <div className="flex items-center justify-between gap-1">
                     <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5 whitespace-nowrap">
                       <Paperclip className="size-3.5 text-blue-600" />
                       <span>5. Supporting Attachments & Verification Documents (Optional)</span>
                     </label>
-                    <span className="text-[10px] text-slate-400 font-medium">
-                      Attach medical bills, hospital estimates, NID cards, invoices or application forms
-                    </span>
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -4229,136 +3826,133 @@ function ZakatManagementPage() {
       {/* ========================================================= */}
       {isRecurringModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white w-full max-w-4xl lg:max-w-5xl rounded-[24px] shadow-2xl border border-slate-200 flex flex-col my-6 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 flex flex-col my-6 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 md:px-8 py-4.5 border-b border-slate-200 bg-white">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
               <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white size-10 rounded-xl flex items-center justify-center shadow-xs">
+                <div className="bg-emerald-600 text-white size-10 rounded-xl flex items-center justify-center shadow-xs">
                   <Repeat className="size-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-                    <span>Configure Recurring Zakat Stipend & Advance Grants</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                      Flexible Engine
-                    </span>
+                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                    Setup Recurring Zakat Stipend & Advance Grant
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">
-                    Continuous monthly welfare allowances or upfront 1-year advance lump-sum settlement (1 bochorer ta ekbare)
+                  <p className="text-xs text-slate-500">
+                    Configure monthly stipend schedule or 1-year advance grant
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsRecurringModalOpen(false)}
-                className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
               >
                 <X className="size-4" />
               </button>
             </div>
 
             <form onSubmit={handleSaveRecurringSchedule} className="flex flex-col">
-              <div className="p-6 md:p-8 space-y-6 max-h-[80vh] overflow-y-auto">
-                {/* 1. Mandate Name */}
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1 whitespace-nowrap">
-                    Stipend Title / Mandate Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={recTitle}
-                    onChange={(e) => setRecTitle(e.target.value)}
-                    placeholder="e.g. Monthly Medical Allowance for Easin Mia / 1-Year Orphan Madrasa Tuition Advance"
-                    className="w-full h-10 px-3.5 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-800 outline-none focus:border-emerald-600 shadow-xs"
-                  />
-                </div>
-
-                {/* 2. Channel & Purpose */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1 whitespace-nowrap">
-                      Beneficiary Channel <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={recChannel}
-                      onChange={(e) => setRecChannel(e.target.value as any)}
-                      className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none focus:border-emerald-600 shadow-xs"
-                    >
-                      <option value="Direct Employee">Direct Employee (Company Staff)</option>
-                      <option value="Via Employee Agent">Via Staff Agent (Village Handover)</option>
-                      <option value="Direct External">Direct External (Outside Person / Organization)</option>
-                    </select>
+              <div className="p-6 space-y-5 max-h-[78vh] overflow-y-auto">
+                {/* SECTION 1: BENEFICIARY & MANDATE DETAILS */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                    <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center justify-center">1</span>
+                    <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Beneficiary Information</h4>
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1 whitespace-nowrap">
-                      Purpose Category <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={recPurposeCategory}
-                      onChange={(e) => setRecPurposeCategory(e.target.value as any)}
-                      className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none focus:border-emerald-600 shadow-xs"
-                    >
-                      <option value="Medical Treatment">Medical Treatment (Healthcare / Care)</option>
-                      <option value="Mosque/Madrasa">Mosque / Madrasa (Educational / Meals)</option>
-                      <option value="Business Setup">Business Setup / Livelihood</option>
-                      <option value="Farm Animal">Farm Animal Maintenance</option>
-                      <option value="Vehicle">Vehicle Upkeep</option>
-                      <option value="Others">Others (Custom Welfare)</option>
-                    </select>
-                  </div>
-                </div>
-
-                {recPurposeCategory === "Others" && (
-                  <div className="animate-in fade-in space-y-1">
-                    <label className="text-[11px] font-bold text-purple-700 uppercase tracking-wide block whitespace-nowrap">
-                      Specify Custom Purpose Details <span className="text-red-500">*</span>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">
+                      Title / Purpose Description <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       required
-                      value={recOtherPurpose}
-                      onChange={(e) => setRecOtherPurpose(e.target.value)}
-                      placeholder="e.g. Higher Education Tuition Assistance / Winter Blanket Provision"
-                      className="w-full h-10 px-3.5 rounded-lg border border-purple-300 bg-purple-50/30 text-xs font-semibold outline-none focus:border-purple-600 text-slate-800 shadow-xs"
+                      value={recTitle}
+                      onChange={(e) => setRecTitle(e.target.value)}
+                      placeholder="e.g. Monthly Medical Allowance / Tuition Support"
+                      className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 transition-all"
                     />
                   </div>
-                )}
 
-                {/* Beneficiary Details based on Channel */}
-                {recChannel === "Direct Employee" ? (
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1 whitespace-nowrap">
-                      Select Internal Employee <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={recEmpId}
-                      onChange={(e) => {
-                        setRecEmpId(e.target.value);
-                        const emp = employeesList.find((em) => em.id === e.target.value);
-                        if (emp) setRecEmpName(emp.name);
-                      }}
-                      className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 shadow-xs"
-                    >
-                      <option value="">-- Choose Employee --</option>
-                      {employeesList.map((emp) => (
-                        <option key={emp.id} value={emp.id}>
-                          {emp.name} ({emp.id}) &middot; {emp.dept}
-                        </option>
-                      ))}
-                    </select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        Beneficiary Channel <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={recChannel}
+                        onChange={(e) => setRecChannel(e.target.value as any)}
+                        className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 transition-all cursor-pointer"
+                      >
+                        <option value="Direct Employee">Direct Employee</option>
+                        <option value="Via Employee Agent">Via Staff Agent (Village Handover)</option>
+                        <option value="Direct External">Direct External</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        Purpose Category <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={recPurposeCategory}
+                        onChange={(e) => setRecPurposeCategory(e.target.value as any)}
+                        className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 transition-all cursor-pointer"
+                      >
+                        <option value="Medical Treatment">Medical Treatment</option>
+                        <option value="Mosque/Madrasa">Mosque / Madrasa</option>
+                        <option value="Business Setup">Business Setup</option>
+                        <option value="Farm Animal">Farm Animal</option>
+                        <option value="Vehicle">Vehicle</option>
+                        <option value="Others">Others</option>
+                      </select>
+                    </div>
                   </div>
-                ) : recChannel === "Via Employee Agent" ? (
-                  <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-3">
-                    <p className="text-[11px] font-black uppercase tracking-wide text-slate-700 flex items-center gap-1.5">
-                      <Users className="size-3.5 text-blue-600" />
-                      <span>Staff Agent & Village Recipient Particulars</span>
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                  {recPurposeCategory === "Others" && (
+                    <div className="animate-in fade-in">
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        Specify Custom Purpose <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={recOtherPurpose}
+                        onChange={(e) => setRecOtherPurpose(e.target.value)}
+                        placeholder="e.g. Higher Education Assistance / Blanket Distribution"
+                        className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
+                      />
+                    </div>
+                  )}
+
+                  {/* Beneficiary Details by Channel */}
+                  {recChannel === "Direct Employee" ? (
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        Select Employee <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={recEmpId}
+                        onChange={(e) => {
+                          setRecEmpId(e.target.value);
+                          const emp = employeesList.find((em) => em.id === e.target.value);
+                          if (emp) setRecEmpName(emp.name);
+                        }}
+                        className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 cursor-pointer"
+                      >
+                        <option value="">-- Choose Employee --</option>
+                        {employeesList.map((emp) => (
+                          <option key={emp.id} value={emp.id}>
+                            {emp.name} ({emp.id}) &middot; {emp.dept}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : recChannel === "Via Employee Agent" ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 bg-slate-50/70 rounded-xl border border-slate-200">
                       <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                          Staff Representative / Agent <span className="text-red-500">*</span>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1 uppercase">
+                          Staff Agent <span className="text-red-500">*</span>
                         </label>
                         <select
                           value={recEmpId}
@@ -4367,7 +3961,7 @@ function ZakatManagementPage() {
                             const emp = employeesList.find((em) => em.id === e.target.value);
                             if (emp) setRecEmpName(emp.name);
                           }}
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium outline-none focus:border-emerald-600 shadow-xs text-slate-800"
+                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 outline-none focus:border-emerald-600"
                         >
                           <option value="">-- Choose Staff Agent --</option>
                           {employeesList.map((emp) => (
@@ -4379,540 +3973,405 @@ function ZakatManagementPage() {
                       </div>
 
                       <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                          End Recipient Full Name <span className="text-red-500">*</span>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1 uppercase">
+                          Recipient Name <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           required
                           value={recBeneficiaryName}
                           onChange={(e) => setRecBeneficiaryName(e.target.value)}
-                          placeholder="e.g. Fatema Begum / Jamil Mia"
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-emerald-600 shadow-xs text-slate-800"
+                          placeholder="e.g. Fatema Begum"
+                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
                         />
                       </div>
 
                       <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                          Recipient Contact Phone
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1 uppercase">
+                          Phone Number
                         </label>
                         <input
                           type="text"
                           value={recBeneficiaryPhone}
                           onChange={(e) => setRecBeneficiaryPhone(e.target.value)}
                           placeholder="e.g. 01712-345678"
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-emerald-600 shadow-xs text-slate-800"
+                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-800 outline-none focus:border-emerald-600"
                         />
                       </div>
 
                       <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                          Village / Location Address
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1 uppercase">
+                          Address / Village
                         </label>
                         <input
                           type="text"
                           value={recBeneficiaryAddress}
                           onChange={(e) => setRecBeneficiaryAddress(e.target.value)}
-                          placeholder="e.g. Village: Bhaluka, District: Mymensingh"
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-emerald-600 shadow-xs text-slate-800"
+                          placeholder="e.g. Bhaluka, Mymensingh"
+                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-800 outline-none focus:border-emerald-600"
                         />
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1 whitespace-nowrap">
-                        Outside Beneficiary / Institution Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={recBeneficiaryName}
-                        onChange={(e) => {
-                          setRecBeneficiaryName(e.target.value);
-                          setRecInstitutionName(e.target.value);
-                        }}
-                        placeholder="e.g. Jamia Qasimul Uloom Madrasa / Rahima Begum"
-                        className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-emerald-600 shadow-xs text-slate-800"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1 whitespace-nowrap">
-                        Contact Phone
-                      </label>
-                      <input
-                        type="text"
-                        value={recBeneficiaryPhone}
-                        onChange={(e) => setRecBeneficiaryPhone(e.target.value)}
-                        placeholder="e.g. 01822-778899"
-                        className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-emerald-600 shadow-xs text-slate-800"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* 3. Disbursement Mode (Cash Grant vs In-Kind Asset) */}
-                <div className="space-y-3">
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block whitespace-nowrap">
-                    Disbursement Mode <span className="text-red-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setRecMode("Cash Grant")}
-                      className={`p-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
-                        recMode === "Cash Grant"
-                          ? "bg-emerald-50/80 border-emerald-600 ring-2 ring-emerald-600/20 shadow-xs"
-                          : "bg-slate-50/70 border-slate-200 hover:border-slate-300 hover:bg-slate-100/60"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Banknote className={`size-4 ${recMode === "Cash Grant" ? "text-emerald-700" : "text-slate-500"}`} />
-                        <div>
-                          <p className={`text-xs font-bold ${recMode === "Cash Grant" ? "text-emerald-900" : "text-slate-800"}`}>
-                            Cash / Bank Transfer
-                          </p>
-                          <p className="text-[10px] text-slate-400">Direct monetary grant or account transfer</p>
-                        </div>
-                      </div>
-                      {recMode === "Cash Grant" && <CheckCircle2 className="size-4 text-emerald-600" />}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setRecMode("Asset Purchased")}
-                      className={`p-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
-                        recMode === "Asset Purchased"
-                          ? "bg-purple-50/80 border-purple-600 ring-2 ring-purple-600/20 shadow-xs"
-                          : "bg-slate-50/70 border-slate-200 hover:border-slate-300 hover:bg-slate-100/60"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <ShoppingBag className={`size-4 ${recMode === "Asset Purchased" ? "text-purple-700" : "text-slate-500"}`} />
-                        <div>
-                          <p className={`text-xs font-bold ${recMode === "Asset Purchased" ? "text-purple-900" : "text-slate-800"}`}>
-                            In-Kind Asset Provisioning
-                          </p>
-                          <p className="text-[10px] text-slate-400">Physical item purchasing & handover</p>
-                        </div>
-                      </div>
-                      {recMode === "Asset Purchased" && <CheckCircle2 className="size-4 text-purple-600" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* If In-Kind Asset: Catalog Selector */}
-                {recMode === "Asset Purchased" && (
-                  <div className="p-4 bg-purple-50/50 rounded-2xl border border-purple-200 space-y-3 animate-in fade-in">
-                    <p className="text-[11px] font-black uppercase tracking-wide text-purple-900 flex items-center gap-1.5">
-                      <ShoppingBag className="size-3.5 text-purple-600" />
-                      <span>Physical Asset Purchase Details & Master Catalog</span>
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="sm:col-span-2">
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                          Select from Master Asset Catalog
-                        </label>
-                        <select
-                          value={recAssetMasterId}
-                          onChange={(e) => {
-                            const chosenId = e.target.value;
-                            setRecAssetMasterId(chosenId);
-                            const found = getActiveZakatAssetMasterList().find((item) => item.id === chosenId);
-                            if (found) {
-                              setRecAssetType(found.assetType);
-                              setRecAssetName(found.assetType);
-                              if (found.defaultQty) setRecAssetQty(found.defaultQty);
-                              if (found.defaultVendorLocation) setRecAssetVendor(found.defaultVendorLocation);
-                              if (found.suggestedPurpose) setRecPurposeCategory(found.suggestedPurpose);
-                            }
-                          }}
-                          className="w-full h-9 px-3 rounded-lg border border-purple-300 bg-white text-xs font-semibold outline-none focus:border-purple-600 text-slate-800 shadow-xs"
-                        >
-                          <option value="">-- Choose Standard Asset from Master Catalog --</option>
-                          {Array.from(new Set(getActiveZakatAssetMasterList().map((m) => m.category))).map((cat) => (
-                            <optgroup key={cat} label={cat}>
-                              {getActiveZakatAssetMasterList().filter((a) => a.category === cat).map((a) => (
-                                <option key={a.id} value={a.id}>{a.assetType}</option>
-                              ))}
-                            </optgroup>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                          Asset Title / Description <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={recAssetName}
-                          onChange={(e) => setRecAssetName(e.target.value)}
-                          placeholder="e.g. Easy Bike / Milch Cow"
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-purple-600 text-slate-800 shadow-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                          Quantity & Units
-                        </label>
-                        <input
-                          type="text"
-                          value={recAssetQty}
-                          onChange={(e) => setRecAssetQty(e.target.value)}
-                          placeholder="e.g. 1 Unit / 2 Goats"
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-purple-600 text-slate-800 shadow-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                          Vendor / Market Location
-                        </label>
-                        <input
-                          type="text"
-                          value={recAssetVendor}
-                          onChange={(e) => setRecAssetVendor(e.target.value)}
-                          placeholder="e.g. Bhaluka Bazar / Gafargaon Cattle Hat"
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-purple-600 text-slate-800 shadow-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                          Delivery / Warranty Remarks
-                        </label>
-                        <input
-                          type="text"
-                          value={recAssetRemarks}
-                          onChange={(e) => setRecAssetRemarks(e.target.value)}
-                          placeholder="e.g. 1-year battery warranty included, inspected by vet"
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-purple-600 text-slate-800 shadow-xs"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. ⚡ SETTLEMENT MODE & CADENCE (DYNAMIC) */}
-                <div className="p-5 bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-slate-50 rounded-2xl border-2 border-emerald-300/80 shadow-xs space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="p-1 rounded-md bg-emerald-600 text-white shadow-2xs">
-                          <Zap className="size-3.5 fill-white" />
-                        </span>
-                        <h4 className="text-xs font-black text-emerald-950 uppercase tracking-wide">
-                          Settlement Mode & Cadence Configuration
-                        </h4>
-                      </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
-                        Choose whether to disburse on a recurring automated schedule or pay the full 1-year entitlement upfront in advance.
-                      </p>
-                    </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 self-start sm:self-auto">
-                      Dynamic Mandate Engine
-                    </span>
-                  </div>
-
-                  {/* Two Main Settlement Mode Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {/* Option 1: Periodic Installments */}
-                    <button
-                      type="button"
-                      onClick={() => setRecSettlementType("Periodic Installments")}
-                      className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between ${
-                        recSettlementType === "Periodic Installments"
-                          ? "bg-white border-emerald-600 ring-2 ring-emerald-600/20 shadow-sm"
-                          : "bg-white/60 border-slate-200 hover:border-slate-300 hover:bg-white"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <CalendarClock
-                            className={`size-4 ${
-                              recSettlementType === "Periodic Installments" ? "text-emerald-600" : "text-slate-400"
-                            }`}
-                          />
-                          <span className="font-bold text-xs text-slate-900">Periodic Scheduled Batches</span>
-                        </div>
-                        {recSettlementType === "Periodic Installments" && (
-                          <CheckCircle2 className="size-4 text-emerald-600" />
-                        )}
-                      </div>
-                      <p className="text-[11px] text-slate-500 mt-2">
-                        Installments are generated and disbursed automatically per cadence (e.g. ৳{parseFloat(recMonthlyAmount || "0").toLocaleString()} each month).
-                      </p>
-                    </button>
-
-                    {/* Option 2: 1-Year Full Advance Lump Sum */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setRecSettlementType("1-Year Full Advance");
-                        setRecCadence("Annual Lump Sum");
-                        setRecTotalMonths("12");
-                      }}
-                      className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden ${
-                        recSettlementType === "1-Year Full Advance"
-                          ? "bg-emerald-600 text-white border-emerald-700 ring-2 ring-emerald-500/40 shadow-sm"
-                          : "bg-white/60 border-emerald-300/80 hover:border-emerald-400 hover:bg-emerald-50/40"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Zap
-                            className={`size-4 ${
-                              recSettlementType === "1-Year Full Advance"
-                                ? "text-amber-300 animate-pulse fill-amber-300"
-                                : "text-emerald-600 fill-emerald-600"
-                            }`}
-                          />
-                          <span
-                            className={`font-bold text-xs ${
-                              recSettlementType === "1-Year Full Advance" ? "text-white" : "text-emerald-950"
-                            }`}
-                          >
-                            1-Year Full Advance (Upfront Lump Sum)
-                          </span>
-                        </div>
-                        {recSettlementType === "1-Year Full Advance" ? (
-                          <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-white/20 text-white">
-                            Active Selection
-                          </span>
-                        ) : (
-                          <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
-                            Upfront Lump Sum
-                          </span>
-                        )}
-                      </div>
-                      <p
-                        className={`text-[11px] mt-2 ${
-                          recSettlementType === "1-Year Full Advance" ? "text-emerald-100" : "text-slate-600"
-                        }`}
-                      >
-                        Pay all 12 months upfront in a single advance lump sum of ৳{((parseFloat(recMonthlyAmount) || 0) * 12).toLocaleString()}. Posts immediately to the disbursement ledger today!
-                      </p>
-                    </button>
-                  </div>
-
-                  {/* Dynamic Sub-Controls depending on Settlement Type */}
-                  {recSettlementType === "Periodic Installments" ? (
-                    <div className="space-y-3 pt-2 border-t border-emerald-200/60">
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                            Payment Cadence
-                          </label>
-                          <select
-                            value={recCadence}
-                            onChange={(e) => setRecCadence(e.target.value as DisbursementCadence)}
-                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-800 outline-none focus:border-emerald-600 shadow-xs"
-                          >
-                            <option value="Monthly">Monthly (12 Disb./Year)</option>
-                            <option value="Quarterly">Quarterly (Every 3 Months)</option>
-                            <option value="Bi-Annual">Bi-Annual (Every 6 Months)</option>
-                            <option value="Annual Lump Sum">Annual (Once a Year)</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                            Disbursement Day
-                          </label>
-                          <select
-                            value={recDisbursementDay}
-                            onChange={(e) => setRecDisbursementDay(e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-800 outline-none focus:border-emerald-600 shadow-xs"
-                          >
-                            <option value="1">1st of Month</option>
-                            <option value="5">5th of Month</option>
-                            <option value="10">10th of Month</option>
-                            <option value="15">15th of Month</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                            Total Mandate Duration
-                          </label>
-                          <select
-                            value={recTotalMonths}
-                            onChange={(e) => setRecTotalMonths(e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-800 outline-none focus:border-emerald-600 shadow-xs"
-                          >
-                            <option value="6">6 Months</option>
-                            <option value="12">12 Months (1 Full Year)</option>
-                            <option value="24">24 Months (2 Years)</option>
-                            <option value="0">Indefinite / Ongoing</option>
-                          </select>
-                        </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200/90 space-y-3 pt-2">
-                      <div className="flex items-center gap-2 text-xs font-black text-emerald-900">
-                        <Sparkles className="size-4 text-emerald-700" />
-                        <span>1-Year Advance Lump Sum Parameters</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          Beneficiary / Organization Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={recBeneficiaryName}
+                          onChange={(e) => {
+                            setRecBeneficiaryName(e.target.value);
+                            setRecInstitutionName(e.target.value);
+                          }}
+                          placeholder="e.g. Jamia Qasimul Uloom / Rahima Begum"
+                          className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
+                        />
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                            Advance Duration Covered
-                          </label>
-                          <select
-                            value={recTotalMonths}
-                            onChange={(e) => setRecTotalMonths(e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg border border-emerald-300 bg-white text-xs font-bold text-emerald-900 outline-none focus:border-emerald-600 shadow-xs"
-                          >
-                            <option value="12">12 Months (Full 1-Year Advance - Standard)</option>
-                            <option value="6">6 Months (Half-Year Advance)</option>
-                            <option value="24">24 Months (2-Year Full Advance)</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                            Immediate Disbursement Date
-                          </label>
-                          <input
-                            type="date"
-                            value={recStartDate}
-                            onChange={(e) => setRecStartDate(e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg border border-emerald-300 bg-white text-xs font-bold text-slate-800 outline-none focus:border-emerald-600 shadow-xs"
-                          />
-                        </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          Phone Number
+                        </label>
+                        <input
+                          type="text"
+                          value={recBeneficiaryPhone}
+                          onChange={(e) => setRecBeneficiaryPhone(e.target.value)}
+                          placeholder="e.g. 01822-778899"
+                          className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-800 outline-none focus:border-emerald-600"
+                        />
                       </div>
-                      <p className="text-[11px] text-emerald-800 font-medium">
-                        <strong>Automatic Ledger Posting:</strong> Submitting this form will immediately generate a single advance transaction of{" "}
-                        <span className="font-mono font-bold text-emerald-950">
-                          ৳ {((parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)).toLocaleString()}
-                        </span>{" "}
-                        in the main ledger with the 1-Year Advance badge, deducting from the current year's Zakat fund pool without requiring monthly repetitive actions.
-                      </p>
                     </div>
                   )}
                 </div>
 
-                {/* 5. Flexible Monthly Amount with Quick Chips */}
-                <div className="p-5 bg-slate-50/90 rounded-2xl border border-slate-200 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1 whitespace-nowrap">
-                      <span>Monthly Stipend Base Commitment Rate (৳)</span> <span className="text-red-500">*</span>
-                    </label>
-                    <span className="text-[10px] text-slate-400 font-medium">Quick selection amount chips:</span>
+                {/* SECTION 2: DISBURSEMENT & SCHEDULE */}
+                <div className="space-y-4 pt-1">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                    <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center justify-center">2</span>
+                    <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Disbursement & Cadence</h4>
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
-                    {[3000, 5000, 8000, 10000, 15000, 20000, 25000].map((chip) => (
-                      <button
-                        type="button"
-                        key={chip}
-                        onClick={() => setRecMonthlyAmount(chip.toString())}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          recMonthlyAmount === chip.toString()
-                            ? "bg-emerald-600 text-white shadow-xs"
-                            : "bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-100"
-                        }`}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        Disbursement Mode <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={recMode}
+                        onChange={(e) => setRecMode(e.target.value as any)}
+                        className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
                       >
-                        ৳{chip.toLocaleString()}
-                      </button>
-                    ))}
+                        <option value="Cash Grant">Cash / Bank Transfer</option>
+                        <option value="Asset Purchased">In-Kind Asset</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        Settlement Mode <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={recSettlementType}
+                        onChange={(e) => {
+                          const val = e.target.value as DisbursementSettlementType;
+                          setRecSettlementType(val);
+                          if (val === "1-Year Full Advance") {
+                            setRecCadence("Annual Lump Sum");
+                            setRecTotalMonths("12");
+                          } else {
+                            setRecCadence("Monthly");
+                          }
+                        }}
+                        className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                      >
+                        <option value="Periodic Installments">Periodic Schedule</option>
+                        <option value="1-Year Full Advance">1-Year Advance</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <input
-                    type="number"
-                    required
-                    value={recMonthlyAmount}
-                    onChange={(e) => setRecMonthlyAmount(e.target.value)}
-                    placeholder="Enter custom monthly rate (e.g. 10000)"
-                    className="w-full h-11 px-3.5 rounded-lg border border-emerald-300 bg-white text-sm font-black font-mono text-emerald-800 outline-none focus:border-emerald-600 shadow-xs"
-                  />
+                  {/* Schedule Details */}
+                  {recSettlementType === "Periodic Installments" ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          Cadence
+                        </label>
+                        <select
+                          value={recCadence}
+                          onChange={(e) => setRecCadence(e.target.value as DisbursementCadence)}
+                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                        >
+                          <option value="Monthly">Monthly</option>
+                          <option value="Quarterly">Quarterly</option>
+                          <option value="Bi-Annual">Bi-Annual</option>
+                          <option value="Annual Lump Sum">Annual</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          Disbursement Day
+                        </label>
+                        <select
+                          value={recDisbursementDay}
+                          onChange={(e) => setRecDisbursementDay(e.target.value)}
+                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                        >
+                          <option value="1">1st of Month</option>
+                          <option value="5">5th of Month</option>
+                          <option value="10">10th of Month</option>
+                          <option value="15">15th of Month</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          Duration
+                        </label>
+                        <select
+                          value={recTotalMonths}
+                          onChange={(e) => setRecTotalMonths(e.target.value)}
+                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                        >
+                          <option value="6">6 Months</option>
+                          <option value="12">12 Months (1 Year)</option>
+                          <option value="24">24 Months (2 Years)</option>
+                          <option value="0">Indefinite</option>
+                        </select>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          Advance Duration
+                        </label>
+                        <select
+                          value={recTotalMonths}
+                          onChange={(e) => setRecTotalMonths(e.target.value)}
+                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                        >
+                          <option value="12">12 Months (1 Year)</option>
+                          <option value="6">6 Months</option>
+                          <option value="24">24 Months</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          Disbursement Date
+                        </label>
+                        <input
+                          type="date"
+                          value={recStartDate}
+                          onChange={(e) => setRecStartDate(e.target.value)}
+                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* If In-Kind Asset: Catalog Selector */}
+                  {recMode === "Asset Purchased" && (
+                    <div className="p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 space-y-3 animate-in fade-in">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                        <ShoppingBag className="size-3.5 text-emerald-600" />
+                        <span>Asset Details</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="sm:col-span-2 lg:col-span-3">
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1 uppercase">
+                            Master Asset Catalog
+                          </label>
+                          <select
+                            value={recAssetMasterId}
+                            onChange={(e) => {
+                              const chosenId = e.target.value;
+                              setRecAssetMasterId(chosenId);
+                              const found = getActiveZakatAssetMasterList().find((item) => item.id === chosenId);
+                              if (found) {
+                                setRecAssetType(found.assetType);
+                                setRecAssetName(found.assetType);
+                                if (found.defaultQty) setRecAssetQty(found.defaultQty);
+                                if (found.defaultVendorLocation) setRecAssetVendor(found.defaultVendorLocation);
+                                if (found.suggestedPurpose) setRecPurposeCategory(found.suggestedPurpose);
+                              }
+                            }}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
+                          >
+                            <option value="">-- Choose Standard Asset from Catalog --</option>
+                            {Array.from(new Set(getActiveZakatAssetMasterList().map((m) => m.category))).map((cat) => (
+                              <optgroup key={cat} label={cat}>
+                                {getActiveZakatAssetMasterList().filter((a) => a.category === cat).map((a) => (
+                                  <option key={a.id} value={a.id}>{a.assetType}</option>
+                                ))}
+                              </optgroup>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1 uppercase">
+                            Asset Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={recAssetName}
+                            onChange={(e) => setRecAssetName(e.target.value)}
+                            placeholder="e.g. Easy Bike / Milch Cow"
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1 uppercase">
+                            Quantity
+                          </label>
+                          <input
+                            type="text"
+                            value={recAssetQty}
+                            onChange={(e) => setRecAssetQty(e.target.value)}
+                            placeholder="e.g. 1 Unit / 2 Goats"
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-800 outline-none focus:border-emerald-600"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1 uppercase">
+                            Vendor / Location
+                          </label>
+                          <input
+                            type="text"
+                            value={recAssetVendor}
+                            onChange={(e) => setRecAssetVendor(e.target.value)}
+                            placeholder="e.g. Bhaluka Bazar"
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-800 outline-none focus:border-emerald-600"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Monthly Amount with Clean Inline Presets */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-slate-700">
+                        Monthly Amount (৳) <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex items-center gap-1">
+                        {[3000, 5000, 10000, 15000, 20000].map((amt) => (
+                          <button
+                            type="button"
+                            key={amt}
+                            onClick={() => setRecMonthlyAmount(amt.toString())}
+                            className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${recMonthlyAmount === amt.toString()
+                                ? "bg-emerald-600 text-white"
+                                : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                              }`}
+                          >
+                            ৳{amt.toLocaleString()}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">৳</span>
+                      <input
+                        type="number"
+                        required
+                        value={recMonthlyAmount}
+                        onChange={(e) => setRecMonthlyAmount(e.target.value)}
+                        placeholder="Enter monthly amount (e.g. 10000)"
+                        className="w-full h-9.5 pl-8 pr-3 rounded-lg border border-slate-300 bg-white text-sm font-bold font-mono text-slate-900 outline-none focus:border-emerald-600 transition-all"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* 6. Payment Transfer Method & Account Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1 whitespace-nowrap">
-                      Disbursement Payment Method <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={recPaymentMethod}
-                      onChange={(e) => setRecPaymentMethod(e.target.value as any)}
-                      className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none focus:border-emerald-600 shadow-xs"
-                    >
-                      <option value="Bank Transfer">Bank Transfer (IBBL / SCB / City Bank)</option>
-                      <option value="Mobile Financial Service">Mobile Financial Service (bKash / Nagad / Rocket)</option>
-                      <option value="Cash Handover">Cash Handover / Physical Envelope</option>
-                      <option value="In-Kind Delivery">In-Kind Delivery / Asset Supplier Direct</option>
-                    </select>
+                {/* SECTION 3: PAYMENT & REMARKS */}
+                <div className="space-y-4 pt-1">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                    <span className="size-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center justify-center">3</span>
+                    <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Payment & Governance</h4>
                   </div>
 
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1 whitespace-nowrap">
-                      Payment Account / Wallet / Cheque Ref
-                    </label>
-                    <input
-                      type="text"
-                      value={recPaymentAccount}
-                      onChange={(e) => setRecPaymentAccount(e.target.value)}
-                      placeholder="e.g. IBBL A/C: 2050-112233 or bKash: 01711-223344"
-                      className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-emerald-600 shadow-xs text-slate-800"
-                    />
-                  </div>
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        Payment Method <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={recPaymentMethod}
+                        onChange={(e) => setRecPaymentMethod(e.target.value as any)}
+                        className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 cursor-pointer"
+                      >
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Mobile Financial Service">Mobile Banking (bKash / Nagad)</option>
+                        <option value="Cash Handover">Cash</option>
+                        <option value="In-Kind Delivery">In-Kind Delivery</option>
+                      </select>
+                    </div>
 
-                {/* 7. Asnaf Category & Instructions */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1 whitespace-nowrap">
-                      Asnaf Shariah Category <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={recAsnaf}
-                      onChange={(e) => setRecAsnaf(e.target.value as any)}
-                      className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none focus:border-emerald-600 shadow-xs"
-                    >
-                      <option value="Al-Masakin">Al-Masakin (The Destitute / Needy)</option>
-                      <option value="Al-Fuqara">Al-Fuqara (The Poor / Low-Income)</option>
-                      <option value="Fi Sabilillah">Fi Sabilillah (In Cause of Allah / Education)</option>
-                      <option value="Al-Gharimin">Al-Gharimin (Debtors in Distress)</option>
-                      <option value="Ibnus-Sabil">Ibnus-Sabil (Stranded Travelers)</option>
-                    </select>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        Account / Mobile / Cheque No
+                      </label>
+                      <input
+                        type="text"
+                        value={recPaymentAccount}
+                        onChange={(e) => setRecPaymentAccount(e.target.value)}
+                        placeholder="e.g. A/C: 2050-112233 or bKash: 01711-223344"
+                        className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-800 outline-none focus:border-emerald-600"
+                      />
+                    </div>
                   </div>
 
-                  <div className="md:col-span-2">
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1 whitespace-nowrap">
-                      Mandate Purpose Instructions & Justification
-                    </label>
-                    <textarea
-                      value={recPurposeDesc}
-                      onChange={(e) => setRecPurposeDesc(e.target.value)}
-                      placeholder="e.g. Approved 1-year continuous medical support for chemotherapy or orphan education."
-                      rows={2}
-                      className="w-full p-3 rounded-lg border border-slate-300 bg-white text-xs font-medium outline-none focus:border-emerald-600 resize-none text-slate-800 shadow-xs"
-                    ></textarea>
-                  </div>
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        Asnaf Category <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={recAsnaf}
+                        onChange={(e) => setRecAsnaf(e.target.value as any)}
+                        className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 cursor-pointer"
+                      >
+                        <option value="Al-Masakin">Al-Masakin (Destitute)</option>
+                        <option value="Al-Fuqara">Al-Fuqara (Poor)</option>
+                        <option value="Fi Sabilillah">Fi Sabilillah</option>
+                        <option value="Al-Gharimin">Al-Gharimin (Debtors)</option>
+                        <option value="Ibnus-Sabil">Ibnus-Sabil (Travelers)</option>
+                      </select>
+                    </div>
 
-                {/* 8. Supporting Attachments & Mandate Documents */}
-                <div className="p-5 bg-slate-50/90 rounded-2xl border border-slate-200 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5 whitespace-nowrap">
-                      <Paperclip className="size-3.5 text-emerald-600" />
-                      <span>Supporting Attachments & Mandate Documents (Optional)</span>
-                    </label>
-                    <span className="text-[10px] text-slate-400 font-medium">
-                      Attach medical prescriptions, approval letters, or monthly verification proof
-                    </span>
+                    <div className="md:col-span-2">
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        Remarks / Justification
+                      </label>
+                      <input
+                        type="text"
+                        value={recPurposeDesc}
+                        onChange={(e) => setRecPurposeDesc(e.target.value)}
+                        placeholder="e.g. Approved continuous medical stipend for chemotherapy"
+                        className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
+                      />
+                    </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <label className="h-10 px-4 rounded-xl border border-dashed border-emerald-400 bg-emerald-50/60 hover:bg-emerald-100/60 text-emerald-700 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-2xs">
-                      <Upload className="size-4" />
-                      <span>Upload Supporting Document</span>
+                  {/* Attachments - Compact & Clean */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-slate-50/70 rounded-xl border border-slate-200">
+                    <div className="flex items-center gap-2">
+                      <Paperclip className="size-4 text-slate-500" />
+                      <span className="text-xs font-semibold text-slate-700">Supporting Attachments</span>
+                      <span className="text-[10px] text-slate-400 font-medium">(PDF, PNG, JPG)</span>
+                    </div>
+
+                    <label className="h-8 px-3 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-colors shrink-0">
+                      <Upload className="size-3.5 text-slate-500" />
+                      <span>Attach Files</span>
                       <input
                         type="file"
                         multiple
@@ -4921,34 +4380,23 @@ function ZakatManagementPage() {
                         className="hidden"
                       />
                     </label>
-                    <span className="text-[11px] text-slate-500 font-medium">
-                      Supported: PDF, JPG, PNG, DOCX, XLSX (Direct in-browser storage)
-                    </span>
                   </div>
 
                   {recAttachments.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
+                    <div className="flex flex-wrap gap-2 pt-1">
                       {recAttachments.map((file) => (
                         <div
                           key={file.id}
-                          className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between shadow-2xs group hover:border-emerald-300 transition-colors"
+                          className="px-2.5 py-1 bg-white rounded-lg border border-slate-200 text-xs flex items-center gap-2 shadow-2xs"
                         >
-                          <div className="flex items-center gap-2 min-w-0">
-                            <div className="size-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                              <FileText className="size-3.5" />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-xs font-bold text-slate-800 truncate max-w-[150px]">{file.name}</p>
-                              <p className="text-[10px] text-slate-400 font-medium">{file.size}</p>
-                            </div>
-                          </div>
+                          <FileText className="size-3 text-emerald-600" />
+                          <span className="font-medium text-slate-700 max-w-[140px] truncate">{file.name}</span>
                           <button
                             type="button"
                             onClick={() => removeAttachment(file.id, "recurring")}
-                            className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                            title="Remove attachment"
+                            className="text-slate-400 hover:text-rose-600 cursor-pointer"
                           >
-                            <Trash2 className="size-3.5" />
+                            <Trash2 className="size-3" />
                           </button>
                         </div>
                       ))}
@@ -4956,108 +4404,78 @@ function ZakatManagementPage() {
                   )}
                 </div>
 
-                {/* 9. ⚡ Live Financial Simulator Box */}
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-md space-y-3">
-                  <div className="flex items-center justify-between border-b border-slate-700/80 pb-2">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="size-4 text-emerald-400" />
-                      <span className="text-xs font-black uppercase tracking-wider text-slate-200">
-                        Live Financial Commitment Simulator
-                      </span>
-                    </div>
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        recSettlementType === "1-Year Full Advance"
-                          ? "bg-amber-400 text-slate-950 font-black"
-                          : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                      }`}
-                    >
-                      {recSettlementType === "1-Year Full Advance"
-                        ? "1-Year Advance Lump Sum"
-                        : `Periodic ${recCadence}`}
-                    </span>
+                {/* SUMMARY STATS BAR */}
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                    <Sparkles className="size-4 text-emerald-600" />
+                    <span>Summary</span>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center sm:text-left">
+                  <div className="flex flex-wrap items-center gap-5">
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase">Monthly Commitment</p>
-                      <p className="text-base font-black font-mono text-emerald-400">
-                        ৳ {(parseFloat(recMonthlyAmount) || 0).toLocaleString()}
-                      </p>
+                      <span className="text-slate-400 text-[11px] block">Rate</span>
+                      <span className="font-bold font-mono text-slate-800">
+                        ৳{(parseFloat(recMonthlyAmount) || 0).toLocaleString()}
+                        {recSettlementType === "Periodic Installments" ? "/mo" : ""}
+                      </span>
                     </div>
 
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase">Duration</p>
-                      <p className="text-base font-black font-mono text-white">
-                        {recTotalMonths === "0" ? "Indefinite" : `${recTotalMonths} Months`}
-                      </p>
+                      <span className="text-slate-400 text-[11px] block">Duration</span>
+                      <span className="font-bold text-slate-800">
+                        {recTotalMonths === "0" ? "Indefinite" : `${recTotalMonths} Mos`}
+                      </span>
                     </div>
 
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase">
-                        {recSettlementType === "1-Year Full Advance" ? "Upfront Advance Total" : "Annual Commitment"}
-                      </p>
-                      <p className="text-lg font-black font-mono text-amber-400">
-                        ৳ {((parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)).toLocaleString()}
-                      </p>
+                      <span className="text-slate-400 text-[11px] block">Total Commitment</span>
+                      <span className="font-bold font-mono text-emerald-700 text-sm">
+                        ৳{((parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)).toLocaleString()}
+                      </span>
                     </div>
 
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase">Pool After Settlement</p>
-                      <p
-                        className={`text-sm font-black font-mono ${
-                          stats.remainingBudget -
-                            ((parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)) <
-                          0
-                            ? "text-rose-400"
-                            : "text-emerald-300"
-                        }`}
-                      >
-                        ৳ {Math.max(
+                      <span className="text-slate-400 text-[11px] block">Remaining Pool</span>
+                      <span className="font-bold font-mono text-slate-800">
+                        ৳{Math.max(
                           0,
                           stats.remainingBudget -
-                            (recSettlementType === "1-Year Full Advance"
-                              ? (parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)
-                              : 0)
+                          (recSettlementType === "1-Year Full Advance"
+                            ? (parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)
+                            : 0)
                         ).toLocaleString()}
-                      </p>
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-between px-6 md:px-8 py-4.5 border-t border-slate-200 bg-slate-50 rounded-b-[24px]">
-                <div className="text-xs font-bold text-emerald-800">
-                  {recSettlementType === "1-Year Full Advance" ? "1-Year Advance Payout:" : "Annual Commitment:"}{" "}
-                  <span className="font-mono font-black text-sm ml-1 text-emerald-950">
-                    ৳ {((parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)).toLocaleString()}
+              <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-slate-50">
+                <div className="text-xs font-semibold text-slate-600">
+                  Total Grant:{" "}
+                  <span className="font-mono font-bold text-sm text-slate-900 ml-1">
+                    ৳{((parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)).toLocaleString()}
                   </span>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <button
                     type="button"
                     onClick={() => setIsRecurringModalOpen(false)}
-                    className="h-10 px-5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 transition-colors cursor-pointer"
+                    className="h-9 px-4 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className={`h-10 px-7 rounded-xl text-xs font-black text-white shadow-sm transition-all cursor-pointer flex items-center gap-2 ${
-                      recSettlementType === "1-Year Full Advance"
-                        ? "bg-emerald-700 hover:bg-emerald-800"
-                        : "bg-emerald-600 hover:bg-emerald-700"
-                    }`}
+                    className="h-9 px-5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer flex items-center gap-1.5"
                   >
-                    {recSettlementType === "1-Year Full Advance" ? (
-                      <span>Disburse 1-Year Advance Now</span>
-                    ) : (
-                      <>
-                        <Check className="size-4" />
-                        <span>Save & Activate Schedule</span>
-                      </>
-                    )}
+                    <Check className="size-3.5" />
+                    <span>
+                      {recSettlementType === "1-Year Full Advance"
+                        ? "Disburse Advance"
+                        : "Save Schedule"}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -5455,33 +4873,30 @@ function ZakatManagementPage() {
                     <button
                       type="button"
                       onClick={() => setDrillDownModeFilter("ALL")}
-                      className={`h-7 px-3 rounded transition-colors cursor-pointer ${
-                        drillDownModeFilter === "ALL"
+                      className={`h-7 px-3 rounded transition-colors cursor-pointer ${drillDownModeFilter === "ALL"
                           ? "bg-white text-slate-900 font-semibold shadow-xs"
                           : "text-slate-600 hover:text-slate-900"
-                      }`}
+                        }`}
                     >
                       All Modes
                     </button>
                     <button
                       type="button"
                       onClick={() => setDrillDownModeFilter("Cash Grant")}
-                      className={`h-7 px-3 rounded transition-colors cursor-pointer ${
-                        drillDownModeFilter === "Cash Grant"
+                      className={`h-7 px-3 rounded transition-colors cursor-pointer ${drillDownModeFilter === "Cash Grant"
                           ? "bg-white text-slate-900 font-semibold shadow-xs"
                           : "text-slate-600 hover:text-slate-900"
-                      }`}
+                        }`}
                     >
                       Cash Grants
                     </button>
                     <button
                       type="button"
                       onClick={() => setDrillDownModeFilter("Asset Purchased")}
-                      className={`h-7 px-3 rounded transition-colors cursor-pointer ${
-                        drillDownModeFilter === "Asset Purchased"
+                      className={`h-7 px-3 rounded transition-colors cursor-pointer ${drillDownModeFilter === "Asset Purchased"
                           ? "bg-white text-slate-900 font-semibold shadow-xs"
                           : "text-slate-600 hover:text-slate-900"
-                      }`}
+                        }`}
                     >
                       Assets Purchased
                     </button>
@@ -5666,13 +5081,12 @@ function ZakatManagementPage() {
                               <div className="text-xs font-medium text-slate-700">{row.asnafCategory}</div>
                               <div className="mt-1">
                                 <span
-                                  className={`inline-block px-2 py-0.5 rounded text-[11px] font-medium border ${
-                                    row.agencyStatus === "Verified"
+                                  className={`inline-block px-2 py-0.5 rounded text-[11px] font-medium border ${row.agencyStatus === "Verified"
                                       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                                       : row.agencyStatus === "Assigned"
-                                      ? "bg-blue-50 text-blue-700 border-blue-200"
-                                      : "bg-slate-100 text-slate-700 border-slate-200"
-                                  }`}
+                                        ? "bg-blue-50 text-blue-700 border-blue-200"
+                                        : "bg-slate-100 text-slate-700 border-slate-200"
+                                    }`}
                                 >
                                   {row.agencyStatus}
                                 </span>
@@ -5823,23 +5237,22 @@ function ZakatManagementPage() {
                     <span className="text-slate-400">
                       ({activeRecord.asnafCategory === "Al-Gharimin" ? "Debt-burdened welfare recipient" :
                         activeRecord.asnafCategory === "Al-Masakin" ? "Destitute with insufficient livelihood" :
-                        activeRecord.asnafCategory === "Al-Fuqara" ? "Extreme needy impoverished" :
-                        activeRecord.asnafCategory === "Fi Sabilillah" ? "Religious & educational sponsorship" :
-                        "Emergency welfare support"})
+                          activeRecord.asnafCategory === "Al-Fuqara" ? "Extreme needy impoverished" :
+                            activeRecord.asnafCategory === "Fi Sabilillah" ? "Religious & educational sponsorship" :
+                              "Emergency welfare support"})
                     </span>
                   </div>
 
                   <div>
                     <span
-                      className={`inline-block px-3 py-1 rounded text-xs font-bold uppercase tracking-wider border ${
-                        activeRecord.agencyStatus === "Verified"
+                      className={`inline-block px-3 py-1 rounded text-xs font-bold uppercase tracking-wider border ${activeRecord.agencyStatus === "Verified"
                           ? "bg-emerald-50 text-emerald-800 border-emerald-300"
                           : activeRecord.agencyStatus === "Distributed"
-                          ? "bg-amber-50 text-amber-800 border-amber-300"
-                          : activeRecord.agencyStatus === "Acknowledged"
-                          ? "bg-blue-50 text-blue-800 border-blue-300"
-                          : "bg-slate-100 text-slate-700 border-slate-300"
-                      }`}
+                            ? "bg-amber-50 text-amber-800 border-amber-300"
+                            : activeRecord.agencyStatus === "Acknowledged"
+                              ? "bg-blue-50 text-blue-800 border-blue-300"
+                              : "bg-slate-100 text-slate-700 border-slate-300"
+                        }`}
                     >
                       {activeRecord.agencyStatus === "Verified" && "VERIFIED & AUDITED COMPLIANT"}
                       {activeRecord.agencyStatus === "Distributed" && "DISTRIBUTED — PENDING FINAL AUDIT"}

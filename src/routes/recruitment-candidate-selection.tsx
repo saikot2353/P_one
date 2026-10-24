@@ -1195,12 +1195,22 @@ function CandidateSelectionPage() {
   const [deptFilter, setDeptFilter] = useState<string>("All");
   const [expandedJobIds, setExpandedJobIds] = useState<Record<string, boolean>>({});
 
-  // Active CV Modal state
+  // Active CV & Review Modal state
   const [activeCvCandidate, setActiveCvCandidate] = useState<{
     candidate: JobCandidate;
     jobTitle: string;
     jobCode: string;
   } | null>(null);
+  const [reviewSalaryInput, setReviewSalaryInput] = useState<number | "">("");
+
+  const openReviewModal = (candidate: JobCandidate, jobTitle: string, jobCode: string) => {
+    setActiveCvCandidate({
+      candidate,
+      jobTitle,
+      jobCode,
+    });
+    setReviewSalaryInput(candidate.agreedSalary || candidate.previousSalary || 0);
+  };
 
   // Close Job Confirmation Modal
   const [closingJob, setClosingJob] = useState<JobPost | null>(null);
@@ -1360,16 +1370,7 @@ function CandidateSelectionPage() {
   } | null>(null);
   const [tempAgreedSalary, setTempAgreedSalary] = useState(0);
 
-  // Candidate Approval Modal with Mandatory Salary Input
-  const [approvingCandidate, setApprovingCandidate] = useState<{
-    jobId: string;
-    candidate: JobCandidate;
-    jobTitle: string;
-    salaryBudgetMin: number;
-    salaryBudgetMax: number;
-    salaryInput: number;
-    remarks?: string;
-  } | null>(null);
+
 
   // Job Submission & Final Approval Modal (with batch salary review)
   const [approvingJob, setApprovingJob] = useState<{
@@ -1455,7 +1456,7 @@ function CandidateSelectionPage() {
     localStorage.setItem("recruitment_candidates", JSON.stringify(queue));
   };
 
-  // Open candidate approval modal requiring salary input
+  // Open candidate review & approval modal
   const handleOpenApproveCandidate = (jobId: string, candidate: JobCandidate) => {
     const job = jobs.find((j) => j.id === jobId);
     if (!job) return;
@@ -1465,28 +1466,20 @@ function CandidateSelectionPage() {
       return;
     }
 
-    setApprovingCandidate({
-      jobId,
-      candidate,
-      jobTitle: job.title,
-      salaryBudgetMin: job.salaryBudgetMin,
-      salaryBudgetMax: job.salaryBudgetMax,
-      salaryInput: candidate.agreedSalary || candidate.previousSalary || job.salaryBudgetMin || 0,
-      remarks: "",
-    });
+    openReviewModal(candidate, job.title, jobId);
   };
 
-  // Confirm candidate approval with the inputted salary
-  const handleConfirmApproveCandidate = () => {
-    if (!approvingCandidate) return;
-    const { jobId, candidate, salaryInput } = approvingCandidate;
-
-    if (!salaryInput || salaryInput <= 0 || isNaN(salaryInput)) {
-      toast.error("Please enter a valid approved salary greater than 0.");
+  // Confirm candidate approval with the inputted salary from review modal
+  const handleApproveFromReview = () => {
+    if (!activeCvCandidate) return;
+    const salary = Number(reviewSalaryInput);
+    if (!salary || salary <= 0 || isNaN(salary)) {
+      toast.error("Please enter a valid final salary.");
       return;
     }
 
-    const job = jobs.find((j) => j.id === jobId);
+    const { jobCode, candidate } = activeCvCandidate;
+    const job = jobs.find((j) => j.id === jobCode);
     if (!job) return;
 
     const baseUrl = window.location.origin;
@@ -1504,7 +1497,7 @@ function CandidateSelectionPage() {
       {
         ...candidate,
         selected: true,
-        agreedSalary: salaryInput,
+        agreedSalary: salary,
         generatedLink,
         linkGeneratedAt: linkTime,
       },
@@ -1513,7 +1506,7 @@ function CandidateSelectionPage() {
     );
 
     const updatedJobs = jobs.map((j) => {
-      if (j.id === jobId) {
+      if (j.id === jobCode) {
         const updatedCandidates = j.candidates.map((c) => {
           if (c.id === candidate.id) {
             return {
@@ -1521,7 +1514,7 @@ function CandidateSelectionPage() {
               selected: true,
               selectedAt: c.selectedAt || new Date().toISOString(),
               status: "Selected" as const,
-              agreedSalary: salaryInput,
+              agreedSalary: salary,
               generatedLink,
               linkGeneratedAt: linkTime,
             };
@@ -1534,10 +1527,12 @@ function CandidateSelectionPage() {
     });
 
     persistJobs(updatedJobs);
-    setApprovingCandidate(null);
-    toast.success(
-      `Approved ${candidate.name} with salary ৳${salaryInput.toLocaleString()}! Link auto-generated & candidate synced.`
-    );
+    toast.success(`Approved ${candidate.name} (৳${salary.toLocaleString()})! Link generated.`);
+  };
+
+  // Confirm candidate approval with the inputted salary (legacy support)
+  const handleConfirmApproveCandidate = () => {
+    handleApproveFromReview();
   };
 
   // Deselect candidate
@@ -2045,7 +2040,7 @@ function CandidateSelectionPage() {
                     Candidate Selection & Link Generator
                   </h1>
                   <p className="text-xs text-muted-foreground font-normal mt-0.5">
-                    Evaluate candidates per job requisition, review official PDF CVs, agree on compensation, and dispatch auto-generated e-recruitment links.
+                    Review candidate PDF CV, finalize agreed salary, and generate recruitment link.
                   </p>
                 </div>
               </div>
@@ -2391,19 +2386,18 @@ function CandidateSelectionPage() {
                           </div>
                         ) : (
                           <div className="overflow-x-auto rounded-lg border border-border/60">
-                            <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
+                            <table className="w-full border-collapse text-left text-xs">
                               <thead>
-                                <tr className="text-[10px] uppercase font-normal tracking-normal text-muted-foreground bg-muted/30 border-b border-border/60">
-                                  <th className="px-3 py-2.5 text-center w-28">Approval</th>
-                                  <th className="px-3 py-2.5">Candidate Info</th>
-                                  <th className="px-3 py-2.5">Experience & Notice</th>
-                                  <th className="px-3 py-2.5 text-right">Previous Salary</th>
-                                  <th className="px-3 py-2.5 text-right">Agreed Salary</th>
-                                  <th className="px-3 py-2.5 text-center">Curriculum Vitae</th>
-                                  <th className="px-3 py-2.5">Auto e-Recruitment Link</th>
+                                <tr className="text-[11px] font-semibold text-muted-foreground bg-muted/40 border-b border-border/60">
+                                  <th className="px-4 py-2.5">Candidate</th>
+                                  <th className="px-4 py-2.5">Experience</th>
+                                  <th className="px-4 py-2.5 text-right">Prev. Salary</th>
+                                  <th className="px-4 py-2.5 text-right whitespace-nowrap">Final Agreed Salary</th>
+                                  <th className="px-4 py-2.5 text-center">Status</th>
+                                  <th className="px-4 py-2.5 text-right">Action</th>
                                 </tr>
                               </thead>
-                              <tbody className="divide-y divide-border/30 bg-card font-normal">
+                              <tbody className="divide-y divide-border/30 bg-card">
                                 {job.candidates.map((cand) => (
                                   <tr
                                     key={cand.id}
@@ -2413,183 +2407,92 @@ function CandidateSelectionPage() {
                                         : "hover:bg-muted/30"
                                     }`}
                                   >
-                                    {/* Approval Action */}
-                                    <td className="px-3 py-2.5 text-center">
-                                      {cand.selected ? (
-                                        <div className="inline-flex items-center gap-1 justify-center">
-                                          <button
-                                            type="button"
-                                            disabled={isClosed}
-                                            onClick={() => handleToggleCandidateSelection(job.id, cand.id)}
-                                            className={`h-6.5 px-2.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[11px] flex items-center gap-1 shadow-2xs transition ${
-                                              isClosed ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-                                            }`}
-                                            title={isClosed ? "Job is closed" : "Approved. Click to deselect candidate."}
-                                          >
-                                            <Check className="size-3 stroke-[2.5]" />
-                                            <span>Approved</span>
-                                          </button>
-                                          {!isClosed && (
-                                            <button
-                                              type="button"
-                                              onClick={() => {
-                                                setApprovingCandidate({
-                                                  jobId: job.id,
-                                                  candidate: cand,
-                                                  jobTitle: job.title,
-                                                  salaryBudgetMin: job.salaryBudgetMin,
-                                                  salaryBudgetMax: job.salaryBudgetMax,
-                                                  salaryInput: cand.agreedSalary,
-                                                  remarks: "",
-                                                });
-                                              }}
-                                              className="size-6.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center transition cursor-pointer"
-                                              title="Edit approved salary"
-                                            >
-                                              <DollarSign className="size-3" />
-                                            </button>
-                                          )}
-                                        </div>
-                                      ) : (
-                                        <button
-                                          type="button"
-                                          disabled={isClosed}
-                                          onClick={() => handleToggleCandidateSelection(job.id, cand.id)}
-                                          className={`h-6.5 px-2.5 rounded-md border border-emerald-600/30 bg-emerald-500/10 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-300 font-medium text-[11px] flex items-center gap-1 transition mx-auto ${
-                                            isClosed ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-                                          }`}
-                                          title={isClosed ? "Job is closed" : "Approve candidate and input agreed salary"}
-                                        >
-                                          <CheckCircle2 className="size-3" />
-                                          <span>Approve</span>
-                                        </button>
-                                      )}
-                                    </td>
-
-                                    {/* Candidate Basic Information */}
-                                    <td className="px-3 py-2.5">
-                                      <div className="flex items-center gap-2.5">
-                                        <div className="size-7.5 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-normal text-primary text-xs shrink-0">
-                                          {cand.name
-                                            .split(" ")
-                                            .filter((p) => p && !p.startsWith("Md"))
-                                            .slice(0, 2)
-                                            .map((p) => p[0])
-                                            .join("") || cand.name[0]}
-                                        </div>
-                                        <div>
-                                          <div className="font-normal text-foreground text-xs">
-                                            {cand.name}
-                                          </div>
-                                          <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-0.5 font-normal">
-                                            <span>{cand.id}</span>
-                                            <span>·</span>
-                                            <span className="flex items-center gap-0.5">
-                                              <Phone className="size-2.5" />
-                                              {cand.phone}
-                                            </span>
-                                          </div>
-                                        </div>
+                                    {/* Candidate Info */}
+                                    <td className="px-4 py-3">
+                                      <div className="font-semibold text-foreground text-xs">{cand.name}</div>
+                                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5 font-mono">
+                                        <span>{cand.id}</span>
+                                        <span>·</span>
+                                        <span>{cand.phone}</span>
                                       </div>
                                     </td>
 
                                     {/* Experience & Notice */}
-                                    <td className="px-3 py-2.5">
-                                      <div className="font-normal text-foreground text-xs">{cand.experience} Exp</div>
-                                      <div className="text-[10px] text-muted-foreground mt-0.5 font-normal">
-                                        Notice: {cand.noticePeriod}
-                                      </div>
+                                    <td className="px-4 py-3">
+                                      <div className="text-xs font-medium text-foreground">{cand.experience}</div>
+                                      <div className="text-[11px] text-muted-foreground mt-0.5">{cand.noticePeriod} notice</div>
                                     </td>
 
                                     {/* Previous Salary */}
-                                    <td className="px-3 py-2.5 text-right">
-                                      <div className="text-xs font-normal text-muted-foreground">
+                                    <td className="px-4 py-3 text-right">
+                                      <span className="text-xs text-muted-foreground font-mono">
                                         ৳{cand.previousSalary.toLocaleString()}
-                                      </div>
+                                      </span>
                                     </td>
 
-                                    {/* Agreed Salary with Clean Edit Trigger */}
-                                    <td className="px-3 py-2.5 text-right">
-                                      <div className="flex items-center justify-end gap-1.5">
-                                        <button
-                                          type="button"
-                                          disabled={isClosed}
-                                          onClick={() => {
-                                            setApprovingCandidate({
-                                              jobId: job.id,
-                                              candidate: cand,
-                                              jobTitle: job.title,
-                                              salaryBudgetMin: job.salaryBudgetMin,
-                                              salaryBudgetMax: job.salaryBudgetMax,
-                                              salaryInput: cand.agreedSalary || cand.previousSalary || 0,
-                                              remarks: "",
-                                            });
-                                          }}
-                                          className={`text-xs font-normal px-2 py-0.5 rounded border transition flex items-center gap-1 ${
-                                            cand.selected
-                                              ? "text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border-emerald-500/25 hover:bg-emerald-500/20 cursor-pointer font-medium"
-                                              : "text-muted-foreground bg-muted/40 border-border/50 hover:border-primary/40 cursor-pointer"
-                                          } ${isClosed ? "pointer-events-none opacity-80" : ""}`}
-                                          title={isClosed ? undefined : "Click to input/update agreed salary"}
-                                        >
-                                          <span>৳{cand.agreedSalary.toLocaleString()}</span>
-                                          {!isClosed && <DollarSign className="size-2.5 opacity-70" />}
-                                        </button>
-                                      </div>
-                                    </td>
-
-                                    {/* PDF CV Button */}
-                                    <td className="px-3 py-2.5 text-center">
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          setActiveCvCandidate({
-                                            candidate: cand,
-                                            jobTitle: job.title,
-                                            jobCode: job.id,
-                                          })
-                                        }
-                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-card hover:bg-muted text-foreground border border-border/70 font-normal text-xs shadow-2xs transition cursor-pointer"
+                                    {/* Final Salary */}
+                                    <td className="px-4 py-3 text-right">
+                                      <span
+                                        className={`text-xs font-mono font-bold ${
+                                          cand.selected ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"
+                                        }`}
                                       >
-                                        <FileText className="size-3 text-red-500" />
-                                        <span>View PDF CV</span>
-                                      </button>
+                                        {cand.agreedSalary ? `৳${cand.agreedSalary.toLocaleString()}` : "—"}
+                                      </span>
                                     </td>
 
-                                    {/* Auto-Generated e-Recruitment Link */}
-                                    <td className="px-3 py-2.5">
-                                      {cand.generatedLink ? (
-                                        <div className="flex items-center gap-1.5">
-                                          <div
-                                            className="max-w-[200px] truncate text-[10px] bg-muted/60 px-2 py-1 rounded border border-border/50 text-foreground cursor-pointer hover:border-primary/40 font-normal"
-                                            title={cand.generatedLink}
-                                            onClick={() => handleCopyLink(cand.generatedLink, cand.name)}
-                                          >
-                                            {cand.generatedLink}
-                                          </div>
-                                          <button
-                                            type="button"
-                                            onClick={() => handleCopyLink(cand.generatedLink, cand.name)}
-                                            className="p-1 rounded bg-card hover:bg-muted border border-border text-foreground transition cursor-pointer"
-                                            title="Copy e-recruitment link"
-                                          >
-                                            <Copy className="size-3" />
-                                          </button>
-                                          <a
-                                            href={cand.generatedLink}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="p-1 rounded bg-card hover:bg-muted border border-border text-primary transition"
-                                            title="Open candidate e-recruitment form"
-                                          >
-                                            <ExternalLink className="size-3" />
-                                          </a>
-                                        </div>
+                                    {/* Status */}
+                                    <td className="px-4 py-3 text-center">
+                                      {cand.selected ? (
+                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+                                          <Check className="size-3 stroke-[2.5]" /> Approved
+                                        </span>
                                       ) : (
-                                        <span className="text-[10px] text-muted-foreground/60 italic font-normal">
-                                          Select candidate to generate link
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] text-muted-foreground bg-muted/60 border border-border/40">
+                                          Pending
                                         </span>
                                       )}
+                                    </td>
+
+                                    {/* Actions */}
+                                    <td className="px-4 py-3 text-right">
+                                      <div className="flex items-center justify-end gap-1.5">
+                                        {!cand.selected ? (
+                                          <button
+                                            type="button"
+                                            disabled={isClosed}
+                                            onClick={() => openReviewModal(cand, job.title, job.id)}
+                                            className={`h-7.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs flex items-center gap-1.5 shadow-2xs transition ${
+                                              isClosed ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                                            }`}
+                                            title={isClosed ? "Job is closed" : "Review PDF CV, finalize salary, and approve"}
+                                          >
+                                            <FileText className="size-3.5" />
+                                            <span>Review & Approve</span>
+                                          </button>
+                                        ) : (
+                                          <>
+                                            <button
+                                              type="button"
+                                              onClick={() => handleCopyLink(cand.generatedLink, cand.name)}
+                                              className="h-7.5 px-2.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 font-medium text-xs flex items-center gap-1 transition cursor-pointer"
+                                              title="Copy e-Recruitment Link"
+                                            >
+                                              <Copy className="size-3" />
+                                              <span>Copy Link</span>
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => openReviewModal(cand, job.title, job.id)}
+                                              className="h-7.5 px-2.5 rounded-lg bg-muted hover:bg-muted/80 text-foreground border border-border/70 text-xs flex items-center gap-1 transition cursor-pointer"
+                                              title="View CV or modify approved salary"
+                                            >
+                                              <FileText className="size-3 text-red-500" />
+                                              <span>View CV</span>
+                                            </button>
+                                          </>
+                                        )}
+                                      </div>
                                     </td>
                                   </tr>
                                 ))}
@@ -2655,34 +2558,41 @@ function CandidateSelectionPage() {
           </div>
         </div>
 
-        {/* ─── MODAL 1: AUTHENTIC PDF CV / RESUME MODAL ───────────────────────── */}
-        {/* ─── MODAL 1: AUTHENTIC PDF CV MODAL WITH SUMMARY CARD ON TOP ───────────────────────── */}
+        {/* ─── UNIFIED MODAL: REVIEW PDF CV, FIX SALARY & APPROVE ───────────── */}
         {activeCvCandidate && (() => {
           const liveCand =
             jobs.flatMap((j) => j.candidates).find((c) => c.id === activeCvCandidate.candidate.id) ||
             activeCvCandidate.candidate;
           const liveJob = jobs.find((j) => j.id === activeCvCandidate.jobCode);
-          const pdfUrl = "/Tahmid%20Afsar%20Shapno-details_.pdf";
+          const pdfUrl = liveCand.pdfUrl || "/Tahmid%20Afsar%20Shapno-details_.pdf";
 
           return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-2 sm:p-4 md:p-6 overflow-y-auto">
-              <div className="bg-card w-full max-w-5xl max-h-[96vh] rounded-2xl shadow-2xl border border-border/80 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-2 sm:p-4 md:p-6 overflow-hidden">
+              <div className="bg-card w-full max-w-6xl h-[92vh] rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Modal Top Bar */}
-                <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-border/60 bg-muted/40 shrink-0">
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-2 bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg">
-                      <FileText className="size-4.5" />
+                <div className="px-5 py-3 border-b border-border bg-muted/30 flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="size-9 rounded-xl bg-red-500/10 text-red-600 flex items-center justify-center shrink-0">
+                      <FileText className="size-5" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                        <span>Candidate CV Dossier — {liveCand.name}</span>
-                        <span className="text-[10px] font-normal px-1.5 py-0.2 rounded bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 uppercase">
-                          PDF View
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-foreground">{liveCand.name}</h3>
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted text-muted-foreground border border-border/60">
+                          {liveCand.id}
                         </span>
-                      </h3>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 font-normal">
-                        Applied Position: <span className="text-foreground">{activeCvCandidate.jobTitle}</span> (
-                        {activeCvCandidate.jobCode})
+                        {liveCand.selected ? (
+                          <span className="px-2 py-0.2 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            Approved
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.2 rounded-full text-[10px] text-muted-foreground bg-muted border border-border/40">
+                            Pending Review
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {activeCvCandidate.jobTitle} · {liveCand.department}
                       </p>
                     </div>
                   </div>
@@ -2692,269 +2602,172 @@ function CandidateSelectionPage() {
                       href={pdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="h-8 px-3 bg-card hover:bg-muted text-foreground border border-border/70 rounded-lg text-xs font-normal transition flex items-center gap-1.5 shadow-2xs"
-                      title="Open PDF in a new tab"
+                      className="h-8 px-2.5 rounded-lg border border-border bg-card hover:bg-muted text-foreground text-xs flex items-center gap-1.5 transition"
+                      title="Open PDF in new tab"
                     >
                       <ExternalLink className="size-3.5" />
                       <span className="hidden sm:inline">Open in Tab</span>
                     </a>
-
                     <a
                       href={pdfUrl}
-                      download="Tahmid Afsar Shapno-details_.pdf"
-                      className="h-8 px-3 bg-card hover:bg-muted text-foreground border border-border/70 rounded-lg text-xs font-normal transition flex items-center gap-1.5 shadow-2xs"
-                      title="Download PDF document"
+                      download={`${liveCand.name}-CV.pdf`}
+                      className="h-8 px-2.5 rounded-lg border border-border bg-card hover:bg-muted text-foreground text-xs flex items-center gap-1.5 transition"
+                      title="Download PDF"
                     >
                       <Download className="size-3.5" />
                       <span className="hidden sm:inline">Download</span>
                     </a>
-
-                    <button
-                      onClick={() => setActiveCvCandidate(null)}
-                      className="size-8 rounded-lg border border-border/70 bg-card hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition cursor-pointer"
-                      title="Close modal"
-                    >
-                      <XCircle className="size-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Modal Scrollable Body */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-muted/15 custom-scrollbar">
-                  {/* ─── SUMMARY CARD ABOVE THE PDF ────────────────────────── */}
-                  {/* ─── SUMMARY CARD ABOVE THE PDF ────────────────────────── */}
-                  <div className="bg-card rounded-xl border border-border/70 p-3 sm:p-3.5 shadow-2xs space-y-2.5">
-                    {/* Top row: Avatar, Name, Department, Designation, Status */}
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pb-2.5 border-b border-border/50">
-                      <div className="flex items-center gap-3">
-                        <div className="size-9 rounded-lg bg-primary/10 text-primary border border-primary/20 font-medium text-xs flex items-center justify-center shrink-0">
-                          {liveCand.name
-                            .split(" ")
-                            .filter((p) => p && !p.startsWith("Md"))
-                            .slice(0, 2)
-                            .map((p) => p[0])
-                            .join("") || liveCand.name[0]}
-                        </div>
-                        <div className="space-y-0.5">
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <h2 className="text-sm font-semibold text-foreground">
-                              {liveCand.name}
-                            </h2>
-                            {liveCand.nameBng && (
-                              <span className="text-xs text-muted-foreground font-normal">
-                                ({liveCand.nameBng})
-                              </span>
-                            )}
-                            <span className="text-[10px] font-normal px-1.5 py-0.2 rounded bg-muted/60 border border-border/50 text-muted-foreground">
-                              {liveCand.id}
-                            </span>
-                            {liveCand.selected ? (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.2 rounded-full border border-emerald-500/20">
-                                <BadgeCheck className="size-3" /> Selected Candidate
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-normal text-muted-foreground bg-muted/60 px-2 py-0.2 rounded-full border border-border/40">
-                                {liveCand.status}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground font-normal">
-                            <span className="px-2 py-0.2 rounded bg-primary/10 text-primary font-medium text-[11px] border border-primary/15">
-                              {liveCand.designation}
-                            </span>
-                            <span className="px-2 py-0.2 rounded bg-muted/60 text-muted-foreground font-normal text-[11px] border border-border/50 flex items-center gap-1">
-                              <Building2 className="size-2.5 text-muted-foreground/70" />
-                              {liveCand.department}
-                            </span>
-                            <span className="text-muted-foreground/60">·</span>
-                            <span>
-                              Applied: <span className="text-foreground font-normal">{activeCvCandidate.jobTitle}</span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Quick Select & Action Button */}
-                      <div className="flex flex-wrap items-center gap-2 pt-1 lg:pt-0">
-                        <button
-                          type="button"
-                          disabled={liveJob?.status === "Closed"}
-                          onClick={() => handleToggleCandidateSelection(activeCvCandidate.jobCode, liveCand.id)}
-                          className={`h-7.5 px-3 rounded-lg font-medium text-xs transition flex items-center gap-1.5 cursor-pointer ${
-                            liveCand.selected
-                              ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                              : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs"
-                          } ${liveJob?.status === "Closed" ? "opacity-60 cursor-not-allowed" : ""}`}
-                        >
-                          <Check className="size-3 stroke-[2.5]" />
-                          <span>{liveCand.selected ? "Approved (Click to Deselect)" : "Approve Candidate & Set Salary"}</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Salary & Critical Candidate Metrics Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
-                      {/* Agreed Salary (Most Important) */}
-                      <div className="bg-emerald-500/[0.03] rounded-lg border border-emerald-500/25 p-2 sm:p-2.5 flex items-center justify-between">
-                        <div>
-                          <div className="text-[10px] uppercase font-medium tracking-normal text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                            <DollarSign className="size-2.5" />
-                            <span>Agreed Salary</span>
-                          </div>
-                          <div className="text-base sm:text-lg font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                            ৳{liveCand.agreedSalary.toLocaleString()}
-                          </div>
-                          <div className="text-[10px] text-muted-foreground font-normal">Final agreed monthly offer</div>
-                        </div>
-                        {(!liveJob || liveJob.status !== "Closed") && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setApprovingCandidate({
-                                jobId: activeCvCandidate.jobCode,
-                                candidate: liveCand,
-                                jobTitle: activeCvCandidate.jobTitle,
-                                salaryBudgetMin: liveJob?.salaryBudgetMin || 0,
-                                salaryBudgetMax: liveJob?.salaryBudgetMax || 0,
-                                salaryInput: liveCand.agreedSalary || liveCand.previousSalary || 0,
-                                remarks: "",
-                              });
-                            }}
-                            className="px-2 py-1 text-xs rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 border border-emerald-500/30 transition cursor-pointer"
-                          >
-                            Edit
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Previous Salary */}
-                      <div className="bg-muted/20 rounded-lg border border-border/60 p-2 sm:p-2.5">
-                        <div className="text-[10px] uppercase font-normal tracking-normal text-muted-foreground flex items-center gap-1">
-                          <DollarSign className="size-2.5 text-muted-foreground/70" />
-                          <span>Previous Salary</span>
-                        </div>
-                        <div className="text-base sm:text-lg font-normal text-foreground mt-0.5">
-                          ৳{liveCand.previousSalary.toLocaleString()}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground font-normal">
-                          Hike:{" "}
-                          <span className="text-emerald-600 font-normal">
-                            +৳{(liveCand.agreedSalary - liveCand.previousSalary).toLocaleString()} (
-                            {Math.round(
-                              ((liveCand.agreedSalary - liveCand.previousSalary) /
-                                (liveCand.previousSalary || 1)) *
-                                100
-                            )}
-                            %)
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Experience */}
-                      <div className="bg-muted/20 rounded-lg border border-border/60 p-2 sm:p-2.5">
-                        <div className="text-[10px] uppercase font-normal tracking-normal text-muted-foreground flex items-center gap-1">
-                          <Briefcase className="size-2.5 text-muted-foreground/70" />
-                          <span>Total Experience</span>
-                        </div>
-                        <div className="text-base sm:text-lg font-normal text-foreground mt-0.5">
-                          {liveCand.experience}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground font-normal">Garment & Textile Industry</div>
-                      </div>
-
-                      {/* Notice Period */}
-                      <div className="bg-muted/20 rounded-lg border border-border/60 p-2 sm:p-2.5">
-                        <div className="text-[10px] uppercase font-normal tracking-normal text-muted-foreground flex items-center gap-1">
-                          <Clock className="size-2.5 text-muted-foreground/70" />
-                          <span>Notice Period</span>
-                        </div>
-                        <div className="text-base sm:text-lg font-normal text-foreground mt-0.5">
-                          {liveCand.noticePeriod}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground font-normal">Joining availability</div>
-                      </div>
-                    </div>
-
-                    {/* Candidate Contact & Auto-generated Link Bar */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pt-2 text-[11px] border-t border-border/40 font-normal">
-                      <div className="flex flex-wrap items-center gap-y-1 gap-x-3.5 text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Phone className="size-3 text-muted-foreground/70" />
-                          <span className="text-foreground font-normal">{liveCand.phone}</span>
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Mail className="size-3 text-muted-foreground/70" />
-                          <span className="text-foreground font-normal">{liveCand.email}</span>
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="size-3 text-muted-foreground/70" />
-                          <span className="font-normal">{liveCand.cv.personalDetails.address}</span>
-                        </span>
-                      </div>
-
-                      {liveCand.generatedLink && (
-                        <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-md">
-                          <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                            <Link2 className="size-2.5" /> Auto-Generated Link:
-                          </span>
-                          <span
-                            className="text-[10px] max-w-[200px] truncate text-foreground font-normal cursor-pointer"
-                            title={liveCand.generatedLink}
-                            onClick={() => handleCopyLink(liveCand.generatedLink, liveCand.name)}
-                          >
-                            {liveCand.generatedLink}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleCopyLink(liveCand.generatedLink, liveCand.name)}
-                            className="p-0.5 rounded bg-card hover:bg-muted text-foreground border border-border"
-                            title="Copy link"
-                          >
-                            <Copy className="size-2.5" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* ─── EMBEDDED REAL PDF CV VIEWER ────────────────────────── */}
-                  <div className="bg-card rounded-xl border border-border/70 p-2.5 sm:p-3 shadow-2xs space-y-2">
-                    <div className="flex items-center justify-between px-1.5 py-0.5">
-                      <div className="flex items-center gap-2 text-xs font-medium text-foreground">
-                        <FileText className="size-3.5 text-red-500" />
-                        <span>Curriculum Vitae Document — Tahmid Afsar Shapno-details_.pdf</span>
-                      </div>
-                      <span className="text-[10px] text-muted-foreground font-normal">
-                        Source: /public/Tahmid Afsar Shapno-details_.pdf
-                      </span>
-                    </div>
-
-                    <div className="w-full h-[620px] sm:h-[720px] rounded-xl overflow-hidden border border-border/80 bg-slate-900/5 dark:bg-slate-900/40 relative">
-                      <iframe
-                        src={`${pdfUrl}#view=FitH&toolbar=1`}
-                        className="w-full h-full border-0 rounded-xl"
-                        title={`CV PDF Document of ${liveCand.name}`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Modal Bottom Footer */}
-                <div className="p-3.5 sm:p-4 border-t border-border/60 bg-card flex flex-wrap items-center justify-between gap-3 shrink-0">
-                  <div className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
-                    <ShieldCheck className="size-4 text-emerald-600" />
-                    <span>Official verified candidate profile dossier · CRIPTON HRIS</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setActiveCvCandidate(null)}
-                      className="h-8 px-3.5 bg-muted hover:bg-muted/80 text-foreground font-medium text-xs rounded-lg transition cursor-pointer"
+                      className="size-8 rounded-lg border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition cursor-pointer"
+                      title="Close modal"
                     >
-                      Close Dossier
+                      <XCircle className="size-4.5" />
                     </button>
+                  </div>
+                </div>
+
+                {/* Main Split Body: PDF Viewer on Left, Salary & Approval on Right */}
+                <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
+                  {/* Left: Full PDF CV Viewer */}
+                  <div className="flex-1 min-w-0 h-full bg-slate-900/5 dark:bg-slate-950 flex flex-col relative">
+                    <iframe
+                      src={`${pdfUrl}#view=FitH&toolbar=1`}
+                      className="w-full h-full border-0"
+                      title={`CV of ${liveCand.name}`}
+                    />
+                  </div>
+
+                  {/* Right: Focused Approval & Salary Panel */}
+                  <div className="w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l border-border bg-card p-5 flex flex-col justify-between shrink-0 overflow-y-auto">
+                    <div className="space-y-4">
+                      {/* Candidate Quick Info */}
+                      <div className="space-y-2 text-xs">
+                        <div className="flex justify-between py-1 border-b border-border/40">
+                          <span className="text-muted-foreground">Phone</span>
+                          <span className="font-mono text-foreground">{liveCand.phone}</span>
+                        </div>
+                        <div className="flex justify-between py-1 border-b border-border/40">
+                          <span className="text-muted-foreground">Experience</span>
+                          <span className="text-foreground">{liveCand.experience}</span>
+                        </div>
+                        <div className="flex justify-between py-1 border-b border-border/40">
+                          <span className="text-muted-foreground">Notice Period</span>
+                          <span className="text-foreground">{liveCand.noticePeriod}</span>
+                        </div>
+                        <div className="flex justify-between py-1 border-b border-border/40">
+                          <span className="text-muted-foreground">Previous Salary</span>
+                          <span className="font-semibold text-foreground">
+                            ৳{liveCand.previousSalary.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between py-1 border-b border-border/40">
+                          <span className="text-muted-foreground font-medium">Final Agreed Salary</span>
+                          <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                            {liveCand.agreedSalary ? `৳${liveCand.agreedSalary.toLocaleString()}` : (reviewSalaryInput ? `৳${Number(reviewSalaryInput).toLocaleString()}` : "—")}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Final Salary Input */}
+                      <div className="space-y-1.5 pt-1">
+                        <label className="text-xs font-semibold text-foreground">
+                          Final Agreed Salary (৳)
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-sm">
+                            ৳
+                          </span>
+                          <input
+                            type="number"
+                            min={1}
+                            value={reviewSalaryInput}
+                            onChange={(e) =>
+                              setReviewSalaryInput(e.target.value === "" ? "" : Number(e.target.value))
+                            }
+                            placeholder="e.g. 52000"
+                            className="w-full h-10 pl-8 pr-3 rounded-lg border border-border bg-background text-sm font-bold text-foreground outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/30"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Approval Action or Generated Link Display */}
+                      {!liveCand.selected ? (
+                        <div className="pt-2">
+                          <button
+                            type="button"
+                            disabled={!reviewSalaryInput || Number(reviewSalaryInput) <= 0 || liveJob?.status === "Closed"}
+                            onClick={handleApproveFromReview}
+                            className="w-full h-10.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer transition"
+                          >
+                            <CheckCircle2 className="size-4" />
+                            <span>Approve & Generate Link</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-3 pt-2">
+                          <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/25 flex items-center gap-2.5 text-emerald-700 dark:text-emerald-300">
+                            <CheckCircle2 className="size-4 shrink-0" />
+                            <div>
+                              <div className="font-semibold text-xs">Candidate Approved</div>
+                              <div className="text-[11px] text-muted-foreground">
+                                Final Salary: ৳{liveCand.agreedSalary.toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-foreground">Recruitment Link</label>
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                type="text"
+                                readOnly
+                                value={liveCand.generatedLink || ""}
+                                className="flex-1 h-8.5 px-2.5 text-[11px] bg-muted/60 border border-border/70 rounded-lg text-foreground font-mono select-all outline-none"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleCopyLink(liveCand.generatedLink, liveCand.name)}
+                                className="h-8.5 px-3 bg-primary hover:opacity-90 text-primary-foreground text-xs font-medium rounded-lg flex items-center gap-1 cursor-pointer shrink-0"
+                              >
+                                <Copy className="size-3.5" />
+                                <span>Copy</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1 border-t border-border/40 text-xs">
+                            <button
+                              type="button"
+                              onClick={handleApproveFromReview}
+                              className="text-primary hover:underline font-medium cursor-pointer"
+                            >
+                              Update Salary
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (liveJob) handleDeselectCandidate(liveJob.id, liveCand.id);
+                              }}
+                              className="text-muted-foreground hover:text-red-600 transition cursor-pointer"
+                            >
+                              Deselect
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-4 border-t border-border/40">
+                      <button
+                        type="button"
+                        onClick={() => setActiveCvCandidate(null)}
+                        className="w-full h-8.5 rounded-lg border border-border bg-card hover:bg-muted text-foreground text-xs font-medium transition cursor-pointer"
+                      >
+                        Close
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3038,170 +2851,6 @@ function CandidateSelectionPage() {
           </div>
         )}
 
-        {/* ─── MODAL 2.5: APPROVE CANDIDATE WITH MANDATORY SALARY INPUT ───────── */}
-        {approvingCandidate && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/65 backdrop-blur-xs p-3 sm:p-4 animate-in fade-in duration-150">
-            <div className="bg-card w-full max-w-lg rounded-2xl shadow-2xl border border-border/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-              {/* Modal Header */}
-              <div className="p-4 sm:p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/20">
-                    <DollarSign className="size-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                      <span>
-                        {approvingCandidate.candidate.selected
-                          ? "Update Approved Salary"
-                          : "Approve Candidate & Set Salary"}
-                      </span>
-                      <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                        Required
-                      </span>
-                    </h3>
-                    <p className="text-xs text-muted-foreground mt-0.5 font-normal">
-                      Candidate: <span className="font-medium text-foreground">{approvingCandidate.candidate.name}</span> ({approvingCandidate.candidate.id})
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setApprovingCandidate(null)}
-                  className="size-8 rounded-lg text-muted-foreground hover:bg-muted flex items-center justify-center cursor-pointer transition"
-                >
-                  <XCircle className="size-4.5" />
-                </button>
-              </div>
-
-              <div className="p-5 sm:p-6 space-y-4">
-                {/* Candidate & Job Context Card */}
-                <div className="p-3.5 bg-muted/30 rounded-xl border border-border/50 space-y-2 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Requisition:</span>
-                    <span className="font-medium text-foreground text-right">{approvingCandidate.jobTitle}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Department / Role:</span>
-                    <span className="text-foreground">
-                      {approvingCandidate.candidate.department} · {approvingCandidate.candidate.designation}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between pt-1 border-t border-border/40">
-                    <span className="text-muted-foreground">Candidate Previous Salary:</span>
-                    <span className="font-semibold text-foreground">
-                      ৳{approvingCandidate.candidate.previousSalary.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Approved Job Budget:</span>
-                    <span className="font-normal text-emerald-600 dark:text-emerald-400">
-                      ৳{approvingCandidate.salaryBudgetMin.toLocaleString()} – ৳{approvingCandidate.salaryBudgetMax.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Mandatory Salary Input */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground flex items-center justify-between">
-                    <span className="flex items-center gap-1">
-                      <span>Approved / Agreed Monthly Salary (BDT ৳)</span>
-                      <span className="text-red-500">*</span>
-                    </span>
-                    {approvingCandidate.salaryInput > 0 && (
-                      <span className="text-[11px] font-normal text-emerald-600 dark:text-emerald-400">
-                        ৳{approvingCandidate.salaryInput.toLocaleString()}
-                      </span>
-                    )}
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground font-medium text-sm">
-                      ৳
-                    </div>
-                    <input
-                      type="number"
-                      autoFocus
-                      min={1}
-                      value={approvingCandidate.salaryInput || ""}
-                      onChange={(e) =>
-                        setApprovingCandidate({
-                          ...approvingCandidate,
-                          salaryInput: Number(e.target.value),
-                        })
-                      }
-                      placeholder="e.g. 52000"
-                      className="w-full h-10 pl-8 pr-3 rounded-lg border border-border bg-background text-sm font-semibold text-foreground outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition"
-                    />
-                  </div>
-
-                  {/* Real-time Salary Variance & Budget Analysis */}
-                  {approvingCandidate.salaryInput > 0 && (
-                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px]">
-                      {(() => {
-                        const diff = approvingCandidate.salaryInput - approvingCandidate.candidate.previousSalary;
-                        const pct = approvingCandidate.candidate.previousSalary > 0
-                          ? Math.round((diff / approvingCandidate.candidate.previousSalary) * 100)
-                          : 0;
-                        return (
-                          <span className={`px-2 py-0.5 rounded-md border font-normal ${
-                            diff >= 0
-                              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25"
-                              : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/25"
-                          }`}>
-                            {diff >= 0 ? `+৳${diff.toLocaleString()} (+${pct}%)` : `-৳${Math.abs(diff).toLocaleString()} (${pct}%)`} vs Previous
-                          </span>
-                        );
-                      })()}
-
-                      {approvingCandidate.salaryInput > approvingCandidate.salaryBudgetMax ? (
-                        <span className="px-2 py-0.5 rounded-md border bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/25 font-normal flex items-center gap-1">
-                          <AlertCircle className="size-2.5" />
-                          <span>Exceeds max budget (৳{approvingCandidate.salaryBudgetMax.toLocaleString()})</span>
-                        </span>
-                      ) : approvingCandidate.salaryInput < approvingCandidate.salaryBudgetMin ? (
-                        <span className="px-2 py-0.5 rounded-md border bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/25 font-normal flex items-center gap-1">
-                          <span>Below min budget</span>
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-md border bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25 font-normal flex items-center gap-1">
-                          <Check className="size-2.5" />
-                          <span>Within approved job budget</span>
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  <p className="text-[11px] text-muted-foreground pt-1 font-normal">
-                    Salary agreement is mandatory before approving candidate. This amount will be locked and synced to the e-recruitment onboarding queue.
-                  </p>
-                </div>
-              </div>
-
-              {/* Modal Actions */}
-              <div className="p-3.5 sm:p-4 border-t border-border/60 bg-muted/10 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setApprovingCandidate(null)}
-                  className="h-8.5 px-3.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-normal rounded-lg transition cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  disabled={!approvingCandidate.salaryInput || approvingCandidate.salaryInput <= 0}
-                  onClick={handleConfirmApproveCandidate}
-                  className="h-8.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Check className="size-3.5 stroke-[2]" />
-                  <span>
-                    {approvingCandidate.candidate.selected
-                      ? "Save Updated Salary"
-                      : "Approve & Generate Link"}
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ─── MODAL 2.6: APPROVE & SUBMIT JOB REQUISITION WITH CANDIDATE SALARIES ───────── */}
         {approvingJob && (() => {

@@ -42,31 +42,31 @@ export const Route = createFileRoute("/zakat-executive-report")({
 function ZakatExecutiveReportPage() {
   const [records, setRecords] = useState<ZakatRecord[]>([]);
   const [recurringSchedules, setRecurringSchedules] = useState<RecurringZakatSchedule[]>([]);
+  const [budgetPools] = useState(INITIAL_BUDGET_POOLS || [{ year: 2026, amount: 800000 }, { year: 2025, amount: 650000 }]);
   const [selectedBudgetYear, setSelectedBudgetYear] = useState<number>(2026);
-  const [budgetPools] = useState(INITIAL_BUDGET_POOLS);
 
   // Load Zakat records from storage or initial
   useEffect(() => {
-    const rawRecs = localStorage.getItem("zakat_distribution_records");
+    const rawRecs = localStorage.getItem("cripton_zakat_records") || localStorage.getItem("zakat_distribution_records");
     if (rawRecs) {
       try {
         setRecords(JSON.parse(rawRecs));
       } catch {
-        setRecords(INITIAL_ZAKAT_DATA);
+        setRecords(INITIAL_ZAKAT_DATA || []);
       }
     } else {
-      setRecords(INITIAL_ZAKAT_DATA);
+      setRecords(INITIAL_ZAKAT_DATA || []);
     }
 
-    const rawSched = localStorage.getItem("zakat_recurring_schedules");
+    const rawSched = localStorage.getItem("cripton_zakat_recurring_schedules") || localStorage.getItem("zakat_recurring_schedules");
     if (rawSched) {
       try {
         setRecurringSchedules(JSON.parse(rawSched));
       } catch {
-        setRecurringSchedules(INITIAL_RECURRING_SCHEDULES);
+        setRecurringSchedules(INITIAL_RECURRING_SCHEDULES || []);
       }
     } else {
-      setRecurringSchedules(INITIAL_RECURRING_SCHEDULES);
+      setRecurringSchedules(INITIAL_RECURRING_SCHEDULES || []);
     }
   }, []);
 
@@ -174,7 +174,7 @@ function ZakatExecutiveReportPage() {
       .filter((s) => s.status === "Active")
       .reduce((sum, s) => sum + s.monthlyAmount, 0);
 
-    const currentBudget = budgetPools.find((b) => b.year === selectedBudgetYear)?.amount || 800000;
+    const currentBudget = (budgetPools || []).find((b) => b.year === selectedBudgetYear)?.amount || 800000;
     const remainingBudget = currentBudget - totalAssigned;
 
     return {
@@ -242,7 +242,7 @@ function ZakatExecutiveReportPage() {
 
       if (drillDownSearch.trim()) {
         const q = drillDownSearch.toLowerCase().trim();
-        const str = `${r.recipientEmpName} ${r.recipientEmpId} ${r.beneficiaryName} ${r.institutionName} ${r.assetName} ${r.purposeCategory} ${r.agentEmployeeName}`.toLowerCase();
+        const str = `${r.employeeName || ""} ${r.employeeId || ""} ${r.beneficiaryName || ""} ${r.institutionName || ""} ${r.assetDetails?.assetName || ""} ${r.purposeCategory || ""}`.toLowerCase();
         return str.includes(q);
       }
       return true;
@@ -277,13 +277,13 @@ function ZakatExecutiveReportPage() {
                 <span>/</span>
                 <Link to="/zakat-list" className="hover:text-primary transition">Zakat Management</Link>
                 <span>/</span>
-                <span className="text-foreground font-semibold">Executive Multi-Dimensional Report</span>
+                <span className="text-foreground font-semibold">Zakat Report Report</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2.5">
                 <div className="p-2 bg-blue-600/10 text-blue-600 rounded-xl border border-blue-600/20">
                   <PieChart className="size-5" />
                 </div>
-                <span>Executive Multi-Dimensional Zakat Governance Report</span>
+                <span>Zakat Report Zakat Governance Report</span>
               </h1>
               <p className="text-xs text-muted-foreground mt-1 font-normal">
                 Audited cross-tabulation of funds disbursed by Beneficiary Channel (Direct Staff vs. Agent vs. Outside) and Aid Mode (Cash vs. Asset Purchases).
@@ -781,45 +781,53 @@ function ZakatExecutiveReportPage() {
 
         {/* ─── DRILL-DOWN AUDIT TRAIL MODAL ──────────────────────────────────── */}
         {drillDownState.isOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-4 overflow-y-auto">
-            <div className="bg-card w-full max-w-5xl xl:max-w-6xl max-h-[92vh] rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-6 overflow-y-auto">
+            <div className="bg-white w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
               {/* Header */}
-              <div className="p-4 sm:p-5 border-b border-border bg-muted/20 flex items-center justify-between shrink-0">
+              <div className="px-6 py-4 border-b border-slate-200/90 bg-white flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-blue-600/10 text-blue-600 rounded-xl border border-blue-600/20">
+                  <div className="size-10 rounded-xl bg-blue-50 border border-blue-200/70 text-blue-600 flex items-center justify-center shrink-0 shadow-xs">
                     <ShieldCheck className="size-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-foreground">{drillDownState.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{drillDownState.subtitle}</p>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-bold text-slate-900 leading-tight">
+                        {drillDownState.title}
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-blue-100/80 text-blue-700 border border-blue-200">
+                        Audit Trail
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">{drillDownState.subtitle}</p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setDrillDownState({ ...drillDownState, isOpen: false })}
-                  className="size-8 rounded-lg text-muted-foreground hover:bg-muted flex items-center justify-center cursor-pointer"
+                  className="size-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer border border-transparent hover:border-slate-200"
+                  title="Close modal"
                 >
                   <X className="size-4.5" />
                 </button>
               </div>
 
               {/* Filters toolbar inside modal */}
-              <div className="p-3.5 border-b border-border bg-muted/10 flex flex-wrap items-center justify-between gap-3 shrink-0">
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="px-6 py-3 border-b border-slate-200/80 bg-slate-50/80 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                <div className="flex flex-wrap items-center gap-2.5">
                   <div className="relative">
-                    <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
                       value={drillDownSearch}
                       onChange={(e) => setDrillDownSearch(e.target.value)}
-                      placeholder="Search recipient, ID, vendor..."
-                      className="h-8 pl-8 pr-3 w-48 sm:w-60 rounded-lg border border-border bg-background text-xs outline-none focus:border-primary"
+                      placeholder="Search recipient, ID, agent..."
+                      className="h-8.5 pl-8 pr-3 w-52 sm:w-60 rounded-lg border border-slate-300/90 bg-white text-xs outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-slate-800 placeholder:text-slate-400 shadow-2xs transition-all"
                     />
                   </div>
                   <select
                     value={drillDownChannelFilter}
                     onChange={(e) => setDrillDownChannelFilter(e.target.value)}
-                    className="h-8 px-2.5 rounded-lg border border-border bg-background text-xs outline-none focus:border-primary"
+                    className="h-8.5 px-3 rounded-lg border border-slate-300/90 bg-white text-xs font-medium text-slate-700 outline-none focus:border-blue-600 shadow-2xs cursor-pointer"
                   >
                     <option value="ALL">All Channels</option>
                     <option value="Direct Employee">Direct Employee</option>
@@ -829,7 +837,7 @@ function ZakatExecutiveReportPage() {
                   <select
                     value={drillDownModeFilter}
                     onChange={(e) => setDrillDownModeFilter(e.target.value)}
-                    className="h-8 px-2.5 rounded-lg border border-border bg-background text-xs outline-none focus:border-primary"
+                    className="h-8.5 px-3 rounded-lg border border-slate-300/90 bg-white text-xs font-medium text-slate-700 outline-none focus:border-blue-600 shadow-2xs cursor-pointer"
                   >
                     <option value="ALL">All Modes</option>
                     <option value="Cash Grant">Cash Grant</option>
@@ -837,87 +845,92 @@ function ZakatExecutiveReportPage() {
                   </select>
                 </div>
 
-                <div className="text-xs font-semibold text-foreground">
-                  Found: <span className="text-primary">{drillDownRecords.length}</span> cases | Total:{" "}
-                  <span className="text-emerald-600 font-bold">
-                    ৳{drillDownRecords.reduce((sum, r) => sum + r.amount, 0).toLocaleString()}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/90 font-medium">
+                    Found: <strong className="text-slate-900 font-bold">{drillDownRecords.length}</strong> cases
+                  </span>
+                  <span className="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold shadow-2xs">
+                    Total: ৳{drillDownRecords.reduce((sum, r) => sum + r.amount, 0).toLocaleString()}
                   </span>
                 </div>
               </div>
 
               {/* Table */}
-              <div className="overflow-y-auto flex-1">
-                <table className="w-full text-left text-xs whitespace-nowrap">
-                  <thead className="bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase border-b border-border sticky top-0">
+              <div className="overflow-auto flex-1 bg-white">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead className="bg-slate-50/95 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 sticky top-0 z-10">
                     <tr>
-                      <th className="px-4 py-3">Case ID</th>
-                      <th className="px-4 py-3">Beneficiary / Recipient</th>
-                      <th className="px-4 py-3">Channel & Agent</th>
-                      <th className="px-4 py-3">Mode & Asset</th>
-                      <th className="px-4 py-3">Purpose</th>
-                      <th className="px-4 py-3 text-right">Amount (৳)</th>
-                      <th className="px-4 py-3 text-center">Status</th>
+                      <th className="px-4 py-3 w-[155px] min-w-[155px] shrink-0 whitespace-nowrap">Case ID</th>
+                      <th className="px-4 py-3 min-w-[180px]">Beneficiary / Recipient</th>
+                      <th className="px-4 py-3 w-[160px] min-w-[160px] shrink-0 whitespace-nowrap">Channel & Agent</th>
+                      <th className="px-4 py-3 min-w-[200px]">Mode & Asset</th>
+                      <th className="px-4 py-3 w-[140px] shrink-0 whitespace-nowrap">Purpose</th>
+                      <th className="px-4 py-3 w-[120px] shrink-0 text-right whitespace-nowrap">Amount (৳)</th>
+                      <th className="px-4 py-3 w-[110px] shrink-0 text-center whitespace-nowrap">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border/60 bg-card font-normal">
+                  <tbody className="divide-y divide-slate-100 bg-white">
                     {drillDownRecords.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-xs">
+                        <td colSpan={7} className="px-4 py-14 text-center text-slate-400 text-xs font-medium">
                           No matching disbursement cases found for this matrix cross-section.
                         </td>
                       </tr>
                     ) : (
-                      drillDownRecords.map((r) => (
-                        <tr key={r.id} className="hover:bg-muted/20">
-                          <td className="px-4 py-3 font-mono font-medium text-primary">
+                      drillDownRecords.map((r, rIdx) => (
+                        <tr key={`${r.id}-${rIdx}`} className="hover:bg-slate-50/70 transition-colors">
+                          <td className="px-4 py-3.5 font-mono font-bold text-blue-600 whitespace-nowrap align-middle">
                             {r.id}
                           </td>
-                          <td className="px-4 py-3">
-                            <div className="font-semibold text-foreground text-xs">
-                              {r.beneficiaryName || r.recipientEmpName || r.institutionName}
+                          <td className="px-4 py-3.5 align-middle">
+                            <div className="font-bold text-slate-800 text-xs leading-snug">
+                              {r.beneficiaryName || r.employeeName || r.institutionName}
                             </div>
-                            <div className="text-[10px] text-muted-foreground">
-                              {r.beneficiaryPhone || r.recipientEmpId || r.institutionType}
+                            <div className="text-[11px] text-slate-500 font-mono mt-0.5">
+                              {r.beneficiaryPhone || r.employeeId || r.institutionType}
                             </div>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className="px-2 py-0.5 rounded-md bg-muted text-foreground border border-border text-[11px]">
+                          <td className="px-4 py-3.5 align-middle">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200/80 text-[11px] font-semibold whitespace-nowrap">
                               {r.disbursementChannel}
                             </span>
-                            {r.agentEmployeeName && (
-                              <div className="text-[10px] text-muted-foreground mt-0.5">
-                                Agent: {r.agentEmployeeName}
+                            {r.disbursementChannel === "Via Employee Agent" && r.employeeName && (
+                              <div className="text-[11px] text-slate-500 font-medium mt-1 leading-tight">
+                                Agent: <span className="text-slate-800 font-semibold">{r.employeeName}</span>
                               </div>
                             )}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3.5 align-middle">
                             {r.disbursementMode === "Asset Purchased" ? (
-                              <div>
-                                <span className="px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 text-[11px] font-medium">
+                              <div className="space-y-1">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200/80 text-[11px] font-semibold whitespace-nowrap">
                                   Asset Purchased
                                 </span>
-                                <div className="text-[10px] text-foreground font-medium mt-0.5">
-                                  {r.assetName} {r.assetQty && `(${r.assetQty})`}
+                                <div className="text-[11px] text-slate-700 font-medium leading-relaxed">
+                                  {r.assetDetails?.assetName || r.assetDetails?.assetType}
+                                  {r.assetDetails?.assetQuantity && (
+                                    <span className="text-slate-500 font-normal ml-1">({r.assetDetails.assetQuantity})</span>
+                                  )}
                                 </div>
                               </div>
                             ) : (
-                              <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 text-[11px] font-medium">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[11px] font-semibold whitespace-nowrap">
                                 Cash Grant
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-muted-foreground">
+                          <td className="px-4 py-3.5 text-slate-700 font-medium align-middle whitespace-nowrap text-xs">
                             {r.purposeCategory}
                           </td>
-                          <td className="px-4 py-3 text-right font-bold text-foreground">
+                          <td className="px-4 py-3.5 text-right font-mono font-bold text-slate-900 align-middle whitespace-nowrap text-xs">
                             ৳{r.amount.toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 text-center">
+                          <td className="px-4 py-3.5 text-center align-middle whitespace-nowrap">
                             <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                              className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap ${
                                 r.agencyStatus === "Verified" || r.agencyStatus === "Distributed"
-                                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
-                                  : "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                                  ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
+                                  : "bg-amber-100/90 text-amber-800 border border-amber-200"
                               }`}
                             >
                               {r.agencyStatus}
@@ -931,14 +944,14 @@ function ZakatExecutiveReportPage() {
               </div>
 
               {/* Footer */}
-              <div className="p-3.5 border-t border-border bg-muted/20 flex items-center justify-between shrink-0">
-                <span className="text-xs text-muted-foreground">
-                  Showing {drillDownRecords.length} records in this drill-down audit trail
+              <div className="px-6 py-3.5 border-t border-slate-200/90 bg-slate-50/70 flex items-center justify-between shrink-0">
+                <span className="text-xs text-slate-500 font-medium">
+                  Showing <strong className="text-slate-700 font-bold">{drillDownRecords.length}</strong> records in this drill-down audit trail
                 </span>
                 <button
                   type="button"
                   onClick={() => setDrillDownState({ ...drillDownState, isOpen: false })}
-                  className="h-8 px-4 rounded-lg bg-muted hover:bg-muted/80 text-foreground text-xs font-medium cursor-pointer"
+                  className="h-8.5 px-5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                 >
                   Close
                 </button>
