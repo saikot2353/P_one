@@ -176,8 +176,8 @@ const navGroups: MMNavGroup[] = [
     to: "/mm-pi",
     subitems: [
       { label: "PI Register", to: "/mm-pi" },
-      { label: "Create PI from Approved Bookings", to: "/mm-pi?tab=create" },
-      { label: "PI Verification & Approval", to: "/mm-pi?tab=approval" },
+      { label: "Create PI from Approved Bookings", to: "/mm-proforma-invoice-create" },
+      { label: "PI Verification Approval", to: "/mm-pi-verification-approval" },
     ],
   },
   {
