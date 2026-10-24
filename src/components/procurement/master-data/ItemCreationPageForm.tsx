@@ -382,6 +382,7 @@ export function ItemCreationPageForm({
 
     return {
       itemCode: `ITM-${Math.floor(1000 + Math.random() * 9000)}`,
+      hsCode: "",
       itemName: "",
       subGroupId: targetSubGroup?.id || "",
       subGroupName: targetSubGroup?.subGroupName || "",
@@ -1062,7 +1063,21 @@ export function ItemCreationPageForm({
               )}
             </div>
 
-            <div className="sm:col-span-2">
+            <div>
+              <label className="block text-xs font-bold mb-1 text-foreground">
+                HS Code
+              </label>
+              <input
+                type="text"
+                disabled={isView}
+                value={formData.hsCode || ""}
+                onChange={(e) => setFormData({ ...formData, hsCode: e.target.value })}
+                placeholder="e.g. 6109.10.00"
+                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+              />
+            </div>
+
+            <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Item Name <span className="text-rose-500">*</span>
               </label>

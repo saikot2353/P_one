@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   ArrowLeft,
   Save,
@@ -15,6 +15,220 @@ import {
   Check,
 } from "lucide-react";
 import { WarehouseStore, StorePermissionEmployee } from "@/lib/procurement-master-data";
+
+// Reference master data for Areas (matching company-setup.tsx & add-employee.tsx Working Area options)
+export interface AreaSectionOption {
+  value: string;
+  label: string;
+  shortName?: string;
+  code?: string;
+  type: "area" | "section";
+  companyName: string;
+}
+
+const MASTER_DEFAULT_AREAS = [
+  // Pakiza Knit Composite Ltd
+  { code: "01", companyName: "Pakiza Knit Composite Ltd", nameEng: "PAL-Fabric Dyeing", shortName: "PAL-FD" },
+  { code: "02", companyName: "Pakiza Knit Composite Ltd", nameEng: "Head Office", shortName: "HO" },
+  { code: "03", companyName: "Pakiza Knit Composite Ltd", nameEng: "Savar Cutting Unit", shortName: "SCU" },
+  { code: "04", companyName: "Pakiza Knit Composite Ltd", nameEng: "Savar Sewing Unit", shortName: "SSU" },
+  { code: "05", companyName: "Pakiza Knit Composite Ltd", nameEng: "Savar Finishing Unit", shortName: "SFU" },
+  { code: "06", companyName: "Pakiza Knit Composite Ltd", nameEng: "Narsingdi Spinning", shortName: "NSP" },
+  { code: "07", companyName: "Pakiza Knit Composite Ltd", nameEng: "Narsingdi Yarn Dyeing", shortName: "NYD" },
+  { code: "08", companyName: "Pakiza Knit Composite Ltd", nameEng: "Tongipara Dyeing Unit", shortName: "TDU" },
+  { code: "09", companyName: "Pakiza Knit Composite Ltd", nameEng: "Ashulia Printing Unit", shortName: "APU" },
+  { code: "10", companyName: "Pakiza Knit Composite Ltd", nameEng: "Narayanganj Apparels", shortName: "NJA" },
+  { code: "11", companyName: "Pakiza Knit Composite Ltd", nameEng: "Comilla Spinning Unit", shortName: "CSU" },
+  { code: "12", companyName: "Pakiza Knit Composite Ltd", nameEng: "Gazipur Texturizing", shortName: "GTL" },
+  { code: "13", companyName: "Pakiza Knit Composite Ltd", nameEng: "Narsingdi Weaving", shortName: "NWV" },
+  { code: "14", companyName: "Pakiza Knit Composite Ltd", nameEng: "Gulshan Showroom", shortName: "GSR" },
+  { code: "15", companyName: "Pakiza Knit Composite Ltd", nameEng: "Uttara Warehouse", shortName: "UWH" },
+  { code: "16", companyName: "Pakiza Knit Composite Ltd", nameEng: "Mymensingh Feed Mill", shortName: "MFM" },
+  { code: "17", companyName: "Pakiza Knit Composite Ltd", nameEng: "Chittagong Port Depot", shortName: "CPD" },
+  { code: "18", companyName: "Pakiza Knit Composite Ltd", nameEng: "Kaliakair Packaging", shortName: "KKP" },
+  { code: "19", companyName: "Pakiza Knit Composite Ltd", nameEng: "Keraniganj Chemical Depot", shortName: "KCD" },
+  { code: "20", companyName: "Pakiza Knit Composite Ltd", nameEng: "Motijheel Sales Office", shortName: "MSO" },
+
+  // Pakiza Software Limited (Primary reference from Add Employee Form Working Area)
+  { code: "PSL-01", companyName: "Pakiza Software Limited", nameEng: "PSL-Operation", shortName: "PSL-OP" },
+  { code: "PSL-02", companyName: "Pakiza Software Limited", nameEng: "Head Office", shortName: "HO" },
+  { code: "PSL-03", companyName: "Pakiza Software Limited", nameEng: "Factory Building A", shortName: "BLD-A" },
+  { code: "PSL-04", companyName: "Pakiza Software Limited", nameEng: "Factory Building B", shortName: "BLD-B" },
+
+  // Pakiza Apparels Ltd
+  { code: "PAL-01", companyName: "Pakiza Apparels Ltd", nameEng: "Head Office", shortName: "HO" },
+  { code: "PAL-02", companyName: "Pakiza Apparels Ltd", nameEng: "Savar Cutting Unit", shortName: "SCU" },
+  { code: "PAL-03", companyName: "Pakiza Apparels Ltd", nameEng: "Savar Sewing Unit", shortName: "SSU" },
+  { code: "PAL-04", companyName: "Pakiza Apparels Ltd", nameEng: "Savar Finishing Unit", shortName: "SFU" },
+  { code: "PAL-05", companyName: "Pakiza Apparels Ltd", nameEng: "Ashulia Printing Unit", shortName: "APU" },
+  { code: "PAL-06", companyName: "Pakiza Apparels Ltd", nameEng: "Narayanganj Apparels", shortName: "NJA" },
+  { code: "PAL-07", companyName: "Pakiza Apparels Ltd", nameEng: "Uttara Warehouse", shortName: "UWH" },
+
+  // Pakiza Spinning Mills Ltd
+  { code: "PSM-01", companyName: "Pakiza Spinning Mills Ltd", nameEng: "Head Office", shortName: "HO" },
+  { code: "PSM-02", companyName: "Pakiza Spinning Mills Ltd", nameEng: "Narsingdi Spinning", shortName: "NSP" },
+  { code: "PSM-03", companyName: "Pakiza Spinning Mills Ltd", nameEng: "Comilla Spinning Unit", shortName: "CSU" },
+  { code: "PSM-04", companyName: "Pakiza Spinning Mills Ltd", nameEng: "Spinning Spare Parts & Consumables Store", shortName: "SPC" },
+  { code: "PSM-05", companyName: "Pakiza Spinning Mills Ltd", nameEng: "Uttara Warehouse", shortName: "UWH" },
+
+  // Pakiza Dyeing & Printing Industries Ltd
+  { code: "PDP-01", companyName: "Pakiza Dyeing & Printing Industries Ltd", nameEng: "Head Office", shortName: "HO" },
+  { code: "PDP-02", companyName: "Pakiza Dyeing & Printing Industries Ltd", nameEng: "PAL-Fabric Dyeing", shortName: "PAL-FD" },
+  { code: "PDP-03", companyName: "Pakiza Dyeing & Printing Industries Ltd", nameEng: "Tongipara Dyeing Unit", shortName: "TDU" },
+  { code: "PDP-04", companyName: "Pakiza Dyeing & Printing Industries Ltd", nameEng: "Ashulia Printing Unit", shortName: "APU" },
+  { code: "PDP-05", companyName: "Pakiza Dyeing & Printing Industries Ltd", nameEng: "Uttara Warehouse", shortName: "UWH" },
+
+  // Pakiza Textiles Ltd
+  { code: "PTX-01", companyName: "Pakiza Textiles Ltd", nameEng: "Head Office", shortName: "HO" },
+  { code: "PTX-02", companyName: "Pakiza Textiles Ltd", nameEng: "Narsingdi Weaving", shortName: "NWV" },
+  { code: "PTX-03", companyName: "Pakiza Textiles Ltd", nameEng: "Gazipur Texturizing", shortName: "GTL" },
+  { code: "PTX-04", companyName: "Pakiza Textiles Ltd", nameEng: "Uttara Warehouse", shortName: "UWH" },
+
+  // Pakiza Technovation Limited
+  { code: "PTL-01", companyName: "Pakiza Technovation Limited", nameEng: "Head Office", shortName: "HO" },
+  { code: "PTL-02", companyName: "Pakiza Technovation Limited", nameEng: "PSL-Operation", shortName: "PSL-OP" },
+  { code: "PTL-03", companyName: "Pakiza Technovation Limited", nameEng: "Central IT & Hardware Depot", shortName: "IT-DEP" },
+  { code: "PTL-04", companyName: "Pakiza Technovation Limited", nameEng: "Factory Building A", shortName: "BLD-A" },
+
+  // Pakiza Garments Ltd
+  { code: "PGL-01", companyName: "Pakiza Garments Ltd", nameEng: "Head Office", shortName: "HO" },
+  { code: "PGL-02", companyName: "Pakiza Garments Ltd", nameEng: "Savar Sewing Unit", shortName: "SSU" },
+  { code: "PGL-03", companyName: "Pakiza Garments Ltd", nameEng: "Savar Finishing Unit", shortName: "SFU" },
+  { code: "PGL-04", companyName: "Pakiza Garments Ltd", nameEng: "Finished Goods Export Transit Store", shortName: "FGS" },
+];
+
+const MASTER_DEFAULT_SECTIONS = [
+  { code: "ADM", nameEng: "Admin Support", shortName: "AS" },
+  { code: "DEV", nameEng: "Software Development", shortName: "SD" },
+  { code: "ACC", nameEng: "Accounts Payable", shortName: "AP" },
+  { code: "SEW", nameEng: "Sewing Section", shortName: "SEW" },
+  { code: "CUT", nameEng: "Cutting Section", shortName: "CUT" },
+  { code: "FIN", nameEng: "Finishing Section", shortName: "FIN" },
+  { code: "QA", nameEng: "Quality Assurance", shortName: "QA" },
+  { code: "MNT", nameEng: "Maintenance Section", shortName: "MNT" },
+];
+
+// Helper to normalize organization string for flexible matching
+const cleanOrg = (str: string): string =>
+  (str || "")
+    .toLowerCase()
+    .replace(/\b(limited|ltd|pvt|inc|corp|co)\b/gi, "")
+    .replace(/[^a-z0-9]/g, "")
+    .trim();
+
+// Helper to load organization-specific areas & sections from existing master data
+const getOrgAreaSections = (orgName: string): AreaSectionOption[] => {
+  const targetClean = cleanOrg(orgName);
+  const options: AreaSectionOption[] = [];
+  const addedValues = new Set<string>();
+
+  const addOption = (
+    value: string,
+    name: string,
+    shortName?: string,
+    code?: string,
+    type: "area" | "section" = "area",
+    companyName = orgName,
+  ) => {
+    const cleanVal = (value || "").trim();
+    if (!cleanVal || addedValues.has(cleanVal.toLowerCase())) return;
+    addedValues.add(cleanVal.toLowerCase());
+
+    const label = shortName && shortName !== cleanVal ? `${name} (${shortName})` : name;
+    options.push({
+      value: cleanVal,
+      label,
+      shortName,
+      code,
+      type,
+      companyName,
+    });
+  };
+
+  // 1. Read existing active records from localStorage (hris_areas)
+  try {
+    if (typeof window !== "undefined") {
+      let rawAreas = localStorage.getItem("hris_areas");
+      if (!rawAreas) {
+        localStorage.setItem("hris_areas", JSON.stringify(MASTER_DEFAULT_AREAS));
+        rawAreas = JSON.stringify(MASTER_DEFAULT_AREAS);
+      }
+      const parsed = JSON.parse(rawAreas);
+      if (Array.isArray(parsed)) {
+        parsed.forEach((a: any) => {
+          const compClean = cleanOrg(a.companyName || a.company || "");
+          const isMatch =
+            !targetClean ||
+            compClean === targetClean ||
+            compClean.includes(targetClean) ||
+            targetClean.includes(compClean);
+          if (isMatch && (a.isActive === undefined || a.isActive === "Active")) {
+            const name = a.nameEng || a.name || a.shortName;
+            if (name) addOption(name, name, a.shortName, a.code, "area", a.companyName);
+          }
+        });
+      }
+    }
+  } catch (e) {}
+
+  // 2. Read existing active records from localStorage (hris_sections)
+  try {
+    if (typeof window !== "undefined") {
+      let rawSections = localStorage.getItem("hris_sections");
+      if (!rawSections) {
+        localStorage.setItem("hris_sections", JSON.stringify(MASTER_DEFAULT_SECTIONS));
+        rawSections = JSON.stringify(MASTER_DEFAULT_SECTIONS);
+      }
+      const parsed = JSON.parse(rawSections);
+      if (Array.isArray(parsed)) {
+        parsed.forEach((s: any) => {
+          const compClean = cleanOrg(s.companyName || s.company || "");
+          const isMatch =
+            !s.companyName ||
+            !targetClean ||
+            compClean === targetClean ||
+            compClean.includes(targetClean) ||
+            targetClean.includes(compClean);
+          if (isMatch && (s.isActive === undefined || s.isActive === "Active")) {
+            const name = s.nameEng || s.name || s.shortName;
+            if (name) addOption(name, name, s.shortName, s.code, "section", s.companyName);
+          }
+        });
+      }
+    }
+  } catch (e) {}
+
+  // 3. Fallback to reference MASTER_DEFAULT_AREAS if options list is empty or minimal
+  if (options.length === 0) {
+    MASTER_DEFAULT_AREAS.forEach((a) => {
+      const compClean = cleanOrg(a.companyName);
+      const isMatch =
+        !targetClean ||
+        compClean === targetClean ||
+        compClean.includes(targetClean) ||
+        targetClean.includes(compClean);
+      if (isMatch) {
+        addOption(a.nameEng, a.nameEng, a.shortName, a.code, "area", a.companyName);
+      }
+    });
+  }
+
+  // 4. Default universal fallback working areas if still empty for an unconfigured company name
+  if (options.length === 0) {
+    const fallbackList = [
+      { name: "Head Office", shortName: "HO", code: "01" },
+      { name: "Central Warehouse Area", shortName: "CWA", code: "02" },
+      { name: "Main Production Unit", shortName: "MPU", code: "03" },
+      { name: "Storage & Transit Section", shortName: "STS", code: "04" },
+      { name: "Operations & Logistics Area", shortName: "OLA", code: "05" },
+    ];
+    fallbackList.forEach((item) => {
+      addOption(item.name, item.name, item.shortName, item.code, "area", orgName);
+    });
+  }
+
+  return options;
+};
 
 interface WarehouseStorePageFormProps {
   mode: "create" | "edit" | "view";
@@ -41,6 +255,7 @@ export function WarehouseStorePageForm({
       storeCode: `WH-${Math.floor(100 + Math.random() * 900)}`,
       storeName: "",
       organization: companyList[0] || "Pakiza Knit Composite Ltd",
+      companyAreaSection: "",
       storeManager: "",
       contactNumber: "",
       status: "Active",
@@ -82,6 +297,61 @@ export function WarehouseStorePageForm({
       storeManager: managerName,
       contactNumber: emp?.mobile || "01750021154",
     }));
+  };
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({ ...initialData });
+    }
+  }, [initialData]);
+
+  const availableAreaSections = useMemo<AreaSectionOption[]>(() => {
+    const org = formData.organization || companyList[0] || "Pakiza Knit Composite Ltd";
+    return getOrgAreaSections(org);
+  }, [formData.organization, companyList]);
+
+  const selectedValue = useMemo(() => {
+    const current = formData.companyAreaSection || "";
+    if (!current) return "";
+    const directMatch = availableAreaSections.find((opt) => opt.value === current);
+    if (directMatch) return directMatch.value;
+    const aliasMatch = availableAreaSections.find(
+      (opt) =>
+        opt.shortName === current ||
+        opt.code === current ||
+        opt.label === current ||
+        opt.value.toLowerCase() === current.toLowerCase(),
+    );
+    return aliasMatch ? aliasMatch.value : current;
+  }, [formData.companyAreaSection, availableAreaSections]);
+
+  const handleOrganizationChange = (newOrg: string) => {
+    const newAreaSections = getOrgAreaSections(newOrg);
+    const currentSelection = formData.companyAreaSection || "";
+    const isStillValid =
+      currentSelection &&
+      newAreaSections.some(
+        (opt) =>
+          opt.value === currentSelection ||
+          opt.shortName === currentSelection ||
+          opt.code === currentSelection ||
+          opt.label === currentSelection ||
+          opt.value.toLowerCase() === currentSelection.toLowerCase(),
+      );
+
+    setFormData((prev) => ({
+      ...prev,
+      organization: newOrg,
+      companyAreaSection: isStillValid ? currentSelection : "",
+    }));
+
+    if (formErrors.companyAreaSection) {
+      setFormErrors((prev) => {
+        const copy = { ...prev };
+        delete copy.companyAreaSection;
+        return copy;
+      });
+    }
   };
 
   const filteredPermissionEmployees = employeeList.filter((emp) => {
@@ -134,6 +404,20 @@ export function WarehouseStorePageForm({
     const errors: Record<string, string> = {};
     if (!formData.storeCode?.trim()) errors.storeCode = "Store Code is required";
     if (!formData.storeName?.trim()) errors.storeName = "Store Name is required";
+    if (
+      formData.companyAreaSection &&
+      availableAreaSections.length > 0 &&
+      !availableAreaSections.some(
+        (sec) =>
+          sec.value === formData.companyAreaSection ||
+          sec.shortName === formData.companyAreaSection ||
+          sec.code === formData.companyAreaSection ||
+          sec.label === formData.companyAreaSection ||
+          sec.value.toLowerCase() === (formData.companyAreaSection || "").toLowerCase(),
+      )
+    ) {
+      errors.companyAreaSection = "Selected Company Area/Section is not associated with this Organization";
+    }
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -145,6 +429,7 @@ export function WarehouseStorePageForm({
       storeCode: formData.storeCode || `WH-${Date.now()}`,
       storeName: formData.storeName || "",
       organization: formData.organization || companyList[0] || "Pakiza Knit Composite Ltd",
+      companyAreaSection: formData.companyAreaSection || "",
       storeManager: formData.storeManager || "",
       contactNumber: formData.contactNumber || "",
       status: formData.status || "Active",
@@ -238,8 +523,8 @@ export function WarehouseStorePageForm({
             <h2 className="text-sm font-bold text-foreground">General Store Information</h2>
           </div>
 
-          {/* Store Name and Organization side-by-side (Requirement 1) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Store Name, Organization, and Company Area/Section (Requirement 8) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Store Name <span className="text-rose-500">*</span>
@@ -264,7 +549,7 @@ export function WarehouseStorePageForm({
               <select
                 disabled={isView}
                 value={formData.organization || companyList[0] || ""}
-                onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
+                onChange={(e) => handleOrganizationChange(e.target.value)}
                 className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
               >
                 {companyList.map((comp) => (
@@ -273,6 +558,55 @@ export function WarehouseStorePageForm({
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold mb-1 text-foreground">
+                Company Area/Section
+              </label>
+              <select
+                disabled={isView || availableAreaSections.length === 0}
+                value={selectedValue}
+                onChange={(e) => {
+                  setFormData({ ...formData, companyAreaSection: e.target.value });
+                  if (formErrors.companyAreaSection) {
+                    setFormErrors((prev) => {
+                      const copy = { ...prev };
+                      delete copy.companyAreaSection;
+                      return copy;
+                    });
+                  }
+                }}
+                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+              >
+                <option value="">
+                  {availableAreaSections.length === 0
+                    ? "No areas/sections configured for this organization"
+                    : "-- Select Company Area/Section --"}
+                </option>
+                {/* Fallback option if saved value exists but not in current list */}
+                {formData.companyAreaSection &&
+                  !availableAreaSections.some(
+                    (sec) =>
+                      sec.value === formData.companyAreaSection ||
+                      sec.shortName === formData.companyAreaSection ||
+                      sec.code === formData.companyAreaSection ||
+                      sec.label === formData.companyAreaSection ||
+                      sec.value.toLowerCase() === (formData.companyAreaSection || "").toLowerCase(),
+                  ) && (
+                    <option value={formData.companyAreaSection}>
+                      {formData.companyAreaSection} (Current Selection)
+                    </option>
+                  )}
+                {availableAreaSections.map((sec) => (
+                  <option key={sec.value} value={sec.value}>
+                    {sec.label}
+                  </option>
+                ))}
+              </select>
+              {formErrors.companyAreaSection && (
+                <p className="text-[10px] text-rose-500 mt-1">{formErrors.companyAreaSection}</p>
+              )}
             </div>
           </div>
 

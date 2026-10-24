@@ -43,6 +43,14 @@ const modules: ModuleConfig[] = [
     path: "/merchandising-dashboard",
   },
   {
+    id: "marketing-merchandising",
+    name: "Marketing & Merchandising",
+    icon: Store,
+    color: "from-emerald-600 via-teal-600 to-cyan-600",
+    shadow: "shadow-teal-500/20",
+    path: "/mm-dashboard",
+  },
+  {
     id: "finance",
     name: "Finance",
     icon: Calculator,
