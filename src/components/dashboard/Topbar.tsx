@@ -332,6 +332,7 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Warning Letters", parent: "Disciplinary Action", to: "/disciplinary-warning-letters" },
   { label: "Case Files", parent: "Disciplinary Action", to: "/disciplinary-case-files" },
   // Manage Overtime
+  { label: "OT Status Update", parent: "Manage Overtime", to: "/ot-status-update" },
   { label: "Overtime Requests", parent: "Manage Overtime", to: "/" },
   { label: "OT Calculations", parent: "Manage Overtime", to: "/" },
   { label: "OT Approvals", parent: "Manage Overtime", to: "/" },

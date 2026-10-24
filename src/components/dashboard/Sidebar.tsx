@@ -378,6 +378,7 @@ export const nav: NavItem[] = [
       { label: "Submit OT Req", to: "/manage-overtime", search: { tab: "submit" } },
       { label: "Submitted OT List", to: "/manage-overtime", search: { tab: "submitted-list" } },
       { label: "Individual OT Review", to: "/manage-overtime", search: { tab: "individual-review" } },
+      { label: "OT Status Update", to: "/ot-status-update" },
       { label: "Lunce Requisition", to: "/lunch-requisition" },
       { label: "Festival Allowance", to: "/festival-allowance" },
     ],
