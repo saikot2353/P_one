@@ -2,19 +2,16 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
-    "id": "602",
-    "date": "2026-10-24T16:05",
-    "type": "Implement PI Register and PI Verification Approval — Overwrite Existing Menus",
-    "module": "Marketing & Merchandising / PI / Proforma Invoice",
-    "link": "/mm-pi",
-    "descriptionEn": "Redesigned and implemented the Proforma Invoice (PI) Register and PI Verification Approval features by overwriting existing menu entries without duplicate menus: (1) Overwrite PI Register: Transformed /mm-pi into a central ERP PI Register featuring dynamic status tabs (All, Draft, Pending, Approved, Passed, Rejected, Returned), multi-column search and filters (PI Number, Supplier, Job ID, Style, Date), clickable PI Number hyperlinks, and row-level actions (View and Edit where permitted); (2) Overwrite PI Verification Approval: Replaced approval entry with dedicated approval register (/mm-pi-verification-approval) with approval workflow tabs (Pending, Approved, Rejected, Returned, All), dynamic queue counts, supplier/date filtering, and direct Review actions; (3) Dedicated PI Approval Details Page: Built a dedicated full page (/mm-pi-approval-details) avoiding modals for record viewing, featuring Section A (PI Main Information 4-column ERP grid), Section B (Consolidated Booking Information Table), Section C (PI Item Details with Specification & Rates), Section D (Additional Charges and Financial Valuation Engine with live USD and BDT totals), and Section E (Approval Workflow & Audit Trail); (4) Interactive Approval Workflow: Implemented modal dialogs on the details page for Authorize & Approve (optional comments, status update, audit logging), Reject (enforced mandatory reason), and Return for Correction (enforced mandatory instructions with draft unlocking); (5) Data Consistency: Integrated with MMRepository.getPIs() ensuring authentic saved records, zero dummy entries, seamless status synchronization across registers, and accurate multi-booking quantity and financial calculations.",
-    "descriptionBn": "মার্কেটিং অ্যান্ড মার্চেন্ডাইজিং মডিউলে বিদ্যমান মেনুসমূহ ওভাররাইট করে Proforma Invoice (PI) Register এবং PI Verification Approval পূর্ণাঙ্গভাবে বাস্তবায়ন করা হয়েছে (কোনো ডুপ্লিকেট মেনু তৈরি না করে): (১) PI Register ওভাররাইট: /mm-pi রাউটটিকে একটি সেন্ট্রাল ERP PI রেজিস্টারে রূপান্তর করা হয়েছে যেখানে স্ট্যাটাস ট্যাব (All, Draft, Pending, Approved, Passed, Rejected, Returned), মাল্টি-কলাম সার্চ ও ফিল্টার (PI No, Supplier, Job ID, Style, Date), ক্লিকযোগ্য PI Number হাইপারলিঙ্ক এবং রো-লেভেল অ্যাকশন (অনুমোদিত ক্ষেত্রে View ও Edit) রয়েছে; (২) PI Verification Approval ওভাররাইট: বিদ্যমান অনুমোদন এন্ট্রির পরিবর্তে একটি ডেডিকেটেড অনুমোদন রেজিস্টার (/mm-pi-verification-approval) তৈরি করা হয়েছে যাতে স্ট্যাটাস ফিল্টার (Pending, Approved, Rejected, Returned, All), কিউ কাউন্টার, সাপ্লায়ার/তারিখ ফিল্টার এবং সরাসরি Review অ্যাকশন যুক্ত রয়েছে; (৩) ডেডিকেটেড PI Approval Details পেজ: মোডালের পরিবর্তে একটি পূর্ণাঙ্গ ডেডিকেটেড পেজ (/mm-pi-approval-details) তৈরি করা হয়েছে যাতে রয়েছে Section A (৪-কলাম বিশিষ্ট PI Main Information ERP গ্রিড), Section B (সংযুক্ত বুকিং তথ্যের টেবিল), Section C (আইটেম বিবরণী, স্পেসিফিকেশন ও রেট), Section D (অতিরিক্ত চার্জ ও ফিনান্সিয়াল ভ্যালুয়েশন ইঞ্জিন সহ লাইভ USD ও BDT টোটাল) এবং Section E (অনুমোদন ওয়ার্কফ্লো ও অডিট হিস্ট্রি); (৪) ইন্টারঅ্যাক্টিভ অনুমোদন ওয়ার্কফ্লো: ডিটেইলস পেজে Authorize & Approve (ঐচ্ছিক মন্তব্য ও অডিট লগসহ), Reject (বাধ্যতামূলক প্রত্যাখ্যান কারণসহ) এবং Return for Correction (বাধ্যতামূলক সংশোধন নির্দেশনাসহ খসড়া আনলক) ডায়ালগ বাস্তবায়ন করা হয়েছে; (৫) ডেটা ধারাবাহিকতা: MMRepository.getPIs()-এর সাথে সমন্বয়ের মাধ্যমে প্রকৃত সংরক্ষিত রেকর্ড প্রদর্শন, কোনো ডামি ডেটা ছাড়া নির্ভুল ক্যালকুলেশন এবং উভয় রেজিস্টারে স্ট্যাটাসের নিখুঁত синхронাইজেশন নিশ্চিত করা হয়েছে।"
+    "id": "605",
+    "date": "2026-10-11T13:45",
+    "type": "UI Refinement",
+    "module": "Approvals - Sync Requisition",
+    "link": "/sync-requisition",
+    "descriptionEn": "Compacted the layout of the Sync Requisition page, constraining the requisition input field to a balanced width, reducing padding, and making the controls and workflow layer cards clean and compact.",
+    "descriptionBn": "Sync Requisition পেজটির ডিজাইন কমপ্যাক্ট করা হয়েছে, যাতে রিকুইজিশন ইনপুট ফিল্ডটি অতিরিক্ত বড় না দেখায় এবং সম্পূর্ণ ইন্টারফেস পরিচ্ছন্ন ও সংকুচিত থাকে।"
   },
   {
-    "id": "601",�ির ডিজাইন কমপ্যাক্ট করা হয়েছে, যাতে রিকুইজিশন ইনপুট ফিল্ডটি অতিরিক্ত বড় না দেখায় এবং সম্পূর্ণ ইন্টারফেস পরিচ্ছন্ন ও সংকুচিত থাকে।"
-  },
-  {
-    "id": "572",
+    "id": "604",
     "date": "2026-10-11T13:35",
     "type": "UI Refinement",
     "module": "Approvals - Sync Requisition",
@@ -23,7 +20,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     "descriptionBn": "Sync Requisition পেজটি পরিচ্ছন্ন করতে নিচের বিস্তারিত ডেটা টেবিলটি সরিয়ে দেওয়া হয়েছে এবং উপরের ভিজ্যুয়াল স্টেপার কার্ডগুলো বহাল রাখা হয়েছে।"
   },
   {
-    "id": "571",
+    "id": "603",
     "date": "2026-10-11T13:30",
     "type": "New Addition",
     "module": "Approvals - Sync Requisition",
@@ -32,15 +29,15 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     "descriptionBn": "Approvals মেনুর অধীনে নতুন 'Sync Requisition' (/sync-requisition) সাবমেনু ও পেজ যুক্ত করা হয়েছে, যেখানে রিকুইজিশন নম্বর দিয়ে Sync ও Confirm করার পর রিকুইজিশনটি বর্তমানে কোন কোন ওয়ার্কফ্লো লেয়ার অতিক্রম করছে তা সরাসরি দেখা যাবে।"
   },
   {
-    "id": "570",
+    "id": "602",
     "date": "2026-10-11T13:05",
     "type": "New Addition",
     "module": "Approvals - Work Flow",
     "link": "/work-flows",
     "descriptionEn": "Added new 'Work Flow' (/work-flows) submenu under Approvals with complete approval workflows dashboard, multi-layer approval flow configuration modal, user assigner, and layer manager matching user design.",
     "descriptionBn": "Approvals মেনুর অধীনে নতুন 'Work Flow' (/work-flows) সাবমেনু ও পেজ তৈরি করা হয়েছে, যেখান থেকে বিভিন্ন ধরনের ওয়ার্কফ্লো তৈরি, মাল্টি-লেয়ার অনুমোদন চেইন কনফিগারেশন, লেয়ারে ইউজার যুক্ত ও অনুমোদন পরিচালনা করা যাবে।"
-=======
->>>>>>> 494bd4700cda9183948ad8eaac955c85e0cfc1c3
+  },
+  {
     "id": "601",
     "date": "2026-10-24T14:15",
     "type": "Fix Company Area/Section Dropdown Data Loading in Create Warehouse / Store Form",
@@ -435,7 +432,6 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     "link": "/mm-dashboard",
     "descriptionEn": "Successfully developed and launched a completely new, independent 'Marketing & Merchandising' module within CriptonHRIS in strict isolation from the existing Merchandising, Procurement, and Inventory modules: (1) Module Isolation: Full non-modification compliance preserving all existing routes and data, registering the new module cleanly in ModuleLauncher and ModuleSelection; (2) 15 Core Company Policies: Configured policies for quotation/pre-costing approvals, booking saving target (default 2%), budget overrun controls, wastage rules, country breakdown requirement, FOB/BOM permissions, and approval limits with full audit history; (3) Buyer Quotation Management: Complete commercial workflow for Woven and Knit garments, style particulars, color/size breakdowns, and policy-driven approvals; (4) Style Pre-Costing & Amendment Diff: Individual item-level costing with persistent preCostItemId identifiers (100% Cotton, Buttons, Zippers, Tags, Labels) and visual revision comparison diff highlighting added (green), modified (amber), and removed (red) components; (5) Confirm Order Entry: Zero-tolerance breakdown reconciliation validating that color, size, PO, lot, and country breakdowns strictly match the total order quantity, plus role-authorized FOB modification audit log; (6) Traceable BOM Management: Mandatory item-level linkage between BOM items and approved Pre-Cost Item IDs with unmapped item exception handling; (7) Fabric & Accessories Bookings: Independent approval workflows and line-level booking saving tracking; (8) Item-wise Cost Saving Analysis: Granular calculation engine distinguishing initial booking saving from final actual cost, rate vs quantity variances, negative overrun warnings, and multi-tier rollups; (9) Proforma Invoice (PI) Management: Eligibility validation blocking pending or rejected bookings, supplier consolidation, and PI approval; (10) Order Closure & Reopening Control: Operational transaction blockade displaying the mandated exact warning 'This order is currently closed. Please reopen the order before proceeding with this transaction.' with full history.",
     "descriptionBn": "পূর্বের Merchandising, Procurement এবং Inventory মডিউল পুরোপুরি অক্ষুণ্ণ রেখে CriptonHRIS-এ সম্পূর্ণ নতুন এবং স্বতন্ত্র 'Marketing & Merchandising' মডিউল সফলভাবে চালু করা হয়েছে: (১) মডিউল আইসোলেশন: আগের কোনো কোড বা ডেটায় হাত না দিয়ে ModuleLauncher ও ModuleSelection-এ নতুন মডিউল যুক্ত করা হয়েছে; (২) ১৫টি প্রাতিষ্ঠানিক পলিসি: কোটেশন/কস্টিং অনুমোদন, বুকিং সেভিং টার্গেট (ডিফল্ট ২%), বাজেট অতিক্রম নিয়ন্ত্রণ, অপচয় হিসাব, কান্ট্রি ব্রেকডাউন বাধ্যবাধকতা, এফওবি/বিওএম পারমিশন এবং অডিট লগসহ পূর্ণাঙ্গ পলিসি ব্যবস্থাপনা; (৩) বায়ার কোটেশন: ওভেন ও নিট গার্মেন্টসের জন্য পূর্ণাঙ্গ বাণিজ্যিক কোটেশন, কালার-সাইজ ব্রেকডাউন এবং পলিসি অনুমোদনের ব্যবস্থা; (৪) প্রি-কস্টিং ও রিভিশন তুলনা: প্রতিটি আইটেমের জন্য স্থায়ী preCostItemId (১০০% কটন, বোতাম, চেইন, ট্যাগ, লেবেল) এবং রিভিশন পরিবর্তনের জন্য ভিজ্যুয়াল ডিফারেন্স টেবিল যাতে নতুন যুক্ত (সবুজ), পরিবর্তিত (হলুদ) ও বাদ দেওয়া (লাল) আইটেম স্পষ্ট ফুটে ওঠে; (৫) কনফার্ম অর্ডার এন্ট্রি: কালার, সাইজ, পিও, লট এবং কান্ট্রি ব্রেকডাউনের মোট যোগফল অর্ডার কোয়ান্টিটির সাথে শতভাগ মেলানোর জিরো-টলারেন্স ভ্যালিডেশন এবং অনুমোদিত এফওবি পরিবর্তনের অডিট ট্রেইল; (৬) ট্রেসেবল বিওএম: অনুমোদিত প্রি-কস্টিং আইটেম আইডির সাথে বিওএম লাইনের সরাসরি সংযোগ এবং নতুন আনম্যাচড আইটেম ট্র্যাকিং; (৭) ফেব্রিক ও এক্সেসরিজ বুকিং: সম্পূর্ণ স্বাধীন অনুমোদন ব্যবস্থা এবং বুকিং সেভিং হিসাব; (৮) আইটেমভিত্তিক কস্ট সেভিং রিপোর্ট: রেট বনাম কোয়ান্টিটি ভ্যারিয়েন্স, বাজেট অতিরিক্ত খরচ চিহ্নিতকরণ এবং মাল্টি-লেভেল রোলআপ রিপোর্ট; (৯) পিআই (প্রোফরমা ইনভয়েস): অননুমোদিত বা রিজেক্টেড বুকিং ব্লক করার কড়া নিয়মসহ পিআই তৈরি ও অনুমোদন; (১০) অর্ডার ক্লোজার ও রিওপেনিং: অর্ডার ক্লোজ থাকলে যেকোনো ট্রানজ্যাকশন ব্লক করে নির্দেশনামাফিক সুনির্দিষ্ট বার্তা প্রদর্শন এবং রিওপেন করার অডিট হিস্টোরি নিশ্চিত করা হয়েছে।"
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
   },
   {
     "id": "557",
