@@ -23,9 +23,17 @@ import {
   BuildingIcon,
   CreditCard,
   Hash,
+  Printer,
+  Hourglass,
+  Calendar,
+  FileCheck2,
+  FileText,
+  User,
+  Info,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { SingleSimPrintModal } from "./SingleSimPrintModal";
 
 export interface SimApprovalModalData {
   id: string;
@@ -44,6 +52,9 @@ export interface SimApprovalModalData {
     location?: string;
     joiningDate?: string;
     businessUnit?: string;
+    requisitionBy?: string;
+    contact?: string;
+    avatarUrl?: string;
   };
   simDetails: {
     operator: string;
@@ -51,6 +62,7 @@ export interface SimApprovalModalData {
     simNumber?: string;
     existingLimit?: number;
     expectedLimit?: number;
+    approvedLimit?: number;
     replacementReason?: string;
     replacementCharge?: number;
     justification: string;
@@ -59,14 +71,18 @@ export interface SimApprovalModalData {
     section?: string;
     attachmentName?: string;
     attachmentSize?: string;
+    documents?: string;
+    issueStatus?: string;
   };
   timeline?: Array<{
     stage: string;
     roleLabel: string;
     approverName: string;
     approverDesignation: string;
+    approverDepartment?: string;
     status: "approved" | "pending" | "rejected";
     date: string;
+    time?: string;
   }>;
   comments?: Array<{
     id: string;
@@ -102,10 +118,13 @@ export function SimApprovalViewModal({
     data.status
   );
   const [commentsList, setCommentsList] = useState(data.comments || []);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   // Approver inputs states
   const [assignedSimNumber, setAssignedSimNumber] = useState("");
-  const [approvedBalanceAmount, setApprovedBalanceAmount] = useState<number | string>("");
+  const [approvedBalanceAmount, setApprovedBalanceAmount] = useState<number | string>(
+    data.simDetails.approvedLimit || data.simDetails.expectedLimit || 1000
+  );
   const [newIssuedSimNumber, setNewIssuedSimNumber] = useState("");
 
   // Sync state when data changes
@@ -116,10 +135,14 @@ export function SimApprovalViewModal({
       setApprovalComment("");
 
       if (data.requestType === "New SIM") {
-        setAssignedSimNumber(data.simDetails.simNumber || "01711-554433");
-        setApprovedBalanceAmount(data.simDetails.expectedLimit || 1000);
+        setAssignedSimNumber(data.simDetails.simNumber || "—");
+        setApprovedBalanceAmount(
+          data.simDetails.approvedLimit || data.simDetails.expectedLimit || 1000
+        );
       } else if (data.requestType === "SIM Balance Limit") {
-        setApprovedBalanceAmount(data.simDetails.expectedLimit || 2500);
+        setApprovedBalanceAmount(
+          data.simDetails.approvedLimit || data.simDetails.expectedLimit || 2500
+        );
       } else if (data.requestType === "SIM Replacement") {
         setNewIssuedSimNumber("01844-998877");
       }
@@ -127,12 +150,7 @@ export function SimApprovalViewModal({
   }, [data]);
 
   const handleApprove = () => {
-    // Validate required inputs based on request type
     if (data.requestType === "New SIM") {
-      if (!String(assignedSimNumber).trim()) {
-        toast.error("Please enter the Assigned SIM Number before approving.");
-        return;
-      }
       if (!approvedBalanceAmount || Number(approvedBalanceAmount) <= 0) {
         toast.error("Please enter a valid Approved SIM Balance Amount.");
         return;
@@ -155,12 +173,16 @@ export function SimApprovalViewModal({
     const updatedDetails: Partial<SimApprovalModalData["simDetails"]> = {};
 
     if (data.requestType === "New SIM") {
-      decisionNote = `[Assigned SIM: ${assignedSimNumber}, Approved Limit: BDT ${Number(approvedBalanceAmount).toLocaleString()}]`;
-      updatedDetails.simNumber = assignedSimNumber;
+      decisionNote = `[Approved Limit: BDT ${Number(approvedBalanceAmount).toLocaleString()}]`;
+      if (assignedSimNumber && assignedSimNumber !== "—") {
+        updatedDetails.simNumber = assignedSimNumber;
+      }
       updatedDetails.expectedLimit = Number(approvedBalanceAmount);
+      updatedDetails.approvedLimit = Number(approvedBalanceAmount);
     } else if (data.requestType === "SIM Balance Limit") {
       decisionNote = `[Approved Limit: BDT ${Number(approvedBalanceAmount).toLocaleString()}]`;
       updatedDetails.expectedLimit = Number(approvedBalanceAmount);
+      updatedDetails.approvedLimit = Number(approvedBalanceAmount);
     } else if (data.requestType === "SIM Replacement") {
       decisionNote = `[New Issued SIM: ${newIssuedSimNumber}]`;
       updatedDetails.simNumber = newIssuedSimNumber;
@@ -168,17 +190,17 @@ export function SimApprovalViewModal({
 
     const fullComment = approvalComment.trim()
       ? `${approvalComment} ${decisionNote}`
-      : `Approved by HR & Telecom Authority. ${decisionNote}`;
+      : `Approved by ICT & Authority. ${decisionNote}`;
 
     setCommentsList((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
-        authorName: "Current Approver",
-        authorRole: "HR & Telecom Authority",
+        authorName: "Mamunoor Rashid",
+        authorRole: "DGM (ICT)",
         timestamp: "Just now",
         comment: fullComment,
-        initials: "CA",
+        initials: "MR",
       },
     ]);
 
@@ -192,17 +214,17 @@ export function SimApprovalViewModal({
     setCurrentStatus("Rejected");
     const fullComment = approvalComment.trim()
       ? approvalComment
-      : "Requisition rejected by approval authority.";
+      : "Requisition rejected by ICT authority.";
 
     setCommentsList((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
-        authorName: "Current Approver",
-        authorRole: "HR & Telecom Authority",
+        authorName: "Mamunoor Rashid",
+        authorRole: "DGM (ICT)",
         timestamp: "Just now",
         comment: fullComment,
-        initials: "CA",
+        initials: "MR",
       },
     ]);
 
@@ -216,730 +238,551 @@ export function SimApprovalViewModal({
     switch (status) {
       case "Approved":
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 font-bold px-3 py-1">
+          <span className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 font-bold px-3 py-0.5 rounded-full text-[11px] uppercase tracking-wider">
             Approved
-          </Badge>
+          </span>
         );
       case "Pending":
         return (
-          <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 font-bold px-3 py-1">
-            Pending Review
-          </Badge>
+          <span className="bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 font-bold px-3 py-0.5 rounded-full text-[11px] uppercase tracking-wider">
+            PENDING
+          </span>
         );
       case "Rejected":
         return (
-          <Badge className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 font-bold px-3 py-1">
+          <span className="bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400 font-bold px-3 py-0.5 rounded-full text-[11px] uppercase tracking-wider">
             Rejected
-          </Badge>
+          </span>
         );
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
   };
 
-  const getRequestTypeBadge = (type: string) => {
-    switch (type) {
-      case "New SIM":
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-            <PlusCircle className="size-3.5" /> New SIM
-          </span>
-        );
-      case "SIM Balance Limit":
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
-            <TrendingUp className="size-3.5" /> SIM Balance Limit
-          </span>
-        );
-      case "SIM Replacement":
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
-            <RefreshCw className="size-3.5" /> SIM Replacement
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20">
-            <Smartphone className="size-3.5" /> {type}
-          </span>
-        );
-    }
-  };
-
-  // Limit difference calculation for SIM Balance Limit
-  const currentLimitVal = data.simDetails.existingLimit || 0;
-  const approvedLimitVal = Number(approvedBalanceAmount) || data.simDetails.expectedLimit || 0;
-  const limitDiff = approvedLimitVal - currentLimitVal;
-  const percentageIncrease = currentLimitVal
-    ? Math.round((limitDiff / currentLimitVal) * 100)
-    : 0;
+  // 4 Approval signatures workflow cards matching Image 1
+  const approvalWorkflowCards = [
+    {
+      roleTitle: "APPROVED BY HOD",
+      name: "Mohammad Tareq Safa",
+      designation: "AGM",
+      department: "MIS",
+      status: "APPROVED" as const,
+      time: "12:17 AM",
+      date: "16/10/2026",
+    },
+    {
+      roleTitle: "APPROVED BY HRD",
+      name: "Rajebul Hasan Rajon",
+      designation: "Deputy Manager",
+      department: "HR, Admin and Compliance",
+      status: "APPROVED" as const,
+      time: "12:18 AM",
+      date: "16/10/2026",
+    },
+    {
+      roleTitle: "APPROVED BY MD",
+      name: "Rakibul Islam Khan",
+      designation: "Managing Director",
+      department: "Management",
+      status: "APPROVED" as const,
+      time: "12:19 AM",
+      date: "16/10/2026",
+    },
+    {
+      roleTitle: "APPROVED BY ICT",
+      name: "Mamunoor Rashid",
+      designation: "DGM",
+      department: "Information and Communication Technology",
+      status: currentStatus === "Approved" ? ("APPROVED" as const) : ("PENDING" as const),
+      time: currentStatus === "Approved" ? "12:25 PM" : "N/A",
+      date: currentStatus === "Approved" ? "16/10/2026" : "N/A",
+    },
+  ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-slate-900 w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
-        {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50 dark:bg-slate-950/50 relative space-y-5">
-          {/* Top Header Bar */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-slate-200 dark:border-slate-800 gap-4">
-            <div className="flex items-start gap-3.5">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shadow-xs shrink-0 border border-teal-200 dark:border-teal-500/20">
-                <Smartphone className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight">
+    <>
+      <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-3 md:p-6 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="bg-white dark:bg-slate-900 w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
+          {/* Scrollable Content Body */}
+          <div className="flex-1 overflow-y-auto p-5 md:p-7 bg-white dark:bg-slate-900 space-y-6">
+            {/* ── TOP HEADER BAR (Exact Image 1 Header) ── */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-slate-100 dark:border-slate-800 gap-4">
+              <div className="flex items-start gap-3.5">
+                <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center shadow-xs shrink-0 border border-sky-100 dark:border-sky-800/40">
+                  <Smartphone className="w-6 h-6 stroke-[1.8]" />
+                </div>
+                <div>
+                  <h1 className="text-base font-bold text-slate-900 dark:text-white">
                     SIM Requisition Approval
                   </h1>
-                  {getRequestTypeBadge(data.requestType)}
-                  {getStatusBadge(currentStatus)}
-                </div>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-0.5 mt-1">
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold tracking-tight">
-                    Req No: <span className="text-slate-700 dark:text-slate-200 font-bold">{data.reqNo}</span>
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold tracking-tight">
-                    Type: <span className="text-teal-700 dark:text-teal-300 font-bold">{data.requestType}</span>
-                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">
+                      {data.reqNo}
+                    </span>
+                    {getStatusBadge(currentStatus)}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Right metadata / Close Button */}
-            <div className="flex items-center gap-4 self-end md:self-center">
-              <div className="text-right border-r pr-4 border-slate-200 dark:border-slate-800 hidden sm:block">
-                <span className="text-[9px] text-slate-400 dark:text-slate-500 block font-bold tracking-wider uppercase">
-                  APPLICATION DATE
-                </span>
-                <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 block">
-                  {data.applicationDate}
-                </span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-semibold mt-0.5">
-                  Submitted {data.submittedTime}
-                </span>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all shrink-0 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* On Behalf Alert Banner */}
-          {data.simDetails.onBehalf && (
-            <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-3.5 flex items-center gap-3 text-amber-800 dark:text-amber-300 text-xs font-semibold">
-              <AlertCircle className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
-              <div>
-                <span className="font-extrabold uppercase text-[10px] tracking-wider block text-amber-700 dark:text-amber-400">
-                  ON BEHALF REQUISITION
-                </span>
-                This requisition was submitted on behalf of{" "}
-                <span className="font-bold underline">{data.simDetails.onBehalfPerson || "Team Member"}</span>
-                {data.simDetails.section && <span> ({data.simDetails.section})</span>}.
-              </div>
-            </div>
-          )}
-
-          {/* REQUISITIONER CARD */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-              <div className="lg:col-span-4 flex items-center gap-4 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 pb-4 lg:pb-0 lg:pr-6">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white font-black flex items-center justify-center text-lg shadow-md shadow-teal-500/20 shrink-0">
-                  {data.employee.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .substring(0, 2)
-                    .toUpperCase()}
-                </div>
-                <div className="min-w-0">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">
-                    REQUISITIONER
+              {/* Right metadata + Actions */}
+              <div className="flex items-center gap-3 self-end md:self-center">
+                <div className="text-right border-r pr-4 border-slate-200 dark:border-slate-800 hidden sm:block">
+                  <div className="flex items-center justify-end gap-1.5 text-[10px] text-slate-400 dark:text-slate-500 font-bold tracking-wider uppercase">
+                    <Calendar className="w-3 h-3" />
+                    <span>APPLICATION DATE</span>
+                  </div>
+                  <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200 block">
+                    {data.applicationDate || "11/10/2026"}
                   </span>
-                  <h2 className="text-sm font-extrabold text-slate-900 dark:text-white truncate">
-                    {data.employee.name}
-                  </h2>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
-                    ID: {data.employee.id}
-                  </p>
-                </div>
-              </div>
-
-              <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6 text-xs">
-                <div className="flex items-start gap-2.5">
-                  <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    <Briefcase className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
-                      DESIGNATION
-                    </p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-                      {data.employee.designation}
-                    </p>
+                  <div className="flex items-center justify-end gap-1 text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5">
+                    <Clock className="w-2.5 h-2.5" />
+                    <span>Submitted {data.submittedTime || "12:22 PM"}</span>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2.5">
-                  <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    <Building2 className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
-                      DEPARTMENT
-                    </p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-                      {data.employee.department}
-                    </p>
-                  </div>
-                </div>
+                {/* Print button in header */}
+                <button
+                  type="button"
+                  onClick={() => setIsPrintModalOpen(true)}
+                  className="h-8 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1.5 text-xs font-bold transition-all shadow-2xs cursor-pointer"
+                  title="Print Official SIM Application Form"
+                >
+                  <Printer className="size-3.5 text-blue-600" />
+                  <span className="hidden sm:inline">Print Form</span>
+                </button>
 
-                <div className="flex items-start gap-2.5">
-                  <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    <Layers className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
-                      SECTION
-                    </p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-                      {data.employee.section || data.simDetails.section || "—"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    <CalendarDays className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
-                      JOINING DATE
-                    </p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-                      {data.employee.joiningDate || "15 Jan 2023"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    <BuildingIcon className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
-                      BUSINESS UNIT
-                    </p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-                      {data.employee.businessUnit || "Pakiza Software Limited"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    <MapPin className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
-                      LOCATION
-                    </p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-                      {data.employee.location || "Head Office, Dhaka"}
-                    </p>
-                  </div>
-                </div>
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all shrink-0 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
             </div>
-          </div>
 
-          {/* DYNAMIC PARAMETERS & LIVE APPROVAL INPUT PREVIEW SECTION */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-md bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center font-bold text-xs shrink-0">
-                  <Signal className="w-4 h-4" />
-                </div>
-                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  {data.requestType} Parameters & Live Approver Inputs
-                </h3>
-              </div>
-              <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                TELECOM ASSET MANAGEMENT
-              </span>
-            </div>
-
-            {/* TYPE 1: NEW SIM */}
-            {data.requestType === "New SIM" && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                      Target Telecom Operator
-                    </span>
-                    <p className="text-sm font-black text-slate-900 dark:text-white mt-1 flex items-center gap-2">
-                      <Signal className="size-4 text-emerald-500" />
-                      {data.simDetails.operator}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                      Recommended Plan
-                    </span>
-                    <p className="text-sm font-black text-slate-900 dark:text-white mt-1">
-                      {data.simDetails.packageType || "Corporate Postpaid Premier"}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
-                      Assigned SIM Number
-                    </span>
-                    <p className="text-sm font-black text-emerald-700 dark:text-emerald-300 mt-1 font-mono">
-                      {assignedSimNumber.trim() ? assignedSimNumber : "Pending Input..."}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-teal-50/60 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/20">
-                    <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider block">
-                      Approved Monthly Balance
-                    </span>
-                    <p className="text-sm font-black text-teal-700 dark:text-teal-300 mt-1 font-mono">
-                      BDT {Number(approvedBalanceAmount || 0).toLocaleString()} / Month
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl bg-teal-50/30 dark:bg-teal-500/5 border border-teal-100 dark:border-teal-500/10">
-                  <span className="text-[10px] font-bold text-teal-700 dark:text-teal-400 uppercase tracking-wider block mb-1">
-                    Business Justification for New Connection
-                  </span>
-                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium leading-relaxed italic">
-                    "{data.simDetails.justification}"
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* TYPE 2: SIM BALANCE LIMIT */}
-            {data.requestType === "SIM Balance Limit" && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                      SIM Mobile Number
-                    </span>
-                    <p className="text-sm font-black text-slate-900 dark:text-white mt-1 font-mono">
-                      {data.simDetails.simNumber || "01711-XXXXXX"}
-                    </p>
-                    <span className="text-[10px] text-slate-500 font-semibold mt-0.5 block">
-                      Operator: {data.simDetails.operator}
-                    </span>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                      Current Monthly Limit
-                    </span>
-                    <p className="text-sm font-black text-slate-600 dark:text-slate-300 mt-1 font-mono">
-                      BDT {(data.simDetails.existingLimit || 0).toLocaleString()}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-indigo-50/60 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20">
-                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block">
-                      Approved Monthly Limit Amount
-                    </span>
-                    <p className="text-base font-black text-indigo-700 dark:text-indigo-300 mt-1 font-mono">
-                      BDT {approvedLimitVal.toLocaleString()}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
-                      Limit Enhancement Difference
-                    </span>
-                    <p className="text-sm font-black text-emerald-700 dark:text-emerald-300 mt-1 font-mono flex items-center gap-1">
-                      +BDT {limitDiff.toLocaleString()}{" "}
-                      <span className="text-[11px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-200/60 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300">
-                        +{percentageIncrease}%
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl bg-indigo-50/30 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/10">
-                  <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider block mb-1">
-                    Limit Upgrade Justification
-                  </span>
-                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium leading-relaxed italic">
-                    "{data.simDetails.justification}"
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* TYPE 3: SIM REPLACEMENT */}
-            {data.requestType === "SIM Replacement" && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                      SIM Number to Replace
-                    </span>
-                    <p className="text-sm font-black text-slate-900 dark:text-white mt-1 font-mono">
-                      {data.simDetails.simNumber || "01844-XXXXXX"}
-                    </p>
-                    <span className="text-[10px] text-slate-500 font-semibold mt-0.5 block">
-                      Operator: {data.simDetails.operator}
-                    </span>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
-                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
-                      New Issued SIM Number
-                    </span>
-                    <p className="text-sm font-black text-amber-700 dark:text-amber-300 mt-1 font-mono">
-                      {newIssuedSimNumber.trim() ? newIssuedSimNumber : "Pending Input..."}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                      Replacement Reason
-                    </span>
-                    <p className="text-sm font-black text-slate-800 dark:text-slate-200 mt-1">
-                      {data.simDetails.replacementReason || "Damaged / Lost SIM"}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                      Replacement Fee Charge
-                    </span>
-                    <p className="text-sm font-black text-slate-900 dark:text-white mt-1">
-                      BDT {(data.simDetails.replacementCharge || 200).toLocaleString()}{" "}
-                      <span className="text-[10px] font-normal text-slate-500">
-                        (Company Covered)
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                {data.simDetails.attachmentName && (
-                  <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-                        <Paperclip className="size-4" />
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
-                          {data.simDetails.attachmentName}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-semibold">
-                          Attached Proof ({data.simDetails.attachmentSize || "PDF Document"})
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => toast.info(`Viewing ${data.simDetails.attachmentName}`)}
-                      className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Download className="size-3.5" /> Download
-                    </button>
-                  </div>
-                )}
-
-                <div className="p-4 rounded-xl bg-amber-50/30 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/10">
-                  <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider block mb-1">
-                    Replacement Request Justification
-                  </span>
-                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium leading-relaxed italic">
-                    "{data.simDetails.justification}"
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* COMMENTS & APPROVER DECISION PANEL */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
-            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
-              <div className="w-6 h-6 rounded-md bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
-                <MessageSquare className="w-3.5 h-3.5" />
-              </div>
-              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                Comments & Approver Action Controls
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-1">
-              {/* Comment Log */}
-              <div className="space-y-3">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  Audit Comments History
+            {/* ── CARD 1: REQUEST FOR (EMPLOYEE DETAILS) (Exact Image 1) ── */}
+            <div className="rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-2xs">
+              <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex items-center gap-2">
+                <UserCheck className="size-4 text-sky-600 dark:text-sky-400" />
+                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  REQUEST FOR (EMPLOYEE DETAILS)
                 </span>
-                {commentsList.length > 0 ? (
-                  commentsList.map((c) => (
-                    <div
-                      key={c.id}
-                      className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-900 dark:text-white">
-                          {c.authorName}{" "}
-                          <span className="text-[10px] font-semibold text-slate-400">
-                            ({c.authorRole})
-                          </span>
-                        </span>
-                        <span className="text-[10px] text-slate-400">{c.timestamp}</span>
-                      </div>
-                      <p className="text-xs text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
-                        {c.comment}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-xs text-slate-400 font-medium bg-slate-50 dark:bg-slate-800/20 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-                    No comments recorded yet.
-                  </div>
-                )}
               </div>
 
-              {/* Action Panel with Dynamic Approver Input Fields */}
-              <div className="bg-slate-50/80 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-4">
-                <div className="flex items-center gap-2 text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider pb-1 border-b border-slate-200 dark:border-slate-700">
-                  <AlertCircle className="size-4 text-teal-600 dark:text-teal-400" />
-                  Approver Input & Decision Controls
-                </div>
-
-                {/* DYNAMIC APPROVER INPUTS FOR NEW SIM */}
-                {data.requestType === "New SIM" && (
-                  <div className="space-y-3 bg-emerald-50/60 dark:bg-emerald-500/10 p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
-                    <div className="text-[11px] font-black text-emerald-800 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <Smartphone className="size-3.5" /> New SIM Assignment Parameters
-                    </div>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1">
-                          Assigned SIM Number <span className="text-rose-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <Hash className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-400" />
-                          <input
-                            type="text"
-                            value={assignedSimNumber}
-                            onChange={(e) => setAssignedSimNumber(e.target.value)}
-                            placeholder="e.g. 01711-554433"
-                            className="w-full h-9 pl-8 pr-3 text-xs font-mono font-bold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-900 dark:text-white"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1">
-                          Approved Balance Amount (BDT) <span className="text-rose-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <CreditCard className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-400" />
-                          <input
-                            type="number"
-                            value={approvedBalanceAmount}
-                            onChange={(e) => setApprovedBalanceAmount(e.target.value)}
-                            placeholder="e.g. 1000"
-                            className="w-full h-9 pl-8 pr-3 text-xs font-mono font-bold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-900 dark:text-white"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* DYNAMIC APPROVER INPUTS FOR SIM BALANCE LIMIT */}
-                {data.requestType === "SIM Balance Limit" && (
-                  <div className="space-y-3 bg-indigo-50/60 dark:bg-indigo-500/10 p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-500/20">
-                    <div className="text-[11px] font-black text-indigo-800 dark:text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <TrendingUp className="size-3.5" /> Approved Balance Limit Amount
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1">
-                        Approved Balance Limit (BDT) <span className="text-rose-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <CreditCard className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-400" />
-                        <input
-                          type="number"
-                          value={approvedBalanceAmount}
-                          onChange={(e) => setApprovedBalanceAmount(e.target.value)}
-                          placeholder="e.g. 2500"
-                          className="w-full h-9 pl-8 pr-3 text-xs font-mono font-bold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-900 dark:text-white"
-                        />
-                      </div>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-1">
-                        Current: BDT {(data.simDetails.existingLimit || 0).toLocaleString()} → Requested: BDT {(data.simDetails.expectedLimit || 0).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* DYNAMIC APPROVER INPUTS FOR SIM REPLACEMENT */}
-                {data.requestType === "SIM Replacement" && (
-                  <div className="space-y-3 bg-amber-50/60 dark:bg-amber-500/10 p-3.5 rounded-xl border border-amber-200 dark:border-amber-500/20">
-                    <div className="text-[11px] font-black text-amber-800 dark:text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <RefreshCw className="size-3.5" /> New Replacement SIM Card Assignment
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1">
-                        New Issued SIM Number <span className="text-rose-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <Hash className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-400" />
-                        <input
-                          type="text"
-                          value={newIssuedSimNumber}
-                          onChange={(e) => setNewIssuedSimNumber(e.target.value)}
-                          placeholder="e.g. 01844-998877"
-                          className="w-full h-9 pl-8 pr-3 text-xs font-mono font-bold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900 dark:text-white"
-                        />
-                      </div>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-1">
-                        Replaces Old SIM Number: {data.simDetails.simNumber || "01844-556677"}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                    Approval Remark / Remark Notes
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={approvalComment}
-                    onChange={(e) => setApprovalComment(e.target.value)}
-                    placeholder="Enter approval note or rejection reasons..."
-                    className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all resize-none"
+              <div className="p-4 md:p-5 flex flex-col md:flex-row items-center md:items-start gap-5">
+                {/* Left Employee Photo / Avatar */}
+                <div className="w-20 h-20 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shrink-0 shadow-2xs">
+                  <img
+                    src={
+                      data.employee.avatarUrl ||
+                      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&auto=format&fit=crop&q=80"
+                    }
+                    alt={data.employee.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLElement).style.display = "none";
+                    }}
                   />
                 </div>
-              </div>
-            </div>
-          </div>
 
-          {/* APPROVAL WORKFLOW SIGNATURES (MOVED UNDER COMMENTS & APPROVER ACTION CONTROLS) */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
-            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
-              <div className="w-6 h-6 rounded-md bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center font-bold text-xs shrink-0">
-                <UserCheck className="w-3.5 h-3.5" />
-              </div>
-              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                Multi-Stage Approval Hierarchy & Signatures
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {(
-                data.timeline || [
-                  {
-                    stage: "STAGE 1: DEPARTMENT HEAD",
-                    roleLabel: "STAGE 1",
-                    approverName: "Md. Tanvir Rahman",
-                    approverDesignation: "Head of IT & Operations",
-                    status: "approved",
-                    date: "2026-09-21 10:30 AM",
-                  },
-                  {
-                    stage: "STAGE 2: TELECOM ADMIN",
-                    roleLabel: "STAGE 2",
-                    approverName: "Farhana Sharmin",
-                    approverDesignation: "Sr. Telecom & Assets Officer",
-                    status: "approved",
-                    date: "2026-09-21 02:15 PM",
-                  },
-                  {
-                    stage: "STAGE 3: GENERAL HR ADMIN",
-                    roleLabel: "STAGE 3",
-                    approverName: "Khairul Bashar Masum",
-                    approverDesignation: "Manager - HR & Admin",
-                    status:
-                      currentStatus === "Approved"
-                        ? "approved"
-                        : currentStatus === "Rejected"
-                        ? "rejected"
-                        : "pending",
-                    date: currentStatus === "Pending" ? "Pending Approval" : "2026-09-24 11:00 AM",
-                  },
-                ]
-              ).map((step, idx) => (
-                <div
-                  key={idx}
-                  className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 relative space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase">
-                      {step.roleLabel || `STAGE ${idx + 1}`}
-                    </span>
-                    {step.status === "approved" ? (
-                      <span className="inline-flex items-center gap-1 text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-500/20 uppercase">
-                        <CheckCircle2 className="size-3" /> Approved
+                {/* 3-Column Info Grid */}
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2.5 text-xs">
+                  {/* Column 1 */}
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Employee Name:
                       </span>
-                    ) : step.status === "rejected" ? (
-                      <span className="inline-flex items-center gap-1 text-[9px] font-black text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-200 dark:border-rose-500/20 uppercase">
-                        <XCircle className="size-3" /> Rejected
+                      <p className="font-bold text-slate-800 dark:text-slate-100 mt-0.5">
+                        {data.employee.name || "Ruhul Amin"}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Department:
                       </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-[9px] font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-500/20 uppercase">
-                        <Clock className="size-3" /> Pending
+                      <p className="font-semibold text-slate-700 dark:text-slate-200 mt-0.5">
+                        {data.employee.department || "Implementation & Business Analysis"}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Location:
                       </span>
-                    )}
+                      <p className="font-semibold text-slate-700 dark:text-slate-200 mt-0.5">
+                        {data.employee.location || "PSL-Operation"}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Requisition By:
+                      </span>
+                      <p className="font-semibold text-slate-700 dark:text-slate-200 mt-0.5">
+                        {data.employee.requisitionBy || `${data.employee.name} (Manager)`}
+                      </p>
+                    </div>
                   </div>
 
-                  <div>
-                    <h4 className="text-xs font-black text-slate-900 dark:text-white">
-                      {step.approverName}
-                    </h4>
-                    <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
-                      {step.approverDesignation}
+                  {/* Column 2 */}
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Employee ID:
+                      </span>
+                      <p className="font-mono font-bold text-slate-800 dark:text-slate-100 mt-0.5">
+                        {data.employee.id || "2026062074"}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Section:
+                      </span>
+                      <p className="font-semibold text-slate-700 dark:text-slate-200 mt-0.5">
+                        {data.employee.section || "Business Analysis"}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Business Unit:
+                      </span>
+                      <p className="font-semibold text-slate-700 dark:text-slate-200 mt-0.5">
+                        {data.employee.businessUnit || "PSL"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Column 3 */}
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Designation:
+                      </span>
+                      <p className="font-bold text-slate-800 dark:text-slate-100 mt-0.5">
+                        {data.employee.designation || "Manager"}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Date of Joining:
+                      </span>
+                      <p className="font-semibold text-slate-700 dark:text-slate-200 mt-0.5">
+                        {data.employee.joiningDate || "03/10/2026"}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Contact:
+                      </span>
+                      <p className="font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
+                        {data.employee.contact || "—"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── CARD 2: MAIN DATA TABLE (Exact Columns: SL, Request For, Justification, Sim Number, Existing Limit, Expected Limit, Approved Limit, Documents, Issue Status) ── */}
+            <div className="rounded-xl border border-slate-200/90 dark:border-slate-800 overflow-hidden shadow-2xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50/70 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider text-[10px] font-bold">
+                      <th className="px-4 py-3 text-center w-12">SL</th>
+                      <th className="px-4 py-3">REQUEST FOR</th>
+                      <th className="px-4 py-3">JUSTIFICATION</th>
+                      <th className="px-4 py-3">SIM NUMBER</th>
+                      <th className="px-4 py-3">EXISTING LIMIT</th>
+                      <th className="px-4 py-3">EXPECTED LIMIT</th>
+                      <th className="px-4 py-3">APPROVED LIMIT</th>
+                      <th className="px-4 py-3 text-center">DOCUMENTS</th>
+                      <th className="px-4 py-3 text-center">ISSUE STATUS</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-200">
+                    <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                      <td className="px-4 py-3.5 text-center font-bold text-slate-500">1</td>
+                      <td className="px-4 py-3.5 font-bold text-slate-900 dark:text-white">
+                        {data.requestType}
+                      </td>
+                      <td className="px-4 py-3.5 text-slate-600 dark:text-slate-300 italic">
+                        "{data.simDetails.justification || "Office use"}"
+                      </td>
+                      <td className="px-4 py-3.5 font-mono text-slate-500">
+                        {assignedSimNumber && assignedSimNumber !== "—"
+                          ? assignedSimNumber
+                          : data.simDetails.simNumber || "—"}
+                      </td>
+                      <td className="px-4 py-3.5 font-mono text-slate-600 dark:text-slate-300">
+                        {data.simDetails.existingLimit
+                          ? data.simDetails.existingLimit.toLocaleString()
+                          : "1000"}
+                      </td>
+                      <td className="px-4 py-3.5 font-mono text-slate-500">
+                        {data.simDetails.expectedLimit
+                          ? data.simDetails.expectedLimit.toLocaleString()
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3.5 font-mono font-bold text-slate-900 dark:text-white">
+                        {approvedBalanceAmount
+                          ? Number(approvedBalanceAmount).toLocaleString()
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3.5 text-center text-slate-400">
+                        {data.simDetails.attachmentName ? (
+                          <span className="text-blue-600 underline font-semibold cursor-pointer">
+                            {data.simDetails.attachmentName}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5 text-center">
+                        <span
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            currentStatus === "Approved"
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400"
+                              : "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400"
+                          }`}
+                        >
+                          {currentStatus === "Approved" ? "Issued" : "Pending"}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* ── CARD 3: APPROVAL WORKFLOW & SIGNATURES (Exact Image 1) ── */}
+            <div className="rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-2xs">
+              <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex items-center gap-2">
+                <FileCheck2 className="size-4 text-sky-600 dark:text-sky-400" />
+                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  Approval Workflow & Signatures
+                </span>
+              </div>
+
+              <div className="p-4 md:p-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                  {approvalWorkflowCards.map((card, idx) => {
+                    const isApproved = card.status === "APPROVED";
+                    return (
+                      <div
+                        key={idx}
+                        className={`rounded-xl border flex flex-col justify-between overflow-hidden transition-all ${
+                          isApproved
+                            ? "border-emerald-200/90 bg-emerald-50/20 dark:border-emerald-800/40 dark:bg-emerald-950/10"
+                            : "border-amber-200/90 bg-amber-50/20 dark:border-amber-800/40 dark:bg-amber-950/10"
+                        }`}
+                      >
+                        {/* Card Top: Role and Status Badge */}
+                        <div className="p-3 pb-2 flex items-center justify-between">
+                          <span
+                            className={`text-[10px] font-extrabold uppercase tracking-wider ${
+                              isApproved ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"
+                            }`}
+                          >
+                            {card.roleTitle}
+                          </span>
+                          <span
+                            className={`inline-flex items-center gap-1 text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                              isApproved
+                                ? "text-emerald-700 dark:text-emerald-300 bg-emerald-100/60 dark:bg-emerald-900/40"
+                                : "text-amber-700 dark:text-amber-300 bg-amber-100/60 dark:bg-amber-900/40"
+                            }`}
+                          >
+                            {isApproved ? (
+                              <CheckCircle2 className="size-3 text-emerald-600 dark:text-emerald-400" />
+                            ) : (
+                              <Hourglass className="size-3 text-amber-600 dark:text-amber-400" />
+                            )}
+                            {card.status}
+                          </span>
+                        </div>
+
+                        {/* Officer Name & Designation */}
+                        <div className="px-3 py-1 space-y-0.5">
+                          <p className="font-bold text-slate-800 dark:text-slate-100 text-xs truncate">
+                            {card.name}
+                          </p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                            {card.designation}
+                          </p>
+                          <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-tight truncate">
+                            {card.department}
+                          </p>
+                        </div>
+
+                        {/* Card Bottom Time Bar */}
+                        <div
+                          className={`mt-3 px-3 py-1.5 text-[10px] font-mono flex items-center justify-between border-t ${
+                            isApproved
+                              ? "bg-emerald-100/50 border-emerald-200/60 text-emerald-800 dark:bg-emerald-950/30 dark:border-emerald-800/30 dark:text-emerald-300"
+                              : "bg-amber-100/50 border-amber-200/60 text-amber-800 dark:bg-amber-950/30 dark:border-amber-800/30 dark:text-amber-300"
+                          }`}
+                        >
+                          <span>{card.time}</span>
+                          <span>{card.date}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* ── CARD 4: COMMENTS & APPROVER ACTION CONTROLS (Exact Image 1) ── */}
+            <div className="rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-2xs space-y-4">
+              <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex items-center gap-2">
+                <MessageSquare className="size-4 text-purple-600 dark:text-purple-400" />
+                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  COMMENTS & APPROVER ACTION CONTROLS
+                </span>
+              </div>
+
+              <div className="p-4 md:p-6 space-y-6">
+                {/* Audit Comments History */}
+                <div className="space-y-3">
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                    AUDIT COMMENTS HISTORY
+                  </span>
+
+                  {commentsList.length === 0 ? (
+                    <div className="py-6 text-center text-xs font-semibold text-slate-400 dark:text-slate-500">
+                      No comments or approval notes yet.
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {commentsList.map((c) => (
+                        <div
+                          key={c.id}
+                          className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800 text-xs space-y-1"
+                        >
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="font-bold text-slate-800 dark:text-slate-200">
+                              {c.authorName} ({c.authorRole})
+                            </span>
+                            <span className="text-slate-400">{c.timestamp}</span>
+                          </div>
+                          <p className="text-slate-600 dark:text-slate-300">{c.comment}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Approver Input & Decision Controls */}
+                <div className="rounded-xl border border-indigo-100 dark:border-indigo-950/60 bg-indigo-50/30 dark:bg-indigo-950/10 p-5 space-y-4">
+                  <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-300">
+                    <Info className="size-4" />
+                    <span className="text-xs font-bold uppercase tracking-wider">
+                      APPROVER INPUT & DECISION CONTROLS
+                    </span>
+                  </div>
+
+                  {/* Approved Balance Limit Card */}
+                  <div className="bg-white dark:bg-slate-900 rounded-xl border border-indigo-100 dark:border-indigo-900/40 p-4 space-y-2.5 shadow-2xs">
+                    <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                      <TrendingUp className="size-4" />
+                      <span className="text-xs font-bold uppercase tracking-wide">
+                        APPROVED BALANCE LIMIT AMOUNT
+                      </span>
+                    </div>
+
+                    <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block">
+                      APPROVED BALANCE LIMIT (BDT) <span className="text-rose-500">*</span>
+                    </label>
+
+                    <div className="relative max-w-md">
+                      <CreditCard className="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="number"
+                        value={approvedBalanceAmount}
+                        onChange={(e) => setApprovedBalanceAmount(e.target.value)}
+                        placeholder="1000"
+                        className="w-full h-10 pl-9 pr-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      />
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                      Current: BDT 1,000 → Requested: BDT 0
                     </p>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-[9.5px] font-bold text-slate-400">
-                    <span>Date: {step.date}</span>
-                    <ShieldCheck className="size-3 text-teal-500" />
-                  </div>
+                  {/* Comment & Decision Buttons (if Pending) */}
+                  {currentStatus === "Pending" && (
+                    <div className="space-y-3 pt-2">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">
+                          Approval / Rejection Remark
+                        </label>
+                        <textarea
+                          value={approvalComment}
+                          onChange={(e) => setApprovalComment(e.target.value)}
+                          placeholder="Add comment or approval instruction..."
+                          rows={2}
+                          className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={handleApprove}
+                          className="flex-1 h-9 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-98 cursor-pointer"
+                        >
+                          <CheckCircle2 className="size-4" />
+                          <span>Approve Requisition</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleReject}
+                          className="flex-1 h-9 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer"
+                        >
+                          <XCircle className="size-4" />
+                          <span>Reject Requisition</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* STICKY APPROVAL ACTION FOOTER (PINNED TO MODAL BOTTOM) */}
-        <div className="px-6 py-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 shadow-lg shrink-0 z-20">
-          <div className="flex items-center gap-2.5">
-            <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-              Requisition Status:
-            </span>
-            {getStatusBadge(currentStatus)}
-          </div>
-
-          <div className="flex items-center gap-3">
+          {/* Modal Bottom Footer (Exact Image 1) */}
+          <div className="px-6 py-3.5 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <button
-              onClick={handleReject}
-              disabled={currentStatus === "Rejected"}
-              className="px-5 h-10 rounded-xl bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 disabled:opacity-50 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs active:scale-95"
+              type="button"
+              onClick={() => setIsPrintModalOpen(true)}
+              className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-2 transition-all shadow-2xs cursor-pointer"
             >
-              <XCircle className="size-4" /> Reject Request
+              <Printer className="size-3.5 text-blue-600" />
+              <span>Print SIM Application</span>
             </button>
+
             <button
-              onClick={handleApprove}
-              disabled={currentStatus === "Approved"}
-              className="px-6 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 cursor-pointer active:scale-95"
+              type="button"
+              onClick={onClose}
+              className="h-9 px-6 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider transition-all shadow-2xs cursor-pointer"
             >
-              <CheckCircle2 className="size-4" /> Approve Request
+              CLOSE
             </button>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Official SIM Application Print Preview Modal (Image 2) */}
+      <SingleSimPrintModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        data={data}
+        approvedLimit={approvedBalanceAmount}
+        assignedSimNumber={assignedSimNumber}
+      />
+    </>
   );
 }

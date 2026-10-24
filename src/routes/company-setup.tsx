@@ -67,7 +67,7 @@ export const Route = createFileRoute("/company-setup")({
   component: CompanySetupPage,
 });
 
-type TabType = "company" | "area" | "mapping" | "department" | "section" | "unit" | "line" | "holiday" | "payslip" | "organogram";
+export type TabType = "company" | "area" | "mapping" | "department" | "section" | "unit" | "line" | "holiday" | "payslip" | "organogram";
 
 interface PayslipField {
   key: string;
@@ -1651,15 +1651,26 @@ const DEFAULT_HOLIDAYS: DefaultHoliday[] = [
   },
 ];
 
-function CompanySetupPage() {
-  const search = Route.useSearch();
-  const [activeTab, setActiveTab] = useState<TabType>(search.tab || "department");
+export interface CompanySetupViewProps {
+  initialTab?: TabType;
+  embedded?: boolean;
+  onTabChange?: (tab: TabType) => void;
+  onBackToOverview?: () => void;
+}
+
+export function CompanySetupView({
+  initialTab = "department",
+  embedded = false,
+  onTabChange,
+  onBackToOverview,
+}: CompanySetupViewProps) {
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab || "department");
 
   useEffect(() => {
-    if (search.tab) {
-      setActiveTab(search.tab);
+    if (initialTab) {
+      setActiveTab(initialTab);
     }
-  }, [search.tab]);
+  }, [initialTab]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [companyFilter, setCompanyFilter] = useState("all");
@@ -2985,88 +2996,117 @@ function CompanySetupPage() {
     { type: "payslip", label: "Payslip Configuration", icon: Settings },
   ];
 
-  return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
-      <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative">
-        <Topbar />
-
-        <div className="p-4 md:p-6 lg:p-8 space-y-2 max-w-[1800px] mx-auto w-full">
-          {/* Breadcrumb & Header */}
-          <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">
-                  Home
-                </Link>
-                <ChevronRight className="size-3.5" />
-                <span>Configure</span>
-                <ChevronRight className="size-3.5" />
-                <span className="text-primary font-bold">Structure Setup</span>
+  const mainContent = (
+    <>
+      <div className={embedded ? "space-y-3.5 w-full animate-in fade-in duration-200" : "p-4 md:p-6 lg:p-8 space-y-2 max-w-[1800px] mx-auto w-full"}>
+        {/* Breadcrumb & Header */}
+        <div className="bg-card rounded-2xl border border-border/50 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            {embedded ? (
+              <div>
+                {onBackToOverview && (
+                  <button
+                    type="button"
+                    onClick={onBackToOverview}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 transition-colors mb-2 cursor-pointer"
+                  >
+                    <ArrowLeft className="size-3.5" />
+                    <span>Back to Master Overview</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
+                    Organization & Structure
+                  </span>
+                  <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 px-2.5 py-0.5 rounded-full">
+                    Active Master Setup
+                  </span>
+                </div>
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2 mt-1">
+                  <Building2 className="size-6 text-primary" />
+                  Company Management
+                </h1>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Configure departments, sections, units, production lines, designation organograms, default holidays, and payslip layouts.
+                </p>
               </div>
-              <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-                <Building2 className="size-6 text-primary" />
-                Company Setup
-              </h1>
-            </div>
-            {!(activeTab === "payslip" && isConfiguringTemplate) && (
-              <div className="flex flex-col sm:flex-row items-center gap-2">
-                <button
-                  onClick={() => {
-                    setCopySourceCompany("");
-                    setCopyTargetCompany(companyFilter === "all" ? "" : companyFilter);
-                    setSelectedCopyItems([]);
-                    setIsCopyModalOpen(true);
-                  }}
-                  className="h-10 px-4 rounded-xl bg-muted text-foreground border border-border/60 font-semibold text-sm shadow-sm hover:bg-muted/80 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
-                >
-                  <Layers className="size-4.5 text-blue-500" /> Copy From...
-                </button>
-                <button
-                  onClick={() => {
-                    if (activeTab === "payslip") {
-                      setTplTitle("");
-                      setTplCompany(orgs[0]?.nameEng || "Pakiza Software Limited");
-                      setTplEmpType("Worker");
-                      setTplOtType("2hrs OT");
-                      setIsCreateTplOpen(true);
-                    } else if (activeTab === "organogram") {
-                      openDesigModal(null);
-                    } else {
-                      openForm(null);
-                    }
-                  }}
-                  className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
-                >
-                  <Plus className="size-4.5" /> Add New Record
-                </button>
-              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
+                  <Link to="/" className="hover:text-primary transition-colors">
+                    Home
+                  </Link>
+                  <ChevronRight className="size-3.5" />
+                  <span>Configure</span>
+                  <ChevronRight className="size-3.5" />
+                  <span className="text-primary font-bold">Structure Setup</span>
+                </div>
+                <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                  <Building2 className="size-6 text-primary" />
+                  Company Setup
+                </h1>
+              </>
             )}
           </div>
+          {!(activeTab === "payslip" && isConfiguringTemplate) && (
+            <div className="flex flex-col sm:flex-row items-center gap-2">
+              <button
+                onClick={() => {
+                  setCopySourceCompany("");
+                  setCopyTargetCompany(companyFilter === "all" ? "" : companyFilter);
+                  setSelectedCopyItems([]);
+                  setIsCopyModalOpen(true);
+                }}
+                className="h-10 px-4 rounded-xl bg-muted text-foreground border border-border/60 font-semibold text-sm shadow-sm hover:bg-muted/80 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Layers className="size-4.5 text-blue-500" /> Copy From...
+              </button>
+              <button
+                onClick={() => {
+                  if (activeTab === "payslip") {
+                    setTplTitle("");
+                    setTplCompany(orgs[0]?.nameEng || "Pakiza Software Limited");
+                    setTplEmpType("Worker");
+                    setTplOtType("2hrs OT");
+                    setIsCreateTplOpen(true);
+                  } else if (activeTab === "organogram") {
+                    openDesigModal(null);
+                  } else {
+                    openForm(null);
+                  }
+                }}
+                className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Plus className="size-4.5" /> Add New Record
+              </button>
+            </div>
+          )}
+        </div>
 
-          {/* Horizontal Master Tabs */}
-          <div className="flex flex-wrap gap-2 pt-2 pb-5 border-b border-border/40 mb-4">
-            {tabsList.map((tab) => {
-              const TabIcon = tab.icon;
-              const isActive = activeTab === tab.type;
-              return (
-                <button
-                  key={tab.type}
-                  onClick={() => {
-                    setActiveTab(tab.type);
-                    setSearchQuery("");
-                  }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all ${isActive
-                    ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                    : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
-                    }`}
-                >
-                  <TabIcon className="size-4" />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+        {/* Horizontal Master Tabs */}
+        <div className="flex flex-wrap gap-2 pt-2 pb-5 border-b border-border/40 mb-4">
+          {tabsList.map((tab) => {
+            const TabIcon = tab.icon;
+            const isActive = activeTab === tab.type;
+            return (
+              <button
+                key={tab.type}
+                onClick={() => {
+                  setActiveTab(tab.type);
+                  setSearchQuery("");
+                  onTabChange?.(tab.type);
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all cursor-pointer ${isActive
+                  ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                  : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
+                  }`}
+              >
+                <TabIcon className="size-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
 
           {/* Search bar & Actions toolbar */}
           {activeTab !== "payslip" && (
@@ -7517,7 +7557,25 @@ function CompanySetupPage() {
           </div>
         </div>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return <div className="w-full relative">{mainContent}</div>;
+  }
+
+  return (
+    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
+      <Sidebar />
+      <main className="flex-1 min-w-0 flex flex-col relative">
+        <Topbar />
+        {mainContent}
       </main>
     </div>
   );
+}
+
+function CompanySetupPage() {
+  const search = Route.useSearch();
+  return <CompanySetupView initialTab={search.tab || "department"} />;
 }

@@ -75,6 +75,12 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/set-manager",
     description: "Bulk assign reporting managers to employees",
   },
+  {
+    label: "Change Employee Status",
+    parent: "Personnel Info",
+    to: "/change-employee-status",
+    description: "Manage employee probation status, confirmation dates, and make permanent",
+  },
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
   { label: "Personnel QR Scanner", parent: "Personnel Info", to: "/" },
@@ -341,6 +347,12 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/recruitment-basic-list",
     description: "List of candidates",
   },
+  {
+    label: "Candidate Selection",
+    parent: "e-Recruitment",
+    to: "/recruitment-candidate-selection",
+    description: "Job-wise candidate review, selection & link generation",
+  },
   // {
   //   label: "Approved Candidates",
   //   parent: "e-Recruitment",
@@ -426,6 +438,12 @@ const searchableMenus: SearchMenuLink[] = [
     parent: "HR Approvals",
     to: "/kpi-approval",
     description: "HRD final evaluation & pending KPI approvals workflow dashboard",
+  },
+  {
+    label: "Personal Info Approval",
+    parent: "HR Approvals",
+    to: "/personal-info-approval",
+    description: "Review and approve employee personal info changes with before/after diff",
   },
   // Configure
   {

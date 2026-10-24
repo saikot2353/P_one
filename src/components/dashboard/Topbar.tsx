@@ -92,6 +92,12 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/set-manager",
     description: "Bulk assign reporting managers to employees",
   },
+  {
+    label: "Change Employee Status",
+    parent: "Personnel Info",
+    to: "/change-employee-status",
+    description: "Manage employee probation status, confirmation dates, and make permanent",
+  },
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
   { label: "Personnel QR Scanner", parent: "Personnel Info", to: "/" },
@@ -160,6 +166,12 @@ const searchableMenus: SearchMenuLink[] = [
     parent: "Configure",
     to: "/maternity-configuration",
     description: "Configure maternity leave effective cutoff dates and wage basis rules (Gross Pay vs Net Pay)",
+  },
+  {
+    label: "Lunch Rate Festival",
+    parent: "Configure",
+    to: "/lunch-rate-festival",
+    description: "Configure and manage festival lunch rates for employees across departments and sections",
   },
   // Separation Module
   {
@@ -323,6 +335,9 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Overtime Requests", parent: "Manage Overtime", to: "/" },
   { label: "OT Calculations", parent: "Manage Overtime", to: "/" },
   { label: "OT Approvals", parent: "Manage Overtime", to: "/" },
+  { label: "Lunce Requisition", parent: "Manage Overtime", to: "/lunch-requisition" },
+  { label: "Lunch Requisition", parent: "Manage Overtime", to: "/lunch-requisition" },
+  { label: "Festival Allowance", parent: "Manage Overtime", to: "/festival-allowance" },
   // Manage Allowance
   { label: "Allowance Setup", parent: "Manage Allowance", to: "/" },
   { label: "Employee Allowance", parent: "Manage Allowance", to: "/" },
@@ -334,6 +349,18 @@ const searchableMenus: SearchMenuLink[] = [
     parent: "Approvals",
     to: "/pending-approvals",
     description: "Track all pending requisitions and see who each approval is currently pending to",
+  },
+  {
+    label: "Work Flow",
+    parent: "Approvals",
+    to: "/work-flows",
+    description: "Multi-level approval workflow configuration, layer points, and approver assignment",
+  },
+  {
+    label: "Sync Requisition",
+    parent: "Approvals",
+    to: "/sync-requisition",
+    description: "Synchronize requisition workflow layers and re-bind approvals to active organizational layers",
   },
   {
     label: "Salary Submit",
@@ -478,6 +505,12 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/recruitment-basic-list",
     description: "List of candidates",
   },
+  {
+    label: "Candidate Selection",
+    parent: "e-Recruitment",
+    to: "/recruitment-candidate-selection",
+    description: "Job-wise candidate review, selection & link generation",
+  },
   // {
   //   label: "Approved Candidates",
   //   parent: "e-Recruitment",
@@ -569,6 +602,30 @@ const searchableMenus: SearchMenuLink[] = [
     parent: "HR Approvals",
     to: "/kpi-approval",
     description: "HRD final evaluation & pending KPI approvals workflow dashboard",
+  },
+  {
+    label: "Personal Info Approval",
+    parent: "HR Approvals",
+    to: "/personal-info-approval",
+    description: "Review and approve employee personal info changes with before/after diff",
+  },
+  {
+    label: "Lunce Requisition approval",
+    parent: "HR Approvals",
+    to: "/lunch-requisition-approval",
+    description: "Review, audit, and approve submitted employee lunch requisitions",
+  },
+  {
+    label: "Lunch Requisition Approval",
+    parent: "HR Approvals",
+    to: "/lunch-requisition-approval",
+    description: "Review, audit, and approve submitted employee lunch requisitions",
+  },
+  {
+    label: "Festival Allowance Approval",
+    parent: "HR Approvals",
+    to: "/festival-allowance-approval",
+    description: "Review, audit, and approve submitted festival holiday allowance claims",
   },
   // Configure
   {

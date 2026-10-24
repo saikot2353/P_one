@@ -34,6 +34,10 @@ import {
   TrendingDown,
   Info
 } from "lucide-react";
+import {
+  SingleLoanPrintModal,
+  AllLoansPrintModal
+} from "@/components/payroll/LoanPrintModals";
 
 export const Route = createFileRoute("/loan-application")({
   head: () => ({
@@ -74,6 +78,32 @@ interface LoanApplication {
 }
 
 const DEFAULT_LOANS: LoanApplication[] = [
+  {
+    id: 101,
+    empId: "2018010173",
+    empName: "Md. Golam Mowdud",
+    section: "Inventory Management",
+    designation: "Manager",
+    unit: "Knit Dyeing",
+    grade: "Office Executive",
+    basicSalary: 42000,
+    grossSalary: 65000,
+    areaName: "PAL-Fabric Dyeing",
+    joinDate: "01/02/2018",
+    expLoanAmount: 50000,
+    appLoanAmt: 50000,
+    installments: 10,
+    installmentAmt: 5000,
+    reason: "Dear Sir, This loan is required for his wife's Cesarean (Baby Delivery) Surgery purpose.",
+    status: "Approved",
+    applicationDate: "2026-08-15",
+    approvalFlow: [
+      { stage: "Prepared By", status: "Approved", date: "2026-08-15", officer: "Khondokar Momenur Rahman" },
+      { stage: "HOD Approved By", status: "Approved", date: "2026-08-16", officer: "Khondokar Momenur Rahman" },
+      { stage: "HR Operations", status: "Approved", date: "2026-09-01", officer: "Md. Shafiul Alam" },
+      { stage: "Approved By", status: "Approved", date: "2026-10-03", officer: "Rakibul Islam Khan" }
+    ]
+  },
   {
     id: 1,
     empId: "2023043910",
@@ -153,6 +183,7 @@ const DEFAULT_LOANS: LoanApplication[] = [
 
 // Mock database of employees to fetch details during loan setup
 const LOOKUP_EMPLOYEES = [
+  { empId: "2018010173", name: "Md. Golam Mowdud", section: "Inventory Management", designation: "Manager", unit: "Knit Dyeing", grade: "Office Executive", line: "Line-C", basicSalary: 42000, grossSalary: 65000, joiningDate: "01/02/2018", areaName: "PAL-Fabric Dyeing" },
   { empId: "2023043910", name: "Tahmid Afsar", section: "Software Development", designation: "Software Engineer", unit: "IT Division", grade: "Grade 3", line: "Line-A", basicSalary: 45000, grossSalary: 75000, joiningDate: "01/08/2023", areaName: "PSL-Operation" },
   { empId: "2023046001", name: "Sohanur Rahman Sohan", section: "Accounts & VAT", designation: "Executive", unit: "Finance Division", grade: "Grade 4", line: "Line-B", basicSalary: 30000, grossSalary: 50000, joiningDate: "15/02/2023", areaName: "PSL-Operation" },
   { empId: "2024049326", name: "Hanif Uddin", section: "Apps Infrastructure", designation: "Sr. Executive", unit: "IT Division", grade: "Grade 2", line: "N/A", basicSalary: 36000, grossSalary: 60000, joiningDate: "10/11/2024", areaName: "PSL-Operation" },
@@ -163,9 +194,14 @@ function LoanApplicationPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [loans, setLoans] = useState<LoanApplication[]>(DEFAULT_LOANS);
 
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(true);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [viewingLoan, setViewingLoan] = useState<LoanApplication | null>(null);
+
+  // Print Modals State
+  const [selectedPrintLoan, setSelectedPrintLoan] = useState<LoanApplication | null>(null);
+  const [isSinglePrintOpen, setIsSinglePrintOpen] = useState(false);
+  const [isAllLoansPrintOpen, setIsAllLoansPrintOpen] = useState(false);
 
   // Form State
   const [empIdInput, setEmpIdInput] = useState("");
@@ -190,8 +226,13 @@ function LoanApplicationPage() {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setLoans(parsed);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const hasImageLoan = parsed.some((p: any) => p.empId === "2018010173");
+          if (!hasImageLoan) {
+            setLoans([...DEFAULT_LOANS.slice(0, 1), ...parsed]);
+          } else {
+            setLoans(parsed);
+          }
         }
       } catch (e) {
         console.error("Failed to load loan applications from localStorage", e);
@@ -206,6 +247,47 @@ function LoanApplicationPage() {
       localStorage.setItem("payroll_loan_applications", JSON.stringify(loans));
     }
   }, [loans, isMounted]);
+
+  // Support direct URL query triggers e.g. /loan-application?print=single or ?print=all
+  useEffect(() => {
+    if (typeof window !== "undefined" && isMounted && loans.length > 0) {
+      const params = new URLSearchParams(window.location.search);
+      const printParam = params.get("print") || params.get("view");
+      if (printParam === "single" || printParam === "application" || printParam === "form") {
+        const found = loans.find(l => l.empId === "2018010173") || loans[0];
+        setSelectedPrintLoan(found);
+        setIsSinglePrintOpen(true);
+      } else if (printParam === "all" || printParam === "list" || printParam === "pdf") {
+        setIsAllLoansPrintOpen(true);
+      }
+    }
+  }, [isMounted, loans]);
+
+  // Export CSV handler for Excel
+  const handleExportExcel = () => {
+    if (filteredLoans.length === 0) {
+      alert("No loan records to export.");
+      return;
+    }
+    const headers = ["SL", "Loan Date", "Employee Name", "Loan ID", "Amount", "Remarks"];
+    const rows = filteredLoans.map((l, idx) => [
+      idx + 1,
+      l.applicationDate,
+      `"${l.empName.replace(/"/g, '""')}"`,
+      `"LN-${String(l.id).padStart(4, "0")}"`,
+      l.status === "Approved" ? l.appLoanAmt : l.expLoanAmount,
+      `"${(l.reason || "").replace(/"/g, '""')} [${l.status}]"`
+    ]);
+    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `All_Loans_Register_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Derived calculation
   const calculatedInstallmentAmt = useMemo(() => {
@@ -343,7 +425,33 @@ function LoanApplicationPage() {
                 </p>
               </div>
 
-              <div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                {/* Direct Single Loan Print Preview Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const sample = loans.find(l => l.empId === "2018010173") || loans[0];
+                    setSelectedPrintLoan(sample);
+                    setIsSinglePrintOpen(true);
+                  }}
+                  className="h-11 px-4 rounded-xl border-emerald-200 text-emerald-800 bg-emerald-50/70 hover:bg-emerald-100 font-bold text-xs flex items-center gap-2 shadow-xs cursor-pointer transition-all"
+                  title="Preview Single Loan Application Print Layout (Pakiza Apparels)"
+                >
+                  <Printer className="size-4 text-emerald-600" />
+                  <span>Loan Application Print</span>
+                </Button>
+
+                {/* Direct All Loans PDF Print Preview Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => setIsAllLoansPrintOpen(true)}
+                  className="h-11 px-4 rounded-xl border-rose-200 text-rose-800 bg-rose-50/70 hover:bg-rose-100 font-bold text-xs flex items-center gap-2 shadow-xs cursor-pointer transition-all"
+                  title="Preview All Loans List PDF Print Layout (SL, Name, Date, Amount, Remarks)"
+                >
+                  <FileText className="size-4 text-rose-600" />
+                  <span>All Loans PDF Print</span>
+                </Button>
+
                 {/* Apply Loan Modal Button */}
                 <Dialog open={isApplyModalOpen} onOpenChange={setIsApplyModalOpen}>
                   <Button
@@ -355,9 +463,9 @@ function LoanApplicationPage() {
                       setLoanReason("");
                       setIsApplyModalOpen(true);
                     }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 px-6 rounded-xl transition-all shadow-md shadow-blue-500/10 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 px-5 rounded-xl transition-all shadow-md shadow-blue-500/10 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-xs"
                   >
-                    <Plus className="size-5" />
+                    <Plus className="size-4" />
                     APPLY FOR LOAN
                   </Button>
 
@@ -548,17 +656,35 @@ function LoanApplicationPage() {
             {/* Action buttons bar */}
             <div className="p-4 border-b border-slate-100 bg-slate-50/40 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
               <div className="flex bg-slate-100/80 border border-slate-200/50 rounded-xl p-1 w-fit shadow-xs">
-                <Button variant="ghost" size="sm" className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleExportExcel}
+                  className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                  title="Export Filtered Loans to Excel CSV"
+                >
                   <FileDown className="size-4 text-emerald-600" />
                   EXCEL
                 </Button>
                 <div className="w-px bg-slate-200 my-1.5" />
-                <Button variant="ghost" size="sm" className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsAllLoansPrintOpen(true)}
+                  className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                  title="Print All Loans Summary List"
+                >
                   <Printer className="size-4 text-blue-600" />
                   PRINT
                 </Button>
                 <div className="w-px bg-slate-200 my-1.5" />
-                <Button variant="ghost" size="sm" className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsAllLoansPrintOpen(true)}
+                  className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                  title="Export All Loans List as PDF"
+                >
                   <FileText className="size-4 text-rose-600" />
                   PDF
                 </Button>
@@ -595,7 +721,7 @@ function LoanApplicationPage() {
                       <thead className="text-[11px] uppercase tracking-wider font-extrabold text-slate-500 bg-slate-50/50 border-b border-slate-200/80">
                         <tr>
                           <th className="px-4 py-3.5 border-r border-slate-100 text-center w-12">Sl</th>
-                          <th className="px-4 py-3.5 border-r border-slate-100 text-center w-16">Details</th>
+                          <th className="px-4 py-3.5 border-r border-slate-100 text-center w-24">Actions</th>
                           <th className="px-4 py-3.5 border-r border-slate-100">Emp Id</th>
                           <th className="px-4 py-3.5 border-r border-slate-100">Employee Name</th>
                           <th className="px-4 py-3.5 border-r border-slate-100">Area Name</th>
@@ -617,16 +743,28 @@ function LoanApplicationPage() {
                             <tr key={row.id} className="hover:bg-slate-50/50 transition-colors group">
                               <td className="px-4 py-3 text-slate-400 text-center border-r border-slate-100 font-bold">{index + 1}</td>
                               <td className="px-4 py-3 text-center border-r border-slate-100">
-                                <button
-                                  onClick={() => {
-                                    setViewingLoan(row);
-                                    setViewDialogTab("summary");
-                                  }}
-                                  className="bg-blue-50 text-blue-600 p-1.5 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors cursor-pointer shadow-xs"
-                                  title="View Loan Details"
-                                >
-                                  <Search className="size-3.5" strokeWidth={2.5} />
-                                </button>
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <button
+                                    onClick={() => {
+                                      setViewingLoan(row);
+                                      setViewDialogTab("summary");
+                                    }}
+                                    className="bg-blue-50 text-blue-600 p-1.5 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors cursor-pointer shadow-xs"
+                                    title="View Loan Details"
+                                  >
+                                    <Search className="size-3.5" strokeWidth={2.5} />
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setSelectedPrintLoan(row);
+                                      setIsSinglePrintOpen(true);
+                                    }}
+                                    className="bg-emerald-50 text-emerald-600 p-1.5 rounded-lg border border-emerald-100 hover:bg-emerald-100 transition-colors cursor-pointer shadow-xs"
+                                    title="Print Loan Application Form (Pakiza Format)"
+                                  >
+                                    <Printer className="size-3.5" strokeWidth={2.5} />
+                                  </button>
+                                </div>
                               </td>
                               <td className="px-4 py-3 font-semibold text-slate-700 border-r border-slate-100">{row.empId}</td>
                               <td className="px-4 py-3 font-bold text-slate-800 border-r border-slate-100 group-hover:text-blue-600 transition-colors">{row.empName}</td>
@@ -872,13 +1010,15 @@ function LoanApplicationPage() {
               <div className="px-6 py-5 border-t border-slate-100 bg-slate-50/30 flex justify-between items-center">
                 <Button
                   variant="outline"
-                  className="h-10 px-5 text-xs font-bold border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl cursor-pointer"
+                  className="h-10 px-5 text-xs font-bold border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl cursor-pointer flex items-center gap-2"
                   onClick={() => {
-                    window.print();
+                    setSelectedPrintLoan(viewingLoan);
+                    setIsSinglePrintOpen(true);
                   }}
+                  title="Print Official Pakiza Loan Application Form"
                 >
-                  <Printer className="size-4 mr-2" />
-                  Print Details
+                  <Printer className="size-4 text-blue-600" />
+                  Print Loan Application Form
                 </Button>
 
                 <Button
@@ -891,6 +1031,20 @@ function LoanApplicationPage() {
             </DialogContent>
           )}
         </Dialog>
+
+        {/* ── SINGLE LOAN APPLICATION PRINT MODAL (PAKIZA OFFICIAL A4 FORMAT) ── */}
+        <SingleLoanPrintModal
+          isOpen={isSinglePrintOpen}
+          onClose={() => setIsSinglePrintOpen(false)}
+          loan={selectedPrintLoan}
+        />
+
+        {/* ── ALL LOANS LIST PDF PRINT MODAL (SL, EMPLOYEES NAME, LOAN DATE, AMOUNT, REMARKS) ── */}
+        <AllLoansPrintModal
+          isOpen={isAllLoansPrintOpen}
+          onClose={() => setIsAllLoansPrintOpen(false)}
+          loans={filteredLoans}
+        />
       </main>
     </div>
   );

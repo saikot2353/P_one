@@ -23,6 +23,7 @@ import {
   GripVertical,
   Settings,
   Coins,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -40,7 +41,14 @@ export const Route = createFileRoute("/configure-structure")({
   component: StructureSetupPage,
 });
 
-type TabType = "group" | "company" | "area" | "mapping" | "departments" | "sections" | "units" | "lines";
+export type TabType = "group" | "company" | "area" | "mapping" | "departments" | "sections" | "units" | "lines";
+
+export interface StructureSetupViewProps {
+  initialTab?: TabType;
+  embedded?: boolean;
+  onTabChange?: (tab: TabType) => void;
+  onBackToOverview?: () => void;
+}
 
 // ----------------------------------------------------
 // Interfaces
@@ -1376,8 +1384,20 @@ const DEFAULT_COMPANY_SETTINGS: CompanyBasicSettings = {
   lateTimeCalculation: "Late Time",
 };
 
-function StructureSetupPage() {
-  const [activeTab, setActiveTab] = useState<TabType>("group");
+export function StructureSetupView({
+  initialTab = "group",
+  embedded = false,
+  onTabChange,
+  onBackToOverview,
+}: StructureSetupViewProps) {
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab || "group");
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+
   const [searchQuery, setSearchQuery] = useState("");
 
   // Lists State
@@ -1406,12 +1426,12 @@ function StructureSetupPage() {
 
   // Load from LocalStorage
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (!embedded && typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get("tab") as TabType;
       if (
         tabParam &&
-        ["company", "area", "mapping", "department", "section", "unit", "line"].includes(tabParam)
+        ["group", "company", "area", "mapping", "departments", "sections", "units", "lines"].includes(tabParam)
       ) {
         setActiveTab(tabParam);
       }
@@ -1941,61 +1961,94 @@ function StructureSetupPage() {
     { type: "area", label: "Area Name", icon: MapPin },
   ];
 
-  return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
-      <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative">
-        <Topbar />
+  const content = (
+    <div className={embedded ? "space-y-4 w-full" : "p-4 md:p-6 lg:p-8 space-y-2 max-w-[1800px] mx-auto w-full"}>
+      {/* Breadcrumb & Header */}
+      {embedded ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => onBackToOverview?.()}
+              className="inline-flex items-center gap-2 text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="size-4" />
+              <span>Back to Master Overview</span>
+            </button>
+            <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-md">
+              Category: Organization & Structure
+            </span>
+          </div>
 
-        <div className="p-4 md:p-6 lg:p-8 space-y-2 max-w-[1800px] mx-auto w-full">
-          {/* Breadcrumb & Header */}
           <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">
-                  Home
-                </Link>
+                <span>Organization & Structure</span>
                 <ChevronRight className="size-3.5" />
-                <span>Configure</span>
-                <ChevronRight className="size-3.5" />
-                <span className="text-primary font-bold">Structure Setup</span>
+                <span className="text-primary font-bold">Organization Structure Management</span>
               </div>
               <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
                 <Building2 className="size-6 text-primary" />
-                Structure Configuration
+                Organization Structure Management
               </h1>
             </div>
             <button
               onClick={() => openForm(null)}
-              className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+              className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Plus className="size-4.5" /> Add New Record
             </button>
           </div>
-
-          {/* Horizontal Master Tabs */}
-          <div className="flex flex-wrap gap-2 pt-2 pb-5 border-b border-border/40 mb-4">
-            {tabsList.map((tab) => {
-              const TabIcon = tab.icon;
-              const isActive = activeTab === tab.type;
-              return (
-                <button
-                  key={tab.type}
-                  onClick={() => {
-                    setActiveTab(tab.type);
-                    setSearchQuery("");
-                  }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all ${isActive
-                    ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                    : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
-                    }`}
-                >
-                  <TabIcon className="size-4" />
-                  {tab.label}
-                </button>
-              );
-            })}
+        </div>
+      ) : (
+        <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
+              <Link to="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+              <ChevronRight className="size-3.5" />
+              <span>Configure</span>
+              <ChevronRight className="size-3.5" />
+              <span className="text-primary font-bold">Structure Setup</span>
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <Building2 className="size-6 text-primary" />
+              Structure Configuration
+            </h1>
           </div>
+          <button
+            onClick={() => openForm(null)}
+            className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <Plus className="size-4.5" /> Add New Record
+          </button>
+        </div>
+      )}
+
+      {/* Horizontal Master Tabs */}
+      <div className="flex flex-wrap gap-2 pt-2 pb-5 border-b border-border/40 mb-4">
+        {tabsList.map((tab) => {
+          const TabIcon = tab.icon;
+          const isActive = activeTab === tab.type;
+          return (
+            <button
+              key={tab.type}
+              onClick={() => {
+                setActiveTab(tab.type);
+                setSearchQuery("");
+                onTabChange?.(tab.type);
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all cursor-pointer ${isActive
+                ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
+                }`}
+            >
+              <TabIcon className="size-4" />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
 
           {/* Search bar & Actions toolbar */}
           <div className="bg-card rounded-2xl border border-border/50 p-4 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
@@ -2723,7 +2776,10 @@ function StructureSetupPage() {
             </div>
           </div>
         </div>
+  );
 
+  const renderModals = () => (
+    <>
         {/* Master Modal Router */}
         {isFormOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
@@ -4123,7 +4179,30 @@ function StructureSetupPage() {
               </div>
             );
           })()}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="w-full relative">
+        {content}
+        {renderModals()}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
+      <Sidebar />
+      <main className="flex-1 min-w-0 flex flex-col relative">
+        <Topbar />
+        {content}
+        {renderModals()}
       </main>
     </div>
   );
+}
+
+export function StructureSetupPage() {
+  return <StructureSetupView initialTab="group" />;
 }

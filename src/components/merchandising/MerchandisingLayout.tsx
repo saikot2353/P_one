@@ -20,6 +20,7 @@ import {
   Search,
   FileCheck,
   BarChart3,
+  History,
 } from "lucide-react";
 import { ModuleLauncher } from "../dashboard/ModuleLauncher";
 

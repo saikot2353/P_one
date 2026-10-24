@@ -114,10 +114,15 @@ function CheckBonusPage() {
   const [tableSearch, setTableSearch] = useState("");
   const [viewingRecord, setViewingRecord] = useState<ERPBonusRecord | null>(null);
 
+  const [reqPctDrafts, setReqPctDrafts] = useState<Record<string, string>>({});
+  const [bonusDrafts, setBonusDrafts] = useState<Record<string, string>>({});
+
   const handleLoadData = () => {
     setIsLoading(true);
     setTimeout(() => {
       setRecords(erpBonusData);
+      setReqPctDrafts({});
+      setBonusDrafts({});
       setIsLoaded(true);
       setIsLoading(false);
       setSelectedIds([]);
@@ -189,6 +194,64 @@ function CheckBonusPage() {
   const handleUpdateRecordField = (empId: string, field: "feedback", value: string) => {
     setRecords((prev) =>
       prev.map((r) => (r.empId === empId ? { ...r, [field]: value } : r))
+    );
+  };
+
+  const handleUpdateReqPct = (empId: string, valStr: string) => {
+    setReqPctDrafts((prev) => ({ ...prev, [empId]: valStr }));
+    setBonusDrafts((prev) => {
+      const next = { ...prev };
+      delete next[empId];
+      return next;
+    });
+
+    const parsed = parseFloat(valStr);
+    const numPct = isNaN(parsed) ? 0 : Math.max(0, parsed);
+
+    setRecords((prev) =>
+      prev.map((r) => {
+        if (r.empId !== empId) return r;
+        const newBonus = Math.round((r.basic * numPct) / 100);
+        const isFullBank = r.miscBonus === 0 && r.bankBonus > 0;
+        const newBankBonus = isFullBank ? newBonus : Math.min(r.bankBonus, newBonus);
+        const newMiscBonus = Math.max(0, newBonus - newBankBonus);
+        return {
+          ...r,
+          reqPct: numPct,
+          bonusAmount: newBonus,
+          bankBonus: newBankBonus,
+          miscBonus: newMiscBonus,
+        };
+      })
+    );
+  };
+
+  const handleUpdateBonusAmount = (empId: string, valStr: string) => {
+    setBonusDrafts((prev) => ({ ...prev, [empId]: valStr }));
+    setReqPctDrafts((prev) => {
+      const next = { ...prev };
+      delete next[empId];
+      return next;
+    });
+
+    const parsed = parseFloat(valStr);
+    const numBonus = isNaN(parsed) ? 0 : Math.max(0, parsed);
+
+    setRecords((prev) =>
+      prev.map((r) => {
+        if (r.empId !== empId) return r;
+        const newReqPct = r.basic > 0 ? Number(((numBonus / r.basic) * 100).toFixed(2)) : 0;
+        const isFullBank = r.miscBonus === 0 && r.bankBonus > 0;
+        const newBankBonus = isFullBank ? numBonus : Math.min(r.bankBonus, numBonus);
+        const newMiscBonus = Math.max(0, numBonus - newBankBonus);
+        return {
+          ...r,
+          bonusAmount: numBonus,
+          reqPct: newReqPct,
+          bankBonus: newBankBonus,
+          miscBonus: newMiscBonus,
+        };
+      })
     );
   };
 
@@ -448,8 +511,26 @@ function CheckBonusPage() {
                         <td className="py-2 px-3 text-right font-mono font-bold text-slate-900 border-r border-slate-200 text-xs">{r.basic.toLocaleString()}</td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-slate-900 border-r border-slate-200 text-xs">{r.gross.toLocaleString()}</td>
                         <td className="py-2 px-3 text-center font-mono text-slate-700 border-r border-slate-200 text-xs">{r.defaultPct}</td>
-                        <td className="py-2 px-3 text-center font-mono text-slate-800 border-r border-slate-200 text-xs">{r.reqPct.toFixed(2)}</td>
-                        <td className="py-2 px-3 text-right font-mono font-bold text-blue-700 border-r border-slate-200 text-xs">{r.bonusAmount.toLocaleString()}</td>
+                        <td className="py-1 px-1.5 text-center border-r border-slate-200">
+                          <input
+                            type="number"
+                            step="any"
+                            min="0"
+                            value={reqPctDrafts[r.empId] !== undefined ? reqPctDrafts[r.empId] : r.reqPct}
+                            onChange={(e) => handleUpdateReqPct(r.empId, e.target.value)}
+                            className="w-18 h-7 px-1.5 text-center font-mono font-bold text-slate-800 bg-white border border-slate-300 rounded-sm text-xs outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                          />
+                        </td>
+                        <td className="py-1 px-1.5 text-right border-r border-slate-200">
+                          <input
+                            type="number"
+                            step="any"
+                            min="0"
+                            value={bonusDrafts[r.empId] !== undefined ? bonusDrafts[r.empId] : r.bonusAmount}
+                            onChange={(e) => handleUpdateBonusAmount(r.empId, e.target.value)}
+                            className="w-24 h-7 px-2 text-right font-mono font-bold text-blue-700 bg-white border border-slate-300 rounded-sm text-xs outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                          />
+                        </td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-emerald-700 border-r border-slate-200 text-xs">{r.bankBonus.toFixed(2)}</td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-amber-700 border-r border-slate-200 text-xs">{r.miscBonus.toFixed(2)}</td>
                         <td className="py-2 px-3 text-slate-600 border-r border-slate-200 text-xs">{r.notes || "—"}</td>

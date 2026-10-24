@@ -51,6 +51,7 @@ import {
   Loader2,
   AlertTriangle,
   List,
+  UserPlus,
 } from "lucide-react";
 
 export const Route = createFileRoute("/add-employee")({
@@ -72,7 +73,15 @@ const TABS = [
   { id: "verification_documents", label: "Verification & Docs", icon: ShieldCheck },
 ];
 
-function AddEmployeePage() {
+export interface AddEmployeeViewProps {
+  embedded?: boolean;
+  onBackToEmployeeList?: () => void;
+}
+
+export function AddEmployeeView({
+  embedded = false,
+  onBackToEmployeeList,
+}: AddEmployeeViewProps) {
   const [activeTab, setActiveTab] = useState("personal_identity");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileStatusExpanded, setIsProfileStatusExpanded] = useState(true);
@@ -1448,43 +1457,86 @@ function AddEmployeePage() {
 
   const ActiveIcon = TABS.find((t) => t.id === activeTab)?.icon || User;
 
-  return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
-      {/* Sidebar Navigation */}
-      <Sidebar />
-
-      {/* Main Core Container */}
-      <main className="flex-1 min-w-0 flex flex-col relative overflow-hidden">
-        <Topbar />
-
-        {/* Form Body Scrollpane */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-2">
-          {/* Top Panel Breadcrumbs and Title Card */}
-          <div className="bg-card border border-border/80 rounded-lg p-2 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-2">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                <Link to="/" className="hover:text-primary transition-colors">
-                  Home
-                </Link>
-                <ChevronRight className="size-2.5" />
-                <span className="hover:text-primary transition-colors">Personnel Info</span>
-                <ChevronRight className="size-2.5" />
-                <span className="text-foreground">Add Employee File</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="size-2 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
-                <h1 className="text-lg font-extrabold tracking-tight text-foreground">
-                  Add New Employee Digital File
-                </h1>
-              </div>
-            </div>
+  const formBody = (
+    <div className={embedded ? "space-y-3.5 w-full" : "flex-1 overflow-y-auto p-2 space-y-2"}>
+      {/* Top Panel Breadcrumbs and Title Card */}
+      {embedded ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
             <button
-              onClick={handleSave}
-              className="h-9 px-5 rounded-lg bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg hover:opacity-95 transition-all duration-300 flex items-center justify-center gap-1.5 shrink-0"
+              onClick={() => onBackToEmployeeList?.()}
+              type="button"
+              className="inline-flex items-center gap-2 text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 transition-colors cursor-pointer"
             >
-              <Save className="size-4" /> Save Employee Digital File
+              <ArrowLeft className="size-4" />
+              <span>Back to Employee List</span>
             </button>
+            <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-md">
+              Category: People & Contacts
+            </span>
           </div>
+
+          <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
+                <span>People & Contacts</span>
+                <ChevronRight className="size-3.5" />
+                <span>Employee Management</span>
+                <ChevronRight className="size-3.5" />
+                <span className="text-primary font-bold">Add Employee</span>
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                <UserPlus className="size-6 text-primary" />
+                Add New Employee Digital File
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => onBackToEmployeeList?.()}
+                className="h-9.5 px-4 rounded-xl border border-border/70 hover:bg-muted text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                className="h-9.5 px-5 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
+              >
+                <Save className="size-4" /> Save Employee Digital File
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-card border border-border/80 rounded-lg p-2 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+              <Link to="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+              <ChevronRight className="size-2.5" />
+              <span className="hover:text-primary transition-colors">Personnel Info</span>
+              <ChevronRight className="size-2.5" />
+              <span className="text-foreground">Add Employee File</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="size-2 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
+              <h1 className="text-lg font-extrabold tracking-tight text-foreground">
+                Add New Employee Digital File
+              </h1>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleSave}
+            className="h-9 px-5 rounded-lg bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg hover:opacity-95 transition-all duration-300 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+          >
+            <Save className="size-4" /> Save Employee Digital File
+          </button>
+        </div>
+      )}
 
           {/* ===== FORM DIRECTORIES + FORM BODY ===== */}
           {/* ===== FORM DIRECTORIES + FORM BODY ===== */}
@@ -5326,7 +5378,19 @@ function AddEmployeePage() {
             </div>
           </form>
         </div>
-      </main>
+  );
+
+  return (
+    <div className={embedded ? "w-full relative" : "min-h-screen flex bg-background text-foreground transition-colors duration-300"}>
+      {!embedded && <Sidebar />}
+      {!embedded ? (
+        <main className="flex-1 min-w-0 flex flex-col relative overflow-hidden">
+          <Topbar />
+          {formBody}
+        </main>
+      ) : (
+        formBody
+      )}
 
       {/* MISSING ATTACHMENTS WARNING MODAL */}
       {missingAttachments && missingAttachments.length > 0 && (
@@ -5822,12 +5886,25 @@ function AddEmployeePage() {
             </div>
 
             <div className="flex w-full gap-3 border-t border-border/30 pt-4 mt-2">
-              <Link
-                to="/personnel-list"
-                className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition duration-200 flex-1 flex items-center justify-center"
-              >
-                Go to Directory
-              </Link>
+              {embedded && onBackToEmployeeList ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    onBackToEmployeeList();
+                  }}
+                  className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition duration-200 flex-1 flex items-center justify-center cursor-pointer"
+                >
+                  Back to Employee List
+                </button>
+              ) : (
+                <Link
+                  to="/personnel-list"
+                  className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition duration-200 flex-1 flex items-center justify-center"
+                >
+                  Go to Directory
+                </Link>
+              )}
               <button
                 onClick={() => {
                   setShowSuccessModal(false);
@@ -6109,4 +6186,8 @@ function AddEmployeePage() {
       )}
     </div>
   );
+}
+
+export function AddEmployeePage() {
+  return <AddEmployeeView />;
 }

@@ -382,6 +382,13 @@ function PersonnelApprovalPage() {
                 <ArrowRightLeft className="size-3.5" />
                 Status Conversions
               </button>
+              <Link
+                to="/personal-info-approval"
+                className="px-4 py-1.5 text-[10px] font-bold rounded transition-all uppercase tracking-wider flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-[#2563eb] hover:bg-white/50"
+              >
+                <FileCheck className="size-3.5 text-blue-500" />
+                Personal Info Changes
+              </Link>
             </div>
           </div>
 

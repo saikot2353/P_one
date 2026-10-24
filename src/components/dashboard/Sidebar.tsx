@@ -38,6 +38,7 @@ import {
   Megaphone,
   DoorOpen,
   FileSpreadsheet,
+  Smartphone,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -103,6 +104,7 @@ export const nav: NavItem[] = [
       { label: "Leave & Policies", to: "/configure-policies" },
       { label: "Maternity Configuration", to: "/maternity-configuration" },
       { label: "Letter Setup", to: "/configure-letter" },
+      { label: "Lunch rate festival", to: "/lunch-rate-festival" },
     ],
   },
   {
@@ -112,12 +114,15 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "All Approvals", to: "/all-approvals" },
       { label: "All Pending Approval List", to: "/pending-approvals", count: 5 },
+      { label: "Work Flow", to: "/work-flows", count: 6 },
+      { label: "Sync Requisition", to: "/sync-requisition" },
       {
         label: "HR Approvals",
         count: 28,
         subitems: [
           { label: "SSP Approval", to: "/ssp-approval", count: 5 },
           { label: "Personnel Approval", to: "/personnel-approval", count: 2 },
+          { label: "Personal Info Approval", to: "/personal-info-approval", count: 2 },
           { label: "Employee Doc Verification", to: "/employee-doc-verification", count: 4 },
           { label: "Manual Attendance", to: "/pending-manual-attendance", count: 7 },
           {
@@ -138,6 +143,8 @@ export const nav: NavItem[] = [
             count: 2,
           },
           { label: "Overtime Requisitions", to: "/approve-overtime", count: 1 },
+          { label: "Lunce Requisition approval", to: "/lunch-requisition-approval", count: 2 },
+          { label: "Festival Allowance Approval", to: "/festival-allowance-approval", count: 1 },
         ],
       },
       {
@@ -160,6 +167,7 @@ export const nav: NavItem[] = [
       { label: "Employee Doc Issue", to: "/employee-doc-issue" },
       { label: "Set HOD", to: "/set-hod" },
       { label: "Set Manager", to: "/set-manager" },
+      { label: "Change Employee Status", to: "/change-employee-status" },
       { label: "Lefty", to: "/disciplinary-lefty" },
     ],
   },
@@ -246,6 +254,7 @@ export const nav: NavItem[] = [
     icon: UserPlus,
     subitems: [
       { label: "Application Queue", to: "/recruitment-basic-list" },
+      { label: "Candidate Selection", to: "/recruitment-candidate-selection" },
       // { label: "Settings", to: "/recruitment-settings" },
       // { label: "Approved List", to: "/recruitment-assessment-list" },
     ],
@@ -266,7 +275,10 @@ export const nav: NavItem[] = [
   {
     label: "Manage Shift",
     icon: Clock,
-    to: "/shift-control-center",
+    subitems: [
+      { label: "Initial Shift Setup", to: "/shift-control-center" },
+      { label: "Shift Roster Assignment", to: "/shift-roster-assignment" },
+    ],
   },
   {
     label: "Manpower Budget",
@@ -328,6 +340,8 @@ export const nav: NavItem[] = [
         subitems: [
           { label: "Budget Configuration", to: "/zakat-budget-configuration" },
           { label: "Zakat List", to: "/zakat-list" },
+          { label: "Asset Master Data", to: "/zakat-asset-master" },
+          { label: "Zakat Report Report", to: "/zakat-executive-report" },
         ]
       },
       {
@@ -366,6 +380,8 @@ export const nav: NavItem[] = [
       { label: "Submit OT Req", to: "/manage-overtime", search: { tab: "submit" } },
       { label: "Submitted OT List", to: "/manage-overtime", search: { tab: "submitted-list" } },
       { label: "Individual OT Review", to: "/manage-overtime", search: { tab: "individual-review" } },
+      { label: "Lunce Requisition", to: "/lunch-requisition" },
+      { label: "Festival Allowance", to: "/festival-allowance" },
     ],
   },
   {
@@ -449,7 +465,7 @@ export const nav: NavItem[] = [
           { label: "Monthly Salary Details", to: "/monthly-salary-details" },
           { label: "Monthly Lefty Salary Sheet", to: "/monthly-lefty-salary-sheet" },
           { label: "Employee Salary History", to: "/employee-salary-history" },
-          {label: "Monthly Advance Salary Sheet", to: "/monthly-advance-salary-sheet" },
+          { label: "Monthly Advance Salary Sheet", to: "/monthly-advance-salary-sheet" },
           { label: "Summary Salary Sheet", to: "/summary-salary-sheet" },
           { label: "Holiday Summary Sheet", to: "/holiday-summary-sheet" },
           { label: "Yearly Bonus Report", to: "/yearly-bonus-report" },
@@ -458,6 +474,15 @@ export const nav: NavItem[] = [
           { label: "Final Settlement Report", to: "/final-settlement-report" },
         ],
       },
+    ],
+  },
+  {
+    label: "Mobile Billing",
+    icon: Smartphone,
+    subitems: [
+      { label: "Bill Entry", to: "/mobile-billing-entry" },
+      { label: "Department wise billing", to: "/mobile-billing-department" },
+      { label: "Employee wise billing", to: "/mobile-billing-employee" },
     ],
   },
   {
@@ -590,7 +615,7 @@ export function Sidebar() {
         try {
           const parsed = JSON.parse(saved);
           return { ...parsed, ...initial };
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     return initial;
@@ -679,7 +704,7 @@ export function Sidebar() {
             </div>
           </div>
         </div>
-        
+
         <div className="leading-tight">
           <div className="font-extrabold tracking-tight text-[13px] text-sidebar-foreground group-hover:text-primary transition-colors duration-300">
             CRIPTON
@@ -778,7 +803,7 @@ export function Sidebar() {
               <div
                 className={[
                   "overflow-hidden transition-all duration-300 space-y-0.5 pl-3.5 bg-sidebar-accent/25 rounded-xl",
-                  isOpen ? "max-h-[600px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
+                  isOpen ? "max-h-[2500px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
                 ].join(" ")}
               >
                 {item.subitems.map((sub) => {
@@ -830,7 +855,7 @@ export function Sidebar() {
                           className={[
                             "overflow-hidden transition-all duration-300 space-y-0.5 pl-6",
                             isSubOpen
-                              ? "max-h-[300px] opacity-100 py-0.5 mt-0.5"
+                              ? "max-h-[1500px] opacity-100 py-0.5 mt-0.5"
                               : "max-h-0 opacity-0",
                           ].join(" ")}
                         >

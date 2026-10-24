@@ -31,6 +31,7 @@ import {
   Check,
   Smartphone,
   DoorOpen,
+  Printer,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -286,41 +287,44 @@ const mockApprovals: ApprovalRequest[] = [
 
   // SIM Requisitions (New SIM, SIM Balance Limit, SIM Replacement)
   {
-    id: "SIM-2026-001",
+    id: "REQ-019250",
     module: "SIM",
-    reqNo: "SIM-2026-001",
+    reqNo: "REQ-019250",
     employee: {
-      name: "Mahmudul Hasan",
-      id: "2024091001",
-      designation: "Senior Software Engineer",
-      department: "IT & Software",
+      name: "Ruhul Amin",
+      id: "2026062074",
+      designation: "Manager",
+      department: "Implementation & Business Analysis",
     },
-    details: "New SIM Requisition - Grameenphone Corporate Postpaid (BDT 1,000/mo)",
+    details: 'New SIM Requisition - "Office use" (Corporate Postpaid)',
     amount: 1000,
-    date: "2026-09-20",
+    date: "2026-10-11",
     status: "Pending",
     simData: {
-      id: "SIM-2026-001",
-      reqNo: "SIM-2026-001",
-      applicationDate: "20 Sep 2026",
-      submittedTime: "10:15 AM",
+      id: "REQ-019250",
+      reqNo: "REQ-019250",
+      applicationDate: "11/10/2026",
+      submittedTime: "12:22 PM",
       status: "Pending",
       requestType: "New SIM",
       employee: {
-        name: "Mahmudul Hasan",
-        id: "2024091001",
-        designation: "Senior Software Engineer",
-        department: "IT & Software",
-        section: "Software Engineering & Solutions",
-        location: "Head Office, Dhaka",
-        joiningDate: "01 Feb 2024",
-        businessUnit: "Pakiza Software Limited",
+        name: "Ruhul Amin",
+        id: "2026062074",
+        designation: "Manager",
+        department: "Implementation & Business Analysis",
+        section: "Business Analysis",
+        location: "PSL-Operation",
+        joiningDate: "03/10/2026",
+        businessUnit: "PSL",
+        requisitionBy: "Ruhul Amin (Manager)",
+        contact: "—",
       },
       simDetails: {
         operator: "Grameenphone",
-        packageType: "Corporate Postpaid Premier 1000",
-        expectedLimit: 1000,
-        justification: "Required for daily client coordination, system production incident alerts, and 24/7 on-call engineering support.",
+        packageType: "Corporate Postpaid Premier",
+        simNumber: "—",
+        existingLimit: 1000,
+        justification: "Office use",
         onBehalf: false,
       },
     },
@@ -1029,6 +1033,13 @@ function AllApprovalsPage() {
                                 title="Reject"
                               >
                                 <XCircle className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleOpenDetailsModal(item)}
+                                className="size-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 flex items-center justify-center transition-colors"
+                                title="Print Requisition Application"
+                              >
+                                <Printer className="size-4" />
                               </button>
                               <button
                                 onClick={() => handleOpenDetailsModal(item)}
