@@ -341,7 +341,7 @@ export const nav: NavItem[] = [
           { label: "Budget Configuration", to: "/zakat-budget-configuration" },
           { label: "Zakat List", to: "/zakat-list" },
           { label: "Asset Master Data", to: "/zakat-asset-master" },
-          { label: "Zakat Report Report", to: "/zakat-executive-report" },
+          { label: "Zakat Executive Report", to: "/zakat-executive-report" },
         ]
       },
       {
