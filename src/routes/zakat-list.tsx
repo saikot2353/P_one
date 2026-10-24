@@ -118,6 +118,28 @@ export interface ZakatAssetMasterItem {
   suggestedPurpose: ZakatPurposeCategory;
 }
 
+export function getActiveZakatAssetMasterList(): ZakatAssetMasterItem[] {
+  if (typeof window !== "undefined") {
+    const raw = localStorage.getItem("zakat_asset_master_items");
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((it: any) => ({
+            id: it.id,
+            category: it.categoryName || it.category || "General Asset",
+            assetType: it.assetType,
+            defaultQty: it.defaultQty,
+            defaultVendorLocation: it.defaultVendorLocation,
+            suggestedPurpose: (it.suggestedPurpose as ZakatPurposeCategory) || "Business Setup",
+          }));
+        }
+      } catch (e) {}
+    }
+  }
+  return ZAKAT_ASSET_MASTER_DATA;
+}
+
 export const ZAKAT_ASSET_MASTER_DATA: ZakatAssetMasterItem[] = [
   // 1. Vehicle / Transport
   {
@@ -1140,7 +1162,7 @@ function normalizeSchedules(data: any[]): RecurringZakatSchedule[] {
 
 function ZakatManagementPage() {
   // Navigation tabs
-  const [activeTab, setActiveTab] = useState<"ledger" | "recurring" | "audit">("ledger");
+  const [activeTab, setActiveTab] = useState<"ledger" | "recurring">("ledger");
 
   // LocalStorage Persistence
   const [records, setRecords] = useState<ZakatRecord[]>(() => {
@@ -1450,7 +1472,7 @@ function ZakatManagementPage() {
       setModalAssetType("");
       return;
     }
-    const item = ZAKAT_ASSET_MASTER_DATA.find((m) => m.id === selectedId);
+    const item = getActiveZakatAssetMasterList().find((m) => m.id === selectedId);
     if (item) {
       setModalAssetType(item.assetType);
       setModalAssetName(item.assetType);
@@ -1470,7 +1492,7 @@ function ZakatManagementPage() {
       setRecAssetType("");
       return;
     }
-    const item = ZAKAT_ASSET_MASTER_DATA.find((m) => m.id === selectedId);
+    const item = getActiveZakatAssetMasterList().find((m) => m.id === selectedId);
     if (item) {
       setRecAssetType(item.assetType);
       setRecAssetName(item.assetType);
@@ -2594,16 +2616,14 @@ function ZakatManagementPage() {
               </span>
             </button>
 
-            <button
-              onClick={() => setActiveTab("audit")}
-              className={`h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer ${
-                activeTab === "audit"
-                  ? "bg-blue-700 text-white shadow-xs"
-                  : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-              }`}
+            <Link
+              to="/zakat-executive-report"
+              className="h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+              title="Open Executive Multi-Dimensional Report sub-menu"
             >
               <span>Executive Multi-Dimensional Report</span>
-            </button>
+              <ExternalLink className="size-3 text-blue-600" />
+            </Link>
           </div>
 
           {/* ========================================================= */}
@@ -3673,18 +3693,28 @@ function ZakatManagementPage() {
 
                     {/* Master Data Catalog Dropdown */}
                     <div>
-                      <label className="text-[10px] font-bold text-slate-700 uppercase block mb-1 whitespace-nowrap">
-                        Asset Type (Master Data Catalog) <span className="text-red-500">*</span>
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-700 uppercase whitespace-nowrap">
+                          Asset Type (Master Data Catalog) <span className="text-red-500">*</span>
+                        </label>
+                        <Link
+                          to="/zakat-asset-master"
+                          target="_blank"
+                          className="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold hover:underline flex items-center gap-0.5"
+                        >
+                          <span>Manage Catalog</span>
+                          <ExternalLink className="size-2.5" />
+                        </Link>
+                      </div>
                       <select
                         value={modalAssetMasterId}
                         onChange={(e) => handleSelectMasterAsset(e.target.value)}
                         className="w-full h-10 px-3 rounded-lg border border-indigo-300 bg-white text-xs font-bold text-slate-800 outline-none focus:border-indigo-600 shadow-xs"
                       >
                         <option value="">-- Choose Asset from Master Data (or enter custom title below) --</option>
-                        {Array.from(new Set(ZAKAT_ASSET_MASTER_DATA.map((m) => m.category))).map((cat) => (
+                        {Array.from(new Set(getActiveZakatAssetMasterList().map((m) => m.category))).map((cat) => (
                           <optgroup key={cat} label={cat}>
-                            {ZAKAT_ASSET_MASTER_DATA.filter((m) => m.category === cat).map((item) => (
+                            {getActiveZakatAssetMasterList().filter((m) => m.category === cat).map((item) => (
                               <option key={item.id} value={item.id}>
                                 {item.assetType} ({item.defaultQty})
                               </option>
@@ -4489,7 +4519,7 @@ function ZakatManagementPage() {
                           onChange={(e) => {
                             const chosenId = e.target.value;
                             setRecAssetMasterId(chosenId);
-                            const found = ZAKAT_ASSET_MASTER_DATA.find((item) => item.id === chosenId);
+                            const found = getActiveZakatAssetMasterList().find((item) => item.id === chosenId);
                             if (found) {
                               setRecAssetType(found.assetType);
                               setRecAssetName(found.assetType);
@@ -4500,22 +4530,14 @@ function ZakatManagementPage() {
                           }}
                           className="w-full h-9 px-3 rounded-lg border border-purple-300 bg-white text-xs font-semibold outline-none focus:border-purple-600 text-slate-800 shadow-xs"
                         >
-                          <option value="">-- Choose Standard Asset --</option>
-                          <optgroup label="Vehicle & Transport">
-                            {ZAKAT_ASSET_MASTER_DATA.filter((a) => a.category === "Vehicle / Transport").map((a) => (
-                              <option key={a.id} value={a.id}>{a.assetType}</option>
-                            ))}
-                          </optgroup>
-                          <optgroup label="Farm Animal / Livestock">
-                            {ZAKAT_ASSET_MASTER_DATA.filter((a) => a.category === "Farm Animal / Livestock").map((a) => (
-                              <option key={a.id} value={a.id}>{a.assetType}</option>
-                            ))}
-                          </optgroup>
-                          <optgroup label="Business Setup & Livelihood">
-                            {ZAKAT_ASSET_MASTER_DATA.filter((a) => a.category === "Business Setup / Livelihood").map((a) => (
-                              <option key={a.id} value={a.id}>{a.assetType}</option>
-                            ))}
-                          </optgroup>
+                          <option value="">-- Choose Standard Asset from Master Catalog --</option>
+                          {Array.from(new Set(getActiveZakatAssetMasterList().map((m) => m.category))).map((cat) => (
+                            <optgroup key={cat} label={cat}>
+                              {getActiveZakatAssetMasterList().filter((a) => a.category === cat).map((a) => (
+                                <option key={a.id} value={a.id}>{a.assetType}</option>
+                              ))}
+                            </optgroup>
+                          ))}
                         </select>
                       </div>
 

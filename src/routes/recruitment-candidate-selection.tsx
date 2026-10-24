@@ -1360,6 +1360,24 @@ function CandidateSelectionPage() {
   } | null>(null);
   const [tempAgreedSalary, setTempAgreedSalary] = useState(0);
 
+  // Candidate Approval Modal with Mandatory Salary Input
+  const [approvingCandidate, setApprovingCandidate] = useState<{
+    jobId: string;
+    candidate: JobCandidate;
+    jobTitle: string;
+    salaryBudgetMin: number;
+    salaryBudgetMax: number;
+    salaryInput: number;
+    remarks?: string;
+  } | null>(null);
+
+  // Job Submission & Final Approval Modal (with batch salary review)
+  const [approvingJob, setApprovingJob] = useState<{
+    job: JobPost;
+    candidateSalaries: Record<string, number>;
+    closeReason: string;
+  } | null>(null);
+
   // Initialize and load data
   useEffect(() => {
     initializeRecruitmentMockData();
@@ -1437,7 +1455,127 @@ function CandidateSelectionPage() {
     localStorage.setItem("recruitment_candidates", JSON.stringify(queue));
   };
 
-  // Auto-generate link and toggle selection
+  // Open candidate approval modal requiring salary input
+  const handleOpenApproveCandidate = (jobId: string, candidate: JobCandidate) => {
+    const job = jobs.find((j) => j.id === jobId);
+    if (!job) return;
+
+    if (job.status === "Closed") {
+      toast.error("This job is Closed. Reopen the job to modify selections.");
+      return;
+    }
+
+    setApprovingCandidate({
+      jobId,
+      candidate,
+      jobTitle: job.title,
+      salaryBudgetMin: job.salaryBudgetMin,
+      salaryBudgetMax: job.salaryBudgetMax,
+      salaryInput: candidate.agreedSalary || candidate.previousSalary || job.salaryBudgetMin || 0,
+      remarks: "",
+    });
+  };
+
+  // Confirm candidate approval with the inputted salary
+  const handleConfirmApproveCandidate = () => {
+    if (!approvingCandidate) return;
+    const { jobId, candidate, salaryInput } = approvingCandidate;
+
+    if (!salaryInput || salaryInput <= 0 || isNaN(salaryInput)) {
+      toast.error("Please enter a valid approved salary greater than 0.");
+      return;
+    }
+
+    const job = jobs.find((j) => j.id === jobId);
+    if (!job) return;
+
+    const baseUrl = window.location.origin;
+    const generatedLink =
+      candidate.generatedLink ||
+      `${baseUrl}/e-recruitment-form?tempId=${candidate.id}&candidateName=${encodeURIComponent(
+        candidate.name
+      )}&department=${encodeURIComponent(candidate.department)}&designation=${encodeURIComponent(
+        candidate.designation
+      )}&jobPost=${encodeURIComponent(job.title)}`;
+    const linkTime = candidate.linkGeneratedAt || new Date().toLocaleString();
+
+    // Sync to Application Queue (recruitment_candidates) with the approved salary
+    syncCandidateToQueue(
+      {
+        ...candidate,
+        selected: true,
+        agreedSalary: salaryInput,
+        generatedLink,
+        linkGeneratedAt: linkTime,
+      },
+      job,
+      generatedLink
+    );
+
+    const updatedJobs = jobs.map((j) => {
+      if (j.id === jobId) {
+        const updatedCandidates = j.candidates.map((c) => {
+          if (c.id === candidate.id) {
+            return {
+              ...c,
+              selected: true,
+              selectedAt: c.selectedAt || new Date().toISOString(),
+              status: "Selected" as const,
+              agreedSalary: salaryInput,
+              generatedLink,
+              linkGeneratedAt: linkTime,
+            };
+          }
+          return c;
+        });
+        return { ...j, candidates: updatedCandidates };
+      }
+      return j;
+    });
+
+    persistJobs(updatedJobs);
+    setApprovingCandidate(null);
+    toast.success(
+      `Approved ${candidate.name} with salary ৳${salaryInput.toLocaleString()}! Link auto-generated & candidate synced.`
+    );
+  };
+
+  // Deselect candidate
+  const handleDeselectCandidate = (jobId: string, candidateId: string) => {
+    const job = jobs.find((j) => j.id === jobId);
+    if (!job) return;
+
+    if (job.status === "Closed") {
+      toast.error("This job is Closed. Reopen the job to modify selections.");
+      return;
+    }
+
+    const candidate = job.candidates.find((c) => c.id === candidateId);
+    if (!candidate) return;
+
+    const updatedJobs = jobs.map((j) => {
+      if (j.id === jobId) {
+        const updatedCandidates = j.candidates.map((c) => {
+          if (c.id === candidateId) {
+            return {
+              ...c,
+              selected: false,
+              selectedAt: undefined,
+              status: "Shortlisted" as const,
+            };
+          }
+          return c;
+        });
+        return { ...j, candidates: updatedCandidates };
+      }
+      return j;
+    });
+
+    persistJobs(updatedJobs);
+    toast.info(`Deselected ${candidate.name}.`);
+  };
+
+  // Auto-generate link and toggle selection (mandates salary input when approving)
   const handleToggleCandidateSelection = (jobId: string, candidateId: string) => {
     const job = jobs.find((j) => j.id === jobId);
     if (!job) return;
@@ -1450,61 +1588,11 @@ function CandidateSelectionPage() {
     const candidate = job.candidates.find((c) => c.id === candidateId);
     if (!candidate) return;
 
-    const willBeSelected = !candidate.selected;
-    const baseUrl = window.location.origin;
-
-    let generatedLink = candidate.generatedLink || "";
-    let linkTime = candidate.linkGeneratedAt;
-
-    if (willBeSelected) {
-      // Auto-generate e-recruitment link
-      generatedLink = `${baseUrl}/e-recruitment-form?tempId=${candidate.id}&candidateName=${encodeURIComponent(
-        candidate.name
-      )}&department=${encodeURIComponent(candidate.department)}&designation=${encodeURIComponent(
-        candidate.designation
-      )}&jobPost=${encodeURIComponent(job.title)}`;
-      linkTime = new Date().toLocaleString();
-
-      // Sync to Application Queue (recruitment_candidates)
-      syncCandidateToQueue(
-        {
-          ...candidate,
-          selected: true,
-          generatedLink,
-          linkGeneratedAt: linkTime,
-        },
-        job,
-        generatedLink
-      );
-
-      toast.success(
-        `Selected ${candidate.name}! e-Recruitment Link auto-generated and candidate synced to queue.`
-      );
+    if (!candidate.selected) {
+      handleOpenApproveCandidate(jobId, candidate);
     } else {
-      toast.info(`Deselected ${candidate.name}.`);
+      handleDeselectCandidate(jobId, candidateId);
     }
-
-    const updatedJobs = jobs.map((j) => {
-      if (j.id === jobId) {
-        const updatedCandidates = j.candidates.map((c) => {
-          if (c.id === candidateId) {
-            return {
-              ...c,
-              selected: willBeSelected,
-              selectedAt: willBeSelected ? new Date().toISOString() : undefined,
-              status: willBeSelected ? ("Selected" as const) : ("Shortlisted" as const),
-              generatedLink: willBeSelected ? generatedLink : c.generatedLink,
-              linkGeneratedAt: willBeSelected ? linkTime : c.linkGeneratedAt,
-            };
-          }
-          return c;
-        });
-        return { ...j, candidates: updatedCandidates };
-      }
-      return j;
-    });
-
-    persistJobs(updatedJobs);
   };
 
   // Copy candidate e-recruitment link
@@ -1545,32 +1633,85 @@ function CandidateSelectionPage() {
     toast.success(`Job ${closingJob.title} has been officially Closed!`);
   };
 
-  // Direct approve & submit job (closes the job immediately when Approve and Submit button is clicked)
-  const handleSubmitJob = (jobId: string) => {
+  // Open Job Approval & Submission Modal (reviews and mandates salary verification for all selected candidates)
+  const handleOpenApproveJobModal = (jobId: string) => {
     const targetJob = jobs.find((j) => j.id === jobId);
     if (!targetJob) return;
 
-    const selectedCount = targetJob.candidates.filter((c) => c.selected).length;
-    if (selectedCount === 0) {
-      toast.error("Please select at least one candidate before approving and submitting.");
+    const selectedCandidates = targetJob.candidates.filter((c) => c.selected);
+    if (selectedCandidates.length === 0) {
+      toast.error("Please approve at least one candidate before submitting this job.");
       return;
     }
 
+    const initialSalaries: Record<string, number> = {};
+    selectedCandidates.forEach((c) => {
+      initialSalaries[c.id] = c.agreedSalary || c.previousSalary || targetJob.salaryBudgetMin || 0;
+    });
+
+    setApprovingJob({
+      job: targetJob,
+      candidateSalaries: initialSalaries,
+      closeReason: `Selection approved and submitted: ${selectedCandidates.length} of ${targetJob.vacancies} vacancies finalized.`,
+    });
+  };
+
+  // Confirm Job Approval & Submission with validated salaries
+  const handleConfirmApproveJob = () => {
+    if (!approvingJob) return;
+    const { job, candidateSalaries, closeReason } = approvingJob;
+
+    const selectedCandidates = job.candidates.filter((c) => c.selected);
+    for (const cand of selectedCandidates) {
+      const sal = candidateSalaries[cand.id];
+      if (!sal || sal <= 0 || isNaN(sal)) {
+        toast.error(`Please input a valid approved salary (> 0) for candidate ${cand.name}.`);
+        return;
+      }
+    }
+
     const updatedJobs = jobs.map((j) => {
-      if (j.id === jobId) {
+      if (j.id === job.id) {
+        const updatedCandidates = j.candidates.map((c) => {
+          if (c.selected) {
+            const finalSal = candidateSalaries[c.id] || c.agreedSalary;
+            syncCandidateToQueue(
+              { ...c, agreedSalary: finalSal },
+              j,
+              c.generatedLink || ""
+            );
+            return {
+              ...c,
+              agreedSalary: finalSal,
+            };
+          }
+          return c;
+        });
+
         return {
           ...j,
+          candidates: updatedCandidates,
           status: "Closed" as const,
           closedAt: new Date().toLocaleDateString("en-GB"),
-          closedBy: `${targetJob.assignedPerson || "Evaluator"} (${targetJob.assignedRole || "Lead"})`,
-          closeReason: `Selection approved and submitted: ${selectedCount} of ${targetJob.vacancies} vacancies finalized.`,
+          closedBy: `${job.assignedPerson || "Evaluator"} (${job.assignedRole || "Lead"})`,
+          closeReason:
+            closeReason.trim() ||
+            `Selection approved and submitted: ${selectedCandidates.length} of ${job.vacancies} vacancies finalized.`,
         };
       }
       return j;
     });
 
     persistJobs(updatedJobs);
-    toast.success(`Job ${targetJob.id} approved and submitted successfully!`);
+    setApprovingJob(null);
+    toast.success(
+      `Job ${job.id} approved and submitted with ${selectedCandidates.length} finalized candidate salaries!`
+    );
+  };
+
+  // Legacy wrapper for direct submit
+  const handleSubmitJob = (jobId: string) => {
+    handleOpenApproveJobModal(jobId);
   };
 
   // Reopen Job
@@ -1616,6 +1757,19 @@ function CandidateSelectionPage() {
     });
 
     persistJobs(updatedJobs);
+
+    // Also sync to application queue if candidate is registered
+    const queueData = localStorage.getItem("recruitment_candidates");
+    if (queueData) {
+      try {
+        let queue: any[] = JSON.parse(queueData);
+        queue = queue.map((c: any) =>
+          c.empIdTemp === editingSalary.candidateId ? { ...c, agreedSalary: tempAgreedSalary } : c
+        );
+        localStorage.setItem("recruitment_candidates", JSON.stringify(queue));
+      } catch (e) {}
+    }
+
     setEditingSalary(null);
     toast.success(`Agreed salary updated to ৳${tempAgreedSalary.toLocaleString()}!`);
   };
@@ -2240,7 +2394,7 @@ function CandidateSelectionPage() {
                             <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
                               <thead>
                                 <tr className="text-[10px] uppercase font-normal tracking-normal text-muted-foreground bg-muted/30 border-b border-border/60">
-                                  <th className="px-3 py-2.5 text-center w-12">Select</th>
+                                  <th className="px-3 py-2.5 text-center w-28">Approval</th>
                                   <th className="px-3 py-2.5">Candidate Info</th>
                                   <th className="px-3 py-2.5">Experience & Notice</th>
                                   <th className="px-3 py-2.5 text-right">Previous Salary</th>
@@ -2255,31 +2409,61 @@ function CandidateSelectionPage() {
                                     key={cand.id}
                                     className={`transition-colors duration-150 ${
                                       cand.selected
-                                        ? "bg-primary/[0.03] dark:bg-primary/[0.05] hover:bg-primary/[0.06]"
+                                        ? "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08]"
                                         : "hover:bg-muted/30"
                                     }`}
                                   >
-                                    {/* Selection Checkbox */}
+                                    {/* Approval Action */}
                                     <td className="px-3 py-2.5 text-center">
-                                      <button
-                                        type="button"
-                                        disabled={isClosed}
-                                        onClick={() => handleToggleCandidateSelection(job.id, cand.id)}
-                                        className={`size-5 rounded-md border flex items-center justify-center transition cursor-pointer mx-auto ${
-                                          cand.selected
-                                            ? "bg-primary border-primary text-primary-foreground shadow-2xs"
-                                            : "border-border/80 bg-background hover:border-primary text-transparent"
-                                        } ${isClosed ? "opacity-60 cursor-not-allowed" : ""}`}
-                                        title={
-                                          isClosed
-                                            ? "Job is closed"
-                                            : cand.selected
-                                            ? "Click to deselect"
-                                            : "Click to select candidate & auto-generate link"
-                                        }
-                                      >
-                                        <Check className="size-3 stroke-[2.5]" />
-                                      </button>
+                                      {cand.selected ? (
+                                        <div className="inline-flex items-center gap-1 justify-center">
+                                          <button
+                                            type="button"
+                                            disabled={isClosed}
+                                            onClick={() => handleToggleCandidateSelection(job.id, cand.id)}
+                                            className={`h-6.5 px-2.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[11px] flex items-center gap-1 shadow-2xs transition ${
+                                              isClosed ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                                            }`}
+                                            title={isClosed ? "Job is closed" : "Approved. Click to deselect candidate."}
+                                          >
+                                            <Check className="size-3 stroke-[2.5]" />
+                                            <span>Approved</span>
+                                          </button>
+                                          {!isClosed && (
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setApprovingCandidate({
+                                                  jobId: job.id,
+                                                  candidate: cand,
+                                                  jobTitle: job.title,
+                                                  salaryBudgetMin: job.salaryBudgetMin,
+                                                  salaryBudgetMax: job.salaryBudgetMax,
+                                                  salaryInput: cand.agreedSalary,
+                                                  remarks: "",
+                                                });
+                                              }}
+                                              className="size-6.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center transition cursor-pointer"
+                                              title="Edit approved salary"
+                                            >
+                                              <DollarSign className="size-3" />
+                                            </button>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          disabled={isClosed}
+                                          onClick={() => handleToggleCandidateSelection(job.id, cand.id)}
+                                          className={`h-6.5 px-2.5 rounded-md border border-emerald-600/30 bg-emerald-500/10 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-300 font-medium text-[11px] flex items-center gap-1 transition mx-auto ${
+                                            isClosed ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                                          }`}
+                                          title={isClosed ? "Job is closed" : "Approve candidate and input agreed salary"}
+                                        >
+                                          <CheckCircle2 className="size-3" />
+                                          <span>Approve</span>
+                                        </button>
+                                      )}
                                     </td>
 
                                     {/* Candidate Basic Information */}
@@ -2327,28 +2511,30 @@ function CandidateSelectionPage() {
                                     {/* Agreed Salary with Clean Edit Trigger */}
                                     <td className="px-3 py-2.5 text-right">
                                       <div className="flex items-center justify-end gap-1.5">
-                                        <span className="text-xs font-normal text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                                          ৳{cand.agreedSalary.toLocaleString()}
-                                        </span>
-                                        {!isClosed && (
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              setEditingSalary({
-                                                jobId: job.id,
-                                                candidateId: cand.id,
-                                                candidateName: cand.name,
-                                                currentAgreed: cand.agreedSalary,
-                                                prevSalary: cand.previousSalary,
-                                              });
-                                              setTempAgreedSalary(cand.agreedSalary);
-                                            }}
-                                            className="p-1 text-muted-foreground hover:text-primary rounded hover:bg-muted transition cursor-pointer"
-                                            title="Edit agreed salary"
-                                          >
-                                            <DollarSign className="size-3" />
-                                          </button>
-                                        )}
+                                        <button
+                                          type="button"
+                                          disabled={isClosed}
+                                          onClick={() => {
+                                            setApprovingCandidate({
+                                              jobId: job.id,
+                                              candidate: cand,
+                                              jobTitle: job.title,
+                                              salaryBudgetMin: job.salaryBudgetMin,
+                                              salaryBudgetMax: job.salaryBudgetMax,
+                                              salaryInput: cand.agreedSalary || cand.previousSalary || 0,
+                                              remarks: "",
+                                            });
+                                          }}
+                                          className={`text-xs font-normal px-2 py-0.5 rounded border transition flex items-center gap-1 ${
+                                            cand.selected
+                                              ? "text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border-emerald-500/25 hover:bg-emerald-500/20 cursor-pointer font-medium"
+                                              : "text-muted-foreground bg-muted/40 border-border/50 hover:border-primary/40 cursor-pointer"
+                                          } ${isClosed ? "pointer-events-none opacity-80" : ""}`}
+                                          title={isClosed ? undefined : "Click to input/update agreed salary"}
+                                        >
+                                          <span>৳{cand.agreedSalary.toLocaleString()}</span>
+                                          {!isClosed && <DollarSign className="size-2.5 opacity-70" />}
+                                        </button>
                                       </div>
                                     </td>
 
@@ -2598,11 +2784,11 @@ function CandidateSelectionPage() {
                           className={`h-7.5 px-3 rounded-lg font-medium text-xs transition flex items-center gap-1.5 cursor-pointer ${
                             liveCand.selected
                               ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                              : "bg-primary hover:opacity-95 text-primary-foreground"
+                              : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs"
                           } ${liveJob?.status === "Closed" ? "opacity-60 cursor-not-allowed" : ""}`}
                         >
                           <Check className="size-3 stroke-[2.5]" />
-                          <span>{liveCand.selected ? "Selected (Click to Deselect)" : "Select Candidate"}</span>
+                          <span>{liveCand.selected ? "Approved (Click to Deselect)" : "Approve Candidate & Set Salary"}</span>
                         </button>
                       </div>
                     </div>
@@ -2610,15 +2796,36 @@ function CandidateSelectionPage() {
                     {/* Salary & Critical Candidate Metrics Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
                       {/* Agreed Salary (Most Important) */}
-                      <div className="bg-emerald-500/[0.03] rounded-lg border border-emerald-500/25 p-2 sm:p-2.5">
-                        <div className="text-[10px] uppercase font-medium tracking-normal text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                          <DollarSign className="size-2.5" />
-                          <span>Agreed Salary</span>
+                      <div className="bg-emerald-500/[0.03] rounded-lg border border-emerald-500/25 p-2 sm:p-2.5 flex items-center justify-between">
+                        <div>
+                          <div className="text-[10px] uppercase font-medium tracking-normal text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                            <DollarSign className="size-2.5" />
+                            <span>Agreed Salary</span>
+                          </div>
+                          <div className="text-base sm:text-lg font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                            ৳{liveCand.agreedSalary.toLocaleString()}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground font-normal">Final agreed monthly offer</div>
                         </div>
-                        <div className="text-base sm:text-lg font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                          ৳{liveCand.agreedSalary.toLocaleString()}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground font-normal">Final agreed monthly offer</div>
+                        {(!liveJob || liveJob.status !== "Closed") && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setApprovingCandidate({
+                                jobId: activeCvCandidate.jobCode,
+                                candidate: liveCand,
+                                jobTitle: activeCvCandidate.jobTitle,
+                                salaryBudgetMin: liveJob?.salaryBudgetMin || 0,
+                                salaryBudgetMax: liveJob?.salaryBudgetMax || 0,
+                                salaryInput: liveCand.agreedSalary || liveCand.previousSalary || 0,
+                                remarks: "",
+                              });
+                            }}
+                            className="px-2 py-1 text-xs rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 border border-emerald-500/30 transition cursor-pointer"
+                          >
+                            Edit
+                          </button>
+                        )}
                       </div>
 
                       {/* Previous Salary */}
@@ -2830,6 +3037,344 @@ function CandidateSelectionPage() {
             </div>
           </div>
         )}
+
+        {/* ─── MODAL 2.5: APPROVE CANDIDATE WITH MANDATORY SALARY INPUT ───────── */}
+        {approvingCandidate && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/65 backdrop-blur-xs p-3 sm:p-4 animate-in fade-in duration-150">
+            <div className="bg-card w-full max-w-lg rounded-2xl shadow-2xl border border-border/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              {/* Modal Header */}
+              <div className="p-4 sm:p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/20">
+                    <DollarSign className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                      <span>
+                        {approvingCandidate.candidate.selected
+                          ? "Update Approved Salary"
+                          : "Approve Candidate & Set Salary"}
+                      </span>
+                      <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        Required
+                      </span>
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5 font-normal">
+                      Candidate: <span className="font-medium text-foreground">{approvingCandidate.candidate.name}</span> ({approvingCandidate.candidate.id})
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setApprovingCandidate(null)}
+                  className="size-8 rounded-lg text-muted-foreground hover:bg-muted flex items-center justify-center cursor-pointer transition"
+                >
+                  <XCircle className="size-4.5" />
+                </button>
+              </div>
+
+              <div className="p-5 sm:p-6 space-y-4">
+                {/* Candidate & Job Context Card */}
+                <div className="p-3.5 bg-muted/30 rounded-xl border border-border/50 space-y-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Requisition:</span>
+                    <span className="font-medium text-foreground text-right">{approvingCandidate.jobTitle}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Department / Role:</span>
+                    <span className="text-foreground">
+                      {approvingCandidate.candidate.department} · {approvingCandidate.candidate.designation}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pt-1 border-t border-border/40">
+                    <span className="text-muted-foreground">Candidate Previous Salary:</span>
+                    <span className="font-semibold text-foreground">
+                      ৳{approvingCandidate.candidate.previousSalary.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Approved Job Budget:</span>
+                    <span className="font-normal text-emerald-600 dark:text-emerald-400">
+                      ৳{approvingCandidate.salaryBudgetMin.toLocaleString()} – ৳{approvingCandidate.salaryBudgetMax.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mandatory Salary Input */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground flex items-center justify-between">
+                    <span className="flex items-center gap-1">
+                      <span>Approved / Agreed Monthly Salary (BDT ৳)</span>
+                      <span className="text-red-500">*</span>
+                    </span>
+                    {approvingCandidate.salaryInput > 0 && (
+                      <span className="text-[11px] font-normal text-emerald-600 dark:text-emerald-400">
+                        ৳{approvingCandidate.salaryInput.toLocaleString()}
+                      </span>
+                    )}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground font-medium text-sm">
+                      ৳
+                    </div>
+                    <input
+                      type="number"
+                      autoFocus
+                      min={1}
+                      value={approvingCandidate.salaryInput || ""}
+                      onChange={(e) =>
+                        setApprovingCandidate({
+                          ...approvingCandidate,
+                          salaryInput: Number(e.target.value),
+                        })
+                      }
+                      placeholder="e.g. 52000"
+                      className="w-full h-10 pl-8 pr-3 rounded-lg border border-border bg-background text-sm font-semibold text-foreground outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition"
+                    />
+                  </div>
+
+                  {/* Real-time Salary Variance & Budget Analysis */}
+                  {approvingCandidate.salaryInput > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px]">
+                      {(() => {
+                        const diff = approvingCandidate.salaryInput - approvingCandidate.candidate.previousSalary;
+                        const pct = approvingCandidate.candidate.previousSalary > 0
+                          ? Math.round((diff / approvingCandidate.candidate.previousSalary) * 100)
+                          : 0;
+                        return (
+                          <span className={`px-2 py-0.5 rounded-md border font-normal ${
+                            diff >= 0
+                              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25"
+                              : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/25"
+                          }`}>
+                            {diff >= 0 ? `+৳${diff.toLocaleString()} (+${pct}%)` : `-৳${Math.abs(diff).toLocaleString()} (${pct}%)`} vs Previous
+                          </span>
+                        );
+                      })()}
+
+                      {approvingCandidate.salaryInput > approvingCandidate.salaryBudgetMax ? (
+                        <span className="px-2 py-0.5 rounded-md border bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/25 font-normal flex items-center gap-1">
+                          <AlertCircle className="size-2.5" />
+                          <span>Exceeds max budget (৳{approvingCandidate.salaryBudgetMax.toLocaleString()})</span>
+                        </span>
+                      ) : approvingCandidate.salaryInput < approvingCandidate.salaryBudgetMin ? (
+                        <span className="px-2 py-0.5 rounded-md border bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/25 font-normal flex items-center gap-1">
+                          <span>Below min budget</span>
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-md border bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25 font-normal flex items-center gap-1">
+                          <Check className="size-2.5" />
+                          <span>Within approved job budget</span>
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  <p className="text-[11px] text-muted-foreground pt-1 font-normal">
+                    Salary agreement is mandatory before approving candidate. This amount will be locked and synced to the e-recruitment onboarding queue.
+                  </p>
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="p-3.5 sm:p-4 border-t border-border/60 bg-muted/10 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setApprovingCandidate(null)}
+                  className="h-8.5 px-3.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-normal rounded-lg transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={!approvingCandidate.salaryInput || approvingCandidate.salaryInput <= 0}
+                  onClick={handleConfirmApproveCandidate}
+                  className="h-8.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Check className="size-3.5 stroke-[2]" />
+                  <span>
+                    {approvingCandidate.candidate.selected
+                      ? "Save Updated Salary"
+                      : "Approve & Generate Link"}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ─── MODAL 2.6: APPROVE & SUBMIT JOB REQUISITION WITH CANDIDATE SALARIES ───────── */}
+        {approvingJob && (() => {
+          const selectedCands = approvingJob.job.candidates.filter((c) => c.selected);
+          const totalPayroll = selectedCands.reduce((sum, c) => {
+            return sum + (approvingJob.candidateSalaries[c.id] || 0);
+          }, 0);
+          const minBudgetTotal = approvingJob.job.salaryBudgetMin * selectedCands.length;
+          const maxBudgetTotal = approvingJob.job.salaryBudgetMax * selectedCands.length;
+          const hasInvalidSalary = selectedCands.some(
+            (c) => !approvingJob.candidateSalaries[c.id] || approvingJob.candidateSalaries[c.id] <= 0
+          );
+
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-3 sm:p-5 overflow-y-auto">
+              <div className="bg-card w-full max-w-2xl max-h-[92vh] rounded-2xl shadow-2xl border border-border/80 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                {/* Header */}
+                <div className="p-4 sm:p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/20">
+                      <BadgeCheck className="size-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                        <span>Approve & Submit Candidate Selection</span>
+                        <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                          {selectedCands.length} Selected
+                        </span>
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-0.5 font-normal">
+                        Job: <span className="font-medium text-foreground">{approvingJob.job.title}</span> ({approvingJob.job.id})
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setApprovingJob(null)}
+                    className="size-8 rounded-lg text-muted-foreground hover:bg-muted flex items-center justify-center cursor-pointer transition"
+                  >
+                    <XCircle className="size-4.5" />
+                  </button>
+                </div>
+
+                {/* Body */}
+                <div className="p-5 sm:p-6 overflow-y-auto space-y-4">
+                  <div className="text-xs text-muted-foreground font-normal">
+                    Please verify or input the finalized monthly salary for each selected candidate before official approval and submission:
+                  </div>
+
+                  {/* Candidate Salary Input Table */}
+                  <div className="border border-border/70 rounded-xl overflow-hidden shadow-2xs">
+                    <table className="w-full text-xs">
+                      <thead className="bg-muted/40 text-[11px] font-medium text-muted-foreground uppercase border-b border-border/60">
+                        <tr>
+                          <th className="px-3.5 py-2.5 text-left">Candidate</th>
+                          <th className="px-3.5 py-2.5 text-right">Previous Salary</th>
+                          <th className="px-3.5 py-2.5 text-right">Approved Salary (BDT ৳) *</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/40 bg-card">
+                        {selectedCands.map((cand) => {
+                          const currentVal = approvingJob.candidateSalaries[cand.id] ?? 0;
+                          const isZero = !currentVal || currentVal <= 0;
+                          return (
+                            <tr key={cand.id} className="hover:bg-muted/20">
+                              <td className="px-3.5 py-3">
+                                <div className="font-medium text-foreground">{cand.name}</div>
+                                <div className="text-[11px] text-muted-foreground mt-0.5">
+                                  {cand.id} · {cand.department}
+                                </div>
+                              </td>
+                              <td className="px-3.5 py-3 text-right text-muted-foreground">
+                                ৳{cand.previousSalary.toLocaleString()}
+                              </td>
+                              <td className="px-3.5 py-3 text-right">
+                                <div className="inline-flex items-center gap-1.5 justify-end">
+                                  <span className="text-xs text-muted-foreground font-medium">৳</span>
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    value={currentVal || ""}
+                                    onChange={(e) => {
+                                      const val = Number(e.target.value);
+                                      setApprovingJob((prev) =>
+                                        prev
+                                          ? {
+                                              ...prev,
+                                              candidateSalaries: {
+                                                ...prev.candidateSalaries,
+                                                [cand.id]: val,
+                                              },
+                                            }
+                                          : null
+                                      );
+                                    }}
+                                    className={`w-32 h-8.5 px-2.5 rounded-lg border text-right text-xs font-semibold outline-none transition ${
+                                      isZero
+                                        ? "border-red-500 bg-red-500/5 text-red-600 focus:border-red-500"
+                                        : "border-emerald-500/40 bg-emerald-500/[0.03] text-emerald-700 dark:text-emerald-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20"
+                                    }`}
+                                    placeholder="Input Salary"
+                                  />
+                                </div>
+                                {isZero && (
+                                  <div className="text-[10px] text-red-500 mt-1 font-normal">Salary required</div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Budget & Total Payroll Summary Card */}
+                  <div className="p-3.5 bg-muted/30 rounded-xl border border-border/60 space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Total Approved Monthly Payroll:</span>
+                      <span className="font-bold text-sm text-emerald-600 dark:text-emerald-400">
+                        ৳{totalPayroll.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-muted-foreground">Budgeted Range for {selectedCands.length} position(s):</span>
+                      <span className="font-normal text-foreground">
+                        ৳{minBudgetTotal.toLocaleString()} – ৳{maxBudgetTotal.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Notes / Reason */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-foreground">
+                      Approval & Closure Remarks (Optional)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={approvingJob.closeReason}
+                      onChange={(e) =>
+                        setApprovingJob({
+                          ...approvingJob,
+                          closeReason: e.target.value,
+                        })
+                      }
+                      placeholder="e.g. Candidates approved by management. Offered salaries finalized and queued for onboarding."
+                      className="w-full p-2.5 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                    />
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="p-3.5 sm:p-4 border-t border-border/60 bg-muted/10 flex items-center justify-end gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setApprovingJob(null)}
+                    className="h-8.5 px-3.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-normal rounded-lg transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    disabled={hasInvalidSalary}
+                    onClick={handleConfirmApproveJob}
+                    className="h-8.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Check className="size-3.5 stroke-[2]" />
+                    <span>Finalize & Approve Selection</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ─── MODAL 3: EDIT AGREED SALARY MODAL ───────────────────────── */}
         {editingSalary && (

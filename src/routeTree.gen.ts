@@ -362,7 +362,9 @@ import { Route as WorkFlowRouteImport } from './routes/work-flow'
 import { Route as WorkFlowsRouteImport } from './routes/work-flows'
 import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
 import { Route as YearlyBonusReportRouteImport } from './routes/yearly-bonus-report'
+import { Route as ZakatAssetMasterRouteImport } from './routes/zakat-asset-master'
 import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
+import { Route as ZakatExecutiveReportRouteImport } from './routes/zakat-executive-report'
 import { Route as ZakatListRouteImport } from './routes/zakat-list'
 import { Route as AccountsConfigFinancialPeriodSetupRouteImport } from './routes/accounts-config.financial-period-setup'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
@@ -2241,12 +2243,22 @@ const YearlyBonusReportRoute = YearlyBonusReportRouteImport.update({
   path: '/yearly-bonus-report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ZakatAssetMasterRoute = ZakatAssetMasterRouteImport.update({
+  id: '/zakat-asset-master',
+  path: '/zakat-asset-master',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ZakatBudgetConfigurationRoute =
   ZakatBudgetConfigurationRouteImport.update({
     id: '/zakat-budget-configuration',
     path: '/zakat-budget-configuration',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ZakatExecutiveReportRoute = ZakatExecutiveReportRouteImport.update({
+  id: '/zakat-executive-report',
+  path: '/zakat-executive-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ZakatListRoute = ZakatListRouteImport.update({
   id: '/zakat-list',
   path: '/zakat-list',
@@ -2635,7 +2647,9 @@ export interface FileRoutesByFullPath {
   '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
+  '/zakat-asset-master': typeof ZakatAssetMasterRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
+  '/zakat-executive-report': typeof ZakatExecutiveReportRoute
   '/zakat-list': typeof ZakatListRoute
   '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -2997,7 +3011,9 @@ export interface FileRoutesByTo {
   '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
+  '/zakat-asset-master': typeof ZakatAssetMasterRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
+  '/zakat-executive-report': typeof ZakatExecutiveReportRoute
   '/zakat-list': typeof ZakatListRoute
   '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -3360,7 +3376,9 @@ export interface FileRoutesById {
   '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
+  '/zakat-asset-master': typeof ZakatAssetMasterRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
+  '/zakat-executive-report': typeof ZakatExecutiveReportRoute
   '/zakat-list': typeof ZakatListRoute
   '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -3724,7 +3742,9 @@ export interface FileRouteTypes {
     | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
+    | '/zakat-asset-master'
     | '/zakat-budget-configuration'
+    | '/zakat-executive-report'
     | '/zakat-list'
     | '/accounts-config/financial-period-setup'
     | '/employee-detail/$id'
@@ -4086,7 +4106,9 @@ export interface FileRouteTypes {
     | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
+    | '/zakat-asset-master'
     | '/zakat-budget-configuration'
+    | '/zakat-executive-report'
     | '/zakat-list'
     | '/accounts-config/financial-period-setup'
     | '/employee-detail/$id'
@@ -4448,7 +4470,9 @@ export interface FileRouteTypes {
     | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
+    | '/zakat-asset-master'
     | '/zakat-budget-configuration'
+    | '/zakat-executive-report'
     | '/zakat-list'
     | '/accounts-config/financial-period-setup'
     | '/employee-detail/$id'
@@ -4811,7 +4835,9 @@ export interface RootRouteChildren {
   WorkFlowsRoute: typeof WorkFlowsRoute
   YearlyBonusProcessRoute: typeof YearlyBonusProcessRoute
   YearlyBonusReportRoute: typeof YearlyBonusReportRoute
+  ZakatAssetMasterRoute: typeof ZakatAssetMasterRoute
   ZakatBudgetConfigurationRoute: typeof ZakatBudgetConfigurationRoute
+  ZakatExecutiveReportRoute: typeof ZakatExecutiveReportRoute
   ZakatListRoute: typeof ZakatListRoute
   AccountsConfigFinancialPeriodSetupRoute: typeof AccountsConfigFinancialPeriodSetupRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
@@ -7293,11 +7319,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof YearlyBonusReportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/zakat-asset-master': {
+      id: '/zakat-asset-master'
+      path: '/zakat-asset-master'
+      fullPath: '/zakat-asset-master'
+      preLoaderRoute: typeof ZakatAssetMasterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/zakat-budget-configuration': {
       id: '/zakat-budget-configuration'
       path: '/zakat-budget-configuration'
       fullPath: '/zakat-budget-configuration'
       preLoaderRoute: typeof ZakatBudgetConfigurationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zakat-executive-report': {
+      id: '/zakat-executive-report'
+      path: '/zakat-executive-report'
+      fullPath: '/zakat-executive-report'
+      preLoaderRoute: typeof ZakatExecutiveReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/zakat-list': {
@@ -7711,7 +7751,9 @@ const rootRouteChildren: RootRouteChildren = {
   WorkFlowsRoute: WorkFlowsRoute,
   YearlyBonusProcessRoute: YearlyBonusProcessRoute,
   YearlyBonusReportRoute: YearlyBonusReportRoute,
+  ZakatAssetMasterRoute: ZakatAssetMasterRoute,
   ZakatBudgetConfigurationRoute: ZakatBudgetConfigurationRoute,
+  ZakatExecutiveReportRoute: ZakatExecutiveReportRoute,
   ZakatListRoute: ZakatListRoute,
   AccountsConfigFinancialPeriodSetupRoute:
     AccountsConfigFinancialPeriodSetupRoute,
