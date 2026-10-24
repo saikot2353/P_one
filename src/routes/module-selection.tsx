@@ -74,6 +74,15 @@ const modules = [
     path: "/merchandising-dashboard",
   },
   {
+    id: "marketing-merchandising",
+    name: "Marketing & Merchandising",
+    description: "Item-level cost saving, Pre-Costing, BOM, Bookings & PI engine",
+    icon: Store,
+    color: "from-emerald-600 via-teal-600 to-cyan-600",
+    shadow: "shadow-teal-500/20",
+    path: "/mm-dashboard",
+  },
+  {
     id: "finance",
     name: "Finance & Accounting",
     description: "Manage accounts and financials",

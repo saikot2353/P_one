@@ -208,6 +208,29 @@ import { Route as MerchandisingSampleTrackerRouteImport } from './routes/merchan
 import { Route as MerchandisingTnaCalendarRouteImport } from './routes/merchandising-tna-calendar'
 import { Route as MerchandisingWorkOrdersRouteImport } from './routes/merchandising-work-orders'
 import { Route as MessengerRouteImport } from './routes/messenger'
+import { Route as MmAccessoriesBookingRouteImport } from './routes/mm-accessories-booking'
+import { Route as MmAccessoriesBookingApprovalRouteImport } from './routes/mm-accessories-booking-approval'
+import { Route as MmAccessoriesBookingApprovalDetailsRouteImport } from './routes/mm-accessories-booking-approval-details'
+import { Route as MmAccessoriesBookingRegisterRouteImport } from './routes/mm-accessories-booking-register'
+import { Route as MmAccessoriesEstimationRouteImport } from './routes/mm-accessories-estimation'
+import { Route as MmAccessoriesEstimationRegisterRouteImport } from './routes/mm-accessories-estimation-register'
+import { Route as MmBomRouteImport } from './routes/mm-bom'
+import { Route as MmBookingApprovalQueueRouteImport } from './routes/mm-booking-approval-queue'
+import { Route as MmBuyerQuotationRouteImport } from './routes/mm-buyer-quotation'
+import { Route as MmCostSavingAnalysisRouteImport } from './routes/mm-cost-saving-analysis'
+import { Route as MmDashboardRouteImport } from './routes/mm-dashboard'
+import { Route as MmFabricBookingRouteImport } from './routes/mm-fabric-booking'
+import { Route as MmFabricBookingApprovalRouteImport } from './routes/mm-fabric-booking-approval'
+import { Route as MmFabricBookingApprovalDetailsRouteImport } from './routes/mm-fabric-booking-approval-details'
+import { Route as MmFabricBookingRegisterRouteImport } from './routes/mm-fabric-booking-register'
+import { Route as MmFabricEstimationRegisterRouteImport } from './routes/mm-fabric-estimation-register'
+import { Route as MmOrderClosureRouteImport } from './routes/mm-order-closure'
+import { Route as MmOrderEntryRouteImport } from './routes/mm-order-entry'
+import { Route as MmPiRouteImport } from './routes/mm-pi'
+import { Route as MmPolicyConfigRouteImport } from './routes/mm-policy-config'
+import { Route as MmPreCostingRouteImport } from './routes/mm-pre-costing'
+import { Route as MmProformaInvoiceCreateRouteImport } from './routes/mm-proforma-invoice-create'
+import { Route as MmReportsRouteImport } from './routes/mm-reports'
 import { Route as MobileBillingDepartmentRouteImport } from './routes/mobile-billing-department'
 import { Route as MobileBillingEmployeeRouteImport } from './routes/mobile-billing-employee'
 import { Route as MobileBillingEntryRouteImport } from './routes/mobile-billing-entry'
@@ -363,7 +386,9 @@ import { Route as WorkFlowRouteImport } from './routes/work-flow'
 import { Route as WorkFlowsRouteImport } from './routes/work-flows'
 import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
 import { Route as YearlyBonusReportRouteImport } from './routes/yearly-bonus-report'
+import { Route as ZakatAssetMasterRouteImport } from './routes/zakat-asset-master'
 import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
+import { Route as ZakatExecutiveReportRouteImport } from './routes/zakat-executive-report'
 import { Route as ZakatListRouteImport } from './routes/zakat-list'
 import { Route as AccountsConfigFinancialPeriodSetupRouteImport } from './routes/accounts-config.financial-period-setup'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
@@ -1408,6 +1433,127 @@ const MessengerRoute = MessengerRouteImport.update({
   path: '/messenger',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MmAccessoriesBookingRoute = MmAccessoriesBookingRouteImport.update({
+  id: '/mm-accessories-booking',
+  path: '/mm-accessories-booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmAccessoriesBookingApprovalRoute =
+  MmAccessoriesBookingApprovalRouteImport.update({
+    id: '/mm-accessories-booking-approval',
+    path: '/mm-accessories-booking-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MmAccessoriesBookingApprovalDetailsRoute =
+  MmAccessoriesBookingApprovalDetailsRouteImport.update({
+    id: '/mm-accessories-booking-approval-details',
+    path: '/mm-accessories-booking-approval-details',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MmAccessoriesBookingRegisterRoute =
+  MmAccessoriesBookingRegisterRouteImport.update({
+    id: '/mm-accessories-booking-register',
+    path: '/mm-accessories-booking-register',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MmAccessoriesEstimationRoute = MmAccessoriesEstimationRouteImport.update({
+  id: '/mm-accessories-estimation',
+  path: '/mm-accessories-estimation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmAccessoriesEstimationRegisterRoute =
+  MmAccessoriesEstimationRegisterRouteImport.update({
+    id: '/mm-accessories-estimation-register',
+    path: '/mm-accessories-estimation-register',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MmBomRoute = MmBomRouteImport.update({
+  id: '/mm-bom',
+  path: '/mm-bom',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmBookingApprovalQueueRoute = MmBookingApprovalQueueRouteImport.update({
+  id: '/mm-booking-approval-queue',
+  path: '/mm-booking-approval-queue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmBuyerQuotationRoute = MmBuyerQuotationRouteImport.update({
+  id: '/mm-buyer-quotation',
+  path: '/mm-buyer-quotation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmCostSavingAnalysisRoute = MmCostSavingAnalysisRouteImport.update({
+  id: '/mm-cost-saving-analysis',
+  path: '/mm-cost-saving-analysis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmDashboardRoute = MmDashboardRouteImport.update({
+  id: '/mm-dashboard',
+  path: '/mm-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmFabricBookingRoute = MmFabricBookingRouteImport.update({
+  id: '/mm-fabric-booking',
+  path: '/mm-fabric-booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmFabricBookingApprovalRoute = MmFabricBookingApprovalRouteImport.update({
+  id: '/mm-fabric-booking-approval',
+  path: '/mm-fabric-booking-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmFabricBookingApprovalDetailsRoute =
+  MmFabricBookingApprovalDetailsRouteImport.update({
+    id: '/mm-fabric-booking-approval-details',
+    path: '/mm-fabric-booking-approval-details',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MmFabricBookingRegisterRoute = MmFabricBookingRegisterRouteImport.update({
+  id: '/mm-fabric-booking-register',
+  path: '/mm-fabric-booking-register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmFabricEstimationRegisterRoute =
+  MmFabricEstimationRegisterRouteImport.update({
+    id: '/mm-fabric-estimation-register',
+    path: '/mm-fabric-estimation-register',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MmOrderClosureRoute = MmOrderClosureRouteImport.update({
+  id: '/mm-order-closure',
+  path: '/mm-order-closure',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmOrderEntryRoute = MmOrderEntryRouteImport.update({
+  id: '/mm-order-entry',
+  path: '/mm-order-entry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmPiRoute = MmPiRouteImport.update({
+  id: '/mm-pi',
+  path: '/mm-pi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmPolicyConfigRoute = MmPolicyConfigRouteImport.update({
+  id: '/mm-policy-config',
+  path: '/mm-policy-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmPreCostingRoute = MmPreCostingRouteImport.update({
+  id: '/mm-pre-costing',
+  path: '/mm-pre-costing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmProformaInvoiceCreateRoute = MmProformaInvoiceCreateRouteImport.update({
+  id: '/mm-proforma-invoice-create',
+  path: '/mm-proforma-invoice-create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmReportsRoute = MmReportsRouteImport.update({
+  id: '/mm-reports',
+  path: '/mm-reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MobileBillingDepartmentRoute = MobileBillingDepartmentRouteImport.update({
   id: '/mobile-billing-department',
   path: '/mobile-billing-department',
@@ -2247,12 +2393,22 @@ const YearlyBonusReportRoute = YearlyBonusReportRouteImport.update({
   path: '/yearly-bonus-report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ZakatAssetMasterRoute = ZakatAssetMasterRouteImport.update({
+  id: '/zakat-asset-master',
+  path: '/zakat-asset-master',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ZakatBudgetConfigurationRoute =
   ZakatBudgetConfigurationRouteImport.update({
     id: '/zakat-budget-configuration',
     path: '/zakat-budget-configuration',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ZakatExecutiveReportRoute = ZakatExecutiveReportRouteImport.update({
+  id: '/zakat-executive-report',
+  path: '/zakat-executive-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ZakatListRoute = ZakatListRouteImport.update({
   id: '/zakat-list',
   path: '/zakat-list',
@@ -2487,6 +2643,29 @@ export interface FileRoutesByFullPath {
   '/merchandising-tna-calendar': typeof MerchandisingTnaCalendarRoute
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
+  '/mm-accessories-booking': typeof MmAccessoriesBookingRoute
+  '/mm-accessories-booking-approval': typeof MmAccessoriesBookingApprovalRoute
+  '/mm-accessories-booking-approval-details': typeof MmAccessoriesBookingApprovalDetailsRoute
+  '/mm-accessories-booking-register': typeof MmAccessoriesBookingRegisterRoute
+  '/mm-accessories-estimation': typeof MmAccessoriesEstimationRoute
+  '/mm-accessories-estimation-register': typeof MmAccessoriesEstimationRegisterRoute
+  '/mm-bom': typeof MmBomRoute
+  '/mm-booking-approval-queue': typeof MmBookingApprovalQueueRoute
+  '/mm-buyer-quotation': typeof MmBuyerQuotationRoute
+  '/mm-cost-saving-analysis': typeof MmCostSavingAnalysisRoute
+  '/mm-dashboard': typeof MmDashboardRoute
+  '/mm-fabric-booking': typeof MmFabricBookingRoute
+  '/mm-fabric-booking-approval': typeof MmFabricBookingApprovalRoute
+  '/mm-fabric-booking-approval-details': typeof MmFabricBookingApprovalDetailsRoute
+  '/mm-fabric-booking-register': typeof MmFabricBookingRegisterRoute
+  '/mm-fabric-estimation-register': typeof MmFabricEstimationRegisterRoute
+  '/mm-order-closure': typeof MmOrderClosureRoute
+  '/mm-order-entry': typeof MmOrderEntryRoute
+  '/mm-pi': typeof MmPiRoute
+  '/mm-policy-config': typeof MmPolicyConfigRoute
+  '/mm-pre-costing': typeof MmPreCostingRoute
+  '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
+  '/mm-reports': typeof MmReportsRoute
   '/mobile-billing-department': typeof MobileBillingDepartmentRoute
   '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
   '/mobile-billing-entry': typeof MobileBillingEntryRoute
@@ -2642,7 +2821,9 @@ export interface FileRoutesByFullPath {
   '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
+  '/zakat-asset-master': typeof ZakatAssetMasterRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
+  '/zakat-executive-report': typeof ZakatExecutiveReportRoute
   '/zakat-list': typeof ZakatListRoute
   '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -2850,6 +3031,29 @@ export interface FileRoutesByTo {
   '/merchandising-tna-calendar': typeof MerchandisingTnaCalendarRoute
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
+  '/mm-accessories-booking': typeof MmAccessoriesBookingRoute
+  '/mm-accessories-booking-approval': typeof MmAccessoriesBookingApprovalRoute
+  '/mm-accessories-booking-approval-details': typeof MmAccessoriesBookingApprovalDetailsRoute
+  '/mm-accessories-booking-register': typeof MmAccessoriesBookingRegisterRoute
+  '/mm-accessories-estimation': typeof MmAccessoriesEstimationRoute
+  '/mm-accessories-estimation-register': typeof MmAccessoriesEstimationRegisterRoute
+  '/mm-bom': typeof MmBomRoute
+  '/mm-booking-approval-queue': typeof MmBookingApprovalQueueRoute
+  '/mm-buyer-quotation': typeof MmBuyerQuotationRoute
+  '/mm-cost-saving-analysis': typeof MmCostSavingAnalysisRoute
+  '/mm-dashboard': typeof MmDashboardRoute
+  '/mm-fabric-booking': typeof MmFabricBookingRoute
+  '/mm-fabric-booking-approval': typeof MmFabricBookingApprovalRoute
+  '/mm-fabric-booking-approval-details': typeof MmFabricBookingApprovalDetailsRoute
+  '/mm-fabric-booking-register': typeof MmFabricBookingRegisterRoute
+  '/mm-fabric-estimation-register': typeof MmFabricEstimationRegisterRoute
+  '/mm-order-closure': typeof MmOrderClosureRoute
+  '/mm-order-entry': typeof MmOrderEntryRoute
+  '/mm-pi': typeof MmPiRoute
+  '/mm-policy-config': typeof MmPolicyConfigRoute
+  '/mm-pre-costing': typeof MmPreCostingRoute
+  '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
+  '/mm-reports': typeof MmReportsRoute
   '/mobile-billing-department': typeof MobileBillingDepartmentRoute
   '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
   '/mobile-billing-entry': typeof MobileBillingEntryRoute
@@ -3005,7 +3209,9 @@ export interface FileRoutesByTo {
   '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
+  '/zakat-asset-master': typeof ZakatAssetMasterRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
+  '/zakat-executive-report': typeof ZakatExecutiveReportRoute
   '/zakat-list': typeof ZakatListRoute
   '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -3214,6 +3420,29 @@ export interface FileRoutesById {
   '/merchandising-tna-calendar': typeof MerchandisingTnaCalendarRoute
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
+  '/mm-accessories-booking': typeof MmAccessoriesBookingRoute
+  '/mm-accessories-booking-approval': typeof MmAccessoriesBookingApprovalRoute
+  '/mm-accessories-booking-approval-details': typeof MmAccessoriesBookingApprovalDetailsRoute
+  '/mm-accessories-booking-register': typeof MmAccessoriesBookingRegisterRoute
+  '/mm-accessories-estimation': typeof MmAccessoriesEstimationRoute
+  '/mm-accessories-estimation-register': typeof MmAccessoriesEstimationRegisterRoute
+  '/mm-bom': typeof MmBomRoute
+  '/mm-booking-approval-queue': typeof MmBookingApprovalQueueRoute
+  '/mm-buyer-quotation': typeof MmBuyerQuotationRoute
+  '/mm-cost-saving-analysis': typeof MmCostSavingAnalysisRoute
+  '/mm-dashboard': typeof MmDashboardRoute
+  '/mm-fabric-booking': typeof MmFabricBookingRoute
+  '/mm-fabric-booking-approval': typeof MmFabricBookingApprovalRoute
+  '/mm-fabric-booking-approval-details': typeof MmFabricBookingApprovalDetailsRoute
+  '/mm-fabric-booking-register': typeof MmFabricBookingRegisterRoute
+  '/mm-fabric-estimation-register': typeof MmFabricEstimationRegisterRoute
+  '/mm-order-closure': typeof MmOrderClosureRoute
+  '/mm-order-entry': typeof MmOrderEntryRoute
+  '/mm-pi': typeof MmPiRoute
+  '/mm-policy-config': typeof MmPolicyConfigRoute
+  '/mm-pre-costing': typeof MmPreCostingRoute
+  '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
+  '/mm-reports': typeof MmReportsRoute
   '/mobile-billing-department': typeof MobileBillingDepartmentRoute
   '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
   '/mobile-billing-entry': typeof MobileBillingEntryRoute
@@ -3369,7 +3598,9 @@ export interface FileRoutesById {
   '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
+  '/zakat-asset-master': typeof ZakatAssetMasterRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
+  '/zakat-executive-report': typeof ZakatExecutiveReportRoute
   '/zakat-list': typeof ZakatListRoute
   '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
@@ -3579,6 +3810,29 @@ export interface FileRouteTypes {
     | '/merchandising-tna-calendar'
     | '/merchandising-work-orders'
     | '/messenger'
+    | '/mm-accessories-booking'
+    | '/mm-accessories-booking-approval'
+    | '/mm-accessories-booking-approval-details'
+    | '/mm-accessories-booking-register'
+    | '/mm-accessories-estimation'
+    | '/mm-accessories-estimation-register'
+    | '/mm-bom'
+    | '/mm-booking-approval-queue'
+    | '/mm-buyer-quotation'
+    | '/mm-cost-saving-analysis'
+    | '/mm-dashboard'
+    | '/mm-fabric-booking'
+    | '/mm-fabric-booking-approval'
+    | '/mm-fabric-booking-approval-details'
+    | '/mm-fabric-booking-register'
+    | '/mm-fabric-estimation-register'
+    | '/mm-order-closure'
+    | '/mm-order-entry'
+    | '/mm-pi'
+    | '/mm-policy-config'
+    | '/mm-pre-costing'
+    | '/mm-proforma-invoice-create'
+    | '/mm-reports'
     | '/mobile-billing-department'
     | '/mobile-billing-employee'
     | '/mobile-billing-entry'
@@ -3734,7 +3988,9 @@ export interface FileRouteTypes {
     | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
+    | '/zakat-asset-master'
     | '/zakat-budget-configuration'
+    | '/zakat-executive-report'
     | '/zakat-list'
     | '/accounts-config/financial-period-setup'
     | '/employee-detail/$id'
@@ -3942,6 +4198,29 @@ export interface FileRouteTypes {
     | '/merchandising-tna-calendar'
     | '/merchandising-work-orders'
     | '/messenger'
+    | '/mm-accessories-booking'
+    | '/mm-accessories-booking-approval'
+    | '/mm-accessories-booking-approval-details'
+    | '/mm-accessories-booking-register'
+    | '/mm-accessories-estimation'
+    | '/mm-accessories-estimation-register'
+    | '/mm-bom'
+    | '/mm-booking-approval-queue'
+    | '/mm-buyer-quotation'
+    | '/mm-cost-saving-analysis'
+    | '/mm-dashboard'
+    | '/mm-fabric-booking'
+    | '/mm-fabric-booking-approval'
+    | '/mm-fabric-booking-approval-details'
+    | '/mm-fabric-booking-register'
+    | '/mm-fabric-estimation-register'
+    | '/mm-order-closure'
+    | '/mm-order-entry'
+    | '/mm-pi'
+    | '/mm-policy-config'
+    | '/mm-pre-costing'
+    | '/mm-proforma-invoice-create'
+    | '/mm-reports'
     | '/mobile-billing-department'
     | '/mobile-billing-employee'
     | '/mobile-billing-entry'
@@ -4097,7 +4376,9 @@ export interface FileRouteTypes {
     | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
+    | '/zakat-asset-master'
     | '/zakat-budget-configuration'
+    | '/zakat-executive-report'
     | '/zakat-list'
     | '/accounts-config/financial-period-setup'
     | '/employee-detail/$id'
@@ -4305,6 +4586,29 @@ export interface FileRouteTypes {
     | '/merchandising-tna-calendar'
     | '/merchandising-work-orders'
     | '/messenger'
+    | '/mm-accessories-booking'
+    | '/mm-accessories-booking-approval'
+    | '/mm-accessories-booking-approval-details'
+    | '/mm-accessories-booking-register'
+    | '/mm-accessories-estimation'
+    | '/mm-accessories-estimation-register'
+    | '/mm-bom'
+    | '/mm-booking-approval-queue'
+    | '/mm-buyer-quotation'
+    | '/mm-cost-saving-analysis'
+    | '/mm-dashboard'
+    | '/mm-fabric-booking'
+    | '/mm-fabric-booking-approval'
+    | '/mm-fabric-booking-approval-details'
+    | '/mm-fabric-booking-register'
+    | '/mm-fabric-estimation-register'
+    | '/mm-order-closure'
+    | '/mm-order-entry'
+    | '/mm-pi'
+    | '/mm-policy-config'
+    | '/mm-pre-costing'
+    | '/mm-proforma-invoice-create'
+    | '/mm-reports'
     | '/mobile-billing-department'
     | '/mobile-billing-employee'
     | '/mobile-billing-entry'
@@ -4460,7 +4764,9 @@ export interface FileRouteTypes {
     | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
+    | '/zakat-asset-master'
     | '/zakat-budget-configuration'
+    | '/zakat-executive-report'
     | '/zakat-list'
     | '/accounts-config/financial-period-setup'
     | '/employee-detail/$id'
@@ -4669,6 +4975,29 @@ export interface RootRouteChildren {
   MerchandisingTnaCalendarRoute: typeof MerchandisingTnaCalendarRoute
   MerchandisingWorkOrdersRoute: typeof MerchandisingWorkOrdersRoute
   MessengerRoute: typeof MessengerRoute
+  MmAccessoriesBookingRoute: typeof MmAccessoriesBookingRoute
+  MmAccessoriesBookingApprovalRoute: typeof MmAccessoriesBookingApprovalRoute
+  MmAccessoriesBookingApprovalDetailsRoute: typeof MmAccessoriesBookingApprovalDetailsRoute
+  MmAccessoriesBookingRegisterRoute: typeof MmAccessoriesBookingRegisterRoute
+  MmAccessoriesEstimationRoute: typeof MmAccessoriesEstimationRoute
+  MmAccessoriesEstimationRegisterRoute: typeof MmAccessoriesEstimationRegisterRoute
+  MmBomRoute: typeof MmBomRoute
+  MmBookingApprovalQueueRoute: typeof MmBookingApprovalQueueRoute
+  MmBuyerQuotationRoute: typeof MmBuyerQuotationRoute
+  MmCostSavingAnalysisRoute: typeof MmCostSavingAnalysisRoute
+  MmDashboardRoute: typeof MmDashboardRoute
+  MmFabricBookingRoute: typeof MmFabricBookingRoute
+  MmFabricBookingApprovalRoute: typeof MmFabricBookingApprovalRoute
+  MmFabricBookingApprovalDetailsRoute: typeof MmFabricBookingApprovalDetailsRoute
+  MmFabricBookingRegisterRoute: typeof MmFabricBookingRegisterRoute
+  MmFabricEstimationRegisterRoute: typeof MmFabricEstimationRegisterRoute
+  MmOrderClosureRoute: typeof MmOrderClosureRoute
+  MmOrderEntryRoute: typeof MmOrderEntryRoute
+  MmPiRoute: typeof MmPiRoute
+  MmPolicyConfigRoute: typeof MmPolicyConfigRoute
+  MmPreCostingRoute: typeof MmPreCostingRoute
+  MmProformaInvoiceCreateRoute: typeof MmProformaInvoiceCreateRoute
+  MmReportsRoute: typeof MmReportsRoute
   MobileBillingDepartmentRoute: typeof MobileBillingDepartmentRoute
   MobileBillingEmployeeRoute: typeof MobileBillingEmployeeRoute
   MobileBillingEntryRoute: typeof MobileBillingEntryRoute
@@ -4824,7 +5153,9 @@ export interface RootRouteChildren {
   WorkFlowsRoute: typeof WorkFlowsRoute
   YearlyBonusProcessRoute: typeof YearlyBonusProcessRoute
   YearlyBonusReportRoute: typeof YearlyBonusReportRoute
+  ZakatAssetMasterRoute: typeof ZakatAssetMasterRoute
   ZakatBudgetConfigurationRoute: typeof ZakatBudgetConfigurationRoute
+  ZakatExecutiveReportRoute: typeof ZakatExecutiveReportRoute
   ZakatListRoute: typeof ZakatListRoute
   AccountsConfigFinancialPeriodSetupRoute: typeof AccountsConfigFinancialPeriodSetupRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
@@ -6228,6 +6559,167 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MessengerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mm-accessories-booking': {
+      id: '/mm-accessories-booking'
+      path: '/mm-accessories-booking'
+      fullPath: '/mm-accessories-booking'
+      preLoaderRoute: typeof MmAccessoriesBookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-accessories-booking-approval': {
+      id: '/mm-accessories-booking-approval'
+      path: '/mm-accessories-booking-approval'
+      fullPath: '/mm-accessories-booking-approval'
+      preLoaderRoute: typeof MmAccessoriesBookingApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-accessories-booking-approval-details': {
+      id: '/mm-accessories-booking-approval-details'
+      path: '/mm-accessories-booking-approval-details'
+      fullPath: '/mm-accessories-booking-approval-details'
+      preLoaderRoute: typeof MmAccessoriesBookingApprovalDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-accessories-booking-register': {
+      id: '/mm-accessories-booking-register'
+      path: '/mm-accessories-booking-register'
+      fullPath: '/mm-accessories-booking-register'
+      preLoaderRoute: typeof MmAccessoriesBookingRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-accessories-estimation': {
+      id: '/mm-accessories-estimation'
+      path: '/mm-accessories-estimation'
+      fullPath: '/mm-accessories-estimation'
+      preLoaderRoute: typeof MmAccessoriesEstimationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-accessories-estimation-register': {
+      id: '/mm-accessories-estimation-register'
+      path: '/mm-accessories-estimation-register'
+      fullPath: '/mm-accessories-estimation-register'
+      preLoaderRoute: typeof MmAccessoriesEstimationRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-bom': {
+      id: '/mm-bom'
+      path: '/mm-bom'
+      fullPath: '/mm-bom'
+      preLoaderRoute: typeof MmBomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-booking-approval-queue': {
+      id: '/mm-booking-approval-queue'
+      path: '/mm-booking-approval-queue'
+      fullPath: '/mm-booking-approval-queue'
+      preLoaderRoute: typeof MmBookingApprovalQueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-buyer-quotation': {
+      id: '/mm-buyer-quotation'
+      path: '/mm-buyer-quotation'
+      fullPath: '/mm-buyer-quotation'
+      preLoaderRoute: typeof MmBuyerQuotationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-cost-saving-analysis': {
+      id: '/mm-cost-saving-analysis'
+      path: '/mm-cost-saving-analysis'
+      fullPath: '/mm-cost-saving-analysis'
+      preLoaderRoute: typeof MmCostSavingAnalysisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-dashboard': {
+      id: '/mm-dashboard'
+      path: '/mm-dashboard'
+      fullPath: '/mm-dashboard'
+      preLoaderRoute: typeof MmDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-fabric-booking': {
+      id: '/mm-fabric-booking'
+      path: '/mm-fabric-booking'
+      fullPath: '/mm-fabric-booking'
+      preLoaderRoute: typeof MmFabricBookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-fabric-booking-approval': {
+      id: '/mm-fabric-booking-approval'
+      path: '/mm-fabric-booking-approval'
+      fullPath: '/mm-fabric-booking-approval'
+      preLoaderRoute: typeof MmFabricBookingApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-fabric-booking-approval-details': {
+      id: '/mm-fabric-booking-approval-details'
+      path: '/mm-fabric-booking-approval-details'
+      fullPath: '/mm-fabric-booking-approval-details'
+      preLoaderRoute: typeof MmFabricBookingApprovalDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-fabric-booking-register': {
+      id: '/mm-fabric-booking-register'
+      path: '/mm-fabric-booking-register'
+      fullPath: '/mm-fabric-booking-register'
+      preLoaderRoute: typeof MmFabricBookingRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-fabric-estimation-register': {
+      id: '/mm-fabric-estimation-register'
+      path: '/mm-fabric-estimation-register'
+      fullPath: '/mm-fabric-estimation-register'
+      preLoaderRoute: typeof MmFabricEstimationRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-order-closure': {
+      id: '/mm-order-closure'
+      path: '/mm-order-closure'
+      fullPath: '/mm-order-closure'
+      preLoaderRoute: typeof MmOrderClosureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-order-entry': {
+      id: '/mm-order-entry'
+      path: '/mm-order-entry'
+      fullPath: '/mm-order-entry'
+      preLoaderRoute: typeof MmOrderEntryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-pi': {
+      id: '/mm-pi'
+      path: '/mm-pi'
+      fullPath: '/mm-pi'
+      preLoaderRoute: typeof MmPiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-policy-config': {
+      id: '/mm-policy-config'
+      path: '/mm-policy-config'
+      fullPath: '/mm-policy-config'
+      preLoaderRoute: typeof MmPolicyConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-pre-costing': {
+      id: '/mm-pre-costing'
+      path: '/mm-pre-costing'
+      fullPath: '/mm-pre-costing'
+      preLoaderRoute: typeof MmPreCostingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-proforma-invoice-create': {
+      id: '/mm-proforma-invoice-create'
+      path: '/mm-proforma-invoice-create'
+      fullPath: '/mm-proforma-invoice-create'
+      preLoaderRoute: typeof MmProformaInvoiceCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-reports': {
+      id: '/mm-reports'
+      path: '/mm-reports'
+      fullPath: '/mm-reports'
+      preLoaderRoute: typeof MmReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mobile-billing-department': {
       id: '/mobile-billing-department'
       path: '/mobile-billing-department'
@@ -7313,11 +7805,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof YearlyBonusReportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/zakat-asset-master': {
+      id: '/zakat-asset-master'
+      path: '/zakat-asset-master'
+      fullPath: '/zakat-asset-master'
+      preLoaderRoute: typeof ZakatAssetMasterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/zakat-budget-configuration': {
       id: '/zakat-budget-configuration'
       path: '/zakat-budget-configuration'
       fullPath: '/zakat-budget-configuration'
       preLoaderRoute: typeof ZakatBudgetConfigurationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zakat-executive-report': {
+      id: '/zakat-executive-report'
+      path: '/zakat-executive-report'
+      fullPath: '/zakat-executive-report'
+      preLoaderRoute: typeof ZakatExecutiveReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/zakat-list': {
@@ -7568,6 +8074,30 @@ const rootRouteChildren: RootRouteChildren = {
   MerchandisingTnaCalendarRoute: MerchandisingTnaCalendarRoute,
   MerchandisingWorkOrdersRoute: MerchandisingWorkOrdersRoute,
   MessengerRoute: MessengerRoute,
+  MmAccessoriesBookingRoute: MmAccessoriesBookingRoute,
+  MmAccessoriesBookingApprovalRoute: MmAccessoriesBookingApprovalRoute,
+  MmAccessoriesBookingApprovalDetailsRoute:
+    MmAccessoriesBookingApprovalDetailsRoute,
+  MmAccessoriesBookingRegisterRoute: MmAccessoriesBookingRegisterRoute,
+  MmAccessoriesEstimationRoute: MmAccessoriesEstimationRoute,
+  MmAccessoriesEstimationRegisterRoute: MmAccessoriesEstimationRegisterRoute,
+  MmBomRoute: MmBomRoute,
+  MmBookingApprovalQueueRoute: MmBookingApprovalQueueRoute,
+  MmBuyerQuotationRoute: MmBuyerQuotationRoute,
+  MmCostSavingAnalysisRoute: MmCostSavingAnalysisRoute,
+  MmDashboardRoute: MmDashboardRoute,
+  MmFabricBookingRoute: MmFabricBookingRoute,
+  MmFabricBookingApprovalRoute: MmFabricBookingApprovalRoute,
+  MmFabricBookingApprovalDetailsRoute: MmFabricBookingApprovalDetailsRoute,
+  MmFabricBookingRegisterRoute: MmFabricBookingRegisterRoute,
+  MmFabricEstimationRegisterRoute: MmFabricEstimationRegisterRoute,
+  MmOrderClosureRoute: MmOrderClosureRoute,
+  MmOrderEntryRoute: MmOrderEntryRoute,
+  MmPiRoute: MmPiRoute,
+  MmPolicyConfigRoute: MmPolicyConfigRoute,
+  MmPreCostingRoute: MmPreCostingRoute,
+  MmProformaInvoiceCreateRoute: MmProformaInvoiceCreateRoute,
+  MmReportsRoute: MmReportsRoute,
   MobileBillingDepartmentRoute: MobileBillingDepartmentRoute,
   MobileBillingEmployeeRoute: MobileBillingEmployeeRoute,
   MobileBillingEntryRoute: MobileBillingEntryRoute,
@@ -7732,7 +8262,9 @@ const rootRouteChildren: RootRouteChildren = {
   WorkFlowsRoute: WorkFlowsRoute,
   YearlyBonusProcessRoute: YearlyBonusProcessRoute,
   YearlyBonusReportRoute: YearlyBonusReportRoute,
+  ZakatAssetMasterRoute: ZakatAssetMasterRoute,
   ZakatBudgetConfigurationRoute: ZakatBudgetConfigurationRoute,
+  ZakatExecutiveReportRoute: ZakatExecutiveReportRoute,
   ZakatListRoute: ZakatListRoute,
   AccountsConfigFinancialPeriodSetupRoute:
     AccountsConfigFinancialPeriodSetupRoute,

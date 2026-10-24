@@ -34,6 +34,7 @@ export interface WarehouseStore {
   name?: string;
   storeType?: StoreType;
   organization: string;
+  companyAreaSection?: string;
   businessUnit?: string;
   branchLocation?: string;
   storeManager: string;
@@ -339,6 +340,7 @@ export interface ItemSpecValue {
 export interface ItemProductMaster {
   id: string;
   itemCode: string;
+  hsCode?: string;
   itemName: string;
   itemGroupId?: string;
   groupId?: string;
