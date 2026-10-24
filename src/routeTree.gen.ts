@@ -208,11 +208,6 @@ import { Route as MerchandisingSampleTrackerRouteImport } from './routes/merchan
 import { Route as MerchandisingTnaCalendarRouteImport } from './routes/merchandising-tna-calendar'
 import { Route as MerchandisingWorkOrdersRouteImport } from './routes/merchandising-work-orders'
 import { Route as MessengerRouteImport } from './routes/messenger'
-<<<<<<< HEAD
-import { Route as MobileBillingDepartmentRouteImport } from './routes/mobile-billing-department'
-import { Route as MobileBillingEmployeeRouteImport } from './routes/mobile-billing-employee'
-import { Route as MobileBillingEntryRouteImport } from './routes/mobile-billing-entry'
-=======
 import { Route as MmAccessoriesBookingRouteImport } from './routes/mm-accessories-booking'
 import { Route as MmAccessoriesBookingApprovalRouteImport } from './routes/mm-accessories-booking-approval'
 import { Route as MmAccessoriesBookingApprovalDetailsRouteImport } from './routes/mm-accessories-booking-approval-details'
@@ -236,7 +231,9 @@ import { Route as MmPolicyConfigRouteImport } from './routes/mm-policy-config'
 import { Route as MmPreCostingRouteImport } from './routes/mm-pre-costing'
 import { Route as MmProformaInvoiceCreateRouteImport } from './routes/mm-proforma-invoice-create'
 import { Route as MmReportsRouteImport } from './routes/mm-reports'
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+import { Route as MobileBillingDepartmentRouteImport } from './routes/mobile-billing-department'
+import { Route as MobileBillingEmployeeRouteImport } from './routes/mobile-billing-employee'
+import { Route as MobileBillingEntryRouteImport } from './routes/mobile-billing-entry'
 import { Route as ModuleSelectionRouteImport } from './routes/module-selection'
 import { Route as MonthlyAdvanceSalarySheetRouteImport } from './routes/monthly-advance-salary-sheet'
 import { Route as MonthlyLeftySalarySheetRouteImport } from './routes/monthly-lefty-salary-sheet'
@@ -1435,21 +1432,6 @@ const MessengerRoute = MessengerRouteImport.update({
   path: '/messenger',
   getParentRoute: () => rootRouteImport,
 } as any)
-<<<<<<< HEAD
-const MobileBillingDepartmentRoute = MobileBillingDepartmentRouteImport.update({
-  id: '/mobile-billing-department',
-  path: '/mobile-billing-department',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MobileBillingEmployeeRoute = MobileBillingEmployeeRouteImport.update({
-  id: '/mobile-billing-employee',
-  path: '/mobile-billing-employee',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MobileBillingEntryRoute = MobileBillingEntryRouteImport.update({
-  id: '/mobile-billing-entry',
-  path: '/mobile-billing-entry',
-=======
 const MmAccessoriesBookingRoute = MmAccessoriesBookingRouteImport.update({
   id: '/mm-accessories-booking',
   path: '/mm-accessories-booking',
@@ -1569,7 +1551,21 @@ const MmProformaInvoiceCreateRoute = MmProformaInvoiceCreateRouteImport.update({
 const MmReportsRoute = MmReportsRouteImport.update({
   id: '/mm-reports',
   path: '/mm-reports',
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MobileBillingDepartmentRoute = MobileBillingDepartmentRouteImport.update({
+  id: '/mobile-billing-department',
+  path: '/mobile-billing-department',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MobileBillingEmployeeRoute = MobileBillingEmployeeRouteImport.update({
+  id: '/mobile-billing-employee',
+  path: '/mobile-billing-employee',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MobileBillingEntryRoute = MobileBillingEntryRouteImport.update({
+  id: '/mobile-billing-entry',
+  path: '/mobile-billing-entry',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModuleSelectionRoute = ModuleSelectionRouteImport.update({
@@ -2641,11 +2637,6 @@ export interface FileRoutesByFullPath {
   '/merchandising-tna-calendar': typeof MerchandisingTnaCalendarRoute
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
-<<<<<<< HEAD
-  '/mobile-billing-department': typeof MobileBillingDepartmentRoute
-  '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
-  '/mobile-billing-entry': typeof MobileBillingEntryRoute
-=======
   '/mm-accessories-booking': typeof MmAccessoriesBookingRoute
   '/mm-accessories-booking-approval': typeof MmAccessoriesBookingApprovalRoute
   '/mm-accessories-booking-approval-details': typeof MmAccessoriesBookingApprovalDetailsRoute
@@ -2669,7 +2660,9 @@ export interface FileRoutesByFullPath {
   '/mm-pre-costing': typeof MmPreCostingRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
   '/mm-reports': typeof MmReportsRoute
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+  '/mobile-billing-department': typeof MobileBillingDepartmentRoute
+  '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
+  '/mobile-billing-entry': typeof MobileBillingEntryRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-advance-salary-sheet': typeof MonthlyAdvanceSalarySheetRoute
   '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
@@ -3031,11 +3024,6 @@ export interface FileRoutesByTo {
   '/merchandising-tna-calendar': typeof MerchandisingTnaCalendarRoute
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
-<<<<<<< HEAD
-  '/mobile-billing-department': typeof MobileBillingDepartmentRoute
-  '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
-  '/mobile-billing-entry': typeof MobileBillingEntryRoute
-=======
   '/mm-accessories-booking': typeof MmAccessoriesBookingRoute
   '/mm-accessories-booking-approval': typeof MmAccessoriesBookingApprovalRoute
   '/mm-accessories-booking-approval-details': typeof MmAccessoriesBookingApprovalDetailsRoute
@@ -3059,7 +3047,9 @@ export interface FileRoutesByTo {
   '/mm-pre-costing': typeof MmPreCostingRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
   '/mm-reports': typeof MmReportsRoute
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+  '/mobile-billing-department': typeof MobileBillingDepartmentRoute
+  '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
+  '/mobile-billing-entry': typeof MobileBillingEntryRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-advance-salary-sheet': typeof MonthlyAdvanceSalarySheetRoute
   '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
@@ -3422,11 +3412,6 @@ export interface FileRoutesById {
   '/merchandising-tna-calendar': typeof MerchandisingTnaCalendarRoute
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
-<<<<<<< HEAD
-  '/mobile-billing-department': typeof MobileBillingDepartmentRoute
-  '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
-  '/mobile-billing-entry': typeof MobileBillingEntryRoute
-=======
   '/mm-accessories-booking': typeof MmAccessoriesBookingRoute
   '/mm-accessories-booking-approval': typeof MmAccessoriesBookingApprovalRoute
   '/mm-accessories-booking-approval-details': typeof MmAccessoriesBookingApprovalDetailsRoute
@@ -3450,7 +3435,9 @@ export interface FileRoutesById {
   '/mm-pre-costing': typeof MmPreCostingRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
   '/mm-reports': typeof MmReportsRoute
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+  '/mobile-billing-department': typeof MobileBillingDepartmentRoute
+  '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
+  '/mobile-billing-entry': typeof MobileBillingEntryRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-advance-salary-sheet': typeof MonthlyAdvanceSalarySheetRoute
   '/monthly-lefty-salary-sheet': typeof MonthlyLeftySalarySheetRoute
@@ -3814,11 +3801,6 @@ export interface FileRouteTypes {
     | '/merchandising-tna-calendar'
     | '/merchandising-work-orders'
     | '/messenger'
-<<<<<<< HEAD
-    | '/mobile-billing-department'
-    | '/mobile-billing-employee'
-    | '/mobile-billing-entry'
-=======
     | '/mm-accessories-booking'
     | '/mm-accessories-booking-approval'
     | '/mm-accessories-booking-approval-details'
@@ -3842,7 +3824,9 @@ export interface FileRouteTypes {
     | '/mm-pre-costing'
     | '/mm-proforma-invoice-create'
     | '/mm-reports'
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+    | '/mobile-billing-department'
+    | '/mobile-billing-employee'
+    | '/mobile-billing-entry'
     | '/module-selection'
     | '/monthly-advance-salary-sheet'
     | '/monthly-lefty-salary-sheet'
@@ -4204,11 +4188,6 @@ export interface FileRouteTypes {
     | '/merchandising-tna-calendar'
     | '/merchandising-work-orders'
     | '/messenger'
-<<<<<<< HEAD
-    | '/mobile-billing-department'
-    | '/mobile-billing-employee'
-    | '/mobile-billing-entry'
-=======
     | '/mm-accessories-booking'
     | '/mm-accessories-booking-approval'
     | '/mm-accessories-booking-approval-details'
@@ -4232,7 +4211,9 @@ export interface FileRouteTypes {
     | '/mm-pre-costing'
     | '/mm-proforma-invoice-create'
     | '/mm-reports'
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+    | '/mobile-billing-department'
+    | '/mobile-billing-employee'
+    | '/mobile-billing-entry'
     | '/module-selection'
     | '/monthly-advance-salary-sheet'
     | '/monthly-lefty-salary-sheet'
@@ -4594,11 +4575,6 @@ export interface FileRouteTypes {
     | '/merchandising-tna-calendar'
     | '/merchandising-work-orders'
     | '/messenger'
-<<<<<<< HEAD
-    | '/mobile-billing-department'
-    | '/mobile-billing-employee'
-    | '/mobile-billing-entry'
-=======
     | '/mm-accessories-booking'
     | '/mm-accessories-booking-approval'
     | '/mm-accessories-booking-approval-details'
@@ -4622,7 +4598,9 @@ export interface FileRouteTypes {
     | '/mm-pre-costing'
     | '/mm-proforma-invoice-create'
     | '/mm-reports'
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+    | '/mobile-billing-department'
+    | '/mobile-billing-employee'
+    | '/mobile-billing-entry'
     | '/module-selection'
     | '/monthly-advance-salary-sheet'
     | '/monthly-lefty-salary-sheet'
@@ -4985,11 +4963,6 @@ export interface RootRouteChildren {
   MerchandisingTnaCalendarRoute: typeof MerchandisingTnaCalendarRoute
   MerchandisingWorkOrdersRoute: typeof MerchandisingWorkOrdersRoute
   MessengerRoute: typeof MessengerRoute
-<<<<<<< HEAD
-  MobileBillingDepartmentRoute: typeof MobileBillingDepartmentRoute
-  MobileBillingEmployeeRoute: typeof MobileBillingEmployeeRoute
-  MobileBillingEntryRoute: typeof MobileBillingEntryRoute
-=======
   MmAccessoriesBookingRoute: typeof MmAccessoriesBookingRoute
   MmAccessoriesBookingApprovalRoute: typeof MmAccessoriesBookingApprovalRoute
   MmAccessoriesBookingApprovalDetailsRoute: typeof MmAccessoriesBookingApprovalDetailsRoute
@@ -5013,7 +4986,9 @@ export interface RootRouteChildren {
   MmPreCostingRoute: typeof MmPreCostingRoute
   MmProformaInvoiceCreateRoute: typeof MmProformaInvoiceCreateRoute
   MmReportsRoute: typeof MmReportsRoute
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+  MobileBillingDepartmentRoute: typeof MobileBillingDepartmentRoute
+  MobileBillingEmployeeRoute: typeof MobileBillingEmployeeRoute
+  MobileBillingEntryRoute: typeof MobileBillingEntryRoute
   ModuleSelectionRoute: typeof ModuleSelectionRoute
   MonthlyAdvanceSalarySheetRoute: typeof MonthlyAdvanceSalarySheetRoute
   MonthlyLeftySalarySheetRoute: typeof MonthlyLeftySalarySheetRoute
@@ -6571,27 +6546,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MessengerRouteImport
       parentRoute: typeof rootRouteImport
     }
-<<<<<<< HEAD
-    '/mobile-billing-department': {
-      id: '/mobile-billing-department'
-      path: '/mobile-billing-department'
-      fullPath: '/mobile-billing-department'
-      preLoaderRoute: typeof MobileBillingDepartmentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mobile-billing-employee': {
-      id: '/mobile-billing-employee'
-      path: '/mobile-billing-employee'
-      fullPath: '/mobile-billing-employee'
-      preLoaderRoute: typeof MobileBillingEmployeeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mobile-billing-entry': {
-      id: '/mobile-billing-entry'
-      path: '/mobile-billing-entry'
-      fullPath: '/mobile-billing-entry'
-      preLoaderRoute: typeof MobileBillingEntryRouteImport
-=======
     '/mm-accessories-booking': {
       id: '/mm-accessories-booking'
       path: '/mm-accessories-booking'
@@ -6751,7 +6705,27 @@ declare module '@tanstack/react-router' {
       path: '/mm-reports'
       fullPath: '/mm-reports'
       preLoaderRoute: typeof MmReportsRouteImport
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+      parentRoute: typeof rootRouteImport
+    }
+    '/mobile-billing-department': {
+      id: '/mobile-billing-department'
+      path: '/mobile-billing-department'
+      fullPath: '/mobile-billing-department'
+      preLoaderRoute: typeof MobileBillingDepartmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mobile-billing-employee': {
+      id: '/mobile-billing-employee'
+      path: '/mobile-billing-employee'
+      fullPath: '/mobile-billing-employee'
+      preLoaderRoute: typeof MobileBillingEmployeeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mobile-billing-entry': {
+      id: '/mobile-billing-entry'
+      path: '/mobile-billing-entry'
+      fullPath: '/mobile-billing-entry'
+      preLoaderRoute: typeof MobileBillingEntryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/module-selection': {
@@ -8080,11 +8054,6 @@ const rootRouteChildren: RootRouteChildren = {
   MerchandisingTnaCalendarRoute: MerchandisingTnaCalendarRoute,
   MerchandisingWorkOrdersRoute: MerchandisingWorkOrdersRoute,
   MessengerRoute: MessengerRoute,
-<<<<<<< HEAD
-  MobileBillingDepartmentRoute: MobileBillingDepartmentRoute,
-  MobileBillingEmployeeRoute: MobileBillingEmployeeRoute,
-  MobileBillingEntryRoute: MobileBillingEntryRoute,
-=======
   MmAccessoriesBookingRoute: MmAccessoriesBookingRoute,
   MmAccessoriesBookingApprovalRoute: MmAccessoriesBookingApprovalRoute,
   MmAccessoriesBookingApprovalDetailsRoute:
@@ -8109,7 +8078,9 @@ const rootRouteChildren: RootRouteChildren = {
   MmPreCostingRoute: MmPreCostingRoute,
   MmProformaInvoiceCreateRoute: MmProformaInvoiceCreateRoute,
   MmReportsRoute: MmReportsRoute,
->>>>>>> bdc11e70426d822cd27fc420c30bd79701e1f99c
+  MobileBillingDepartmentRoute: MobileBillingDepartmentRoute,
+  MobileBillingEmployeeRoute: MobileBillingEmployeeRoute,
+  MobileBillingEntryRoute: MobileBillingEntryRoute,
   ModuleSelectionRoute: ModuleSelectionRoute,
   MonthlyAdvanceSalarySheetRoute: MonthlyAdvanceSalarySheetRoute,
   MonthlyLeftySalarySheetRoute: MonthlyLeftySalarySheetRoute,
