@@ -1095,21 +1095,18 @@ export function Topbar() {
                         setIsSearchOpen(false);
                         setSearchQuery("");
                       }}
-                      className={`w-full group text-left flex items-center gap-3 p-2.5 rounded-xl transition duration-150 border ${
-                        isFocused
+                      className={`w-full group text-left flex items-center gap-3 p-2.5 rounded-xl transition duration-150 border ${isFocused
                           ? "bg-primary/[0.08] dark:bg-primary/[0.12] border-primary/20 text-primary"
                           : "hover:bg-slate-50/70 dark:hover:bg-slate-900/40 border-transparent text-slate-700 dark:text-slate-350"
-                      }`}
+                        }`}
                     >
                       {/* Left: Beautiful visually distinct Category Icon Box */}
                       <div
-                        className={`size-8 rounded-lg flex items-center justify-center border shrink-0 transition-transform duration-300 ${
-                          isFocused ? "scale-105" : ""
-                        } ${
-                          isActiveRoute
+                        className={`size-8 rounded-lg flex items-center justify-center border shrink-0 transition-transform duration-300 ${isFocused ? "scale-105" : ""
+                          } ${isActiveRoute
                             ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                             : "bg-slate-100 border-slate-200/40 text-slate-400 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-500"
-                        }`}
+                          }`}
                       >
                         <CategoryIcon className="size-4" />
                       </div>
@@ -1121,11 +1118,10 @@ export function Topbar() {
                             {item.label}
                           </span>
                           <span
-                            className={`px-1.5 py-0.2 rounded text-[7.5px] font-black uppercase tracking-wider scale-90 ${
-                              isActiveRoute
+                            className={`px-1.5 py-0.2 rounded text-[7.5px] font-black uppercase tracking-wider scale-90 ${isActiveRoute
                                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                                 : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
-                            }`}
+                              }`}
                           >
                             {item.parent}
                           </span>
@@ -1382,7 +1378,7 @@ export function Topbar() {
                   <p className="text-xs font-extrabold">Tahmid Afsar</p>
                   <p className="text-[10px] text-muted-foreground font-medium truncate">tahmid@pakizasoftware.com</p>
                 </div>
-                
+
                 <Link
                   to="/my-profile"
                   onClick={() => setIsProfileMenuOpen(false)}

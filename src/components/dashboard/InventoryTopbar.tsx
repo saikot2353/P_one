@@ -52,6 +52,12 @@ const searchableMenus: SearchMenuLink[] = [
     description: "View and filter complete staff profiles",
   },
   {
+    label: "Employee Account Information",
+    parent: "Personnel Info",
+    to: "/employee-account-information",
+    description: "Manage employee bank accounts, cash/bank payments, and bulk account uploads",
+  },
+  {
     label: "ID Card Setup",
     parent: "Personnel Info",
     to: "/id-card-setup",

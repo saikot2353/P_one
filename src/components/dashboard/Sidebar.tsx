@@ -163,6 +163,7 @@ export const nav: NavItem[] = [
     icon: UserRound,
     subitems: [
       { label: "Personnel List", to: "/personnel-list" },
+      { label: "Employee Account Information", to: "/employee-account-information" },
       { label: "ID Card Setup", to: "/id-card-setup" },
       { label: "Employee Doc Issue", to: "/employee-doc-issue" },
       { label: "Set HOD", to: "/set-hod" },
