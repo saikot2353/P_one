@@ -247,6 +247,7 @@ import { Route as MyProfileRouteImport } from './routes/my-profile'
 import { Route as NoticeRouteImport } from './routes/notice'
 import { Route as OrganizationMasterSetupRouteImport } from './routes/organization-master-setup'
 import { Route as OtSheetHolidayRouteImport } from './routes/ot-sheet-holiday'
+import { Route as OtStatusUpdateRouteImport } from './routes/ot-status-update'
 import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
 import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
 import { Route as PayrollBenefitsCommonRouteImport } from './routes/payroll-benefits-common'
@@ -1638,6 +1639,11 @@ const OtSheetHolidayRoute = OtSheetHolidayRouteImport.update({
   path: '/ot-sheet-holiday',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OtStatusUpdateRoute = OtStatusUpdateRouteImport.update({
+  id: '/ot-status-update',
+  path: '/ot-status-update',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PayrollAdvanceRoute = PayrollAdvanceRouteImport.update({
   id: '/payroll-advance',
   path: '/payroll-advance',
@@ -2695,6 +2701,7 @@ export interface FileRoutesByFullPath {
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
+  '/ot-status-update': typeof OtStatusUpdateRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -3085,6 +3092,7 @@ export interface FileRoutesByTo {
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
+  '/ot-status-update': typeof OtStatusUpdateRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -3476,6 +3484,7 @@ export interface FileRoutesById {
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
+  '/ot-status-update': typeof OtStatusUpdateRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -3868,6 +3877,7 @@ export interface FileRouteTypes {
     | '/notice'
     | '/organization-master-setup'
     | '/ot-sheet-holiday'
+    | '/ot-status-update'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -4258,6 +4268,7 @@ export interface FileRouteTypes {
     | '/notice'
     | '/organization-master-setup'
     | '/ot-sheet-holiday'
+    | '/ot-status-update'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -4648,6 +4659,7 @@ export interface FileRouteTypes {
     | '/notice'
     | '/organization-master-setup'
     | '/ot-sheet-holiday'
+    | '/ot-status-update'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -5039,6 +5051,7 @@ export interface RootRouteChildren {
   NoticeRoute: typeof NoticeRoute
   OrganizationMasterSetupRoute: typeof OrganizationMasterSetupRoute
   OtSheetHolidayRoute: typeof OtSheetHolidayRoute
+  OtStatusUpdateRoute: typeof OtStatusUpdateRoute
   PayrollAdvanceRoute: typeof PayrollAdvanceRoute
   PayrollBenefitsRoute: typeof PayrollBenefitsRoute
   PayrollBenefitsCommonRoute: typeof PayrollBenefitsCommonRoute
@@ -6859,6 +6872,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OtSheetHolidayRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ot-status-update': {
+      id: '/ot-status-update'
+      path: '/ot-status-update'
+      fullPath: '/ot-status-update'
+      preLoaderRoute: typeof OtStatusUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/payroll-advance': {
       id: '/payroll-advance'
       path: '/payroll-advance'
@@ -8155,6 +8175,7 @@ const rootRouteChildren: RootRouteChildren = {
   NoticeRoute: NoticeRoute,
   OrganizationMasterSetupRoute: OrganizationMasterSetupRoute,
   OtSheetHolidayRoute: OtSheetHolidayRoute,
+  OtStatusUpdateRoute: OtStatusUpdateRoute,
   PayrollAdvanceRoute: PayrollAdvanceRoute,
   PayrollBenefitsRoute: PayrollBenefitsRoute,
   PayrollBenefitsCommonRoute: PayrollBenefitsCommonRoute,
