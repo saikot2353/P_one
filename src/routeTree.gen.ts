@@ -228,6 +228,8 @@ import { Route as MmFabricEstimationRegisterRouteImport } from './routes/mm-fabr
 import { Route as MmOrderClosureRouteImport } from './routes/mm-order-closure'
 import { Route as MmOrderEntryRouteImport } from './routes/mm-order-entry'
 import { Route as MmPiRouteImport } from './routes/mm-pi'
+import { Route as MmPiApprovalDetailsRouteImport } from './routes/mm-pi-approval-details'
+import { Route as MmPiVerificationApprovalRouteImport } from './routes/mm-pi-verification-approval'
 import { Route as MmPolicyConfigRouteImport } from './routes/mm-policy-config'
 import { Route as MmPreCostingRouteImport } from './routes/mm-pre-costing'
 import { Route as MmProformaInvoiceCreateRouteImport } from './routes/mm-proforma-invoice-create'
@@ -1539,6 +1541,17 @@ const MmPiRoute = MmPiRouteImport.update({
   path: '/mm-pi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MmPiApprovalDetailsRoute = MmPiApprovalDetailsRouteImport.update({
+  id: '/mm-pi-approval-details',
+  path: '/mm-pi-approval-details',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmPiVerificationApprovalRoute =
+  MmPiVerificationApprovalRouteImport.update({
+    id: '/mm-pi-verification-approval',
+    path: '/mm-pi-verification-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MmPolicyConfigRoute = MmPolicyConfigRouteImport.update({
   id: '/mm-policy-config',
   path: '/mm-policy-config',
@@ -2663,6 +2676,8 @@ export interface FileRoutesByFullPath {
   '/mm-order-closure': typeof MmOrderClosureRoute
   '/mm-order-entry': typeof MmOrderEntryRoute
   '/mm-pi': typeof MmPiRoute
+  '/mm-pi-approval-details': typeof MmPiApprovalDetailsRoute
+  '/mm-pi-verification-approval': typeof MmPiVerificationApprovalRoute
   '/mm-policy-config': typeof MmPolicyConfigRoute
   '/mm-pre-costing': typeof MmPreCostingRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
@@ -3051,6 +3066,8 @@ export interface FileRoutesByTo {
   '/mm-order-closure': typeof MmOrderClosureRoute
   '/mm-order-entry': typeof MmOrderEntryRoute
   '/mm-pi': typeof MmPiRoute
+  '/mm-pi-approval-details': typeof MmPiApprovalDetailsRoute
+  '/mm-pi-verification-approval': typeof MmPiVerificationApprovalRoute
   '/mm-policy-config': typeof MmPolicyConfigRoute
   '/mm-pre-costing': typeof MmPreCostingRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
@@ -3440,6 +3457,8 @@ export interface FileRoutesById {
   '/mm-order-closure': typeof MmOrderClosureRoute
   '/mm-order-entry': typeof MmOrderEntryRoute
   '/mm-pi': typeof MmPiRoute
+  '/mm-pi-approval-details': typeof MmPiApprovalDetailsRoute
+  '/mm-pi-verification-approval': typeof MmPiVerificationApprovalRoute
   '/mm-policy-config': typeof MmPolicyConfigRoute
   '/mm-pre-costing': typeof MmPreCostingRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
@@ -3830,6 +3849,8 @@ export interface FileRouteTypes {
     | '/mm-order-closure'
     | '/mm-order-entry'
     | '/mm-pi'
+    | '/mm-pi-approval-details'
+    | '/mm-pi-verification-approval'
     | '/mm-policy-config'
     | '/mm-pre-costing'
     | '/mm-proforma-invoice-create'
@@ -4218,6 +4239,8 @@ export interface FileRouteTypes {
     | '/mm-order-closure'
     | '/mm-order-entry'
     | '/mm-pi'
+    | '/mm-pi-approval-details'
+    | '/mm-pi-verification-approval'
     | '/mm-policy-config'
     | '/mm-pre-costing'
     | '/mm-proforma-invoice-create'
@@ -4606,6 +4629,8 @@ export interface FileRouteTypes {
     | '/mm-order-closure'
     | '/mm-order-entry'
     | '/mm-pi'
+    | '/mm-pi-approval-details'
+    | '/mm-pi-verification-approval'
     | '/mm-policy-config'
     | '/mm-pre-costing'
     | '/mm-proforma-invoice-create'
@@ -4995,6 +5020,8 @@ export interface RootRouteChildren {
   MmOrderClosureRoute: typeof MmOrderClosureRoute
   MmOrderEntryRoute: typeof MmOrderEntryRoute
   MmPiRoute: typeof MmPiRoute
+  MmPiApprovalDetailsRoute: typeof MmPiApprovalDetailsRoute
+  MmPiVerificationApprovalRoute: typeof MmPiVerificationApprovalRoute
   MmPolicyConfigRoute: typeof MmPolicyConfigRoute
   MmPreCostingRoute: typeof MmPreCostingRoute
   MmProformaInvoiceCreateRoute: typeof MmProformaInvoiceCreateRoute
@@ -6699,6 +6726,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MmPiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mm-pi-approval-details': {
+      id: '/mm-pi-approval-details'
+      path: '/mm-pi-approval-details'
+      fullPath: '/mm-pi-approval-details'
+      preLoaderRoute: typeof MmPiApprovalDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-pi-verification-approval': {
+      id: '/mm-pi-verification-approval'
+      path: '/mm-pi-verification-approval'
+      fullPath: '/mm-pi-verification-approval'
+      preLoaderRoute: typeof MmPiVerificationApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mm-policy-config': {
       id: '/mm-policy-config'
       path: '/mm-policy-config'
@@ -8095,6 +8136,8 @@ const rootRouteChildren: RootRouteChildren = {
   MmOrderClosureRoute: MmOrderClosureRoute,
   MmOrderEntryRoute: MmOrderEntryRoute,
   MmPiRoute: MmPiRoute,
+  MmPiApprovalDetailsRoute: MmPiApprovalDetailsRoute,
+  MmPiVerificationApprovalRoute: MmPiVerificationApprovalRoute,
   MmPolicyConfigRoute: MmPolicyConfigRoute,
   MmPreCostingRoute: MmPreCostingRoute,
   MmProformaInvoiceCreateRoute: MmProformaInvoiceCreateRoute,

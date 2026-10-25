@@ -20,7 +20,7 @@ export interface MMBookingApprovalHistoryItem {
   timestamp: string;
   comment?: string;
 }
-export type PIStatus = "Draft" | "Pending Approval" | "Approved" | "Passed" | "Rejected";
+export type PIStatus = "Draft" | "Pending Approval" | "Approved" | "Passed" | "Rejected" | "Returned";
 
 // ----------------------------------------------------------------------------
 // 1. Company Policy & Configuration Model
@@ -1355,8 +1355,12 @@ export interface MMProformaInvoice {
   notes: string;
   comments?: Array<{ id: string; user: string; timestamp: string; message: string }>;
   rejectionReason?: string;
+  returnReason?: string;
   approvalDate?: string;
   approvedBy?: string;
+  submittedBy?: string;
+  submittedDate?: string;
+  approvalHistory?: MMBookingApprovalHistoryItem[];
   attachments: string[];
   createdBy: string;
   createdDate: string;
@@ -4324,8 +4328,34 @@ export const INITIAL_MM_PROFORMA_INVOICES: MMProformaInvoice[] = [
     status: "Approved",
     approvedBy: "Head of Merchandising (Rashidul Islam)",
     approvalDate: "2026-09-30",
+    submittedBy: "Senior Merchandiser (Tanvir Ahmed)",
+    submittedDate: "2026-09-28",
     createdBy: "Senior Merchandiser (Tanvir Ahmed)",
     createdDate: "2026-09-28",
+    approvalHistory: [
+      {
+        id: "ah-pi-001-1",
+        bookingId: "pi-001",
+        bookingNo: "PI-PK-2026-0104",
+        action: "Submitted",
+        previousStatus: "Draft",
+        newStatus: "Pending Approval",
+        performedBy: "Senior Merchandiser (Tanvir Ahmed)",
+        timestamp: "2026-09-28 11:30",
+        comment: "Consolidated PI submitted for management verification",
+      },
+      {
+        id: "ah-pi-001-2",
+        bookingId: "pi-001",
+        bookingNo: "PI-PK-2026-0104",
+        action: "Approved",
+        previousStatus: "Pending Approval",
+        newStatus: "Approved",
+        performedBy: "Head of Merchandising (Rashidul Islam)",
+        timestamp: "2026-09-30 16:45",
+        comment: "Verified against FB-2026-0031. Rates and quantities approved.",
+      },
+    ],
     version: 1,
     allocatedBookings: [
       {
@@ -4457,6 +4487,112 @@ export const INITIAL_MM_PROFORMA_INVOICES: MMProformaInvoice[] = [
     additionalCharges: 0,
     totalPiValue: 10118.40,
     notes: "Passed for BBLC opening.",
+    attachments: [],
+  },
+  {
+    id: "pi-004",
+    piNo: "PI-NOM-2026-0033",
+    entryNo: "ENT-PI-004",
+    piDate: "2026-10-12",
+    entryDate: "2026-10-12",
+    supplierName: "Noman Weaving Mills",
+    businessUnit: "Unit 1 - Woven",
+    currency: "USD",
+    conversionRate: 1.0,
+    paymentTerms: "TT 30 Days",
+    deliveryTerms: "FOB Savar",
+    deliveryMode: "Road",
+    lcReferenceNo: "LC-NOM-2026-8810",
+    status: "Pending Approval",
+    submittedBy: "Merchandiser (Nafis Imtiaz)",
+    submittedDate: "2026-10-12",
+    createdBy: "Merchandiser (Nafis Imtiaz)",
+    createdDate: "2026-10-12",
+    approvalHistory: [
+      {
+        id: "ah-pi-004-1",
+        bookingId: "pi-004",
+        bookingNo: "PI-NOM-2026-0033",
+        action: "Submitted",
+        previousStatus: "Draft",
+        newStatus: "Pending Approval",
+        performedBy: "Merchandiser (Nafis Imtiaz)",
+        timestamp: "2026-10-12 14:15",
+        comment: "Submitted for verification and approval against FB-2026-0033",
+      },
+    ],
+    version: 1,
+    allocatedBookings: [
+      {
+        bookingId: "fb-003",
+        bookingNo: "FB-2026-0033",
+        bookingType: "Fabric",
+        orderNo: "ORD-2026-0042",
+        styleNo: "ZR-WV-4019",
+        allocatedAmount: 13641.60,
+      },
+    ],
+    items: [
+      {
+        piItemId: "PII-301",
+        bookingItemId: "FBI-202",
+        sourceBookingNo: "FB-2026-0033",
+        itemDescription: "65/35 TC Pocketing Twill Fabric 120 GSM",
+        specification: "Width 58 Inch, 120 GSM, Bleached White",
+        unit: "Yds",
+        quantity: 11760,
+        unitPrice: 1.16,
+        totalAmount: 13641.60,
+      },
+    ],
+    additionalCharges: 0,
+    totalPiValue: 13641.60,
+    notes: "Submitted for verification and approval against FB-2026-0033.",
+    attachments: [],
+  },
+  {
+    id: "pi-005",
+    piNo: "PI-AD-2026-0054",
+    entryNo: "ENT-PI-005",
+    piDate: "2026-10-15",
+    entryDate: "2026-10-15",
+    supplierName: "Avery Dennison BD",
+    businessUnit: "Unit 2 - Garments",
+    currency: "USD",
+    conversionRate: 1.0,
+    paymentTerms: "LC 60 Days",
+    deliveryTerms: "FOB Dhaka",
+    deliveryMode: "Road",
+    status: "Draft",
+    createdBy: "Senior Merchandiser (Tanvir Ahmed)",
+    createdDate: "2026-10-15",
+    version: 1,
+    allocatedBookings: [
+      {
+        bookingId: "ab-004",
+        bookingNo: "AB-2026-0054",
+        bookingType: "Accessories",
+        orderNo: "ORD-2026-0042",
+        styleNo: "ZR-WV-4019",
+        allocatedAmount: 8976.00,
+      },
+    ],
+    items: [
+      {
+        piItemId: "PII-401",
+        bookingItemId: "ABI-202",
+        sourceBookingNo: "AB-2026-0054",
+        itemDescription: "Genuine Leather Back Waistband Brand Tag",
+        specification: "Vegetable tanned embossed leather patch 60x40mm",
+        unit: "Pcs",
+        quantity: 32640,
+        unitPrice: 0.275,
+        totalAmount: 8976.00,
+      },
+    ],
+    additionalCharges: 0,
+    totalPiValue: 8976.00,
+    notes: "Draft Proforma Invoice for accessories trimming package.",
     attachments: [],
   },
 ];
@@ -5046,6 +5182,106 @@ export class MMRepository {
       : "PK";
     const year = new Date().getFullYear();
     return `PI-${prefix}-${year}-${String(count).padStart(4, "0")}`;
+  }
+
+  static approvePI(piId: string, approver: string = "Authorized Approver", comment?: string): boolean {
+    const list = this.getPIs();
+    const pi = list.find((p) => p.id === piId || p.piNo === piId);
+    if (!pi) return false;
+    const prevStatus = pi.status;
+    pi.status = "Approved";
+    pi.approvedBy = approver;
+    pi.approvalDate = new Date().toISOString().split("T")[0];
+    if (!pi.approvalHistory) pi.approvalHistory = [];
+    pi.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: pi.id,
+      bookingNo: pi.piNo,
+      action: "Approved",
+      previousStatus: prevStatus,
+      newStatus: "Approved",
+      performedBy: approver,
+      timestamp: new Date().toISOString(),
+      comment: comment || "Approved by Merchandising Management",
+    });
+    this.set(STORAGE_KEYS.PROFORMA_INVOICES, list);
+    this.addAuditLog({
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      entityType: "PI",
+      entityId: pi.id,
+      action: "Approve",
+      userId: approver,
+      userName: approver,
+      comments: comment,
+    });
+    return true;
+  }
+
+  static rejectPI(piId: string, approver: string = "Authorized Approver", reason: string): boolean {
+    const list = this.getPIs();
+    const pi = list.find((p) => p.id === piId || p.piNo === piId);
+    if (!pi) return false;
+    const prevStatus = pi.status;
+    pi.status = "Rejected";
+    pi.rejectionReason = reason;
+    if (!pi.approvalHistory) pi.approvalHistory = [];
+    pi.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: pi.id,
+      bookingNo: pi.piNo,
+      action: "Rejected",
+      previousStatus: prevStatus,
+      newStatus: "Rejected",
+      performedBy: approver,
+      timestamp: new Date().toISOString(),
+      comment: reason,
+    });
+    this.set(STORAGE_KEYS.PROFORMA_INVOICES, list);
+    this.addAuditLog({
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      entityType: "PI",
+      entityId: pi.id,
+      action: "Reject",
+      userId: approver,
+      userName: approver,
+      comments: reason,
+    });
+    return true;
+  }
+
+  static returnPI(piId: string, approver: string = "Authorized Approver", comment: string): boolean {
+    const list = this.getPIs();
+    const pi = list.find((p) => p.id === piId || p.piNo === piId);
+    if (!pi) return false;
+    const prevStatus = pi.status;
+    pi.status = "Returned";
+    pi.returnReason = comment;
+    if (!pi.approvalHistory) pi.approvalHistory = [];
+    pi.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: pi.id,
+      bookingNo: pi.piNo,
+      action: "Returned",
+      previousStatus: prevStatus,
+      newStatus: "Returned",
+      performedBy: approver,
+      timestamp: new Date().toISOString(),
+      comment: comment,
+    });
+    this.set(STORAGE_KEYS.PROFORMA_INVOICES, list);
+    this.addAuditLog({
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      entityType: "PI",
+      entityId: pi.id,
+      action: "Update",
+      userId: approver,
+      userName: approver,
+      comments: `Returned for correction: ${comment}`,
+    });
+    return true;
   }
 
   // 9. Audit Logs
