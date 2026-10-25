@@ -39,6 +39,7 @@ import {
   DoorOpen,
   FileSpreadsheet,
   Smartphone,
+  Network,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -308,6 +309,11 @@ export const nav: NavItem[] = [
     label: "JD List",
     to: "/jd-list",
     icon: Briefcase,
+  },
+  {
+    label: "Department SOP",
+    to: "/department-sop",
+    icon: Network,
   },
   {
     label: "Separation",

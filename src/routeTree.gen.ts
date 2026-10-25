@@ -48,6 +48,7 @@ import { Route as ConfigureTaxRouteImport } from './routes/configure-tax'
 import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
 import { Route as CurrencySetupRouteImport } from './routes/currency-setup'
+import { Route as DepartmentSopRouteImport } from './routes/department-sop'
 import { Route as DeptWiseSalarySheetRouteImport } from './routes/dept-wise-salary-sheet'
 import { Route as DisciplinaryCaseFilesRouteImport } from './routes/disciplinary-case-files'
 import { Route as DisciplinaryLeftyRouteImport } from './routes/disciplinary-lefty'
@@ -590,6 +591,11 @@ const CreateRosterRoute = CreateRosterRouteImport.update({
 const CurrencySetupRoute = CurrencySetupRouteImport.update({
   id: '/currency-setup',
   path: '/currency-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DepartmentSopRoute = DepartmentSopRouteImport.update({
+  id: '/department-sop',
+  path: '/department-sop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeptWiseSalarySheetRoute = DeptWiseSalarySheetRouteImport.update({
@@ -2477,6 +2483,7 @@ export interface FileRoutesByFullPath {
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/currency-setup': typeof CurrencySetupRoute
+  '/department-sop': typeof DepartmentSopRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
@@ -2864,6 +2871,7 @@ export interface FileRoutesByTo {
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/currency-setup': typeof CurrencySetupRoute
+  '/department-sop': typeof DepartmentSopRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
@@ -3252,6 +3260,7 @@ export interface FileRoutesById {
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/currency-setup': typeof CurrencySetupRoute
+  '/department-sop': typeof DepartmentSopRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
@@ -3641,6 +3650,7 @@ export interface FileRouteTypes {
     | '/configure-time'
     | '/create-roster'
     | '/currency-setup'
+    | '/department-sop'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
@@ -4028,6 +4038,7 @@ export interface FileRouteTypes {
     | '/configure-time'
     | '/create-roster'
     | '/currency-setup'
+    | '/department-sop'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
@@ -4415,6 +4426,7 @@ export interface FileRouteTypes {
     | '/configure-time'
     | '/create-roster'
     | '/currency-setup'
+    | '/department-sop'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
@@ -4803,6 +4815,7 @@ export interface RootRouteChildren {
   ConfigureTimeRoute: typeof ConfigureTimeRoute
   CreateRosterRoute: typeof CreateRosterRoute
   CurrencySetupRoute: typeof CurrencySetupRoute
+  DepartmentSopRoute: typeof DepartmentSopRoute
   DeptWiseSalarySheetRoute: typeof DeptWiseSalarySheetRoute
   DisciplinaryCaseFilesRoute: typeof DisciplinaryCaseFilesRoute
   DisciplinaryLeftyRoute: typeof DisciplinaryLeftyRoute
@@ -5424,6 +5437,13 @@ declare module '@tanstack/react-router' {
       path: '/currency-setup'
       fullPath: '/currency-setup'
       preLoaderRoute: typeof CurrencySetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/department-sop': {
+      id: '/department-sop'
+      path: '/department-sop'
+      fullPath: '/department-sop'
+      preLoaderRoute: typeof DepartmentSopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dept-wise-salary-sheet': {
@@ -7891,6 +7911,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfigureTimeRoute: ConfigureTimeRoute,
   CreateRosterRoute: CreateRosterRoute,
   CurrencySetupRoute: CurrencySetupRoute,
+  DepartmentSopRoute: DepartmentSopRoute,
   DeptWiseSalarySheetRoute: DeptWiseSalarySheetRoute,
   DisciplinaryCaseFilesRoute: DisciplinaryCaseFilesRoute,
   DisciplinaryLeftyRoute: DisciplinaryLeftyRoute,
