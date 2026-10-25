@@ -308,15 +308,15 @@ export function DepartmentSOPPage() {
           {activeTab === "organogram" && (
             <div className="print-canvas-wrapper flex justify-center overflow-x-auto">
               <div
-                className="print-sheet bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs p-3 sm:p-4 transition-transform duration-200 origin-top w-full max-w-[1240px]"
+                className="print-sheet bg-white dark:bg-slate-900 border-2 border-slate-400 dark:border-slate-700 rounded-xl shadow-xs p-3 sm:p-4 transition-transform duration-200 origin-top w-full max-w-[1240px]"
                 style={{
                   transform: zoomScale !== 100 ? `scale(${zoomScale / 100})` : "none",
                 }}
               >
                 {/* Print Title Header */}
-                <div className="mb-1.5 pb-1 border-b border-slate-300 dark:border-slate-700 text-center">
-                  <div className="text-[8.5px] tracking-widest uppercase font-bold text-slate-500">
-                    CRIPTON HRIS • ORGANIZATIONAL STRUCTURE
+                <div className="mb-1.5 pb-1 border-b-2 border-slate-400 dark:border-slate-600 text-center">
+                  <div className="text-[8.5px] tracking-widest uppercase font-bold text-slate-600 dark:text-slate-400">
+                    Pakiza Software Limited • ORGANIZATIONAL STRUCTURE
                   </div>
                   <h1 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wide">
                     Department SOP & Hierarchy Organogram
@@ -327,7 +327,7 @@ export function DepartmentSOPPage() {
                     LAYER 1: FIRST LAYER — RAKIBUL ISLAM KHAN
                 ───────────────────────────────────────────────────────────── */}
                 <div className="flex flex-col items-center mb-0.5">
-                  <div className="bg-slate-900 text-white dark:bg-slate-950 dark:border-slate-700 px-4 py-1.5 rounded-lg border border-slate-800 text-center min-w-[240px] shadow-xs">
+                  <div className="bg-slate-900 text-white dark:bg-slate-950 px-4 py-1.5 rounded-lg border-2 border-slate-700 text-center min-w-[240px] shadow-sm">
                     <div className="text-[8px] font-bold uppercase tracking-wider text-slate-400">
                       Top Management
                     </div>
@@ -336,41 +336,41 @@ export function DepartmentSOPPage() {
                     </div>
                   </div>
 
-                  {/* SVG Tree Connector directly spanning to the 3 columns (Centers: 24%, 59.5%, 85.5%) */}
+                  {/* SVG Tree Connector directly spanning to the 3 columns (Centers: 16.7%, 50.0%, 83.3% - Perfectly Symmetrical) */}
                   <div className="w-full flex justify-center my-0.5">
                     <svg className="w-full h-4 overflow-visible" viewBox="0 0 1000 16" fill="none" preserveAspectRatio="none">
-                      {/* Vertical line from top node */}
-                      <line x1="500" y1="0" x2="500" y2="8" stroke="#94a3b8" strokeWidth="1.5" />
-                      {/* Horizontal bar across 3 column centers */}
-                      <line x1="240" y1="8" x2="855" y2="8" stroke="#94a3b8" strokeWidth="1.5" />
-                      {/* Drop to Col 1 (Rajon - center 24%) */}
-                      <line x1="240" y1="8" x2="240" y2="16" stroke="#94a3b8" strokeWidth="1.5" />
-                      {/* Drop to Col 2 (Nasif - center 59.5%) */}
-                      <line x1="595" y1="8" x2="595" y2="16" stroke="#94a3b8" strokeWidth="1.5" />
-                      {/* Drop to Col 3 (Tareq - center 85.5%) */}
-                      <line x1="855" y1="8" x2="855" y2="16" stroke="#94a3b8" strokeWidth="1.5" />
+                      {/* Vertical line from top node (Rakibul) down to horizontal bar */}
+                      <line x1="500" y1="0" x2="500" y2="8" stroke="#475569" strokeWidth="1.75" />
+                      {/* Horizontal bar across 3 column centers: exactly 333px left and 333px right */}
+                      <line x1="167" y1="8" x2="833" y2="8" stroke="#475569" strokeWidth="1.75" />
+                      {/* Drop to Col 1 (Rajon - dead center 16.7%) */}
+                      <line x1="167" y1="8" x2="167" y2="16" stroke="#475569" strokeWidth="1.75" />
+                      {/* Drop to Col 2 (Nasif - dead center 50.0%) */}
+                      <line x1="500" y1="8" x2="500" y2="16" stroke="#475569" strokeWidth="1.75" />
+                      {/* Drop to Col 3 (Tareq - dead center 83.3%) */}
+                      <line x1="833" y1="8" x2="833" y2="16" stroke="#475569" strokeWidth="1.75" />
                     </svg>
                   </div>
                 </div>
 
                 {/* ─────────────────────────────────────────────────────────────
-                    LAYER 2 & 3: THREE EXECUTIVE LEADS (STRICT 3-COLUMN GRID: 48% / 23% / 29%)
+                    LAYER 2 & 3: THREE EXECUTIVE LEADS (BALANCED 3-COLUMN GRID: 1fr / 1fr / 1fr)
                 ───────────────────────────────────────────────────────────── */}
                 <div
                   className="organogram-three-columns w-full"
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "48% 23% 29%",
-                    gap: "6px",
+                    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                    gap: "8px",
                     alignItems: "start",
                   }}
                 >
                   {/* ═══════════════════════════════════════════════════════════
-                      COLUMN 1: RAJEBUL HASAN RAJON (48% width)
+                      COLUMN 1: RAJEBUL HASAN RAJON (Equal 1/3 width)
                   ═══════════════════════════════════════════════════════════ */}
-                  <div className="flex flex-col rounded-lg p-2 bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800">
+                  <div className="flex flex-col rounded-lg p-2 bg-slate-50/95 dark:bg-slate-900/80 border-2 border-slate-400 dark:border-slate-600 shadow-xs">
                     {/* Header */}
-                    <div className="bg-slate-800 text-white dark:bg-slate-800/90 py-1.5 px-2 rounded-md text-center mb-1.5 shadow-xs">
+                    <div className="bg-slate-800 text-white dark:bg-slate-800/90 py-1.5 px-2 rounded-md text-center mb-1.5 shadow-xs border border-slate-700">
                       <span className="text-[8px] font-semibold uppercase tracking-wider text-slate-300 block">
                         Executive Lead
                       </span>
@@ -379,24 +379,24 @@ export function DepartmentSOPPage() {
 
                     <div className="space-y-1.5 flex-1 text-xs">
                       {/* Department: Tech & Engineering */}
-                      <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-1.5">
-                        <div className="pb-1 border-b border-slate-200 dark:border-slate-800 mb-1 flex items-center gap-1">
-                          <Cpu className="size-3 text-slate-600" />
-                          <h3 className="text-[9.5px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
+                      <div className="bg-white dark:bg-slate-900 border border-slate-400 dark:border-slate-600 rounded p-1.5 shadow-2xs">
+                        <div className="pb-1 border-b border-slate-300 dark:border-slate-700 mb-1 flex items-center gap-1">
+                          <Cpu className="size-3 text-slate-700 dark:text-slate-300" />
+                          <h3 className="text-[9.5px] font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
                             Department: Tech & Engineering
                           </h3>
                         </div>
 
                         {/* Sub-Branch: Anik (16 members in 2-column grid) */}
-                        <div className="border border-slate-200 dark:border-slate-700 rounded p-1 bg-slate-50/60 dark:bg-slate-800/40 mb-1">
-                          <div className="text-[9px] font-bold text-slate-800 dark:text-slate-200 mb-0.5">
+                        <div className="border border-slate-300 dark:border-slate-700 rounded p-1 bg-slate-50/80 dark:bg-slate-800/50 mb-1">
+                          <div className="text-[9px] font-bold text-slate-900 dark:text-slate-100 mb-0.5">
                             Team Lead: <strong>Md. Anik Islam</strong>
                           </div>
                           <div className="grid grid-cols-2 gap-0.5">
                             {anikTeam.map((m) => (
                               <div
                                 key={m.id}
-                                className="text-[8px] px-1 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 truncate leading-tight font-medium"
+                                className="text-[8px] px-1 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 truncate leading-tight font-medium"
                               >
                                 {m.name}
                               </div>
@@ -405,15 +405,15 @@ export function DepartmentSOPPage() {
                         </div>
 
                         {/* Direct Tech ICs */}
-                        <div className="border border-slate-200 dark:border-slate-700 rounded p-1 bg-slate-50/60 dark:bg-slate-800/40 mb-1">
-                          <div className="text-[8.5px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                            Direct Technical Members (Team Lead Rajon)
+                        <div className="border border-slate-300 dark:border-slate-700 rounded p-1 bg-slate-50/80 dark:bg-slate-800/50 mb-1">
+                          <div className="text-[8.5px] font-semibold text-slate-700 dark:text-slate-300 mb-0.5">
+                            Direct Technical Members (Team Lead: Rajebul Hasan Rajon)
                           </div>
                           <div className="grid grid-cols-2 gap-0.5">
                             {rajonDirectTech.map((m) => (
                               <div
                                 key={m.id}
-                                className="text-[8px] px-1 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-semibold truncate leading-tight"
+                                className="text-[8px] px-1 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold truncate leading-tight"
                               >
                                 {m.name}
                               </div>
@@ -424,11 +424,11 @@ export function DepartmentSOPPage() {
                         {/* Sub-Leads: Sumaya, Mahfujul, Anwar */}
                         <div className="grid grid-cols-3 gap-1">
                           {/* Sumaya */}
-                          <div className="p-1 rounded border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 text-[8px]">
-                            <div className="font-bold text-slate-800 dark:text-slate-200 truncate">Sumaya Siddika (TL)</div>
+                          <div className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/50 text-[8px]">
+                            <div className="font-bold text-slate-900 dark:text-slate-100 truncate">Sumaya Siddika (TL)</div>
                             <div className="mt-0.5 space-y-0.5">
                               {sumayaTeam.map((p) => (
-                                <div key={p.id} className="p-0.5 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-800 truncate text-[7.5px] leading-tight">
+                                <div key={p.id} className="p-0.5 bg-white dark:bg-slate-900 rounded border border-slate-300 dark:border-slate-700 truncate text-[7.5px] leading-tight">
                                   {p.name}
                                 </div>
                               ))}
@@ -436,11 +436,11 @@ export function DepartmentSOPPage() {
                           </div>
 
                           {/* Mahfujul */}
-                          <div className="p-1 rounded border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 text-[8px]">
-                            <div className="font-bold text-slate-800 dark:text-slate-200 truncate">Md. Mahfujul Haque (TL)</div>
+                          <div className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/50 text-[8px]">
+                            <div className="font-bold text-slate-900 dark:text-slate-100 truncate">Md. Mahfujul Haque (TL)</div>
                             <div className="mt-0.5 space-y-0.5">
                               {mahfujulTeam.map((p) => (
-                                <div key={p.id} className="p-0.5 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-800 truncate text-[7.5px] leading-tight">
+                                <div key={p.id} className="p-0.5 bg-white dark:bg-slate-900 rounded border border-slate-300 dark:border-slate-700 truncate text-[7.5px] leading-tight">
                                   {p.name}
                                 </div>
                               ))}
@@ -448,11 +448,11 @@ export function DepartmentSOPPage() {
                           </div>
 
                           {/* Anwar */}
-                          <div className="p-1 rounded border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 text-[8px]">
-                            <div className="font-bold text-slate-800 dark:text-slate-200 truncate">Md. Anwar Hossain (TL)</div>
+                          <div className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/50 text-[8px]">
+                            <div className="font-bold text-slate-900 dark:text-slate-100 truncate">Md. Anwar Hossain (TL)</div>
                             <div className="mt-0.5 space-y-0.5">
                               {anwarTeam.map((p) => (
-                                <div key={p.id} className="p-0.5 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-800 truncate text-[7.5px] leading-tight">
+                                <div key={p.id} className="p-0.5 bg-white dark:bg-slate-900 rounded border border-slate-300 dark:border-slate-700 truncate text-[7.5px] leading-tight">
                                   {p.name}
                                 </div>
                               ))}
@@ -462,8 +462,8 @@ export function DepartmentSOPPage() {
                       </div>
 
                       {/* Department: Database Administrator (DBA) */}
-                      <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-1 flex items-center justify-between text-xs">
-                        <span className="text-[9px] font-bold text-slate-800 dark:text-slate-200 uppercase">
+                      <div className="bg-white dark:bg-slate-900 border border-slate-400 dark:border-slate-600 rounded p-1 flex items-center justify-between text-xs shadow-2xs">
+                        <span className="text-[9px] font-bold text-slate-900 dark:text-slate-100 uppercase">
                           DBA:
                         </span>
                         {rajonDbaTeam.map((m) => (
@@ -474,16 +474,16 @@ export function DepartmentSOPPage() {
                       </div>
 
                       {/* Department: HR, Admin and Compliance */}
-                      <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-1.5">
-                        <div className="pb-0.5 border-b border-slate-200 dark:border-slate-800 mb-1 flex items-center gap-1">
-                          <Users className="size-3 text-slate-600" />
-                          <h3 className="text-[9px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
+                      <div className="bg-white dark:bg-slate-900 border border-slate-400 dark:border-slate-600 rounded p-1.5 shadow-2xs">
+                        <div className="pb-0.5 border-b border-slate-300 dark:border-slate-700 mb-1 flex items-center gap-1">
+                          <Users className="size-3 text-slate-700 dark:text-slate-300" />
+                          <h3 className="text-[9px] font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
                             Department: HR, Admin and Compliance
                           </h3>
                         </div>
                         <div className="grid grid-cols-2 gap-0.5">
                           {rajonHrTeam.map((m) => (
-                            <div key={m.id} className="text-[8px] px-1 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 truncate leading-tight font-medium">
+                            <div key={m.id} className="text-[8px] px-1 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 truncate leading-tight font-medium">
                               {m.name}
                             </div>
                           ))}
@@ -491,13 +491,13 @@ export function DepartmentSOPPage() {
                       </div>
 
                       {/* Department: Implementation & Business Analysis (Wing) */}
-                      <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-1">
-                        <div className="text-[9px] font-bold text-slate-800 dark:text-slate-200 uppercase mb-0.5">
+                      <div className="bg-white dark:bg-slate-900 border border-slate-400 dark:border-slate-600 rounded p-1 shadow-2xs">
+                        <div className="text-[9px] font-bold text-slate-900 dark:text-slate-100 uppercase mb-0.5">
                           Department: Implementation & Business Analysis (Wing)
                         </div>
                         <div className="grid grid-cols-2 gap-0.5">
                           {rajonImplTeam.map((m) => (
-                            <div key={m.id} className="text-[8px] px-1 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold truncate leading-tight">
+                            <div key={m.id} className="text-[8px] px-1 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-semibold truncate leading-tight">
                               {m.name}
                             </div>
                           ))}
@@ -509,9 +509,9 @@ export function DepartmentSOPPage() {
                   {/* ═══════════════════════════════════════════════════════════
                       COLUMN 2: SK. NASIF WAHID (23% width)
                   ═══════════════════════════════════════════════════════════ */}
-                  <div className="flex flex-col rounded-lg p-2 bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800">
+                  <div className="flex flex-col rounded-lg p-2 bg-slate-50/95 dark:bg-slate-900/80 border-2 border-slate-400 dark:border-slate-600 shadow-xs">
                     {/* Header */}
-                    <div className="bg-slate-800 text-white dark:bg-slate-800/90 py-1.5 px-2 rounded-md text-center mb-1.5 shadow-xs">
+                    <div className="bg-slate-800 text-white dark:bg-slate-800/90 py-1.5 px-2 rounded-md text-center mb-1.5 shadow-xs border border-slate-700">
                       <span className="text-[8px] font-semibold uppercase tracking-wider text-slate-300 block">
                         Executive Lead
                       </span>
@@ -520,29 +520,28 @@ export function DepartmentSOPPage() {
 
                     <div className="space-y-1.5 flex-1 text-xs">
                       {/* Department: Business Development */}
-                      <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-1.5">
-                        <div className="pb-1 border-b border-slate-200 dark:border-slate-800 mb-1 flex items-center gap-1">
-                          <TrendingUp className="size-3 text-slate-600" />
-                          <h3 className="text-[9.5px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
+                      <div className="bg-white dark:bg-slate-900 border border-slate-400 dark:border-slate-600 rounded p-1.5 shadow-2xs">
+                        <div className="pb-1 border-b border-slate-300 dark:border-slate-700 mb-1 flex items-center gap-1">
+                          <TrendingUp className="size-3 text-slate-700 dark:text-slate-300" />
+                          <h3 className="text-[9.5px] font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
                             Department: Business Development
                           </h3>
                         </div>
 
                         {/* Head */}
                         <div className="p-1 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 mb-1">
-                          <span className="text-[7.5px] uppercase font-bold text-slate-500 block">Lead</span>
-                          <span className="text-[10px] font-bold text-slate-900 dark:text-white">SK. Nasif Wahid</span>
+                          <span className="text-[10px] font-bold text-slate-900 dark:text-white">Team Lead: SK. Nasif Wahid</span>
                         </div>
 
                         {/* Team */}
                         <div className="space-y-0.5">
-                          <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">
+                          <span className="text-[8px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-0.5">
                             Team Members
                           </span>
                           {nasifTeam.map((m) => (
                             <div
                               key={m.id}
-                              className="text-[8.5px] px-1.5 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-medium text-slate-900 dark:text-white truncate leading-tight"
+                              className="text-[8.5px] px-1.5 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium text-slate-900 dark:text-white truncate leading-tight"
                             >
                               {m.name}
                             </div>
@@ -555,9 +554,9 @@ export function DepartmentSOPPage() {
                   {/* ═══════════════════════════════════════════════════════════
                       COLUMN 3: MOHAMMAD TAREQ SAFA (29% width)
                   ═══════════════════════════════════════════════════════════ */}
-                  <div className="flex flex-col rounded-lg p-2 bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800">
+                  <div className="flex flex-col rounded-lg p-2 bg-slate-50/95 dark:bg-slate-900/80 border-2 border-slate-400 dark:border-slate-600 shadow-xs">
                     {/* Header */}
-                    <div className="bg-slate-800 text-white dark:bg-slate-800/90 py-1.5 px-2 rounded-md text-center mb-1.5 shadow-xs">
+                    <div className="bg-slate-800 text-white dark:bg-slate-800/90 py-1.5 px-2 rounded-md text-center mb-1.5 shadow-xs border border-slate-700">
                       <span className="text-[8px] font-semibold uppercase tracking-wider text-slate-300 block">
                         Executive Lead
                       </span>
@@ -566,8 +565,8 @@ export function DepartmentSOPPage() {
 
                     <div className="space-y-1.5 flex-1 text-xs">
                       {/* Department: MIS */}
-                      <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-1 flex items-center justify-between text-xs">
-                        <span className="text-[9px] font-bold text-slate-800 dark:text-slate-200 uppercase">
+                      <div className="bg-white dark:bg-slate-900 border border-slate-400 dark:border-slate-600 rounded p-1 flex items-center justify-between text-xs shadow-2xs">
+                        <span className="text-[9px] font-bold text-slate-900 dark:text-slate-100 uppercase">
                           Department: MIS
                         </span>
                         <span className="text-[8.5px] font-bold text-slate-900 dark:text-white">
@@ -576,10 +575,10 @@ export function DepartmentSOPPage() {
                       </div>
 
                       {/* Department: Implementation & Business Analysis */}
-                      <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-1.5">
-                        <div className="pb-1 border-b border-slate-200 dark:border-slate-800 mb-1 flex items-center gap-1">
-                          <ClipboardCheck className="size-3 text-slate-600" />
-                          <h3 className="text-[9.5px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
+                      <div className="bg-white dark:bg-slate-900 border border-slate-400 dark:border-slate-600 rounded p-1.5 shadow-2xs">
+                        <div className="pb-1 border-b border-slate-300 dark:border-slate-700 mb-1 flex items-center gap-1">
+                          <ClipboardCheck className="size-3 text-slate-700 dark:text-slate-300" />
+                          <h3 className="text-[9.5px] font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
                             Department: Implementation & Business Analysis
                           </h3>
                         </div>
@@ -590,7 +589,7 @@ export function DepartmentSOPPage() {
                             .map((m) => (
                               <div
                                 key={m.id}
-                                className="text-[8.5px] px-1.5 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-medium text-slate-900 dark:text-white truncate leading-tight"
+                                className="text-[8.5px] px-1.5 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium text-slate-900 dark:text-white truncate leading-tight"
                               >
                                 {m.name}
                               </div>
@@ -599,10 +598,10 @@ export function DepartmentSOPPage() {
                       </div>
 
                       {/* Department: Tech & Engineering (Wing) */}
-                      <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-1.5">
-                        <div className="pb-1 border-b border-slate-200 dark:border-slate-800 mb-1 flex items-center gap-1">
-                          <Cpu className="size-3 text-slate-600" />
-                          <h3 className="text-[9.5px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
+                      <div className="bg-white dark:bg-slate-900 border border-slate-400 dark:border-slate-600 rounded p-1.5 shadow-2xs">
+                        <div className="pb-1 border-b border-slate-300 dark:border-slate-700 mb-1 flex items-center gap-1">
+                          <Cpu className="size-3 text-slate-700 dark:text-slate-300" />
+                          <h3 className="text-[9.5px] font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
                             Department: Tech & Engineering (Wing)
                           </h3>
                         </div>
@@ -612,7 +611,7 @@ export function DepartmentSOPPage() {
                             .map((m) => (
                               <div
                                 key={m.id}
-                                className="text-[8.5px] px-1.5 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-medium text-slate-900 dark:text-white truncate leading-tight"
+                                className="text-[8.5px] px-1.5 py-0.5 rounded bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium text-slate-900 dark:text-white truncate leading-tight"
                               >
                                 {m.name}
                               </div>
@@ -624,7 +623,7 @@ export function DepartmentSOPPage() {
                 </div>
 
                 {/* Print Footer */}
-                <div className="mt-2 pt-1 border-t border-slate-300 dark:border-slate-700 flex justify-between text-[7.5px] text-slate-500 font-medium">
+                <div className="mt-2 pt-1 border-t-2 border-slate-400 dark:border-slate-600 flex justify-between text-[7.5px] text-slate-600 dark:text-slate-400 font-medium">
                   <span>CRIPTON HRIS • Master Department SOP Organogram</span>
                   <span>All 58 Personnel • Single Page A4 Landscape Format</span>
                 </div>
@@ -816,7 +815,7 @@ export function DepartmentSOPPage() {
             width: 100% !important;
             max-width: 100% !important;
             min-width: 100% !important;
-            border: 1px solid #cbd5e1 !important;
+            border: 1.5px solid #64748b !important;
             border-radius: 6px !important;
             box-shadow: none !important;
             padding: 2.5mm 3.5mm !important;
@@ -829,14 +828,15 @@ export function DepartmentSOPPage() {
           }
           .organogram-three-columns {
             display: grid !important;
-            grid-template-columns: 48% 23% 29% !important;
-            gap: 6px !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 8px !important;
             width: 100% !important;
             align-items: start !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
           }
           .organogram-three-columns > div {
+            border: 1.5px solid #64748b !important;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
           }
