@@ -410,10 +410,7 @@ export default function MMPIVerificationApprovalPage() {
                   <th className="py-3 px-3.5 whitespace-nowrap">Supplier</th>
                   <th className="py-3 px-3 whitespace-nowrap">Job ID</th>
                   <th className="py-3 px-3 whitespace-nowrap">Style</th>
-                  <th className="py-3 px-3.5 whitespace-nowrap">Booking Number(s)</th>
-                  <th className="py-3 px-3 text-right whitespace-nowrap">Total Quantity</th>
                   <th className="py-3 px-3.5 text-right whitespace-nowrap">PI Value</th>
-                  <th className="py-3 px-2.5 text-center whitespace-nowrap">Curr.</th>
                   <th className="py-3 px-3.5 whitespace-nowrap">Approval Status</th>
                   <th className="py-3 px-3 whitespace-nowrap">Submitted By</th>
                   <th className="py-3 px-3 whitespace-nowrap">Submitted Date</th>
@@ -425,14 +422,14 @@ export default function MMPIVerificationApprovalPage() {
               <tbody className="divide-y divide-slate-200">
                 {filteredPis.length === 0 ? (
                   <tr>
-                    <td colSpan={13} className="py-12 text-center text-slate-500">
+                    <td colSpan={10} className="py-12 text-center text-slate-500">
                       <div className="flex flex-col items-center justify-center space-y-3">
                         <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
                           <ShieldCheck className="w-6 h-6" />
                         </div>
                         <p className="text-sm font-semibold text-slate-800">
                           {activeTab === "Pending"
-                            ? "No Proforma Invoices Pending Approval"
+                            ? "No PIs Pending Approval"
                             : `No ${activeTab} Proforma Invoices Found`}
                         </p>
                         <p className="text-xs text-slate-500 max-w-sm">
@@ -464,21 +461,16 @@ export default function MMPIVerificationApprovalPage() {
                         key={pi.id}
                         className="hover:bg-indigo-50/40 transition-colors group"
                       >
-                        {/* PI Number Hyperlink - opens dedicated details page */}
+                        {/* PI Number Hyperlink -> opens existing PI Entry Form in view mode */}
                         <td className="py-3 px-3.5 whitespace-nowrap">
                           <Link
-                            to="/mm-pi-approval-details"
-                            search={{ id: pi.id, from: "approval" } as any}
+                            to="/mm-proforma-invoice-create"
+                            search={{ piId: pi.id, mode: "view" } as any}
                             className="font-mono font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1.5"
-                            title={`Review PI ${pi.piNo}`}
+                            title={`View PI in Entry Form: ${pi.piNo}`}
                           >
                             <span>{pi.piNo}</span>
                           </Link>
-                          {pi.entryNo && (
-                            <span className="block text-[10px] text-slate-400 font-mono">
-                              {pi.entryNo}
-                            </span>
-                          )}
                         </td>
 
                         {/* PI Date */}
@@ -486,7 +478,7 @@ export default function MMPIVerificationApprovalPage() {
                           {pi.piDate || "—"}
                         </td>
 
-                        {/* Supplier */}
+                        {/* Supplier (Display only supplier name, no unit name) */}
                         <td className="py-3 px-3.5 whitespace-nowrap">
                           <div className="flex items-center gap-1.5">
                             <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
@@ -494,11 +486,6 @@ export default function MMPIVerificationApprovalPage() {
                               {pi.supplierName}
                             </span>
                           </div>
-                          {pi.businessUnit && (
-                            <span className="block text-[10px] text-slate-500 pl-5">
-                              {pi.businessUnit}
-                            </span>
-                          )}
                         </td>
 
                         {/* Job ID */}
@@ -511,37 +498,6 @@ export default function MMPIVerificationApprovalPage() {
                           {styleSummary}
                         </td>
 
-                        {/* Booking Number(s) */}
-                        <td className="py-3 px-3.5">
-                          <div className="flex flex-wrap gap-1 max-w-xs">
-                            {pi.allocatedBookings && pi.allocatedBookings.length > 0 ? (
-                              pi.allocatedBookings.map((b) => (
-                                <span
-                                  key={b.bookingId}
-                                  className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold ${
-                                    b.bookingType === "Fabric"
-                                      ? "bg-purple-50 text-purple-700 border border-purple-200"
-                                      : "bg-teal-50 text-teal-700 border border-teal-200"
-                                  }`}
-                                  title={`${b.bookingType} Booking: ${b.bookingNo}`}
-                                >
-                                  {b.bookingNo}
-                                </span>
-                              ))
-                            ) : (
-                              <span className="text-slate-400 italic">Direct PI</span>
-                            )}
-                          </div>
-                        </td>
-
-                        {/* Total Quantity */}
-                        <td className="py-3 px-3 text-right whitespace-nowrap font-mono text-slate-800">
-                          <span className="font-semibold">
-                            {totalQty.qty.toLocaleString("en-US")}
-                          </span>{" "}
-                          <span className="text-[10px] text-slate-500">{totalQty.unit}</span>
-                        </td>
-
                         {/* PI Value */}
                         <td className="py-3 px-3.5 text-right whitespace-nowrap font-mono font-bold text-slate-900">
                           {pi.currency === "USD" ? "$" : "৳"}
@@ -549,13 +505,6 @@ export default function MMPIVerificationApprovalPage() {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           })}
-                        </td>
-
-                        {/* Currency */}
-                        <td className="py-3 px-2.5 text-center whitespace-nowrap">
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                            {pi.currency || "USD"}
-                          </span>
                         </td>
 
                         {/* Approval Status */}
@@ -573,16 +522,16 @@ export default function MMPIVerificationApprovalPage() {
                           {pi.submittedDate || pi.createdDate || "—"}
                         </td>
 
-                        {/* Action - dedicated View / Review page */}
+                        {/* Action -> View button opens existing PI Entry Form in view mode */}
                         <td className="py-3 px-3 text-center whitespace-nowrap sticky right-0 bg-white group-hover:bg-indigo-50/40 z-10 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">
                           <Link
-                            to="/mm-pi-approval-details"
-                            search={{ id: pi.id, from: "approval" } as any}
+                            to="/mm-proforma-invoice-create"
+                            search={{ piId: pi.id, mode: "view" } as any}
                             className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded transition-colors"
-                            title="Open dedicated PI approval details page"
+                            title="View in PI Entry Form"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>{normalizeStatus(pi.status) === "Pending" ? "Review" : "View"}</span>
+                            <span>View</span>
                           </Link>
                         </td>
                       </tr>

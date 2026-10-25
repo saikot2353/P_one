@@ -52,7 +52,7 @@ export const Route = createFileRoute("/mm-pi")({
   component: MMPIRegisterPage,
 });
 
-type StatusFilter = "All" | "Draft" | "Pending" | "Approved" | "Passed" | "Rejected" | "Returned";
+type StatusFilter = "All" | "Draft" | "Pending" | "Approved" | "Rejected" | "Returned";
 
 export default function MMPIRegisterPage() {
   const navigate = useNavigate();
@@ -79,7 +79,8 @@ export default function MMPIRegisterPage() {
   const [supplierFilter, setSupplierFilter] = useState("All");
   const [jobIdFilter, setJobIdFilter] = useState("");
   const [styleFilter, setStyleFilter] = useState("");
-  const [dateFilter, setDateFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const loadData = () => {
     const list = MMRepository.getPIs();
@@ -95,8 +96,7 @@ export default function MMPIRegisterPage() {
     if (!status) return "Draft";
     const s = status.toLowerCase().trim();
     if (s.includes("pending") || s.includes("submit")) return "Pending";
-    if (s.includes("pass")) return "Passed";
-    if (s.includes("approve")) return "Approved";
+    if (s.includes("approve") || s.includes("pass")) return "Approved";
     if (s.includes("reject")) return "Rejected";
     if (s.includes("return")) return "Returned";
     return "Draft";
@@ -116,7 +116,6 @@ export default function MMPIRegisterPage() {
     let draft = 0;
     let pending = 0;
     let approved = 0;
-    let passed = 0;
     let rejected = 0;
     let returned = 0;
 
@@ -125,7 +124,6 @@ export default function MMPIRegisterPage() {
       if (norm === "Draft") draft++;
       else if (norm === "Pending") pending++;
       else if (norm === "Approved") approved++;
-      else if (norm === "Passed") passed++;
       else if (norm === "Rejected") rejected++;
       else if (norm === "Returned") returned++;
     });
@@ -135,7 +133,6 @@ export default function MMPIRegisterPage() {
       Draft: draft,
       Pending: pending,
       Approved: approved,
-      Passed: passed,
       Rejected: rejected,
       Returned: returned,
     };
@@ -208,7 +205,10 @@ export default function MMPIRegisterPage() {
       if (styleFilter.trim() && !styleStr.includes(styleFilter.toLowerCase().trim())) {
         return false;
       }
-      if (dateFilter && p.piDate !== dateFilter) {
+      if (fromDate && p.piDate && p.piDate < fromDate) {
+        return false;
+      }
+      if (toDate && p.piDate && p.piDate > toDate) {
         return false;
       }
       if (searchQuery.trim()) {
@@ -224,7 +224,7 @@ export default function MMPIRegisterPage() {
       }
       return true;
     });
-  }, [pis, activeTab, supplierFilter, piNoFilter, jobIdFilter, styleFilter, dateFilter, searchQuery]);
+  }, [pis, activeTab, supplierFilter, piNoFilter, jobIdFilter, styleFilter, fromDate, toDate, searchQuery]);
 
   const hasActiveFilters =
     searchQuery.trim() !== "" ||
@@ -232,7 +232,8 @@ export default function MMPIRegisterPage() {
     supplierFilter !== "All" ||
     jobIdFilter.trim() !== "" ||
     styleFilter.trim() !== "" ||
-    dateFilter !== "" ||
+    fromDate !== "" ||
+    toDate !== "" ||
     activeTab !== "All";
 
   const clearFilters = () => {
@@ -241,7 +242,8 @@ export default function MMPIRegisterPage() {
     setSupplierFilter("All");
     setJobIdFilter("");
     setStyleFilter("");
-    setDateFilter("");
+    setFromDate("");
+    setToDate("");
     setActiveTab("All");
   };
 
@@ -262,13 +264,7 @@ export default function MMPIRegisterPage() {
             Approved
           </span>
         );
-      case "Passed":
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-            <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
-            Passed
-          </span>
-        );
+
       case "Rejected":
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
@@ -302,7 +298,6 @@ export default function MMPIRegisterPage() {
         { label: "PI Register" },
       ]}
       title="Proforma Invoice (PI) Register"
-      subtitle="Central register of saved Proforma Invoices with supplier consolidation, booking associations, financial valuations, and verification statuses."
       actions={
         <div className="flex items-center gap-2">
           <Link
@@ -337,7 +332,6 @@ export default function MMPIRegisterPage() {
                 { id: "Draft", label: "Draft", count: tabCounts.Draft },
                 { id: "Pending", label: "Pending Approval", count: tabCounts.Pending },
                 { id: "Approved", label: "Approved", count: tabCounts.Approved },
-                { id: "Passed", label: "Passed", count: tabCounts.Passed },
                 { id: "Rejected", label: "Rejected", count: tabCounts.Rejected },
                 { id: "Returned", label: "Returned", count: tabCounts.Returned },
               ] as const
@@ -376,7 +370,7 @@ export default function MMPIRegisterPage() {
 
         {/* Filter Controls Bar */}
         <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
             {/* Quick Search */}
             <div className="lg:col-span-2 relative">
               <label className="block text-[11px] font-medium text-slate-600 mb-1">
@@ -427,29 +421,44 @@ export default function MMPIRegisterPage() {
               </select>
             </div>
 
-            {/* Filter by Job ID / Style */}
+            {/* Filter by Job ID */}
             <div>
               <label className="block text-[11px] font-medium text-slate-600 mb-1">
-                Job ID / Order
+                Job ID
               </label>
               <input
                 type="text"
-                placeholder="Job / Order No"
+                placeholder="Job ID"
                 value={jobIdFilter}
                 onChange={(e) => setJobIdFilter(e.target.value)}
                 className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-mono"
               />
             </div>
 
-            {/* Filter by PI Date */}
+            {/* Filter by From Date */}
             <div>
               <label className="block text-[11px] font-medium text-slate-600 mb-1">
-                PI Date
+                From Date
               </label>
               <input
                 type="date"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
+                value={fromDate}
+                max={toDate || undefined}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+              />
+            </div>
+
+            {/* Filter by To Date */}
+            <div>
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                To Date
+              </label>
+              <input
+                type="date"
+                value={toDate}
+                min={fromDate || undefined}
+                onChange={(e) => setToDate(e.target.value)}
                 className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
               />
             </div>
@@ -481,9 +490,14 @@ export default function MMPIRegisterPage() {
                     Job: {jobIdFilter}
                   </span>
                 )}
-                {dateFilter && (
+                {fromDate && (
                   <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700">
-                    Date: {dateFilter}
+                    From: {fromDate}
+                  </span>
+                )}
+                {toDate && (
+                  <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                    To: {toDate}
                   </span>
                 )}
               </div>
@@ -508,11 +522,7 @@ export default function MMPIRegisterPage() {
                   <th className="py-3 px-3.5 whitespace-nowrap">Supplier</th>
                   <th className="py-3 px-3 whitespace-nowrap">Job ID</th>
                   <th className="py-3 px-3 whitespace-nowrap">Style</th>
-                  <th className="py-3 px-3.5 whitespace-nowrap">Booking Number(s)</th>
-                  <th className="py-3 px-3 text-right whitespace-nowrap">Total Items</th>
-                  <th className="py-3 px-3 text-right whitespace-nowrap">Total Quantity</th>
                   <th className="py-3 px-3.5 text-right whitespace-nowrap">PI Value</th>
-                  <th className="py-3 px-2.5 text-center whitespace-nowrap">Curr.</th>
                   <th className="py-3 px-3.5 whitespace-nowrap">PI Status</th>
                   <th className="py-3 px-3 whitespace-nowrap">Created By</th>
                   <th className="py-3 px-3 text-center whitespace-nowrap sticky right-0 bg-slate-50 z-10 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">
@@ -523,7 +533,7 @@ export default function MMPIRegisterPage() {
               <tbody className="divide-y divide-slate-200">
                 {filteredPis.length === 0 ? (
                   <tr>
-                    <td colSpan={13} className="py-12 text-center text-slate-500">
+                    <td colSpan={9} className="py-12 text-center text-slate-500">
                       <div className="flex flex-col items-center justify-center space-y-3">
                         <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
                           <FileCheck className="w-6 h-6" />
@@ -567,13 +577,13 @@ export default function MMPIRegisterPage() {
                         key={pi.id}
                         className="hover:bg-indigo-50/40 transition-colors group"
                       >
-                        {/* PI Number Hyperlink */}
+                        {/* PI Number Hyperlink -> opens existing PI Entry Form in view mode */}
                         <td className="py-3 px-3.5 whitespace-nowrap">
                           <Link
-                            to="/mm-pi-approval-details"
-                            search={{ id: pi.id, from: "register" } as any}
+                            to="/mm-proforma-invoice-create"
+                            search={{ piId: pi.id, mode: "view" } as any}
                             className="font-mono font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1.5"
-                            title={`View PI Details for ${pi.piNo}`}
+                            title={`View PI in Entry Form: ${pi.piNo}`}
                           >
                             <span>{pi.piNo}</span>
                           </Link>
@@ -589,7 +599,7 @@ export default function MMPIRegisterPage() {
                           {pi.piDate || "—"}
                         </td>
 
-                        {/* Supplier */}
+                        {/* Supplier (Display only supplier name, no unit name) */}
                         <td className="py-3 px-3.5 whitespace-nowrap">
                           <div className="flex items-center gap-1.5">
                             <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
@@ -597,11 +607,6 @@ export default function MMPIRegisterPage() {
                               {pi.supplierName}
                             </span>
                           </div>
-                          {pi.businessUnit && (
-                            <span className="block text-[10px] text-slate-500 pl-5">
-                              {pi.businessUnit}
-                            </span>
-                          )}
                         </td>
 
                         {/* Job ID */}
@@ -614,42 +619,6 @@ export default function MMPIRegisterPage() {
                           {styleSummary}
                         </td>
 
-                        {/* Booking Number(s) */}
-                        <td className="py-3 px-3.5">
-                          <div className="flex flex-wrap gap-1 max-w-xs">
-                            {pi.allocatedBookings && pi.allocatedBookings.length > 0 ? (
-                              pi.allocatedBookings.map((b) => (
-                                <span
-                                  key={b.bookingId}
-                                  className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold ${
-                                    b.bookingType === "Fabric"
-                                      ? "bg-purple-50 text-purple-700 border border-purple-200"
-                                      : "bg-teal-50 text-teal-700 border border-teal-200"
-                                  }`}
-                                  title={`${b.bookingType} Booking: ${b.bookingNo}`}
-                                >
-                                  {b.bookingNo}
-                                </span>
-                              ))
-                            ) : (
-                              <span className="text-slate-400 italic">Direct PI</span>
-                            )}
-                          </div>
-                        </td>
-
-                        {/* Total Items */}
-                        <td className="py-3 px-3 text-right whitespace-nowrap text-slate-700 font-medium font-mono">
-                          {pi.items?.length || 0}
-                        </td>
-
-                        {/* Total Quantity */}
-                        <td className="py-3 px-3 text-right whitespace-nowrap font-mono text-slate-800">
-                          <span className="font-semibold">
-                            {totalQty.qty.toLocaleString("en-US")}
-                          </span>{" "}
-                          <span className="text-[10px] text-slate-500">{totalQty.unit}</span>
-                        </td>
-
                         {/* PI Value */}
                         <td className="py-3 px-3.5 text-right whitespace-nowrap font-mono font-bold text-slate-900">
                           {pi.currency === "USD" ? "$" : "৳"}
@@ -657,13 +626,6 @@ export default function MMPIRegisterPage() {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           })}
-                        </td>
-
-                        {/* Currency */}
-                        <td className="py-3 px-2.5 text-center whitespace-nowrap">
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                            {pi.currency || "USD"}
-                          </span>
                         </td>
 
                         {/* PI Status */}
@@ -682,12 +644,12 @@ export default function MMPIRegisterPage() {
                         {/* Action (Sticky) */}
                         <td className="py-3 px-3 text-center whitespace-nowrap sticky right-0 bg-white group-hover:bg-indigo-50/40 z-10 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">
                           <div className="flex items-center justify-center gap-1.5">
-                            {/* View Action opens dedicated details page */}
+                            {/* View Action opens existing PI Entry Form in view mode */}
                             <Link
-                              to="/mm-pi-approval-details"
-                              search={{ id: pi.id, from: "register" } as any}
+                              to="/mm-proforma-invoice-create"
+                              search={{ piId: pi.id, mode: "view" } as any}
                               className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-100/60 rounded transition-colors"
-                              title="View Proforma Invoice Details"
+                              title="View in PI Entry Form"
                             >
                               <Eye className="w-4 h-4" />
                             </Link>

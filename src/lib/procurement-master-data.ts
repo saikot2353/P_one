@@ -69,6 +69,7 @@ export interface StoreLocation {
   locationName: string;
   locationType: LocationType;
   locationStatus: "Active" | "Inactive";
+  defaultLocationName?: boolean;
   // Batch Configuration
   batchTrackingEnabled: boolean;
   batchNumbering: string;
@@ -255,6 +256,7 @@ export interface ItemSubGroup {
   parentSubGroupId?: string | null; // Parent Sub Group ID (null if root under item group)
   description?: string;
   status: "Active" | "Inactive";
+  serviceFlag?: boolean;
 }
 
 // -------------------------------------------------------------
@@ -769,6 +771,7 @@ export const DEFAULT_STORE_LOCATIONS: StoreLocation[] = [
     locationName: "Rack A1 - Raw Cotton Pallet",
     locationType: "Rack",
     locationStatus: "Active",
+    defaultLocationName: true,
     batchTrackingEnabled: false,
     batchNumbering: "",
     createDate: "2026-09-01",
@@ -786,6 +789,7 @@ export const DEFAULT_STORE_LOCATIONS: StoreLocation[] = [
     locationName: "Shelf B - Laptop Storage Units",
     locationType: "Shelf",
     locationStatus: "Active",
+    defaultLocationName: false,
     batchTrackingEnabled: false,
     batchNumbering: "",
     createDate: "2026-09-05",
@@ -1375,6 +1379,7 @@ export const DEFAULT_ITEM_SUB_GROUPS: ItemSubGroup[] = [
     parentSubGroupId: null,
     description: "Inward & outward shipping, carriage and transport",
     status: "Active",
+    serviceFlag: true,
   },
   {
     id: "sub-loading",
@@ -1384,6 +1389,7 @@ export const DEFAULT_ITEM_SUB_GROUPS: ItemSubGroup[] = [
     parentSubGroupId: null,
     description: "Loading, unloading, and warehouse porter handling services",
     status: "Active",
+    serviceFlag: true,
   },
   {
     id: "sub-srv-maint",
@@ -1393,6 +1399,7 @@ export const DEFAULT_ITEM_SUB_GROUPS: ItemSubGroup[] = [
     parentSubGroupId: null,
     description: "Equipment overhaul, repair and contract service jobs",
     status: "Active",
+    serviceFlag: true,
   },
 ];
 
