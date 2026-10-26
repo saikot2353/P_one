@@ -1384,6 +1384,100 @@ function ZakatManagementPage() {
   const [newInstitutionRep, setNewInstitutionRep] = useState("");
   const [newInstitutionPhone, setNewInstitutionPhone] = useState("");
 
+  // Via Employee Agent Multi-Beneficiaries (Beneficiary-wise Physical Asset details support)
+  const [viaBeneficiaries, setViaBeneficiaries] = useState<Array<{
+    id: string;
+    name: string;
+    phone: string;
+    address: string;
+    amount: string;
+    assetMasterId?: string;
+    assetType?: string;
+    assetName: string;
+    assetQty: string;
+  }>>([
+    {
+      id: "vb-1",
+      name: "",
+      phone: "",
+      address: "",
+      amount: "",
+      assetMasterId: "",
+      assetType: "",
+      assetName: "",
+      assetQty: "1 Unit",
+    },
+  ]);
+
+  const totalViaAmount = useMemo(() => {
+    return viaBeneficiaries.reduce((sum, b) => sum + (parseFloat(b.amount) || 0), 0);
+  }, [viaBeneficiaries]);
+
+  const addViaBeneficiary = () => {
+    setViaBeneficiaries((prev) => [
+      ...prev,
+      {
+        id: `vb-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        name: "",
+        phone: "",
+        address: "",
+        amount: "",
+        assetMasterId: "",
+        assetType: "",
+        assetName: "",
+        assetQty: "1 Unit",
+      },
+    ]);
+  };
+
+  const updateViaBeneficiary = (
+    id: string,
+    field: "name" | "phone" | "address" | "amount" | "assetMasterId" | "assetType" | "assetName" | "assetQty",
+    value: string
+  ) => {
+    setViaBeneficiaries((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, [field]: value } : b))
+    );
+  };
+
+  const handleSelectBeneficiaryMasterAsset = (id: string, masterId: string) => {
+    const item = getActiveZakatAssetMasterList().find((m) => m.id === masterId);
+    if (item) {
+      setViaBeneficiaries((prev) =>
+        prev.map((b) =>
+          b.id === id
+            ? {
+                ...b,
+                assetMasterId: masterId,
+                assetType: item.assetType,
+                assetName: item.assetType,
+                assetQty: item.defaultQty || "1 Unit",
+              }
+            : b
+        )
+      );
+    } else {
+      setViaBeneficiaries((prev) =>
+        prev.map((b) =>
+          b.id === id
+            ? {
+                ...b,
+                assetMasterId: "",
+                assetType: "",
+              }
+            : b
+        )
+      );
+    }
+  };
+
+  const removeViaBeneficiary = (id: string) => {
+    setViaBeneficiaries((prev) => {
+      if (prev.length <= 1) return prev;
+      return prev.filter((b) => b.id !== id);
+    });
+  };
+
   // Purpose & Financials
   const [newPurposeCategory, setNewPurposeCategory] = useState<ZakatPurposeCategory>("Medical Treatment");
   const [newOtherPurposeDetails, setNewOtherPurposeDetails] = useState("");
@@ -1504,6 +1598,15 @@ function ZakatManagementPage() {
       if (item.suggestedPurpose) {
         setNewPurposeCategory(item.suggestedPurpose);
       }
+      setViaBeneficiaries((prev) =>
+        prev.map((b) => ({
+          ...b,
+          assetMasterId: b.assetMasterId || item.id,
+          assetType: b.assetType || item.assetType,
+          assetName: b.assetName || item.assetType,
+          assetQty: b.assetQty || item.defaultQty || "1 Unit",
+        }))
+      );
     }
   };
 
@@ -1859,18 +1962,35 @@ function ZakatManagementPage() {
   const handleAssignZakat = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!newAmount || parseFloat(newAmount) <= 0) {
-      alert("Please enter a valid amount.");
-      return;
+    if (modalChannel === "Via Employee Agent") {
+      if (!newEmpId || !newEmpName) {
+        alert("Please select the agent employee from the search dropdown.");
+        return;
+      }
+      for (let i = 0; i < viaBeneficiaries.length; i++) {
+        const b = viaBeneficiaries[i];
+        if (!b.name.trim()) {
+          alert(`Please enter the name for Beneficiary #${i + 1}.`);
+          return;
+        }
+        if (modalMode === "Asset Purchased" && !b.assetName?.trim()) {
+          alert(`Please specify the asset/item being purchased for Beneficiary #${i + 1} (${b.name || "Unnamed"}).`);
+          return;
+        }
+        if (!b.amount || parseFloat(b.amount) <= 0) {
+          alert(`Please enter a valid disbursement amount for Beneficiary #${i + 1} (${b.name || "Unnamed"}).`);
+          return;
+        }
+      }
+    } else {
+      if (!newAmount || parseFloat(newAmount) <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+      }
     }
 
     if (modalChannel === "Direct Employee" && (!newEmpId || !newEmpName)) {
       alert("Please select an internal employee from the search dropdown.");
-      return;
-    }
-
-    if (modalChannel === "Via Employee Agent" && (!newEmpId || !newBeneficiaryName.trim())) {
-      alert("Please select the agent employee AND provide the beneficiary's name in their village.");
       return;
     }
 
@@ -1879,7 +1999,7 @@ function ZakatManagementPage() {
       return;
     }
 
-    if (modalMode === "Asset Purchased" && !modalAssetName.trim()) {
+    if (modalChannel !== "Via Employee Agent" && modalMode === "Asset Purchased" && !modalAssetName.trim()) {
       alert("Please specify the asset/item being purchased (e.g. Van, Cow, Tea Stall Setup).");
       return;
     }
@@ -1889,7 +2009,7 @@ function ZakatManagementPage() {
       return;
     }
 
-    const amountNum = parseFloat(newAmount);
+    const amountNum = modalChannel === "Via Employee Agent" ? totalViaAmount : parseFloat(newAmount);
     if (amountNum > stats.remainingBudget) {
       if (
         !confirm(
@@ -1901,60 +2021,109 @@ function ZakatManagementPage() {
     }
 
     const today = new Date().toISOString().slice(0, 10);
-    const resolvedBeneficiary =
-      modalChannel === "Direct Employee"
-        ? `${newEmpName} (Staff Self)`
-        : modalChannel === "Direct External" && newInstitutionName.trim()
-          ? newInstitutionName
-          : newBeneficiaryName;
 
-    const newRecord: ZakatRecord = {
-      id: `ZK-${selectedBudgetYear}-${String(records.length + 1).padStart(2, "0")}`,
-      budgetYear: selectedBudgetYear,
-      assignedDate: today,
-      distributionDeadline: newDeadline || today,
-      amount: amountNum,
-      isRecurring: false,
-      disbursementChannel: modalChannel,
-      disbursementMode: modalMode,
-      assetDetails:
-        modalMode === "Asset Purchased"
-          ? {
-            assetType: modalAssetType || undefined,
-            assetName: modalAssetName,
-            assetQuantity: modalAssetQty || "1 Unit",
-            vendorOrMarket: modalAssetVendor,
-            invoiceRef: modalAssetInvoice,
-            remarks: modalAssetRemarks || undefined,
-          }
-          : undefined,
-      purposeCategory: newPurposeCategory,
-      otherPurposeDetails: newPurposeCategory === "Others" ? newOtherPurposeDetails : undefined,
-      purposeSpecificDescription:
-        newPurposeDescription.trim() ||
-        (modalMode === "Asset Purchased"
-          ? `Asset: ${modalAssetName}`
-          : newPurposeCategory === "Others"
-            ? newOtherPurposeDetails
-            : `${newPurposeCategory} Grant`),
-      employeeId: modalChannel === "Direct Employee" || modalChannel === "Via Employee Agent" ? newEmpId : undefined,
-      employeeName: modalChannel === "Direct Employee" || modalChannel === "Via Employee Agent" ? newEmpName : undefined,
-      employeeDept: selectedEmpDetails?.dept,
-      employeeDesignation: selectedEmpDetails?.title,
-      beneficiaryName: resolvedBeneficiary,
-      beneficiaryPhone: newBeneficiaryPhone,
-      beneficiaryAddress: newBeneficiaryAddress,
-      institutionName: modalChannel === "Direct External" && newInstitutionName ? newInstitutionName : undefined,
-      institutionType: modalChannel === "Direct External" && newInstitutionName ? newInstitutionType : undefined,
-      institutionRepresentative: modalChannel === "Direct External" && newInstitutionName ? newInstitutionRep : undefined,
-      institutionContactPhone: modalChannel === "Direct External" && newInstitutionName ? newInstitutionPhone : undefined,
-      asnafCategory: newAsnaf,
-      justificationDetails: newJustification || "Approved corporate Zakat disbursement.",
-      agencyStatus: "Assigned",
-      attachments: modalAttachments.length > 0 ? modalAttachments : undefined,
-    };
+    if (modalChannel === "Via Employee Agent") {
+      const newRecordsToAdd: ZakatRecord[] = viaBeneficiaries.map((b, idx) => {
+        const itemDesc = b.assetName?.trim() || modalAssetName || "Physical Asset";
+        return {
+          id: `ZK-${selectedBudgetYear}-${String(records.length + idx + 1).padStart(2, "0")}`,
+          budgetYear: selectedBudgetYear,
+          assignedDate: today,
+          distributionDeadline: newDeadline || today,
+          amount: parseFloat(b.amount),
+          isRecurring: false,
+          disbursementChannel: "Via Employee Agent",
+          disbursementMode: modalMode,
+          assetDetails:
+            modalMode === "Asset Purchased"
+              ? {
+                  assetType: b.assetType || modalAssetType || undefined,
+                  assetName: itemDesc,
+                  assetQuantity: b.assetQty?.trim() || "1 Unit",
+                }
+              : undefined,
+          purposeCategory: newPurposeCategory,
+          otherPurposeDetails: newPurposeCategory === "Others" ? newOtherPurposeDetails : undefined,
+          purposeSpecificDescription:
+            newPurposeDescription.trim() ||
+            (modalMode === "Asset Purchased"
+              ? `Asset: ${itemDesc} (${b.assetQty || "1 Unit"})`
+              : newPurposeCategory === "Others"
+                ? newOtherPurposeDetails
+                : `${newPurposeCategory} Grant`),
+          employeeId: newEmpId,
+          employeeName: newEmpName,
+          employeeDept: selectedEmpDetails?.dept,
+          employeeDesignation: selectedEmpDetails?.title,
+          beneficiaryName: b.name.trim(),
+          beneficiaryPhone: b.phone.trim() || undefined,
+          beneficiaryAddress: b.address.trim() || undefined,
+          asnafCategory: newAsnaf,
+          justificationDetails:
+            newJustification ||
+            `Approved corporate Zakat disbursement via staff agent ${newEmpName} for ${b.name.trim()}${
+              viaBeneficiaries.length > 1 ? ` (${idx + 1} of ${viaBeneficiaries.length} recipients)` : ""
+            }.`,
+          agencyStatus: "Assigned",
+          attachments: modalAttachments.length > 0 ? modalAttachments : undefined,
+        };
+      });
 
-    setRecords((prev) => [newRecord, ...prev]);
+      setRecords((prev) => [...newRecordsToAdd, ...prev]);
+    } else {
+      const resolvedBeneficiary =
+        modalChannel === "Direct Employee"
+          ? `${newEmpName} (Staff Self)`
+          : modalChannel === "Direct External" && newInstitutionName.trim()
+            ? newInstitutionName
+            : newBeneficiaryName;
+
+      const newRecord: ZakatRecord = {
+        id: `ZK-${selectedBudgetYear}-${String(records.length + 1).padStart(2, "0")}`,
+        budgetYear: selectedBudgetYear,
+        assignedDate: today,
+        distributionDeadline: newDeadline || today,
+        amount: amountNum,
+        isRecurring: false,
+        disbursementChannel: modalChannel,
+        disbursementMode: modalMode,
+        assetDetails:
+          modalMode === "Asset Purchased"
+            ? {
+                assetType: modalAssetType || undefined,
+                assetName: modalAssetName,
+                assetQuantity: modalAssetQty || "1 Unit",
+              }
+            : undefined,
+        purposeCategory: newPurposeCategory,
+        otherPurposeDetails: newPurposeCategory === "Others" ? newOtherPurposeDetails : undefined,
+        purposeSpecificDescription:
+          newPurposeDescription.trim() ||
+          (modalMode === "Asset Purchased"
+            ? `Asset: ${modalAssetName}`
+            : newPurposeCategory === "Others"
+              ? newOtherPurposeDetails
+              : `${newPurposeCategory} Grant`),
+        employeeId: modalChannel === "Direct Employee" ? newEmpId : undefined,
+        employeeName: modalChannel === "Direct Employee" ? newEmpName : undefined,
+        employeeDept: selectedEmpDetails?.dept,
+        employeeDesignation: selectedEmpDetails?.title,
+        beneficiaryName: resolvedBeneficiary,
+        beneficiaryPhone: newBeneficiaryPhone,
+        beneficiaryAddress: newBeneficiaryAddress,
+        institutionName: modalChannel === "Direct External" && newInstitutionName ? newInstitutionName : undefined,
+        institutionType: modalChannel === "Direct External" && newInstitutionName ? newInstitutionType : undefined,
+        institutionRepresentative: modalChannel === "Direct External" && newInstitutionName ? newInstitutionRep : undefined,
+        institutionContactPhone: modalChannel === "Direct External" && newInstitutionName ? newInstitutionPhone : undefined,
+        asnafCategory: newAsnaf,
+        justificationDetails: newJustification || "Approved corporate Zakat disbursement.",
+        agencyStatus: "Assigned",
+        attachments: modalAttachments.length > 0 ? modalAttachments : undefined,
+      };
+
+      setRecords((prev) => [newRecord, ...prev]);
+    }
+
     setIsAssignModalOpen(false);
 
     // Reset Form
@@ -1964,6 +2133,19 @@ function ZakatManagementPage() {
     setNewBeneficiaryName("");
     setNewBeneficiaryPhone("");
     setNewBeneficiaryAddress("");
+    setViaBeneficiaries([
+      {
+        id: "vb-1",
+        name: "",
+        phone: "",
+        address: "",
+        amount: "",
+        assetMasterId: "",
+        assetType: "",
+        assetName: "",
+        assetQty: "1 Unit",
+      },
+    ]);
     setNewInstitutionName("");
     setNewInstitutionRep("");
     setNewInstitutionPhone("");
@@ -2465,6 +2647,19 @@ function ZakatManagementPage() {
                   setNewEmpName("");
                   setEmpSearchInput("");
                   setNewAmount("");
+                  setViaBeneficiaries([
+                    {
+                      id: "vb-1",
+                      name: "",
+                      phone: "",
+                      address: "",
+                      amount: "",
+                      assetMasterId: "",
+                      assetType: "",
+                      assetName: "",
+                      assetQty: "1 Unit",
+                    },
+                  ]);
                   setIsAssignModalOpen(true);
                 }}
                 className="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -3394,47 +3589,237 @@ function ZakatManagementPage() {
                       </div>
                     </div>
 
-                    <div className="border-t border-slate-200/80 pt-3">
-                      <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-2.5">
-                        Village Beneficiary Details (Recipient in Employee's Village) <span className="text-red-500">*</span>
-                      </label>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                    <div className="border-t border-slate-200/80 pt-4 space-y-3.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div>
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Village Beneficiary Name <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={newBeneficiaryName}
-                            onChange={(e) => setNewBeneficiaryName(e.target.value)}
-                            placeholder="e.g. Jamil Mia"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
+                          <div className="flex items-center gap-2">
+                            <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wide">
+                              Village Beneficiaries via this Staff Agent <span className="text-red-500">*</span>
+                            </label>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                              {viaBeneficiaries.length} {viaBeneficiaries.length === 1 ? "Recipient" : "Recipients"}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            Add one or multiple village recipients receiving aid through this staff member.
+                          </p>
                         </div>
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Beneficiary Contact Phone
-                          </label>
-                          <input
-                            type="text"
-                            value={newBeneficiaryPhone}
-                            onChange={(e) => setNewBeneficiaryPhone(e.target.value)}
-                            placeholder="e.g. 01712-345678"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
+                        <button
+                          type="button"
+                          onClick={addViaBeneficiary}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
+                        >
+                          <Plus className="size-3.5" />
+                          <span>Add Beneficiary</span>
+                        </button>
+                      </div>
+
+                      {/* Beneficiaries List */}
+                      <div className="space-y-3">
+                        {viaBeneficiaries.map((b, index) => (
+                          <div
+                            key={b.id}
+                            className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs space-y-3 relative hover:border-blue-300 transition-colors"
+                          >
+                            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                              <span className="text-[11px] font-bold text-slate-700 flex items-center gap-2">
+                                <span className="size-5 rounded-full bg-blue-50 text-blue-700 font-mono text-[10px] font-black flex items-center justify-center border border-blue-200">
+                                  {index + 1}
+                                </span>
+                                <span>Beneficiary #{index + 1}</span>
+                              </span>
+                              {viaBeneficiaries.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeViaBeneficiary(b.id)}
+                                  className="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                  title="Remove beneficiary"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                  <span className="text-[10px] font-semibold hidden sm:inline">Remove</span>
+                                </button>
+                              )}
+                            </div>
+
+                            <div className="space-y-3">
+                              {/* Beneficiary Info Row */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+                                {/* Beneficiary Name */}
+                                <div className={modalMode === "Asset Purchased" ? "lg:col-span-4" : "lg:col-span-4"}>
+                                  <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                                    Beneficiary Name <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    required
+                                    value={b.name}
+                                    onChange={(e) => updateViaBeneficiary(b.id, "name", e.target.value)}
+                                    placeholder="e.g. Jamil Mia"
+                                    className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                                  />
+                                </div>
+
+                                {/* Beneficiary Phone */}
+                                <div className={modalMode === "Asset Purchased" ? "lg:col-span-3" : "lg:col-span-2"}>
+                                  <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                                    Contact Phone
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={b.phone}
+                                    onChange={(e) => updateViaBeneficiary(b.id, "phone", e.target.value)}
+                                    placeholder="01712-345678"
+                                    className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                                  />
+                                </div>
+
+                                {/* Village / Address */}
+                                <div className={modalMode === "Asset Purchased" ? "lg:col-span-5" : "lg:col-span-3"}>
+                                  <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                                    Village / Address
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={b.address}
+                                    onChange={(e) => updateViaBeneficiary(b.id, "address", e.target.value)}
+                                    placeholder="e.g. Bhaluka, Mymensingh"
+                                    className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
+                                  />
+                                </div>
+
+                                {/* Cash Mode: Amount */}
+                                {modalMode === "Cash Grant" && (
+                                  <div className="lg:col-span-3">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <label className="text-[10px] font-bold text-emerald-700 uppercase whitespace-nowrap">
+                                        Disbursement Amount (BDT ৳) <span className="text-red-500">*</span>
+                                      </label>
+                                    </div>
+                                    <div className="relative">
+                                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">৳</span>
+                                      <input
+                                        type="number"
+                                        required
+                                        value={b.amount}
+                                        onChange={(e) => updateViaBeneficiary(b.id, "amount", e.target.value)}
+                                        placeholder="e.g. 15000"
+                                        className="w-full h-10 pl-6 pr-2 rounded-lg border border-emerald-300 bg-emerald-50/20 text-xs font-bold font-mono outline-none focus:border-emerald-600 text-slate-900 shadow-xs"
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Beneficiary-wise Physical Asset Purchase Details */}
+                              {modalMode === "Asset Purchased" && (
+                                <div className="mt-2.5 p-3.5 bg-indigo-50/50 rounded-xl border border-indigo-200/90 space-y-3">
+                                  <div className="flex items-center justify-between border-b border-indigo-100 pb-2">
+                                    <div className="text-[11px] font-bold text-indigo-900 flex items-center gap-1.5 uppercase tracking-wide">
+                                      <ShoppingBag className="size-3.5 text-indigo-600" />
+                                      <span>Physical Asset Purchase Details &bull; Beneficiary #{index + 1}</span>
+                                    </div>
+                                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">
+                                      Master Catalog Linked
+                                    </span>
+                                  </div>
+
+                                  {/* Master Data Catalog Dropdown */}
+                                  <div>
+                                    <div className="flex items-center justify-between mb-1">
+                                      <label className="text-[10px] font-bold text-slate-700 uppercase whitespace-nowrap">
+                                        Asset Type (Master Catalog)
+                                      </label>
+                                      <Link
+                                        to="/zakat-asset-master"
+                                        target="_blank"
+                                        className="text-[9px] text-indigo-600 hover:text-indigo-800 font-semibold hover:underline flex items-center gap-0.5"
+                                      >
+                                        <span>Catalog</span>
+                                        <ExternalLink className="size-2.5" />
+                                      </Link>
+                                    </div>
+                                    <select
+                                      value={b.assetMasterId || ""}
+                                      onChange={(e) => handleSelectBeneficiaryMasterAsset(b.id, e.target.value)}
+                                      className="w-full h-9 px-3 rounded-lg border border-indigo-200 bg-white text-xs font-semibold text-slate-800 outline-none focus:border-indigo-600 shadow-xs"
+                                    >
+                                      <option value="">-- Choose Asset from Master Catalog (or specify manually below) --</option>
+                                      {Array.from(new Set(getActiveZakatAssetMasterList().map((m) => m.category))).map((cat) => (
+                                        <optgroup key={cat} label={cat}>
+                                          {getActiveZakatAssetMasterList().filter((m) => m.category === cat).map((item) => (
+                                            <option key={item.id} value={item.id}>
+                                              {item.assetType} ({item.defaultQty})
+                                            </option>
+                                          ))}
+                                        </optgroup>
+                                      ))}
+                                    </select>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                                    <div className="sm:col-span-6">
+                                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                                        Asset / Item Description <span className="text-red-500">*</span>
+                                      </label>
+                                      <input
+                                        type="text"
+                                        required
+                                        value={b.assetName}
+                                        onChange={(e) => updateViaBeneficiary(b.id, "assetName", e.target.value)}
+                                        placeholder="e.g. Battery Electric Cargo Auto-Van / Dairy Cow"
+                                        className="w-full h-9 px-3 rounded-lg border border-indigo-200 bg-white text-xs font-semibold outline-none focus:border-indigo-600 text-slate-800 shadow-xs"
+                                      />
+                                    </div>
+
+                                    <div className="sm:col-span-3">
+                                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
+                                        Quantity / Unit
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={b.assetQty}
+                                        onChange={(e) => updateViaBeneficiary(b.id, "assetQty", e.target.value)}
+                                        placeholder="e.g. 1 Unit / 2 Goats"
+                                        className="w-full h-9 px-3 rounded-lg border border-indigo-200 bg-white text-xs outline-none focus:border-indigo-600 text-slate-800 shadow-xs"
+                                      />
+                                    </div>
+
+                                    <div className="sm:col-span-3">
+                                      <label className="text-[10px] font-bold text-emerald-700 uppercase block mb-1 whitespace-nowrap">
+                                        Asset Cost / Amount (BDT ৳) <span className="text-red-500">*</span>
+                                      </label>
+                                      <div className="relative">
+                                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">৳</span>
+                                        <input
+                                          type="number"
+                                          required
+                                          value={b.amount}
+                                          onChange={(e) => updateViaBeneficiary(b.id, "amount", e.target.value)}
+                                          placeholder="e.g. 25000"
+                                          className="w-full h-9 pl-6 pr-2 rounded-lg border border-emerald-300 bg-emerald-50/20 text-xs font-bold font-mono outline-none focus:border-emerald-600 text-slate-900 shadow-xs"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Total Summary Footer */}
+                      <div className="flex flex-wrap items-center justify-between p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl text-xs font-medium text-blue-900">
+                        <div className="flex items-center gap-2">
+                          <Users className="size-4 text-blue-600" />
+                          <span className="font-bold">Total Beneficiaries:</span>
+                          <span className="font-bold text-blue-800">{viaBeneficiaries.length} {viaBeneficiaries.length === 1 ? "Recipient" : "Recipients"}</span>
                         </div>
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                            Village / Location Address
-                          </label>
-                          <input
-                            type="text"
-                            value={newBeneficiaryAddress}
-                            onChange={(e) => setNewBeneficiaryAddress(e.target.value)}
-                            placeholder="e.g. Village: Bhaluka, District: Mymensingh"
-                            className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                          />
+                        <div className="flex items-center gap-2">
+                          <span className="text-slate-600 font-medium">Combined Total:</span>
+                          <span className="text-emerald-700 font-mono text-base font-black">
+                            ৳ {totalViaAmount.toLocaleString()}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -3513,8 +3898,8 @@ function ZakatManagementPage() {
                   </div>
                 )}
 
-                {/* 4. Conditional Physical Asset Purchase Fields */}
-                {modalMode === "Asset Purchased" && (
+                {/* 4. Conditional Physical Asset Purchase Fields (Direct Employee / Direct External) */}
+                {modalMode === "Asset Purchased" && modalChannel !== "Via Employee Agent" && (
                   <div className="p-5 bg-indigo-50/40 rounded-2xl border border-indigo-200 space-y-4 animate-in fade-in duration-150">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-indigo-100 pb-2">
                       <div className="text-[11px] font-black text-indigo-900 uppercase tracking-wide flex items-center gap-1.5">
@@ -3559,8 +3944,8 @@ function ZakatManagementPage() {
                       </select>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                      <div className="lg:col-span-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                      <div className="sm:col-span-2">
                         <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
                           Asset / Item Description <span className="text-red-500">*</span>
                         </label>
@@ -3575,18 +3960,6 @@ function ZakatManagementPage() {
                       </div>
                       <div>
                         <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Vendor / Market Location
-                        </label>
-                        <input
-                          type="text"
-                          value={modalAssetVendor}
-                          onChange={(e) => setModalAssetVendor(e.target.value)}
-                          placeholder="e.g. Gafargaon Cattle Hat / Sreepur"
-                          className="w-full h-10 px-3 rounded-lg border border-indigo-200 bg-white text-xs outline-none focus:border-indigo-600 text-slate-800"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
                           Quantity / Unit
                         </label>
                         <input
@@ -3594,33 +3967,6 @@ function ZakatManagementPage() {
                           value={modalAssetQty}
                           onChange={(e) => setModalAssetQty(e.target.value)}
                           placeholder="e.g. 1 Unit / 2 Goats"
-                          className="w-full h-10 px-3 rounded-lg border border-indigo-200 bg-white text-xs outline-none focus:border-indigo-600 text-slate-800"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Invoice / Receipt No.
-                        </label>
-                        <input
-                          type="text"
-                          value={modalAssetInvoice}
-                          onChange={(e) => setModalAssetInvoice(e.target.value)}
-                          placeholder="e.g. VOUCHER-9981"
-                          className="w-full h-10 px-3 rounded-lg border border-indigo-200 bg-white text-xs font-mono outline-none focus:border-indigo-600 text-slate-800"
-                        />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Asset Remarks & Handover Notes
-                        </label>
-                        <input
-                          type="text"
-                          value={modalAssetRemarks}
-                          onChange={(e) => setModalAssetRemarks(e.target.value)}
-                          placeholder="e.g. Verified 1-year battery warranty; inspected healthy condition at handover."
                           className="w-full h-10 px-3 rounded-lg border border-indigo-200 bg-white text-xs outline-none focus:border-indigo-600 text-slate-800"
                         />
                       </div>
@@ -3683,26 +4029,46 @@ function ZakatManagementPage() {
                       <span>Disbursement Amount (BDT ৳)</span>
                       <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="number"
-                      required
-                      value={newAmount}
-                      onChange={(e) => setNewAmount(e.target.value)}
-                      placeholder="e.g. 25000"
-                      className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-sm font-bold font-mono outline-none focus:border-blue-500 text-slate-900 shadow-xs"
-                    />
-                    <div className="flex items-center gap-1.5 pt-0.5">
-                      {[5000, 10000, 20000, 50000, 100000].map((amt) => (
-                        <button
-                          key={amt}
-                          type="button"
-                          onClick={() => setNewAmount(amt.toString())}
-                          className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-slate-200 border border-slate-200 text-slate-600 cursor-pointer transition-colors"
-                        >
-                          ৳{amt >= 1000 ? `${amt / 1000}k` : amt}
-                        </button>
-                      ))}
-                    </div>
+                    {modalChannel === "Via Employee Agent" ? (
+                      <div className="space-y-1">
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 font-bold text-sm">৳</span>
+                          <input
+                            type="text"
+                            readOnly
+                            value={totalViaAmount > 0 ? totalViaAmount.toLocaleString() : ""}
+                            placeholder="Enter amounts in recipients above"
+                            className="w-full h-10 pl-7 pr-3 rounded-lg border border-emerald-300 bg-emerald-50/40 text-sm font-bold font-mono outline-none text-emerald-900 shadow-xs cursor-default"
+                          />
+                        </div>
+                        <div className="text-[10px] text-emerald-700 font-medium">
+                          Auto-summed from {viaBeneficiaries.length} recipient amount{viaBeneficiaries.length > 1 ? "s" : ""} above
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <input
+                          type="number"
+                          required
+                          value={newAmount}
+                          onChange={(e) => setNewAmount(e.target.value)}
+                          placeholder="e.g. 25000"
+                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-sm font-bold font-mono outline-none focus:border-blue-500 text-slate-900 shadow-xs"
+                        />
+                        <div className="flex items-center gap-1.5 pt-0.5">
+                          {[5000, 10000, 20000, 50000, 100000].map((amt) => (
+                            <button
+                              key={amt}
+                              type="button"
+                              onClick={() => setNewAmount(amt.toString())}
+                              className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-slate-200 border border-slate-200 text-slate-600 cursor-pointer transition-colors"
+                            >
+                              ৳{amt >= 1000 ? `${amt / 1000}k` : amt}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">

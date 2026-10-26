@@ -341,6 +341,7 @@ export const nav: NavItem[] = [
     label: "Welfare & Support",
     icon: HeartHandshake,
     subitems: [
+      { label: "Zakat and Financial Aid", to: "/zakat-and-financial-aid" },
       {
         label: "Zakat Management",
         subitems: [

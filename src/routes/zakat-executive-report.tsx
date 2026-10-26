@@ -23,6 +23,7 @@ import {
   X,
   FileText,
   Layers,
+  RotateCcw,
 } from "lucide-react";
 import {
   INITIAL_ZAKAT_DATA,
@@ -43,7 +44,14 @@ function ZakatExecutiveReportPage() {
   const [records, setRecords] = useState<ZakatRecord[]>([]);
   const [recurringSchedules, setRecurringSchedules] = useState<RecurringZakatSchedule[]>([]);
   const [budgetPools] = useState(INITIAL_BUDGET_POOLS || [{ year: 2026, amount: 800000 }, { year: 2025, amount: 650000 }]);
-  const [selectedBudgetYear, setSelectedBudgetYear] = useState<number>(2026);
+
+  // Multi-dimensional filters (Year, Month, Date Range, Channel, Mode)
+  const [filterYear, setFilterYear] = useState<string>("2026");
+  const [filterMonth, setFilterMonth] = useState<string>("ALL");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
+  const [filterChannel, setFilterChannel] = useState<string>("ALL");
+  const [filterMode, setFilterMode] = useState<string>("ALL");
 
   // Load Zakat records from storage or initial
   useEffect(() => {
@@ -70,11 +78,45 @@ function ZakatExecutiveReportPage() {
     }
   }, []);
 
+  // Filtered records based on active multi-dimensional filters
+  const filteredRecords = useMemo(() => {
+    return records.filter((r) => {
+      // 1. Year filter
+      if (filterYear !== "ALL") {
+        const matchesYear =
+          r.budgetYear?.toString() === filterYear ||
+          (r.assignedDate && r.assignedDate.startsWith(filterYear));
+        if (!matchesYear) return false;
+      }
+
+      // 2. Month filter (assignedDate: YYYY-MM-DD)
+      if (filterMonth !== "ALL") {
+        if (!r.assignedDate) return false;
+        const parts = r.assignedDate.split("-");
+        if (parts.length >= 2) {
+          if (parts[1] !== filterMonth) return false;
+        } else {
+          return false;
+        }
+      }
+
+      // 3. Date Range
+      if (dateFrom && r.assignedDate && r.assignedDate < dateFrom) return false;
+      if (dateTo && r.assignedDate && r.assignedDate > dateTo) return false;
+
+      // 4. Channel filter
+      if (filterChannel !== "ALL" && r.disbursementChannel !== filterChannel) return false;
+
+      // 5. Aid Mode filter
+      if (filterMode !== "ALL" && r.disbursementMode !== filterMode) return false;
+
+      return true;
+    });
+  }, [records, filterYear, filterMonth, dateFrom, dateTo, filterChannel, filterMode]);
+
   // Compute multi-dimensional stats
   const stats = useMemo(() => {
-    const yearRecords = records.filter(
-      (r) => r.budgetYear === selectedBudgetYear || r.assignedDate.startsWith(selectedBudgetYear.toString())
-    );
+    const targetRecords = filteredRecords;
 
     let totalAssigned = 0;
     let totalDistributed = 0;
@@ -111,7 +153,7 @@ function ZakatExecutiveReportPage() {
       Others: { total: 0, count: 0, cash: 0, asset: 0 },
     };
 
-    yearRecords.forEach((r) => {
+    targetRecords.forEach((r) => {
       totalAssigned += r.amount;
       if (r.agencyStatus === "Distributed" || r.agencyStatus === "Verified") {
         totalDistributed += r.amount;
@@ -174,7 +216,10 @@ function ZakatExecutiveReportPage() {
       .filter((s) => s.status === "Active")
       .reduce((sum, s) => sum + s.monthlyAmount, 0);
 
-    const currentBudget = (budgetPools || []).find((b) => b.year === selectedBudgetYear)?.amount || 800000;
+    const currentBudget =
+      filterYear !== "ALL"
+        ? (budgetPools || []).find((b) => b.year === Number(filterYear))?.amount || 800000
+        : (budgetPools || []).reduce((sum, b) => sum + b.amount, 0);
     const remainingBudget = currentBudget - totalAssigned;
 
     return {
@@ -198,9 +243,9 @@ function ZakatExecutiveReportPage() {
       purposeBreakdown,
       activeMonthlyCommitment,
       activeSchedulesCount: recurringSchedules.filter((s) => s.status === "Active").length,
-      totalRecords: yearRecords.length,
+      totalRecords: targetRecords.length,
     };
-  }, [records, selectedBudgetYear, budgetPools, recurringSchedules]);
+  }, [filteredRecords, filterYear, budgetPools, recurringSchedules]);
 
   // Drill-down Modal State
   const [drillDownState, setDrillDownState] = useState<{
@@ -226,11 +271,7 @@ function ZakatExecutiveReportPage() {
   // Filtered drill-down items
   const drillDownRecords = useMemo(() => {
     if (!drillDownState.isOpen) return [];
-    return records.filter((r) => {
-      const matchYear =
-        r.budgetYear === selectedBudgetYear || r.assignedDate.startsWith(selectedBudgetYear.toString());
-      if (!matchYear) return false;
-
+    return filteredRecords.filter((r) => {
       // Base matrix constraints
       if (drillDownState.channel !== "ALL" && r.disbursementChannel !== drillDownState.channel) return false;
       if (drillDownState.mode !== "ALL" && r.disbursementMode !== drillDownState.mode) return false;
@@ -248,9 +289,8 @@ function ZakatExecutiveReportPage() {
       return true;
     });
   }, [
-    records,
+    filteredRecords,
     drillDownState,
-    selectedBudgetYear,
     drillDownChannelFilter,
     drillDownModeFilter,
     drillDownSearch,
@@ -277,37 +317,23 @@ function ZakatExecutiveReportPage() {
                 <span>/</span>
                 <Link to="/zakat-list" className="hover:text-primary transition">Zakat Management</Link>
                 <span>/</span>
-                <span className="text-foreground font-semibold">Zakat Report Report</span>
+                <span className="text-foreground font-semibold">Zakat Executive Report</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2.5">
                 <div className="p-2 bg-blue-600/10 text-blue-600 rounded-xl border border-blue-600/20">
                   <PieChart className="size-5" />
                 </div>
-                <span>Zakat Report Zakat Governance Report</span>
+                <span>Zakat Governance & Executive Audit Report</span>
               </h1>
               <p className="text-xs text-muted-foreground mt-1 font-normal">
-                Audited cross-tabulation of funds disbursed by Beneficiary Channel (Direct Staff vs. Agent vs. Outside) and Aid Mode (Cash vs. Asset Purchases).
+                Cross-tabulated audit statement by Beneficiary Channel (Staff vs. Agent vs. Outside) and Aid Medium (Cash vs. Asset Purchases).
               </p>
             </div>
 
             <div className="flex items-center gap-2.5 flex-wrap print:hidden">
-              <div className="flex items-center gap-1.5 bg-card border border-border px-3 py-1.5 rounded-lg text-xs font-semibold shadow-2xs">
-                <Calendar className="size-3.5 text-muted-foreground" />
-                <span className="text-muted-foreground text-[11px] uppercase">Pool Year:</span>
-                <select
-                  value={selectedBudgetYear}
-                  onChange={(e) => setSelectedBudgetYear(Number(e.target.value))}
-                  className="bg-transparent font-bold text-foreground outline-none cursor-pointer"
-                >
-                  <option value={2026}>2026</option>
-                  <option value={2025}>2025</option>
-                  <option value={2024}>2024</option>
-                </select>
-              </div>
-
               <Link
                 to="/zakat-list"
-                className="h-8.5 px-3.5 rounded-lg border border-border bg-card hover:bg-muted text-foreground text-xs font-medium flex items-center gap-1.5 transition"
+                className="h-8.5 px-3.5 rounded-lg border border-border bg-card hover:bg-muted text-foreground text-xs font-medium flex items-center gap-1.5 transition shadow-2xs"
               >
                 <HeartHandshake className="size-4 text-emerald-600" />
                 <span>Zakat Cases List</span>
@@ -324,83 +350,173 @@ function ZakatExecutiveReportPage() {
             </div>
           </div>
 
-          {/* 6 Executive Summary Metric Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {/* Total Budget */}
-            <div className="bg-card rounded-xl border border-border p-3.5 shadow-2xs">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                {selectedBudgetYear} Budget Pool
-              </span>
-              <div className="text-lg font-bold text-foreground mt-1">
-                ৳{stats.currentBudget.toLocaleString()}
+          {/* Enhanced Multi-Dimensional Filter Bar */}
+          <div className="bg-card rounded-xl border border-border p-4 shadow-2xs space-y-3 print:hidden">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-border/60">
+              <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wide">
+                <Filter className="size-3.5 text-primary" />
+                <span>Executive Report Filters</span>
+                {(filterYear !== "2026" || filterMonth !== "ALL" || dateFrom || dateTo || filterChannel !== "ALL" || filterMode !== "ALL") && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                    Filters Active
+                  </span>
+                )}
               </div>
-              <div className="text-[11px] text-muted-foreground mt-0.5">Corporate Allocation</div>
-            </div>
-
-            {/* Direct Employee Channel */}
-            <div className="bg-card rounded-xl border border-border p-3.5 shadow-2xs">
-              <span className="text-[10px] font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider block">
-                1. Direct Employee
-              </span>
-              <div className="text-lg font-bold text-purple-700 dark:text-purple-400 mt-1">
-                ৳{stats.totalDirectEmployee.toLocaleString()}
-              </div>
-              <div className="text-[11px] text-purple-600 dark:text-purple-300 mt-0.5 font-medium">
-                {stats.countDirectEmployee} Staff Beneficiaries
-              </div>
-            </div>
-
-            {/* Via Agent Channel */}
-            <div className="bg-card rounded-xl border border-border p-3.5 shadow-2xs">
-              <span className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider block">
-                2. Via Staff Agent
-              </span>
-              <div className="text-lg font-bold text-blue-700 dark:text-blue-400 mt-1">
-                ৳{stats.totalViaAgent.toLocaleString()}
-              </div>
-              <div className="text-[11px] text-blue-600 dark:text-blue-300 mt-0.5 font-medium">
-                {stats.countViaAgent} Distributed in Villages
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilterYear("2026");
+                    setFilterMonth("ALL");
+                    setDateFrom("");
+                    setDateTo("");
+                    setFilterChannel("ALL");
+                    setFilterMode("ALL");
+                  }}
+                  className="text-xs text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1 cursor-pointer transition"
+                >
+                  <RotateCcw className="size-3" />
+                  <span>Reset All</span>
+                </button>
               </div>
             </div>
 
-            {/* Direct External */}
-            <div className="bg-card rounded-xl border border-border p-3.5 shadow-2xs">
-              <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider block">
-                3. Direct External
-              </span>
-              <div className="text-lg font-bold text-amber-700 dark:text-amber-400 mt-1">
-                ৳{stats.totalDirectExternal.toLocaleString()}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {/* 1. Year */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase block">
+                  Year
+                </label>
+                <select
+                  value={filterYear}
+                  onChange={(e) => setFilterYear(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-lg border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary cursor-pointer shadow-2xs"
+                >
+                  <option value="ALL">All Years</option>
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                  <option value="2024">2024</option>
+                </select>
               </div>
-              <div className="text-[11px] text-amber-600 dark:text-amber-300 mt-0.5 font-medium">
-                {stats.countDirectExternal} Madrasa / Public
+
+              {/* 2. Month */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase block">
+                  Month
+                </label>
+                <select
+                  value={filterMonth}
+                  onChange={(e) => setFilterMonth(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-lg border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary cursor-pointer shadow-2xs"
+                >
+                  <option value="ALL">All Months</option>
+                  <option value="01">01 - January</option>
+                  <option value="02">02 - February</option>
+                  <option value="03">03 - March</option>
+                  <option value="04">04 - April</option>
+                  <option value="05">05 - May</option>
+                  <option value="06">06 - June</option>
+                  <option value="07">07 - July</option>
+                  <option value="08">08 - August</option>
+                  <option value="09">09 - September</option>
+                  <option value="10">10 - October</option>
+                  <option value="11">11 - November</option>
+                  <option value="12">12 - December</option>
+                </select>
+              </div>
+
+              {/* 3. Date From */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase block">
+                  Date From
+                </label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-lg border border-border bg-background text-xs font-medium text-foreground outline-none focus:border-primary cursor-pointer shadow-2xs"
+                />
+              </div>
+
+              {/* 4. Date To */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase block">
+                  Date To
+                </label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-lg border border-border bg-background text-xs font-medium text-foreground outline-none focus:border-primary cursor-pointer shadow-2xs"
+                />
+              </div>
+
+              {/* 5. Channel */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase block">
+                  Channel
+                </label>
+                <select
+                  value={filterChannel}
+                  onChange={(e) => setFilterChannel(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-lg border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary cursor-pointer shadow-2xs"
+                >
+                  <option value="ALL">All Channels</option>
+                  <option value="Direct Employee">Direct Employee</option>
+                  <option value="Via Employee Agent">Via Staff Agent</option>
+                  <option value="Direct External">Direct External</option>
+                </select>
+              </div>
+
+              {/* 6. Aid Mode */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase block">
+                  Aid Mode
+                </label>
+                <select
+                  value={filterMode}
+                  onChange={(e) => setFilterMode(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-lg border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary cursor-pointer shadow-2xs"
+                >
+                  <option value="ALL">All Modes</option>
+                  <option value="Cash Grant">Direct Cash Grant</option>
+                  <option value="Asset Purchased">In-Kind Asset Purchased</option>
+                </select>
               </div>
             </div>
 
-            {/* Asset vs Cash Split */}
-            <div className="bg-card rounded-xl border border-border p-3.5 shadow-2xs">
-              <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider block">
-                Asset vs. Cash Split
-              </span>
-              <div className="text-xs font-bold text-foreground mt-1">
-                Asset: ৳{stats.totalAssetPurchased.toLocaleString()}
+            {/* Compact Executive Key Metrics Strip */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-border/50 text-xs">
+              <div className="flex flex-wrap items-center gap-3 font-medium text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <span className="size-2 rounded-full bg-emerald-500"></span>
+                  <span>Filtered Cases: <strong className="text-foreground font-bold">{stats.totalRecords}</strong></span>
+                </div>
+                <span className="text-border">|</span>
+                <div>
+                  Cash Grants: <strong className="text-foreground font-bold">৳{stats.totalCashGrants.toLocaleString()}</strong> ({stats.countCashGrants})
+                </div>
+                <span className="text-border">|</span>
+                <div>
+                  Asset Purchases: <strong className="text-indigo-600 dark:text-indigo-400 font-bold">৳{stats.totalAssetPurchased.toLocaleString()}</strong> ({stats.countAssetPurchased})
+                </div>
               </div>
-              <div className="text-[11px] text-muted-foreground mt-0.5">
-                Cash: ৳{stats.totalCashGrants.toLocaleString()}
-              </div>
-            </div>
 
-            {/* Remaining Balance */}
-            <div className="bg-card rounded-xl border border-border p-3.5 shadow-2xs">
-              <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider block">
-                Remaining Balance
-              </span>
-              <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-                ৳{stats.remainingBudget.toLocaleString()}
-              </div>
-              <div className="text-[11px] text-emerald-600 font-medium mt-0.5">
-                {stats.currentBudget > 0
-                  ? `${((stats.totalAssigned / stats.currentBudget) * 100).toFixed(1)}% disbursed`
-                  : "0%"}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 bg-muted/50 px-3 py-1 rounded-lg border border-border/70">
+                  <span className="text-muted-foreground text-[11px] uppercase font-bold">Total Disbursed:</span>
+                  <span className="text-foreground font-mono text-sm font-black">
+                    ৳{stats.totalAssigned.toLocaleString()}
+                  </span>
+                </div>
+                {filterYear !== "ALL" && (
+                  <div className="flex items-center gap-1.5 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20 text-emerald-700 dark:text-emerald-400">
+                    <span className="text-[11px] uppercase font-bold">Remaining Pool:</span>
+                    <span className="font-mono text-sm font-black">
+                      ৳{stats.remainingBudget.toLocaleString()}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -418,16 +534,6 @@ function ZakatExecutiveReportPage() {
               </div>
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider self-start sm:self-auto">
                 Staff vs. Staff Agent vs. Outside
-              </span>
-            </div>
-
-            {/* Notice Bar */}
-            <div className="p-3 bg-muted/30 rounded-lg border border-border/60 flex items-center justify-between text-xs text-foreground">
-              <div>
-                <strong className="text-primary">Clickable Audit Trail:</strong> Click any channel row or disbursement figure to view the itemized list of beneficiaries, locations, agent handover chains, and receipts.
-              </div>
-              <span className="hidden md:inline-block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-card border border-border px-2 py-0.5 rounded">
-                Clickable Drill-Down
               </span>
             </div>
 
