@@ -281,12 +281,15 @@ export function ItemCreationPageForm({
       parentSubGroupId: null,
       description: "",
       status: "Active",
+      serviceFlag: !!grp.serviceFlag,
     });
     setSubModalErrors({});
     setIsSubModalOpen(true);
   };
 
   const handleOpenAddChildSubGroup = (parentSub: ItemSubGroup) => {
+    const parentGroup = itemGroups.find((g) => g.id === parentSub.itemGroupId);
+    const isService = !!parentSub.serviceFlag || !!parentGroup?.serviceFlag;
     setSubModalMode("create");
     setSubModalValues({
       subGroupCode: `SUB-${Math.floor(100 + Math.random() * 900)}`,
@@ -295,6 +298,23 @@ export function ItemCreationPageForm({
       parentSubGroupId: parentSub.id,
       description: "",
       status: "Active",
+      serviceFlag: isService,
+    });
+    setSubModalErrors({});
+    setIsSubModalOpen(true);
+  };
+
+  const handleOpenEditSubGroup = (subGroup: ItemSubGroup) => {
+    const parentGroup = itemGroups.find((g) => g.id === subGroup.itemGroupId);
+    const parentSub = subGroup.parentSubGroupId
+      ? itemSubGroups.find((s) => s.id === subGroup.parentSubGroupId)
+      : null;
+    const isMandatory = !!parentGroup?.serviceFlag || !!parentSub?.serviceFlag;
+
+    setSubModalMode("edit");
+    setSubModalValues({
+      ...subGroup,
+      serviceFlag: isMandatory ? true : !!subGroup.serviceFlag,
     });
     setSubModalErrors({});
     setIsSubModalOpen(true);
@@ -303,12 +323,13 @@ export function ItemCreationPageForm({
   const handleSelectSubGroup = (node: ItemSubGroup, currentSubs = itemSubGroups) => {
     const parentGroup = itemGroups.find((g) => g.id === node.itemGroupId);
     const bc = getSubGroupBreadcrumb(node.id, currentSubs, itemGroups);
+    const isService = !!node.serviceFlag || !!parentGroup?.serviceFlag;
     setFormData((prev) => ({
       ...prev,
       subGroupId: node.id,
       subGroupName: node.subGroupName,
       subGroupBreadcrumb: bc,
-      serviceFlag: parentGroup ? !!parentGroup.serviceFlag : prev.serviceFlag,
+      serviceFlag: isService ? true : prev.serviceFlag,
     }));
     toast.info(`Assigned to "${node.subGroupName}"`);
   };
@@ -320,6 +341,15 @@ export function ItemCreationPageForm({
       return;
     }
 
+    const currentParentGroup = itemGroups.find(
+      (g) => g.id === (subModalValues.itemGroupId || itemGroups[0]?.id),
+    );
+    const currentParentSub = subModalValues.parentSubGroupId
+      ? itemSubGroups.find((s) => s.id === subModalValues.parentSubGroupId)
+      : null;
+    const isParentMandatoryService =
+      !!currentParentGroup?.serviceFlag || !!currentParentSub?.serviceFlag;
+
     const newSub: ItemSubGroup = {
       id: subModalValues.id || `sub-${Date.now()}`,
       subGroupCode: subModalValues.subGroupCode || `SUB-${Date.now()}`,
@@ -328,6 +358,7 @@ export function ItemCreationPageForm({
       parentSubGroupId: subModalValues.parentSubGroupId || null,
       description: subModalValues.description || "",
       status: (subModalValues.status as any) || "Active",
+      serviceFlag: isParentMandatoryService ? true : !!subModalValues.serviceFlag,
     };
 
     const updated =
@@ -339,16 +370,20 @@ export function ItemCreationPageForm({
     setStoredData("proc_item_sub_groups_v2", updated);
     onItemSubGroupsChange?.(updated);
 
-    // Auto-select this newly created sub-group for current item
+    // Auto-select this newly created / updated sub-group for current item
     handleSelectSubGroup(newSub, updated);
 
     setIsSubModalOpen(false);
-    toast.success("Sub Group created and assigned successfully.");
+    toast.success(
+      subModalMode === "create"
+        ? "Sub Group created and assigned successfully."
+        : "Sub Group updated successfully.",
+    );
   };
 
   const [formData, setFormData] = useState<Partial<ItemProductMaster>>(() => {
     const parentGroup = itemGroups.find((g) => g.id === targetSubGroup?.itemGroupId);
-    const inheritedServiceFlag = !!parentGroup?.serviceFlag;
+    const inheritedServiceFlag = !!targetSubGroup?.serviceFlag || !!parentGroup?.serviceFlag;
 
     if (initialData) {
       const existingWarehouses =
@@ -794,6 +829,11 @@ export function ItemCreationPageForm({
                               <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted/70 text-muted-foreground shrink-0">
                                 {node.subGroupCode}
                               </span>
+                              {node.serviceFlag && (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 shrink-0">
+                                  SERVICE
+                                </span>
+                              )}
                             </div>
 
                             <div className="flex items-center gap-1.5 shrink-0 ml-2">
@@ -804,6 +844,14 @@ export function ItemCreationPageForm({
                                 className="size-5 rounded flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
                               >
                                 <Plus className="size-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditSubGroup(node)}
+                                title="Edit Sub Group"
+                                className="size-5 rounded flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-amber-500 transition cursor-pointer"
+                              >
+                                <Edit className="size-3" />
                               </button>
                               <button
                                 type="button"
@@ -947,93 +995,167 @@ export function ItemCreationPageForm({
               </button>
             </div>
 
-            <form onSubmit={handleSaveSubGroupModal} className="p-4 sm:p-5 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">
-                    Parent Item Group <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    value={subModalValues.itemGroupId || ""}
-                    onChange={(e) =>
-                      setSubModalValues({ ...subModalValues, itemGroupId: e.target.value })
-                    }
-                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
-                  >
-                    {itemGroups.map((g) => (
-                      <option key={g.id} value={g.id}>
-                        {g.groupName} ({g.groupCode})
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            {(() => {
+              const currentModalParentGroup = itemGroups.find(
+                (g) => g.id === (subModalValues.itemGroupId || itemGroups[0]?.id),
+              );
+              const currentModalParentSub = subModalValues.parentSubGroupId
+                ? itemSubGroups.find((s) => s.id === subModalValues.parentSubGroupId)
+                : null;
+              const isParentMandatoryService =
+                !!currentModalParentGroup?.serviceFlag || !!currentModalParentSub?.serviceFlag;
 
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">
-                    Sub Group Code <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={subModalValues.subGroupCode || ""}
-                    onChange={(e) =>
-                      setSubModalValues({ ...subModalValues, subGroupCode: e.target.value })
-                    }
-                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none"
-                  />
-                </div>
+              return (
+                <form onSubmit={handleSaveSubGroupModal} className="p-4 sm:p-5 space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold mb-1 text-foreground">
+                        Parent Item Group <span className="text-rose-500">*</span>
+                      </label>
+                      <select
+                        value={subModalValues.itemGroupId || ""}
+                        onChange={(e) => {
+                          const newGroupId = e.target.value;
+                          const newParentGroup = itemGroups.find((g) => g.id === newGroupId);
+                          const isMandatory =
+                            !!newParentGroup?.serviceFlag || !!currentModalParentSub?.serviceFlag;
+                          setSubModalValues((prev) => ({
+                            ...prev,
+                            itemGroupId: newGroupId,
+                            serviceFlag: isMandatory ? true : false,
+                          }));
+                        }}
+                        className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
+                      >
+                        {itemGroups.map((g) => (
+                          <option key={g.id} value={g.id}>
+                            {g.groupName} ({g.groupCode}){g.serviceFlag ? " [Service]" : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold mb-1 text-foreground">
-                    Sub Group Name <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={subModalValues.subGroupName || ""}
-                    onChange={(e) =>
-                      setSubModalValues({ ...subModalValues, subGroupName: e.target.value })
-                    }
-                    placeholder="e.g. Cotton Yarns, Circuit Boards"
-                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
-                  />
-                  {subModalErrors.subGroupName && (
-                    <p className="text-[10px] text-rose-500 mt-1">
-                      {subModalErrors.subGroupName}
-                    </p>
-                  )}
-                </div>
+                    {currentModalParentSub ? (
+                      <div>
+                        <label className="block text-xs font-bold mb-1 text-foreground">
+                          Parent Sub Group
+                        </label>
+                        <div className="w-full h-9 px-3 rounded-lg border border-border/80 bg-muted/40 text-xs font-medium flex items-center text-muted-foreground truncate">
+                          {currentModalParentSub.subGroupName}
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="block text-xs font-bold mb-1 text-foreground">
+                          Sub Group Code <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={subModalValues.subGroupCode || ""}
+                          onChange={(e) =>
+                            setSubModalValues({ ...subModalValues, subGroupCode: e.target.value })
+                          }
+                          className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none"
+                        />
+                      </div>
+                    )}
 
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold mb-1 text-foreground">
-                    Description
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={subModalValues.description || ""}
-                    onChange={(e) =>
-                      setSubModalValues({ ...subModalValues, description: e.target.value })
-                    }
-                    className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
-                  />
-                </div>
-              </div>
+                    {currentModalParentSub && (
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs font-bold mb-1 text-foreground">
+                          Sub Group Code <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={subModalValues.subGroupCode || ""}
+                          onChange={(e) =>
+                            setSubModalValues({ ...subModalValues, subGroupCode: e.target.value })
+                          }
+                          className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none"
+                        />
+                      </div>
+                    )}
 
-              <div className="pt-4 border-t border-border/70 flex items-center justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setIsSubModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-bold transition cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex items-center gap-1.5 px-4.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-xs cursor-pointer"
-                >
-                  <Save className="size-3.5" />
-                  <span>Save Sub Group</span>
-                </button>
-              </div>
-            </form>
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold mb-1 text-foreground">
+                        Sub Group Name <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={subModalValues.subGroupName || ""}
+                        onChange={(e) =>
+                          setSubModalValues({ ...subModalValues, subGroupName: e.target.value })
+                        }
+                        placeholder="e.g. Cotton Yarns, Circuit Boards"
+                        className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
+                      />
+                      {subModalErrors.subGroupName && (
+                        <p className="text-[10px] text-rose-500 mt-1">
+                          {subModalErrors.subGroupName}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold mb-1 text-foreground">
+                        Description
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={subModalValues.description || ""}
+                        onChange={(e) =>
+                          setSubModalValues({ ...subModalValues, description: e.target.value })
+                        }
+                        className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-1 sm:col-span-2">
+                      <input
+                        type="checkbox"
+                        id="subGroupServiceFlag"
+                        disabled={isParentMandatoryService}
+                        checked={isParentMandatoryService ? true : !!subModalValues.serviceFlag}
+                        onChange={(e) =>
+                          setSubModalValues({ ...subModalValues, serviceFlag: e.target.checked })
+                        }
+                        className="size-4 rounded border-border text-amber-500 focus:ring-amber-500/20 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                      />
+                      <label
+                        htmlFor="subGroupServiceFlag"
+                        className={`text-xs font-semibold text-foreground ${
+                          isParentMandatoryService ? "cursor-not-allowed" : "cursor-pointer"
+                        }`}
+                      >
+                        Service Item Group (Non-physical goods or external services)
+                      </label>
+                      {isParentMandatoryService && (
+                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
+                          Inherited from Parent Group
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-border/70 flex items-center justify-end gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setIsSubModalOpen(false)}
+                      className="px-4 py-2 rounded-xl border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-bold transition cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex items-center gap-1.5 px-4.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                    >
+                      <Save className="size-3.5" />
+                      <span>{subModalMode === "create" ? "Save Sub Group" : "Update Sub Group"}</span>
+                    </button>
+                  </div>
+                </form>
+              );
+            })()}
           </div>
         </div>
       )}

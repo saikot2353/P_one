@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Save, Layers, Edit } from "lucide-react";
 import { StoreLocation, WarehouseStore } from "@/lib/procurement-master-data";
 
@@ -20,11 +20,18 @@ export function StoreLocationPageForm({
   onSwitchToEdit,
 }: StoreLocationPageFormProps) {
   const [formData, setFormData] = useState<Partial<StoreLocation>>(() => {
-    if (initialData) return { ...initialData };
+    if (initialData) {
+      return {
+        ...initialData,
+        defaultLocationName:
+          initialData.trackingMode === "Location" ? !!initialData.defaultLocationName : false,
+      };
+    }
     return {
       trackingMode: "Location",
       locationTrackingEnabled: true,
       batchTrackingEnabled: false,
+      defaultLocationName: false,
       store: warehouses[0]?.storeName || "PKCL Central Raw Material Warehouse",
       locationCode: `LOC-${Math.floor(100 + Math.random() * 900)}`,
       locationName: "Rack A - Shelf 01",
@@ -40,6 +47,36 @@ export function StoreLocationPageForm({
     };
   });
 
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        ...initialData,
+        defaultLocationName:
+          initialData.trackingMode === "Location" ? !!initialData.defaultLocationName : false,
+      });
+    } else {
+      setFormData({
+        trackingMode: "Location",
+        locationTrackingEnabled: true,
+        batchTrackingEnabled: false,
+        defaultLocationName: false,
+        store: warehouses[0]?.storeName || "PKCL Central Raw Material Warehouse",
+        locationCode: `LOC-${Math.floor(100 + Math.random() * 900)}`,
+        locationName: "Rack A - Shelf 01",
+        locationType: "Rack",
+        locationStatus: "Active",
+        batchNumbering: `BATCH-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+        createDate: new Date().toISOString().split("T")[0],
+        expireDate: `${new Date().getFullYear() + 2}-12-31`,
+        batchStatus: "Active",
+        status: "Active",
+        capacity: 500,
+        capacityUOM: "KG",
+      });
+    }
+    setFormErrors({});
+  }, [initialData, mode, warehouses]);
+
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const isView = mode === "view";
 
@@ -50,6 +87,7 @@ export function StoreLocationPageForm({
       trackingMode: modeType,
       locationTrackingEnabled: modeType === "Location",
       batchTrackingEnabled: modeType === "Batch",
+      defaultLocationName: modeType === "Location" ? (prev.defaultLocationName ?? false) : false,
     }));
   };
 
@@ -80,6 +118,8 @@ export function StoreLocationPageForm({
       locationName: formData.locationName || "",
       locationType: (formData.locationType as any) || "Rack",
       locationStatus: (formData.locationStatus as any) || "Active",
+      defaultLocationName:
+        formData.trackingMode === "Location" ? !!formData.defaultLocationName : false,
       batchNumbering: formData.batchNumbering || "",
       createDate: formData.createDate || new Date().toISOString().split("T")[0],
       expireDate: formData.expireDate || "",
@@ -259,6 +299,25 @@ export function StoreLocationPageForm({
                     <option value="Floor">Floor</option>
                     <option value="Other">Other</option>
                   </select>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1 sm:col-span-2 md:col-span-3">
+                  <input
+                    type="checkbox"
+                    id="defaultLocationName"
+                    disabled={isView}
+                    checked={!!formData.defaultLocationName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, defaultLocationName: e.target.checked })
+                    }
+                    className="size-4 rounded border-border text-amber-500 focus:ring-amber-500/20 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  />
+                  <label
+                    htmlFor="defaultLocationName"
+                    className="text-xs font-semibold text-foreground cursor-pointer select-none"
+                  >
+                    Default Location Name
+                  </label>
                 </div>
               </>
             ) : (

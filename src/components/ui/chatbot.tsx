@@ -168,7 +168,7 @@ export function Chatbot() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end pointer-events-none">
+    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end pointer-events-none print:hidden">
       {/* Chat Window */}
       <div 
         className={`pointer-events-auto mb-4 w-[360px] sm:w-[400px] bg-card/95 backdrop-blur-2xl border border-border/50 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] rounded-3xl flex flex-col overflow-hidden transition-all duration-500 origin-bottom-right transform ${

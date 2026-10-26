@@ -48,6 +48,7 @@ import { Route as ConfigureTaxRouteImport } from './routes/configure-tax'
 import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
 import { Route as CurrencySetupRouteImport } from './routes/currency-setup'
+import { Route as DepartmentSopRouteImport } from './routes/department-sop'
 import { Route as DeptWiseSalarySheetRouteImport } from './routes/dept-wise-salary-sheet'
 import { Route as DisciplinaryCaseFilesRouteImport } from './routes/disciplinary-case-files'
 import { Route as DisciplinaryLeftyRouteImport } from './routes/disciplinary-lefty'
@@ -74,6 +75,7 @@ import { Route as FinalSettlementConfigurationRouteImport } from './routes/final
 import { Route as FinalSettlementReportRouteImport } from './routes/final-settlement-report'
 import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/financial-aid-budget-configuration'
 import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
+import { Route as FinancialAidReportRouteImport } from './routes/financial-aid-report'
 import { Route as HolidaySummarySheetRouteImport } from './routes/holiday-summary-sheet'
 import { Route as HrPolicyRouteImport } from './routes/hr-policy'
 import { Route as HrReportAbsentCounselingRouteImport } from './routes/hr-report-absent-counseling'
@@ -228,6 +230,8 @@ import { Route as MmFabricEstimationRegisterRouteImport } from './routes/mm-fabr
 import { Route as MmOrderClosureRouteImport } from './routes/mm-order-closure'
 import { Route as MmOrderEntryRouteImport } from './routes/mm-order-entry'
 import { Route as MmPiRouteImport } from './routes/mm-pi'
+import { Route as MmPiApprovalDetailsRouteImport } from './routes/mm-pi-approval-details'
+import { Route as MmPiVerificationApprovalRouteImport } from './routes/mm-pi-verification-approval'
 import { Route as MmPolicyConfigRouteImport } from './routes/mm-policy-config'
 import { Route as MmPreCostingRouteImport } from './routes/mm-pre-costing'
 import { Route as MmProformaInvoiceCreateRouteImport } from './routes/mm-proforma-invoice-create'
@@ -387,6 +391,7 @@ import { Route as WorkFlowRouteImport } from './routes/work-flow'
 import { Route as WorkFlowsRouteImport } from './routes/work-flows'
 import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
 import { Route as YearlyBonusReportRouteImport } from './routes/yearly-bonus-report'
+import { Route as ZakatAndFinancialAidRouteImport } from './routes/zakat-and-financial-aid'
 import { Route as ZakatAssetMasterRouteImport } from './routes/zakat-asset-master'
 import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
 import { Route as ZakatExecutiveReportRouteImport } from './routes/zakat-executive-report'
@@ -594,6 +599,11 @@ const CurrencySetupRoute = CurrencySetupRouteImport.update({
   path: '/currency-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DepartmentSopRoute = DepartmentSopRouteImport.update({
+  id: '/department-sop',
+  path: '/department-sop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DeptWiseSalarySheetRoute = DeptWiseSalarySheetRouteImport.update({
   id: '/dept-wise-salary-sheet',
   path: '/dept-wise-salary-sheet',
@@ -729,6 +739,11 @@ const FinancialAidBudgetConfigurationRoute =
 const FinancialAidListRoute = FinancialAidListRouteImport.update({
   id: '/financial-aid-list',
   path: '/financial-aid-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinancialAidReportRoute = FinancialAidReportRouteImport.update({
+  id: '/financial-aid-report',
+  path: '/financial-aid-report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HolidaySummarySheetRoute = HolidaySummarySheetRouteImport.update({
@@ -1541,6 +1556,17 @@ const MmPiRoute = MmPiRouteImport.update({
   path: '/mm-pi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MmPiApprovalDetailsRoute = MmPiApprovalDetailsRouteImport.update({
+  id: '/mm-pi-approval-details',
+  path: '/mm-pi-approval-details',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmPiVerificationApprovalRoute =
+  MmPiVerificationApprovalRouteImport.update({
+    id: '/mm-pi-verification-approval',
+    path: '/mm-pi-verification-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MmPolicyConfigRoute = MmPolicyConfigRouteImport.update({
   id: '/mm-policy-config',
   path: '/mm-policy-config',
@@ -2400,6 +2426,11 @@ const YearlyBonusReportRoute = YearlyBonusReportRouteImport.update({
   path: '/yearly-bonus-report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ZakatAndFinancialAidRoute = ZakatAndFinancialAidRouteImport.update({
+  id: '/zakat-and-financial-aid',
+  path: '/zakat-and-financial-aid',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ZakatAssetMasterRoute = ZakatAssetMasterRouteImport.update({
   id: '/zakat-asset-master',
   path: '/zakat-asset-master',
@@ -2490,6 +2521,7 @@ export interface FileRoutesByFullPath {
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/currency-setup': typeof CurrencySetupRoute
+  '/department-sop': typeof DepartmentSopRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
@@ -2516,6 +2548,7 @@ export interface FileRoutesByFullPath {
   '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/financial-aid-report': typeof FinancialAidReportRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-report-absent-counseling': typeof HrReportAbsentCounselingRoute
@@ -2670,6 +2703,8 @@ export interface FileRoutesByFullPath {
   '/mm-order-closure': typeof MmOrderClosureRoute
   '/mm-order-entry': typeof MmOrderEntryRoute
   '/mm-pi': typeof MmPiRoute
+  '/mm-pi-approval-details': typeof MmPiApprovalDetailsRoute
+  '/mm-pi-verification-approval': typeof MmPiVerificationApprovalRoute
   '/mm-policy-config': typeof MmPolicyConfigRoute
   '/mm-pre-costing': typeof MmPreCostingRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
@@ -2829,6 +2864,7 @@ export interface FileRoutesByFullPath {
   '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
+  '/zakat-and-financial-aid': typeof ZakatAndFinancialAidRoute
   '/zakat-asset-master': typeof ZakatAssetMasterRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-executive-report': typeof ZakatExecutiveReportRoute
@@ -2879,6 +2915,7 @@ export interface FileRoutesByTo {
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/currency-setup': typeof CurrencySetupRoute
+  '/department-sop': typeof DepartmentSopRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
@@ -2905,6 +2942,7 @@ export interface FileRoutesByTo {
   '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/financial-aid-report': typeof FinancialAidReportRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-report-absent-counseling': typeof HrReportAbsentCounselingRoute
@@ -3059,6 +3097,8 @@ export interface FileRoutesByTo {
   '/mm-order-closure': typeof MmOrderClosureRoute
   '/mm-order-entry': typeof MmOrderEntryRoute
   '/mm-pi': typeof MmPiRoute
+  '/mm-pi-approval-details': typeof MmPiApprovalDetailsRoute
+  '/mm-pi-verification-approval': typeof MmPiVerificationApprovalRoute
   '/mm-policy-config': typeof MmPolicyConfigRoute
   '/mm-pre-costing': typeof MmPreCostingRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
@@ -3218,6 +3258,7 @@ export interface FileRoutesByTo {
   '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
+  '/zakat-and-financial-aid': typeof ZakatAndFinancialAidRoute
   '/zakat-asset-master': typeof ZakatAssetMasterRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-executive-report': typeof ZakatExecutiveReportRoute
@@ -3269,6 +3310,7 @@ export interface FileRoutesById {
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/currency-setup': typeof CurrencySetupRoute
+  '/department-sop': typeof DepartmentSopRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
@@ -3295,6 +3337,7 @@ export interface FileRoutesById {
   '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/financial-aid-report': typeof FinancialAidReportRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-report-absent-counseling': typeof HrReportAbsentCounselingRoute
@@ -3449,6 +3492,8 @@ export interface FileRoutesById {
   '/mm-order-closure': typeof MmOrderClosureRoute
   '/mm-order-entry': typeof MmOrderEntryRoute
   '/mm-pi': typeof MmPiRoute
+  '/mm-pi-approval-details': typeof MmPiApprovalDetailsRoute
+  '/mm-pi-verification-approval': typeof MmPiVerificationApprovalRoute
   '/mm-policy-config': typeof MmPolicyConfigRoute
   '/mm-pre-costing': typeof MmPreCostingRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
@@ -3608,6 +3653,7 @@ export interface FileRoutesById {
   '/work-flows': typeof WorkFlowsRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
+  '/zakat-and-financial-aid': typeof ZakatAndFinancialAidRoute
   '/zakat-asset-master': typeof ZakatAssetMasterRoute
   '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
   '/zakat-executive-report': typeof ZakatExecutiveReportRoute
@@ -3660,6 +3706,7 @@ export interface FileRouteTypes {
     | '/configure-time'
     | '/create-roster'
     | '/currency-setup'
+    | '/department-sop'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
@@ -3686,6 +3733,7 @@ export interface FileRouteTypes {
     | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/financial-aid-report'
     | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-report-absent-counseling'
@@ -3840,6 +3888,8 @@ export interface FileRouteTypes {
     | '/mm-order-closure'
     | '/mm-order-entry'
     | '/mm-pi'
+    | '/mm-pi-approval-details'
+    | '/mm-pi-verification-approval'
     | '/mm-policy-config'
     | '/mm-pre-costing'
     | '/mm-proforma-invoice-create'
@@ -3999,6 +4049,7 @@ export interface FileRouteTypes {
     | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
+    | '/zakat-and-financial-aid'
     | '/zakat-asset-master'
     | '/zakat-budget-configuration'
     | '/zakat-executive-report'
@@ -4049,6 +4100,7 @@ export interface FileRouteTypes {
     | '/configure-time'
     | '/create-roster'
     | '/currency-setup'
+    | '/department-sop'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
@@ -4075,6 +4127,7 @@ export interface FileRouteTypes {
     | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/financial-aid-report'
     | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-report-absent-counseling'
@@ -4229,6 +4282,8 @@ export interface FileRouteTypes {
     | '/mm-order-closure'
     | '/mm-order-entry'
     | '/mm-pi'
+    | '/mm-pi-approval-details'
+    | '/mm-pi-verification-approval'
     | '/mm-policy-config'
     | '/mm-pre-costing'
     | '/mm-proforma-invoice-create'
@@ -4388,6 +4443,7 @@ export interface FileRouteTypes {
     | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
+    | '/zakat-and-financial-aid'
     | '/zakat-asset-master'
     | '/zakat-budget-configuration'
     | '/zakat-executive-report'
@@ -4438,6 +4494,7 @@ export interface FileRouteTypes {
     | '/configure-time'
     | '/create-roster'
     | '/currency-setup'
+    | '/department-sop'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
@@ -4464,6 +4521,7 @@ export interface FileRouteTypes {
     | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/financial-aid-report'
     | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-report-absent-counseling'
@@ -4618,6 +4676,8 @@ export interface FileRouteTypes {
     | '/mm-order-closure'
     | '/mm-order-entry'
     | '/mm-pi'
+    | '/mm-pi-approval-details'
+    | '/mm-pi-verification-approval'
     | '/mm-policy-config'
     | '/mm-pre-costing'
     | '/mm-proforma-invoice-create'
@@ -4777,6 +4837,7 @@ export interface FileRouteTypes {
     | '/work-flows'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
+    | '/zakat-and-financial-aid'
     | '/zakat-asset-master'
     | '/zakat-budget-configuration'
     | '/zakat-executive-report'
@@ -4828,6 +4889,7 @@ export interface RootRouteChildren {
   ConfigureTimeRoute: typeof ConfigureTimeRoute
   CreateRosterRoute: typeof CreateRosterRoute
   CurrencySetupRoute: typeof CurrencySetupRoute
+  DepartmentSopRoute: typeof DepartmentSopRoute
   DeptWiseSalarySheetRoute: typeof DeptWiseSalarySheetRoute
   DisciplinaryCaseFilesRoute: typeof DisciplinaryCaseFilesRoute
   DisciplinaryLeftyRoute: typeof DisciplinaryLeftyRoute
@@ -4854,6 +4916,7 @@ export interface RootRouteChildren {
   FinalSettlementReportRoute: typeof FinalSettlementReportRoute
   FinancialAidBudgetConfigurationRoute: typeof FinancialAidBudgetConfigurationRoute
   FinancialAidListRoute: typeof FinancialAidListRoute
+  FinancialAidReportRoute: typeof FinancialAidReportRoute
   HolidaySummarySheetRoute: typeof HolidaySummarySheetRoute
   HrPolicyRoute: typeof HrPolicyRoute
   HrReportAbsentCounselingRoute: typeof HrReportAbsentCounselingRoute
@@ -5008,6 +5071,8 @@ export interface RootRouteChildren {
   MmOrderClosureRoute: typeof MmOrderClosureRoute
   MmOrderEntryRoute: typeof MmOrderEntryRoute
   MmPiRoute: typeof MmPiRoute
+  MmPiApprovalDetailsRoute: typeof MmPiApprovalDetailsRoute
+  MmPiVerificationApprovalRoute: typeof MmPiVerificationApprovalRoute
   MmPolicyConfigRoute: typeof MmPolicyConfigRoute
   MmPreCostingRoute: typeof MmPreCostingRoute
   MmProformaInvoiceCreateRoute: typeof MmProformaInvoiceCreateRoute
@@ -5167,6 +5232,7 @@ export interface RootRouteChildren {
   WorkFlowsRoute: typeof WorkFlowsRoute
   YearlyBonusProcessRoute: typeof YearlyBonusProcessRoute
   YearlyBonusReportRoute: typeof YearlyBonusReportRoute
+  ZakatAndFinancialAidRoute: typeof ZakatAndFinancialAidRoute
   ZakatAssetMasterRoute: typeof ZakatAssetMasterRoute
   ZakatBudgetConfigurationRoute: typeof ZakatBudgetConfigurationRoute
   ZakatExecutiveReportRoute: typeof ZakatExecutiveReportRoute
@@ -5453,6 +5519,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CurrencySetupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/department-sop': {
+      id: '/department-sop'
+      path: '/department-sop'
+      fullPath: '/department-sop'
+      preLoaderRoute: typeof DepartmentSopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dept-wise-salary-sheet': {
       id: '/dept-wise-salary-sheet'
       path: '/dept-wise-salary-sheet'
@@ -5633,6 +5706,13 @@ declare module '@tanstack/react-router' {
       path: '/financial-aid-list'
       fullPath: '/financial-aid-list'
       preLoaderRoute: typeof FinancialAidListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/financial-aid-report': {
+      id: '/financial-aid-report'
+      path: '/financial-aid-report'
+      fullPath: '/financial-aid-report'
+      preLoaderRoute: typeof FinancialAidReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/holiday-summary-sheet': {
@@ -6711,6 +6791,20 @@ declare module '@tanstack/react-router' {
       path: '/mm-pi'
       fullPath: '/mm-pi'
       preLoaderRoute: typeof MmPiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-pi-approval-details': {
+      id: '/mm-pi-approval-details'
+      path: '/mm-pi-approval-details'
+      fullPath: '/mm-pi-approval-details'
+      preLoaderRoute: typeof MmPiApprovalDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-pi-verification-approval': {
+      id: '/mm-pi-verification-approval'
+      path: '/mm-pi-verification-approval'
+      fullPath: '/mm-pi-verification-approval'
+      preLoaderRoute: typeof MmPiVerificationApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mm-policy-config': {
@@ -7826,6 +7920,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof YearlyBonusReportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/zakat-and-financial-aid': {
+      id: '/zakat-and-financial-aid'
+      path: '/zakat-and-financial-aid'
+      fullPath: '/zakat-and-financial-aid'
+      preLoaderRoute: typeof ZakatAndFinancialAidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/zakat-asset-master': {
       id: '/zakat-asset-master'
       path: '/zakat-asset-master'
@@ -7932,6 +8033,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfigureTimeRoute: ConfigureTimeRoute,
   CreateRosterRoute: CreateRosterRoute,
   CurrencySetupRoute: CurrencySetupRoute,
+  DepartmentSopRoute: DepartmentSopRoute,
   DeptWiseSalarySheetRoute: DeptWiseSalarySheetRoute,
   DisciplinaryCaseFilesRoute: DisciplinaryCaseFilesRoute,
   DisciplinaryLeftyRoute: DisciplinaryLeftyRoute,
@@ -7958,6 +8060,7 @@ const rootRouteChildren: RootRouteChildren = {
   FinalSettlementReportRoute: FinalSettlementReportRoute,
   FinancialAidBudgetConfigurationRoute: FinancialAidBudgetConfigurationRoute,
   FinancialAidListRoute: FinancialAidListRoute,
+  FinancialAidReportRoute: FinancialAidReportRoute,
   HolidaySummarySheetRoute: HolidaySummarySheetRoute,
   HrPolicyRoute: HrPolicyRoute,
   HrReportAbsentCounselingRoute: HrReportAbsentCounselingRoute,
@@ -8116,6 +8219,8 @@ const rootRouteChildren: RootRouteChildren = {
   MmOrderClosureRoute: MmOrderClosureRoute,
   MmOrderEntryRoute: MmOrderEntryRoute,
   MmPiRoute: MmPiRoute,
+  MmPiApprovalDetailsRoute: MmPiApprovalDetailsRoute,
+  MmPiVerificationApprovalRoute: MmPiVerificationApprovalRoute,
   MmPolicyConfigRoute: MmPolicyConfigRoute,
   MmPreCostingRoute: MmPreCostingRoute,
   MmProformaInvoiceCreateRoute: MmProformaInvoiceCreateRoute,
@@ -8284,6 +8389,7 @@ const rootRouteChildren: RootRouteChildren = {
   WorkFlowsRoute: WorkFlowsRoute,
   YearlyBonusProcessRoute: YearlyBonusProcessRoute,
   YearlyBonusReportRoute: YearlyBonusReportRoute,
+  ZakatAndFinancialAidRoute: ZakatAndFinancialAidRoute,
   ZakatAssetMasterRoute: ZakatAssetMasterRoute,
   ZakatBudgetConfigurationRoute: ZakatBudgetConfigurationRoute,
   ZakatExecutiveReportRoute: ZakatExecutiveReportRoute,

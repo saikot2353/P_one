@@ -39,6 +39,7 @@ import {
   DoorOpen,
   FileSpreadsheet,
   Smartphone,
+  Network,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -47,6 +48,7 @@ export interface NestedItem {
   search?: Record<string, any>;
   subitems?: NestedItem[];
   count?: number;
+  hidden?: boolean;
 }
 
 export interface SubItem {
@@ -55,6 +57,7 @@ export interface SubItem {
   search?: Record<string, any>;
   subitems?: NestedItem[];
   count?: number;
+  hidden?: boolean;
 }
 
 export interface NavItem {
@@ -66,6 +69,7 @@ export interface NavItem {
   search?: Record<string, any>;
   count?: number;
   activeRoutes?: string[];
+  hidden?: boolean;
 }
 
 export const nav: NavItem[] = [
@@ -311,6 +315,11 @@ export const nav: NavItem[] = [
     icon: Briefcase,
   },
   {
+    label: "Department SOP",
+    to: "/department-sop",
+    icon: Network,
+  },
+  {
     label: "Separation",
     icon: LogOut,
     subitems: [
@@ -336,17 +345,21 @@ export const nav: NavItem[] = [
     label: "Welfare & Support",
     icon: HeartHandshake,
     subitems: [
+      { label: "Zakat and Financial Aid", to: "/zakat-and-financial-aid" },
+      { label: "Asset Master Data", to: "/zakat-asset-master" },
+      { label: "Zakat Executive Report", to: "/zakat-executive-report" },
+      { label: "Financial Aid Report", to: "/financial-aid-report" },
       {
         label: "Zakat Management",
+        hidden: true,
         subitems: [
           { label: "Budget Configuration", to: "/zakat-budget-configuration" },
           { label: "Zakat List", to: "/zakat-list" },
-          { label: "Asset Master Data", to: "/zakat-asset-master" },
-          { label: "Zakat Executive Report", to: "/zakat-executive-report" },
         ]
       },
       {
         label: "Financial Aid",
+        hidden: true,
         subitems: [
           { label: "Budget Configuration", to: "/financial-aid-budget-configuration" },
           { label: "Financial Aid List", to: "/financial-aid-list" },
@@ -673,7 +686,7 @@ export function Sidebar() {
     }));
   };
 
-  const filteredNav = nav;
+  const filteredNav = nav.filter((item) => !item.hidden);
 
   if (typeof window !== "undefined" && window.location.search.includes("embed=true")) {
     return null;
@@ -808,7 +821,9 @@ export function Sidebar() {
                   isOpen ? "max-h-[2500px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
                 ].join(" ")}
               >
-                {item.subitems.map((sub) => {
+                {item.subitems
+                  .filter((sub) => !sub.hidden)
+                  .map((sub) => {
                   if (sub.subitems) {
                     const isSubOpen = openMenus[sub.label];
                     const isSubActive = sub.subitems.some((nested) => {
@@ -861,7 +876,9 @@ export function Sidebar() {
                               : "max-h-0 opacity-0",
                           ].join(" ")}
                         >
-                          {sub.subitems.map((nested) => {
+                          {sub.subitems
+                            .filter((nested) => !nested.hidden)
+                            .map((nested) => {
                             if (nested.subitems) {
                               const isNestedOpen = openMenus[nested.label];
                               const isNestedActive = nested.subitems.some(

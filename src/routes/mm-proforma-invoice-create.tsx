@@ -135,6 +135,9 @@ interface SearchParams {
   bookingNo?: string;
   bookingNos?: string;
   piId?: string;
+  id?: string;
+  view?: string;
+  mode?: string;
   source?: string;
   item?: string;
 }
@@ -154,7 +157,10 @@ export const Route = createFileRoute("/mm-proforma-invoice-create")({
     bookingIds: (search.bookingIds as string) || undefined,
     bookingNo: (search.bookingNo as string) || undefined,
     bookingNos: (search.bookingNos as string) || undefined,
-    piId: (search.piId as string) || undefined,
+    piId: (search.piId as string) || (search.id as string) || undefined,
+    id: (search.id as string) || (search.piId as string) || undefined,
+    view: (search.view as string) || undefined,
+    mode: (search.mode as string) || undefined,
     source: (search.source as string) || undefined,
     item: (search.item as string) || undefined,
   }),
@@ -163,7 +169,9 @@ export const Route = createFileRoute("/mm-proforma-invoice-create")({
 
 function MMProformaInvoiceCreatePage() {
   const search = Route.useSearch();
-  const { bookingId, bookingIds, piId, source: searchSource, item: searchItem } = search;
+  const { bookingId, bookingIds, piId: rawPiId, id: rawId, view: searchView, mode: searchMode, source: searchSource, item: searchItem } = search;
+  const effectivePiId = rawPiId || rawId;
+  const isViewMode = searchView === "true" || searchMode === "view";
   const navigate = useNavigate();
 
   // Local state for all Bookings from localStorage / MMRepository
@@ -265,9 +273,15 @@ function MMProformaInvoiceCreatePage() {
   useEffect(() => {
     if (fabricBookings.length === 0 && accBookings.length === 0) return;
 
-    // Case 1: Loading an existing PI by piId
-    if (piId) {
-      const existing = MMRepository.getPIs().find((p) => p.id === piId);
+    // Case 1: Loading an existing PI by piId or id
+    if (effectivePiId) {
+      const existing = MMRepository.getPIs().find(
+        (p) =>
+          p.id === effectivePiId ||
+          p.piNo === effectivePiId ||
+          decodeURIComponent(p.id) === effectivePiId ||
+          decodeURIComponent(p.piNo) === effectivePiId
+      );
       if (existing) {
         populateFormFromPI(existing);
         return;
@@ -328,7 +342,7 @@ function MMProformaInvoiceCreatePage() {
     if (!currentId) {
       initializeBlankPi(searchItem === "Accessories" ? "Accessories" : "Fabric");
     }
-  }, [bookingId, bookingIds, piId, fabricBookings, accBookings, searchSource, searchItem]);
+  }, [bookingId, bookingIds, effectivePiId, fabricBookings, accBookings, searchSource, searchItem]);
 
   // Helper to initialize blank PI
   const initializeBlankPi = (defaultCategory: "Fabric" | "Accessories" = "Fabric") => {
@@ -1911,8 +1925,25 @@ function MMProformaInvoiceCreatePage() {
     }
 
     // 6. Save the PI and its booking/item relationships to Local Storage
-    // 7. Prevent duplicate submissions that would unintentionally create duplicate PI records
+    // 7. Update status to "Pending Approval" upon submission and record audit log
     const recordId = currentId || `pi-${Date.now()}`;
+    const submissionTimestamp = new Date().toISOString().split("T")[0];
+    const submitter = merchant || "Tanvir Ahmed - Key Account Manager";
+
+    const updatedApprovalHistory = [
+      {
+        id: `ah-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        bookingId: recordId,
+        bookingNo: piNumber.trim(),
+        action: "Submitted" as const,
+        previousStatus: status,
+        newStatus: "Pending Approval" as const,
+        performedBy: submitter,
+        timestamp: new Date().toLocaleString(),
+        comment: "Proforma Invoice submitted for verification and approval.",
+      },
+    ];
+
     const piRecordToSave: MMProformaInvoice = {
       id: recordId,
       piNo: piNumber.trim(),
@@ -1942,7 +1973,10 @@ function MMProformaInvoiceCreatePage() {
       amendmentReason: amendmentReason,
       bblcReferenceNo: bblcNo,
       docNo: docNo,
-      status: status, // Do not trigger passing/approval workflow
+      status: "Pending Approval",
+      submittedBy: submitter,
+      submittedDate: submissionTimestamp,
+      approvalHistory: updatedApprovalHistory,
       allocatedBookings: attachedBookings,
       items: piItems,
       charges: additionalChargesList,
@@ -1954,16 +1988,17 @@ function MMProformaInvoiceCreatePage() {
       comments: comments,
       attachments: attachments,
       createdBy: merchant || "Tanvir Ahmed - Key Account Manager",
-      createdDate: entryDate || new Date().toISOString().split("T")[0],
+      createdDate: entryDate || submissionTimestamp,
       version: 1,
     };
 
     MMRepository.savePI(piRecordToSave);
+    setStatus("Pending Approval");
     setAllPis(MMRepository.getPIs());
     setCurrentId(recordId);
 
     // 8. Display success message
-    setSuccessMessage(`Proforma Invoice ${piNumber} has been successfully submitted and saved.`);
+    setSuccessMessage(`Proforma Invoice ${piNumber} has been successfully submitted for approval.`);
     setTimeout(() => setSuccessMessage(null), 5000);
   };
 
@@ -2016,20 +2051,29 @@ function MMProformaInvoiceCreatePage() {
       actions={
         <div className="flex items-center gap-2">
           <Link
-            to={itemCategory === "Accessories" ? "/mm-accessories-booking" : "/mm-fabric-booking"}
+            to="/mm-pi"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all shadow-sm"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>{itemCategory === "Accessories" ? "Accessories Booking" : "Fabric Booking"}</span>
+            <span>PI Register</span>
           </Link>
-          <button
-            onClick={() => handleSaveDraft()}
-            disabled={status === "Passed"}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white shadow-sm shadow-teal-600/30 transition-all"
+          <Link
+            to="/mm-pi-verification-approval"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all shadow-sm"
           >
-            <Save className="w-3.5 h-3.5" />
-            <span>Save Draft</span>
-          </button>
+            <FileCheck className="w-3.5 h-3.5" />
+            <span>Verification Approval</span>
+          </Link>
+          {!isViewMode && (
+            <button
+              onClick={() => handleSaveDraft()}
+              disabled={status === "Passed" || status === "Approved"}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white shadow-sm shadow-teal-600/30 transition-all"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span>Save Draft</span>
+            </button>
+          )}
         </div>
       }
     >
@@ -2064,6 +2108,25 @@ function MMProformaInvoiceCreatePage() {
             >
               <X className="w-4 h-4" />
             </button>
+          </div>
+        )}
+
+        {/* View Mode Notice Banner */}
+        {isViewMode && (
+          <div className="flex items-center justify-between p-3.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200 text-xs shadow-sm">
+            <div className="flex items-center gap-2">
+              <Eye className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+              <span>
+                <strong>View Mode:</strong> Viewing saved Proforma Invoice record <span className="font-mono font-bold">{piNumber || currentId}</span>. All fields are displayed in inspection mode.
+              </span>
+            </div>
+            <Link
+              to="/mm-proforma-invoice-create"
+              search={{ piId: currentId } as any}
+              className="text-xs font-bold text-indigo-700 hover:text-indigo-900 underline"
+            >
+              Switch to Edit
+            </Link>
           </div>
         )}
 

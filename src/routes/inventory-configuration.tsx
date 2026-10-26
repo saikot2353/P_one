@@ -684,6 +684,10 @@ function InventoryConfigurationPage() {
   };
 
   const handleOpenAddSubGroupChild = (parentSubId: string, parentGroupId: string) => {
+    const parentSub = itemSubGroups.find((s) => s.id === parentSubId);
+    const parentGroup = itemGroups.find((g) => g.id === parentGroupId);
+    const isService = !!parentSub?.serviceFlag || !!parentGroup?.serviceFlag;
+
     setSubGroupModalMode("create");
     setSubGroupFormValues({
       subGroupCode: `SUB-${Math.floor(100 + Math.random() * 900)}`,
@@ -692,20 +696,23 @@ function InventoryConfigurationPage() {
       parentSubGroupId: parentSubId,
       description: "",
       status: "Active",
+      serviceFlag: isService,
     });
     setSubGroupFormErrors({});
     setIsSubGroupModalOpen(true);
   };
 
   const handleOpenAddRootSubGroup = () => {
+    const defaultGroup = itemGroups[0];
     setSubGroupModalMode("create");
     setSubGroupFormValues({
       subGroupCode: `SUB-${Math.floor(100 + Math.random() * 900)}`,
       subGroupName: "",
-      itemGroupId: itemGroups[0]?.id || "",
+      itemGroupId: defaultGroup?.id || "",
       parentSubGroupId: null,
       description: "",
       status: "Active",
+      serviceFlag: !!defaultGroup?.serviceFlag,
     });
     setSubGroupFormErrors({});
     setIsSubGroupModalOpen(true);
@@ -718,6 +725,12 @@ function InventoryConfigurationPage() {
       return;
     }
 
+    const parentGroup = itemGroups.find((g) => g.id === subGroupFormValues.itemGroupId);
+    const parentSub = subGroupFormValues.parentSubGroupId
+      ? itemSubGroups.find((s) => s.id === subGroupFormValues.parentSubGroupId)
+      : null;
+    const isParentMandatoryService = !!parentGroup?.serviceFlag || !!parentSub?.serviceFlag;
+
     if (subGroupModalMode === "create") {
       const newSub: ItemSubGroup = {
         id: `sub-${Date.now()}`,
@@ -727,13 +740,20 @@ function InventoryConfigurationPage() {
         parentSubGroupId: subGroupFormValues.parentSubGroupId || null,
         description: subGroupFormValues.description || "",
         status: (subGroupFormValues.status as any) || "Active",
+        serviceFlag: isParentMandatoryService ? true : !!subGroupFormValues.serviceFlag,
       };
       setItemSubGroups((prev) => [...prev, newSub]);
       toast.success("Sub Group created successfully.");
     } else {
       setItemSubGroups((prev) =>
         prev.map((sg) =>
-          sg.id === subGroupFormValues.id ? ({ ...sg, ...subGroupFormValues } as ItemSubGroup) : sg,
+          sg.id === subGroupFormValues.id
+            ? ({
+                ...sg,
+                ...subGroupFormValues,
+                serviceFlag: isParentMandatoryService ? true : !!subGroupFormValues.serviceFlag,
+              } as ItemSubGroup)
+            : sg,
         ),
       );
       toast.success("Sub Group updated successfully.");
@@ -1240,6 +1260,11 @@ function InventoryConfigurationPage() {
                                         <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20 shrink-0">
                                           Level {node.depth + 1}
                                         </span>
+                                        {node.serviceFlag && (
+                                          <span className="text-[9px] px-1.5 py-0.2 rounded font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 shrink-0">
+                                            SERVICE
+                                          </span>
+                                        )}
                                         {isQueryMatch && (
                                           <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-extrabold shrink-0">
                                             Match
@@ -1276,8 +1301,23 @@ function InventoryConfigurationPage() {
                                       <button
                                         type="button"
                                         onClick={() => {
+                                          const parentGroup = itemGroups.find(
+                                            (g) => g.id === node.itemGroupId,
+                                          );
+                                          const parentSub = node.parentSubGroupId
+                                            ? itemSubGroups.find(
+                                                (s) => s.id === node.parentSubGroupId,
+                                              )
+                                            : null;
+                                          const isMandatory =
+                                            !!parentGroup?.serviceFlag ||
+                                            !!parentSub?.serviceFlag;
+
                                           setSubGroupModalMode("edit");
-                                          setSubGroupFormValues({ ...node });
+                                          setSubGroupFormValues({
+                                            ...node,
+                                            serviceFlag: isMandatory ? true : !!node.serviceFlag,
+                                          });
                                           setIsSubGroupModalOpen(true);
                                         }}
                                         title="Edit Sub Group"
@@ -1733,7 +1773,14 @@ function InventoryConfigurationPage() {
                                   </span>
                                 </td>
                                 <td className="py-2.5 px-3.5 font-medium">
-                                  {item.locationName || item.batchNumber || "—"}
+                                  <div className="flex items-center gap-1.5">
+                                    <span>{item.locationName || item.batchNumber || "—"}</span>
+                                    {item.defaultLocationName && item.trackingMode === "Location" && (
+                                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 shrink-0">
+                                        Default
+                                      </span>
+                                    )}
+                                  </div>
                                 </td>
                                 <td className="py-2.5 px-3.5 text-muted-foreground">
                                   {item.trackingMode === "Batch"
@@ -2014,14 +2061,25 @@ function InventoryConfigurationPage() {
                 <label className="block text-xs font-bold mb-1 text-foreground">Parent Item Group</label>
                 <select
                   value={subGroupFormValues.itemGroupId || ""}
-                  onChange={(e) =>
-                    setSubGroupFormValues({ ...subGroupFormValues, itemGroupId: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const newGroupId = e.target.value;
+                    const newParentGroup = itemGroups.find((g) => g.id === newGroupId);
+                    const parentSub = subGroupFormValues.parentSubGroupId
+                      ? itemSubGroups.find((s) => s.id === subGroupFormValues.parentSubGroupId)
+                      : null;
+                    const isMandatory = !!newParentGroup?.serviceFlag || !!parentSub?.serviceFlag;
+
+                    setSubGroupFormValues({
+                      ...subGroupFormValues,
+                      itemGroupId: newGroupId,
+                      serviceFlag: isMandatory ? true : false,
+                    });
+                  }}
                   className="w-full h-8.5 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
                 >
                   {itemGroups.map((g) => (
                     <option key={g.id} value={g.id}>
-                      {g.groupName}
+                      {g.groupName} ({g.groupCode}){g.serviceFlag ? " [Service]" : ""}
                     </option>
                   ))}
                 </select>
@@ -2038,6 +2096,46 @@ function InventoryConfigurationPage() {
                   className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs resize-none focus:border-amber-500 outline-none"
                 />
               </div>
+
+              {(() => {
+                const parentGroup = itemGroups.find((g) => g.id === subGroupFormValues.itemGroupId);
+                const parentSub = subGroupFormValues.parentSubGroupId
+                  ? itemSubGroups.find((s) => s.id === subGroupFormValues.parentSubGroupId)
+                  : null;
+                const isParentMandatoryService =
+                  !!parentGroup?.serviceFlag || !!parentSub?.serviceFlag;
+
+                return (
+                  <div className="flex items-center gap-2 pt-1">
+                    <input
+                      type="checkbox"
+                      id="invSubGroupServiceFlag"
+                      disabled={isParentMandatoryService}
+                      checked={isParentMandatoryService ? true : !!subGroupFormValues.serviceFlag}
+                      onChange={(e) =>
+                        setSubGroupFormValues({
+                          ...subGroupFormValues,
+                          serviceFlag: e.target.checked,
+                        })
+                      }
+                      className="size-4 rounded border-border text-amber-500 focus:ring-amber-500/20 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                    />
+                    <label
+                      htmlFor="invSubGroupServiceFlag"
+                      className={`text-xs font-semibold text-foreground ${
+                        isParentMandatoryService ? "cursor-not-allowed" : "cursor-pointer"
+                      }`}
+                    >
+                      Service Item Group (Non-physical goods or external services)
+                    </label>
+                    {isParentMandatoryService && (
+                      <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
+                        Inherited from Parent
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div>
                 <label className="block text-xs font-bold mb-1 text-foreground">Status</label>
