@@ -84,8 +84,7 @@ export type ZakatPurposeCategory =
 
 export type ZakatDisbursementChannel =
   | "Direct Employee"
-  | "Via Employee Agent"
-  | "Direct External";
+  | "Via Employee Agent";
 
 export type ZakatDisbursementMode =
   | "Cash Grant"
@@ -295,6 +294,9 @@ export interface UnifiedAidRecord {
   justificationDetails: string;
   agencyStatus: "Assigned" | "Acknowledged" | "Distributed" | "Verified";
 
+  batchRecipientInfo?: string; // e.g. "Recipient 1 of 4"
+  batchDriveTitle?: string;     // e.g. "Trishal Livelihood Drive"
+
   proofDetails?: {
     receiptRef?: string;
     witnessName?: string;
@@ -431,19 +433,20 @@ const INITIAL_UNIFIED_RECORDS: UnifiedAidRecord[] = [
     distributionDeadline: "2026-07-25",
     amount: 35000,
     isRecurring: false,
-    disbursementChannel: "Direct External",
+    disbursementChannel: "Via Employee Agent",
     disbursementMode: "Cash Grant",
     purposeCategory: "Medical Treatment",
     purposeSpecificDescription: "Community pediatric treatment camp co-sponsorship grant",
-    institutionName: "Al-Razi Child Care Trust",
-    institutionRepresentative: "Dr. Farhana Yasmin",
-    institutionContactPhone: "01755-334455",
+    employeeId: "2018001090",
+    employeeName: "Anisur Rahman",
+    employeeDept: "Admin & Compliance",
+    employeeDesignation: "Compliance Officer",
     beneficiaryName: "Al-Razi Child Care Trust",
     beneficiaryPhone: "01755-334455",
     beneficiaryAddress: "Kashimpur, Gazipur",
     // No Asnaf for Financial Aid
     justificationDetails: "Corporate social responsibility and company employee family medical subsidy for pediatric thalassemia patients.",
-    agencyStatus: "Acknowledged",
+    agencyStatus: "Distributed",
   },
   {
     id: "ZK-2026-03",
@@ -504,7 +507,7 @@ const INITIAL_UNIFIED_RECORDS: UnifiedAidRecord[] = [
     distributionDeadline: "2026-08-15",
     amount: 32000,
     isRecurring: false,
-    disbursementChannel: "Direct External",
+    disbursementChannel: "Via Employee Agent",
     disbursementMode: "Asset Purchased",
     purposeCategory: "Business Setup",
     assetDetails: {
@@ -513,11 +516,15 @@ const INITIAL_UNIFIED_RECORDS: UnifiedAidRecord[] = [
       assetQuantity: "1 Kiosk Set",
     },
     purposeSpecificDescription: "Complete street tea stall setup built and furnished for fire victim",
+    employeeId: "2019001155",
+    employeeName: "Md. Tariqul Islam",
+    employeeDept: "Production",
+    employeeDesignation: "Sr. Executive",
     beneficiaryName: "Jamil Mia",
     beneficiaryPhone: "01788-112233",
     beneficiaryAddress: "Sreepur, Gazipur",
     asnafCategory: "Al-Gharimin",
-    justificationDetails: "Destitute shopkeeper who lost his livelihood in market fire; gifted physical business setup instead of cash.",
+    justificationDetails: "Destitute shopkeeper who lost his livelihood in market fire; gifted physical business setup via staff agent instead of cash.",
     agencyStatus: "Acknowledged",
   },
   {
@@ -547,6 +554,384 @@ const INITIAL_UNIFIED_RECORDS: UnifiedAidRecord[] = [
     justificationDetails: "Company welfare assistance providing self-reliance micro-tailoring equipment to destitute rural family.",
     agencyStatus: "Assigned",
   },
+
+  // =========================================================================
+  // MULTI-BENEFICIARY DEMO BATCH 1: ZAKAT VILLAGE SELF-RELIANCE LIVESTOCK DRIVE
+  // Agent: Tahmid Afsar Shapno (4 Beneficiaries in Trishal, Mymensingh)
+  // =========================================================================
+  {
+    id: "ZK-2026-05",
+    fundType: "Zakat",
+    budgetYear: 2026,
+    assignedDate: "2026-08-12",
+    distributionDeadline: "2026-09-10",
+    amount: 35000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    purposeCategory: "Farm Animal",
+    assetDetails: {
+      assetType: "High-Yield Milking Dairy Cow with Calf",
+      assetName: "1 Milking Dairy Cow with Healthy Calf",
+      assetQuantity: "1 Cow + 1 Calf",
+    },
+    purposeSpecificDescription: "Milking cow gifted to provide daily milk selling income for widower's family",
+    employeeId: "2023043910",
+    employeeName: "Tahmid Afsar Shapno",
+    employeeDept: "Business Innovation",
+    employeeDesignation: "Asst. Manager",
+    beneficiaryName: "Mokhlesur Rahman",
+    beneficiaryPhone: "01744-889901",
+    beneficiaryAddress: "Trishal, Mymensingh",
+    asnafCategory: "Al-Fuqara",
+    justificationDetails: "Approved corporate Zakat asset grant via staff agent Tahmid Afsar Shapno for Mokhlesur Rahman (Recipient 1 of 4 in Trishal village dairy drive).",
+    agencyStatus: "Verified",
+    batchRecipientInfo: "Recipient 1 of 4",
+    batchDriveTitle: "Trishal Livelihood Drive",
+  },
+  {
+    id: "ZK-2026-06",
+    fundType: "Zakat",
+    budgetYear: 2026,
+    assignedDate: "2026-08-12",
+    distributionDeadline: "2026-09-10",
+    amount: 25000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    purposeCategory: "Farm Animal",
+    assetDetails: {
+      assetType: "Breeding Goats / Sheep Pair",
+      assetName: "2 Black Bengal Breeding Goats with Fodder Supply Kit",
+      assetQuantity: "2 Goats",
+    },
+    purposeSpecificDescription: "Breeding goat pair gifted to destitute widow for home-based sustainable livestock rearing",
+    employeeId: "2023043910",
+    employeeName: "Tahmid Afsar Shapno",
+    employeeDept: "Business Innovation",
+    employeeDesignation: "Asst. Manager",
+    beneficiaryName: "Ayesha Siddiqua (Destitute Widow)",
+    beneficiaryPhone: "01744-889902",
+    beneficiaryAddress: "Trishal, Mymensingh",
+    asnafCategory: "Al-Masakin",
+    justificationDetails: "Approved corporate Zakat asset grant via staff agent Tahmid Afsar Shapno for Ayesha Siddiqua (Recipient 2 of 4 in Trishal village dairy drive).",
+    agencyStatus: "Verified",
+    batchRecipientInfo: "Recipient 2 of 4",
+    batchDriveTitle: "Trishal Livelihood Drive",
+  },
+  {
+    id: "ZK-2026-07",
+    fundType: "Zakat",
+    budgetYear: 2026,
+    assignedDate: "2026-08-12",
+    distributionDeadline: "2026-09-10",
+    amount: 30000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    purposeCategory: "Vehicle",
+    assetDetails: {
+      assetType: "Battery Electric Auto-Van / Easy Bike",
+      assetName: "Battery Electric Cargo Auto-Van (Easy Van)",
+      assetQuantity: "1 Unit",
+    },
+    purposeSpecificDescription: "Electric cargo transport van delivered to disabled rural farmer to earn daily transport livelihood",
+    employeeId: "2023043910",
+    employeeName: "Tahmid Afsar Shapno",
+    employeeDept: "Business Innovation",
+    employeeDesignation: "Asst. Manager",
+    beneficiaryName: "Abdul Khaleque (Disabled Farmer)",
+    beneficiaryPhone: "01744-889903",
+    beneficiaryAddress: "Trishal, Mymensingh",
+    asnafCategory: "Al-Fuqara",
+    justificationDetails: "Approved corporate Zakat asset grant via staff agent Tahmid Afsar Shapno for Abdul Khaleque (Recipient 3 of 4 in Trishal village dairy drive).",
+    agencyStatus: "Distributed",
+    batchRecipientInfo: "Recipient 3 of 4",
+    batchDriveTitle: "Trishal Livelihood Drive",
+  },
+  {
+    id: "ZK-2026-08",
+    fundType: "Zakat",
+    budgetYear: 2026,
+    assignedDate: "2026-08-12",
+    distributionDeadline: "2026-09-10",
+    amount: 20000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Medical Treatment",
+    purposeSpecificDescription: "Immediate cash grant for elderly orthopedic surgery and post-operative medications",
+    employeeId: "2023043910",
+    employeeName: "Tahmid Afsar Shapno",
+    employeeDept: "Business Innovation",
+    employeeDesignation: "Asst. Manager",
+    beneficiaryName: "Nurjahan Begum (Elderly Care)",
+    beneficiaryPhone: "01744-889904",
+    beneficiaryAddress: "Trishal, Mymensingh",
+    asnafCategory: "Al-Masakin",
+    justificationDetails: "Approved corporate Zakat cash grant via staff agent Tahmid Afsar Shapno for Nurjahan Begum (Recipient 4 of 4 in Trishal village dairy drive).",
+    agencyStatus: "Distributed",
+    batchRecipientInfo: "Recipient 4 of 4",
+    batchDriveTitle: "Trishal Livelihood Drive",
+  },
+
+  // =========================================================================
+  // MULTI-BENEFICIARY DEMO BATCH 2: FINANCIAL AID MONSOON FLOOD RELIEF
+  // Agent: Anisur Rahman (3 Beneficiaries in Sunamganj Sadar)
+  // =========================================================================
+  {
+    id: "FA-2026-05",
+    fundType: "Financial Aid",
+    budgetYear: 2026,
+    assignedDate: "2026-08-18",
+    distributionDeadline: "2026-09-05",
+    amount: 20000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Others",
+    otherPurposeDetails: "Flash Flood Homestead Reconstruction",
+    purposeSpecificDescription: "Emergency cash grant for mud wall rebuilding and CI sheet roof installation after flash flood",
+    employeeId: "2018001090",
+    employeeName: "Anisur Rahman",
+    employeeDept: "Admin & Compliance",
+    employeeDesignation: "Compliance Officer",
+    beneficiaryName: "Kabir Hossain & Family",
+    beneficiaryPhone: "01822-771122",
+    beneficiaryAddress: "Sunamganj Sadar",
+    justificationDetails: "Approved corporate Financial Aid emergency grant via staff agent Anisur Rahman for Kabir Hossain (Recipient 1 of 3 in Sunamganj flood relief drive).",
+    agencyStatus: "Verified",
+    batchRecipientInfo: "Recipient 1 of 3",
+    batchDriveTitle: "Sunamganj Flood Relief Drive",
+  },
+  {
+    id: "FA-2026-06",
+    fundType: "Financial Aid",
+    budgetYear: 2026,
+    assignedDate: "2026-08-18",
+    distributionDeadline: "2026-09-05",
+    amount: 25000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Others",
+    otherPurposeDetails: "Emergency Shelter Rebuilding",
+    purposeSpecificDescription: "Urgent living and sanitation restoration support for flood-displaced single mother",
+    employeeId: "2018001090",
+    employeeName: "Anisur Rahman",
+    employeeDept: "Admin & Compliance",
+    employeeDesignation: "Compliance Officer",
+    beneficiaryName: "Morium Begum (Single Mother)",
+    beneficiaryPhone: "01822-771123",
+    beneficiaryAddress: "Sunamganj Sadar",
+    justificationDetails: "Approved corporate Financial Aid emergency grant via staff agent Anisur Rahman for Morium Begum (Recipient 2 of 3 in Sunamganj flood relief drive).",
+    agencyStatus: "Verified",
+    batchRecipientInfo: "Recipient 2 of 3",
+    batchDriveTitle: "Sunamganj Flood Relief Drive",
+  },
+  {
+    id: "FA-2026-07",
+    fundType: "Financial Aid",
+    budgetYear: 2026,
+    assignedDate: "2026-08-18",
+    distributionDeadline: "2026-09-05",
+    amount: 20000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    purposeCategory: "Business Setup",
+    assetDetails: {
+      assetType: "Country Boat & Fishing Gear Setup",
+      assetName: "Commercial Fishing Net Roll & Country Wooden Boat Repair Kit",
+      assetQuantity: "1 Complete Set",
+    },
+    purposeSpecificDescription: "Fishing gear and net replacement delivered to rural fisherman who lost boat in flood",
+    employeeId: "2018001090",
+    employeeName: "Anisur Rahman",
+    employeeDept: "Admin & Compliance",
+    employeeDesignation: "Compliance Officer",
+    beneficiaryName: "Al-Amin Mia (Rural Fisherman)",
+    beneficiaryPhone: "01822-771124",
+    beneficiaryAddress: "Sunamganj Sadar",
+    justificationDetails: "Approved corporate Financial Aid emergency grant via staff agent Anisur Rahman for Al-Amin Mia (Recipient 3 of 3 in Sunamganj flood relief drive).",
+    agencyStatus: "Distributed",
+    batchRecipientInfo: "Recipient 3 of 3",
+    batchDriveTitle: "Sunamganj Flood Relief Drive",
+  },
+
+  // =========================================================================
+  // MULTI-BENEFICIARY DEMO BATCH 3: ZAKAT WOMEN MICRO-TAILORING EMPOWERMENT
+  // Agent: Farid Hossain (3 Beneficiaries in Bhaluka, Mymensingh)
+  // =========================================================================
+  {
+    id: "ZK-2026-09",
+    fundType: "Zakat",
+    budgetYear: 2026,
+    assignedDate: "2026-08-25",
+    distributionDeadline: "2026-09-15",
+    amount: 28000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    purposeCategory: "Business Setup",
+    assetDetails: {
+      assetType: "Industrial Heavy-Duty Sewing Machine with Electric Motor Table",
+      assetName: "1 Juki Industrial Direct-Drive Sewing Machine & Table Setup",
+      assetQuantity: "1 Unit",
+    },
+    purposeSpecificDescription: "Industrial sewing machine provided to enable home boutique tailoring income",
+    employeeId: "2020002130",
+    employeeName: "Farid Hossain",
+    employeeDept: "Medical & Welfare",
+    employeeDesignation: "Welfare Officer",
+    beneficiaryName: "Fatema Khatun (Widow)",
+    beneficiaryPhone: "01633-112233",
+    beneficiaryAddress: "Bhaluka, Mymensingh",
+    asnafCategory: "Al-Masakin",
+    justificationDetails: "Approved corporate Zakat asset grant via staff agent Farid Hossain for Fatema Khatun (Recipient 1 of 3 in Bhaluka micro-tailoring drive).",
+    agencyStatus: "Verified",
+    batchRecipientInfo: "Recipient 1 of 3",
+    batchDriveTitle: "Women Tailoring Empowerment",
+  },
+  {
+    id: "ZK-2026-10",
+    fundType: "Zakat",
+    budgetYear: 2026,
+    assignedDate: "2026-08-25",
+    distributionDeadline: "2026-09-15",
+    amount: 28000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    purposeCategory: "Business Setup",
+    assetDetails: {
+      assetType: "Industrial Heavy-Duty Sewing Machine with Electric Motor Table",
+      assetName: "1 Juki Industrial Direct-Drive Sewing Machine & Table Setup",
+      assetQuantity: "1 Unit",
+    },
+    purposeSpecificDescription: "Commercial sewing machine provided to support resident orphan children's mother",
+    employeeId: "2020002130",
+    employeeName: "Farid Hossain",
+    employeeDept: "Medical & Welfare",
+    employeeDesignation: "Welfare Officer",
+    beneficiaryName: "Hasna Banu (Orphan Caregiver)",
+    beneficiaryPhone: "01633-112234",
+    beneficiaryAddress: "Bhaluka, Mymensingh",
+    asnafCategory: "Al-Masakin",
+    justificationDetails: "Approved corporate Zakat asset grant via staff agent Farid Hossain for Hasna Banu (Recipient 2 of 3 in Bhaluka micro-tailoring drive).",
+    agencyStatus: "Verified",
+    batchRecipientInfo: "Recipient 2 of 3",
+    batchDriveTitle: "Women Tailoring Empowerment",
+  },
+  {
+    id: "ZK-2026-11",
+    fundType: "Zakat",
+    budgetYear: 2026,
+    assignedDate: "2026-08-25",
+    distributionDeadline: "2026-09-15",
+    amount: 28000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    purposeCategory: "Business Setup",
+    assetDetails: {
+      assetType: "Industrial Heavy-Duty Sewing Machine with Electric Motor Table",
+      assetName: "1 Juki Industrial Direct-Drive Sewing Machine & Table Setup",
+      assetQuantity: "1 Unit",
+    },
+    purposeSpecificDescription: "Micro-tailoring equipment provided to deserted mother to achieve sustainable living",
+    employeeId: "2020002130",
+    employeeName: "Farid Hossain",
+    employeeDept: "Medical & Welfare",
+    employeeDesignation: "Welfare Officer",
+    beneficiaryName: "Rashida Begum (Deserted Mother)",
+    beneficiaryPhone: "01633-112235",
+    beneficiaryAddress: "Bhaluka, Mymensingh",
+    asnafCategory: "Al-Fuqara",
+    justificationDetails: "Approved corporate Zakat asset grant via staff agent Farid Hossain for Rashida Begum (Recipient 3 of 3 in Bhaluka micro-tailoring drive).",
+    agencyStatus: "Acknowledged",
+    batchRecipientInfo: "Recipient 3 of 3",
+    batchDriveTitle: "Women Tailoring Empowerment",
+  },
+
+  // =========================================================================
+  // MULTI-BENEFICIARY DEMO BATCH 4: FINANCIAL AID COMMUNITY HARDSHIP DRIVE
+  // Agent: Mizanur Rahman (3 Beneficiaries in Sreepur, Gazipur)
+  // =========================================================================
+  {
+    id: "FA-2026-08",
+    fundType: "Financial Aid",
+    budgetYear: 2026,
+    assignedDate: "2026-09-02",
+    distributionDeadline: "2026-09-25",
+    amount: 15000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Others",
+    otherPurposeDetails: "Special Needs Educational Assistive Grant",
+    purposeSpecificDescription: "Educational textbook, tuition and assistive wheelchair stipend for disabled teen",
+    employeeId: "2019003881",
+    employeeName: "Mizanur Rahman",
+    employeeDept: "Quality Assurance",
+    employeeDesignation: "Sr. QA Inspector",
+    beneficiaryName: "Sumon Mia (Polio Disabled Teen)",
+    beneficiaryPhone: "01933-445566",
+    beneficiaryAddress: "Sreepur, Gazipur",
+    justificationDetails: "Approved corporate Financial Aid educational assistance via staff agent Mizanur Rahman for Sumon Mia (Recipient 1 of 3 in Sreepur welfare drive).",
+    agencyStatus: "Verified",
+    batchRecipientInfo: "Recipient 1 of 3",
+    batchDriveTitle: "Sreepur Community Hardship Drive",
+  },
+  {
+    id: "FA-2026-09",
+    fundType: "Financial Aid",
+    budgetYear: 2026,
+    assignedDate: "2026-09-02",
+    distributionDeadline: "2026-09-25",
+    amount: 15000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Others",
+    otherPurposeDetails: "Higher Secondary College Admission Aid",
+    purposeSpecificDescription: "College admission, uniform and examination fee support for brilliant orphan student",
+    employeeId: "2019003881",
+    employeeName: "Mizanur Rahman",
+    employeeDept: "Quality Assurance",
+    employeeDesignation: "Sr. QA Inspector",
+    beneficiaryName: "Rina Akter (Orphan SSC Candidate)",
+    beneficiaryPhone: "01933-445567",
+    beneficiaryAddress: "Sreepur, Gazipur",
+    justificationDetails: "Approved corporate Financial Aid educational assistance via staff agent Mizanur Rahman for Rina Akter (Recipient 2 of 3 in Sreepur welfare drive).",
+    agencyStatus: "Distributed",
+    batchRecipientInfo: "Recipient 2 of 3",
+    batchDriveTitle: "Sreepur Community Hardship Drive",
+  },
+  {
+    id: "FA-2026-10",
+    fundType: "Financial Aid",
+    budgetYear: 2026,
+    assignedDate: "2026-09-02",
+    distributionDeadline: "2026-09-25",
+    amount: 15000,
+    isRecurring: false,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Medical Treatment",
+    purposeSpecificDescription: "Co-pay assistance for specialist audiology assessment and digital hearing aid procurement",
+    employeeId: "2019003881",
+    employeeName: "Mizanur Rahman",
+    employeeDept: "Quality Assurance",
+    employeeDesignation: "Sr. QA Inspector",
+    beneficiaryName: "Tofazzal Hossain (Hearing Impaired Boy)",
+    beneficiaryPhone: "01933-445568",
+    beneficiaryAddress: "Sreepur, Gazipur",
+    justificationDetails: "Approved corporate Financial Aid medical co-pay grant via staff agent Mizanur Rahman for Tofazzal Hossain (Recipient 3 of 3 in Sreepur welfare drive).",
+    agencyStatus: "Assigned",
+    batchRecipientInfo: "Recipient 3 of 3",
+    batchDriveTitle: "Sreepur Community Hardship Drive",
+  },
 ];
 
 const INITIAL_RECURRING_SCHEDULES: UnifiedRecurringSchedule[] = [
@@ -554,15 +939,16 @@ const INITIAL_RECURRING_SCHEDULES: UnifiedRecurringSchedule[] = [
     id: "REC-ZK-2026-01",
     fundType: "Zakat",
     title: "Monthly Quran Madrasa Orphan Student Food & Tuition Stipend",
-    disbursementChannel: "Direct External",
+    disbursementChannel: "Via Employee Agent",
     disbursementMode: "Cash Grant",
     purposeCategory: "Mosque/Madrasa",
     purposeDescription: "Monthly food grain, oil, and textbook allowance for 10 resident orphan students.",
     cadence: "Monthly",
-    institutionName: "Darul Uloom Hussainia Madrasa & Yateemkhana",
-    institutionRepresentative: "Maulana Mufti Harun",
-    institutionContactPhone: "01711-998877",
+    employeeId: "2018001090",
+    employeeName: "Anisur Rahman",
+    employeeDept: "Admin & Compliance",
     beneficiaryName: "Darul Uloom Hussainia Madrasa & Yateemkhana",
+    beneficiaryPhone: "01711-998877",
     asnafCategory: "Fi Sabilillah",
     monthlyAmount: 20000,
     disbursementDayOfMonth: 1,
@@ -580,12 +966,15 @@ const INITIAL_RECURRING_SCHEDULES: UnifiedRecurringSchedule[] = [
     id: "REC-FA-2026-01",
     fundType: "Financial Aid",
     title: "Monthly Deceased Operator Family Subsidy",
-    disbursementChannel: "Direct External",
+    disbursementChannel: "Via Employee Agent",
     disbursementMode: "Cash Grant",
     purposeCategory: "Others",
     otherPurposeDetails: "Family Hardship Living Allowance",
     purposeDescription: "Living stipend for the widow and school-going children of deceased sewing operator late Rafiqul Islam.",
     cadence: "Monthly",
+    employeeId: "2020002130",
+    employeeName: "Farid Hossain",
+    employeeDept: "Medical & Welfare",
     beneficiaryName: "Hasna Hena (Widow of late Rafiqul Islam)",
     beneficiaryPhone: "01819-334455",
     beneficiaryAddress: "Sreepur, Gazipur",
@@ -635,12 +1024,14 @@ const INITIAL_RECURRING_SCHEDULES: UnifiedRecurringSchedule[] = [
 
 // Fallback staff list for searching
 const DEFAULT_COMPANY_EMPLOYEES = [
+  { id: "2023043910", name: "Tahmid Afsar Shapno", dept: "Business Innovation", title: "Asst. Manager", gross: "65000" },
+  { id: "2018001090", name: "Anisur Rahman", dept: "Admin & Compliance", title: "Compliance Officer", gross: "48000" },
+  { id: "2019003881", name: "Mizanur Rahman", dept: "Quality Assurance", title: "Sr. QA Inspector", gross: "42000" },
+  { id: "2020002130", name: "Farid Hossain", dept: "Medical & Welfare", title: "Welfare Officer", gross: "35000" },
   { id: "2023043021", name: "Shakil Ahmed", dept: "Maintenance", title: "Sr. Electrician", gross: "32500" },
   { id: "2023046001", name: "Salma Khatun", dept: "Sewing (Line-04)", title: "Sr. Sewing Operator", gross: "18500" },
-  { id: "2019003881", name: "Mizanur Rahman", dept: "Quality Assurance", title: "Sr. QA Inspector", gross: "42000" },
   { id: "2021008812", name: "Faridul Islam", dept: "Finishing", title: "Assistant Supervisor", gross: "26000" },
   { id: "2022001144", name: "Nasima Akter", dept: "Cutting", title: "Pattern Cutter", gross: "21500" },
-  { id: "2018001090", name: "Anisur Rahman", dept: "Admin & Compliance", title: "Compliance Officer", gross: "48000" },
   { id: "2020004510", name: "Abdur Rashid", dept: "Logistics", title: "Forklift Operator", gross: "24500" },
   { id: "2024009931", name: "Jamil Mia", dept: "Security", title: "Security Guard", gross: "16000" },
   { id: "2022005521", name: "Taslima Parvin", dept: "HR & Welfare", title: "Welfare Assistant", gross: "28000" },
@@ -659,7 +1050,11 @@ function ZakatAndFinancialAidPage() {
       const saved = localStorage.getItem("cripton_unified_aid_records");
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          const hasMultiBen = Array.isArray(parsed) && parsed.some((r: any) => r.batchRecipientInfo || r.justificationDetails?.includes("recipients"));
+          if (Array.isArray(parsed) && parsed.length >= 15 && hasMultiBen) {
+            return parsed.filter((r: any) => r.disbursementChannel !== "Direct External");
+          }
         } catch (e) {}
       }
     }
@@ -1157,11 +1552,6 @@ function ZakatAndFinancialAidPage() {
       return;
     }
 
-    if (modalChannel === "Direct External" && !newInstitutionName.trim() && !newBeneficiaryName.trim()) {
-      alert("Please enter the outside beneficiary person or institution name.");
-      return;
-    }
-
     if (modalChannel !== "Via Employee Agent" && modalMode === "Asset Purchased" && !modalAssetName.trim()) {
       alert("Please specify the asset/item being purchased (e.g. Van, Cow, Tea Stall Setup).");
       return;
@@ -1215,18 +1605,15 @@ function ZakatAndFinancialAidPage() {
               viaBeneficiaries.length > 1 ? ` (${idx + 1} of ${viaBeneficiaries.length} recipients)` : ""
             }.`,
           agencyStatus: "Assigned",
+          batchRecipientInfo: viaBeneficiaries.length > 1 ? `Recipient ${idx + 1} of ${viaBeneficiaries.length}` : undefined,
+          batchDriveTitle: viaBeneficiaries.length > 1 ? `${newEmpName}'s Distribution Drive` : undefined,
           attachments: modalAttachments.length > 0 ? modalAttachments : undefined,
         };
       });
 
       setRecords((prev) => [...newRecordsToAdd, ...prev]);
     } else {
-      const resolvedBeneficiary =
-        modalChannel === "Direct Employee"
-          ? `${newEmpName} (Staff Self)`
-          : modalChannel === "Direct External" && newInstitutionName.trim()
-            ? newInstitutionName.trim()
-            : newBeneficiaryName.trim();
+      const resolvedBeneficiary = `${newEmpName} (Staff Self)`;
 
       const newRecord: UnifiedAidRecord = {
         id: `${prefix}-${selectedBudgetYear}-${String(records.length + 1).padStart(2, "0")}`,
@@ -1236,7 +1623,7 @@ function ZakatAndFinancialAidPage() {
         distributionDeadline: newDeadline || today,
         amount: parseFloat(newAmount),
         isRecurring: false,
-        disbursementChannel: modalChannel,
+        disbursementChannel: "Direct Employee",
         disbursementMode: modalMode,
         assetDetails:
           modalMode === "Asset Purchased"
@@ -1255,19 +1642,12 @@ function ZakatAndFinancialAidPage() {
             : newPurposeCategory === "Others"
               ? newOtherPurposeDetails
               : `${newPurposeCategory} Grant`),
-        employeeId: modalChannel === "Direct Employee" ? newEmpId : undefined,
-        employeeName: modalChannel === "Direct Employee" ? newEmpName : undefined,
+        employeeId: newEmpId,
+        employeeName: newEmpName,
         employeeDept: selectedEmpDetails?.dept,
         employeeDesignation: selectedEmpDetails?.title,
         beneficiaryName: resolvedBeneficiary,
-        beneficiaryPhone:
-          modalChannel === "Direct External"
-            ? newBeneficiaryPhone.trim() || newInstitutionPhone.trim()
-            : undefined,
         beneficiaryAddress: newBeneficiaryAddress.trim() || undefined,
-        institutionName: modalChannel === "Direct External" ? newInstitutionName.trim() || undefined : undefined,
-        institutionRepresentative: modalChannel === "Direct External" ? newInstitutionRep.trim() || undefined : undefined,
-        institutionContactPhone: modalChannel === "Direct External" ? newInstitutionPhone.trim() || undefined : undefined,
         // Only Zakat gets Asnaf Category
         asnafCategory: modalFundType === "Zakat" ? newAsnaf : undefined,
         justificationDetails:
@@ -1292,17 +1672,10 @@ function ZakatAndFinancialAidPage() {
       return;
     }
 
-    if (recChannel === "Direct External" && !recInstitutionName.trim() && !recBeneficiaryName.trim()) {
-      alert("Please provide the beneficiary person or institution name.");
-      return;
-    }
-
     const resolvedBeneficiary =
       recChannel === "Direct Employee"
         ? (newEmpName ? `${newEmpName} (Staff Self)` : "Internal Staff Beneficiary")
-        : recChannel === "Direct External" && recInstitutionName.trim()
-          ? recInstitutionName.trim()
-          : recBeneficiaryName.trim() || "Beneficiary";
+        : (recBeneficiaryName.trim() || "Beneficiary");
 
     const prefix = recFundType === "Zakat" ? "REC-ZK" : "REC-FA";
     const newSchedule: UnifiedRecurringSchedule = {
@@ -1691,7 +2064,6 @@ function ZakatAndFinancialAidPage() {
                   <option value="ALL">All Channels</option>
                   <option value="Direct Employee">Direct Employee</option>
                   <option value="Via Employee Agent">Via Staff Agent</option>
-                  <option value="Direct External">Direct External</option>
                 </select>
               </div>
 
@@ -1743,21 +2115,21 @@ function ZakatAndFinancialAidPage() {
           </div>
 
           {/* 6. Unified Data Table */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-100/70 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[11px] font-black uppercase text-slate-600 dark:text-slate-300 tracking-wider">
-                    <th className="py-3 px-3.5">Fund Type & ID</th>
-                    <th className="py-3 px-3">Date</th>
-                    <th className="py-3 px-3.5">Beneficiary / Recipient</th>
-                    <th className="py-3 px-3">Channel</th>
-                    <th className="py-3 px-3">Mode & Asset Item</th>
-                    <th className="py-3 px-3">Purpose</th>
-                    <th className="py-3 px-3">Asnaf Category</th>
-                    <th className="py-3 px-3 text-right">Amount (BDT)</th>
-                    <th className="py-3 px-3 text-center">Status</th>
-                    <th className="py-3 px-3.5 text-center">Actions</th>
+                  <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase text-slate-600 dark:text-slate-300 tracking-wider">
+                    <th className="py-3 px-4 whitespace-nowrap w-[130px]">Fund Type & ID</th>
+                    <th className="py-3 px-3 whitespace-nowrap w-[95px]">Date</th>
+                    <th className="py-3 px-4 min-w-[190px]">Beneficiary / Recipient</th>
+                    <th className="py-3 px-3 text-center whitespace-nowrap w-[110px]">Channel</th>
+                    <th className="py-3 px-4 min-w-[210px]">Mode & Asset Item</th>
+                    <th className="py-3 px-4 min-w-[160px]">Purpose</th>
+                    <th className="py-3 px-3 text-center whitespace-nowrap w-[130px]">Asnaf Category</th>
+                    <th className="py-3 px-4 text-right whitespace-nowrap w-[115px]">Amount (BDT)</th>
+                    <th className="py-3 px-3 text-center whitespace-nowrap w-[105px]">Status</th>
+                    <th className="py-3 px-4 text-center whitespace-nowrap w-[80px]">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
@@ -1770,13 +2142,13 @@ function ZakatAndFinancialAidPage() {
                           className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
                         >
                           {/* Fund Type & ID */}
-                          <td className="py-3 px-3.5 whitespace-nowrap">
+                          <td className="py-3.5 px-4 align-top whitespace-nowrap">
                             <div className="flex items-center gap-1.5">
                               <span
-                                className={`text-[10px] font-black px-2 py-0.5 rounded-md border ${
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
                                   isZakat
-                                    ? "bg-emerald-100/80 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800"
-                                    : "bg-blue-100/80 text-blue-800 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800"
+                                    ? "bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800"
+                                    : "bg-blue-50 text-blue-800 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800"
                                 }`}
                               >
                                 {r.fundType}
@@ -1787,86 +2159,93 @@ function ZakatAndFinancialAidPage() {
                                 </span>
                               )}
                             </div>
-                            <div className="font-mono text-[11px] font-bold text-slate-800 dark:text-slate-200 mt-1">
+                            <div className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100 mt-1">
                               {r.id}
                             </div>
                           </td>
 
                           {/* Date */}
-                          <td className="py-3 px-3 text-slate-600 dark:text-slate-400 whitespace-nowrap font-mono text-[11px]">
+                          <td className="py-3.5 px-3 align-top text-slate-600 dark:text-slate-400 whitespace-nowrap font-mono text-xs">
                             {r.assignedDate}
                           </td>
 
                           {/* Beneficiary */}
-                          <td className="py-3 px-3.5">
-                            <div className="font-bold text-slate-900 dark:text-slate-100">
-                              {r.beneficiaryName}
+                          <td className="py-3.5 px-4 align-top">
+                            <div className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 flex-wrap">
+                              <span>{r.beneficiaryName}</span>
+                              {r.batchRecipientInfo && (
+                                <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                  <Users className="size-2.5 shrink-0" />
+                                  {r.batchRecipientInfo}
+                                </span>
+                              )}
                             </div>
                             {r.disbursementChannel === "Via Employee Agent" && r.employeeName && (
-                              <div className="text-[10px] text-blue-600 dark:text-blue-400 flex items-center gap-1 font-medium mt-0.5">
-                                <Users className="size-3" />
-                                <span>Via Agent: {r.employeeName}</span>
+                              <div className="text-[11px] text-blue-600 dark:text-blue-400 flex items-center gap-1 font-medium mt-0.5">
+                                <Users className="size-3 shrink-0" />
+                                <span>Via Agent: {r.employeeName} {r.employeeDept ? `(${r.employeeDept})` : ""}</span>
+                              </div>
+                            )}
+                            {r.batchDriveTitle && (
+                              <div className="text-[10px] text-slate-500 font-medium mt-0.5">
+                                Drive: {r.batchDriveTitle}
                               </div>
                             )}
                             {r.beneficiaryPhone && (
-                              <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                              <div className="text-[11px] text-slate-400 font-mono mt-0.5">
                                 {r.beneficiaryPhone}
                               </div>
                             )}
                           </td>
 
                           {/* Channel */}
-                          <td className="py-3 px-3 whitespace-nowrap">
+                          <td className="py-3.5 px-3 align-top text-center whitespace-nowrap">
                             <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              className={`inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                                 r.disbursementChannel === "Direct Employee"
                                   ? "bg-sky-50 text-sky-800 border border-sky-200"
-                                  : r.disbursementChannel === "Via Employee Agent"
-                                    ? "bg-purple-50 text-purple-800 border border-purple-200"
-                                    : "bg-amber-50 text-amber-800 border border-amber-200"
+                                  : "bg-purple-50 text-purple-800 border border-purple-200"
                               }`}
                             >
                               {r.disbursementChannel === "Direct Employee"
                                 ? "Direct Staff"
-                                : r.disbursementChannel === "Via Employee Agent"
-                                  ? "Via Agent"
-                                  : "Direct External"}
+                                : "Via Agent"}
                             </span>
                           </td>
 
                           {/* Mode & Asset */}
-                          <td className="py-3 px-3">
+                          <td className="py-3.5 px-4 align-top">
                             <div className="flex items-center gap-1.5 font-semibold text-slate-800 dark:text-slate-200">
                               {r.disbursementMode === "Asset Purchased" ? (
-                                <ShoppingBag className="size-3.5 text-indigo-600" />
+                                <ShoppingBag className="size-3.5 text-indigo-600 shrink-0" />
                               ) : (
-                                <Banknote className="size-3.5 text-emerald-600" />
+                                <Banknote className="size-3.5 text-emerald-600 shrink-0" />
                               )}
                               <span>{r.disbursementMode}</span>
                             </div>
                             {r.assetDetails?.assetName && (
-                              <div className="text-[10px] text-indigo-700 dark:text-indigo-400 font-medium line-clamp-1 mt-0.5">
+                              <div className="text-xs text-indigo-700 dark:text-indigo-400 font-medium line-clamp-1 mt-0.5">
                                 {r.assetDetails.assetName} {r.assetDetails.assetQuantity ? `(${r.assetDetails.assetQuantity})` : ""}
                               </div>
                             )}
                           </td>
 
                           {/* Purpose */}
-                          <td className="py-3 px-3 whitespace-nowrap">
-                            <span className="font-semibold text-slate-800 dark:text-slate-200">
+                          <td className="py-3.5 px-4 align-top">
+                            <div className="font-semibold text-slate-800 dark:text-slate-200">
                               {r.purposeCategory}
-                            </span>
+                            </div>
                             {r.otherPurposeDetails && (
-                              <div className="text-[10px] text-slate-400 line-clamp-1">
+                              <div className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
                                 {r.otherPurposeDetails}
                               </div>
                             )}
                           </td>
 
                           {/* Asnaf Category */}
-                          <td className="py-3 px-3 whitespace-nowrap">
+                          <td className="py-3.5 px-3 align-top text-center whitespace-nowrap">
                             {isZakat ? (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                              <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                                 {r.asnafCategory || "Al-Masakin"}
                               </span>
                             ) : (
@@ -1877,26 +2256,26 @@ function ZakatAndFinancialAidPage() {
                           </td>
 
                           {/* Amount */}
-                          <td className="py-3 px-3 text-right whitespace-nowrap">
-                            <span className="font-mono font-black text-slate-900 dark:text-white text-sm">
+                          <td className="py-3.5 px-4 align-top text-right whitespace-nowrap">
+                            <span className="font-mono font-bold text-slate-900 dark:text-white text-xs">
                               ৳ {r.amount.toLocaleString()}
                             </span>
                           </td>
 
                           {/* Status */}
-                          <td className="py-3 px-3 text-center whitespace-nowrap">
+                          <td className="py-3.5 px-3 align-top text-center whitespace-nowrap">
                             <button
                               type="button"
                               onClick={() => advanceRecordStatus(r.id)}
                               title="Click to advance status"
-                              className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border cursor-pointer transition-all hover:scale-105 ${
+                              className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border cursor-pointer transition-colors ${
                                 r.agencyStatus === "Verified"
-                                  ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300"
+                                  ? "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300"
                                   : r.agencyStatus === "Distributed"
-                                    ? "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/70 dark:text-blue-300"
+                                    ? "bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/70 dark:text-blue-300"
                                     : r.agencyStatus === "Acknowledged"
-                                      ? "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/70 dark:text-amber-300"
-                                      : "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300"
+                                      ? "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/70 dark:text-amber-300"
+                                      : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300"
                               }`}
                             >
                               {r.agencyStatus}
@@ -1904,20 +2283,20 @@ function ZakatAndFinancialAidPage() {
                           </td>
 
                           {/* Actions */}
-                          <td className="py-3 px-3.5 text-center whitespace-nowrap">
-                            <div className="flex items-center justify-center gap-1">
+                          <td className="py-3.5 px-4 align-top text-center whitespace-nowrap">
+                            <div className="flex items-center justify-center gap-1.5">
                               <button
                                 type="button"
                                 onClick={() => setViewRecord(r)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors cursor-pointer"
-                                title="View Case Dossier"
+                                className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                                title="View Details"
                               >
                                 <Eye className="size-3.5" />
                               </button>
                               <button
                                 type="button"
                                 onClick={() => deleteRecord(r.id)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                                className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer transition-colors"
                                 title="Delete Record"
                               >
                                 <Trash2 className="size-3.5" />
@@ -1985,7 +2364,6 @@ function ZakatAndFinancialAidPage() {
                   >
                     <option value="Direct Employee">Direct Employee (Company Staff)</option>
                     <option value="Via Employee Agent">Via Staff Agent (Staff Village Handover)</option>
-                    <option value="Direct External">Direct External (Outside Person / Institution)</option>
                   </select>
                 </div>
 
@@ -2312,63 +2690,6 @@ function ZakatAndFinancialAidPage() {
                 </div>
               )}
 
-              {modalChannel === "Direct External" && (
-                <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide block">
-                    External Beneficiary / Organization Details <span className="text-red-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                        Institution / Madrasa (If Applicable)
-                      </label>
-                      <input
-                        type="text"
-                        value={newInstitutionName}
-                        onChange={(e) => setNewInstitutionName(e.target.value)}
-                        placeholder="e.g. Darul Uloom Madrasa"
-                        className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none focus:border-blue-500 shadow-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                        Beneficiary Person Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={newBeneficiaryName}
-                        onChange={(e) => setNewBeneficiaryName(e.target.value)}
-                        placeholder="e.g. Jamil Mia"
-                        className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold outline-none focus:border-blue-500 shadow-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                        Contact Phone
-                      </label>
-                      <input
-                        type="text"
-                        value={newBeneficiaryPhone}
-                        onChange={(e) => setNewBeneficiaryPhone(e.target.value)}
-                        placeholder="01712-345678"
-                        className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none focus:border-blue-500 shadow-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
-                        Village / Location
-                      </label>
-                      <input
-                        type="text"
-                        value={newBeneficiaryAddress}
-                        onChange={(e) => setNewBeneficiaryAddress(e.target.value)}
-                        placeholder="e.g. Bhaluka, Mymensingh"
-                        className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none focus:border-blue-500 shadow-xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Conditional Global Physical Asset Fields (for Direct single disbursements) */}
               {modalMode === "Asset Purchased" && modalChannel !== "Via Employee Agent" && (
@@ -2717,7 +3038,6 @@ function ZakatAndFinancialAidPage() {
                       >
                         <option value="Direct Employee">Direct Employee</option>
                         <option value="Via Employee Agent">Via Staff Agent (Village Handover)</option>
-                        <option value="Direct External">Direct External</option>
                       </select>
                     </div>
 
@@ -2779,7 +3099,7 @@ function ZakatAndFinancialAidPage() {
                         ))}
                       </select>
                     </div>
-                  ) : recChannel === "Via Employee Agent" ? (
+                  ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 bg-slate-50/70 rounded-xl border border-slate-200">
                       <div>
                         <label className="text-[11px] font-bold text-slate-600 block mb-1 uppercase">
@@ -2840,37 +3160,6 @@ function ZakatAndFinancialAidPage() {
                           onChange={(e) => setRecBeneficiaryAddress(e.target.value)}
                           placeholder="e.g. Bhaluka, Mymensingh"
                           className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-800 outline-none focus:border-emerald-600"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-xs font-semibold text-slate-700 block mb-1">
-                          Beneficiary / Organization Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={recBeneficiaryName}
-                          onChange={(e) => {
-                            setRecBeneficiaryName(e.target.value);
-                            setRecInstitutionName(e.target.value);
-                          }}
-                          placeholder="e.g. Jamia Qasimul Uloom / Rahima Begum"
-                          className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-700 block mb-1">
-                          Phone Number
-                        </label>
-                        <input
-                          type="text"
-                          value={recBeneficiaryPhone}
-                          onChange={(e) => setRecBeneficiaryPhone(e.target.value)}
-                          placeholder="e.g. 01822-778899"
-                          className="w-full h-9.5 px-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-800 outline-none focus:border-emerald-600"
                         />
                       </div>
                     </div>
@@ -3390,15 +3679,29 @@ function ZakatAndFinancialAidPage() {
               </div>
 
               <div className="space-y-1.5 border-t border-slate-100 dark:border-slate-800 pt-3">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">Beneficiary</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Beneficiary</span>
+                  {viewRecord.batchRecipientInfo && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                      <Users className="size-3" />
+                      {viewRecord.batchRecipientInfo} {viewRecord.batchDriveTitle ? `• ${viewRecord.batchDriveTitle}` : ""}
+                    </span>
+                  )}
+                </div>
                 <div className="text-sm font-bold text-slate-900 dark:text-white">
                   {viewRecord.beneficiaryName}
                 </div>
+                {viewRecord.disbursementChannel === "Via Employee Agent" && viewRecord.employeeName && (
+                  <div className="text-xs text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
+                    <Users className="size-3" />
+                    <span>Authorized Staff Agent: {viewRecord.employeeName} {viewRecord.employeeDept ? `(${viewRecord.employeeDept} - ${viewRecord.employeeDesignation || ""})` : ""}</span>
+                  </div>
+                )}
                 {viewRecord.beneficiaryPhone && (
-                  <div className="text-slate-500 font-mono">Phone: {viewRecord.beneficiaryPhone}</div>
+                  <div className="text-slate-500 font-mono text-xs">Phone: {viewRecord.beneficiaryPhone}</div>
                 )}
                 {viewRecord.beneficiaryAddress && (
-                  <div className="text-slate-500">Address: {viewRecord.beneficiaryAddress}</div>
+                  <div className="text-slate-500 text-xs">Address: {viewRecord.beneficiaryAddress}</div>
                 )}
               </div>
 

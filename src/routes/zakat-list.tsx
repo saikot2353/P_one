@@ -79,11 +79,10 @@ export type ZakatPurposeCategory =
   | "Business Setup"
   | "Others";
 
-// 2. Beneficiary Channel (Direct Staff vs. Via Agent vs. Direct External)
+// 2. Beneficiary Channel (Direct Staff vs. Via Agent)
 export type ZakatDisbursementChannel =
   | "Direct Employee"       // Direct Company Staff Beneficiary
-  | "Via Employee Agent"    // Via Staff Representative
-  | "Direct External";      // Direct Outside Person or Institution
+  | "Via Employee Agent";   // Via Staff Representative
 
 // 3. Disbursement Mode (Cash vs. In-Kind Asset Purchased)
 export type ZakatDisbursementMode =
@@ -535,7 +534,7 @@ export const defaultZakatRecords: ZakatRecord[] = [
     distributionDeadline: "2026-07-20",
     amount: 30000,
     isRecurring: false,
-    disbursementChannel: "Direct External",
+    disbursementChannel: "Via Employee Agent",
     disbursementMode: "Asset Purchased",
     purposeCategory: "Business Setup",
     assetDetails: {
@@ -547,12 +546,17 @@ export const defaultZakatRecords: ZakatRecord[] = [
       remarks: "Full physical kiosk structure with burner and gas cylinder delivered on-site; includes 6-month burner warranty.",
     },
     purposeSpecificDescription: "Complete street tea stall setup built and furnished for fire victim",
+    employeeName: "Md. Tariqul Islam",
+    employeeId: "2019001155",
+    employeeDept: "Production",
+    employeeDesignation: "Sr. Executive",
     beneficiaryName: "Jamil Mia",
     beneficiaryPhone: "01788-112233",
     beneficiaryAddress: "Sreepur, Gazipur",
     asnafCategory: "Al-Gharimin",
     justificationDetails:
-      "Destitute shopkeeper who lost his livelihood in market fire; gifted physical business setup instead of cash.",
+      "Destitute shopkeeper who lost his livelihood in market fire; gifted physical business setup via staff agent instead of cash.",
+    agencyStatus: "Verified",
     agencyStatus: "Acknowledged",
     attachments: [
       {
@@ -618,19 +622,20 @@ export const defaultZakatRecords: ZakatRecord[] = [
     distributionDeadline: "2026-07-30",
     amount: 40000,
     isRecurring: false,
-    disbursementChannel: "Direct External",
+    disbursementChannel: "Via Employee Agent",
     disbursementMode: "Cash Grant",
     purposeCategory: "Mosque/Madrasa",
     purposeSpecificDescription: "Living allowance, food and clothing sponsorship for 15 orphan Hifz students",
-    institutionName: "Darul Uloom Islamia Madrasa & Orphanage",
-    institutionType: "Madrasa",
-    institutionRepresentative: "Maulana Mufti Harun",
-    institutionContactPhone: "01722-554433",
+    employeeName: "Anisur Rahman",
+    employeeId: "2018001090",
+    employeeDept: "Admin & Compliance",
+    employeeDesignation: "Compliance Officer",
     beneficiaryName: "Darul Uloom Madrasa (15 Orphan Students)",
+    beneficiaryPhone: "01722-554433",
     beneficiaryAddress: "Tongi, Gazipur",
     asnafCategory: "Fi Sabilillah",
     justificationDetails:
-      "Direct institutional grant transferred to madrasa committee account for destitute students' meals.",
+      "Zakat grant delivered via company staff agent to madrasa committee for destitute students' meals.",
     agencyStatus: "Verified",
     proofDetails: {
       receiptRef: "MAD-REC-2026-44",
@@ -715,16 +720,20 @@ export const defaultZakatRecords: ZakatRecord[] = [
     distributionDeadline: "2026-09-05",
     amount: 30000,
     isRecurring: false,
-    disbursementChannel: "Direct External",
+    disbursementChannel: "Via Employee Agent",
     disbursementMode: "Cash Grant",
     purposeCategory: "Medical Treatment",
     purposeSpecificDescription: "Financial assistance for emergency pediatric open-heart valve surgery",
+    employeeName: "Farid Hossain",
+    employeeId: "2020002130",
+    employeeDept: "Medical & Welfare",
+    employeeDesignation: "Welfare Officer",
     beneficiaryName: "Baby Arif (7-year-old orphan)",
     beneficiaryPhone: "01855-667788",
     beneficiaryAddress: "National Heart Foundation & Hospital, Mirpur-2, Dhaka",
     asnafCategory: "Al-Fuqara",
     justificationDetails:
-      "Life-saving congenital cardiac surgery support for destitute orphan child referred by hospital social welfare unit.",
+      "Life-saving congenital cardiac surgery support for destitute orphan child delivered via company welfare officer.",
     agencyStatus: "Distributed",
     proofDetails: {
       receiptRef: "NICVD-WEL-4410",
@@ -777,7 +786,7 @@ export const defaultZakatRecords: ZakatRecord[] = [
     distributionDeadline: "2026-09-20",
     amount: 25000,
     isRecurring: false,
-    disbursementChannel: "Direct External",
+    disbursementChannel: "Via Employee Agent",
     disbursementMode: "Asset Purchased",
     purposeCategory: "Business Setup",
     assetDetails: {
@@ -787,12 +796,16 @@ export const defaultZakatRecords: ZakatRecord[] = [
       invoiceRef: "SINGER-SEW-7712",
     },
     purposeSpecificDescription: "Commercial sewing machine and fabric inventory provided to establish home tailoring boutique",
+    employeeName: "Mustafizur Rahman",
+    employeeId: "2021004120",
+    employeeDept: "Maintenance",
+    employeeDesignation: "Sr. Technician",
     beneficiaryName: "Morium Begum (Destitute Widow)",
     beneficiaryPhone: "01622-334455",
     beneficiaryAddress: "Konabari, Gazipur",
     asnafCategory: "Al-Masakin",
     justificationDetails:
-      "Gifted physical capital asset for micro-enterprise to prevent begging and achieve dignified financial independence.",
+      "Gifted physical capital asset for micro-enterprise via staff agent to prevent begging and achieve dignified financial independence.",
     agencyStatus: "Verified",
     proofDetails: {
       receiptRef: "INV-SEW-7712",
@@ -939,17 +952,17 @@ export const defaultRecurringSchedules: RecurringZakatSchedule[] = [
   {
     id: "REC-ZK-2026-02",
     title: "Monthly Orphan Students Welfare Grant",
-    disbursementChannel: "Direct External",
+    disbursementChannel: "Via Employee Agent",
     disbursementMode: "Cash Grant",
     cadence: "Monthly",
     settlementType: "Periodic Installments",
     disbursementMethod: "Bank Transfer",
     paymentDetails: "Islami Bank A/C: 2050-1199-002",
-    institutionName: "Jamia Qasimul Uloom Madrasa",
-    institutionType: "Madrasa",
-    institutionRepresentative: "Maulana Zakaria",
-    institutionContactPhone: "01822-778899",
+    employeeName: "Anisur Rahman",
+    employeeId: "2018001090",
+    employeeDept: "Admin & Compliance",
     beneficiaryName: "Jamia Qasimul Uloom (Orphan Care)",
+    beneficiaryPhone: "01822-778899",
     beneficiaryAddress: "Joydebpur, Gazipur",
     purposeCategory: "Mosque/Madrasa",
     purposeDescription: "Monthly stipend of ৳12,000 supporting 3 orphan students' meals and textbooks.",
@@ -1081,14 +1094,12 @@ function normalizeRecords(raw: any[]): ZakatRecord[] {
     const justification = r.justificationDetails || r.recipientDetails || "Zakat support";
 
     // Resolve channel
-    let channel: ZakatDisbursementChannel = "Direct External";
+    let channel: ZakatDisbursementChannel = "Via Employee Agent";
     if (r.disbursementChannel) {
-      channel = r.disbursementChannel;
+      channel = r.disbursementChannel === "Direct External" ? "Via Employee Agent" : r.disbursementChannel;
     } else if (r.recipientType === "Internal Employee") {
       channel = "Direct Employee";
-    } else if (r.recipientType === "Employee Agent") {
-      channel = "Via Employee Agent";
-    } else if (r.employeeName && !r.recipientType) {
+    } else {
       channel = "Via Employee Agent";
     }
 
@@ -1994,11 +2005,6 @@ function ZakatManagementPage() {
       return;
     }
 
-    if (modalChannel === "Direct External" && !newInstitutionName.trim() && !newBeneficiaryName.trim()) {
-      alert("Please enter the outside beneficiary person or institution name.");
-      return;
-    }
-
     if (modalChannel !== "Via Employee Agent" && modalMode === "Asset Purchased" && !modalAssetName.trim()) {
       alert("Please specify the asset/item being purchased (e.g. Van, Cow, Tea Stall Setup).");
       return;
@@ -2071,12 +2077,7 @@ function ZakatManagementPage() {
 
       setRecords((prev) => [...newRecordsToAdd, ...prev]);
     } else {
-      const resolvedBeneficiary =
-        modalChannel === "Direct Employee"
-          ? `${newEmpName} (Staff Self)`
-          : modalChannel === "Direct External" && newInstitutionName.trim()
-            ? newInstitutionName
-            : newBeneficiaryName;
+      const resolvedBeneficiary = `${newEmpName} (Staff Self)`;
 
       const newRecord: ZakatRecord = {
         id: `ZK-${selectedBudgetYear}-${String(records.length + 1).padStart(2, "0")}`,
@@ -2085,7 +2086,7 @@ function ZakatManagementPage() {
         distributionDeadline: newDeadline || today,
         amount: amountNum,
         isRecurring: false,
-        disbursementChannel: modalChannel,
+        disbursementChannel: "Direct Employee",
         disbursementMode: modalMode,
         assetDetails:
           modalMode === "Asset Purchased"
@@ -2104,17 +2105,13 @@ function ZakatManagementPage() {
             : newPurposeCategory === "Others"
               ? newOtherPurposeDetails
               : `${newPurposeCategory} Grant`),
-        employeeId: modalChannel === "Direct Employee" ? newEmpId : undefined,
-        employeeName: modalChannel === "Direct Employee" ? newEmpName : undefined,
+        employeeId: newEmpId,
+        employeeName: newEmpName,
         employeeDept: selectedEmpDetails?.dept,
         employeeDesignation: selectedEmpDetails?.title,
         beneficiaryName: resolvedBeneficiary,
         beneficiaryPhone: newBeneficiaryPhone,
         beneficiaryAddress: newBeneficiaryAddress,
-        institutionName: modalChannel === "Direct External" && newInstitutionName ? newInstitutionName : undefined,
-        institutionType: modalChannel === "Direct External" && newInstitutionName ? newInstitutionType : undefined,
-        institutionRepresentative: modalChannel === "Direct External" && newInstitutionName ? newInstitutionRep : undefined,
-        institutionContactPhone: modalChannel === "Direct External" && newInstitutionName ? newInstitutionPhone : undefined,
         asnafCategory: newAsnaf,
         justificationDetails: newJustification || "Approved corporate Zakat disbursement.",
         agencyStatus: "Assigned",
@@ -2177,9 +2174,7 @@ function ZakatManagementPage() {
     const resolvedBeneficiary =
       recChannel === "Direct Employee"
         ? `${recEmpName} (Staff)`
-        : recChannel === "Direct External" && recInstitutionName
-          ? recInstitutionName
-          : recBeneficiaryName;
+        : recBeneficiaryName;
 
     const isAdvance = recSettlementType === "1-Year Full Advance";
     const plannedMonths = isAdvance ? (parseInt(recTotalMonths) || 12) : (parseInt(recTotalMonths) || undefined);
@@ -2202,12 +2197,11 @@ function ZakatManagementPage() {
             remarks: recAssetRemarks || undefined,
           }
           : undefined,
-      employeeId: recChannel === "Direct Employee" || recChannel === "Via Employee Agent" ? recEmpId : undefined,
-      employeeName: recChannel === "Direct Employee" || recChannel === "Via Employee Agent" ? recEmpName : undefined,
+      employeeId: recEmpId,
+      employeeName: recEmpName,
       beneficiaryName: resolvedBeneficiary || "Beneficiary",
       beneficiaryPhone: recBeneficiaryPhone,
       beneficiaryAddress: recBeneficiaryAddress || undefined,
-      institutionName: recChannel === "Direct External" ? recInstitutionName : undefined,
       purposeCategory: recPurposeCategory,
       otherPurposeDetails: recPurposeCategory === "Others" ? recOtherPurpose : undefined,
       purposeDescription: recPurposeDesc || `${recPurposeCategory} ${isAdvance ? "Full 1-Year Advance Stipend" : "regular monthly stipend"}`,
@@ -2259,7 +2253,6 @@ function ZakatManagementPage() {
         beneficiaryName: resolvedBeneficiary || "Beneficiary",
         beneficiaryPhone: recBeneficiaryPhone,
         beneficiaryAddress: recBeneficiaryAddress || undefined,
-        institutionName: recChannel === "Direct External" ? recInstitutionName : undefined,
         asnafCategory: recAsnaf,
         justificationDetails: `Full 1-Year upfront advance Zakat stipend for ${recTitle}. Total ৳${totalAdvanceAmt.toLocaleString()} covering ${plannedMonths || 12} months at ৳${monthlyAmt.toLocaleString()}/mo via ${recPaymentMethod} ${recPaymentAccount ? `(${recPaymentAccount})` : ""}.`,
         agencyStatus: "Distributed",
@@ -2746,7 +2739,6 @@ function ZakatManagementPage() {
                     <option value="ALL">All Beneficiary Channels</option>
                     <option value="Direct Employee">Direct Employee (Company Staff)</option>
                     <option value="Via Employee Agent">Via Staff Agent (Village Handover)</option>
-                    <option value="Direct External">Direct External (Outside Person / Org)</option>
                   </select>
 
                   {/* Mode Filter (Cash vs Asset) */}
@@ -3340,7 +3332,6 @@ function ZakatManagementPage() {
                     >
                       <option value="Direct Employee">Direct Employee (Internal Company Staff)</option>
                       <option value="Via Employee Agent">Via Staff Agent (Staff Village Handover)</option>
-                      <option value="Direct External">Direct External (Outside Person / Institution / Madrasa)</option>
                     </select>
                   </div>
 
@@ -3826,79 +3817,8 @@ function ZakatManagementPage() {
                   </div>
                 )}
 
-                {modalChannel === "Direct External" && (
-                  <div className="p-5 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-3.5 animate-in fade-in">
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block">
-                      External Beneficiary / Institution Details <span className="text-red-500">*</span>
-                    </label>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Madrasa / Mosque / Org (If Institution)
-                        </label>
-                        <input
-                          type="text"
-                          value={newInstitutionName}
-                          onChange={(e) => setNewInstitutionName(e.target.value)}
-                          placeholder="e.g. Darul Uloom Madrasa"
-                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Representative / Imam
-                        </label>
-                        <input
-                          type="text"
-                          value={newInstitutionRep}
-                          onChange={(e) => setNewInstitutionRep(e.target.value)}
-                          placeholder="e.g. Maulana Mufti Harun"
-                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Beneficiary Person Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={newBeneficiaryName}
-                          onChange={(e) => setNewBeneficiaryName(e.target.value)}
-                          placeholder="e.g. Jamil Mia / Ayesha Begum"
-                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Beneficiary Contact Phone
-                        </label>
-                        <input
-                          type="text"
-                          value={newBeneficiaryPhone}
-                          onChange={(e) => setNewBeneficiaryPhone(e.target.value)}
-                          placeholder="e.g. 01712-345678"
-                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                        />
-                      </div>
-                      <div className="md:col-span-2 lg:col-span-4">
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Village / Address Location
-                        </label>
-                        <input
-                          type="text"
-                          value={newBeneficiaryAddress}
-                          onChange={(e) => setNewBeneficiaryAddress(e.target.value)}
-                          placeholder="e.g. Village: Bhaluka, District: Mymensingh"
-                          className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs outline-none focus:border-blue-500 text-slate-800 shadow-xs"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. Conditional Physical Asset Purchase Fields (Direct Employee / Direct External) */}
+                {/* 4. Conditional Physical Asset Purchase Fields (Direct Employee) */}
                 {modalMode === "Asset Purchased" && modalChannel !== "Via Employee Agent" && (
                   <div className="p-5 bg-indigo-50/40 rounded-2xl border border-indigo-200 space-y-4 animate-in fade-in duration-150">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-indigo-100 pb-2">
@@ -4252,7 +4172,6 @@ function ZakatManagementPage() {
                       >
                         <option value="Direct Employee">Direct Employee</option>
                         <option value="Via Employee Agent">Via Staff Agent (Village Handover)</option>
-                        <option value="Direct External">Direct External</option>
                       </select>
                     </div>
 
@@ -5277,7 +5196,6 @@ function ZakatManagementPage() {
                     <option value="ALL">All Beneficiary Channels</option>
                     <option value="Direct Employee">Direct Employee (Company Staff)</option>
                     <option value="Via Employee Agent">Via Staff Agent (Village Handover)</option>
-                    <option value="Direct External">Direct External (Outside Person / Org)</option>
                   </select>
 
                   {/* Purpose Dropdown */}
@@ -5389,15 +5307,6 @@ function ZakatManagementPage() {
                                   <div className="font-semibold text-slate-900">Via Staff Agent</div>
                                   <div className="text-[11px] text-slate-600 mt-0.5">Agent: {row.employeeName}</div>
                                   {row.employeeId && <div className="text-[10px] text-slate-400">ID: {row.employeeId}</div>}
-                                </div>
-                              )}
-                              {row.disbursementChannel === "Direct External" && (
-                                <div>
-                                  <div className="font-semibold text-slate-900">Direct External</div>
-                                  <div className="text-[11px] text-slate-600 mt-0.5">{row.institutionName || row.beneficiaryName}</div>
-                                  {row.institutionRepresentative && (
-                                    <div className="text-[10px] text-slate-400">Rep: {row.institutionRepresentative}</div>
-                                  )}
                                 </div>
                               )}
                             </td>

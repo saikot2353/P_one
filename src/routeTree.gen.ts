@@ -74,6 +74,7 @@ import { Route as FinalSettlementConfigurationRouteImport } from './routes/final
 import { Route as FinalSettlementReportRouteImport } from './routes/final-settlement-report'
 import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/financial-aid-budget-configuration'
 import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
+import { Route as FinancialAidReportRouteImport } from './routes/financial-aid-report'
 import { Route as HolidaySummarySheetRouteImport } from './routes/holiday-summary-sheet'
 import { Route as HrPolicyRouteImport } from './routes/hr-policy'
 import { Route as HrReportAbsentCounselingRouteImport } from './routes/hr-report-absent-counseling'
@@ -731,6 +732,11 @@ const FinancialAidBudgetConfigurationRoute =
 const FinancialAidListRoute = FinancialAidListRouteImport.update({
   id: '/financial-aid-list',
   path: '/financial-aid-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinancialAidReportRoute = FinancialAidReportRouteImport.update({
+  id: '/financial-aid-report',
+  path: '/financial-aid-report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HolidaySummarySheetRoute = HolidaySummarySheetRouteImport.update({
@@ -2534,6 +2540,7 @@ export interface FileRoutesByFullPath {
   '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/financial-aid-report': typeof FinancialAidReportRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-report-absent-counseling': typeof HrReportAbsentCounselingRoute
@@ -2926,6 +2933,7 @@ export interface FileRoutesByTo {
   '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/financial-aid-report': typeof FinancialAidReportRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-report-absent-counseling': typeof HrReportAbsentCounselingRoute
@@ -3319,6 +3327,7 @@ export interface FileRoutesById {
   '/final-settlement-report': typeof FinalSettlementReportRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
+  '/financial-aid-report': typeof FinancialAidReportRoute
   '/holiday-summary-sheet': typeof HolidaySummarySheetRoute
   '/hr-policy': typeof HrPolicyRoute
   '/hr-report-absent-counseling': typeof HrReportAbsentCounselingRoute
@@ -3713,6 +3722,7 @@ export interface FileRouteTypes {
     | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/financial-aid-report'
     | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-report-absent-counseling'
@@ -4105,6 +4115,7 @@ export interface FileRouteTypes {
     | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/financial-aid-report'
     | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-report-absent-counseling'
@@ -4497,6 +4508,7 @@ export interface FileRouteTypes {
     | '/final-settlement-report'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
+    | '/financial-aid-report'
     | '/holiday-summary-sheet'
     | '/hr-policy'
     | '/hr-report-absent-counseling'
@@ -4890,6 +4902,7 @@ export interface RootRouteChildren {
   FinalSettlementReportRoute: typeof FinalSettlementReportRoute
   FinancialAidBudgetConfigurationRoute: typeof FinancialAidBudgetConfigurationRoute
   FinancialAidListRoute: typeof FinancialAidListRoute
+  FinancialAidReportRoute: typeof FinancialAidReportRoute
   HolidaySummarySheetRoute: typeof HolidaySummarySheetRoute
   HrPolicyRoute: typeof HrPolicyRoute
   HrReportAbsentCounselingRoute: typeof HrReportAbsentCounselingRoute
@@ -5672,6 +5685,13 @@ declare module '@tanstack/react-router' {
       path: '/financial-aid-list'
       fullPath: '/financial-aid-list'
       preLoaderRoute: typeof FinancialAidListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/financial-aid-report': {
+      id: '/financial-aid-report'
+      path: '/financial-aid-report'
+      fullPath: '/financial-aid-report'
+      preLoaderRoute: typeof FinancialAidReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/holiday-summary-sheet': {
@@ -8018,6 +8038,7 @@ const rootRouteChildren: RootRouteChildren = {
   FinalSettlementReportRoute: FinalSettlementReportRoute,
   FinancialAidBudgetConfigurationRoute: FinancialAidBudgetConfigurationRoute,
   FinancialAidListRoute: FinancialAidListRoute,
+  FinancialAidReportRoute: FinancialAidReportRoute,
   HolidaySummarySheetRoute: HolidaySummarySheetRoute,
   HrPolicyRoute: HrPolicyRoute,
   HrReportAbsentCounselingRoute: HrReportAbsentCounselingRoute,

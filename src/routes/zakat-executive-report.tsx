@@ -138,7 +138,6 @@ function ZakatExecutiveReportPage() {
     const channelMatrix = {
       "Direct Employee": { cash: 0, asset: 0, total: 0, count: 0 },
       "Via Employee Agent": { cash: 0, asset: 0, total: 0, count: 0 },
-      "Direct External": { cash: 0, asset: 0, total: 0, count: 0 },
     };
 
     const purposeBreakdown: Record<
@@ -159,18 +158,8 @@ function ZakatExecutiveReportPage() {
         totalDistributed += r.amount;
       }
 
-      // Channel Segregation
-      if (r.disbursementChannel === "Direct Employee") {
-        totalDirectEmployee += r.amount;
-        countDirectEmployee++;
-        channelMatrix["Direct Employee"].total += r.amount;
-        channelMatrix["Direct Employee"].count++;
-        if (r.disbursementMode === "Asset Purchased") {
-          channelMatrix["Direct Employee"].asset += r.amount;
-        } else {
-          channelMatrix["Direct Employee"].cash += r.amount;
-        }
-      } else if (r.disbursementChannel === "Via Employee Agent") {
+      // Channel Segregation (Direct Staff vs. Via Staff Agent)
+      if (r.disbursementChannel === "Via Employee Agent" || (r as any).disbursementChannel === "Direct External") {
         totalViaAgent += r.amount;
         countViaAgent++;
         channelMatrix["Via Employee Agent"].total += r.amount;
@@ -181,14 +170,14 @@ function ZakatExecutiveReportPage() {
           channelMatrix["Via Employee Agent"].cash += r.amount;
         }
       } else {
-        totalDirectExternal += r.amount;
-        countDirectExternal++;
-        channelMatrix["Direct External"].total += r.amount;
-        channelMatrix["Direct External"].count++;
+        totalDirectEmployee += r.amount;
+        countDirectEmployee++;
+        channelMatrix["Direct Employee"].total += r.amount;
+        channelMatrix["Direct Employee"].count++;
         if (r.disbursementMode === "Asset Purchased") {
-          channelMatrix["Direct External"].asset += r.amount;
+          channelMatrix["Direct Employee"].asset += r.amount;
         } else {
-          channelMatrix["Direct External"].cash += r.amount;
+          channelMatrix["Direct Employee"].cash += r.amount;
         }
       }
 
@@ -464,7 +453,6 @@ function ZakatExecutiveReportPage() {
                   <option value="ALL">All Channels</option>
                   <option value="Direct Employee">Direct Employee</option>
                   <option value="Via Employee Agent">Via Staff Agent</option>
-                  <option value="Direct External">Direct External</option>
                 </select>
               </div>
 
@@ -526,14 +514,14 @@ function ZakatExecutiveReportPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h3 className="text-sm font-bold text-foreground">
-                  Report 1: Beneficiary Channel Segregation (Staff vs. Agent vs. Outside)
+                  Report 1: Beneficiary Channel Segregation (Direct Staff vs. Staff Agent)
                 </h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Segregates funds distributed directly to staff, channeled through staff proxies for village handovers, or paid to external parties.
+                  Segregates funds distributed directly to staff or channeled through staff proxies for village handovers.
                 </p>
               </div>
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider self-start sm:self-auto">
-                Staff vs. Staff Agent vs. Outside
+                Direct Staff vs. Staff Agent
               </span>
             </div>
 
@@ -561,11 +549,6 @@ function ZakatExecutiveReportPage() {
                       channel: "Via Employee Agent" as ZakatDisbursementChannel,
                       label: "Via Staff Agent (Village Handover)",
                       desc: "Handed to employee to distribute to verified village poor",
-                    },
-                    {
-                      channel: "Direct External" as ZakatDisbursementChannel,
-                      label: "Direct External (Outside Person / Madrasa)",
-                      desc: "Given directly to outside needy people, mosques, or madrasas",
                     },
                   ].map(({ channel, label, desc }) => {
                     const data = stats.channelMatrix[channel];
@@ -938,7 +921,6 @@ function ZakatExecutiveReportPage() {
                     <option value="ALL">All Channels</option>
                     <option value="Direct Employee">Direct Employee</option>
                     <option value="Via Employee Agent">Via Staff Agent</option>
-                    <option value="Direct External">Direct External</option>
                   </select>
                   <select
                     value={drillDownModeFilter}
