@@ -510,7 +510,13 @@ const searchableMenus: SearchMenuLink[] = [
     label: "Candidate Selection",
     parent: "e-Recruitment",
     to: "/recruitment-candidate-selection",
-    description: "Job-wise candidate review, selection & link generation",
+    description: "Job-wise candidate review, selection & salary entry",
+  },
+  {
+    label: "Candidate Selection Approval",
+    parent: "e-Recruitment",
+    to: "/recruitment-candidate-selection-approval",
+    description: "Multi-tier approval console, balance modification & history",
   },
   // {
   //   label: "Approved Candidates",

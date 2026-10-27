@@ -557,7 +557,6 @@ export const defaultZakatRecords: ZakatRecord[] = [
     justificationDetails:
       "Destitute shopkeeper who lost his livelihood in market fire; gifted physical business setup via staff agent instead of cash.",
     agencyStatus: "Verified",
-    agencyStatus: "Acknowledged",
     attachments: [
       {
         id: "att-zk-03-1",

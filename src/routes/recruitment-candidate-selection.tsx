@@ -45,6 +45,8 @@ import {
   Upload,
   Trash2,
   Paperclip,
+  Send,
+  Edit3,
 } from "lucide-react";
 import { toast } from "sonner";
 import { initializeRecruitmentMockData } from "@/lib/recruitment-mock-data";
@@ -52,77 +54,24 @@ import { initializeRecruitmentMockData } from "@/lib/recruitment-mock-data";
 export const Route = createFileRoute("/recruitment-candidate-selection")({
   head: () => ({
     meta: [
-      { title: "Candidate Selection & Link Generator — CRIPTON HRIS" },
+      { title: "Candidate Selection (Data Entry) — CRIPTON HRIS" },
       {
         name: "description",
         content:
-          "Job-wise candidate evaluation, salary agreement, PDF CV review, selection, and automated e-recruitment link dispatching.",
+          "Job-wise candidate evaluation, salary agreement entry, PDF CV review, and candidate nomination submission.",
       },
     ],
   }),
   component: CandidateSelectionPage,
 });
 
-export interface JobCandidate {
-  id: string; // e.g. "PAL000021"
-  name: string;
-  nameBng?: string;
-  photo?: string;
-  email: string;
-  phone: string;
-  department: string;
-  designation: string;
-  previousSalary: number;
-  agreedSalary: number;
-  experience: string;
-  noticePeriod: string;
-  selected: boolean;
-  selectedAt?: string;
-  generatedLink?: string;
-  linkGeneratedAt?: string;
-  pdfUrl?: string;
-  pdfFileName?: string;
-  status: "Shortlisted" | "Selected" | "Rejected" | "Pending";
-  cv: {
-    summary: string;
-    highlights: string[];
-    academics: { degree: string; institute: string; year: string; grade: string }[];
-    experiences: {
-      role: string;
-      company: string;
-      duration: string;
-      responsibilities: string[];
-    }[];
-    personalDetails: {
-      dob: string;
-      bloodGroup: string;
-      nid: string;
-      address: string;
-      maritalStatus: string;
-    };
-    skills: string[];
-    references: { name: string; designation: string; company: string; phone: string }[];
-  };
-}
+import {
+  JobCandidate,
+  JobPost,
+  createDefaultApprovalFlow,
+} from "@/lib/recruitment-candidate-selection-data";
 
-export interface JobPost {
-  id: string; // e.g. "JOB-2026-001"
-  title: string;
-  department: string;
-  designation: string;
-  vacancies: number;
-  assignedPerson: string;
-  assignedRole: string;
-  targetDate: string;
-  salaryBudgetMin: number;
-  salaryBudgetMax: number;
-  status: "Open" | "Closed";
-  closedAt?: string;
-  closedBy?: string;
-  closeReason?: string;
-  createdAt: string;
-  candidates: JobCandidate[];
-}
+export type { JobCandidate, JobPost };
 
 const STORAGE_KEY = "recruitment_job_selections";
 
@@ -1191,7 +1140,7 @@ const INITIAL_JOBS: JobPost[] = [
 function CandidateSelectionPage() {
   const [jobs, setJobs] = useState<JobPost[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"All" | "Open" | "Closed">("All");
+  const [statusFilter, setStatusFilter] = useState<"Pending" | "Submitted" | "Approved">("Pending");
   const [deptFilter, setDeptFilter] = useState<string>("All");
   const [expandedJobIds, setExpandedJobIds] = useState<Record<string, boolean>>({});
 
@@ -1370,7 +1319,84 @@ function CandidateSelectionPage() {
   } | null>(null);
   const [tempAgreedSalary, setTempAgreedSalary] = useState(0);
 
+  // Edit Candidate Modal State (Direct Candidate Particulars & Proposed Salary Editing)
+  const [editingCandidate, setEditingCandidate] = useState<{
+    job: JobPost;
+    candidate: JobCandidate;
+    name: string;
+    phone: string;
+    email: string;
+    experience: string;
+    noticePeriod: string;
+    previousSalary: number | string;
+    agreedSalary: number | string;
+    pdfUrl: string;
+    pdfFileName: string;
+  } | null>(null);
 
+  const handleOpenEditCandidate = (job: JobPost, candidate: JobCandidate) => {
+    if (candidate.status === "Approved" || job.status === "Approved") {
+      toast.error("This candidate has already been approved and cannot be edited.");
+      return;
+    }
+    setEditingCandidate({
+      job,
+      candidate,
+      name: candidate.name,
+      phone: candidate.phone,
+      email: candidate.email,
+      experience: candidate.experience,
+      noticePeriod: candidate.noticePeriod,
+      previousSalary: candidate.previousSalary,
+      agreedSalary: candidate.agreedSalary,
+      pdfUrl: candidate.pdfUrl || "/Tahmid%20Afsar%20Shapno-details_.pdf",
+      pdfFileName: candidate.pdfFileName || "Curriculum_Vitae.pdf",
+    });
+  };
+
+  const handleSaveEditedCandidate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCandidate) return;
+    const { job, candidate, name, phone, email, experience, noticePeriod, previousSalary, agreedSalary, pdfUrl, pdfFileName } = editingCandidate;
+
+    if (!name.trim()) {
+      toast.error("Candidate full name is required.");
+      return;
+    }
+
+    const prevSal = Number(previousSalary) || 0;
+    const agrSal = Number(agreedSalary) || prevSal;
+
+    const updatedJobs = jobs.map((j) => {
+      if (j.id === job.id) {
+        return {
+          ...j,
+          candidates: j.candidates.map((c) => {
+            if (c.id === candidate.id) {
+              return {
+                ...c,
+                name: name.trim(),
+                phone: phone.trim(),
+                email: email.trim(),
+                experience: experience.trim() || c.experience,
+                noticePeriod: noticePeriod.trim() || c.noticePeriod,
+                previousSalary: prevSal,
+                agreedSalary: agrSal,
+                pdfUrl,
+                pdfFileName,
+              };
+            }
+            return c;
+          }),
+        };
+      }
+      return j;
+    });
+
+    persistJobs(updatedJobs);
+    setEditingCandidate(null);
+    toast.success(`Candidate ${name} updated successfully!`);
+  };
 
   // Job Submission & Final Approval Modal (with batch salary review)
   const [approvingJob, setApprovingJob] = useState<{
@@ -1386,22 +1412,60 @@ function CandidateSelectionPage() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setJobs(parsed);
+        const normalized = parsed.map((j: JobPost) => ({
+          ...j,
+          candidates: j.candidates.map((c: JobCandidate) => ({
+            ...c,
+            selected: true,
+            status: (c.status === "Approved" ? "Approved" : "Selected") as JobCandidate["status"],
+          })),
+        }));
+        setJobs(normalized);
+        // Smart default status filter selection
+        const hasPending = normalized.some((j: JobPost) => {
+          const tot = j.candidates.length;
+          const app = j.candidates.filter((c: JobCandidate) => c.status === "Approved").length;
+          const isApp = j.status === "Approved" || (tot > 0 && app === tot);
+          return !isApp && j.status !== "Submitted";
+        });
+        const hasSubmitted = normalized.some((j: JobPost) => j.status === "Submitted");
+        if (!hasPending && hasSubmitted) {
+          setStatusFilter("Submitted");
+        } else if (!hasPending && !hasSubmitted && normalized.length > 0) {
+          setStatusFilter("Approved");
+        }
+
         // Default expand first two open jobs
         const initialExpand: Record<string, boolean> = {};
-        parsed.slice(0, 2).forEach((j: JobPost) => {
+        normalized.slice(0, 2).forEach((j: JobPost) => {
           initialExpand[j.id] = true;
         });
         setExpandedJobIds(initialExpand);
       } catch (e) {
-        setJobs(INITIAL_JOBS);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_JOBS));
+        const normalizedInit: JobPost[] = INITIAL_JOBS.map((j) => ({
+          ...j,
+          candidates: j.candidates.map((c) => ({
+            ...c,
+            selected: true,
+            status: (c.status === "Approved" ? "Approved" : "Selected") as JobCandidate["status"],
+          })),
+        }));
+        setJobs(normalizedInit);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedInit));
       }
     } else {
-      setJobs(INITIAL_JOBS);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_JOBS));
+      const normalizedInit: JobPost[] = INITIAL_JOBS.map((j) => ({
+        ...j,
+        candidates: j.candidates.map((c) => ({
+          ...c,
+          selected: true,
+          status: (c.status === "Approved" ? "Approved" : "Selected") as JobCandidate["status"],
+        })),
+      }));
+      setJobs(normalizedInit);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedInit));
       const initialExpand: Record<string, boolean> = {};
-      INITIAL_JOBS.slice(0, 2).forEach((j) => {
+      normalizedInit.slice(0, 2).forEach((j) => {
         initialExpand[j.id] = true;
       });
       setExpandedJobIds(initialExpand);
@@ -1469,41 +1533,18 @@ function CandidateSelectionPage() {
     openReviewModal(candidate, job.title, jobId);
   };
 
-  // Confirm candidate approval with the inputted salary from review modal
+  // Confirm candidate selection & proposed salary from review modal (Entry Mode)
   const handleApproveFromReview = () => {
     if (!activeCvCandidate) return;
     const salary = Number(reviewSalaryInput);
     if (!salary || salary <= 0 || isNaN(salary)) {
-      toast.error("Please enter a valid final salary.");
+      toast.error("Please enter a valid agreed/proposed salary.");
       return;
     }
 
     const { jobCode, candidate } = activeCvCandidate;
     const job = jobs.find((j) => j.id === jobCode);
     if (!job) return;
-
-    const baseUrl = window.location.origin;
-    const generatedLink =
-      candidate.generatedLink ||
-      `${baseUrl}/e-recruitment-form?tempId=${candidate.id}&candidateName=${encodeURIComponent(
-        candidate.name
-      )}&department=${encodeURIComponent(candidate.department)}&designation=${encodeURIComponent(
-        candidate.designation
-      )}&jobPost=${encodeURIComponent(job.title)}`;
-    const linkTime = candidate.linkGeneratedAt || new Date().toLocaleString();
-
-    // Sync to Application Queue (recruitment_candidates) with the approved salary
-    syncCandidateToQueue(
-      {
-        ...candidate,
-        selected: true,
-        agreedSalary: salary,
-        generatedLink,
-        linkGeneratedAt: linkTime,
-      },
-      job,
-      generatedLink
-    );
 
     const updatedJobs = jobs.map((j) => {
       if (j.id === jobCode) {
@@ -1515,8 +1556,7 @@ function CandidateSelectionPage() {
               selectedAt: c.selectedAt || new Date().toISOString(),
               status: "Selected" as const,
               agreedSalary: salary,
-              generatedLink,
-              linkGeneratedAt: linkTime,
+              initialAgreedSalary: c.initialAgreedSalary || salary,
             };
           }
           return c;
@@ -1527,7 +1567,7 @@ function CandidateSelectionPage() {
     });
 
     persistJobs(updatedJobs);
-    toast.success(`Approved ${candidate.name} (৳${salary.toLocaleString()})! Link generated.`);
+    toast.success(`Candidate ${candidate.name} selected (৳${salary.toLocaleString()})! Ready for approval.`);
   };
 
   // Confirm candidate approval with the inputted salary (legacy support)
@@ -1628,39 +1668,37 @@ function CandidateSelectionPage() {
     toast.success(`Job ${closingJob.title} has been officially Closed!`);
   };
 
-  // Open Job Approval & Submission Modal (reviews and mandates salary verification for all selected candidates)
+  // Open Job Proposal & Submission Modal (reviews and mandates salary verification before forwarding to approval console)
   const handleOpenApproveJobModal = (jobId: string) => {
     const targetJob = jobs.find((j) => j.id === jobId);
     if (!targetJob) return;
 
-    const selectedCandidates = targetJob.candidates.filter((c) => c.selected);
-    if (selectedCandidates.length === 0) {
-      toast.error("Please approve at least one candidate before submitting this job.");
+    if (targetJob.candidates.length === 0) {
+      toast.error("Please add at least one candidate before submitting this position for approval.");
       return;
     }
 
     const initialSalaries: Record<string, number> = {};
-    selectedCandidates.forEach((c) => {
+    targetJob.candidates.forEach((c) => {
       initialSalaries[c.id] = c.agreedSalary || c.previousSalary || targetJob.salaryBudgetMin || 0;
     });
 
     setApprovingJob({
       job: targetJob,
       candidateSalaries: initialSalaries,
-      closeReason: `Selection approved and submitted: ${selectedCandidates.length} of ${targetJob.vacancies} vacancies finalized.`,
+      closeReason: `Candidate selection submitted: ${targetJob.candidates.length} of ${targetJob.vacancies} vacancies proposed for management approval.`,
     });
   };
 
-  // Confirm Job Approval & Submission with validated salaries
+  // Confirm Job Submission for Approval
   const handleConfirmApproveJob = () => {
     if (!approvingJob) return;
     const { job, candidateSalaries, closeReason } = approvingJob;
 
-    const selectedCandidates = job.candidates.filter((c) => c.selected);
-    for (const cand of selectedCandidates) {
-      const sal = candidateSalaries[cand.id];
+    for (const cand of job.candidates) {
+      const sal = candidateSalaries[cand.id] || cand.agreedSalary;
       if (!sal || sal <= 0 || isNaN(sal)) {
-        toast.error(`Please input a valid approved salary (> 0) for candidate ${cand.name}.`);
+        toast.error(`Please input a valid proposed salary (> 0) for candidate ${cand.name}.`);
         return;
       }
     }
@@ -1668,30 +1706,43 @@ function CandidateSelectionPage() {
     const updatedJobs = jobs.map((j) => {
       if (j.id === job.id) {
         const updatedCandidates = j.candidates.map((c) => {
-          if (c.selected) {
-            const finalSal = candidateSalaries[c.id] || c.agreedSalary;
-            syncCandidateToQueue(
-              { ...c, agreedSalary: finalSal },
-              j,
-              c.generatedLink || ""
-            );
-            return {
-              ...c,
-              agreedSalary: finalSal,
-            };
-          }
-          return c;
+          const finalSal = candidateSalaries[c.id] || c.agreedSalary;
+          return {
+            ...c,
+            selected: true,
+            agreedSalary: finalSal,
+            initialAgreedSalary: c.initialAgreedSalary || finalSal,
+            status: c.status === "Approved" ? ("Approved" as const) : ("Selected" as const),
+          };
         });
+
+        const newFlow =
+          j.approvalFlow && j.approvalFlow.length > 0
+            ? j.approvalFlow
+            : createDefaultApprovalFlow(j.assignedPerson, j.assignedRole);
+
+        const newHistoryLog = {
+          id: "act-" + Date.now(),
+          level: 1,
+          approverName: j.assignedPerson || "Requisition Lead",
+          approverRole: "Department Head",
+          approverDesignation: j.assignedRole || "Lead Evaluator",
+          action: "Submitted" as const,
+          timestamp: new Date().toLocaleString(),
+          remarks:
+            closeReason.trim() ||
+            `Candidate selection submitted: ${updatedCandidates.length} of ${j.vacancies} vacancies proposed for management approval.`,
+        };
 
         return {
           ...j,
           candidates: updatedCandidates,
-          status: "Closed" as const,
-          closedAt: new Date().toLocaleDateString("en-GB"),
-          closedBy: `${job.assignedPerson || "Evaluator"} (${job.assignedRole || "Lead"})`,
-          closeReason:
-            closeReason.trim() ||
-            `Selection approved and submitted: ${selectedCandidates.length} of ${job.vacancies} vacancies finalized.`,
+          status: "Submitted" as const,
+          submittedAt: new Date().toLocaleString(),
+          submittedBy: `${job.assignedPerson || "Evaluator"} (${job.assignedRole || "Lead"})`,
+          currentApprovalLevel: 1,
+          approvalFlow: newFlow,
+          approvalHistory: [...(j.approvalHistory || []), newHistoryLog],
         };
       }
       return j;
@@ -1700,8 +1751,25 @@ function CandidateSelectionPage() {
     persistJobs(updatedJobs);
     setApprovingJob(null);
     toast.success(
-      `Job ${job.id} approved and submitted with ${selectedCandidates.length} finalized candidate salaries!`
+      `Requisition ${job.title} successfully submitted! Awaiting approval in Candidate Selection Approval console.`
     );
+  };
+
+  // Withdraw / Recall to draft
+  const handleWithdrawSubmission = (jobId: string) => {
+    const updatedJobs = jobs.map((j) => {
+      if (j.id === jobId) {
+        return {
+          ...j,
+          status: "Open" as const,
+          submittedAt: undefined,
+          submittedBy: undefined,
+        };
+      }
+      return j;
+    });
+    persistJobs(updatedJobs);
+    toast.info("Requisition withdrawn to editable draft.");
   };
 
   // Legacy wrapper for direct submit
@@ -1797,8 +1865,8 @@ function CandidateSelectionPage() {
         `${singleCandidateDraft.name.toLowerCase().replace(/\s+/g, ".")}@example.com`,
       pdfUrl: singleCandidateDraft.pdfUrl || "/Tahmid%20Afsar%20Shapno-details_.pdf",
       pdfFileName: singleCandidateDraft.pdfFileName || "Tahmid Afsar Shapno-details_.pdf",
-      selected: false,
-      status: "Shortlisted",
+      selected: true,
+      status: "Selected",
       cv: {
         summary: `Applicant for ${addingCandidateToJob.title} with background in ${addingCandidateToJob.department}.`,
         highlights: [
@@ -1890,8 +1958,8 @@ function CandidateSelectionPage() {
           `${draft.name.toLowerCase().replace(/\s+/g, ".")}@example.com`,
         pdfUrl: draft.pdfUrl || "/Tahmid%20Afsar%20Shapno-details_.pdf",
         pdfFileName: draft.pdfFileName || "Tahmid Afsar Shapno-details_.pdf",
-        selected: false,
-        status: "Shortlisted",
+        selected: true,
+        status: "Selected",
         cv: {
           summary: `Applicant for ${newJobTitle} with background in ${newJobDept}.`,
           highlights: [
@@ -1964,7 +2032,18 @@ function CandidateSelectionPage() {
     );
   };
 
-  // Filtered Jobs
+  // Canonical job status category: Pending | Submitted | Approved
+  const getJobStatusCategory = (j: JobPost): "Pending" | "Submitted" | "Approved" => {
+    const totalCand = j.candidates.length;
+    const approvedCount = j.candidates.filter((c) => c.status === "Approved").length;
+    const isApproved =
+      j.status === "Approved" || (totalCand > 0 && approvedCount === totalCand);
+    if (isApproved) return "Approved";
+    if (j.status === "Submitted") return "Submitted";
+    return "Pending";
+  };
+
+  // Filtered Jobs by canonical status: Pending | Submitted | Approved
   const filteredJobs = useMemo(() => {
     return jobs.filter((j) => {
       const q = searchQuery.toLowerCase();
@@ -1975,7 +2054,7 @@ function CandidateSelectionPage() {
         j.designation.toLowerCase().includes(q) ||
         j.candidates.some((c) => c.name.toLowerCase().includes(q) || c.id.toLowerCase().includes(q));
 
-      const matchesStatus = statusFilter === "All" || j.status === statusFilter;
+      const matchesStatus = getJobStatusCategory(j) === statusFilter;
       const matchesDept = deptFilter === "All" || j.department === deptFilter;
 
       return matchesSearch && matchesStatus && matchesDept;
@@ -1985,8 +2064,9 @@ function CandidateSelectionPage() {
   // Global aggregate stats
   const stats = useMemo(() => {
     const totalJobs = jobs.length;
-    const openJobs = jobs.filter((j) => j.status === "Open").length;
-    const closedJobs = jobs.filter((j) => j.status === "Closed").length;
+    const pendingJobs = jobs.filter((j) => getJobStatusCategory(j) === "Pending").length;
+    const submittedJobs = jobs.filter((j) => getJobStatusCategory(j) === "Submitted").length;
+    const approvedJobs = jobs.filter((j) => getJobStatusCategory(j) === "Approved").length;
     const allCandidates = jobs.flatMap((j) => j.candidates);
     const totalCandidates = allCandidates.length;
     const selectedCandidates = allCandidates.filter((c) => c.selected).length;
@@ -1994,8 +2074,9 @@ function CandidateSelectionPage() {
 
     return {
       totalJobs,
-      openJobs,
-      closedJobs,
+      pendingJobs,
+      submittedJobs,
+      approvedJobs,
       totalCandidates,
       selectedCandidates,
       linksGenerated,
@@ -2072,25 +2153,25 @@ function CandidateSelectionPage() {
             {/* Metric 1 */}
             <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-3 first:pt-0 first:px-0">
               <div className="size-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <Briefcase className="size-4.5" />
+                <Clock className="size-4.5" />
               </div>
               <div>
-                <div className="text-[11px] font-normal text-muted-foreground">Open Positions</div>
+                <div className="text-[11px] font-normal text-muted-foreground">Pending Selection</div>
                 <div className="text-lg font-medium text-foreground">
-                  {stats.openJobs} <span className="text-xs font-normal text-muted-foreground">/ {stats.totalJobs} total</span>
+                  {stats.pendingJobs} <span className="text-xs font-normal text-muted-foreground">/ {stats.totalJobs} total</span>
                 </div>
               </div>
             </div>
 
             {/* Metric 2 */}
             <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
-              <div className="size-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <Users className="size-4.5" />
+              <div className="size-9 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                <Send className="size-4.5" />
               </div>
               <div>
-                <div className="text-[11px] font-normal text-muted-foreground">Total Candidates</div>
-                <div className="text-lg font-medium text-foreground">
-                  {stats.totalCandidates} <span className="text-xs font-normal text-muted-foreground">in pipeline</span>
+                <div className="text-[11px] font-normal text-muted-foreground">Submitted for Approval</div>
+                <div className="text-lg font-medium text-amber-600 dark:text-amber-400">
+                  {stats.submittedJobs} <span className="text-xs font-normal text-muted-foreground">in review</span>
                 </div>
               </div>
             </div>
@@ -2101,9 +2182,9 @@ function CandidateSelectionPage() {
                 <UserCheck className="size-4.5" />
               </div>
               <div>
-                <div className="text-[11px] font-normal text-muted-foreground">Selected Candidates</div>
+                <div className="text-[11px] font-normal text-muted-foreground">Approved Finalized</div>
                 <div className="text-lg font-medium text-emerald-600 dark:text-emerald-400">
-                  {stats.selectedCandidates} <span className="text-xs font-normal text-muted-foreground">confirmed</span>
+                  {stats.approvedJobs} <span className="text-xs font-normal text-muted-foreground">finalized</span>
                 </div>
               </div>
             </div>
@@ -2125,37 +2206,43 @@ function CandidateSelectionPage() {
           {/* Filters & Search Control Bar */}
           <div className="bg-card rounded-xl border border-border/70 p-3 sm:p-3.5 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
-              {/* Status Segmented Tabs */}
+              {/* Status Segmented Tabs: Pending, Submitted, Approved */}
               <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/40 text-xs font-normal">
                 <button
-                  onClick={() => setStatusFilter("All")}
-                  className={`px-3 py-1 rounded-md transition ${
-                    statusFilter === "All"
-                      ? "bg-card text-foreground shadow-2xs border border-border/60 font-medium"
+                  type="button"
+                  onClick={() => setStatusFilter("Pending")}
+                  className={`px-3 py-1 rounded-md transition cursor-pointer flex items-center gap-1.5 ${
+                    statusFilter === "Pending"
+                      ? "bg-card text-primary shadow-2xs border border-border/60 font-medium"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  All ({jobs.length})
+                  <Clock className="size-3" />
+                  <span>Pending ({stats.pendingJobs})</span>
                 </button>
                 <button
-                  onClick={() => setStatusFilter("Open")}
-                  className={`px-3 py-1 rounded-md transition ${
-                    statusFilter === "Open"
+                  type="button"
+                  onClick={() => setStatusFilter("Submitted")}
+                  className={`px-3 py-1 rounded-md transition cursor-pointer flex items-center gap-1.5 ${
+                    statusFilter === "Submitted"
+                      ? "bg-card text-amber-600 dark:text-amber-400 shadow-2xs border border-border/60 font-medium"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Send className="size-3" />
+                  <span>Submitted ({stats.submittedJobs})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter("Approved")}
+                  className={`px-3 py-1 rounded-md transition cursor-pointer flex items-center gap-1.5 ${
+                    statusFilter === "Approved"
                       ? "bg-card text-emerald-600 dark:text-emerald-400 shadow-2xs border border-border/60 font-medium"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  Open ({stats.openJobs})
-                </button>
-                <button
-                  onClick={() => setStatusFilter("Closed")}
-                  className={`px-3 py-1 rounded-md transition ${
-                    statusFilter === "Closed"
-                      ? "bg-card text-slate-700 dark:text-slate-300 shadow-2xs border border-border/60 font-medium"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Closed ({stats.closedJobs})
+                  <CheckCircle2 className="size-3" />
+                  <span>Approved ({stats.approvedJobs})</span>
                 </button>
               </div>
 
@@ -2212,18 +2299,24 @@ function CandidateSelectionPage() {
                 <button
                   onClick={() => {
                     setSearchQuery("");
-                    setStatusFilter("All");
+                    setStatusFilter("Pending");
                     setDeptFilter("All");
                   }}
                   className="px-3.5 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg text-xs font-medium transition cursor-pointer"
                 >
-                  Reset All Filters
+                  Reset Filter
                 </button>
               </div>
             ) : (
               filteredJobs.map((job) => {
                 const isExpanded = !!expandedJobIds[job.id];
                 const selectedCount = job.candidates.filter((c) => c.selected).length;
+                const totalCandCount = job.candidates.length;
+                const approvedCandCount = job.candidates.filter((c) => c.status === "Approved").length;
+                const isJobApproved =
+                  job.status === "Approved" ||
+                  (totalCandCount > 0 && approvedCandCount === totalCandCount);
+                const isJobSubmitted = job.status === "Submitted";
                 const isFulfilled = selectedCount >= job.vacancies;
                 const isClosed = job.status === "Closed";
 
@@ -2233,70 +2326,82 @@ function CandidateSelectionPage() {
                     className={`bg-card rounded-xl border transition-all duration-200 shadow-2xs overflow-hidden ${
                       isClosed
                         ? "border-slate-300/70 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-900/10"
+                        : isJobApproved
+                        ? "border-emerald-500/40 hover:border-emerald-500/60"
+                        : isJobSubmitted
+                        ? "border-amber-500/40 hover:border-amber-500/60"
                         : isFulfilled
-                        ? "border-emerald-500/30 hover:border-emerald-500/50"
+                        ? "border-primary/40 hover:border-primary/60"
                         : "border-border/70 hover:border-border"
                     }`}
                   >
                     {/* Job Card Header */}
-                    <div className="p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 border-b border-border/40 bg-muted/15">
-                      <div className="space-y-1 min-w-0">
-                        {/* Row 1: Badges & Department */}
+                    <div className="p-4 sm:px-5 sm:py-3.5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5 border-b border-border/40 bg-card">
+                      <div className="space-y-1.5 min-w-0">
+                        {/* Row 1: Title + Job ID + Status */}
                         <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="text-sm sm:text-base font-semibold text-foreground tracking-tight">
+                            {job.title}
+                          </h2>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/70 text-muted-foreground border border-border/50">
+                            {job.id}
+                          </span>
+
                           {/* Status Badge */}
-                          {isClosed ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-normal uppercase bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
+                          {isJobApproved ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              <span className="size-1.5 rounded-full bg-emerald-500" />
+                              Approved ({approvedCandCount}/{totalCandCount})
+                            </span>
+                          ) : isJobSubmitted ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                              <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+                              Submitted ({approvedCandCount}/{totalCandCount})
+                            </span>
+                          ) : isClosed ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
                               <Lock className="size-2.5 text-slate-500" />
                               Closed
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-normal uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                              Open Position
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                              <span className="size-1.5 rounded-full bg-blue-500" />
+                              Pending Selection
                             </span>
                           )}
-
-                          <span className="text-[10px] font-normal text-muted-foreground px-1.5 py-0.5 rounded bg-muted/60 border border-border/50">
-                            {job.id}
-                          </span>
-
-                          <span className="text-[11px] font-normal text-muted-foreground flex items-center gap-1">
-                            <Building2 className="size-3 text-muted-foreground/70" />
-                            {job.department} · {job.designation}
-                          </span>
                         </div>
 
-                        {/* Row 2: Title and Vacancy Count */}
-                        <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                          <h2 className="text-sm sm:text-base font-medium text-foreground tracking-tight">
-                            {job.title}
-                          </h2>
-                          <span className="text-[11px] font-normal text-muted-foreground bg-muted/40 px-2 py-0.5 rounded border border-border/40">
-                            Vacancies: <span className="text-foreground font-medium">{job.vacancies}</span>
+                        {/* Row 2: Clean Metadata Line */}
+                        <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-xs text-muted-foreground font-normal">
+                          <span className="flex items-center gap-1 text-foreground/85 font-medium">
+                            <Building2 className="size-3.5 text-muted-foreground/70" />
+                            {job.department}
                           </span>
-                        </div>
-
-                        {/* Row 3: Meta details */}
-                        <div className="flex flex-wrap items-center gap-y-1 gap-x-3 text-xs text-muted-foreground font-normal pt-0.5">
+                          <span className="text-border/80">•</span>
                           <span className="flex items-center gap-1">
-                            <User className="size-3 text-primary/80" />
-                            Evaluator: <span className="text-foreground font-normal">{job.assignedPerson}</span>
+                            <Users className="size-3.5 text-muted-foreground/70" />
+                            {job.vacancies} {job.vacancies === 1 ? "Vacancy" : "Vacancies"}
                           </span>
-                          <span className="text-muted-foreground/40">·</span>
+                          <span className="text-border/80">•</span>
                           <span className="flex items-center gap-1">
-                            <Calendar className="size-3 text-muted-foreground/70" />
+                            <User className="size-3.5 text-muted-foreground/70" />
+                            Evaluator: <span className="text-foreground">{job.assignedPerson}</span>
+                          </span>
+                          <span className="text-border/80">•</span>
+                          <span className="flex items-center gap-1">
+                            <Calendar className="size-3.5 text-muted-foreground/70" />
                             Target: {job.targetDate}
                           </span>
-                          <span className="text-muted-foreground/40">·</span>
-                          <span className="flex items-center gap-1">
-                            <DollarSign className="size-3 text-emerald-600" />
-                            Budget: ৳{job.salaryBudgetMin.toLocaleString()} – ৳{job.salaryBudgetMax.toLocaleString()}
+                          <span className="text-border/80">•</span>
+                          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                            <DollarSign className="size-3.5" />
+                            ৳{job.salaryBudgetMin.toLocaleString()} – ৳{job.salaryBudgetMax.toLocaleString()}
                           </span>
                           {isClosed && job.closedAt && (
                             <>
-                              <span className="text-muted-foreground/40">·</span>
-                              <span className="text-slate-500 dark:text-slate-400 text-[11px]">
-                                Closed on {job.closedAt}
+                              <span className="text-border/80">•</span>
+                              <span className="text-slate-500 text-[11px]">
+                                Closed: {job.closedAt}
                               </span>
                             </>
                           )}
@@ -2304,27 +2409,44 @@ function CandidateSelectionPage() {
                       </div>
 
                       {/* Header Actions & Selection Counter */}
-                      <div className="flex flex-wrap items-center gap-2 pt-2 lg:pt-0 border-t lg:border-t-0 border-border/30 shrink-0">
-                        {/* Selection Progress Pill */}
-                        <div className="flex items-center gap-2 bg-card px-2.5 py-1.5 rounded-lg border border-border/60 shadow-2xs">
+                      <div className="flex flex-wrap items-center gap-2.5 pt-2 lg:pt-0 border-t lg:border-t-0 border-border/30 shrink-0">
+                        {/* Status / Selection Progress Pill */}
+                        <div className="flex items-center gap-2.5 bg-muted/40 px-3 py-1.5 rounded-lg border border-border/60">
                           <div className="text-right">
-                            <div className="text-[9px] uppercase font-normal text-muted-foreground tracking-normal">
-                              Selection
+                            <div className="text-[10px] text-muted-foreground">
+                              {isJobApproved || isJobSubmitted ? "Status" : "Selected"}
                             </div>
-                            <div className="text-xs font-normal text-foreground">
-                              <span className={selectedCount >= job.vacancies ? "text-emerald-600 font-medium" : "text-primary font-medium"}>
-                                {selectedCount}
-                              </span>{" "}
-                              / {job.vacancies} Selected
+                            <div className="text-xs font-semibold font-mono text-foreground">
+                              {isJobApproved || isJobSubmitted ? (
+                                <span className={isJobApproved ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}>
+                                  {approvedCandCount}/{totalCandCount} Approved
+                                </span>
+                              ) : (
+                                <span className={selectedCount >= job.vacancies ? "text-emerald-600" : "text-primary"}>
+                                  {selectedCount}/{job.vacancies} Selected
+                                </span>
+                              )}
                             </div>
                           </div>
-                          <div className="w-10 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div className="w-10 h-1.5 bg-muted-foreground/20 rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all duration-300 ${
-                                selectedCount >= job.vacancies ? "bg-emerald-500" : "bg-primary"
+                                isJobApproved
+                                  ? "bg-emerald-500"
+                                  : isJobSubmitted
+                                  ? "bg-amber-500"
+                                  : selectedCount >= job.vacancies
+                                  ? "bg-emerald-500"
+                                  : "bg-primary"
                               }`}
                               style={{
-                                width: `${Math.min(100, (selectedCount / (job.vacancies || 1)) * 100)}%`,
+                                width: `${
+                                  isJobApproved || isJobSubmitted
+                                    ? totalCandCount > 0
+                                      ? (approvedCandCount / totalCandCount) * 100
+                                      : 0
+                                    : Math.min(100, (selectedCount / (job.vacancies || 1)) * 100)
+                                }%`,
                               }}
                             />
                           </div>
@@ -2338,10 +2460,10 @@ function CandidateSelectionPage() {
                               setAddingCandidateToJob(job);
                               setSingleCandidateDraft(createDefaultCandidateDraft());
                             }}
-                            className="h-8 px-2.5 bg-card hover:bg-muted text-foreground border border-border/60 font-normal text-xs rounded-lg shadow-2xs transition flex items-center gap-1 cursor-pointer"
+                            className="h-8.5 px-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/25 font-medium text-xs rounded-lg shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
                             title="Add a candidate directly to this job"
                           >
-                            <Plus className="size-3 text-primary" />
+                            <Plus className="size-3.5" />
                             <span>Add Candidate</span>
                           </button>
                         )}
@@ -2349,9 +2471,9 @@ function CandidateSelectionPage() {
                         {/* Expand / Collapse Button */}
                         <button
                           onClick={() => toggleJobAccordion(job.id)}
-                          className="h-8 px-2.5 bg-card hover:bg-muted text-foreground border border-border/60 font-normal text-xs rounded-lg shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
+                          className="h-8.5 px-3 bg-card hover:bg-muted text-foreground border border-border/70 font-medium text-xs rounded-lg shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
                         >
-                          <Users className="size-3 text-primary" />
+                          <Users className="size-3.5 text-muted-foreground" />
                           <span>{job.candidates.length} Candidates</span>
                           {isExpanded ? (
                             <ChevronUp className="size-3.5 text-muted-foreground" />
@@ -2443,13 +2565,17 @@ function CandidateSelectionPage() {
 
                                     {/* Status */}
                                     <td className="px-4 py-3 text-center">
-                                      {cand.selected ? (
+                                      {job.status === "Approved" || cand.status === "Approved" ? (
                                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
                                           <Check className="size-3 stroke-[2.5]" /> Approved
                                         </span>
+                                      ) : cand.selected ? (
+                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/25">
+                                          <UserCheck className="size-3 stroke-[2]" /> Selected / Nominated
+                                        </span>
                                       ) : (
                                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] text-muted-foreground bg-muted/60 border border-border/40">
-                                          Pending
+                                          Shortlisted
                                         </span>
                                       )}
                                     </td>
@@ -2457,40 +2583,51 @@ function CandidateSelectionPage() {
                                     {/* Actions */}
                                     <td className="px-4 py-3 text-right">
                                       <div className="flex items-center justify-end gap-1.5">
-                                        {!cand.selected ? (
+                                        {/* After approval, candidate cannot be edited */}
+                                        {job.status === "Approved" || cand.status === "Approved" ? (
+                                          <span
+                                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium bg-muted text-muted-foreground border border-border/50 cursor-not-allowed"
+                                            title="Approved candidate cannot be edited"
+                                          >
+                                            <Lock className="size-3 text-muted-foreground" />
+                                            <span>Locked (Approved)</span>
+                                          </span>
+                                        ) : (
                                           <button
                                             type="button"
                                             disabled={isClosed}
-                                            onClick={() => openReviewModal(cand, job.title, job.id)}
-                                            className={`h-7.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs flex items-center gap-1.5 shadow-2xs transition ${
+                                            onClick={() => handleOpenEditCandidate(job, cand)}
+                                            className={`h-7.5 px-2.5 rounded-lg bg-card hover:bg-muted text-foreground border border-border/70 text-xs font-normal flex items-center gap-1.5 transition shadow-2xs ${
                                               isClosed ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
                                             }`}
-                                            title={isClosed ? "Job is closed" : "Review PDF CV, finalize salary, and approve"}
+                                            title="Edit candidate particulars & proposed salary"
                                           >
-                                            <FileText className="size-3.5" />
-                                            <span>Review & Approve</span>
+                                            <Edit3 className="size-3 text-primary" />
+                                            <span>Edit</span>
                                           </button>
-                                        ) : (
-                                          <>
-                                            <button
-                                              type="button"
-                                              onClick={() => handleCopyLink(cand.generatedLink, cand.name)}
-                                              className="h-7.5 px-2.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 font-medium text-xs flex items-center gap-1 transition cursor-pointer"
-                                              title="Copy e-Recruitment Link"
-                                            >
-                                              <Copy className="size-3" />
-                                              <span>Copy Link</span>
-                                            </button>
-                                            <button
-                                              type="button"
-                                              onClick={() => openReviewModal(cand, job.title, job.id)}
-                                              className="h-7.5 px-2.5 rounded-lg bg-muted hover:bg-muted/80 text-foreground border border-border/70 text-xs flex items-center gap-1 transition cursor-pointer"
-                                              title="View CV or modify approved salary"
-                                            >
-                                              <FileText className="size-3 text-red-500" />
-                                              <span>View CV</span>
-                                            </button>
-                                          </>
+                                        )}
+
+                                        {/* View CV */}
+                                        <button
+                                          type="button"
+                                          onClick={() => openReviewModal(cand, job.title, job.id)}
+                                          className="h-7.5 px-2.5 rounded-lg bg-muted hover:bg-muted/80 text-foreground border border-border/70 text-xs flex items-center gap-1 transition cursor-pointer"
+                                          title="View Candidate CV"
+                                        >
+                                          <FileText className="size-3 text-red-500" />
+                                          <span>CV</span>
+                                        </button>
+
+                                        {cand.generatedLink && (
+                                          <button
+                                            type="button"
+                                            onClick={() => handleCopyLink(cand.generatedLink, cand.name)}
+                                            className="h-7.5 px-2.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 font-medium text-xs flex items-center gap-1 transition cursor-pointer"
+                                            title="Copy e-Recruitment Link"
+                                          >
+                                            <Copy className="size-3" />
+                                            <span>Link</span>
+                                          </button>
                                         )}
                                       </div>
                                     </td>
@@ -2506,17 +2643,36 @@ function CandidateSelectionPage() {
                     {/* ─── BOTTOM SUBMIT BAR FOR EVERY JOB ───────────────────── */}
                     <div className="p-3 sm:p-3.5 bg-muted/20 border-t border-border/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div className="text-xs text-muted-foreground font-normal flex items-center gap-2">
-                        <CheckCircle2 className={`size-3.5 ${isClosed ? "text-slate-400" : "text-emerald-600"}`} />
+                        <CheckCircle2
+                          className={`size-3.5 ${
+                            job.status === "Approved"
+                              ? "text-emerald-600"
+                              : job.status === "Submitted"
+                              ? "text-amber-500"
+                              : isClosed
+                              ? "text-slate-400"
+                              : "text-primary"
+                          }`}
+                        />
                         <span>
-                          {isClosed ? (
+                          {job.status === "Approved" ? (
+                            <>
+                              Requisition is <span className="font-semibold text-emerald-600">Approved</span>.{" "}
+                              <span className="font-mono font-semibold text-foreground">{approvedCandCount}/{totalCandCount}</span> candidate(s) approved and appointment links dispatched.
+                            </>
+                          ) : job.status === "Submitted" ? (
+                            <>
+                              Requisition is <span className="font-semibold text-amber-600 dark:text-amber-400">Submitted for Approval</span> (Status:{" "}
+                              <span className="font-mono font-semibold text-foreground">{approvedCandCount}/{totalCandCount}</span> approved · Level {job.currentApprovalLevel || 1} Review).
+                            </>
+                          ) : isClosed ? (
                             <>
                               Requisition is <span className="font-normal text-slate-700 dark:text-slate-300">Closed</span>.
-                              {job.closedAt && ` Submitted on ${job.closedAt}.`} {selectedCount} candidate(s) enrolled.
+                              {job.closedAt && ` Closed on ${job.closedAt}.`}
                             </>
                           ) : (
                             <>
-                              Candidate Selection: <span className="font-normal text-foreground">{selectedCount}</span> of{" "}
-                              <span className="font-normal text-foreground">{job.vacancies}</span> required vacancies selected.
+                              Candidate Selection: <span className="font-mono font-semibold text-foreground">{selectedCount}/{job.vacancies}</span> required vacancies selected.
                               {selectedCount === 0 && (
                                 <span className="text-amber-600 dark:text-amber-400 font-normal ml-1.5">
                                   (Select candidate to enable submit)
@@ -2528,7 +2684,33 @@ function CandidateSelectionPage() {
                       </div>
 
                       <div className="flex items-center gap-2 self-end sm:self-auto">
-                        {isClosed ? (
+                        {job.status === "Submitted" ? (
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleWithdrawSubmission(job.id)}
+                              className="h-8 px-3 bg-muted hover:bg-muted/80 text-foreground border border-border/60 text-xs font-normal rounded-lg transition flex items-center gap-1.5 cursor-pointer"
+                              title="Withdraw submission to edit candidate data"
+                            >
+                              <RotateCcw className="size-3 text-amber-600" />
+                              <span>Recall to Draft</span>
+                            </button>
+                            <Link
+                              to="/recruitment-candidate-selection-approval"
+                              className="h-8 px-3.5 bg-primary hover:opacity-90 text-primary-foreground text-xs font-medium rounded-lg transition flex items-center gap-1.5 shadow-2xs"
+                            >
+                              <span>Open in Approval Console</span>
+                              <ArrowRight className="size-3" />
+                            </Link>
+                          </div>
+                        ) : job.status === "Approved" ? (
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+                              <CheckCircle2 className="size-3.5" />
+                              <span>Approved & Finalized</span>
+                            </span>
+                          </div>
+                        ) : isClosed ? (
                           <button
                             type="button"
                             onClick={() => handleReopenJob(job.id)}
@@ -2538,15 +2720,15 @@ function CandidateSelectionPage() {
                             <Unlock className="size-3 text-emerald-600" />
                             <span>Reopen Job</span>
                           </button>
-                        ) : selectedCount > 0 ? (
+                        ) : job.candidates.length > 0 ? (
                           <button
                             type="button"
                             onClick={() => handleSubmitJob(job.id)}
                             className="h-8 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-normal rounded-lg transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
-                            title="Approve candidate selection and submit this job"
+                            title="Submit candidate selection for management approval"
                           >
-                            <Check className="size-3.5 stroke-[2]" />
-                            <span>Approve and Submit</span>
+                            <Send className="size-3.5" />
+                            <span>Submit for Approval</span>
                           </button>
                         ) : null}
                       </div>
@@ -2692,50 +2874,57 @@ function CandidateSelectionPage() {
                         </div>
                       </div>
 
-                      {/* Approval Action or Generated Link Display */}
+                      {/* Candidate Selection & Proposed Salary Action */}
                       {!liveCand.selected ? (
-                        <div className="pt-2">
+                        <div className="pt-2 space-y-2">
                           <button
                             type="button"
                             disabled={!reviewSalaryInput || Number(reviewSalaryInput) <= 0 || liveJob?.status === "Closed"}
                             onClick={handleApproveFromReview}
                             className="w-full h-10.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer transition"
                           >
-                            <CheckCircle2 className="size-4" />
-                            <span>Approve & Generate Link</span>
+                            <UserCheck className="size-4" />
+                            <span>Select Candidate & Save Proposed Salary</span>
                           </button>
+                          <p className="text-[10px] text-muted-foreground text-center">
+                            Candidate will be nominated for approval in Candidate Selection Approval console.
+                          </p>
                         </div>
                       ) : (
                         <div className="space-y-3 pt-2">
-                          <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/25 flex items-center gap-2.5 text-emerald-700 dark:text-emerald-300">
-                            <CheckCircle2 className="size-4 shrink-0" />
+                          <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 flex items-center gap-2.5 text-primary">
+                            <UserCheck className="size-4 shrink-0" />
                             <div>
-                              <div className="font-semibold text-xs">Candidate Approved</div>
+                              <div className="font-semibold text-xs">
+                                {liveCand.status === "Approved" ? "Candidate Approved" : "Candidate Selected (Pending Approval)"}
+                              </div>
                               <div className="text-[11px] text-muted-foreground">
-                                Final Salary: ৳{liveCand.agreedSalary.toLocaleString()}
+                                Proposed Salary: ৳{liveCand.agreedSalary.toLocaleString()}
                               </div>
                             </div>
                           </div>
 
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-foreground">Recruitment Link</label>
-                            <div className="flex items-center gap-1.5">
-                              <input
-                                type="text"
-                                readOnly
-                                value={liveCand.generatedLink || ""}
-                                className="flex-1 h-8.5 px-2.5 text-[11px] bg-muted/60 border border-border/70 rounded-lg text-foreground font-mono select-all outline-none"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleCopyLink(liveCand.generatedLink, liveCand.name)}
-                                className="h-8.5 px-3 bg-primary hover:opacity-90 text-primary-foreground text-xs font-medium rounded-lg flex items-center gap-1 cursor-pointer shrink-0"
-                              >
-                                <Copy className="size-3.5" />
-                                <span>Copy</span>
-                              </button>
+                          {liveCand.generatedLink && (
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-medium text-foreground">Recruitment Link</label>
+                              <div className="flex items-center gap-1.5">
+                                <input
+                                  type="text"
+                                  readOnly
+                                  value={liveCand.generatedLink || ""}
+                                  className="flex-1 h-8.5 px-2.5 text-[11px] bg-muted/60 border border-border/70 rounded-lg text-foreground font-mono select-all outline-none"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyLink(liveCand.generatedLink, liveCand.name)}
+                                  className="h-8.5 px-3 bg-primary hover:opacity-90 text-primary-foreground text-xs font-medium rounded-lg flex items-center gap-1 cursor-pointer shrink-0"
+                                >
+                                  <Copy className="size-3.5" />
+                                  <span>Copy</span>
+                                </button>
+                              </div>
                             </div>
-                          </div>
+                          )}
 
                           <div className="flex items-center justify-between pt-1 border-t border-border/40 text-xs">
                             <button
@@ -2743,7 +2932,7 @@ function CandidateSelectionPage() {
                               onClick={handleApproveFromReview}
                               className="text-primary hover:underline font-medium cursor-pointer"
                             >
-                              Update Salary
+                              Update Proposed Salary
                             </button>
                             <button
                               type="button"
@@ -2752,7 +2941,7 @@ function CandidateSelectionPage() {
                               }}
                               className="text-muted-foreground hover:text-red-600 transition cursor-pointer"
                             >
-                              Deselect
+                              Remove Selection
                             </button>
                           </div>
                         </div>
@@ -2852,7 +3041,7 @@ function CandidateSelectionPage() {
         )}
 
 
-        {/* ─── MODAL 2.6: APPROVE & SUBMIT JOB REQUISITION WITH CANDIDATE SALARIES ───────── */}
+        {/* ─── MODAL 2.6: SUBMIT CANDIDATE SELECTION FOR APPROVAL ───────── */}
         {approvingJob && (() => {
           const selectedCands = approvingJob.job.candidates.filter((c) => c.selected);
           const totalPayroll = selectedCands.reduce((sum, c) => {
@@ -2870,13 +3059,13 @@ function CandidateSelectionPage() {
                 {/* Header */}
                 <div className="p-4 sm:p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/20">
-                      <BadgeCheck className="size-5" />
+                    <div className="p-2.5 bg-primary/10 text-primary rounded-xl border border-primary/20">
+                      <Send className="size-5" />
                     </div>
                     <div>
                       <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                        <span>Approve & Submit Candidate Selection</span>
-                        <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        <span>Submit Candidate Selection for Approval</span>
+                        <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                           {selectedCands.length} Selected
                         </span>
                       </h3>
@@ -2897,7 +3086,7 @@ function CandidateSelectionPage() {
                 {/* Body */}
                 <div className="p-5 sm:p-6 overflow-y-auto space-y-4">
                   <div className="text-xs text-muted-foreground font-normal">
-                    Please verify or input the finalized monthly salary for each selected candidate before official approval and submission:
+                    Please review or input the proposed monthly salary for each selected candidate before submitting to the multi-level management approval console:
                   </div>
 
                   {/* Candidate Salary Input Table */}
@@ -2907,7 +3096,7 @@ function CandidateSelectionPage() {
                         <tr>
                           <th className="px-3.5 py-2.5 text-left">Candidate</th>
                           <th className="px-3.5 py-2.5 text-right">Previous Salary</th>
-                          <th className="px-3.5 py-2.5 text-right">Approved Salary (BDT ৳) *</th>
+                          <th className="px-3.5 py-2.5 text-right">Proposed Salary (BDT ৳) *</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/40 bg-card">
@@ -2949,7 +3138,7 @@ function CandidateSelectionPage() {
                                     className={`w-32 h-8.5 px-2.5 rounded-lg border text-right text-xs font-semibold outline-none transition ${
                                       isZero
                                         ? "border-red-500 bg-red-500/5 text-red-600 focus:border-red-500"
-                                        : "border-emerald-500/40 bg-emerald-500/[0.03] text-emerald-700 dark:text-emerald-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20"
+                                        : "border-primary/40 bg-primary/[0.03] text-foreground focus:border-primary focus:ring-1 focus:ring-primary/20"
                                     }`}
                                     placeholder="Input Salary"
                                   />
@@ -2968,8 +3157,8 @@ function CandidateSelectionPage() {
                   {/* Budget & Total Payroll Summary Card */}
                   <div className="p-3.5 bg-muted/30 rounded-xl border border-border/60 space-y-2 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Total Approved Monthly Payroll:</span>
-                      <span className="font-bold text-sm text-emerald-600 dark:text-emerald-400">
+                      <span className="text-muted-foreground">Total Proposed Monthly Payroll:</span>
+                      <span className="font-bold text-sm text-primary">
                         ৳{totalPayroll.toLocaleString()}
                       </span>
                     </div>
@@ -2984,7 +3173,7 @@ function CandidateSelectionPage() {
                   {/* Notes / Reason */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">
-                      Approval & Closure Remarks (Optional)
+                      Submission Remarks & Notes for Reviewers
                     </label>
                     <textarea
                       rows={2}
@@ -2995,7 +3184,7 @@ function CandidateSelectionPage() {
                           closeReason: e.target.value,
                         })
                       }
-                      placeholder="e.g. Candidates approved by management. Offered salaries finalized and queued for onboarding."
+                      placeholder="e.g. Candidates shortlisted based on technical interviews. Proposed compensation within budget parameters."
                       className="w-full p-2.5 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                     />
                   </div>
@@ -3014,10 +3203,10 @@ function CandidateSelectionPage() {
                     type="button"
                     disabled={hasInvalidSalary}
                     onClick={handleConfirmApproveJob}
-                    className="h-8.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                    className="h-8.5 px-4 bg-primary hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground text-xs font-medium rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                   >
-                    <Check className="size-3.5 stroke-[2]" />
-                    <span>Finalize & Approve Selection</span>
+                    <Send className="size-3.5 stroke-[2]" />
+                    <span>Submit for Approval</span>
                   </button>
                 </div>
               </div>
@@ -3853,6 +4042,218 @@ function CandidateSelectionPage() {
                   >
                     <Plus className="size-3.5" />
                     <span>Add Candidate to Job</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ─── MODAL 6: EDIT CANDIDATE INFORMATION & PROPOSED SALARY ──────────── */}
+        {editingCandidate && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-4 overflow-y-auto">
+            <div className="bg-card w-full max-w-xl rounded-xl shadow-2xl border border-border/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              <div className="p-4 sm:p-5 border-b border-border/60 bg-muted/20 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 bg-primary/10 text-primary rounded-lg">
+                    <Edit3 className="size-4.5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-foreground">
+                      Edit Candidate Particulars
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5 font-normal">
+                      {editingCandidate.candidate.id} · {editingCandidate.job.title}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingCandidate(null)}
+                  className="size-8 rounded-lg text-muted-foreground hover:bg-muted flex items-center justify-center cursor-pointer"
+                >
+                  <XCircle className="size-4.5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveEditedCandidate}>
+                <div className="p-5 sm:p-6 space-y-3.5 text-xs">
+                  <div className="space-y-1.5">
+                    <label className="font-normal text-muted-foreground">Candidate Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingCandidate.name}
+                      onChange={(e) =>
+                        setEditingCandidate((prev) => (prev ? { ...prev, name: e.target.value } : null))
+                      }
+                      placeholder="e.g. Md. Tariqul Islam"
+                      className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="font-normal text-muted-foreground">Previous Gross Salary (৳)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        value={editingCandidate.previousSalary}
+                        onChange={(e) =>
+                          setEditingCandidate((prev) =>
+                            prev ? { ...prev, previousSalary: e.target.value } : null
+                          )
+                        }
+                        placeholder="e.g. 40000"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="font-normal text-muted-foreground">
+                        Proposed / Agreed Salary (৳) *
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        min={1000}
+                        value={editingCandidate.agreedSalary}
+                        onChange={(e) =>
+                          setEditingCandidate((prev) =>
+                            prev ? { ...prev, agreedSalary: e.target.value } : null
+                          )
+                        }
+                        placeholder="e.g. 52000"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-mono font-medium text-emerald-600 dark:text-emerald-400 outline-none focus:border-primary/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="font-normal text-muted-foreground">Contact Phone</label>
+                      <input
+                        type="text"
+                        value={editingCandidate.phone}
+                        onChange={(e) =>
+                          setEditingCandidate((prev) =>
+                            prev ? { ...prev, phone: e.target.value } : null
+                          )
+                        }
+                        placeholder="+880 1711-000000"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50 font-mono"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="font-normal text-muted-foreground">Email Address</label>
+                      <input
+                        type="email"
+                        value={editingCandidate.email}
+                        onChange={(e) =>
+                          setEditingCandidate((prev) =>
+                            prev ? { ...prev, email: e.target.value } : null
+                          )
+                        }
+                        placeholder="candidate@example.com"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="font-normal text-muted-foreground">Total Experience</label>
+                      <input
+                        type="text"
+                        value={editingCandidate.experience}
+                        onChange={(e) =>
+                          setEditingCandidate((prev) =>
+                            prev ? { ...prev, experience: e.target.value } : null
+                          )
+                        }
+                        placeholder="e.g. 6.5 Years"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="font-normal text-muted-foreground">Notice Period</label>
+                      <input
+                        type="text"
+                        value={editingCandidate.noticePeriod}
+                        onChange={(e) =>
+                          setEditingCandidate((prev) =>
+                            prev ? { ...prev, noticePeriod: e.target.value } : null
+                          )
+                        }
+                        placeholder="e.g. 15 Days notice"
+                        className="w-full h-8.5 px-3 rounded-lg border border-border bg-background text-xs font-normal text-foreground outline-none focus:border-primary/50"
+                      />
+                    </div>
+                  </div>
+
+                  {/* PDF CV Preview & Replacement */}
+                  <div className="space-y-1.5 pt-1">
+                    <label className="font-normal text-muted-foreground">Curriculum Vitae (.pdf)</label>
+                    <div className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-dashed border-border bg-muted/20">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <FileText className="size-3.5 text-red-500 shrink-0" />
+                        <div className="min-w-0">
+                          <div className="font-normal text-foreground truncate">
+                            {editingCandidate.pdfFileName}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground font-normal">
+                            Attached Document
+                          </div>
+                        </div>
+                      </div>
+
+                      <label className="h-7.5 px-3 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-normal transition flex items-center gap-1.5 cursor-pointer shrink-0">
+                        <Upload className="size-3" />
+                        <span>Replace PDF</span>
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const sizeKb = Math.round(file.size / 1024);
+                              const sizeLabel = sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`;
+                              const objectUrl = URL.createObjectURL(file);
+                              setEditingCandidate((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      pdfUrl: objectUrl,
+                                      pdfFileName: file.name,
+                                    }
+                                  : null
+                              );
+                              toast.success(`Attached new CV: ${file.name} (${sizeLabel})`);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3.5 sm:p-4 border-t border-border/60 bg-muted/15 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingCandidate(null)}
+                    className="h-8 px-3.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-normal rounded-lg transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="h-8 px-4 bg-primary hover:opacity-95 text-primary-foreground text-xs font-normal rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Check className="size-3.5" />
+                    <span>Save Changes</span>
                   </button>
                 </div>
               </form>
