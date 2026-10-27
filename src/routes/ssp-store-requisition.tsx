@@ -382,9 +382,6 @@ export function StoreRequisitionPage() {
                       Select type, item, and enter required justification.
                     </p>
                   </div>
-                  <span className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full uppercase">
-                    Multiple Items Supported
-                  </span>
                 </div>
 
                 {/* Clean Simple Dropdowns: Requisition Type & ICT Requisition Type (Locked when items exist) */}
