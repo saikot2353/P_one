@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import { componentTagger } from "lovable-tagger";
 import path from "path";
@@ -37,8 +36,23 @@ export default defineConfig(({ mode }) => {
     build: {
       target: "es2022",
       reportCompressedSize: false,
-      chunkSizeWarningLimit: 2500,
+      chunkSizeWarningLimit: 3000,
       sourcemap: false,
+      cssCodeSplit: true,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules")) {
+              if (id.includes("xlsx")) return "vendor-xlsx";
+              if (id.includes("recharts") || id.includes("d3-")) return "vendor-charts";
+              if (id.includes("jodit")) return "vendor-editor";
+              if (id.includes("@svg-maps")) return "vendor-maps";
+              if (id.includes("lucide-react")) return "vendor-lucide";
+              if (id.includes("@radix-ui")) return "vendor-radix";
+            }
+          },
+        },
+      },
     },
 
     plugins: [
