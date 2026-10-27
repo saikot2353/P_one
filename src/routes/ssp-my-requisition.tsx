@@ -17,7 +17,12 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { LeaveApplicationModal } from "@/components/ssp/LeaveApplicationModal";
-import { GeneralStoreRequisitionModal } from "@/components/ssp/GeneralStoreRequisitionModal";
+import {
+  GeneralStoreRequisitionModal,
+  DEFAULT_REQUISITION,
+  ON_BEHALF_DEMO_REQUISITION,
+  RequisitionViewData,
+} from "@/components/ssp/GeneralStoreRequisitionModal";
 import { GroupLeaveApplicationModal } from "@/components/ssp/GroupLeaveApplicationModal";
 import { IOURequisitionModal } from "@/components/ssp/IOURequisitionModal";
 import { SimRequisitionModal } from "@/components/ssp/SimRequisitionModal";
@@ -68,8 +73,16 @@ const BASE_TABLE_DATA: Omit<RequisitionRow, "onClickView">[] = [
     reqNum: "378956",
     date: "2026-05-05",
     status: "Approved",
-    doc: "General Product Store Requisition",
-    note: "",
+    doc: "Store Requisition — ICT Hardware",
+    note: "Sony LED TV Wall mount Kit & HDMI Cable",
+  },
+  {
+    id: "389201",
+    reqNum: "389201",
+    date: "2026-09-12",
+    status: "Pending",
+    doc: "Store Requisition — On Behalf (Fahim Chowdhury)",
+    note: "Dell 24\" FHD IPS Monitor & Wireless Combo (On Behalf)",
   },
   {
     id: "375460",
@@ -93,6 +106,7 @@ function MyRequisitionPage() {
   const navigate = useNavigate();
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
   const [storeModalOpen, setStoreModalOpen] = useState(false);
+  const [selectedStoreReq, setSelectedStoreReq] = useState<RequisitionViewData | null>(null);
   const [groupLeaveModalOpen, setGroupLeaveModalOpen] = useState(false);
   const [iouModalOpen, setIouModalOpen] = useState(false);
   const [simModalOpen, setSimModalOpen] = useState(false);
@@ -159,8 +173,10 @@ function MyRequisitionPage() {
           handleOpenSimModal(r.reqNum, r);
         } else if (r.doc.includes("IOU")) {
           navigate({ to: "/ssp-iou-requisition-view" });
+        } else if (r.doc.includes("On Behalf")) {
+          navigate({ to: "/ssp-store-requisition-view", search: { id: "389201" } });
         } else if (r.doc.includes("Store")) {
-          setStoreModalOpen(true);
+          navigate({ to: "/ssp-store-requisition-view", search: { id: "378956" } });
         } else if (r.doc.includes("Group Leave")) {
           setGroupLeaveModalOpen(true);
         } else {
@@ -175,8 +191,10 @@ function MyRequisitionPage() {
           handleOpenSimModal(r.reqNum, r);
         } else if (r.id === "MRN/2026/00035" || r.id === "MRN/2026/00042") {
           navigate({ to: "/ssp-iou-requisition-view" });
-        } else if (r.id === "378956") {
-          setStoreModalOpen(true);
+        } else if (r.id === "389201" || r.doc.includes("On Behalf")) {
+          navigate({ to: "/ssp-store-requisition-view", search: { id: "389201" } });
+        } else if (r.id === "378956" || r.doc.includes("Store")) {
+          navigate({ to: "/ssp-store-requisition-view", search: { id: "378956" } });
         } else if (r.id === "375460") {
           setGroupLeaveModalOpen(true);
         } else {
@@ -494,7 +512,11 @@ function MyRequisitionPage() {
       </main>
 
       <LeaveApplicationModal open={leaveModalOpen} onOpenChange={setLeaveModalOpen} />
-      <GeneralStoreRequisitionModal open={storeModalOpen} onOpenChange={setStoreModalOpen} />
+      <GeneralStoreRequisitionModal
+        open={storeModalOpen}
+        onOpenChange={setStoreModalOpen}
+        requisitionData={selectedStoreReq || DEFAULT_REQUISITION}
+      />
       <GroupLeaveApplicationModal open={groupLeaveModalOpen} onOpenChange={setGroupLeaveModalOpen} />
       <IOURequisitionModal isOpen={iouModalOpen} onClose={() => setIouModalOpen(false)} />
       <SimRequisitionModal open={simModalOpen} onOpenChange={setSimModalOpen} data={selectedSimReq} />

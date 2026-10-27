@@ -382,6 +382,8 @@ import { Route as SspProductBudgetRequestRouteImport } from './routes/ssp-produc
 import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
 import { Route as SspSimRequisitionRouteImport } from './routes/ssp-sim-requisition'
 import { Route as SspSimRequisitionViewRouteImport } from './routes/ssp-sim-requisition-view'
+import { Route as SspStoreRequisitionRouteImport } from './routes/ssp-store-requisition'
+import { Route as SspStoreRequisitionViewRouteImport } from './routes/ssp-store-requisition-view'
 import { Route as SummarySalarySheetRouteImport } from './routes/summary-salary-sheet'
 import { Route as SyncRequisitionRouteImport } from './routes/sync-requisition'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
@@ -2381,6 +2383,16 @@ const SspSimRequisitionViewRoute = SspSimRequisitionViewRouteImport.update({
   path: '/ssp-sim-requisition-view',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SspStoreRequisitionRoute = SspStoreRequisitionRouteImport.update({
+  id: '/ssp-store-requisition',
+  path: '/ssp-store-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspStoreRequisitionViewRoute = SspStoreRequisitionViewRouteImport.update({
+  id: '/ssp-store-requisition-view',
+  path: '/ssp-store-requisition-view',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SummarySalarySheetRoute = SummarySalarySheetRouteImport.update({
   id: '/summary-salary-sheet',
   path: '/summary-salary-sheet',
@@ -2855,6 +2867,8 @@ export interface FileRoutesByFullPath {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/ssp-store-requisition': typeof SspStoreRequisitionRoute
+  '/ssp-store-requisition-view': typeof SspStoreRequisitionViewRoute
   '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/sync-requisition': typeof SyncRequisitionRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
@@ -3249,6 +3263,8 @@ export interface FileRoutesByTo {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/ssp-store-requisition': typeof SspStoreRequisitionRoute
+  '/ssp-store-requisition-view': typeof SspStoreRequisitionViewRoute
   '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/sync-requisition': typeof SyncRequisitionRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
@@ -3644,6 +3660,8 @@ export interface FileRoutesById {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/ssp-store-requisition': typeof SspStoreRequisitionRoute
+  '/ssp-store-requisition-view': typeof SspStoreRequisitionViewRoute
   '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/sync-requisition': typeof SyncRequisitionRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
@@ -4040,6 +4058,8 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/ssp-store-requisition'
+    | '/ssp-store-requisition-view'
     | '/summary-salary-sheet'
     | '/sync-requisition'
     | '/transfer-control-center'
@@ -4434,6 +4454,8 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/ssp-store-requisition'
+    | '/ssp-store-requisition-view'
     | '/summary-salary-sheet'
     | '/sync-requisition'
     | '/transfer-control-center'
@@ -4828,6 +4850,8 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/ssp-store-requisition'
+    | '/ssp-store-requisition-view'
     | '/summary-salary-sheet'
     | '/sync-requisition'
     | '/transfer-control-center'
@@ -5223,6 +5247,8 @@ export interface RootRouteChildren {
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   SspSimRequisitionRoute: typeof SspSimRequisitionRoute
   SspSimRequisitionViewRoute: typeof SspSimRequisitionViewRoute
+  SspStoreRequisitionRoute: typeof SspStoreRequisitionRoute
+  SspStoreRequisitionViewRoute: typeof SspStoreRequisitionViewRoute
   SummarySalarySheetRoute: typeof SummarySalarySheetRoute
   SyncRequisitionRoute: typeof SyncRequisitionRoute
   TransferControlCenterRoute: typeof TransferControlCenterRoute
@@ -7857,6 +7883,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SspSimRequisitionViewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ssp-store-requisition': {
+      id: '/ssp-store-requisition'
+      path: '/ssp-store-requisition'
+      fullPath: '/ssp-store-requisition'
+      preLoaderRoute: typeof SspStoreRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-store-requisition-view': {
+      id: '/ssp-store-requisition-view'
+      path: '/ssp-store-requisition-view'
+      fullPath: '/ssp-store-requisition-view'
+      preLoaderRoute: typeof SspStoreRequisitionViewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/summary-salary-sheet': {
       id: '/summary-salary-sheet'
       path: '/summary-salary-sheet'
@@ -8381,6 +8421,8 @@ const rootRouteChildren: RootRouteChildren = {
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   SspSimRequisitionRoute: SspSimRequisitionRoute,
   SspSimRequisitionViewRoute: SspSimRequisitionViewRoute,
+  SspStoreRequisitionRoute: SspStoreRequisitionRoute,
+  SspStoreRequisitionViewRoute: SspStoreRequisitionViewRoute,
   SummarySalarySheetRoute: SummarySalarySheetRoute,
   SyncRequisitionRoute: SyncRequisitionRoute,
   TransferControlCenterRoute: TransferControlCenterRoute,
