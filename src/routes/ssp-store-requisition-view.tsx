@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { useState, useEffect, useMemo } from "react";
+import { createFileRoute, Link, useSearch, useNavigate } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
@@ -15,6 +15,11 @@ import {
   MessageSquare,
   Send,
   FileCheck,
+  ShoppingCart,
+  Zap,
+  CheckCircle2,
+  AlertTriangle,
+  Boxes,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -23,11 +28,17 @@ import {
   RequisitionViewData,
   RequisitionCommentView,
 } from "@/components/ssp/GeneralStoreRequisitionModal";
+import {
+  loadImplementationRequisitions,
+  saveImplementationRequisitions,
+  StoreImplementationRecord,
+} from "./-ssp-implementation-data";
 
 export const Route = createFileRoute("/ssp-store-requisition-view")({
   validateSearch: (search: Record<string, unknown>) => {
     return {
       id: (search.id as string) || "",
+      from: (search.from as string) || "",
     };
   },
   head: () => ({
@@ -43,24 +54,63 @@ export const Route = createFileRoute("/ssp-store-requisition-view")({
 });
 
 function StoreRequisitionViewPage() {
+  const navigate = useNavigate();
   const search = useSearch({ from: "/ssp-store-requisition-view" });
   const [data, setData] = useState<RequisitionViewData>(DEFAULT_REQUISITION);
   const [comments, setComments] = useState<RequisitionCommentView[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [matchedRecord, setMatchedRecord] = useState<StoreImplementationRecord | null>(null);
 
   useEffect(() => {
-    // If search id matches the on-behalf demo or contains on-behalf
-    if (search.id === "389201" || search.id.includes("OB") || search.id.toLowerCase().includes("behalf")) {
-      setData(ON_BEHALF_DEMO_REQUISITION);
-      setComments(ON_BEHALF_DEMO_REQUISITION.comments || []);
+    const allRecords = loadImplementationRequisitions();
+    const found = allRecords.find((r) => r.id === search.id || r.ref === search.id);
+    if (found) {
+      setMatchedRecord(found);
+      setData(found.viewData);
+      setComments(found.viewData.comments || []);
+    } else if (
+      search.id === "389201" ||
+      search.id.includes("OB") ||
+      search.id.toLowerCase().includes("behalf")
+    ) {
+      const obRecord = allRecords.find((r) => r.id === "389201");
+      if (obRecord) {
+        setMatchedRecord(obRecord);
+        setData(obRecord.viewData);
+        setComments(obRecord.viewData.comments || []);
+      } else {
+        setData(ON_BEHALF_DEMO_REQUISITION);
+        setComments(ON_BEHALF_DEMO_REQUISITION.comments || []);
+      }
     } else {
-      setData(DEFAULT_REQUISITION);
-      setComments(DEFAULT_REQUISITION.comments || []);
+      const defRecord = allRecords.find((r) => r.id === "378956");
+      if (defRecord) {
+        setMatchedRecord(defRecord);
+        setData(defRecord.viewData);
+        setComments(defRecord.viewData.comments || []);
+      } else {
+        setData(DEFAULT_REQUISITION);
+        setComments(DEFAULT_REQUISITION.comments || []);
+      }
     }
   }, [search.id]);
 
   const items = data.items || [];
   const approvers = data.approvers || [];
+
+  const hasStock = useMemo(() => {
+    if (matchedRecord) return matchedRecord.hasStock;
+    if (items.length === 0) return false;
+    return items.every((it) => {
+      const stockNum = parseFloat(it.stock) || 0;
+      const demandNum = parseFloat(it.demand) || 1;
+      return stockNum >= demandNum;
+    });
+  }, [matchedRecord, items]);
+
+  const currentStatus =
+    matchedRecord?.implementationStatus ||
+    (hasStock ? "Ready to Execute" : "Needs Purchase");
 
   const handleCopyRef = () => {
     if (data.ref) {
@@ -92,6 +142,112 @@ function StoreRequisitionViewPage() {
     toast.success("Comment recorded in official requisition docket.");
   };
 
+  // Handle Execute
+  const handleExecute = () => {
+    if (!hasStock) {
+      toast.error(
+        "Cannot execute: Required items are out of stock in store warehouse. Please send to Purchase."
+      );
+      return;
+    }
+
+    const nowStr = new Date().toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const execComment: RequisitionCommentView = {
+      id: "cm-" + Date.now(),
+      author: "Tahmid Afsar",
+      designation: "Assistant Manager — HR & Admin",
+      role: "Store In-Charge",
+      date: nowStr,
+      avatar: "TA",
+      text: "✓ Store Requisition executed. Warehouse inventory issued and handed over to employee.",
+    };
+
+    setComments((prev) => [execComment, ...prev]);
+
+    if (matchedRecord) {
+      const allRecords = loadImplementationRequisitions();
+      const updated = allRecords.map((r) => {
+        if (r.id === matchedRecord.id) {
+          return {
+            ...r,
+            implementationStatus: "Executed" as const,
+            executedDate: nowStr,
+            executedBy: "Tahmid Afsar (Store In-Charge)",
+            viewData: {
+              ...r.viewData,
+              comments: [execComment, ...(r.viewData.comments || [])],
+            },
+          };
+        }
+        return r;
+      });
+      saveImplementationRequisitions(updated);
+      setMatchedRecord((prev) =>
+        prev ? { ...prev, implementationStatus: "Executed" } : null
+      );
+    }
+
+    toast.success("✓ Requisition executed successfully! Store stock issued to employee.");
+  };
+
+  // Handle Sent to Purchase
+  const handleSentToPurchase = () => {
+    const nowStr = new Date().toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const purchaseComment: RequisitionCommentView = {
+      id: "cm-" + Date.now(),
+      author: "Tahmid Afsar",
+      designation: "Assistant Manager — HR & Admin",
+      role: "Store In-Charge",
+      date: nowStr,
+      avatar: "TA",
+      text: "Requisition sent to Procurement / Purchase department for purchase order placement.",
+    };
+
+    setComments((prev) => [purchaseComment, ...prev]);
+
+    if (matchedRecord) {
+      const allRecords = loadImplementationRequisitions();
+      const updated = allRecords.map((r) => {
+        if (r.id === matchedRecord.id) {
+          return {
+            ...r,
+            implementationStatus: "Sent to Purchase" as const,
+            sentToPurchaseDate: nowStr,
+            viewData: {
+              ...r.viewData,
+              comments: [purchaseComment, ...(r.viewData.comments || [])],
+            },
+          };
+        }
+        return r;
+      });
+      saveImplementationRequisitions(updated);
+      setMatchedRecord((prev) =>
+        prev ? { ...prev, implementationStatus: "Sent to Purchase" } : null
+      );
+    }
+
+    toast.success("✓ Requisition sent to Purchase Module successfully!");
+
+    setTimeout(() => {
+      navigate({ to: "/procurement-purchase-requisition" });
+    }, 900);
+  };
+
   return (
     <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
       <Sidebar />
@@ -107,8 +263,11 @@ function StoreRequisitionViewPage() {
                   Home
                 </Link>
                 <ChevronRight className="size-2.5" />
-                <Link to="/ssp-my-requisition" className="hover:text-primary transition-colors">
-                  My Requisitions
+                <Link
+                  to={search.from === "implementation" ? "/ssp-implementation" : "/ssp-my-requisition"}
+                  className="hover:text-primary transition-colors"
+                >
+                  {search.from === "implementation" ? "Implementation Queue" : "My Requisitions"}
                 </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-primary font-extrabold">
@@ -131,11 +290,13 @@ function StoreRequisitionViewPage() {
 
             <div className="flex items-center gap-2 self-start md:self-center">
               <Link
-                to="/ssp-my-requisition"
+                to={search.from === "implementation" ? "/ssp-implementation" : "/ssp-my-requisition"}
                 className="px-3.5 py-2 rounded-lg border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition flex items-center gap-1.5 shadow-2xs"
               >
                 <ArrowLeft className="size-3.5 text-muted-foreground" />
-                <span>Back to Requisitions</span>
+                <span>
+                  {search.from === "implementation" ? "Back to Implementation" : "Back to Requisitions"}
+                </span>
               </Link>
 
               <button
@@ -369,130 +530,243 @@ function StoreRequisitionViewPage() {
             </div>
           </div>
 
-          {/* 3. MULTI-LEVEL APPROVAL STATUS STRIP (4-Tier Cards) */}
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                <ShieldCheck className="size-3.5 text-primary" />
-                Multi-Tier Approval Hierarchy
-              </span>
-              <span className="text-[10.5px] text-muted-foreground">
-                Official Authorization Pipeline
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {approvers.map((approver, idx) => (
-                <div
-                  key={idx}
-                  className="bg-card border border-border/80 rounded-xl p-3.5 space-y-2 shadow-2xs hover:border-primary/40 transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="text-[11px] font-bold text-foreground truncate">
-                      {approver.role.split(":")[0]}
-                    </span>
-                    <span
-                      className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${
-                        approver.status === "Review"
-                          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                          : approver.status === "Pending"
-                          ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                          : "bg-muted text-muted-foreground border-border"
-                      }`}
-                    >
-                      {approver.status === "Review" ? "✓ REVIEWED" : "⏱ PENDING"}
-                    </span>
-                  </div>
-
-                  <div>
-                    <h4 className="font-bold text-xs text-foreground truncate">
-                      {approver.name}
-                    </h4>
-                    <p className="text-[10.5px] text-muted-foreground truncate">
-                      {approver.designation}
-                    </p>
-                  </div>
-
-                  <div className="pt-2 border-t border-border/50 flex items-center justify-between text-[10px] text-muted-foreground font-mono">
-                    <span>{approver.date ? approver.date.split(" ")[0] : "Awaiting Action"}</span>
-                    <span>{approver.date ? approver.date.split(" ")[1] : "—"}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 4. COMMENTS & AUDIT TRAIL */}
-          <div className="bg-card rounded-xl border border-border/80 p-4.5 sm:p-5 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b border-border/60 pb-3">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="size-4 text-primary" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
-                  Comments History ({comments.length})
-                </h3>
+          {/* 3. MULTI-LEVEL APPROVAL STATUS STRIP (Hidden in implementation view) */}
+          {search.from !== "implementation" && (
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <ShieldCheck className="size-3.5 text-primary" />
+                  Multi-Tier Approval Hierarchy
+                </span>
+                <span className="text-[10.5px] text-muted-foreground">
+                  Official Authorization Pipeline
+                </span>
               </div>
-              <span className="text-[10.5px] text-muted-foreground">
-                Official Audit Trail
-              </span>
-            </div>
 
-            <div className="space-y-3">
-              {comments.map((cm) => (
-                <div
-                  key={cm.id}
-                  className="p-3 rounded-xl bg-muted/20 border border-border/60 space-y-1.5 hover:bg-muted/30 transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <div className="flex items-center gap-2">
-                      <div className="size-6 rounded-full bg-primary/10 text-primary font-bold text-[10px] flex items-center justify-center border border-primary/20">
-                        {cm.avatar || cm.author.charAt(0)}
-                      </div>
-                      <span className="text-xs font-bold text-foreground">
-                        {cm.author}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {approvers.map((approver, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-card border border-border/80 rounded-xl p-3.5 space-y-2 shadow-2xs hover:border-primary/40 transition-colors"
+                  >
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-[11px] font-bold text-foreground truncate">
+                        {approver.role.split(":")[0]}
                       </span>
-                      <span className="text-[10.5px] text-muted-foreground">
-                        &bull; {cm.designation}
-                      </span>
-                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.2 rounded bg-muted text-muted-foreground border border-border/60">
-                        {cm.role}
+                      <span
+                        className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${
+                          approver.status === "Review"
+                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                            : approver.status === "Pending"
+                            ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                            : "bg-muted text-muted-foreground border-border"
+                        }`}
+                      >
+                        {approver.status === "Review" ? "✓ REVIEWED" : "⏱ PENDING"}
                       </span>
                     </div>
 
-                    <span className="text-[10px] font-mono text-muted-foreground">
-                      {cm.date}
-                    </span>
-                  </div>
+                    <div>
+                      <h4 className="font-bold text-xs text-foreground truncate">
+                        {approver.name}
+                      </h4>
+                      <p className="text-[10.5px] text-muted-foreground truncate">
+                        {approver.designation}
+                      </p>
+                    </div>
 
-                  <p className="text-xs text-foreground/90 pl-8 leading-relaxed">
-                    {cm.text}
-                  </p>
+                    <div className="pt-2 border-t border-border/50 flex items-center justify-between text-[10px] text-muted-foreground font-mono">
+                      <span>{approver.date ? approver.date.split(" ")[0] : "Awaiting Action"}</span>
+                      <span>{approver.date ? approver.date.split(" ")[1] : "—"}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 4. COMMENTS & AUDIT TRAIL (Hidden in implementation view) */}
+          {search.from !== "implementation" && (
+            <div className="bg-card rounded-xl border border-border/80 p-4.5 sm:p-5 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="size-4 text-primary" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                    Comments History ({comments.length})
+                  </h3>
                 </div>
-              ))}
+                <span className="text-[10.5px] text-muted-foreground">
+                  Official Audit Trail
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {comments.map((cm) => (
+                  <div
+                    key={cm.id}
+                    className="p-3 rounded-xl bg-muted/20 border border-border/60 space-y-1.5 hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <div className="size-6 rounded-full bg-primary/10 text-primary font-bold text-[10px] flex items-center justify-center border border-primary/20">
+                          {cm.avatar || cm.author.charAt(0)}
+                        </div>
+                        <span className="text-xs font-bold text-foreground">
+                          {cm.author}
+                        </span>
+                        <span className="text-[10.5px] text-muted-foreground">
+                          &bull; {cm.designation}
+                        </span>
+                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.2 rounded bg-muted text-muted-foreground border border-border/60">
+                          {cm.role}
+                        </span>
+                      </div>
+
+                      <span className="text-[10px] font-mono text-muted-foreground">
+                        {cm.date}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-foreground/90 pl-8 leading-relaxed">
+                      {cm.text}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add New Comment */}
+              <div className="pt-2 border-t border-border/60 flex items-center gap-2.5">
+                <input
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddComment();
+                    }
+                  }}
+                  placeholder="Write an internal comment or approval note for this requisition..."
+                  className="flex-1 h-9.5 px-3.5 rounded-xl border border-border bg-background text-xs text-foreground outline-none focus:border-primary transition"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddComment}
+                  className="h-9.5 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition cursor-pointer shadow-xs"
+                >
+                  <Send className="size-3.5" />
+                  <span>Post</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Store Implementation & Fulfillment Action Bar */}
+          <div className="bg-card border-2 border-primary/20 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border/70">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="p-2 rounded-xl bg-primary/10 text-primary">
+                    <Boxes className="size-4" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">
+                      Store Implementation &amp; Warehouse Fulfillment
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Approved requisition handling: issue available inventory from stock or dispatch to purchase.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status Badge */}
+              <div className="flex items-center gap-2">
+                {currentStatus === "Executed" ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    <CheckCircle2 className="size-3.5" />
+                    Executed &amp; Stock Issued
+                  </span>
+                ) : currentStatus === "Sent to Purchase" ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                    <ShoppingCart className="size-3.5" />
+                    Sent to Purchase
+                  </span>
+                ) : hasStock ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    <Check className="size-3.5" />
+                    Stock Available (Ready to Execute)
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                    <AlertTriangle className="size-3.5" />
+                    Stock Unavailable (Procurement Required)
+                  </span>
+                )}
+              </div>
             </div>
 
-            {/* Add New Comment */}
-            <div className="pt-2 border-t border-border/60 flex items-center gap-2.5">
-              <input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddComment();
+            {/* Inventory Status Note & Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+              <div className="text-xs space-y-1">
+                {hasStock ? (
+                  <p className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1.5">
+                    <CheckCircle2 className="size-3.5 shrink-0" />
+                    Stock is fully available in warehouse store. Click <strong>Execute</strong> to issue items to requester.
+                  </p>
+                ) : (
+                  <p className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
+                    <AlertTriangle className="size-3.5 shrink-0" />
+                    Requested item(s) are out of stock (Stock: 0.00). Execution disabled. Click <strong>Sent to Purchase</strong> to forward to Procurement module.
+                  </p>
+                )}
+                {matchedRecord?.executedDate && (
+                  <p className="text-[11px] text-muted-foreground">
+                    Executed on {matchedRecord.executedDate} by {matchedRecord.executedBy || "Store In-Charge"}
+                  </p>
+                )}
+                {matchedRecord?.sentToPurchaseDate && (
+                  <p className="text-[11px] text-muted-foreground">
+                    Sent to Purchase on {matchedRecord.sentToPurchaseDate}
+                  </p>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 self-end sm:self-auto shrink-0">
+                {/* Sent to Purchase Button */}
+                <button
+                  type="button"
+                  onClick={handleSentToPurchase}
+                  className="px-4.5 py-2.5 rounded-xl border border-indigo-500/30 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 font-semibold text-xs transition flex items-center gap-2 cursor-pointer shadow-xs active:scale-[0.98]"
+                  title="Forward this requisition demand to Purchase / Procurement module"
+                >
+                  <ShoppingCart className="size-4 text-indigo-600 dark:text-indigo-400" />
+                  <span>Sent to Purchase</span>
+                </button>
+
+                {/* Execute Button */}
+                <button
+                  type="button"
+                  onClick={handleExecute}
+                  disabled={!hasStock || currentStatus === "Executed"}
+                  className={`px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 shadow-xs ${
+                    hasStock && currentStatus !== "Executed"
+                      ? "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer active:scale-[0.98]"
+                      : "bg-muted text-muted-foreground/60 border border-border cursor-not-allowed opacity-60"
+                  }`}
+                  title={
+                    !hasStock
+                      ? "Cannot execute: Items are out of stock"
+                      : currentStatus === "Executed"
+                      ? "Requisition is already executed"
+                      : "Execute and issue items from store"
                   }
-                }}
-                placeholder="Write an internal comment or approval note for this requisition..."
-                className="flex-1 h-9.5 px-3.5 rounded-xl border border-border bg-background text-xs text-foreground outline-none focus:border-primary transition"
-              />
-              <button
-                type="button"
-                onClick={handleAddComment}
-                className="h-9.5 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition cursor-pointer shadow-xs"
-              >
-                <Send className="size-3.5" />
-                <span>Post</span>
-              </button>
+                >
+                  <Zap className="size-4" />
+                  <span>{currentStatus === "Executed" ? "Executed" : "Execute"}</span>
+                </button>
+              </div>
             </div>
           </div>
 

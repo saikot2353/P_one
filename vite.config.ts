@@ -34,11 +34,14 @@ export default defineConfig(({ mode }) => {
       noExternal: ["tslib", "react-remove-scroll", "react-remove-scroll-bar"],
     },
 
-    plugins: [
-      tsconfigPaths({
-        projects: ["./tsconfig.json"],
-      }),
+    build: {
+      target: "es2022",
+      reportCompressedSize: false,
+      chunkSizeWarningLimit: 2500,
+      sourcemap: false,
+    },
 
+    plugins: [
       tanstackStart(),
 
       nitro(),

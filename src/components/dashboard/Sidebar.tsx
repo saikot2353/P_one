@@ -82,6 +82,7 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "New Requisition", to: "/ssp-new-requisition" },
       { label: "My Requisition", to: "/ssp-my-requisition" },
+      { label: "Implementation", to: "/ssp-implementation" },
       {
         label: "Attendance",
         subitems: [

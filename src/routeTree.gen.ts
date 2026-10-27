@@ -372,6 +372,7 @@ import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
 import { Route as SspGeneralProductBudgetRequestRouteImport } from './routes/ssp-general-product-budget-request'
 import { Route as SspIctProductBudgetRequestRouteImport } from './routes/ssp-ict-product-budget-request'
 import { Route as SspIctRequisitionRouteImport } from './routes/ssp-ict-requisition'
+import { Route as SspImplementationRouteImport } from './routes/ssp-implementation'
 import { Route as SspIouRequisitionRouteImport } from './routes/ssp-iou-requisition'
 import { Route as SspIouRequisitionViewRouteImport } from './routes/ssp-iou-requisition-view'
 import { Route as SspLeaveRequisitionRouteImport } from './routes/ssp-leave-requisition'
@@ -2332,6 +2333,11 @@ const SspIctRequisitionRoute = SspIctRequisitionRouteImport.update({
   path: '/ssp-ict-requisition',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SspImplementationRoute = SspImplementationRouteImport.update({
+  id: '/ssp-implementation',
+  path: '/ssp-implementation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SspIouRequisitionRoute = SspIouRequisitionRouteImport.update({
   id: '/ssp-iou-requisition',
   path: '/ssp-iou-requisition',
@@ -2857,6 +2863,7 @@ export interface FileRoutesByFullPath {
   '/ssp-general-product-budget-request': typeof SspGeneralProductBudgetRequestRoute
   '/ssp-ict-product-budget-request': typeof SspIctProductBudgetRequestRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-implementation': typeof SspImplementationRoute
   '/ssp-iou-requisition': typeof SspIouRequisitionRoute
   '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
   '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
@@ -3253,6 +3260,7 @@ export interface FileRoutesByTo {
   '/ssp-general-product-budget-request': typeof SspGeneralProductBudgetRequestRoute
   '/ssp-ict-product-budget-request': typeof SspIctProductBudgetRequestRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-implementation': typeof SspImplementationRoute
   '/ssp-iou-requisition': typeof SspIouRequisitionRoute
   '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
   '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
@@ -3650,6 +3658,7 @@ export interface FileRoutesById {
   '/ssp-general-product-budget-request': typeof SspGeneralProductBudgetRequestRoute
   '/ssp-ict-product-budget-request': typeof SspIctProductBudgetRequestRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-implementation': typeof SspImplementationRoute
   '/ssp-iou-requisition': typeof SspIouRequisitionRoute
   '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
   '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
@@ -4048,6 +4057,7 @@ export interface FileRouteTypes {
     | '/ssp-general-product-budget-request'
     | '/ssp-ict-product-budget-request'
     | '/ssp-ict-requisition'
+    | '/ssp-implementation'
     | '/ssp-iou-requisition'
     | '/ssp-iou-requisition-view'
     | '/ssp-leave-requisition'
@@ -4444,6 +4454,7 @@ export interface FileRouteTypes {
     | '/ssp-general-product-budget-request'
     | '/ssp-ict-product-budget-request'
     | '/ssp-ict-requisition'
+    | '/ssp-implementation'
     | '/ssp-iou-requisition'
     | '/ssp-iou-requisition-view'
     | '/ssp-leave-requisition'
@@ -4840,6 +4851,7 @@ export interface FileRouteTypes {
     | '/ssp-general-product-budget-request'
     | '/ssp-ict-product-budget-request'
     | '/ssp-ict-requisition'
+    | '/ssp-implementation'
     | '/ssp-iou-requisition'
     | '/ssp-iou-requisition-view'
     | '/ssp-leave-requisition'
@@ -5237,6 +5249,7 @@ export interface RootRouteChildren {
   SspGeneralProductBudgetRequestRoute: typeof SspGeneralProductBudgetRequestRoute
   SspIctProductBudgetRequestRoute: typeof SspIctProductBudgetRequestRoute
   SspIctRequisitionRoute: typeof SspIctRequisitionRoute
+  SspImplementationRoute: typeof SspImplementationRoute
   SspIouRequisitionRoute: typeof SspIouRequisitionRoute
   SspIouRequisitionViewRoute: typeof SspIouRequisitionViewRoute
   SspLeaveRequisitionRoute: typeof SspLeaveRequisitionRoute
@@ -7813,6 +7826,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SspIctRequisitionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ssp-implementation': {
+      id: '/ssp-implementation'
+      path: '/ssp-implementation'
+      fullPath: '/ssp-implementation'
+      preLoaderRoute: typeof SspImplementationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ssp-iou-requisition': {
       id: '/ssp-iou-requisition'
       path: '/ssp-iou-requisition'
@@ -8411,6 +8431,7 @@ const rootRouteChildren: RootRouteChildren = {
   SspGeneralProductBudgetRequestRoute: SspGeneralProductBudgetRequestRoute,
   SspIctProductBudgetRequestRoute: SspIctProductBudgetRequestRoute,
   SspIctRequisitionRoute: SspIctRequisitionRoute,
+  SspImplementationRoute: SspImplementationRoute,
   SspIouRequisitionRoute: SspIouRequisitionRoute,
   SspIouRequisitionViewRoute: SspIouRequisitionViewRoute,
   SspLeaveRequisitionRoute: SspLeaveRequisitionRoute,
