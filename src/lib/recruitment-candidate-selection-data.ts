@@ -147,6 +147,61 @@ export const createDefaultApprovalFlow = (
   },
 ];
 
+export const buildCandidateApprovalTiers = (params: {
+  candidateId: string;
+  l1Status: "Pending" | "Approved";
+  l2Status?: "Pending" | "Approved";
+  l3Status?: "Pending" | "Approved";
+  l1Salary: number;
+  l2Salary?: number;
+  l3Salary?: number;
+  l1Date?: string;
+  l2Date?: string;
+  l3Date?: string;
+  l1Remarks?: string;
+  l2Remarks?: string;
+  l3Remarks?: string;
+  l1ApproverName?: string;
+  l1ApproverRole?: string;
+}): CandidateApprovalTier[] => [
+  {
+    id: `tier-1-${params.candidateId}`,
+    level: 1,
+    tierName: "Tier 1: Department Head Endorsement",
+    approverName: params.l1ApproverName || "Tanvir Ahmed",
+    approverDesignation: params.l1ApproverRole || "Head of Merchandising",
+    company: "Pakiza Knit Composite Ltd.",
+    approvedSalary: params.l1Salary,
+    status: params.l1Status,
+    actionDate: params.l1Date,
+    remarks: params.l1Remarks,
+  },
+  {
+    id: `tier-2-${params.candidateId}`,
+    level: 2,
+    tierName: "Tier 2: HR Operations & Compensation",
+    approverName: "Tahmid Afsar",
+    approverDesignation: "HR Director",
+    company: "Pakiza Software Limited (PSL-Operation)",
+    approvedSalary: params.l2Salary ?? params.l1Salary,
+    status: params.l2Status || "Pending",
+    actionDate: params.l2Date,
+    remarks: params.l2Remarks,
+  },
+  {
+    id: `tier-3-${params.candidateId}`,
+    level: 3,
+    tierName: "Tier 3: Executive Management Approval",
+    approverName: "Engr. Mosharraf Hossain",
+    approverDesignation: "Managing Director & CEO",
+    company: "Pakiza Group",
+    approvedSalary: params.l3Salary ?? params.l2Salary ?? params.l1Salary,
+    status: params.l3Status || "Pending",
+    actionDate: params.l3Date,
+    remarks: params.l3Remarks,
+  },
+];
+
 export const INITIAL_JOBS: JobPost[] = [
   {
     id: "JOB-2026-001",
@@ -239,6 +294,17 @@ export const INITIAL_JOBS: JobPost[] = [
         selected: true,
         selectedAt: "2026-10-25 10:15",
         status: "Selected",
+        approvalTiers: buildCandidateApprovalTiers({
+          candidateId: "PAL000021",
+          l1Status: "Approved",
+          l2Status: "Pending",
+          l3Status: "Pending",
+          l1Salary: 52000,
+          l1Date: "2026-10-25 15:45",
+          l1Remarks: "Endorsed. Strong European accounts portfolio and fast sample turnaround.",
+          l1ApproverName: "Tanvir Ahmed",
+          l1ApproverRole: "Head of Merchandising",
+        }),
         salaryHistory: [
           {
             id: "rev-201",
@@ -349,6 +415,17 @@ export const INITIAL_JOBS: JobPost[] = [
         selected: true,
         selectedAt: "2026-10-25 10:20",
         status: "Selected",
+        approvalTiers: buildCandidateApprovalTiers({
+          candidateId: "PAL000022",
+          l1Status: "Approved",
+          l2Status: "Pending",
+          l3Status: "Pending",
+          l1Salary: 49000,
+          l1Date: "2026-10-25 15:48",
+          l1Remarks: "Endorsed. Immediate joiner with knitwear product development expertise.",
+          l1ApproverName: "Tanvir Ahmed",
+          l1ApproverRole: "Head of Merchandising",
+        }),
         salaryHistory: [
           {
             id: "rev-203",
@@ -643,6 +720,20 @@ export const INITIAL_JOBS: JobPost[] = [
         selected: true,
         selectedAt: "2026-10-26 09:00",
         status: "Selected",
+        approvalTiers: buildCandidateApprovalTiers({
+          candidateId: "PAL000025",
+          l1Status: "Approved",
+          l2Status: "Approved",
+          l3Status: "Pending",
+          l1Salary: 29000,
+          l2Salary: 29000,
+          l1Date: "2026-10-26 10:00",
+          l2Date: "2026-10-26 16:30",
+          l1Remarks: "Nominated and endorsed by QA Director Rezaul Karim.",
+          l2Remarks: "Compensation verified within QA band by HR Director Tahmid Afsar.",
+          l1ApproverName: "Engr. Rezaul Karim",
+          l1ApproverRole: "Quality Assurance Director",
+        }),
         salaryHistory: [
           {
             id: "rev-204",
@@ -714,7 +805,18 @@ export const INITIAL_JOBS: JobPost[] = [
         experience: "3.5 Years",
         noticePeriod: "15 Days",
         selected: false,
-        status: "Shortlisted",
+        status: "Selected",
+        approvalTiers: buildCandidateApprovalTiers({
+          candidateId: "PAL000026",
+          l1Status: "Approved",
+          l2Status: "Pending",
+          l3Status: "Pending",
+          l1Salary: 28000,
+          l1Date: "2026-10-26 10:15",
+          l1Remarks: "Endorsed for sewing floor quality audit by QA Director.",
+          l1ApproverName: "Engr. Rezaul Karim",
+          l1ApproverRole: "Quality Assurance Director",
+        }),
         cv: {
           summary:
             "Meticulous Quality Auditor specializing in sewing floor inline audits, defect classification (Critical, Major, Minor), and Root Cause Analysis (RCA).",
@@ -782,8 +884,27 @@ export const INITIAL_JOBS: JobPost[] = [
         agreedSalary: 16800,
         experience: "4.5 Years",
         noticePeriod: "Immediate",
-        selected: false,
-        status: "Shortlisted",
+        selected: true,
+        status: "Approved",
+        generatedLink: "http://localhost:3000/e-recruitment-form?tempId=PAL000028&candidateName=Md.%20Al-Amin%20Sheikh&department=RMG%20Operation&designation=Operator&jobPost=Senior%20Sewing%20Machine%20Operator",
+        linkGeneratedAt: "2026-10-26 17:00",
+        approvalTiers: buildCandidateApprovalTiers({
+          candidateId: "PAL000028",
+          l1Status: "Approved",
+          l2Status: "Approved",
+          l3Status: "Approved",
+          l1Salary: 16800,
+          l2Salary: 16800,
+          l3Salary: 16800,
+          l1Date: "2026-10-24 11:30",
+          l2Date: "2026-10-25 14:15",
+          l3Date: "2026-10-26 17:00",
+          l1Remarks: "High efficiency grade-A operator approved by Production Manager.",
+          l2Remarks: "Grade A scale salary approved by HR Director.",
+          l3Remarks: "Final appointment authorized by Managing Director & CEO.",
+          l1ApproverName: "Mizanur Rahman",
+          l1ApproverRole: "Production Manager",
+        }),
         cv: {
           summary:
             "High-efficiency Grade-A Sewing Operator proficient in Overlock (4-thread / 5-thread), Single Needle Lockstitch (SNLS), and Flatlock cuff/hem attachments at 85%+ operator efficiency.",
@@ -839,8 +960,22 @@ export const INITIAL_JOBS: JobPost[] = [
         agreedSalary: 16200,
         experience: "3.5 Years",
         noticePeriod: "Immediate",
-        selected: false,
-        status: "Shortlisted",
+        selected: true,
+        status: "Selected",
+        approvalTiers: buildCandidateApprovalTiers({
+          candidateId: "PAL000029",
+          l1Status: "Approved",
+          l2Status: "Approved",
+          l3Status: "Pending",
+          l1Salary: 16200,
+          l2Salary: 16200,
+          l1Date: "2026-10-25 09:30",
+          l2Date: "2026-10-26 12:00",
+          l1Remarks: "Endorsed for waistband special machine by Production Manager.",
+          l2Remarks: "Wage verified within scale by HR Director.",
+          l1ApproverName: "Mizanur Rahman",
+          l1ApproverRole: "Production Manager",
+        }),
         cv: {
           summary:
             "Skilled knitwear sewing operator with specialized training in waistband elastic attach, tape binding, and double needle feed-off-the-arm machine.",
@@ -1069,12 +1204,16 @@ export const INITIAL_JOBS: JobPost[] = [
   },
 ];
 
+export const SEED_VERSION = "demo_layers_v11";
+
 export const getStoredJobSelections = (): JobPost[] => {
   if (typeof window === "undefined") return INITIAL_JOBS;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
+    const currentSeed = localStorage.getItem("recruitment_job_selections_seed_ver");
+    if (!raw || currentSeed !== SEED_VERSION) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_JOBS));
+      localStorage.setItem("recruitment_job_selections_seed_ver", SEED_VERSION);
       return INITIAL_JOBS;
     }
     const parsed = JSON.parse(raw);
@@ -1147,7 +1286,9 @@ export const getOrInitCandidateApprovalTiers = (
   const initialSalary = candidate.initialAgreedSalary || candidate.agreedSalary || 0;
   const currentAgreed = candidate.agreedSalary || initialSalary;
   const isCandidateFullyApproved = candidate.status === "Approved";
-  const isTier1Approved = isCandidateFullyApproved;
+  const isTier1Approved = candidate.status === "Approved" || candidate.status === "Selected";
+  const isTier2Approved = isCandidateFullyApproved;
+  const isTier3Approved = isCandidateFullyApproved && !!candidate.generatedLink;
 
   // Tier 1: Department Head / Functional Lead (Evaluator)
   const tier1Name = job?.assignedPerson || "Tanvir Ahmed";
@@ -1163,7 +1304,7 @@ export const getOrInitCandidateApprovalTiers = (
       company: "Pakiza Knit Composite Ltd.",
       approvedSalary: initialSalary,
       status: isTier1Approved ? "Approved" : "Pending",
-      actionDate: isTier1Approved ? (candidate.selectedAt || "2026-10-13 11:20") : undefined,
+      actionDate: isTier1Approved ? (candidate.selectedAt || "2026-10-25 15:45") : undefined,
       remarks: isTier1Approved
         ? "Candidate credentials verified & endorsed for HR compensation review."
         : undefined,
@@ -1176,9 +1317,9 @@ export const getOrInitCandidateApprovalTiers = (
       approverDesignation: "HR Director",
       company: "Pakiza Software Limited (PSL-Operation)",
       approvedSalary: currentAgreed,
-      status: isCandidateFullyApproved ? "Approved" : "Pending",
-      actionDate: isCandidateFullyApproved ? (candidate.linkGeneratedAt || "2026-10-27 13:10") : undefined,
-      remarks: isCandidateFullyApproved
+      status: isTier2Approved ? "Approved" : "Pending",
+      actionDate: isTier2Approved ? (candidate.linkGeneratedAt || "2026-10-26 14:20") : undefined,
+      remarks: isTier2Approved
         ? "Salary benchmark verified and approved for issuance of recruitment link."
         : undefined,
     },
@@ -1190,9 +1331,9 @@ export const getOrInitCandidateApprovalTiers = (
       approverDesignation: "Managing Director & CEO",
       company: "Pakiza Group",
       approvedSalary: currentAgreed,
-      status: "Pending", // "bakider ta pending thakbe"
-      actionDate: undefined,
-      remarks: undefined,
+      status: isTier3Approved ? "Approved" : "Pending",
+      actionDate: isTier3Approved ? "2026-10-27 10:00" : undefined,
+      remarks: isTier3Approved ? "Final appointment authorized." : undefined,
     },
   ];
 

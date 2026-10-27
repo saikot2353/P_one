@@ -705,98 +705,6 @@ export function CandidateSelectionApprovalPage() {
                 );
               })}
             </div>
-
-            {/* Current Acting Approver Guidance Banner */}
-            <div className="bg-primary/5 border border-primary/20 rounded-xl px-3.5 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-2 text-foreground font-medium flex-wrap">
-                <span className="size-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                <span>
-                  Current Reviewing Level:{" "}
-                  <strong className="text-primary font-bold">
-                    {APPROVAL_LAYERS[activeLayer - 1].name}
-                  </strong>
-                </span>
-                <span className="text-border/80 hidden sm:inline">•</span>
-                <span className="text-muted-foreground">
-                  Acting Approver:{" "}
-                  <strong className="text-foreground">
-                    {APPROVAL_LAYERS[activeLayer - 1].role}
-                  </strong>
-                </span>
-              </div>
-              <div className="text-[11px] text-muted-foreground font-normal">
-                {activeLayer === 1
-                  ? "All 5 candidates in requisition pool appear. Select qualified candidates, adjust salary & forward."
-                  : activeLayer === 2
-                  ? "Only candidates endorsed by Department Head are visible. Select candidates, tune salary & forward."
-                  : "Finalists endorsed by HR Director visible. Grant final authorization & issue links."}
-              </div>
-            </div>
-          </div>
-
-          {/* ─── EXECUTIVE METRICS STRIP (Active Layer Context) ──────────────── */}
-          <div className="bg-card rounded-xl border border-border/70 p-4 shadow-2xs grid grid-cols-2 lg:grid-cols-4 gap-4 divide-y lg:divide-y-0 lg:divide-x divide-border/50">
-            {/* Metric 1 */}
-            <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-3 first:pt-0 first:px-0">
-              <div className="size-9 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                <Clock className="size-4.5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-normal text-muted-foreground">
-                  Awaiting Layer {activeLayer} Action
-                </div>
-                <div className="text-lg font-medium text-amber-600 dark:text-amber-400 font-mono">
-                  {stats.pendingApproval}{" "}
-                  <span className="text-xs font-normal text-muted-foreground">candidates</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Metric 2 */}
-            <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
-              <div className="size-9 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                <UserCheck className="size-4.5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-normal text-muted-foreground">
-                  Approved in Layer {activeLayer}
-                </div>
-                <div className="text-lg font-medium text-emerald-600 dark:text-emerald-400 font-mono">
-                  {stats.totalApproved}{" "}
-                  <span className="text-xs font-normal text-muted-foreground">candidates</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Metric 3 */}
-            <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
-              <div className="size-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <DollarSign className="size-4.5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-normal text-muted-foreground">
-                  Monthly Commitment (L{activeLayer})
-                </div>
-                <div className="text-lg font-medium text-foreground font-mono">
-                  ৳{stats.totalMonthlyCommitment.toLocaleString()}
-                </div>
-              </div>
-            </div>
-
-            {/* Metric 4 */}
-            <div className="flex items-center gap-3 pt-2 lg:pt-0 lg:px-4">
-              <div className="size-9 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                <TrendingDown className="size-4.5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-normal text-muted-foreground">
-                  Budget Surplus Pool
-                </div>
-                <div className="text-lg font-medium text-emerald-600 dark:text-emerald-400 font-mono">
-                  +৳{stats.totalSurplus.toLocaleString()}
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* ─── FILTERS & SEARCH CONTROL BAR ──────────────────────────────── */}
@@ -1311,16 +1219,6 @@ export function CandidateSelectionApprovalPage() {
                                 Approve{selectedInThisJob.length > 0 ? ` (${selectedInThisJob.length})` : ""}
                               </span>
                             </button>
-
-                            <button
-                              type="button"
-                              onClick={() => handleReturnForRevision(job)}
-                              className="h-8 px-3 rounded-lg border border-border bg-card hover:bg-muted text-foreground text-xs font-normal transition flex items-center gap-1 cursor-pointer"
-                              title={`Reset Layer ${activeLayer} statuses for this job`}
-                            >
-                              <RotateCcw className="size-3 text-muted-foreground" />
-                              <span>Reset L{activeLayer}</span>
-                            </button>
                           </div>
                         </div>
                       </div>
@@ -1798,17 +1696,6 @@ export function CandidateSelectionApprovalPage() {
                           >
                             +2k
                           </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setReviewModal((prev) =>
-                                prev ? { ...prev, adjustedSalary: initialSalary } : null
-                              )
-                            }
-                            className="h-6.5 px-2 rounded-md bg-muted hover:bg-muted/80 text-[11px] text-muted-foreground hover:text-foreground ml-auto transition cursor-pointer"
-                          >
-                            Reset
-                          </button>
                         </div>
                       )}
                     </div>
@@ -1834,72 +1721,46 @@ export function CandidateSelectionApprovalPage() {
                     )}
                   </div>
 
-                  {/* Inside Modal Action: Select Candidate or Approve Directly */}
-                  <div className="pt-4 border-t border-border/70 flex flex-col gap-2 mt-4">
-                    {!isApprovedInActiveLayer ? (
-                      <>
-                        {/* 1. Primary Selection Button: View kore select korbe */}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const isCurrentlySelected = !!selectedCandidateIds[candidate.id];
-                            toggleCandidateSelect(candidate.id);
-                            setInlineSalaries((prev) => ({
-                              ...prev,
-                              [candidate.id]: adjustedSalary,
-                            }));
-                            toast.success(
-                              isCurrentlySelected
-                                ? `Deselected ${candidate.name}`
-                                : `✓ ${candidate.name} selected for approval at ৳${adjustedSalary.toLocaleString()}`
-                            );
-                          }}
-                          className={`w-full h-10.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-xs ${
-                            selectedCandidateIds[candidate.id]
-                              ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                              : "bg-primary text-primary-foreground hover:opacity-90"
-                          }`}
-                        >
-                          {selectedCandidateIds[candidate.id] ? (
-                            <>
-                              <CheckCircle2 className="size-4" />
-                              <span>✓ Candidate Selected (Click to Deselect)</span>
-                            </>
-                          ) : (
-                            <>
-                              <UserCheck className="size-4" />
-                              <span>Select Candidate (৳{adjustedSalary.toLocaleString()})</span>
-                            </>
-                          )}
-                        </button>
-
-                        {/* 2. Direct 1-Click Approve Now Option */}
-                        <button
-                          type="button"
-                          onClick={handleApproveFromModal}
-                          className="w-full h-9 rounded-xl bg-card hover:bg-muted text-foreground border border-border font-medium text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
-                        >
-                          <Check className="size-3.5 stroke-[2.5] text-emerald-600" />
-                          <span>
-                            {activeLayer === 1
-                              ? "Approve Now & Forward to Layer 2"
-                              : activeLayer === 2
-                              ? "Approve Now & Forward to Layer 3"
-                              : "Grant Final Authorization Now"}
-                          </span>
-                        </button>
-                      </>
-                    ) : (
-                      <div className="w-full h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-2">
-                        <Check className="size-4 stroke-[2.5]" />
-                        <span>Approved in Layer {activeLayer}</span>
-                      </div>
-                    )}
+                  {/* Modal Action Buttons: ONLY TWO BUTTONS - Select & Close */}
+                  <div className="pt-4 border-t border-border/70 flex flex-col gap-2 mt-auto">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const isCurrentlySelected = !!selectedCandidateIds[candidate.id];
+                        toggleCandidateSelect(candidate.id);
+                        setInlineSalaries((prev) => ({
+                          ...prev,
+                          [candidate.id]: adjustedSalary,
+                        }));
+                        toast.success(
+                          isCurrentlySelected
+                            ? `Deselected ${candidate.name}`
+                            : `✓ ${candidate.name} selected`
+                        );
+                      }}
+                      className={`w-full h-10 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-xs ${
+                        selectedCandidateIds[candidate.id]
+                          ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                          : "bg-primary text-primary-foreground hover:opacity-90"
+                      }`}
+                    >
+                      {selectedCandidateIds[candidate.id] ? (
+                        <>
+                          <Check className="size-4 stroke-[2.5]" />
+                          <span>Selected</span>
+                        </>
+                      ) : (
+                        <>
+                          <UserCheck className="size-4" />
+                          <span>Select</span>
+                        </>
+                      )}
+                    </button>
 
                     <button
                       type="button"
                       onClick={() => setReviewModal(null)}
-                      className="w-full h-8.5 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground text-xs font-normal transition cursor-pointer"
+                      className="w-full h-9 rounded-xl border border-border bg-card hover:bg-muted text-foreground text-xs font-medium transition cursor-pointer flex items-center justify-center"
                     >
                       Close
                     </button>
