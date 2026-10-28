@@ -168,6 +168,8 @@ export const nav: NavItem[] = [
     icon: UserRound,
     subitems: [
       { label: "Personnel List", to: "/personnel-list" },
+      { label: "Employee Account Information", to: "/employee-account-information" },
+      { label: "Bulk Account Upload", to: "/bulk-account-upload" },
       { label: "ID Card Setup", to: "/id-card-setup" },
       { label: "Employee Doc Issue", to: "/employee-doc-issue" },
       { label: "Set HOD", to: "/set-hod" },
@@ -201,8 +203,11 @@ export const nav: NavItem[] = [
       { label: "Leave Application", to: "/leave-application" },
       { label: "Bulk Leave", to: "/bulk-leave" },
       {
-        label: "Maternity",
+        label: "Maternity Leave",
         subitems: [
+          { label: "Welfare Verification", to: "/maternity-welfare-verification" },
+          { label: "Medical Verification", to: "/maternity-medical-verification" },
+          { label: "HR Verification", to: "/maternity-hr-verification" },
           { label: "Maternity Payment", to: "/maternity-payment" },
           { label: "Maternity Payment Report", to: "/maternity-payment-report" },
         ],

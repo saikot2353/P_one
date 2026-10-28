@@ -27,6 +27,7 @@ import { Route as BudgetOvertimeRouteImport } from './routes/budget-overtime'
 import { Route as BudgetPlanningRouteImport } from './routes/budget-planning'
 import { Route as BudgetRequisitionApprovalsRouteImport } from './routes/budget-requisition-approvals'
 import { Route as BudgetStatementRouteImport } from './routes/budget-statement'
+import { Route as BulkAccountUploadRouteImport } from './routes/bulk-account-upload'
 import { Route as BulkLeaveRouteImport } from './routes/bulk-leave'
 import { Route as CashSheetPrintRouteImport } from './routes/cash-sheet-print'
 import { Route as ChangeEmployeeStatusRouteImport } from './routes/change-employee-status'
@@ -59,6 +60,7 @@ import { Route as EarnLeavePayReportRouteImport } from './routes/earn-leave-pay-
 import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
 import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
+import { Route as EmployeeAccountInformationRouteImport } from './routes/employee-account-information'
 import { Route as EmployeeDocIssueRouteImport } from './routes/employee-doc-issue'
 import { Route as EmployeeDocVerificationRouteImport } from './routes/employee-doc-verification'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
@@ -188,8 +190,11 @@ import { Route as LunchRequisitionApprovalRouteImport } from './routes/lunch-req
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as MaternityConfigurationRouteImport } from './routes/maternity-configuration'
+import { Route as MaternityHrVerificationRouteImport } from './routes/maternity-hr-verification'
+import { Route as MaternityMedicalVerificationRouteImport } from './routes/maternity-medical-verification'
 import { Route as MaternityPaymentRouteImport } from './routes/maternity-payment'
 import { Route as MaternityPaymentReportRouteImport } from './routes/maternity-payment-report'
+import { Route as MaternityWelfareVerificationRouteImport } from './routes/maternity-welfare-verification'
 import { Route as MerchandisingBomRouteImport } from './routes/merchandising-bom'
 import { Route as MerchandisingCadRouteImport } from './routes/merchandising-cad'
 import { Route as MerchandisingCapacityAllocationRouteImport } from './routes/merchandising-capacity-allocation'
@@ -496,6 +501,11 @@ const BudgetStatementRoute = BudgetStatementRouteImport.update({
   path: '/budget-statement',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BulkAccountUploadRoute = BulkAccountUploadRouteImport.update({
+  id: '/bulk-account-upload',
+  path: '/bulk-account-upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BulkLeaveRoute = BulkLeaveRouteImport.update({
   id: '/bulk-leave',
   path: '/bulk-leave',
@@ -659,6 +669,12 @@ const EarnLeaveWorkflowRoute = EarnLeaveWorkflowRouteImport.update({
   path: '/earn-leave-workflow',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployeeAccountInformationRoute =
+  EmployeeAccountInformationRouteImport.update({
+    id: '/employee-account-information',
+    path: '/employee-account-information',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EmployeeDocIssueRoute = EmployeeDocIssueRouteImport.update({
   id: '/employee-doc-issue',
   path: '/employee-doc-issue',
@@ -1333,6 +1349,17 @@ const MaternityConfigurationRoute = MaternityConfigurationRouteImport.update({
   path: '/maternity-configuration',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MaternityHrVerificationRoute = MaternityHrVerificationRouteImport.update({
+  id: '/maternity-hr-verification',
+  path: '/maternity-hr-verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaternityMedicalVerificationRoute =
+  MaternityMedicalVerificationRouteImport.update({
+    id: '/maternity-medical-verification',
+    path: '/maternity-medical-verification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MaternityPaymentRoute = MaternityPaymentRouteImport.update({
   id: '/maternity-payment',
   path: '/maternity-payment',
@@ -1343,6 +1370,12 @@ const MaternityPaymentReportRoute = MaternityPaymentReportRouteImport.update({
   path: '/maternity-payment-report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MaternityWelfareVerificationRoute =
+  MaternityWelfareVerificationRouteImport.update({
+    id: '/maternity-welfare-verification',
+    path: '/maternity-welfare-verification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MerchandisingBomRoute = MerchandisingBomRouteImport.update({
   id: '/merchandising-bom',
   path: '/merchandising-bom',
@@ -2518,6 +2551,7 @@ export interface FileRoutesByFullPath {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/bulk-account-upload': typeof BulkAccountUploadRoute
   '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
   '/change-employee-status': typeof ChangeEmployeeStatusRoute
@@ -2550,6 +2584,7 @@ export interface FileRoutesByFullPath {
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-account-information': typeof EmployeeAccountInformationRoute
   '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
@@ -2679,8 +2714,11 @@ export interface FileRoutesByFullPath {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
+  '/maternity-hr-verification': typeof MaternityHrVerificationRoute
+  '/maternity-medical-verification': typeof MaternityMedicalVerificationRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
+  '/maternity-welfare-verification': typeof MaternityWelfareVerificationRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
@@ -2915,6 +2953,7 @@ export interface FileRoutesByTo {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/bulk-account-upload': typeof BulkAccountUploadRoute
   '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
   '/change-employee-status': typeof ChangeEmployeeStatusRoute
@@ -2947,6 +2986,7 @@ export interface FileRoutesByTo {
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-account-information': typeof EmployeeAccountInformationRoute
   '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
@@ -3076,8 +3116,11 @@ export interface FileRoutesByTo {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
+  '/maternity-hr-verification': typeof MaternityHrVerificationRoute
+  '/maternity-medical-verification': typeof MaternityMedicalVerificationRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
+  '/maternity-welfare-verification': typeof MaternityWelfareVerificationRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
@@ -3313,6 +3356,7 @@ export interface FileRoutesById {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/bulk-account-upload': typeof BulkAccountUploadRoute
   '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
   '/change-employee-status': typeof ChangeEmployeeStatusRoute
@@ -3345,6 +3389,7 @@ export interface FileRoutesById {
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-account-information': typeof EmployeeAccountInformationRoute
   '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
@@ -3474,8 +3519,11 @@ export interface FileRoutesById {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
+  '/maternity-hr-verification': typeof MaternityHrVerificationRoute
+  '/maternity-medical-verification': typeof MaternityMedicalVerificationRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
+  '/maternity-welfare-verification': typeof MaternityWelfareVerificationRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
@@ -3712,6 +3760,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/bulk-account-upload'
     | '/bulk-leave'
     | '/cash-sheet-print'
     | '/change-employee-status'
@@ -3744,6 +3793,7 @@ export interface FileRouteTypes {
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
+    | '/employee-account-information'
     | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
@@ -3873,8 +3923,11 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
+    | '/maternity-hr-verification'
+    | '/maternity-medical-verification'
     | '/maternity-payment'
     | '/maternity-payment-report'
+    | '/maternity-welfare-verification'
     | '/merchandising-bom'
     | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
@@ -4109,6 +4162,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/bulk-account-upload'
     | '/bulk-leave'
     | '/cash-sheet-print'
     | '/change-employee-status'
@@ -4141,6 +4195,7 @@ export interface FileRouteTypes {
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
+    | '/employee-account-information'
     | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
@@ -4270,8 +4325,11 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
+    | '/maternity-hr-verification'
+    | '/maternity-medical-verification'
     | '/maternity-payment'
     | '/maternity-payment-report'
+    | '/maternity-welfare-verification'
     | '/merchandising-bom'
     | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
@@ -4506,6 +4564,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/bulk-account-upload'
     | '/bulk-leave'
     | '/cash-sheet-print'
     | '/change-employee-status'
@@ -4538,6 +4597,7 @@ export interface FileRouteTypes {
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
+    | '/employee-account-information'
     | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
@@ -4667,8 +4727,11 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
+    | '/maternity-hr-verification'
+    | '/maternity-medical-verification'
     | '/maternity-payment'
     | '/maternity-payment-report'
+    | '/maternity-welfare-verification'
     | '/merchandising-bom'
     | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
@@ -4904,6 +4967,7 @@ export interface RootRouteChildren {
   BudgetPlanningRoute: typeof BudgetPlanningRoute
   BudgetRequisitionApprovalsRoute: typeof BudgetRequisitionApprovalsRoute
   BudgetStatementRoute: typeof BudgetStatementRoute
+  BulkAccountUploadRoute: typeof BulkAccountUploadRoute
   BulkLeaveRoute: typeof BulkLeaveRoute
   CashSheetPrintRoute: typeof CashSheetPrintRoute
   ChangeEmployeeStatusRoute: typeof ChangeEmployeeStatusRoute
@@ -4936,6 +5000,7 @@ export interface RootRouteChildren {
   EarnLeaveProcessRoute: typeof EarnLeaveProcessRoute
   EarnLeaveSubmitRoute: typeof EarnLeaveSubmitRoute
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
+  EmployeeAccountInformationRoute: typeof EmployeeAccountInformationRoute
   EmployeeDocIssueRoute: typeof EmployeeDocIssueRoute
   EmployeeDocVerificationRoute: typeof EmployeeDocVerificationRoute
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
@@ -5065,8 +5130,11 @@ export interface RootRouteChildren {
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
   MaternityConfigurationRoute: typeof MaternityConfigurationRoute
+  MaternityHrVerificationRoute: typeof MaternityHrVerificationRoute
+  MaternityMedicalVerificationRoute: typeof MaternityMedicalVerificationRoute
   MaternityPaymentRoute: typeof MaternityPaymentRoute
   MaternityPaymentReportRoute: typeof MaternityPaymentReportRoute
+  MaternityWelfareVerificationRoute: typeof MaternityWelfareVerificationRoute
   MerchandisingBomRoute: typeof MerchandisingBomRoute
   MerchandisingCadRoute: typeof MerchandisingCadRoute
   MerchandisingCapacityAllocationRoute: typeof MerchandisingCapacityAllocationRoute
@@ -5411,6 +5479,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BudgetStatementRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bulk-account-upload': {
+      id: '/bulk-account-upload'
+      path: '/bulk-account-upload'
+      fullPath: '/bulk-account-upload'
+      preLoaderRoute: typeof BulkAccountUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bulk-leave': {
       id: '/bulk-leave'
       path: '/bulk-leave'
@@ -5633,6 +5708,13 @@ declare module '@tanstack/react-router' {
       path: '/earn-leave-workflow'
       fullPath: '/earn-leave-workflow'
       preLoaderRoute: typeof EarnLeaveWorkflowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/employee-account-information': {
+      id: '/employee-account-information'
+      path: '/employee-account-information'
+      fullPath: '/employee-account-information'
+      preLoaderRoute: typeof EmployeeAccountInformationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/employee-doc-issue': {
@@ -6538,6 +6620,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MaternityConfigurationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/maternity-hr-verification': {
+      id: '/maternity-hr-verification'
+      path: '/maternity-hr-verification'
+      fullPath: '/maternity-hr-verification'
+      preLoaderRoute: typeof MaternityHrVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maternity-medical-verification': {
+      id: '/maternity-medical-verification'
+      path: '/maternity-medical-verification'
+      fullPath: '/maternity-medical-verification'
+      preLoaderRoute: typeof MaternityMedicalVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/maternity-payment': {
       id: '/maternity-payment'
       path: '/maternity-payment'
@@ -6550,6 +6646,13 @@ declare module '@tanstack/react-router' {
       path: '/maternity-payment-report'
       fullPath: '/maternity-payment-report'
       preLoaderRoute: typeof MaternityPaymentReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maternity-welfare-verification': {
+      id: '/maternity-welfare-verification'
+      path: '/maternity-welfare-verification'
+      fullPath: '/maternity-welfare-verification'
+      preLoaderRoute: typeof MaternityWelfareVerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/merchandising-bom': {
@@ -8072,6 +8175,7 @@ const rootRouteChildren: RootRouteChildren = {
   BudgetPlanningRoute: BudgetPlanningRoute,
   BudgetRequisitionApprovalsRoute: BudgetRequisitionApprovalsRoute,
   BudgetStatementRoute: BudgetStatementRoute,
+  BulkAccountUploadRoute: BulkAccountUploadRoute,
   BulkLeaveRoute: BulkLeaveRoute,
   CashSheetPrintRoute: CashSheetPrintRoute,
   ChangeEmployeeStatusRoute: ChangeEmployeeStatusRoute,
@@ -8104,6 +8208,7 @@ const rootRouteChildren: RootRouteChildren = {
   EarnLeaveProcessRoute: EarnLeaveProcessRoute,
   EarnLeaveSubmitRoute: EarnLeaveSubmitRoute,
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
+  EmployeeAccountInformationRoute: EmployeeAccountInformationRoute,
   EmployeeDocIssueRoute: EmployeeDocIssueRoute,
   EmployeeDocVerificationRoute: EmployeeDocVerificationRoute,
   EmployeeJobCardRoute: EmployeeJobCardRoute,
@@ -8235,8 +8340,11 @@ const rootRouteChildren: RootRouteChildren = {
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
   MaternityConfigurationRoute: MaternityConfigurationRoute,
+  MaternityHrVerificationRoute: MaternityHrVerificationRoute,
+  MaternityMedicalVerificationRoute: MaternityMedicalVerificationRoute,
   MaternityPaymentRoute: MaternityPaymentRoute,
   MaternityPaymentReportRoute: MaternityPaymentReportRoute,
+  MaternityWelfareVerificationRoute: MaternityWelfareVerificationRoute,
   MerchandisingBomRoute: MerchandisingBomRoute,
   MerchandisingCadRoute: MerchandisingCadRoute,
   MerchandisingCapacityAllocationRoute: MerchandisingCapacityAllocationRoute,
