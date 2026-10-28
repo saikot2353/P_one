@@ -347,6 +347,7 @@ import { Route as RecruitmentBasicInfoListRouteImport } from './routes/recruitme
 import { Route as RecruitmentBasicListRouteImport } from './routes/recruitment-basic-list'
 import { Route as RecruitmentBasicSetupRouteImport } from './routes/recruitment-basic-setup'
 import { Route as RecruitmentCandidateSelectionRouteImport } from './routes/recruitment-candidate-selection'
+import { Route as RecruitmentCandidateSelectionApprovalRouteImport } from './routes/recruitment-candidate-selection-approval'
 import { Route as RecruitmentConfigurationRouteImport } from './routes/recruitment-configuration'
 import { Route as RecruitmentHrListRouteImport } from './routes/recruitment-hr-list'
 import { Route as RecruitmentIeListRouteImport } from './routes/recruitment-ie-list'
@@ -373,6 +374,7 @@ import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
 import { Route as SspGeneralProductBudgetRequestRouteImport } from './routes/ssp-general-product-budget-request'
 import { Route as SspIctProductBudgetRequestRouteImport } from './routes/ssp-ict-product-budget-request'
 import { Route as SspIctRequisitionRouteImport } from './routes/ssp-ict-requisition'
+import { Route as SspImplementationRouteImport } from './routes/ssp-implementation'
 import { Route as SspIouRequisitionRouteImport } from './routes/ssp-iou-requisition'
 import { Route as SspIouRequisitionViewRouteImport } from './routes/ssp-iou-requisition-view'
 import { Route as SspLeaveRequisitionRouteImport } from './routes/ssp-leave-requisition'
@@ -383,6 +385,8 @@ import { Route as SspProductBudgetRequestRouteImport } from './routes/ssp-produc
 import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
 import { Route as SspSimRequisitionRouteImport } from './routes/ssp-sim-requisition'
 import { Route as SspSimRequisitionViewRouteImport } from './routes/ssp-sim-requisition-view'
+import { Route as SspStoreRequisitionRouteImport } from './routes/ssp-store-requisition'
+import { Route as SspStoreRequisitionViewRouteImport } from './routes/ssp-store-requisition-view'
 import { Route as SummarySalarySheetRouteImport } from './routes/summary-salary-sheet'
 import { Route as SyncRequisitionRouteImport } from './routes/sync-requisition'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
@@ -2197,6 +2201,12 @@ const RecruitmentCandidateSelectionRoute =
     path: '/recruitment-candidate-selection',
     getParentRoute: () => rootRouteImport,
   } as any)
+const RecruitmentCandidateSelectionApprovalRoute =
+  RecruitmentCandidateSelectionApprovalRouteImport.update({
+    id: '/recruitment-candidate-selection-approval',
+    path: '/recruitment-candidate-selection-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const RecruitmentConfigurationRoute =
   RecruitmentConfigurationRouteImport.update({
     id: '/recruitment-configuration',
@@ -2336,6 +2346,11 @@ const SspIctRequisitionRoute = SspIctRequisitionRouteImport.update({
   path: '/ssp-ict-requisition',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SspImplementationRoute = SspImplementationRouteImport.update({
+  id: '/ssp-implementation',
+  path: '/ssp-implementation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SspIouRequisitionRoute = SspIouRequisitionRouteImport.update({
   id: '/ssp-iou-requisition',
   path: '/ssp-iou-requisition',
@@ -2385,6 +2400,16 @@ const SspSimRequisitionRoute = SspSimRequisitionRouteImport.update({
 const SspSimRequisitionViewRoute = SspSimRequisitionViewRouteImport.update({
   id: '/ssp-sim-requisition-view',
   path: '/ssp-sim-requisition-view',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspStoreRequisitionRoute = SspStoreRequisitionRouteImport.update({
+  id: '/ssp-store-requisition',
+  path: '/ssp-store-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspStoreRequisitionViewRoute = SspStoreRequisitionViewRouteImport.update({
+  id: '/ssp-store-requisition-view',
+  path: '/ssp-store-requisition-view',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SummarySalarySheetRoute = SummarySalarySheetRouteImport.update({
@@ -2826,6 +2851,7 @@ export interface FileRoutesByFullPath {
   '/recruitment-basic-list': typeof RecruitmentBasicListRoute
   '/recruitment-basic-setup': typeof RecruitmentBasicSetupRoute
   '/recruitment-candidate-selection': typeof RecruitmentCandidateSelectionRoute
+  '/recruitment-candidate-selection-approval': typeof RecruitmentCandidateSelectionApprovalRoute
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
@@ -2852,6 +2878,7 @@ export interface FileRoutesByFullPath {
   '/ssp-general-product-budget-request': typeof SspGeneralProductBudgetRequestRoute
   '/ssp-ict-product-budget-request': typeof SspIctProductBudgetRequestRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-implementation': typeof SspImplementationRoute
   '/ssp-iou-requisition': typeof SspIouRequisitionRoute
   '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
   '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
@@ -2862,6 +2889,8 @@ export interface FileRoutesByFullPath {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/ssp-store-requisition': typeof SspStoreRequisitionRoute
+  '/ssp-store-requisition-view': typeof SspStoreRequisitionViewRoute
   '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/sync-requisition': typeof SyncRequisitionRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
@@ -3221,6 +3250,7 @@ export interface FileRoutesByTo {
   '/recruitment-basic-list': typeof RecruitmentBasicListRoute
   '/recruitment-basic-setup': typeof RecruitmentBasicSetupRoute
   '/recruitment-candidate-selection': typeof RecruitmentCandidateSelectionRoute
+  '/recruitment-candidate-selection-approval': typeof RecruitmentCandidateSelectionApprovalRoute
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
@@ -3247,6 +3277,7 @@ export interface FileRoutesByTo {
   '/ssp-general-product-budget-request': typeof SspGeneralProductBudgetRequestRoute
   '/ssp-ict-product-budget-request': typeof SspIctProductBudgetRequestRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-implementation': typeof SspImplementationRoute
   '/ssp-iou-requisition': typeof SspIouRequisitionRoute
   '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
   '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
@@ -3257,6 +3288,8 @@ export interface FileRoutesByTo {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/ssp-store-requisition': typeof SspStoreRequisitionRoute
+  '/ssp-store-requisition-view': typeof SspStoreRequisitionViewRoute
   '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/sync-requisition': typeof SyncRequisitionRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
@@ -3617,6 +3650,7 @@ export interface FileRoutesById {
   '/recruitment-basic-list': typeof RecruitmentBasicListRoute
   '/recruitment-basic-setup': typeof RecruitmentBasicSetupRoute
   '/recruitment-candidate-selection': typeof RecruitmentCandidateSelectionRoute
+  '/recruitment-candidate-selection-approval': typeof RecruitmentCandidateSelectionApprovalRoute
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
@@ -3643,6 +3677,7 @@ export interface FileRoutesById {
   '/ssp-general-product-budget-request': typeof SspGeneralProductBudgetRequestRoute
   '/ssp-ict-product-budget-request': typeof SspIctProductBudgetRequestRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-implementation': typeof SspImplementationRoute
   '/ssp-iou-requisition': typeof SspIouRequisitionRoute
   '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
   '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
@@ -3653,6 +3688,8 @@ export interface FileRoutesById {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/ssp-sim-requisition': typeof SspSimRequisitionRoute
   '/ssp-sim-requisition-view': typeof SspSimRequisitionViewRoute
+  '/ssp-store-requisition': typeof SspStoreRequisitionRoute
+  '/ssp-store-requisition-view': typeof SspStoreRequisitionViewRoute
   '/summary-salary-sheet': typeof SummarySalarySheetRoute
   '/sync-requisition': typeof SyncRequisitionRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
@@ -4014,6 +4051,7 @@ export interface FileRouteTypes {
     | '/recruitment-basic-list'
     | '/recruitment-basic-setup'
     | '/recruitment-candidate-selection'
+    | '/recruitment-candidate-selection-approval'
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
@@ -4040,6 +4078,7 @@ export interface FileRouteTypes {
     | '/ssp-general-product-budget-request'
     | '/ssp-ict-product-budget-request'
     | '/ssp-ict-requisition'
+    | '/ssp-implementation'
     | '/ssp-iou-requisition'
     | '/ssp-iou-requisition-view'
     | '/ssp-leave-requisition'
@@ -4050,6 +4089,8 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/ssp-store-requisition'
+    | '/ssp-store-requisition-view'
     | '/summary-salary-sheet'
     | '/sync-requisition'
     | '/transfer-control-center'
@@ -4409,6 +4450,7 @@ export interface FileRouteTypes {
     | '/recruitment-basic-list'
     | '/recruitment-basic-setup'
     | '/recruitment-candidate-selection'
+    | '/recruitment-candidate-selection-approval'
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
@@ -4435,6 +4477,7 @@ export interface FileRouteTypes {
     | '/ssp-general-product-budget-request'
     | '/ssp-ict-product-budget-request'
     | '/ssp-ict-requisition'
+    | '/ssp-implementation'
     | '/ssp-iou-requisition'
     | '/ssp-iou-requisition-view'
     | '/ssp-leave-requisition'
@@ -4445,6 +4488,8 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/ssp-store-requisition'
+    | '/ssp-store-requisition-view'
     | '/summary-salary-sheet'
     | '/sync-requisition'
     | '/transfer-control-center'
@@ -4804,6 +4849,7 @@ export interface FileRouteTypes {
     | '/recruitment-basic-list'
     | '/recruitment-basic-setup'
     | '/recruitment-candidate-selection'
+    | '/recruitment-candidate-selection-approval'
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
@@ -4830,6 +4876,7 @@ export interface FileRouteTypes {
     | '/ssp-general-product-budget-request'
     | '/ssp-ict-product-budget-request'
     | '/ssp-ict-requisition'
+    | '/ssp-implementation'
     | '/ssp-iou-requisition'
     | '/ssp-iou-requisition-view'
     | '/ssp-leave-requisition'
@@ -4840,6 +4887,8 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/ssp-sim-requisition'
     | '/ssp-sim-requisition-view'
+    | '/ssp-store-requisition'
+    | '/ssp-store-requisition-view'
     | '/summary-salary-sheet'
     | '/sync-requisition'
     | '/transfer-control-center'
@@ -5200,6 +5249,7 @@ export interface RootRouteChildren {
   RecruitmentBasicListRoute: typeof RecruitmentBasicListRoute
   RecruitmentBasicSetupRoute: typeof RecruitmentBasicSetupRoute
   RecruitmentCandidateSelectionRoute: typeof RecruitmentCandidateSelectionRoute
+  RecruitmentCandidateSelectionApprovalRoute: typeof RecruitmentCandidateSelectionApprovalRoute
   RecruitmentConfigurationRoute: typeof RecruitmentConfigurationRoute
   RecruitmentHrListRoute: typeof RecruitmentHrListRoute
   RecruitmentIeListRoute: typeof RecruitmentIeListRoute
@@ -5226,6 +5276,7 @@ export interface RootRouteChildren {
   SspGeneralProductBudgetRequestRoute: typeof SspGeneralProductBudgetRequestRoute
   SspIctProductBudgetRequestRoute: typeof SspIctProductBudgetRequestRoute
   SspIctRequisitionRoute: typeof SspIctRequisitionRoute
+  SspImplementationRoute: typeof SspImplementationRoute
   SspIouRequisitionRoute: typeof SspIouRequisitionRoute
   SspIouRequisitionViewRoute: typeof SspIouRequisitionViewRoute
   SspLeaveRequisitionRoute: typeof SspLeaveRequisitionRoute
@@ -5236,6 +5287,8 @@ export interface RootRouteChildren {
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   SspSimRequisitionRoute: typeof SspSimRequisitionRoute
   SspSimRequisitionViewRoute: typeof SspSimRequisitionViewRoute
+  SspStoreRequisitionRoute: typeof SspStoreRequisitionRoute
+  SspStoreRequisitionViewRoute: typeof SspStoreRequisitionViewRoute
   SummarySalarySheetRoute: typeof SummarySalarySheetRoute
   SyncRequisitionRoute: typeof SyncRequisitionRoute
   TransferControlCenterRoute: typeof TransferControlCenterRoute
@@ -7625,6 +7678,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecruitmentCandidateSelectionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recruitment-candidate-selection-approval': {
+      id: '/recruitment-candidate-selection-approval'
+      path: '/recruitment-candidate-selection-approval'
+      fullPath: '/recruitment-candidate-selection-approval'
+      preLoaderRoute: typeof RecruitmentCandidateSelectionApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/recruitment-configuration': {
       id: '/recruitment-configuration'
       path: '/recruitment-configuration'
@@ -7807,6 +7867,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SspIctRequisitionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ssp-implementation': {
+      id: '/ssp-implementation'
+      path: '/ssp-implementation'
+      fullPath: '/ssp-implementation'
+      preLoaderRoute: typeof SspImplementationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ssp-iou-requisition': {
       id: '/ssp-iou-requisition'
       path: '/ssp-iou-requisition'
@@ -7875,6 +7942,20 @@ declare module '@tanstack/react-router' {
       path: '/ssp-sim-requisition-view'
       fullPath: '/ssp-sim-requisition-view'
       preLoaderRoute: typeof SspSimRequisitionViewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-store-requisition': {
+      id: '/ssp-store-requisition'
+      path: '/ssp-store-requisition'
+      fullPath: '/ssp-store-requisition'
+      preLoaderRoute: typeof SspStoreRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-store-requisition-view': {
+      id: '/ssp-store-requisition-view'
+      path: '/ssp-store-requisition-view'
+      fullPath: '/ssp-store-requisition-view'
+      preLoaderRoute: typeof SspStoreRequisitionViewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/summary-salary-sheet': {
@@ -8365,6 +8446,8 @@ const rootRouteChildren: RootRouteChildren = {
   RecruitmentBasicListRoute: RecruitmentBasicListRoute,
   RecruitmentBasicSetupRoute: RecruitmentBasicSetupRoute,
   RecruitmentCandidateSelectionRoute: RecruitmentCandidateSelectionRoute,
+  RecruitmentCandidateSelectionApprovalRoute:
+    RecruitmentCandidateSelectionApprovalRoute,
   RecruitmentConfigurationRoute: RecruitmentConfigurationRoute,
   RecruitmentHrListRoute: RecruitmentHrListRoute,
   RecruitmentIeListRoute: RecruitmentIeListRoute,
@@ -8391,6 +8474,7 @@ const rootRouteChildren: RootRouteChildren = {
   SspGeneralProductBudgetRequestRoute: SspGeneralProductBudgetRequestRoute,
   SspIctProductBudgetRequestRoute: SspIctProductBudgetRequestRoute,
   SspIctRequisitionRoute: SspIctRequisitionRoute,
+  SspImplementationRoute: SspImplementationRoute,
   SspIouRequisitionRoute: SspIouRequisitionRoute,
   SspIouRequisitionViewRoute: SspIouRequisitionViewRoute,
   SspLeaveRequisitionRoute: SspLeaveRequisitionRoute,
@@ -8401,6 +8485,8 @@ const rootRouteChildren: RootRouteChildren = {
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   SspSimRequisitionRoute: SspSimRequisitionRoute,
   SspSimRequisitionViewRoute: SspSimRequisitionViewRoute,
+  SspStoreRequisitionRoute: SspStoreRequisitionRoute,
+  SspStoreRequisitionViewRoute: SspStoreRequisitionViewRoute,
   SummarySalarySheetRoute: SummarySalarySheetRoute,
   SyncRequisitionRoute: SyncRequisitionRoute,
   TransferControlCenterRoute: TransferControlCenterRoute,

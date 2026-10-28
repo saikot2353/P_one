@@ -82,6 +82,7 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "New Requisition", to: "/ssp-new-requisition" },
       { label: "My Requisition", to: "/ssp-my-requisition" },
+      { label: "Implementation", to: "/ssp-implementation" },
       {
         label: "Attendance",
         subitems: [
@@ -261,6 +262,7 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "Application Queue", to: "/recruitment-basic-list" },
       { label: "Candidate Selection", to: "/recruitment-candidate-selection" },
+      { label: "Candidate Selection Approval", to: "/recruitment-candidate-selection-approval" },
       // { label: "Settings", to: "/recruitment-settings" },
       // { label: "Approved List", to: "/recruitment-assessment-list" },
     ],

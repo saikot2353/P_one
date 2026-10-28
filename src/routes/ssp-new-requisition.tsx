@@ -1,6 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
   ChevronRight,
   CalendarClock,
@@ -16,7 +18,30 @@ import {
   HandCoins,
   Monitor,
   ShoppingBag,
+  Wrench,
+  Plus,
+  Trash2,
+  UserCheck,
+  User,
+  AlertCircle,
+  X,
+  ExternalLink,
+  Layers,
+  Eye,
 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  ICT_SERVICES_OPTIONS,
+  ICT_PRODUCTS_OPTIONS,
+  GENERAL_PRODUCTS_OPTIONS,
+  EMPLOYEE_OPTIONS,
+  QUANTITY_UNITS,
+  StoreRequisitionItem,
+} from "./ssp-store-requisition";
+import {
+  GeneralStoreRequisitionModal,
+  RequisitionViewData,
+} from "@/components/ssp/GeneralStoreRequisitionModal";
 
 export const Route = createFileRoute("/ssp-new-requisition")({
   head: () => ({
@@ -33,6 +58,33 @@ export const Route = createFileRoute("/ssp-new-requisition")({
 });
 
 function NewRequisitionPage() {
+  const navigate = useNavigate();
+
+  // ─── STORE REQUISITION MODAL STATE ───
+  const [storeModalOpen, setStoreModalOpen] = useState(false);
+  const [reqType, setReqType] = useState<"ICT" | "General">("ICT");
+  const [ictReqType, setIctReqType] = useState<"Service" | "Product">("Service");
+
+  // Form Fields
+  const [selectedService, setSelectedService] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState("");
+  const [quantity, setQuantity] = useState("1");
+  const [unit, setUnit] = useState("Pcs");
+  const [justification, setJustification] = useState("");
+
+  // Multiple Items List
+  const [items, setItems] = useState<StoreRequisitionItem[]>([]);
+
+  // On Behalf
+  const [onBehalf, setOnBehalf] = useState(false);
+  const [onBehalfEmp, setOnBehalfEmp] = useState("");
+
+  // Requisition View Docket Modal
+  const [viewDocketModal, setViewDocketModal] = useState<RequisitionViewData | null>(null);
+
+  const currentItemType: "Service" | "Product" = reqType === "General" ? "Product" : ictReqType;
+  const currentProductOptions = reqType === "ICT" ? ICT_PRODUCTS_OPTIONS : GENERAL_PRODUCTS_OPTIONS;
+
   const categories = [
     {
       title: "Product Budget Request",
@@ -44,6 +96,7 @@ function NewRequisitionPage() {
       iconBg: "bg-blue-500/10 border-blue-500/20",
       badge: "Active",
       badgeColor: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+      isStoreModal: false,
     },
     {
       title: "Leave Application",
@@ -55,6 +108,7 @@ function NewRequisitionPage() {
       iconBg: "bg-emerald-500/10 border-emerald-500/20",
       badge: "Active",
       badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+      isStoreModal: false,
     },
     {
       title: "IOU Requisition",
@@ -66,6 +120,7 @@ function NewRequisitionPage() {
       iconBg: "bg-amber-500/10 border-amber-500/20",
       badge: "Active",
       badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+      isStoreModal: false,
     },
     {
       title: "ICT Requisition",
@@ -77,17 +132,18 @@ function NewRequisitionPage() {
       iconBg: "bg-purple-500/10 border-purple-500/20",
       badge: "Active",
       badgeColor: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+      isStoreModal: false,
     },
     {
-      title: "General Store Requisition",
+      title: "Store Requisition",
       icon: Package,
-      desc: "Order office supplies, corporate stationery, files, and physical materials.",
-      to: "#",
-      color: "from-slate-500/10 via-slate-500/5 to-transparent hover:border-slate-500/40",
-      iconColor: "text-slate-500",
-      iconBg: "bg-slate-500/10 border-slate-500/20",
-      badge: "Available",
-      badgeColor: "bg-slate-500/10 text-slate-500 border-slate-500/20",
+      desc: "Request ICT hardware, support services, and general corporate store stationery with individual justifications.",
+      to: "/ssp-store-requisition",
+      color: "from-amber-500/10 via-amber-500/5 to-transparent hover:border-amber-500/40",
+      iconColor: "text-amber-500",
+      iconBg: "bg-amber-500/10 border-amber-500/20",
+      badge: "Active",
+      badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/20",
     },
     {
       title: "Sim Requisition",
@@ -99,6 +155,7 @@ function NewRequisitionPage() {
       iconBg: "bg-emerald-500/10 border-emerald-500/20",
       badge: "Active",
       badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+      isStoreModal: false,
     },
     {
       title: "Lunch and Conveyance",
@@ -110,10 +167,11 @@ function NewRequisitionPage() {
       iconBg: "bg-rose-500/10 border-rose-500/20",
       badge: "Claimable",
       badgeColor: "bg-rose-500/10 text-rose-500 border-rose-500/20",
+      isStoreModal: false,
     },
   ];
 
-  const recentRequisitions = [
+  const [recentRequisitions, setRecentRequisitions] = useState([
     {
       id: "REQ-2026-PBR-001",
       type: "Product Budget Request (General)",
@@ -143,6 +201,13 @@ function NewRequisitionPage() {
       status: "Approved",
     },
     {
+      id: "REQ-2026-009",
+      type: "Store Requisition (On Behalf)",
+      date: "12/09/2026",
+      details: "Logitech Combo & Dell UltraSharp (On Behalf)",
+      status: "Pending",
+    },
+    {
       id: "REQ-2026-008",
       type: "ICT Requisition",
       date: "17/06/2026",
@@ -163,12 +228,95 @@ function NewRequisitionPage() {
       details: "Corporate Sim Card Request",
       status: "Approved",
     },
-  ];
+  ]);
+
+  const handleAddItem = () => {
+    const itemName = currentItemType === "Service" ? selectedService.trim() : selectedProduct.trim();
+
+    if (!itemName) {
+      toast.error(
+        currentItemType === "Service"
+          ? "Please select or type a service name."
+          : "Please select or type a product name."
+      );
+      return;
+    }
+
+    if (!justification.trim()) {
+      toast.error("Justification is required for this item.");
+      return;
+    }
+
+    const qtyNumber = currentItemType === "Product" ? Math.max(1, parseInt(quantity, 10) || 1) : undefined;
+
+    const newItem: StoreRequisitionItem = {
+      id: "item-" + Date.now() + "-" + Math.random().toString(36).substr(2, 4),
+      reqType,
+      itemType: currentItemType,
+      name: itemName,
+      quantity: qtyNumber,
+      unit: currentItemType === "Product" ? unit : undefined,
+      justification: justification.trim(),
+    };
+
+    setItems((prev) => [...prev, newItem]);
+
+    if (currentItemType === "Service") {
+      setSelectedService("");
+    } else {
+      setSelectedProduct("");
+      setQuantity("1");
+    }
+    setJustification("");
+
+    toast.success(`✓ Added "${itemName}" to requisition list.`);
+  };
+
+  const handleRemoveItem = (id: string) => {
+    setItems((prev) => prev.filter((i) => i.id !== id));
+    toast.info("Item removed from list.");
+  };
+
+  const handleSubmitRequisition = () => {
+    if (items.length === 0) {
+      toast.error("Please add at least one product or service before submitting.");
+      return;
+    }
+
+    if (onBehalf && !onBehalfEmp.trim()) {
+      toast.error("You checked 'On Behalf'. Please select the target employee.");
+      return;
+    }
+
+    const newReqId = `REQ-2026-STR-${Math.floor(100 + Math.random() * 900)}`;
+    const newEntry = {
+      id: newReqId,
+      type: `Store Requisition (${reqType})`,
+      date: new Date().toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }),
+      details: `${items.map((i) => i.name).join(", ")} (${items.length} item${items.length > 1 ? "s" : ""})`,
+      status: "Pending",
+    };
+
+    setRecentRequisitions((prev) => [newEntry, ...prev]);
+    setItems([]);
+    setJustification("");
+    setSelectedProduct("");
+    setSelectedService("");
+    setOnBehalf(false);
+    setOnBehalfEmp("");
+    setStoreModalOpen(false);
+
+    toast.success(`🎉 Requisition ${newReqId} created successfully!`);
+  };
 
   const stats = [
     {
       label: "Total Submitted",
-      value: "16",
+      value: (16 + recentRequisitions.length - 7).toString(),
       icon: FileText,
       color: "text-primary bg-primary/10 border-primary/20",
     },
@@ -287,12 +435,14 @@ function NewRequisitionPage() {
                       </p>
                     </div>
 
-                    {category.to !== "#" && (
-                      <div className="flex items-center gap-1 text-[10.5px] font-black text-primary hover:text-primary-glow select-none mt-1">
-                        <span>Launch Portal</span>
-                        <ChevronRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-1" />
-                      </div>
-                    )}
+                    <div className="flex items-center justify-between pt-1">
+                      {category.to !== "#" && (
+                        <div className="flex items-center gap-1 text-[10.5px] font-black text-primary hover:text-primary-glow select-none">
+                          <span>Launch Portal</span>
+                          <ChevronRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+                        </div>
+                      )}
+                    </div>
                   </Link>
                 ))}
               </div>
@@ -317,11 +467,110 @@ function NewRequisitionPage() {
                   {recentRequisitions.map((req) => (
                     <div
                       key={req.id}
-                      className="py-2.5 flex items-center justify-between gap-3 first:pt-0 last:pb-0"
+                      onClick={() => {
+                        const isOnBehalf = req.type.includes("On Behalf");
+                        setViewDocketModal({
+                          title: req.type.includes("ICT") || isOnBehalf
+                            ? "ICT PRODUCT PURCHASE REQUISITION"
+                            : "STORE PRODUCT PURCHASE REQUISITION",
+                          ref: req.id,
+                          docCode: isOnBehalf ? "PTVL/REC/STR/04" : "PTVL/REC/STR/02",
+                          date: `${req.date} 19:57:03`,
+                          onBehalf: isOnBehalf,
+                          requestedBy: isOnBehalf
+                            ? {
+                                name: "Tahmid Afsar",
+                                designation: "Assistant Manager — HR & Admin",
+                                empId: "2023011409",
+                              }
+                            : undefined,
+                          requestFor: isOnBehalf
+                            ? {
+                                name: "Fahim Chowdhury",
+                                empId: "2021029012",
+                                doj: "15/01/2021",
+                                designation: "Deputy Manager",
+                                section: "Network & Systems",
+                                dept: "Information & Communication Technology",
+                                company: "Pakiza Technovation Limited , PTVL-HQ",
+                              }
+                            : {
+                                name: "Rajebul Hasan Rajon",
+                                empId: "2022034013",
+                                doj: "02/02/2022",
+                                designation: "Deputy Manager",
+                                section: "HR & Admin",
+                                dept: "HR, Admin and Compliance",
+                                company: "Pakiza Technovation Limited , PTVL-Operation",
+                              },
+                          items: isOnBehalf
+                            ? [
+                                {
+                                  grant: true,
+                                  sl: 1,
+                                  name: 'Dell UltraSharp 24" FHD USB-C Hub Monitor (P2422HE)',
+                                  advJustification: "Dual monitor workspace setup for software development & devops pipeline monitoring",
+                                  stock: "0.00 PCS",
+                                  demand: "1.00 PCS",
+                                  safety: "0.00 PCS",
+                                  adjust: "0.00 PCS",
+                                  total: "1.000 PCS",
+                                  apdQty: "1",
+                                  unit: "PCS",
+                                  category: "Hardware",
+                                },
+                                {
+                                  grant: true,
+                                  sl: 2,
+                                  name: "Logitech MK295 Silent Wireless Keyboard & Mouse Combo",
+                                  advJustification: "Replacement for malfunctioning mechanical keys during shift operations",
+                                  stock: "0.00 SET",
+                                  demand: "1.00 SET",
+                                  safety: "0.00 SET",
+                                  adjust: "0.00 SET",
+                                  total: "1.000 SET",
+                                  apdQty: "1",
+                                  unit: "SET",
+                                  category: "Accessories",
+                                },
+                              ]
+                            : [
+                                {
+                                  grant: true,
+                                  sl: 1,
+                                  name: req.details.includes("(") ? req.details.split(" (")[0] : req.details,
+                                  advJustification: "CEO Sir room TV use purpose & Conference Audio-Visual Installation",
+                                  stock: "0.00 SET",
+                                  demand: "1.00 SET",
+                                  safety: "0.00 SET",
+                                  adjust: "0.00 SET",
+                                  total: "1.000 SET",
+                                  apdQty: "1",
+                                  unit: "SET",
+                                  category: "Hardware",
+                                },
+                                {
+                                  grant: true,
+                                  sl: 2,
+                                  name: "HDMI Cable (High Speed 4K 5m Nylon Braided)",
+                                  advJustification: "CEO Sir room TV use purpose",
+                                  stock: "0.00 PCS",
+                                  demand: "1.00 PCS",
+                                  safety: "0.00 PCS",
+                                  adjust: "0.00 PCS",
+                                  total: "1.000 PCS",
+                                  apdQty: "1",
+                                  unit: "PCS",
+                                  category: "Cables & Connectivity",
+                                },
+                              ],
+                        });
+                      }}
+                      className="py-2.5 px-2 -mx-2 rounded-lg hover:bg-muted/50 transition cursor-pointer flex items-center justify-between gap-3 first:pt-1 last:pb-1 group"
                     >
                       <div className="space-y-0.5 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[9.5px] font-mono font-bold text-muted-foreground">
+                          <span className="text-[9.5px] font-mono font-bold text-muted-foreground group-hover:text-primary transition-colors">
                             {req.id}
                           </span>
                           <span className="text-[9.5px] font-black text-foreground truncate">
@@ -333,17 +582,20 @@ function NewRequisitionPage() {
                         </span>
                       </div>
 
-                      <span
-                        className={`text-[8.5px] font-black uppercase px-2 py-0.5 rounded border shrink-0 ${
-                          req.status === "Approved"
-                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25"
-                            : req.status === "Rejected"
-                              ? "bg-rose-500/10 text-rose-600 border-rose-500/25"
-                              : "bg-amber-500/10 text-amber-600 border-amber-500/25"
-                        }`}
-                      >
-                        {req.status}
-                      </span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span
+                          className={`text-[8.5px] font-black uppercase px-2 py-0.5 rounded border ${
+                            req.status === "Approved"
+                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25"
+                              : req.status === "Rejected"
+                                ? "bg-rose-500/10 text-rose-600 border-rose-500/25"
+                                : "bg-amber-500/10 text-amber-600 border-amber-500/25"
+                          }`}
+                        >
+                          {req.status}
+                        </span>
+                        <Eye className="size-3 text-muted-foreground group-hover:text-primary transition" />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -352,6 +604,15 @@ function NewRequisitionPage() {
           </div>
         </div>
       </main>
+
+      {/* ─── OFFICIAL REQUISITION DOCKET VIEW MODAL ────────────────────── */}
+      <GeneralStoreRequisitionModal
+        open={!!viewDocketModal}
+        onOpenChange={(open) => !open && setViewDocketModal(null)}
+        requisitionData={viewDocketModal || undefined}
+      />
+
     </div>
   );
 }
+

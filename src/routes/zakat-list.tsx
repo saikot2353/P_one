@@ -90,6 +90,23 @@ export type ZakatDisbursementMode =
   | "Asset Purchased";      // In-Kind Asset Purchased (Vehicle, Livestock, Store Setup)
 
 // 4. Asset Details (when mode === "Asset Purchased")
+export interface ZakatAssetItem {
+  id: string;
+  assetMasterId?: string;
+  assetType?: string;
+  assetName: string;
+  quantity?: string;
+  amount?: number;
+}
+
+export interface DirectAssetInputItem {
+  id: string;
+  assetMasterId: string;
+  assetName: string;
+  assetQty: string;
+  amount: string;
+}
+
 export interface ZakatAssetDetails {
   assetType?: string;         // from master data / dropdown e.g. "Battery Electric Auto-Van / Easy Bike", "Dairy Cow"
   assetName: string;          // specific title / description
@@ -97,6 +114,7 @@ export interface ZakatAssetDetails {
   vendorOrMarket?: string;    // e.g. "Sreepur Bazar", "Gafargaon Cattle Hat"
   invoiceRef?: string;        // Purchase voucher/receipt
   remarks?: string;           // Asset condition, warranty, handover location notes
+  items?: ZakatAssetItem[];
 }
 
 // 5. Global Attachment Interface (Prescriptions, Vouchers, NID, Applications)
@@ -557,7 +575,6 @@ export const defaultZakatRecords: ZakatRecord[] = [
     justificationDetails:
       "Destitute shopkeeper who lost his livelihood in market fire; gifted physical business setup via staff agent instead of cash.",
     agencyStatus: "Verified",
-    agencyStatus: "Acknowledged",
     attachments: [
       {
         id: "att-zk-03-1",
@@ -1489,6 +1506,56 @@ function ZakatManagementPage() {
     });
   };
 
+  // Direct Multiple Assets State & Helpers
+  const [directAssetItems, setDirectAssetItems] = useState<DirectAssetInputItem[]>([
+    { id: "dai-1", assetMasterId: "", assetName: "", assetQty: "1 Unit", amount: "" },
+  ]);
+
+  const addDirectAssetItem = () => {
+    setDirectAssetItems((prev) => [
+      ...prev,
+      {
+        id: `dai-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        assetMasterId: "",
+        assetName: "",
+        assetQty: "1 Unit",
+        amount: "",
+      },
+    ]);
+  };
+
+  const removeDirectAssetItem = (id: string) => {
+    setDirectAssetItems((prev) => {
+      if (prev.length <= 1) return prev;
+      return prev.filter((item) => item.id !== id);
+    });
+  };
+
+  const updateDirectAssetItem = (id: string, field: keyof DirectAssetInputItem, value: string) => {
+    setDirectAssetItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== id) return item;
+        if (field === "assetMasterId") {
+          const masterItem = getActiveAssetMasterList().find((m) => m.id === value);
+          if (masterItem && masterItem.suggestedPurpose) {
+            setNewPurposeCategory(masterItem.suggestedPurpose);
+          }
+          return {
+            ...item,
+            assetMasterId: value,
+            assetName: masterItem ? masterItem.assetType : item.assetName,
+            assetQty: masterItem?.defaultQty || item.assetQty || "1 Unit",
+          };
+        }
+        return { ...item, [field]: value };
+      })
+    );
+  };
+
+  const totalDirectAssetsAmount = useMemo(() => {
+    return directAssetItems.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+  }, [directAssetItems]);
+
   // Purpose & Financials
   const [newPurposeCategory, setNewPurposeCategory] = useState<ZakatPurposeCategory>("Medical Treatment");
   const [newOtherPurposeDetails, setNewOtherPurposeDetails] = useState("");
@@ -1994,9 +2061,24 @@ function ZakatManagementPage() {
         }
       }
     } else {
-      if (!newAmount || parseFloat(newAmount) <= 0) {
-        alert("Please enter a valid amount.");
-        return;
+      if (modalMode === "Asset Purchased") {
+        const invalidItem = directAssetItems.find((item) => !item.assetName.trim());
+        if (invalidItem) {
+          alert("Please provide an Asset / Item Description for all items in the purchase list.");
+          return;
+        }
+        const invalidAmount = directAssetItems.find(
+          (item) => !item.amount || parseFloat(item.amount) <= 0 || isNaN(parseFloat(item.amount))
+        );
+        if (invalidAmount) {
+          alert("Please enter a valid amount (BDT ৳) for all items in the purchase list.");
+          return;
+        }
+      } else {
+        if (!newAmount || parseFloat(newAmount) <= 0) {
+          alert("Please enter a valid amount.");
+          return;
+        }
       }
     }
 
@@ -2005,17 +2087,18 @@ function ZakatManagementPage() {
       return;
     }
 
-    if (modalChannel !== "Via Employee Agent" && modalMode === "Asset Purchased" && !modalAssetName.trim()) {
-      alert("Please specify the asset/item being purchased (e.g. Van, Cow, Tea Stall Setup).");
-      return;
-    }
-
     if (newPurposeCategory === "Others" && !newOtherPurposeDetails.trim()) {
       alert("Please specify the custom purpose in the 'Others' details field.");
       return;
     }
 
-    const amountNum = modalChannel === "Via Employee Agent" ? totalViaAmount : parseFloat(newAmount);
+    const amountNum =
+      modalChannel === "Via Employee Agent"
+        ? totalViaAmount
+        : modalMode === "Asset Purchased"
+        ? totalDirectAssetsAmount
+        : parseFloat(newAmount);
+
     if (amountNum > stats.remainingBudget) {
       if (
         !confirm(
@@ -2079,6 +2162,26 @@ function ZakatManagementPage() {
     } else {
       const resolvedBeneficiary = `${newEmpName} (Staff Self)`;
 
+      const assetItemsToSave: ZakatAssetItem[] = directAssetItems.map((item) => ({
+        id: item.id,
+        assetMasterId: item.assetMasterId || undefined,
+        assetName: item.assetName.trim(),
+        quantity: item.assetQty.trim() || "1 Unit",
+        amount: parseFloat(item.amount) || 0,
+      }));
+
+      const combinedDirectAssetName =
+        directAssetItems.length === 1
+          ? directAssetItems[0].assetName.trim()
+          : directAssetItems
+              .map((i) => `${i.assetName.trim()} (${i.assetQty || "1 Unit"}) - ৳${parseFloat(i.amount || "0").toLocaleString()}`)
+              .join("; ");
+
+      const combinedDirectAssetQty =
+        directAssetItems.length === 1
+          ? directAssetItems[0].assetQty.trim() || "1 Unit"
+          : `${directAssetItems.length} Items`;
+
       const newRecord: ZakatRecord = {
         id: `ZK-${selectedBudgetYear}-${String(records.length + 1).padStart(2, "0")}`,
         budgetYear: selectedBudgetYear,
@@ -2091,9 +2194,10 @@ function ZakatManagementPage() {
         assetDetails:
           modalMode === "Asset Purchased"
             ? {
-                assetType: modalAssetType || undefined,
-                assetName: modalAssetName,
-                assetQuantity: modalAssetQty || "1 Unit",
+                assetType: directAssetItems[0]?.assetMasterId ? "Master Catalog Asset" : undefined,
+                assetName: combinedDirectAssetName,
+                assetQuantity: combinedDirectAssetQty,
+                items: assetItemsToSave,
               }
             : undefined,
         purposeCategory: newPurposeCategory,
@@ -2101,7 +2205,7 @@ function ZakatManagementPage() {
         purposeSpecificDescription:
           newPurposeDescription.trim() ||
           (modalMode === "Asset Purchased"
-            ? `Asset: ${modalAssetName}`
+            ? `Assets: ${combinedDirectAssetName}`
             : newPurposeCategory === "Others"
               ? newOtherPurposeDetails
               : `${newPurposeCategory} Grant`),
@@ -3818,77 +3922,160 @@ function ZakatManagementPage() {
                 )}
 
 
-                {/* 4. Conditional Physical Asset Purchase Fields (Direct Employee) */}
+                {/* 4. Conditional Physical Asset Purchase Fields (Direct Employee with MULTIPLE ITEMS support) */}
                 {modalMode === "Asset Purchased" && modalChannel !== "Via Employee Agent" && (
-                  <div className="p-5 bg-indigo-50/40 rounded-2xl border border-indigo-200 space-y-4 animate-in fade-in duration-150">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-indigo-100 pb-2">
-                      <div className="text-[11px] font-black text-indigo-900 uppercase tracking-wide flex items-center gap-1.5">
-                        <ShoppingBag className="size-4 text-indigo-600" />
-                        <span>Physical Asset Purchase Details</span>
+                  <div className="p-4.5 bg-indigo-50/50 rounded-2xl border border-indigo-200 space-y-4 animate-in fade-in duration-150">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 bg-indigo-600 text-white rounded-lg shadow-2xs">
+                          <ShoppingBag className="size-4" />
+                        </div>
+                        <div>
+                          <span className="text-xs font-black text-indigo-950 uppercase tracking-wide flex items-center gap-2">
+                            <span>Physical Asset Purchase Details</span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 lowercase">
+                              {directAssetItems.length} {directAssetItems.length === 1 ? "item" : "items"}
+                            </span>
+                          </span>
+                          <p className="text-[10.5px] text-indigo-700/80">
+                            Add multiple items with individual quantity and purchase amount.
+                          </p>
+                        </div>
                       </div>
-                      <span className="text-[10px] text-indigo-700 font-bold bg-indigo-100/70 px-2 py-0.5 rounded-full border border-indigo-200">
-                        Master Catalog Linked
-                      </span>
-                    </div>
-
-                    {/* Master Data Catalog Dropdown */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-[10px] font-bold text-slate-700 uppercase whitespace-nowrap">
-                          Asset Type (Master Data Catalog) <span className="text-red-500">*</span>
-                        </label>
+                      <div className="flex items-center gap-2 self-start sm:self-center">
                         <Link
                           to="/zakat-asset-master"
                           target="_blank"
-                          className="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold hover:underline flex items-center gap-0.5"
+                          className="text-[11px] text-indigo-600 hover:text-indigo-800 font-semibold hover:underline flex items-center gap-1"
                         >
-                          <span>Manage Catalog</span>
-                          <ExternalLink className="size-2.5" />
+                          <span>Manage Master Catalog</span>
+                          <ExternalLink className="size-3" />
                         </Link>
                       </div>
-                      <select
-                        value={modalAssetMasterId}
-                        onChange={(e) => handleSelectMasterAsset(e.target.value)}
-                        className="w-full h-10 px-3 rounded-lg border border-indigo-300 bg-white text-xs font-bold text-slate-800 outline-none focus:border-indigo-600 shadow-xs"
-                      >
-                        <option value="">-- Choose Asset from Master Data (or enter custom title below) --</option>
-                        {Array.from(new Set(getActiveZakatAssetMasterList().map((m) => m.category))).map((cat) => (
-                          <optgroup key={cat} label={cat}>
-                            {getActiveZakatAssetMasterList().filter((m) => m.category === cat).map((item) => (
-                              <option key={item.id} value={item.id}>
-                                {item.assetType} ({item.defaultQty})
-                              </option>
-                            ))}
-                          </optgroup>
-                        ))}
-                      </select>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                      <div className="sm:col-span-2">
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Asset / Item Description <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={modalAssetName}
-                          onChange={(e) => setModalAssetName(e.target.value)}
-                          placeholder="e.g. Battery Electric Cargo Auto-Van / 2 Dairy Breeding Goats"
-                          className="w-full h-10 px-3 rounded-lg border border-indigo-200 bg-white text-xs font-semibold outline-none focus:border-indigo-600 text-slate-800"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1 whitespace-nowrap">
-                          Quantity / Unit
-                        </label>
-                        <input
-                          type="text"
-                          value={modalAssetQty}
-                          onChange={(e) => setModalAssetQty(e.target.value)}
-                          placeholder="e.g. 1 Unit / 2 Goats"
-                          className="w-full h-10 px-3 rounded-lg border border-indigo-200 bg-white text-xs outline-none focus:border-indigo-600 text-slate-800"
-                        />
+                    {/* Multiple Items List */}
+                    <div className="space-y-3">
+                      {directAssetItems.map((item, idx) => (
+                        <div
+                          key={item.id}
+                          className="p-3.5 bg-white rounded-xl border border-indigo-200/90 shadow-2xs space-y-2.5"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-black text-indigo-950 flex items-center gap-2">
+                              <span className="size-5 rounded-md bg-indigo-100 text-indigo-700 text-[10px] flex items-center justify-center font-mono font-bold">
+                                #{idx + 1}
+                              </span>
+                              <span>Asset / In-Kind Item #{idx + 1}</span>
+                            </span>
+                            {directAssetItems.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeDirectAssetItem(item.id)}
+                                className="text-slate-400 hover:text-rose-500 p-1 rounded-md hover:bg-rose-50 transition-colors cursor-pointer"
+                                title="Remove item"
+                              >
+                                <Trash2 className="size-3.5" />
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Optional Quick Catalog Select */}
+                          <div>
+                            <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
+                              Choose from Catalog (Optional Quick-Fill)
+                            </label>
+                            <select
+                              value={item.assetMasterId}
+                              onChange={(e) => updateDirectAssetItem(item.id, "assetMasterId", e.target.value)}
+                              className="w-full h-8.5 px-2.5 rounded-lg border border-slate-200 bg-slate-50/70 text-xs font-medium outline-none focus:border-indigo-600"
+                            >
+                              <option value="">-- Choose Asset from Master Data (or enter custom title below) --</option>
+                              {Array.from(new Set(getActiveZakatAssetMasterList().map((m) => m.category))).map((cat) => (
+                                <optgroup key={cat} label={cat}>
+                                  {getActiveZakatAssetMasterList()
+                                    .filter((m) => m.category === cat)
+                                    .map((mItem) => (
+                                      <option key={mItem.id} value={mItem.id}>
+                                        {mItem.assetType} ({mItem.defaultQty})
+                                      </option>
+                                    ))}
+                                </optgroup>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Item Description, Quantity, and Amount in 3 columns */}
+                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                            <div className="sm:col-span-6">
+                              <label className="text-[10px] font-bold text-slate-700 uppercase block mb-1">
+                                Asset / Item Description <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={item.assetName}
+                                onChange={(e) => updateDirectAssetItem(item.id, "assetName", e.target.value)}
+                                placeholder="e.g. Battery Electric Cargo Auto-Van / 2 Dairy Breeding Goats"
+                                className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-semibold outline-none focus:border-indigo-600"
+                              />
+                            </div>
+
+                            <div className="sm:col-span-3">
+                              <label className="text-[10px] font-bold text-slate-700 uppercase block mb-1">
+                                Quantity / Unit <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={item.assetQty}
+                                onChange={(e) => updateDirectAssetItem(item.id, "assetQty", e.target.value)}
+                                placeholder="e.g. 1 Unit / 2 Goats"
+                                className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium outline-none focus:border-indigo-600"
+                              />
+                            </div>
+
+                            <div className="sm:col-span-3">
+                              <label className="text-[10px] font-bold text-emerald-700 uppercase block mb-1">
+                                Item Amount (BDT ৳) <span className="text-red-500">*</span>
+                              </label>
+                              <div className="relative">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-600 font-bold text-xs">
+                                  ৳
+                                </span>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  step="any"
+                                  required
+                                  value={item.amount}
+                                  onChange={(e) => updateDirectAssetItem(item.id, "amount", e.target.value)}
+                                  placeholder="e.g. 25000"
+                                  className="w-full h-9 pl-6 pr-2 rounded-lg border border-emerald-300 bg-emerald-50/20 text-xs font-bold font-mono outline-none focus:border-emerald-600 shadow-2xs"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Add Item Button & Subtotal Bar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                      <button
+                        type="button"
+                        onClick={addDirectAssetItem}
+                        className="px-3.5 py-1.5 rounded-lg border border-indigo-300 bg-indigo-50/60 hover:bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Plus className="size-3.5" />
+                        <span>+ Add Another Asset / Item</span>
+                      </button>
+
+                      <div className="flex items-center gap-2.5 text-xs bg-white px-3 py-1.5 rounded-xl border border-indigo-200 self-end sm:self-auto">
+                        <span className="text-slate-500 font-medium">Combined Asset Cost:</span>
+                        <span className="font-mono font-black text-sm text-emerald-700">
+                          ৳ {totalDirectAssetsAmount.toLocaleString()}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -3963,6 +4150,23 @@ function ZakatManagementPage() {
                         </div>
                         <div className="text-[10px] text-emerald-700 font-medium">
                           Auto-summed from {viaBeneficiaries.length} recipient amount{viaBeneficiaries.length > 1 ? "s" : ""} above
+                        </div>
+                      </div>
+                    ) : modalMode === "Asset Purchased" ? (
+                      <div className="space-y-1">
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 font-bold text-sm">৳</span>
+                          <input
+                            type="text"
+                            readOnly
+                            value={totalDirectAssetsAmount > 0 ? totalDirectAssetsAmount.toLocaleString() : ""}
+                            placeholder="Auto-calculated from items above"
+                            className="w-full h-10 pl-7 pr-3 rounded-lg border border-emerald-300 bg-emerald-50/40 text-sm font-bold font-mono outline-none text-emerald-900 shadow-xs cursor-default"
+                          />
+                        </div>
+                        <div className="text-[10px] text-emerald-700 font-medium flex items-center justify-between">
+                          <span>Auto-calculated from {directAssetItems.length} item{directAssetItems.length > 1 ? "s" : ""} above</span>
+                          <span className="font-mono font-bold">৳ {totalDirectAssetsAmount.toLocaleString()}</span>
                         </div>
                       </div>
                     ) : (
@@ -5651,10 +5855,34 @@ function ZakatManagementPage() {
 
                           {/* In-Kind Asset Specifications */}
                           {activeRecord.disbursementMode === "Asset Purchased" && activeRecord.assetDetails && (
-                            <div className="p-2.5 bg-slate-50 rounded border border-slate-200 text-[11px] space-y-0.5 mt-1.5">
-                              <div className="font-semibold text-slate-900">
-                                Physical Asset: {activeRecord.assetDetails.assetName} ({activeRecord.assetDetails.assetQuantity || "1 Unit"})
+                            <div className="p-2.5 bg-slate-50 rounded border border-slate-200 text-[11px] space-y-1.5 mt-1.5">
+                              <div className="flex items-center justify-between">
+                                <span className="font-bold text-slate-900">Physical Asset Purchase</span>
+                                {activeRecord.assetDetails.items && activeRecord.assetDetails.items.length > 1 && (
+                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">
+                                    {activeRecord.assetDetails.items.length} items
+                                  </span>
+                                )}
                               </div>
+                              {activeRecord.assetDetails.items && activeRecord.assetDetails.items.length > 0 ? (
+                                <div className="space-y-1">
+                                  {activeRecord.assetDetails.items.map((it, idx) => (
+                                    <div key={it.id || idx} className="flex items-center justify-between bg-white p-1.5 rounded border border-slate-200">
+                                      <span>
+                                        <b className="text-slate-800">{it.assetName}</b>
+                                        <span className="text-slate-500 ml-1">({it.quantity || "1 Unit"})</span>
+                                      </span>
+                                      {it.amount !== undefined && (
+                                        <span className="font-mono font-bold text-emerald-700">৳ {it.amount.toLocaleString()}</span>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="font-semibold text-slate-900">
+                                  Physical Asset: {activeRecord.assetDetails.assetName} ({activeRecord.assetDetails.assetQuantity || "1 Unit"})
+                                </div>
+                              )}
                               {activeRecord.assetDetails.assetType && (
                                 <div className="text-slate-600">Type / Classification: {activeRecord.assetDetails.assetType}</div>
                               )}
