@@ -203,8 +203,11 @@ export const nav: NavItem[] = [
       { label: "Leave Application", to: "/leave-application" },
       { label: "Bulk Leave", to: "/bulk-leave" },
       {
-        label: "Maternity",
+        label: "Maternity Leave",
         subitems: [
+          { label: "Welfare Verification", to: "/maternity-welfare-verification" },
+          { label: "Medical Verification", to: "/maternity-medical-verification" },
+          { label: "HR Verification", to: "/maternity-hr-verification" },
           { label: "Maternity Payment", to: "/maternity-payment" },
           { label: "Maternity Payment Report", to: "/maternity-payment-report" },
         ],

@@ -190,8 +190,11 @@ import { Route as LunchRequisitionApprovalRouteImport } from './routes/lunch-req
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as MaternityConfigurationRouteImport } from './routes/maternity-configuration'
+import { Route as MaternityHrVerificationRouteImport } from './routes/maternity-hr-verification'
+import { Route as MaternityMedicalVerificationRouteImport } from './routes/maternity-medical-verification'
 import { Route as MaternityPaymentRouteImport } from './routes/maternity-payment'
 import { Route as MaternityPaymentReportRouteImport } from './routes/maternity-payment-report'
+import { Route as MaternityWelfareVerificationRouteImport } from './routes/maternity-welfare-verification'
 import { Route as MerchandisingBomRouteImport } from './routes/merchandising-bom'
 import { Route as MerchandisingCadRouteImport } from './routes/merchandising-cad'
 import { Route as MerchandisingCapacityAllocationRouteImport } from './routes/merchandising-capacity-allocation'
@@ -1346,6 +1349,17 @@ const MaternityConfigurationRoute = MaternityConfigurationRouteImport.update({
   path: '/maternity-configuration',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MaternityHrVerificationRoute = MaternityHrVerificationRouteImport.update({
+  id: '/maternity-hr-verification',
+  path: '/maternity-hr-verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaternityMedicalVerificationRoute =
+  MaternityMedicalVerificationRouteImport.update({
+    id: '/maternity-medical-verification',
+    path: '/maternity-medical-verification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MaternityPaymentRoute = MaternityPaymentRouteImport.update({
   id: '/maternity-payment',
   path: '/maternity-payment',
@@ -1356,6 +1370,12 @@ const MaternityPaymentReportRoute = MaternityPaymentReportRouteImport.update({
   path: '/maternity-payment-report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MaternityWelfareVerificationRoute =
+  MaternityWelfareVerificationRouteImport.update({
+    id: '/maternity-welfare-verification',
+    path: '/maternity-welfare-verification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MerchandisingBomRoute = MerchandisingBomRouteImport.update({
   id: '/merchandising-bom',
   path: '/merchandising-bom',
@@ -2694,8 +2714,11 @@ export interface FileRoutesByFullPath {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
+  '/maternity-hr-verification': typeof MaternityHrVerificationRoute
+  '/maternity-medical-verification': typeof MaternityMedicalVerificationRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
+  '/maternity-welfare-verification': typeof MaternityWelfareVerificationRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
@@ -3093,8 +3116,11 @@ export interface FileRoutesByTo {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
+  '/maternity-hr-verification': typeof MaternityHrVerificationRoute
+  '/maternity-medical-verification': typeof MaternityMedicalVerificationRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
+  '/maternity-welfare-verification': typeof MaternityWelfareVerificationRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
@@ -3493,8 +3519,11 @@ export interface FileRoutesById {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
+  '/maternity-hr-verification': typeof MaternityHrVerificationRoute
+  '/maternity-medical-verification': typeof MaternityMedicalVerificationRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
+  '/maternity-welfare-verification': typeof MaternityWelfareVerificationRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
@@ -3894,8 +3923,11 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
+    | '/maternity-hr-verification'
+    | '/maternity-medical-verification'
     | '/maternity-payment'
     | '/maternity-payment-report'
+    | '/maternity-welfare-verification'
     | '/merchandising-bom'
     | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
@@ -4293,8 +4325,11 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
+    | '/maternity-hr-verification'
+    | '/maternity-medical-verification'
     | '/maternity-payment'
     | '/maternity-payment-report'
+    | '/maternity-welfare-verification'
     | '/merchandising-bom'
     | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
@@ -4692,8 +4727,11 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
+    | '/maternity-hr-verification'
+    | '/maternity-medical-verification'
     | '/maternity-payment'
     | '/maternity-payment-report'
+    | '/maternity-welfare-verification'
     | '/merchandising-bom'
     | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
@@ -5092,8 +5130,11 @@ export interface RootRouteChildren {
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
   MaternityConfigurationRoute: typeof MaternityConfigurationRoute
+  MaternityHrVerificationRoute: typeof MaternityHrVerificationRoute
+  MaternityMedicalVerificationRoute: typeof MaternityMedicalVerificationRoute
   MaternityPaymentRoute: typeof MaternityPaymentRoute
   MaternityPaymentReportRoute: typeof MaternityPaymentReportRoute
+  MaternityWelfareVerificationRoute: typeof MaternityWelfareVerificationRoute
   MerchandisingBomRoute: typeof MerchandisingBomRoute
   MerchandisingCadRoute: typeof MerchandisingCadRoute
   MerchandisingCapacityAllocationRoute: typeof MerchandisingCapacityAllocationRoute
@@ -6579,6 +6620,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MaternityConfigurationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/maternity-hr-verification': {
+      id: '/maternity-hr-verification'
+      path: '/maternity-hr-verification'
+      fullPath: '/maternity-hr-verification'
+      preLoaderRoute: typeof MaternityHrVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maternity-medical-verification': {
+      id: '/maternity-medical-verification'
+      path: '/maternity-medical-verification'
+      fullPath: '/maternity-medical-verification'
+      preLoaderRoute: typeof MaternityMedicalVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/maternity-payment': {
       id: '/maternity-payment'
       path: '/maternity-payment'
@@ -6591,6 +6646,13 @@ declare module '@tanstack/react-router' {
       path: '/maternity-payment-report'
       fullPath: '/maternity-payment-report'
       preLoaderRoute: typeof MaternityPaymentReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maternity-welfare-verification': {
+      id: '/maternity-welfare-verification'
+      path: '/maternity-welfare-verification'
+      fullPath: '/maternity-welfare-verification'
+      preLoaderRoute: typeof MaternityWelfareVerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/merchandising-bom': {
@@ -8278,8 +8340,11 @@ const rootRouteChildren: RootRouteChildren = {
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
   MaternityConfigurationRoute: MaternityConfigurationRoute,
+  MaternityHrVerificationRoute: MaternityHrVerificationRoute,
+  MaternityMedicalVerificationRoute: MaternityMedicalVerificationRoute,
   MaternityPaymentRoute: MaternityPaymentRoute,
   MaternityPaymentReportRoute: MaternityPaymentReportRoute,
+  MaternityWelfareVerificationRoute: MaternityWelfareVerificationRoute,
   MerchandisingBomRoute: MerchandisingBomRoute,
   MerchandisingCadRoute: MerchandisingCadRoute,
   MerchandisingCapacityAllocationRoute: MerchandisingCapacityAllocationRoute,
