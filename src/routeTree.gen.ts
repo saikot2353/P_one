@@ -69,6 +69,7 @@ import { Route as EmployeeTaxPayRouteImport } from './routes/employee-tax-pay'
 import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
 import { Route as FestivalAllowanceRouteImport } from './routes/festival-allowance'
 import { Route as FestivalAllowanceApprovalRouteImport } from './routes/festival-allowance-approval'
+import { Route as FestivalAllowanceCheckHrRouteImport } from './routes/festival-allowance-check-hr'
 import { Route as FestivalAllowancePaymentSheetRouteImport } from './routes/festival-allowance-payment-sheet'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
@@ -714,6 +715,12 @@ const FestivalAllowanceApprovalRoute =
   FestivalAllowanceApprovalRouteImport.update({
     id: '/festival-allowance-approval',
     path: '/festival-allowance-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FestivalAllowanceCheckHrRoute =
+  FestivalAllowanceCheckHrRouteImport.update({
+    id: '/festival-allowance-check-hr',
+    path: '/festival-allowance-check-hr',
     getParentRoute: () => rootRouteImport,
   } as any)
 const FestivalAllowancePaymentSheetRoute =
@@ -2593,6 +2600,7 @@ export interface FileRoutesByFullPath {
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/festival-allowance': typeof FestivalAllowanceRoute
   '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
+  '/festival-allowance-check-hr': typeof FestivalAllowanceCheckHrRoute
   '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
@@ -2995,6 +3003,7 @@ export interface FileRoutesByTo {
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/festival-allowance': typeof FestivalAllowanceRoute
   '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
+  '/festival-allowance-check-hr': typeof FestivalAllowanceCheckHrRoute
   '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
@@ -3398,6 +3407,7 @@ export interface FileRoutesById {
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/festival-allowance': typeof FestivalAllowanceRoute
   '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
+  '/festival-allowance-check-hr': typeof FestivalAllowanceCheckHrRoute
   '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
@@ -3802,6 +3812,7 @@ export interface FileRouteTypes {
     | '/enroll-fingerprint'
     | '/festival-allowance'
     | '/festival-allowance-approval'
+    | '/festival-allowance-check-hr'
     | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
@@ -4204,6 +4215,7 @@ export interface FileRouteTypes {
     | '/enroll-fingerprint'
     | '/festival-allowance'
     | '/festival-allowance-approval'
+    | '/festival-allowance-check-hr'
     | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
@@ -4606,6 +4618,7 @@ export interface FileRouteTypes {
     | '/enroll-fingerprint'
     | '/festival-allowance'
     | '/festival-allowance-approval'
+    | '/festival-allowance-check-hr'
     | '/festival-allowance-payment-sheet'
     | '/final-approve-increment'
     | '/final-settlement'
@@ -5009,6 +5022,7 @@ export interface RootRouteChildren {
   EnrollFingerprintRoute: typeof EnrollFingerprintRoute
   FestivalAllowanceRoute: typeof FestivalAllowanceRoute
   FestivalAllowanceApprovalRoute: typeof FestivalAllowanceApprovalRoute
+  FestivalAllowanceCheckHrRoute: typeof FestivalAllowanceCheckHrRoute
   FestivalAllowancePaymentSheetRoute: typeof FestivalAllowancePaymentSheetRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
   FinalSettlementRoute: typeof FinalSettlementRoute
@@ -5771,6 +5785,13 @@ declare module '@tanstack/react-router' {
       path: '/festival-allowance-approval'
       fullPath: '/festival-allowance-approval'
       preLoaderRoute: typeof FestivalAllowanceApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/festival-allowance-check-hr': {
+      id: '/festival-allowance-check-hr'
+      path: '/festival-allowance-check-hr'
+      fullPath: '/festival-allowance-check-hr'
+      preLoaderRoute: typeof FestivalAllowanceCheckHrRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/festival-allowance-payment-sheet': {
@@ -8217,6 +8238,7 @@ const rootRouteChildren: RootRouteChildren = {
   EnrollFingerprintRoute: EnrollFingerprintRoute,
   FestivalAllowanceRoute: FestivalAllowanceRoute,
   FestivalAllowanceApprovalRoute: FestivalAllowanceApprovalRoute,
+  FestivalAllowanceCheckHrRoute: FestivalAllowanceCheckHrRoute,
   FestivalAllowancePaymentSheetRoute: FestivalAllowancePaymentSheetRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
   FinalSettlementRoute: FinalSettlementRoute,

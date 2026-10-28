@@ -413,6 +413,7 @@ export const nav: NavItem[] = [
       { label: "Employee Allowance", to: "/" },
       { label: "Tax Exemption Rules", to: "/" },
       { label: "Allowance Requisition", to: "/allowance-requisition" },
+      { label: "Fastival allowance Check (HR)", to: "/festival-allowance-check-hr" },
     ],
   },
   {
