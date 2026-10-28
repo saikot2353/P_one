@@ -1,4 +1,5 @@
 {
   "framework": null,
+  "installCommand": "npm ci --prefer-offline --no-audit",
   "buildCommand": "NODE_OPTIONS=\"--max-old-space-size=8192\" npm run build"
 }
