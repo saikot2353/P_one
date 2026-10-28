@@ -256,7 +256,6 @@ export const nav: NavItem[] = [
       { label: "Increment (Multi)", to: "/increment-multiple" },
       { label: "Proposed Increment", to: "/propose-increment" },
       { label: "Increment Report", to: "/increment-report" },
-      { label: "Increment History", to: "/increment-history" },
     ],
   },
   {
@@ -562,11 +561,15 @@ export const nav: NavItem[] = [
       { label: "Without In Out Attendance", to: "/hr-report-without-in-out-attendance" },
       { label: "Absent Counseling Report", to: "/hr-report-absent-counseling" },
       { label: "Print OT Requisition", to: "#" },
+      { label: "Pending OT Request", to: "/pending-ot-request" },
+      { label: "Working Hour Analysis", to: "/working-hour-analysis" },
       { label: "Continuous Absent", to: "/hr-report-continuous-absent" },
       { label: "SIM Requisition Report", to: "/hr-report-sim-requisition" },
       { label: "Tiffin Allowance All", to: "/hr-report-tiffin-allowance-all" },
       { label: "Night Card", to: "/hr-report-night-card" },
       { label: "Tiffin Card", to: "/hr-report-tiffin-card" },
+      { label: "Increment History", to: "/increment-history" },
+      { label: "Increment QueueList", to: "/increment-queuelist" },
     ],
   },
 ];
