@@ -168,6 +168,7 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "Personnel List", to: "/personnel-list" },
       { label: "Employee Account Information", to: "/employee-account-information" },
+      { label: "Bulk Account Upload", to: "/bulk-account-upload" },
       { label: "ID Card Setup", to: "/id-card-setup" },
       { label: "Employee Doc Issue", to: "/employee-doc-issue" },
       { label: "Set HOD", to: "/set-hod" },

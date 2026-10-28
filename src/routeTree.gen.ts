@@ -27,6 +27,7 @@ import { Route as BudgetOvertimeRouteImport } from './routes/budget-overtime'
 import { Route as BudgetPlanningRouteImport } from './routes/budget-planning'
 import { Route as BudgetRequisitionApprovalsRouteImport } from './routes/budget-requisition-approvals'
 import { Route as BudgetStatementRouteImport } from './routes/budget-statement'
+import { Route as BulkAccountUploadRouteImport } from './routes/bulk-account-upload'
 import { Route as BulkLeaveRouteImport } from './routes/bulk-leave'
 import { Route as CashSheetPrintRouteImport } from './routes/cash-sheet-print'
 import { Route as ChangeEmployeeStatusRouteImport } from './routes/change-employee-status'
@@ -491,6 +492,11 @@ const BudgetRequisitionApprovalsRoute =
 const BudgetStatementRoute = BudgetStatementRouteImport.update({
   id: '/budget-statement',
   path: '/budget-statement',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BulkAccountUploadRoute = BulkAccountUploadRouteImport.update({
+  id: '/bulk-account-upload',
+  path: '/bulk-account-upload',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BulkLeaveRoute = BulkLeaveRouteImport.update({
@@ -2500,6 +2506,7 @@ export interface FileRoutesByFullPath {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/bulk-account-upload': typeof BulkAccountUploadRoute
   '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
   '/change-employee-status': typeof ChangeEmployeeStatusRoute
@@ -2894,6 +2901,7 @@ export interface FileRoutesByTo {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/bulk-account-upload': typeof BulkAccountUploadRoute
   '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
   '/change-employee-status': typeof ChangeEmployeeStatusRoute
@@ -3289,6 +3297,7 @@ export interface FileRoutesById {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/bulk-account-upload': typeof BulkAccountUploadRoute
   '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
   '/change-employee-status': typeof ChangeEmployeeStatusRoute
@@ -3685,6 +3694,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/bulk-account-upload'
     | '/bulk-leave'
     | '/cash-sheet-print'
     | '/change-employee-status'
@@ -4079,6 +4089,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/bulk-account-upload'
     | '/bulk-leave'
     | '/cash-sheet-print'
     | '/change-employee-status'
@@ -4473,6 +4484,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/bulk-account-upload'
     | '/bulk-leave'
     | '/cash-sheet-print'
     | '/change-employee-status'
@@ -4868,6 +4880,7 @@ export interface RootRouteChildren {
   BudgetPlanningRoute: typeof BudgetPlanningRoute
   BudgetRequisitionApprovalsRoute: typeof BudgetRequisitionApprovalsRoute
   BudgetStatementRoute: typeof BudgetStatementRoute
+  BulkAccountUploadRoute: typeof BulkAccountUploadRoute
   BulkLeaveRoute: typeof BulkLeaveRoute
   CashSheetPrintRoute: typeof CashSheetPrintRoute
   ChangeEmployeeStatusRoute: typeof ChangeEmployeeStatusRoute
@@ -5370,6 +5383,13 @@ declare module '@tanstack/react-router' {
       path: '/budget-statement'
       fullPath: '/budget-statement'
       preLoaderRoute: typeof BudgetStatementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bulk-account-upload': {
+      id: '/bulk-account-upload'
+      path: '/bulk-account-upload'
+      fullPath: '/bulk-account-upload'
+      preLoaderRoute: typeof BulkAccountUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bulk-leave': {
@@ -8012,6 +8032,7 @@ const rootRouteChildren: RootRouteChildren = {
   BudgetPlanningRoute: BudgetPlanningRoute,
   BudgetRequisitionApprovalsRoute: BudgetRequisitionApprovalsRoute,
   BudgetStatementRoute: BudgetStatementRoute,
+  BulkAccountUploadRoute: BulkAccountUploadRoute,
   BulkLeaveRoute: BulkLeaveRoute,
   CashSheetPrintRoute: CashSheetPrintRoute,
   ChangeEmployeeStatusRoute: ChangeEmployeeStatusRoute,

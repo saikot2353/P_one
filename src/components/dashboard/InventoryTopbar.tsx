@@ -55,7 +55,13 @@ const searchableMenus: SearchMenuLink[] = [
     label: "Employee Account Information",
     parent: "Personnel Info",
     to: "/employee-account-information",
-    description: "Manage employee bank accounts, cash/bank payments, and bulk account uploads",
+    description: "Manage employee bank accounts, cash/bank payments, and tax amounts",
+  },
+  {
+    label: "Bulk Account Upload",
+    parent: "Personnel Info",
+    to: "/bulk-account-upload",
+    description: "Bulk assign bank accounts, import CSV records, and update payment parameters",
   },
   {
     label: "ID Card Setup",
