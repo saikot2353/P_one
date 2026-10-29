@@ -20,7 +20,6 @@ import {
   EyeOff,
   FileText,
   FileClock,
-  UserCog,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -92,7 +91,6 @@ function IncrementHistoryPage() {
 
   // Table Search, Selection, and Pagination
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedEmpIds, setSelectedEmpIds] = useState<string[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<RawIncrementRecord | null>(null);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
@@ -153,7 +151,6 @@ function IncrementHistoryPage() {
     setStatus("Working");
     setFilterYear("ALL");
     setSearchQuery("");
-    setSelectedEmpIds([]);
     setAppliedFilters({
       company: "Pakiza Software Limited",
       area: "PSL-Operation",
@@ -178,21 +175,6 @@ function IncrementHistoryPage() {
     }
   };
 
-  // Multi-select actions
-  const toggleSelectAll = () => {
-    if (filteredRecords.length === 0) return;
-    if (selectedEmpIds.length === filteredRecords.length) {
-      setSelectedEmpIds([]);
-    } else {
-      setSelectedEmpIds(filteredRecords.map((r) => r.empId));
-    }
-  };
-
-  const toggleSelectEmp = (empId: string) => {
-    setSelectedEmpIds((prev) =>
-      prev.includes(empId) ? prev.filter((item) => item !== empId) : [...prev, empId],
-    );
-  };
 
   const toggleColumn = (key: keyof typeof defaultColumns) => {
     setVisibleCols((prev) => ({
@@ -439,10 +421,6 @@ function IncrementHistoryPage() {
     }, 300);
   };
 
-  const triggerBulkAction = (actionName: string) => {
-    toast.success(`Bulk Operation [${actionName}] applied to ${selectedEmpIds.length} employees.`);
-    setSelectedEmpIds([]);
-  };
 
   return (
     <div className="flex h-screen bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden font-sans">
@@ -670,51 +648,6 @@ function IncrementHistoryPage() {
             </form>
           </div>
 
-          {/* Bulk Operations Hub (When records are selected) */}
-          {selectedEmpIds.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/80 rounded-2xl p-4 shadow-xs space-y-3 animate-in fade-in slide-in-from-top-2 duration-300 print:hidden">
-              <div className="flex items-center justify-between gap-4 pb-2 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-                    {selectedEmpIds.length} Selected
-                  </span>
-                  <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Active Increment History Operations Console
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setSelectedEmpIds([])}
-                  className="text-xs font-bold text-slate-500 hover:text-rose-500 transition cursor-pointer"
-                >
-                  Clear Selection
-                </button>
-              </div>
-
-              <div className="flex items-center gap-3 flex-wrap">
-                <button
-                  onClick={() => triggerBulkAction("Print Selected Profiles")}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 text-xs font-bold transition shadow-2xs cursor-pointer"
-                >
-                  <Printer className="size-3.5" />
-                  <span>Print Selected</span>
-                </button>
-                <button
-                  onClick={() => triggerBulkAction("Bulk Export PDF Register")}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 text-xs font-bold transition shadow-2xs cursor-pointer"
-                >
-                  <FileClock className="size-3.5" />
-                  <span>PDF Register</span>
-                </button>
-                <button
-                  onClick={() => triggerBulkAction("Consolidated Audit Review")}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-xs font-bold transition shadow-2xs cursor-pointer"
-                >
-                  <UserCog className="size-3.5" />
-                  <span>Audit Review</span>
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* ACTION TOOLBAR & RESULTS TABLE CARD (EXACT INCREMENT-QUEUELIST STYLE) */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
@@ -825,26 +758,21 @@ function IncrementHistoryPage() {
               <table className="w-full border-collapse text-left text-[11px] whitespace-nowrap">
                 <thead>
                   <tr className="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-extrabold border-b border-slate-200 dark:border-slate-700">
-                    {/* Sticky Actions and Checkbox Column */}
-                    <th className="sticky left-0 bg-slate-100 dark:bg-slate-800 px-2.5 py-3 font-bold border-r border-slate-200 dark:border-slate-700 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[95px] min-w-[95px] max-w-[95px] text-center">
-                      <div className="flex items-center gap-2 justify-center">
-                        <input
-                          type="checkbox"
-                          checked={
-                            filteredRecords.length > 0 &&
-                            selectedEmpIds.length === filteredRecords.length
-                          }
-                          onChange={toggleSelectAll}
-                          className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer"
-                        />
-                        <span className="text-[10px] text-slate-600 dark:text-slate-300 font-extrabold uppercase">Action</span>
+                    {/* Sticky SL Column */}
+                    <th
+                      onClick={() => handleSort("sl")}
+                      className="sticky left-0 bg-slate-100 dark:bg-slate-800 px-2 py-3 font-bold border-r border-slate-200 dark:border-slate-700 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[50px] min-w-[50px] max-w-[50px] text-center cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
+                    >
+                      <div className="flex items-center justify-center gap-1">
+                        <span>SL</span>
+                        {sortField === "sl" && <ArrowUpDown className="size-3 text-indigo-500" />}
                       </div>
                     </th>
 
                     {/* Fixed Sticky Header for ID and Name */}
                     <th
                       onClick={() => handleSort("empId")}
-                      className="sticky left-[95px] bg-slate-100 dark:bg-slate-800 px-3 py-3 font-bold border-r border-slate-200 dark:border-slate-700 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[110px] min-w-[110px] max-w-[110px] cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
+                      className="sticky left-[50px] bg-slate-100 dark:bg-slate-800 px-3 py-3 font-bold border-r border-slate-200 dark:border-slate-700 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[110px] min-w-[110px] max-w-[110px] cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
                     >
                       <div className="flex items-center gap-1">
                         <span>Emp ID</span>
@@ -853,7 +781,7 @@ function IncrementHistoryPage() {
                     </th>
                     <th
                       onClick={() => handleSort("empName")}
-                      className="sticky left-[205px] bg-slate-100 dark:bg-slate-800 px-3 py-3 font-bold border-r border-slate-200 dark:border-slate-700 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[180px] min-w-[180px] max-w-[180px] cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
+                      className="sticky left-[160px] bg-slate-100 dark:bg-slate-800 px-3 py-3 font-bold border-r border-slate-200 dark:border-slate-700 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[180px] min-w-[180px] max-w-[180px] cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
                     >
                       <div className="flex items-center gap-1">
                         <span>Name</span>
@@ -974,7 +902,7 @@ function IncrementHistoryPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                   {filteredRecords.length > 0 ? (
-                    filteredRecords.map((row) => {
+                    filteredRecords.map((row, idx) => {
                       const isSelected = selectedRecord?.empId === row.empId;
                       const stickyCellBgClass = isSelected
                         ? "bg-slate-100 dark:bg-slate-800"
@@ -990,45 +918,21 @@ function IncrementHistoryPage() {
                               : "hover:bg-slate-50/80 dark:hover:bg-slate-800/50"
                           }`}
                         >
-                          {/* Sticky Left Actions and Checkbox Cell */}
+                          {/* Sticky Left SL Cell */}
                           <td
-                            className={`sticky left-0 ${stickyCellBgClass} px-2 py-2.5 border-r border-slate-200 dark:border-slate-800 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[95px] min-w-[95px] max-w-[95px] text-center transition-colors`}
-                            onClick={(event) => event.stopPropagation()}
+                            className={`sticky left-0 ${stickyCellBgClass} px-2 py-2.5 font-bold text-center text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[50px] min-w-[50px] max-w-[50px] transition-colors`}
                           >
-                            <div className="flex items-center gap-1.5 justify-center">
-                              <input
-                                type="checkbox"
-                                checked={selectedEmpIds.includes(row.empId)}
-                                onChange={() => toggleSelectEmp(row.empId)}
-                                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer"
-                              />
-                              <button
-                                type="button"
-                                className="size-6 bg-amber-500 hover:bg-amber-600 text-white rounded flex items-center justify-center shadow-2xs transition cursor-pointer"
-                                onClick={() => setSelectedRecord(row)}
-                                title="Audit Breakdown Summary"
-                              >
-                                <FileText className="size-3" />
-                              </button>
-                              <button
-                                type="button"
-                                className="size-6 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 rounded flex items-center justify-center transition cursor-pointer"
-                                onClick={() => setSelectedRecord(row)}
-                                title="View Compensation"
-                              >
-                                <Eye className="size-3" />
-                              </button>
-                            </div>
+                            {idx + 1}
                           </td>
 
                           {/* Sticky Left Emp ID and Name Cell */}
                           <td
-                            className={`sticky left-[95px] ${stickyCellBgClass} px-3 py-2.5 font-bold font-mono text-indigo-600 dark:text-indigo-400 border-r border-slate-200 dark:border-slate-800 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[110px] min-w-[110px] max-w-[110px] transition-colors`}
+                            className={`sticky left-[50px] ${stickyCellBgClass} px-3 py-2.5 font-bold font-mono text-indigo-600 dark:text-indigo-400 border-r border-slate-200 dark:border-slate-800 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[110px] min-w-[110px] max-w-[110px] transition-colors`}
                           >
                             {row.empId}
                           </td>
                           <td
-                            className={`sticky left-[205px] ${stickyCellBgClass} px-3 py-2.5 font-bold text-slate-900 dark:text-white border-r border-slate-200 dark:border-slate-800 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[180px] min-w-[180px] max-w-[180px] transition-colors`}
+                            className={`sticky left-[160px] ${stickyCellBgClass} px-3 py-2.5 font-bold text-slate-900 dark:text-white border-r border-slate-200 dark:border-slate-800 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[180px] min-w-[180px] max-w-[180px] transition-colors`}
                           >
                             <div className="flex items-center gap-2">
                               <div className="size-6 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-[9px] font-bold text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center">

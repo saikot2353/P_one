@@ -492,6 +492,8 @@ export const nav: NavItem[] = [
           { label: "Earn Leave Pay Report", to: "/earn-leave-pay-report" },
           { label: "Festival Allowance Payment Sheet", to: "/festival-allowance-payment-sheet" },
           { label: "Final Settlement Report", to: "/final-settlement-report" },
+          { label: "Extra OT", to: "/extra-ot-report" },
+          { label: "Night Allowance Report", to: "/night-allowance-report" },
         ],
       },
     ],

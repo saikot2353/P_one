@@ -11,7 +11,6 @@ import {
   TrendingUp,
   RefreshCw,
   SlidersHorizontal,
-  Pencil,
   X,
   CheckCircle2,
   Eye,
@@ -937,12 +936,11 @@ export function IncrementQueueListPage() {
               <table className="w-full text-[11px] text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-extrabold border-b border-slate-200 dark:border-slate-700">
-                    <th className="p-2.5 w-12 text-center">Action</th>
                     <th
                       onClick={() => handleSort("sl")}
-                      className="p-2.5 w-10 text-center cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
+                      className="p-2.5 w-12 text-center cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
                     >
-                      #
+                      SL
                     </th>
                     <th
                       onClick={() => handleSort("id")}
@@ -1013,19 +1011,7 @@ export function IncrementQueueListPage() {
                         key={row.id}
                         className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
                       >
-                        {/* Action Pencil Icon */}
-                        <td className="p-2.5 text-center">
-                          <button
-                            type="button"
-                            onClick={() => handleEditClick(row)}
-                            className="p-1 rounded text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
-                            title="Edit / Adjust Increment"
-                          >
-                            <Pencil className="size-3.5" />
-                          </button>
-                        </td>
-
-                        {/* # */}
+                        {/* SL */}
                         <td className="p-2.5 text-center font-bold text-slate-500">
                           {idx + 1}
                         </td>
@@ -1083,7 +1069,7 @@ export function IncrementQueueListPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={12} className="p-8 text-center text-slate-400 dark:text-slate-500">
+                      <td colSpan={11} className="p-8 text-center text-slate-400 dark:text-slate-500">
                         No matching increment queue records found.
                       </td>
                     </tr>

@@ -11,6 +11,7 @@ import {
   Calculator,
   Gift,
   PieChart,
+  Timer, Moon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/payroll-reports")({
@@ -65,6 +66,18 @@ function PayrollReportsPage() {
           icon: CalendarDays,
           desc: "Summary report on holiday overtime and compensation.",
           to: "/holiday-summary-sheet",
+        },
+        {
+          title: "Extra OT",
+          icon: Timer,
+          desc: "Employee extra overtime hours, rates, and total disbursement.",
+          to: "/extra-ot-report",
+        },
+        {
+          title: "Night Allowance Report",
+          icon: Moon,
+          desc: "Employee night shift attendance, in/out timings, and night allowance disbursement ledger.",
+          to: "/night-allowance-report",
         },
       ],
     },

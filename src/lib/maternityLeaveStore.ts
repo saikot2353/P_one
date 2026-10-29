@@ -361,6 +361,142 @@ export function checkMaternityEligibility(
 // Initial Mock Requests to provide rich data out of the box across all 3 pages
 export const INITIAL_MATERNITY_REQUESTS: MaternityRequest[] = [
   {
+    id: "MAT-2026-004",
+    employeeId: "2023018844",
+    employee: INITIAL_FEMALE_EMPLOYEES[3],
+    currentStage: "MEDICAL_VERIFIED",
+    statusLabel: "Medical Verified (Ready to Schedule Dates)",
+    createdAt: "2026-10-10 10:00:00",
+    updatedAt: "2026-10-28 11:30:00",
+    welfareStage1: {
+      intakeDate: "2026-10-10",
+      welfareOfficerName: "Rozina Akter (Welfare Lead)",
+      welfareOfficerId: "WLF-012",
+      informedPregnancyDate: "2026-10-09",
+      tentativeTrimester: "2nd Trimester (13-26 wks)",
+      serviceDurationText: "3 years, 9 months",
+      isEligible: true,
+      counselingNotes:
+        "Employee Shahanaz Parvin (Senior Sewing Operator, Unit-05) reported pregnancy. Service period exceeds statutory requirement (3y 9m). Two previous maternity deliveries verified on record. Completed welfare counseling and referred to Medical Clinic for full follow-up verification.",
+      attachedDocuments: [
+        {
+          id: "DOC-301",
+          name: "Doctor_Initial_Prescription.pdf",
+          type: "Prescription",
+          size: "1.4 MB",
+          uploadDate: "2026-10-10",
+          status: "Verified",
+        },
+        {
+          id: "DOC-302",
+          name: "USG_Fetal_Growth_Scan.pdf",
+          type: "USG_Report",
+          size: "2.8 MB",
+          uploadDate: "2026-10-10",
+          status: "Verified",
+        },
+        {
+          id: "DOC-303",
+          name: "Employee_NID_Document.pdf",
+          type: "NID",
+          size: "512 KB",
+          uploadDate: "2026-10-10",
+          status: "Verified",
+        },
+      ],
+      previousHistoryDisplayed: true,
+    },
+    medicalStage: {
+      assignedDoctor: "Dr. Farzana Yasmin, MBBS, DGO",
+      doctorRegNo: "BMDC-A-45920",
+      checkupVisits: [
+        {
+          visitId: "VISIT-01",
+          visitNumber: 1,
+          visitDate: "2026-10-14",
+          doctorName: "Dr. Farzana Yasmin",
+          doctorRegNo: "BMDC-A-45920",
+          bloodPressure: "118/76 mmHg",
+          pulseRate: "78 bpm",
+          weightKg: 64.5,
+          gestationalWeeks: 24,
+          fetalHeartRate: "142 bpm",
+          hemoglobin: "11.6 g/dL",
+          bloodSugar: "5.3 mmol/L",
+          clinicalFindings: "First clinical checkup. Single intrauterine pregnancy. Maternal vitals normal. Advised prenatal multivitamins.",
+          prescribedVitamins: "Tab. Folic Acid 5mg, Cap. Iron polymaltose, Calcium daily.",
+          nextFollowupDate: "2026-10-21",
+          medicalReports: ["USG_Anomaly_Scan_Report.pdf"],
+        },
+        {
+          visitId: "VISIT-02",
+          visitNumber: 2,
+          visitDate: "2026-10-21",
+          doctorName: "Dr. Farzana Yasmin",
+          doctorRegNo: "BMDC-A-45920",
+          bloodPressure: "120/78 mmHg",
+          pulseRate: "76 bpm",
+          weightKg: 65.2,
+          gestationalWeeks: 25,
+          fetalHeartRate: "140 bpm",
+          hemoglobin: "11.4 g/dL",
+          bloodSugar: "5.5 mmol/L",
+          clinicalFindings: "Second follow-up consultation. Fetal movements active. Growth parameters satisfactory. Repeat routine blood tests normal.",
+          prescribedVitamins: "Continue prenatal supplements. Balanced nutrition advised.",
+          nextFollowupDate: "2026-10-28",
+          medicalReports: ["Routine_Blood_Report.pdf"],
+        },
+        {
+          visitId: "VISIT-03",
+          visitNumber: 3,
+          visitDate: "2026-10-28",
+          doctorName: "Dr. Farzana Yasmin",
+          doctorRegNo: "BMDC-A-45920",
+          bloodPressure: "116/74 mmHg",
+          pulseRate: "74 bpm",
+          weightKg: 66.0,
+          gestationalWeeks: 26,
+          fetalHeartRate: "138 bpm",
+          hemoglobin: "11.8 g/dL",
+          bloodSugar: "5.2 mmol/L",
+          clinicalFindings: "Final follow-up visit successfully completed. Mother and fetus both in optimal health. Full clinical follow-up protocol finished.",
+          prescribedVitamins: "Prenatal multivitamin continued.",
+          nextFollowupDate: null,
+          medicalReports: ["Final_Clinical_Fitness_Slip.pdf"],
+        },
+      ],
+      isFinalCheckupDone: true,
+      expectedDeliveryDate: "",
+      clinicalFitness: "Normal Health - Fit to Work",
+      doctorFinalRemarks:
+        "All 3 medical follow-up consultations and clinical verifications completed. Patient is in healthy condition. Returned to Welfare Department for inputting Expected Delivery Date (EDD), computing statutory leave dates, and recording employee leave address.",
+      medicalVerifiedAt: "2026-10-28 11:30:00",
+    },
+    welfareStage2: {
+      expectedLeaveStartDate: "",
+      expectedLeaveEndDate: "",
+      totalLeaveDays: 112,
+      leaveAddress: "",
+      emergencyContactPerson: "Md. Anisur Rahman (Spouse)",
+      emergencyPhone: "01855-667788",
+      welfareOfficerRemarks: "",
+      submittedToHrAt: null,
+    },
+    hrStage: {
+      hrReviewerName: null,
+      approvedAt: null,
+      sanctionOrderNo: null,
+      hrRemarks: null,
+      benefitEstimate: {
+        grossMonthlyWage: 22500,
+        dailyRate: 865.38,
+        total112DaysAmount: 96923,
+        firstInstallment: 48462,
+        secondInstallment: 48461,
+      },
+    },
+  },
+  {
     id: "MAT-2026-001",
     employeeId: "2016003496",
     employee: INITIAL_FEMALE_EMPLOYEES[0],
@@ -634,9 +770,10 @@ export const INITIAL_MATERNITY_REQUESTS: MaternityRequest[] = [
       },
     },
   },
+
 ];
 
-const LOCAL_STORAGE_KEY = "cripton_maternity_requests_v2";
+const LOCAL_STORAGE_KEY = "cripton_maternity_requests_v4";
 
 export function getMaternityRequests(): MaternityRequest[] {
   if (typeof window === "undefined") return INITIAL_MATERNITY_REQUESTS;
@@ -646,7 +783,18 @@ export function getMaternityRequests(): MaternityRequest[] {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(INITIAL_MATERNITY_REQUESTS));
       return INITIAL_MATERNITY_REQUESTS;
     }
-    return JSON.parse(raw);
+    const parsed: MaternityRequest[] = JSON.parse(raw);
+    let hasNew = false;
+    INITIAL_MATERNITY_REQUESTS.forEach((initReq) => {
+      if (!parsed.some((r) => r.id === initReq.id)) {
+        parsed.push(initReq);
+        hasNew = true;
+      }
+    });
+    if (hasNew) {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(parsed));
+    }
+    return parsed;
   } catch (err) {
     console.error("Error reading maternity requests from storage", err);
     return INITIAL_MATERNITY_REQUESTS;

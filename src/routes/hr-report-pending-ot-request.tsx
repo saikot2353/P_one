@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Route as PendingOTRoute } from "./pending-ot-request";
+import { PendingOTRequestPage } from "./pending-ot-request";
 
 export const Route = createFileRoute("/hr-report-pending-ot-request")({
   head: () => ({
@@ -11,5 +11,5 @@ export const Route = createFileRoute("/hr-report-pending-ot-request")({
       },
     ],
   }),
-  component: PendingOTRoute.options.component,
+  component: PendingOTRequestPage,
 });

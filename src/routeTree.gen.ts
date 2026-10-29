@@ -67,6 +67,7 @@ import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EmployeeSalaryHistoryRouteImport } from './routes/employee-salary-history'
 import { Route as EmployeeTaxPayRouteImport } from './routes/employee-tax-pay'
 import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
+import { Route as ExtraOtReportRouteImport } from './routes/extra-ot-report'
 import { Route as FestivalAllowanceRouteImport } from './routes/festival-allowance'
 import { Route as FestivalAllowanceApprovalRouteImport } from './routes/festival-allowance-approval'
 import { Route as FestivalAllowancePaymentSheetRouteImport } from './routes/festival-allowance-payment-sheet'
@@ -254,6 +255,7 @@ import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salar
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MyProfileRouteImport } from './routes/my-profile'
+import { Route as NightAllowanceReportRouteImport } from './routes/night-allowance-report'
 import { Route as NoticeRouteImport } from './routes/notice'
 import { Route as OrganizationMasterSetupRouteImport } from './routes/organization-master-setup'
 import { Route as OtSheetHolidayRouteImport } from './routes/ot-sheet-holiday'
@@ -709,6 +711,11 @@ const EmployeeTaxPayRoute = EmployeeTaxPayRouteImport.update({
 const EnrollFingerprintRoute = EnrollFingerprintRouteImport.update({
   id: '/enroll-fingerprint',
   path: '/enroll-fingerprint',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtraOtReportRoute = ExtraOtReportRouteImport.update({
+  id: '/extra-ot-report',
+  path: '/extra-ot-report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FestivalAllowanceRoute = FestivalAllowanceRouteImport.update({
@@ -1697,6 +1704,11 @@ const MyProfileRoute = MyProfileRouteImport.update({
   path: '/my-profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NightAllowanceReportRoute = NightAllowanceReportRouteImport.update({
+  id: '/night-allowance-report',
+  path: '/night-allowance-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NoticeRoute = NoticeRouteImport.update({
   id: '/notice',
   path: '/notice',
@@ -2630,6 +2642,7 @@ export interface FileRoutesByFullPath {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/extra-ot-report': typeof ExtraOtReportRoute
   '/festival-allowance': typeof FestivalAllowanceRoute
   '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
   '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
@@ -2817,6 +2830,7 @@ export interface FileRoutesByFullPath {
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/my-profile': typeof MyProfileRoute
+  '/night-allowance-report': typeof NightAllowanceReportRoute
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
@@ -3038,6 +3052,7 @@ export interface FileRoutesByTo {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/extra-ot-report': typeof ExtraOtReportRoute
   '/festival-allowance': typeof FestivalAllowanceRoute
   '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
   '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
@@ -3225,6 +3240,7 @@ export interface FileRoutesByTo {
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/my-profile': typeof MyProfileRoute
+  '/night-allowance-report': typeof NightAllowanceReportRoute
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
@@ -3447,6 +3463,7 @@ export interface FileRoutesById {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/extra-ot-report': typeof ExtraOtReportRoute
   '/festival-allowance': typeof FestivalAllowanceRoute
   '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
   '/festival-allowance-payment-sheet': typeof FestivalAllowancePaymentSheetRoute
@@ -3634,6 +3651,7 @@ export interface FileRoutesById {
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/my-profile': typeof MyProfileRoute
+  '/night-allowance-report': typeof NightAllowanceReportRoute
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
@@ -3857,6 +3875,7 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/extra-ot-report'
     | '/festival-allowance'
     | '/festival-allowance-approval'
     | '/festival-allowance-payment-sheet'
@@ -4044,6 +4063,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/my-profile'
+    | '/night-allowance-report'
     | '/notice'
     | '/organization-master-setup'
     | '/ot-sheet-holiday'
@@ -4265,6 +4285,7 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/extra-ot-report'
     | '/festival-allowance'
     | '/festival-allowance-approval'
     | '/festival-allowance-payment-sheet'
@@ -4452,6 +4473,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/my-profile'
+    | '/night-allowance-report'
     | '/notice'
     | '/organization-master-setup'
     | '/ot-sheet-holiday'
@@ -4673,6 +4695,7 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/extra-ot-report'
     | '/festival-allowance'
     | '/festival-allowance-approval'
     | '/festival-allowance-payment-sheet'
@@ -4860,6 +4883,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/my-profile'
+    | '/night-allowance-report'
     | '/notice'
     | '/organization-master-setup'
     | '/ot-sheet-holiday'
@@ -5082,6 +5106,7 @@ export interface RootRouteChildren {
   EmployeeSalaryHistoryRoute: typeof EmployeeSalaryHistoryRoute
   EmployeeTaxPayRoute: typeof EmployeeTaxPayRoute
   EnrollFingerprintRoute: typeof EnrollFingerprintRoute
+  ExtraOtReportRoute: typeof ExtraOtReportRoute
   FestivalAllowanceRoute: typeof FestivalAllowanceRoute
   FestivalAllowanceApprovalRoute: typeof FestivalAllowanceApprovalRoute
   FestivalAllowancePaymentSheetRoute: typeof FestivalAllowancePaymentSheetRoute
@@ -5269,6 +5294,7 @@ export interface RootRouteChildren {
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
   MyProfileRoute: typeof MyProfileRoute
+  NightAllowanceReportRoute: typeof NightAllowanceReportRoute
   NoticeRoute: typeof NoticeRoute
   OrganizationMasterSetupRoute: typeof OrganizationMasterSetupRoute
   OtSheetHolidayRoute: typeof OtSheetHolidayRoute
@@ -5838,6 +5864,13 @@ declare module '@tanstack/react-router' {
       path: '/enroll-fingerprint'
       fullPath: '/enroll-fingerprint'
       preLoaderRoute: typeof EnrollFingerprintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extra-ot-report': {
+      id: '/extra-ot-report'
+      path: '/extra-ot-report'
+      fullPath: '/extra-ot-report'
+      preLoaderRoute: typeof ExtraOtReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/festival-allowance': {
@@ -7149,6 +7182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/night-allowance-report': {
+      id: '/night-allowance-report'
+      path: '/night-allowance-report'
+      fullPath: '/night-allowance-report'
+      preLoaderRoute: typeof NightAllowanceReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notice': {
       id: '/notice'
       path: '/notice'
@@ -8338,6 +8378,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmployeeSalaryHistoryRoute: EmployeeSalaryHistoryRoute,
   EmployeeTaxPayRoute: EmployeeTaxPayRoute,
   EnrollFingerprintRoute: EnrollFingerprintRoute,
+  ExtraOtReportRoute: ExtraOtReportRoute,
   FestivalAllowanceRoute: FestivalAllowanceRoute,
   FestivalAllowanceApprovalRoute: FestivalAllowanceApprovalRoute,
   FestivalAllowancePaymentSheetRoute: FestivalAllowancePaymentSheetRoute,
@@ -8529,6 +8570,7 @@ const rootRouteChildren: RootRouteChildren = {
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,
   MyProfileRoute: MyProfileRoute,
+  NightAllowanceReportRoute: NightAllowanceReportRoute,
   NoticeRoute: NoticeRoute,
   OrganizationMasterSetupRoute: OrganizationMasterSetupRoute,
   OtSheetHolidayRoute: OtSheetHolidayRoute,

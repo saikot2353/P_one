@@ -289,7 +289,7 @@ const INITIAL_OT_DATA: OTRequestRecord[] = [
   },
 ];
 
-function PendingOTRequestPage() {
+export function PendingOTRequestPage() {
   // Filter States matching the user's provided criteria image
   const [startDate, setStartDate] = useState("2026-10-28");
   const [endDate, setEndDate] = useState("2026-10-28");
