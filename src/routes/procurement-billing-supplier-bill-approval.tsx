@@ -462,12 +462,9 @@ export function SupplierBillApprovalPage() {
                 </div>
               </div>
 
-              {/* 2. MRR Reference Section */}
+              {/* MRR Reference Section */}
               <div className="bg-muted/20 p-4 rounded-xl border border-border space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="size-5 rounded-full bg-amber-500/10 text-amber-600 flex items-center justify-center text-[10px] font-black">
-                    2
-                  </span>
                   <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
                     Linked Material Receive Report (MRR) References
                   </h3>
@@ -488,14 +485,11 @@ export function SupplierBillApprovalPage() {
                 </div>
               </div>
 
-              {/* 3. Bill Item Details from MRR */}
+              {/* Bill Item Details from MRR */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                     Bill Item Details (MRR Verified Quantities)
-                    <span className="text-[10px] text-muted-foreground normal-case font-normal">
-                      (Current Bill Qty ≤ MRR Received Qty − Previously Billed Qty)
-                    </span>
                   </h3>
                 </div>
 
@@ -513,6 +507,7 @@ export function SupplierBillApprovalPage() {
                           Current Bill Qty
                         </th>
                         <th className="py-2.5 px-3 text-right font-bold">Unit Price (৳)</th>
+                        <th className="py-2.5 px-3 text-right font-bold">Discount (৳)</th>
                         <th className="py-2.5 px-3 text-right font-bold">VAT</th>
                         <th className="py-2.5 px-3 text-right font-bold text-amber-600">Tax</th>
                         <th className="py-2.5 px-3 text-right font-bold">Line Total (৳)</th>
@@ -547,6 +542,9 @@ export function SupplierBillApprovalPage() {
                           </td>
                           <td className="py-2.5 px-3 text-right font-mono text-muted-foreground">
                             ৳ {item.unitPrice.toLocaleString()}
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono text-rose-600">
+                            {item.discount ? `-৳ ${Number(item.discount).toLocaleString()}` : "৳ 0"}
                           </td>
                           <td className="py-2.5 px-3 text-right font-mono text-muted-foreground">
                             ৳ {item.vatAmount.toLocaleString()}
@@ -584,51 +582,73 @@ export function SupplierBillApprovalPage() {
                     className="w-full p-2.5 text-xs bg-muted/40 border border-border rounded-xl cursor-not-allowed"
                   />
 
-                  {/* Financial inputs display: Other Charges, Adjustment, Discount, VAT */}
-                  <div className="grid grid-cols-2 gap-3 text-xs pt-1">
+                  {/* Financial inputs display: Other Charges breakdown, Adjustment, Discount, VAT */}
+                  <div className="space-y-3 pt-1 text-xs">
                     <div>
-                      <label className="text-[10.5px] font-bold text-muted-foreground uppercase block mb-1">
-                        Other Charges (Freight/Loading)
+                      <label className="text-[10.5px] font-bold text-muted-foreground uppercase block mb-1.5">
+                        Other Charges Breakdown
                       </label>
-                      <input
-                        type="text"
-                        readOnly
-                        value={`৳ ${selectedBill.otherCharges.toLocaleString()}`}
-                        className="w-full px-2.5 py-1.5 font-mono bg-muted/40 border border-border rounded-lg cursor-not-allowed"
-                      />
+                      {((selectedBill as any).otherChargesBreakdown && (selectedBill as any).otherChargesBreakdown.length > 0) ? (
+                        <div className="space-y-1.5 border border-border/70 rounded-xl p-2.5 bg-muted/20">
+                          {(selectedBill as any).otherChargesBreakdown.map((charge: any, idx: number) => (
+                            <div
+                              key={charge.id || idx}
+                              className="flex items-center justify-between gap-2 p-1.5 rounded-lg bg-background border border-border/60 text-xs"
+                            >
+                              <div className="truncate flex-1">
+                                <span className="font-bold text-foreground">{charge.name}</span>
+                                {charge.code && (
+                                  <span className="ml-1.5 font-mono text-[10px] text-muted-foreground">({charge.code})</span>
+                                )}
+                              </div>
+                              <span className="font-mono font-bold text-foreground">
+                                ৳ {Number(charge.amount || 0).toLocaleString()}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-2.5 rounded-xl bg-muted/40 border border-border flex justify-between items-center text-xs">
+                          <span className="text-muted-foreground font-medium">Other Charges (General)</span>
+                          <span className="font-mono font-bold text-foreground">৳ {selectedBill.otherCharges.toLocaleString()}</span>
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <label className="text-[10.5px] font-bold text-muted-foreground uppercase block mb-1">
-                        Adjustment (+/-)
-                      </label>
-                      <input
-                        type="text"
-                        readOnly
-                        value={`৳ ${selectedBill.adjustment.toLocaleString()}`}
-                        className="w-full px-2.5 py-1.5 font-mono bg-muted/40 border border-border rounded-lg cursor-not-allowed"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10.5px] font-bold text-emerald-600 uppercase block mb-1">
-                        Discount (৳)
-                      </label>
-                      <input
-                        type="text"
-                        readOnly
-                        value={`- ৳ ${selectedBill.discount.toLocaleString()}`}
-                        className="w-full px-2.5 py-1.5 font-mono bg-muted/40 border border-emerald-500/30 text-emerald-600 rounded-lg cursor-not-allowed font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10.5px] font-bold text-blue-600 uppercase block mb-1">
-                        VAT Amount (৳)
-                      </label>
-                      <input
-                        type="text"
-                        readOnly
-                        value={`+ ৳ ${selectedBill.vat.toLocaleString()}`}
-                        className="w-full px-2.5 py-1.5 font-mono bg-muted/40 border border-blue-500/30 text-blue-600 rounded-lg cursor-not-allowed font-bold"
-                      />
+
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-[10.5px] font-bold text-muted-foreground uppercase block mb-1">
+                          Adjustment (+/-)
+                        </label>
+                        <input
+                          type="text"
+                          readOnly
+                          value={`৳ ${selectedBill.adjustment.toLocaleString()}`}
+                          className="w-full px-2.5 py-1.5 font-mono bg-muted/40 border border-border rounded-lg cursor-not-allowed"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10.5px] font-bold text-emerald-600 uppercase block mb-1">
+                          Discount (৳)
+                        </label>
+                        <input
+                          type="text"
+                          readOnly
+                          value={`- ৳ ${selectedBill.discount.toLocaleString()}`}
+                          className="w-full px-2.5 py-1.5 font-mono bg-muted/40 border border-emerald-500/30 text-emerald-600 rounded-lg cursor-not-allowed font-bold"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10.5px] font-bold text-blue-600 uppercase block mb-1">
+                          VAT Amount (৳)
+                        </label>
+                        <input
+                          type="text"
+                          readOnly
+                          value={`+ ৳ ${selectedBill.vat.toLocaleString()}`}
+                          className="w-full px-2.5 py-1.5 font-mono bg-muted/40 border border-blue-500/30 text-blue-600 rounded-lg cursor-not-allowed font-bold"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -652,6 +672,12 @@ export function SupplierBillApprovalPage() {
                     <span>VAT</span>
                     <span className="font-mono font-bold text-foreground">
                       + ৳ {selectedBill.vat.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-muted-foreground">
+                    <span>Tax</span>
+                    <span className="font-mono font-bold text-amber-600 dark:text-amber-400">
+                      + ৳ {(((selectedBill as any).tax) ?? 0).toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-muted-foreground">

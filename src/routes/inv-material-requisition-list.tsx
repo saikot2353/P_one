@@ -240,6 +240,7 @@ function MaterialRequisitionListPage() {
       };
     }
     return {
+      hideLogo: true,
       companyName: reportTarget.organization || "Pakiza Knit Composite Ltd",
       companyAddress: "Gorat, Ashulia, Savar, Dhaka, Bangladesh",
       reportTitle: "MATERIAL REQUISITION NOTE",
@@ -247,11 +248,11 @@ function MaterialRequisitionListPage() {
       reportDate: reportTarget.requisitionDate,
       statusBadge: reportTarget.status,
       metaFields: [
-        { label: "Department", value: reportTarget.department },
-        { label: "Requested By", value: reportTarget.requestedBy },
+        { label: "Requisition Date", value: reportTarget.requisitionDate },
         { label: "Required Date", value: reportTarget.requiredDate },
+        { label: "Requested By", value: reportTarget.requestedBy },
+        { label: "Department", value: reportTarget.department },
         { label: "Priority", value: reportTarget.priority },
-        { label: "Warehouse / Store", value: reportTarget.warehouseStore },
         { label: "Purpose", value: reportTarget.purpose || "N/A" },
       ],
       tableHeaders: [
@@ -261,9 +262,7 @@ function MaterialRequisitionListPage() {
         "SPECIFICATION",
         "UOM",
         "REQ QTY",
-        "AVL STOCK",
-        "SHORTAGE",
-        "REMARKS",
+        "APP QTY",
       ],
       tableRows: reportTarget.items.map((it, idx) => [
         String(idx + 1),
@@ -272,22 +271,10 @@ function MaterialRequisitionListPage() {
         it.specification || "-",
         it.uom,
         String(it.requestedQuantity),
-        String(it.availableStock),
-        String(it.shortageQuantity),
-        it.remarks || "-",
+        String(it.approvedQuantity ?? it.requestedQuantity),
       ]),
       summaryCards: [
-        { label: "Total Items", value: String(reportTarget.totalItems) },
         { label: "Requested Qty", value: String(reportTarget.requestedQuantity) },
-        { label: "Issued Qty", value: String(reportTarget.issuedQuantity) },
-        { label: "Remaining Qty", value: String(reportTarget.remainingQuantity) },
-        { label: "Shortage Qty", value: String(reportTarget.shortageQuantity) },
-      ],
-      notes: [
-        `Requisition created on ${reportTarget.createdDate}.`,
-        reportTarget.shortageQuantity > 0
-          ? `NOTE: Shortage of ${reportTarget.shortageQuantity} units identified against store stock. Purchase Requisition may be generated.`
-          : "Full requested quantity available in store.",
       ],
       signatures: [
         { title: "Requested By", name: reportTarget.requestedBy, date: reportTarget.requisitionDate },
@@ -437,28 +424,6 @@ function MaterialRequisitionListPage() {
                       onChange={(e) => setRequestedByFilter(e.target.value)}
                       className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
                     />
-                  </div>
-
-                  {/* Warehouse / Store */}
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                      Issue Warehouse / Store
-                    </label>
-                    <select
-                      value={warehouseFilter}
-                      onChange={(e) => setWarehouseFilter(e.target.value)}
-                      className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                    >
-                      <option value="All">All Warehouses</option>
-                      {warehouses.map((w: any) => {
-                        const name = w.storeName || w.name || w.storeCode;
-                        return (
-                          <option key={w.id} value={name}>
-                            {name}
-                          </option>
-                        );
-                      })}
-                    </select>
                   </div>
 
                   {/* Status */}

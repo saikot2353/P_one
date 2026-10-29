@@ -26,6 +26,7 @@ interface SearchableSelectProps {
   allowCustom?: boolean;
   variant?: "default" | "underline";
   showSearchIconInTrigger?: boolean;
+  disabled?: boolean;
 }
 
 export function SearchableSelect({
@@ -37,6 +38,7 @@ export function SearchableSelect({
   allowCustom = false,
   variant = "default",
   showSearchIconInTrigger,
+  disabled = false,
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
@@ -46,16 +48,17 @@ export function SearchableSelect({
   const shouldShowSearchIcon = showSearchIconInTrigger ?? !isUnderline;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={disabled ? false : open} onOpenChange={disabled ? undefined : setOpen}>
       <PopoverTrigger asChild>
         <button
           type="button"
           role="combobox"
           aria-expanded={open}
+          disabled={disabled}
           className={cn(
             isUnderline
-              ? "flex w-full items-center justify-between h-8 py-1 px-0 bg-transparent border-0 border-b border-slate-300 focus:border-blue-500 rounded-none outline-none text-sm text-slate-800 cursor-pointer text-left shadow-none transition-colors"
-              : "flex w-full items-center justify-between h-10 px-3 rounded-xl bg-background border border-border/80 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-sm transition-all text-foreground cursor-pointer hover:border-primary/50 text-left",
+              ? "flex w-full items-center justify-between h-8 py-1 px-0 bg-transparent border-0 border-b border-slate-300 focus:border-blue-500 rounded-none outline-none text-sm text-slate-800 cursor-pointer text-left shadow-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              : "flex w-full items-center justify-between h-10 px-3 rounded-xl bg-background border border-border/80 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-sm transition-all text-foreground cursor-pointer hover:border-primary/50 text-left disabled:opacity-50 disabled:cursor-not-allowed",
             className,
           )}
         >

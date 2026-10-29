@@ -35,8 +35,8 @@ export function UOMMasterPageForm({
     e.preventDefault();
     if (isView) return;
 
+    const finalUomCode = formData.uomCode?.trim() || `UOM-${Math.floor(100 + Math.random() * 900)}`;
     const errors: Record<string, string> = {};
-    if (!formData.uomCode?.trim()) errors.uomCode = "UOM Code is required";
     if (!formData.uomName?.trim()) errors.uomName = "UOM Name is required";
 
     if (Object.keys(errors).length > 0) {
@@ -46,7 +46,7 @@ export function UOMMasterPageForm({
 
     const payload: UOM = {
       id: initialData?.id || `uom-${Date.now()}`,
-      uomCode: formData.uomCode?.toUpperCase() || "",
+      uomCode: finalUomCode.toUpperCase(),
       uomName: formData.uomName || "",
       uomType: "Count",
       decimalAllowed: true,
@@ -133,27 +133,10 @@ export function UOMMasterPageForm({
         <div className="bg-card rounded-2xl border border-border/70 p-5 shadow-2xs space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b border-border/60">
             <Ruler className="size-4 text-emerald-500" />
-            <h2 className="text-sm font-bold text-foreground">Unit Specification</h2>
+            <h2 className="text-sm font-bold text-foreground">UOM Details</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">
-                Code / ID <span className="text-[10px] font-normal text-muted-foreground ml-1">(Auto-generated)</span>
-              </label>
-              <input
-                type="text"
-                disabled={isView}
-                value={formData.uomCode || ""}
-                onChange={(e) => setFormData({ ...formData, uomCode: e.target.value.toUpperCase() })}
-                placeholder="e.g. PCS, KG, MTR"
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold uppercase focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-              {formErrors.uomCode && (
-                <p className="text-[10px] text-rose-500 mt-1">{formErrors.uomCode}</p>
-              )}
-            </div>
-
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
                 UOM Name <span className="text-rose-500">*</span>
@@ -172,17 +155,6 @@ export function UOMMasterPageForm({
             </div>
 
             <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">Base Conversion Factor</label>
-              <input
-                type="number"
-                disabled={isView}
-                value={formData.conversionFactor ?? 1}
-                onChange={(e) => setFormData({ ...formData, conversionFactor: Number(e.target.value) })}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-            </div>
-
-            <div>
               <label className="block text-xs font-bold mb-1 text-foreground">Status</label>
               <select
                 disabled={isView}
@@ -193,18 +165,6 @@ export function UOMMasterPageForm({
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-bold mb-1 text-foreground">Description / Notes</label>
-              <textarea
-                rows={2}
-                disabled={isView}
-                value={formData.description || ""}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Standard unit definition and packaging notes..."
-                className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs resize-none focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
             </div>
           </div>
         </div>

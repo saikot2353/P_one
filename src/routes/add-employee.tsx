@@ -52,7 +52,16 @@ import {
   AlertTriangle,
   List,
   UserPlus,
+  Globe,
 } from "lucide-react";
+import {
+  SocialMediaLink,
+  SUPPORTED_PLATFORMS,
+  SocialMediaIcon,
+  validateSocialMediaLinks,
+} from "@/components/social-media/SocialMediaUtils";
+import { employeesData } from "@/routes/personnel-list";
+import { createCard, getCardByEmployeeId } from "@/lib/digital-business-card-service";
 
 export const Route = createFileRoute("/add-employee")({
   head: () => ({
@@ -443,6 +452,113 @@ export function AddEmployeeView({
     },
   ]);
 
+  // Dynamic Social Media Links state
+  const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLink[]>([]);
+  const [socialMediaErrors, setSocialMediaErrors] = useState<
+    Record<number, { platform?: string; customPlatform?: string; url?: string }>
+  >({});
+
+  // Social Media Link Handlers
+  const handleAddSocialMediaLink = () => {
+    const newLink: SocialMediaLink = {
+      id: "sml-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+      platform: "LinkedIn",
+      url: "",
+    };
+    setSocialMediaLinks((prev) => [...prev, newLink]);
+  };
+
+  const handleRemoveSocialMediaLink = (index: number) => {
+    setSocialMediaLinks((prev) => prev.filter((_, i) => i !== index));
+    setSocialMediaErrors((prev) => {
+      const updated = { ...prev };
+      delete updated[index];
+      return updated;
+    });
+  };
+
+  const handleUpdateSocialMediaLink = (
+    index: number,
+    field: keyof SocialMediaLink,
+    value: string
+  ) => {
+    setSocialMediaLinks((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
+    // Clear validation error for that field if present
+    setSocialMediaErrors((prev) => {
+      if (!prev[index]) return prev;
+      const updatedRow = { ...prev[index] };
+      delete updatedRow[field as keyof typeof updatedRow];
+      return { ...prev, [index]: updatedRow };
+    });
+  };
+
+  // Reopen or edit existing employee file if ID is provided in query params
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const queryId = searchParams.get("id") || searchParams.get("empId");
+      if (queryId) {
+        let foundEmp: any = null;
+        const synced = localStorage.getItem("recruitment_synced_employees");
+        if (synced) {
+          try {
+            const list = JSON.parse(synced);
+            foundEmp = list.find((e: any) => e.id === queryId);
+          } catch (e) {
+            console.error(e);
+          }
+        }
+        if (!foundEmp) {
+          foundEmp = employeesData.find((e) => e.id === queryId);
+        }
+
+        if (foundEmp) {
+          setForm((prev) => ({
+            ...prev,
+            id: foundEmp.id,
+            offcId: foundEmp.offcId !== "—" ? foundEmp.offcId || "" : "",
+            nameEng: foundEmp.name || "",
+            empType: foundEmp.type || prev.empType,
+            dept: foundEmp.dept || prev.dept,
+            sect: foundEmp.sect || prev.sect,
+            title: foundEmp.title || "",
+            unit: foundEmp.unit || prev.unit,
+            line: foundEmp.line || prev.line,
+            grade: foundEmp.grade || prev.grade,
+            shift: foundEmp.shift || prev.shift,
+            joinDate: foundEmp.joinDate || prev.joinDate,
+            blood: foundEmp.blood || prev.blood,
+            gross: foundEmp.gross || prev.gross,
+            offcEmail: foundEmp.email !== "—" ? foundEmp.email || "" : "",
+            offcMobile: foundEmp.officeMob !== "—" ? foundEmp.officeMob || "" : "",
+            personalEmail: foundEmp.personalEmail || prev.personalEmail,
+            personalContact:
+              foundEmp.personalContact !== "—"
+                ? foundEmp.personalContact || ""
+                : foundEmp.phone !== "—"
+                ? foundEmp.phone || ""
+                : "",
+            gender: foundEmp.gender || prev.gender,
+            dob: foundEmp.dob || prev.dob,
+            empStatus: foundEmp.empStatus || prev.empStatus,
+          }));
+
+          if (Array.isArray(foundEmp.socialMediaLinks)) {
+            setSocialMediaLinks(foundEmp.socialMediaLinks);
+          }
+          if (Array.isArray(foundEmp.educationList) && foundEmp.educationList.length > 0) {
+            setEducationList(foundEmp.educationList);
+          }
+          if (Array.isArray(foundEmp.experienceList) && foundEmp.experienceList.length > 0) {
+            setExperienceList(foundEmp.experienceList);
+          }
+        }
+      }
+    }
+  }, []);
+
   // Upload progress indicators for pictures
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
 
@@ -724,9 +840,25 @@ export function AddEmployeeView({
         certifications: certifications,
         trainingList: trainingList,
         involvements: involvements,
+        socialMediaLinks: socialMediaLinks,
       };
-      list.push(newEmp);
+
+      const existingIndex = list.findIndex((e) => e.id === form.id);
+      if (existingIndex >= 0) {
+        list[existingIndex] = { ...list[existingIndex], ...newEmp };
+      } else {
+        list.push(newEmp);
+      }
       localStorage.setItem("recruitment_synced_employees", JSON.stringify(list));
+
+      // Ensure Digital Business Card exists or is synchronized
+      const existingCard = getCardByEmployeeId(form.id);
+      if (!existingCard) {
+        createCard(form.id, {
+          whatsappNumber: form.offcMobile || "",
+          officeAddress: form.presentVillage || "Pakiza Corporate Tower, 12 Green Road, Dhaka",
+        });
+      }
     }
     setMissingAttachments(null);
     setShowSuccessModal(true);
@@ -753,6 +885,18 @@ export function AddEmployeeView({
       }
       return;
     }
+
+    // Validate Social Media Links if any exist
+    const socialValidation = validateSocialMediaLinks(socialMediaLinks);
+    if (!socialValidation.isValid) {
+      setSocialMediaErrors(socialValidation.errors);
+      setActiveTab("personal_identity");
+      toast.error(
+        "Please provide valid HTTP/HTTPS URLs and complete required fields for all social media links."
+      );
+      return;
+    }
+    setSocialMediaErrors({});
 
     // Collect rows that have content but are missing an attachment
     const missing: { type: "education" | "experience"; label: string }[] = [];
@@ -3085,6 +3229,156 @@ export function AddEmployeeView({
                               <Phone className="size-3.5 text-muted-foreground/60 absolute left-3.5 top-1/2 -translate-y-1/2" />
                             </div>
                           </div>
+                        </div>
+
+                        {/* Social Media Links Subsection */}
+                        <div className="mt-6 pt-5 border-t border-border/40 space-y-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="space-y-0.5">
+                              <label className="text-xs font-extrabold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                                <Globe className="size-4 text-sky-500" />
+                                Social Media Links
+                                <span className="text-[10px] font-semibold text-muted-foreground font-normal normal-case">
+                                  (optional — displayed on Digital Business Card)
+                                </span>
+                              </label>
+                              <p className="text-[11px] text-muted-foreground">
+                                Add dynamic social profiles to display on the employee's Digital Business Card and public QR code URL.
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleAddSocialMediaLink}
+                              className="h-8.5 px-3.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 text-xs font-bold transition-all duration-150 flex items-center gap-1.5 border border-sky-500/30 hover:border-sky-500/50 self-start sm:self-auto cursor-pointer shadow-2xs"
+                            >
+                              <Plus className="size-3.5" />
+                              Add Social Media Link (+)
+                            </button>
+                          </div>
+
+                          {socialMediaLinks.length === 0 ? (
+                            <div className="p-4 rounded-xl border border-dashed border-border/70 bg-muted/20 text-center space-y-1">
+                              <p className="text-xs font-semibold text-muted-foreground">
+                                No social media links added yet.
+                              </p>
+                              <p className="text-[11px] text-muted-foreground/70">
+                                Click <strong className="text-foreground">"Add Social Media Link (+)"</strong> above to attach LinkedIn, Facebook, personal website, etc.
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              {socialMediaLinks.map((link, idx) => {
+                                const rowErr = socialMediaErrors[idx];
+                                return (
+                                  <div
+                                    key={link.id || idx}
+                                    className="p-3.5 rounded-xl bg-muted/15 border border-border/60 hover:border-border transition-all duration-150 space-y-2.5"
+                                  >
+                                    <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+                                      {/* Platform Dropdown with Brand Icon */}
+                                      <div className="w-full md:w-56 shrink-0 space-y-1">
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                          Platform Name
+                                        </label>
+                                        <div className="relative">
+                                          <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                            <SocialMediaIcon platform={link.platform} className="size-4" />
+                                          </div>
+                                          <select
+                                            value={link.platform}
+                                            onChange={(e) =>
+                                              handleUpdateSocialMediaLink(idx, "platform", e.target.value)
+                                            }
+                                            className={`h-10 pl-9 pr-8 rounded-xl border bg-card text-xs font-semibold w-full appearance-none outline-none transition cursor-pointer ${
+                                              rowErr?.platform ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border"
+                                            }`}
+                                          >
+                                            {SUPPORTED_PLATFORMS.map((plat) => (
+                                              <option key={plat} value={plat}>
+                                                {plat}
+                                              </option>
+                                            ))}
+                                          </select>
+                                          <ChevronDown className="size-3.5 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                        </div>
+                                      </div>
+
+                                      {/* Custom Platform Input if "Other" */}
+                                      {link.platform === "Other" && (
+                                        <div className="w-full md:w-44 shrink-0 space-y-1">
+                                          <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                            Custom Name <span className="text-rose-500">*</span>
+                                          </label>
+                                          <input
+                                            type="text"
+                                            value={link.customPlatform || ""}
+                                            onChange={(e) =>
+                                              handleUpdateSocialMediaLink(idx, "customPlatform", e.target.value)
+                                            }
+                                            placeholder="e.g. Behance, Medium"
+                                            className={`h-10 px-3 rounded-xl border bg-card text-xs font-semibold w-full outline-none transition ${
+                                              rowErr?.customPlatform ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border"
+                                            }`}
+                                          />
+                                        </div>
+                                      )}
+
+                                      {/* Profile URL Input */}
+                                      <div className="flex-1 w-full space-y-1 min-w-0">
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                          Profile URL <span className="text-rose-500">*</span>
+                                        </label>
+                                        <div className="relative">
+                                          <input
+                                            type="url"
+                                            value={link.url}
+                                            onChange={(e) =>
+                                              handleUpdateSocialMediaLink(idx, "url", e.target.value)
+                                            }
+                                            placeholder={
+                                              link.platform === "LinkedIn"
+                                                ? "https://linkedin.com/in/username"
+                                                : link.platform === "Facebook"
+                                                ? "https://facebook.com/username"
+                                                : link.platform === "WhatsApp"
+                                                ? "https://wa.me/8801713XXXXXX"
+                                                : "https://example.com/profile"
+                                            }
+                                            className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-medium w-full outline-none transition ${
+                                              rowErr?.url ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border"
+                                            }`}
+                                          />
+                                        </div>
+                                      </div>
+
+                                      {/* Remove (-) Button */}
+                                      <div className="shrink-0 pt-0 md:pt-4 self-end md:self-auto">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleRemoveSocialMediaLink(idx)}
+                                          className="h-10 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold transition flex items-center gap-1.5 border border-rose-500/25 hover:border-rose-500/50 cursor-pointer"
+                                          title="Remove Link (-)"
+                                        >
+                                          <Trash2 className="size-3.5" />
+                                          <span className="hidden sm:inline">Remove (-)</span>
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {/* Inline Row Validation Messages */}
+                                    {(rowErr?.platform || rowErr?.customPlatform || rowErr?.url) && (
+                                      <div className="text-[11px] font-semibold text-rose-500 flex items-center gap-1.5 pl-1 pt-0.5">
+                                        <AlertTriangle className="size-3.5 shrink-0" />
+                                        <span>
+                                          {rowErr.customPlatform || rowErr.url || rowErr.platform}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -5885,7 +6179,16 @@ export function AddEmployeeView({
               </div>
             </div>
 
-            <div className="flex w-full gap-3 border-t border-border/30 pt-4 mt-2">
+            <div className="flex flex-col sm:flex-row w-full gap-2.5 border-t border-border/30 pt-4 mt-2">
+              <Link
+                to="/digital-business-card/$id"
+                params={{ id: getCardByEmployeeId(form.id)?.publicToken || form.id }}
+                target="_blank"
+                className="h-10 px-4 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30 text-xs font-bold transition flex items-center justify-center gap-1.5 flex-1"
+              >
+                <Globe className="size-3.5" />
+                View Digital Card
+              </Link>
               {embedded && onBackToEmployeeList ? (
                 <button
                   type="button"
@@ -5893,16 +6196,16 @@ export function AddEmployeeView({
                     setShowSuccessModal(false);
                     onBackToEmployeeList();
                   }}
-                  className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition duration-200 flex-1 flex items-center justify-center cursor-pointer"
+                  className="h-10 px-4 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition duration-200 flex-1 flex items-center justify-center cursor-pointer"
                 >
-                  Back to Employee List
+                  Back to List
                 </button>
               ) : (
                 <Link
                   to="/personnel-list"
-                  className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition duration-200 flex-1 flex items-center justify-center"
+                  className="h-10 px-4 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition duration-200 flex-1 flex items-center justify-center"
                 >
-                  Go to Directory
+                  Directory
                 </Link>
               )}
               <button
@@ -5916,9 +6219,10 @@ export function AddEmployeeView({
                     title: "",
                     gross: "",
                   }));
+                  setSocialMediaLinks([]);
                   setActiveTab("personal_identity");
                 }}
-                className="h-10 px-5 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg transition-all duration-200 flex-1"
+                className="h-10 px-4 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg transition-all duration-200 flex-1"
               >
                 Create Another
               </button>

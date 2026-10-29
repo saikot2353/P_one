@@ -332,8 +332,6 @@ function TransferRequisitionListPage() {
                     <th className="py-2.5 px-3 w-28">Type</th>
                     <th className="py-2.5 px-3 min-w-[220px]">Requisitioning Store</th>
                     <th className="py-2.5 px-3 min-w-[220px]">Requested From (Source)</th>
-                    <th className="py-2.5 px-3 w-24 text-center">Items & Qty</th>
-                    <th className="py-2.5 px-3 w-28 text-right">Est. Value (৳)</th>
                     <th className="py-2.5 px-3 w-32 text-center">Status</th>
                     <th className="py-2.5 px-3 w-28 text-center">Actions</th>
                   </tr>
@@ -341,7 +339,7 @@ function TransferRequisitionListPage() {
                 <tbody className="divide-y divide-slate-100">
                   {filteredRequisitions.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="py-12 text-center text-slate-400">
+                      <td colSpan={8} className="py-12 text-center text-slate-400">
                         No transfer requisitions match the current criteria.
                       </td>
                     </tr>
@@ -380,13 +378,6 @@ function TransferRequisitionListPage() {
                         <td className="py-3 px-3">
                           <div className="font-semibold text-amber-900 truncate max-w-[210px]">{req.requestedFromStore}</div>
                           <div className="text-[10px] text-amber-700 font-medium truncate max-w-[210px]">{req.requestedFromCompany}</div>
-                        </td>
-                        <td className="py-3 px-3 text-center">
-                          <span className="font-bold text-slate-800">{req.totalItems} items</span>
-                          <div className="text-[10px] text-slate-500">{req.totalRequiredQty} units</div>
-                        </td>
-                        <td className="py-3 px-3 text-right font-mono font-bold text-slate-900">
-                          ৳ {req.totalEstimatedValue.toLocaleString()}
                         </td>
                         <td className="py-3 px-3 text-center">
                           <span

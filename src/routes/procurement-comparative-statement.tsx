@@ -95,6 +95,7 @@ import {
   DEFAULT_PAYMENT_TERMS,
 } from "@/lib/procurement-master-data";
 import { employeesData } from "@/routes/personnel-list";
+import { ComparativeStatementReportModal } from "@/components/procurement/ComparativeStatementReportModal";
 
 interface CSSearch {
   action?: "list" | "create" | "edit" | "view";
@@ -153,6 +154,10 @@ export default function ComparativeStatementPage() {
   const [prSearchQuery, setPrSearchQuery] = useState("");
   const [awardMode, setAwardMode] = useState<"single" | "multiple">("multiple");
   const [historyModalItem, setHistoryModalItem] = useState<CSItemQuote | null>(null);
+  const [csReportModalOpen, setCsReportModalOpen] = useState(false);
+  const [reportTargetCS, setReportTargetCS] = useState<ComparativeStatement | null>(null);
+  const [supplierModalOpen, setSupplierModalOpen] = useState(false);
+  const [supplierSearchQuery, setSupplierSearchQuery] = useState("");
 
   type CSFormData = Omit<ComparativeStatement, "id"> & {
     items: CSItemQuote[];
@@ -1092,12 +1097,6 @@ export default function ComparativeStatementPage() {
                 <Scale className="w-7 h-7 text-indigo-600" />
                 Comparative Statement (CS)
               </h1>
-              <p className="text-sm text-slate-500 mt-1">
-                Connected Procurement Chain:{" "}
-                <span className="font-semibold text-slate-700">
-                  PR &rarr; CS &rarr; Evaluation &rarr; Recommendation &rarr; Approval &rarr; PO / WO
-                </span>
-              </p>
             </div>
 
             {viewMode === "list" ? (
@@ -1110,10 +1109,13 @@ export default function ComparativeStatementPage() {
               </button>
             ) : (
               <div className="flex items-center gap-2.5">
-                {viewMode === "view" && (
+                {viewMode === "view" && activeCS && (
                   <button
-                    onClick={() => window.print()}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition shadow-sm print:hidden"
+                    onClick={() => {
+                      setReportTargetCS(activeCS);
+                      setCsReportModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition shadow-sm print:hidden cursor-pointer"
                   >
                     <Printer className="w-4 h-4 text-slate-500" />
                     Print CS Report
@@ -1225,11 +1227,8 @@ export default function ComparativeStatementPage() {
                     <thead>
                       <tr className="border-b border-slate-200 bg-slate-100/75 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
                         <th className="py-3 px-4">CS Number & Date</th>
-                        <th className="py-3 px-4">PR Reference</th>
-                        <th className="py-3 px-4">Organization & Type</th>
                         <th className="py-3 px-4 text-center">Bidders</th>
                         <th className="py-3 px-4">Recommended Vendor</th>
-                        <th className="py-3 px-4 text-right">Negotiated Cost</th>
                         <th className="py-3 px-4 text-center">Status</th>
                         <th className="py-3 px-4 text-right">Contextual Actions</th>
                       </tr>
@@ -1237,7 +1236,7 @@ export default function ComparativeStatementPage() {
                     <tbody className="divide-y divide-slate-100 text-sm">
                       {filteredList.length === 0 ? (
                         <tr>
-                          <td colSpan={8} className="py-12 text-center text-slate-400">
+                          <td colSpan={5} className="py-12 text-center text-slate-400">
                             <Scale className="w-10 h-10 mx-auto text-slate-300 mb-2" />
                             <p className="font-medium text-slate-600">No comparative statements found</p>
                             <p className="text-xs text-slate-400 mt-0.5">
@@ -1275,32 +1274,6 @@ export default function ComparativeStatementPage() {
                                 {cs.csDate}
                               </div>
                             </td>
-                            <td className="py-3.5 px-4">
-                              <div className="font-medium text-slate-800">
-                                {cs.linkedPRs && cs.linkedPRs.length > 1 ? (
-                                  <span className="inline-flex items-center gap-1 text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded font-semibold text-xs border border-indigo-100">
-                                    {cs.linkedPRs.length} PRs Linked
-                                  </span>
-                                ) : (
-                                  prNum
-                                )}
-                              </div>
-                              <div className="text-xs text-slate-500">
-                                Est: BDT {prEst.toLocaleString()}
-                              </div>
-                              {cs.linkedPRs && cs.linkedPRs.length > 1 && (
-                                <div
-                                  className="text-[10px] text-slate-400 truncate max-w-[170px]"
-                                  title={cs.linkedPRs.map((p) => p.prNumber).join(", ")}
-                                >
-                                  {cs.linkedPRs.map((p) => p.prNumber).join(", ")}
-                                </div>
-                              )}
-                            </td>
-                            <td className="py-3.5 px-4">
-                              <div className="font-medium text-slate-800">{org}</div>
-                              <div className="text-xs text-slate-400">{cs.procurementType}</div>
-                            </td>
                             <td className="py-3.5 px-4 text-center">
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">
                                 <Users className="w-3 h-3" />
@@ -1331,14 +1304,6 @@ export default function ComparativeStatementPage() {
                                 )
                               )}
                             </td>
-                            <td className="py-3.5 px-4 text-right">
-                              <div className="font-bold text-slate-900">
-                                {negTotal.toLocaleString("en-BD", {
-                                  minimumFractionDigits: 2,
-                                })}
-                              </div>
-                              <div className="text-[11px] text-slate-400">{cs.currency || "BDT"}</div>
-                            </td>
                             <td className="py-3.5 px-4 text-center">
                               <span
                                 className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-full ${
@@ -1357,8 +1322,18 @@ export default function ComparativeStatementPage() {
                             <td className="py-3.5 px-4 text-right">
                               <div className="flex items-center justify-end gap-1.5">
                                 <button
+                                  onClick={() => {
+                                    setReportTargetCS(cs);
+                                    setCsReportModalOpen(true);
+                                  }}
+                                  className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition cursor-pointer"
+                                  title="Preview Print Report"
+                                >
+                                  <Printer className="w-4 h-4" />
+                                </button>
+                                <button
                                   onClick={() => handleOpenView(cs)}
-                                  className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition"
+                                  className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition cursor-pointer"
                                   title="View Full Evaluation"
                                 >
                                   <Eye className="w-4 h-4" />
@@ -1559,7 +1534,7 @@ export default function ComparativeStatementPage() {
                 {/* Item-wise Comparative Matrix */}
                 <div>
                   <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center justify-between">
-                    <span>1. Item-Wise Comparative Matrix</span>
+                    <span>Item-Wise Comparative Matrix</span>
                     <span className="text-[11px] font-normal text-slate-500 lowercase">
                       * highlighted green indicates lowest price (L1) per item
                     </span>
@@ -1692,7 +1667,7 @@ export default function ComparativeStatementPage() {
                 <div>
                   <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <span className="size-4 rounded bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-[10px]">৳</span>
-                    2. Supplier Financial Summary & Landed Cost Breakdown
+                    Supplier Financial Summary & Landed Cost Breakdown
                   </h3>
                   <div className="overflow-x-auto border border-slate-200 rounded-lg">
                     <table className="w-full text-left border-collapse text-xs">
@@ -1880,23 +1855,14 @@ export default function ComparativeStatementPage() {
           ) : (
             /* 10-Section Create / Edit Form */
             <div className="space-y-6">
-              {/* Section 1: Basic Information */}
+              {/* Basic Information */}
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                 <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <FileText className="w-4 h-4 text-indigo-600" />
-                  1. Basic Information
+                  Basic Information
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1">CS Number*</label>
-                    <input
-                      type="text"
-                      value={formData.csNumber}
-                      readOnly
-                      className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-600 font-semibold cursor-not-allowed"
-                    />
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-xs">
                   <div>
                     <label className="block font-semibold text-slate-700 mb-1">CS Date*</label>
                     <input
@@ -1907,21 +1873,12 @@ export default function ComparativeStatementPage() {
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Organization*</label>
-                    <input
-                      type="text"
-                      value={formData.organization}
-                      readOnly
-                      className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-600 cursor-not-allowed"
-                    />
-                  </div>
-                  <div>
                     <label className="block font-semibold text-slate-700 mb-1">Department*</label>
                     <input
                       type="text"
                       value={formData.department}
                       readOnly
-                      className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-600 cursor-not-allowed"
+                      className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-600 cursor-not-allowed font-medium"
                     />
                   </div>
                   <div>
@@ -1930,7 +1887,7 @@ export default function ComparativeStatementPage() {
                       type="text"
                       value={formData.preparedBy}
                       readOnly
-                      className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-600 cursor-not-allowed"
+                      className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-600 cursor-not-allowed font-medium"
                     />
                   </div>
                   <div>
@@ -1954,13 +1911,13 @@ export default function ComparativeStatementPage() {
                 </div>
               </div>
 
-              {/* Section 2: Linked Purchase Requisitions (Multi-PR Support) */}
+              {/* Linked Purchase Requisitions (Multi-PR Support) */}
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                   <div>
                     <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                       <FileCheck className="w-4 h-4 text-indigo-600" />
-                      2. Linked Purchase Requisitions ({formData.linkedPRs?.length || 0})
+                      Linked Purchase Requisitions ({formData.linkedPRs?.length || 0})
                     </h2>
                     <p className="text-xs text-slate-500 mt-0.5">
                       Consolidate multiple approved Purchase Requisitions into this single Comparative Statement
@@ -2014,13 +1971,13 @@ export default function ComparativeStatementPage() {
                 </div>
               </div>
 
-              {/* Section 3: Supplier / Quotation Info */}
+              {/* Participating Suppliers / Quotations */}
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                   <div>
                     <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                       <Users className="w-4 h-4 text-indigo-600" />
-                      3. Participating Suppliers / Quotations ({formData.suppliers.length})
+                      Participating Suppliers / Quotations ({formData.suppliers.length})
                     </h2>
                     <p className="text-xs text-slate-500 mt-0.5">
                       Add competing bidders and set their quotation terms.
@@ -2028,22 +1985,17 @@ export default function ComparativeStatementPage() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <select
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          handleAddSupplier(e.target.value);
-                          e.target.value = "";
-                        }
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSupplierSearchQuery("");
+                        setSupplierModalOpen(true);
                       }}
-                      className="text-xs bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition shadow-sm cursor-pointer"
                     >
-                      <option value="">+ Add Supplier from Master Data...</option>
-                      {suppliers.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.supplierName} ({s.vendorCode || "VEN"})
-                        </option>
-                      ))}
-                    </select>
+                      <Plus className="w-3.5 h-3.5" />
+                      Add Supplier from Master Data
+                    </button>
                   </div>
                 </div>
 
@@ -2127,13 +2079,13 @@ export default function ComparativeStatementPage() {
                 </div>
               </div>
 
-              {/* Section 4: Item-Wise Comparison Matrix */}
+              {/* Item-Wise Comparison Matrix */}
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-4 border-b border-slate-200 bg-slate-50/60">
                   <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <Scale className="w-4 h-4 text-indigo-600" />
-                      4. Item-Wise Comparison Matrix
+                      Item-Wise Comparison Matrix
                     </span>
                     <span className="text-[11px] font-medium text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
                       Pricing Rules: Blank = Unquoted • N/A = Not Available • 0 = Free
@@ -2257,11 +2209,11 @@ export default function ComparativeStatementPage() {
                 </div>
               </div>
 
-              {/* Section 5: Supplier-Wise Financial Summary & Taxes (৳) */}
+              {/* Supplier-Wise Financial Summary & Taxes (৳) */}
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                 <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2 flex items-center gap-2">
                   <span className="size-4 rounded bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">৳</span>
-                  5. Supplier-Wise Financial Summary & Taxes
+                  Supplier-Wise Financial Summary & Taxes
                 </h2>
                 <p className="text-xs text-slate-500 mb-4">
                   Formula: Gross Amount - Discount + VAT + Tax + Other Charges = Net Landed Amount
@@ -2379,11 +2331,11 @@ export default function ComparativeStatementPage() {
                 </div>
               </div>
 
-              {/* Section 6: Recommendation & Final Selection */}
+              {/* Recommendation & Final Selection */}
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
                 <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                   <Award className="w-4 h-4 text-indigo-600" />
-                  6. Recommendation & Final Selection
+                  Recommendation & Final Selection
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -2433,13 +2385,13 @@ export default function ComparativeStatementPage() {
                 </div>
               </div>
 
-              {/* Section 7: CS Attachments (Optional) */}
+              {/* Attachments (Optional) */}
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                       <Paperclip className="w-4 h-4 text-indigo-600" />
-                      7. Attachments (Optional)
+                      Attachments (Optional)
                     </h2>
                     <p className="text-xs text-slate-500 mt-0.5">
                       Attach supporting vendor quotations, comparative analysis sheets, or technical documents
@@ -2714,8 +2666,132 @@ export default function ComparativeStatementPage() {
               </div>
             </div>
           )}
+
+          {/* Master Data Supplier Search Modal */}
+          {supplierModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+              <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+                      <Users className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-bold text-slate-900">Select Supplier from Master Data</h2>
+                      <p className="text-xs text-slate-500">
+                        Search and add approved suppliers to this Comparative Statement
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSupplierModalOpen(false)}
+                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="p-4 border-b border-slate-200 bg-slate-50/60">
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Search by supplier name, vendor code, email, or category..."
+                      value={supplierSearchQuery}
+                      onChange={(e) => setSupplierSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4 divide-y divide-slate-100 text-xs">
+                  {suppliers
+                    .filter((s) => {
+                      const q = supplierSearchQuery.toLowerCase();
+                      const name = s.supplierName || s.vendorName || "";
+                      const category = s.vendorCategory || (s as any).category || "";
+                      const email = s.emailAddress || (s as any).email || "";
+                      return (
+                        name.toLowerCase().includes(q) ||
+                        (s.vendorCode || "").toLowerCase().includes(q) ||
+                        category.toLowerCase().includes(q) ||
+                        email.toLowerCase().includes(q)
+                      );
+                    })
+                    .map((s) => {
+                      const isAlreadyAdded = formData.suppliers.some((sup) => sup.supplierId === s.id);
+
+                      return (
+                        <div
+                          key={s.id}
+                          className="py-3 px-3 flex items-center justify-between hover:bg-slate-50 rounded-lg transition"
+                        >
+                          <div>
+                            <div className="font-bold text-slate-900 flex items-center gap-2">
+                              <span>{s.supplierName || s.vendorName}</span>
+                              <span className="font-mono text-[10px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                                {s.vendorCode || "VEN"}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-3">
+                              <span>{s.vendorCategory || "General Supplier"}</span>
+                              <span>•</span>
+                              <span>{s.emailAddress || "vendor@pakiza.com"}</span>
+                              <span>•</span>
+                              <span>{s.mobileNumber || "+880 1711-000000"}</span>
+                            </div>
+                          </div>
+
+                          <div>
+                            {isAlreadyAdded ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200">
+                                <Check className="w-3.5 h-3.5" />
+                                Added
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleAddSupplier(s.id);
+                                  toast.success(`Added ${s.supplierName} to comparative statement`);
+                                }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition cursor-pointer"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                Add to CS
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+
+                <div className="px-6 py-3 border-t border-slate-200 bg-slate-50/80 flex items-center justify-between text-xs text-slate-500">
+                  <span>Available Master Suppliers: <strong>{suppliers.length}</strong></span>
+                  <button
+                    type="button"
+                    onClick={() => setSupplierModalOpen(false)}
+                    className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium transition cursor-pointer"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
       </div>
+
+      {/* Comparative Statement Landscape Report Modal */}
+      <ComparativeStatementReportModal
+        isOpen={csReportModalOpen}
+        onClose={() => {
+          setCsReportModalOpen(false);
+          setReportTargetCS(null);
+        }}
+        cs={reportTargetCS}
+      />
     </div>
   );
 }

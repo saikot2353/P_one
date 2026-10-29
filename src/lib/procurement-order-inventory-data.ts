@@ -18,6 +18,7 @@ export interface POItem {
   itemId?: string;
   itemCode: string;
   itemName: string;
+  category?: string;
   specification: string;
   brand: string;
   origin: string;
@@ -253,6 +254,7 @@ export interface SupplierBill {
   tax?: number; // Tax / AIT
   otherCharges: number;
   otherChargeServiceItemIds?: string[];
+  otherChargesBreakdown?: { id: string; name: string; code?: string; amount: number }[];
   adjustment: number;
   netBillAmount: number;
   roundOff: number;
@@ -317,6 +319,7 @@ export interface SupplierReturn {
   supplierId: string;
   supplierName: string;
   storeName: string;
+  returnedBy?: string;
   returnReason: ReturnReason;
   returnRemarks?: string;
   totalReturnedQty: number;
@@ -1063,6 +1066,69 @@ export const DEFAULT_SUPPLIER_BILLS: SupplierBill[] = [
         taxRate: 2,
         taxAmount: 930,
         lineAmount: 49755,
+      },
+    ],
+  },
+  {
+    id: "bil-2026-002",
+    billNumber: "BIL-2026-000143",
+    billDate: "2026-10-15",
+    poNumber: "PO-2026-0002",
+    poDate: "2026-10-10",
+    mrrNumbers: ["MRR-2026-0002"],
+    supplierId: "sup-dhaka-01",
+    supplierName: "Dhaka Office Equipment Ltd.",
+    supplierBillNo: "INV-DOE-2026-104",
+    supplierBillDate: "2026-10-14",
+    currency: "BDT",
+    subtotal: 125000,
+    discount: 2500,
+    vat: 6125,
+    tax: 3675,
+    otherCharges: 4500,
+    otherChargesBreakdown: [
+      { id: "srv-frt", name: "Freight & Transport Charges", code: "SRV-FRT-01", amount: 3000 },
+      { id: "srv-lod", name: "Loading & Handling Service", code: "SRV-LOD-02", amount: 1500 },
+    ],
+    adjustment: 0,
+    netBillAmount: 136800,
+    roundOff: 0,
+    paymentStatus: "Unpaid",
+    paymentDueDate: "2026-11-14",
+    paidAmount: 0,
+    outstandingAmount: 136800,
+    approvalStatus: "Submitted",
+    submittedBy: "Tahmid Afsar Shapno",
+    submittedDate: "2026-10-15",
+    remarks: "Regular commercial invoice for office supplies consignment.",
+    attachments: [
+      {
+        documentType: "Supplier Invoice",
+        documentName: "Vendor_Invoice_INV-DOE-2026-104.pdf",
+        fileName: "Vendor_Invoice_INV-DOE-2026-104.pdf",
+        description: "Scanned commercial invoice with packing slip.",
+      },
+    ],
+    items: [
+      {
+        id: "sbi-201",
+        sl: 1,
+        itemCode: "IT-ACC-001",
+        itemName: "Ergonomic Mesh Office Executive Chair",
+        specification: "High-back mesh, adjustable lumbar support, 3D armrest",
+        brand: "Apex Office Furniture",
+        origin: "Bangladesh",
+        uom: "PCS",
+        mrrReceivedQty: 10,
+        previouslyBilledQty: 0,
+        currentBillQty: 10,
+        unitPrice: 12500,
+        discount: 2500,
+        vatRate: 5,
+        vatAmount: 6125,
+        taxRate: 3,
+        taxAmount: 3675,
+        lineAmount: 132300,
       },
     ],
   },

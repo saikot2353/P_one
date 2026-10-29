@@ -435,25 +435,6 @@ function MaterialIssueListPage() {
                       />
                     </div>
 
-                    {/* Warehouse / Store */}
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                        Warehouse / Store
-                      </label>
-                      <select
-                        value={warehouseFilter}
-                        onChange={(e) => setWarehouseFilter(e.target.value)}
-                        className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                      >
-                        <option value="All">All Warehouses</option>
-                        {warehouses.map((w) => (
-                          <option key={w.id} value={w.name}>
-                            {w.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
                     {/* Status */}
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
@@ -526,7 +507,6 @@ function MaterialIssueListPage() {
                       <th className="py-3 px-3.5">Requisition Date</th>
                       <th className="py-3 px-3.5">Department</th>
                       <th className="py-3 px-3.5">Requested By</th>
-                      <th className="py-3 px-3.5">Warehouse / Store</th>
                       <th className="py-3 px-3.5 text-center">Total Items</th>
                       <th className="py-3 px-3.5 text-right">Requested Qty</th>
                       <th className="py-3 px-3.5 text-right">Previously Issued</th>
@@ -540,7 +520,7 @@ function MaterialIssueListPage() {
                   <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                     {eligibleRequisitions.length === 0 ? (
                       <tr>
-                        <td colSpan={12} className="py-12 text-center text-slate-400">
+                        <td colSpan={11} className="py-12 text-center text-slate-400">
                           <div className="flex flex-col items-center justify-center gap-2">
                             <CheckCircle2 className="size-8 text-indigo-300 stroke-[1.5]" />
                             <p className="text-xs font-semibold text-slate-600">
@@ -577,9 +557,6 @@ function MaterialIssueListPage() {
                               {mr.department}
                             </td>
                             <td className="py-3 px-3.5 text-slate-800">{mr.requestedBy}</td>
-                            <td className="py-3 px-3.5 max-w-[160px] truncate" title={mr.warehouseStore}>
-                              {mr.warehouseStore}
-                            </td>
                             <td className="py-3 px-3.5 text-center font-bold font-mono">
                               {mr.totalItems}
                             </td>

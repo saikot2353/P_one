@@ -227,6 +227,7 @@ export function MaterialReceiveMRRPage() {
       title: "MATERIAL RECEIVE REPORT (MRR)",
       documentNumber: receiveNumber,
       documentDate: receiveDate,
+      hideLogo: true,
       metadata: [
         { label: "MRR Number", value: receiveNumber, highlight: true },
         { label: "Receive Date", value: receiveDate },
@@ -235,11 +236,7 @@ export function MaterialReceiveMRRPage() {
         { label: "Warehouse / Store", value: warehouseStore },
         { label: "Challan Number", value: challanNo },
         { label: "Challan Date", value: challanDate },
-        { label: "Vehicle Number", value: vehicleNumber },
-        { label: "Department", value: department },
         { label: "Received By", value: receivedBy },
-        { label: "Total Received Qty", value: `${totalReceived} Items` },
-        { label: "Total Valuation", value: `৳ ${totalAmount.toLocaleString()}` },
       ],
       tableHeaders: [
         "SL",
@@ -250,8 +247,6 @@ export function MaterialReceiveMRRPage() {
         "Receive Qty",
         "Accepted",
         "Rejected",
-        "Unit Price",
-        "Line Total (৳)",
       ],
       tableRows: mrrItems.map((item, idx) => {
         return [
@@ -266,15 +261,12 @@ export function MaterialReceiveMRRPage() {
           item.currentReceiveQty,
           item.acceptedQty ?? item.currentReceiveQty,
           item.rejectedQty ?? 0,
-          `৳ ${item.unitPrice.toLocaleString()}`,
-          `৳ ${item.lineTotal.toLocaleString()}`,
         ];
       }),
       summaryCards: [
         { label: "Total Received Qty", value: totalReceived },
         { label: "Quality Accepted Qty", value: totalAccepted },
         { label: "Quality Rejected Qty", value: totalRejected },
-        { label: "Total Valuation", value: `৳ ${totalAmount.toLocaleString()}`, isBold: true, isHighlight: true },
       ],
       signatures: [
         { role: "Store Officer", name: receivedBy, designation: "Received By" },
@@ -600,27 +592,12 @@ export function MaterialReceiveMRRPage() {
           {/* Section 1: Receive Header Information */}
           <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-2xs space-y-4">
             <div className="flex items-center gap-2 border-b border-border/50 pb-3">
-              <span className="size-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-black">
-                1
-              </span>
               <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
                 Receive Header Information
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-                  Receive Number*
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  value={receiveNumber}
-                  className="w-full px-3 py-2 font-mono font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed select-all"
-                />
-              </div>
-
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-xs">
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                   Receive Date*
@@ -633,7 +610,7 @@ export function MaterialReceiveMRRPage() {
                 />
               </div>
 
-              {/* Purchase Order / Work Order* (Auto-populated, Cannot be changed, displays PO Number + PO Date) */}
+              {/* Purchase Order / Work Order* (Displays only WO/PO Number) */}
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
                   <Lock className="size-3 text-muted-foreground" /> Purchase Order / Work Order*
@@ -641,7 +618,7 @@ export function MaterialReceiveMRRPage() {
                 <input
                   type="text"
                   readOnly
-                  value={`${currentPo?.orderNumber || selectedPoNumber} (${currentPo?.orderDate || "2026-09-15"})`}
+                  value={currentPo?.orderNumber || selectedPoNumber}
                   className="w-full px-3 py-2 font-bold font-mono bg-muted/50 border border-border rounded-lg cursor-not-allowed text-primary"
                 />
               </div>
@@ -660,7 +637,7 @@ export function MaterialReceiveMRRPage() {
               </div>
 
               {/* Supplier (Auto-populated, Read-only) */}
-              <div className="lg:col-span-2">
+              <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
                   <Lock className="size-3 text-muted-foreground" /> Supplier / Vendor
                 </label>
@@ -673,7 +650,7 @@ export function MaterialReceiveMRRPage() {
               </div>
 
               {/* Warehouse / Store* (Auto-populated from selected store, Cannot be changed) */}
-              <div className="lg:col-span-2">
+              <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
                   <Lock className="size-3 text-muted-foreground" /> Warehouse / Store*
                 </label>
@@ -681,7 +658,7 @@ export function MaterialReceiveMRRPage() {
                   type="text"
                   readOnly
                   value={selectedStore}
-                  className="w-full px-3 py-2 font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-foreground"
+                  className="w-full px-3 py-2 font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-foreground truncate"
                 />
               </div>
 
@@ -717,11 +694,11 @@ export function MaterialReceiveMRRPage() {
                   type="text"
                   readOnly
                   value={receivedBy}
-                  className="w-full px-3 py-2 font-semibold bg-muted/50 border border-border rounded-lg cursor-not-allowed"
+                  className="w-full px-3 py-2 font-semibold bg-muted/50 border border-border rounded-lg cursor-not-allowed truncate"
                 />
               </div>
 
-              <div>
+              <div className="lg:col-span-2">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                   General Remarks
                 </label>
@@ -740,9 +717,6 @@ export function MaterialReceiveMRRPage() {
           <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-border/50 pb-3">
               <div className="flex items-center gap-2">
-                <span className="size-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-black">
-                  2
-                </span>
                 <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
                   Material Receive Details
                 </h2>
@@ -766,10 +740,9 @@ export function MaterialReceiveMRRPage() {
                       Receive Qty*
                     </th>
                     <th className="py-2.5 px-3 text-right font-bold w-20">Remaining</th>
-                    <th className="py-2.5 px-2 text-center font-bold w-24">Tracking (B/L)</th>
                     <th className="py-2.5 px-2 text-center font-bold w-24 text-emerald-600">Accepted</th>
                     <th className="py-2.5 px-2 text-center font-bold w-24 text-rose-600">Rejected</th>
-                    <th className="py-2.5 px-3 text-right font-bold w-28">Line Total (৳)</th>
+                    <th className="py-2.5 px-2 text-center font-bold w-24">Tracking (B/L)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -821,17 +794,6 @@ export function MaterialReceiveMRRPage() {
                           )}
                         </td>
 
-                        {/* Tracking (B/L) Cell: Shows ONLY B or ONLY L based on item configuration */}
-                        <td className="py-2.5 px-2 text-center">
-                          <ItemTrackingCell
-                            mode={getItemTrackingMode(item.itemCode)}
-                            batchCount={itemBatches[item.id]?.length || (item.batchNumber ? 1 : 0)}
-                            locationCount={itemLocations[item.id]?.length || (item.location ? 1 : 0)}
-                            onOpenBatch={() => handleOpenBatchModal(item)}
-                            onOpenLocation={() => handleOpenLocationModal(item)}
-                          />
-                        </td>
-
                         {/* Item-level Quality Accepted */}
                         <td className="py-2.5 px-2 text-center">
                           <input
@@ -862,9 +824,15 @@ export function MaterialReceiveMRRPage() {
                           />
                         </td>
 
-                        {/* Line Total */}
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-foreground">
-                          ৳ {item.lineTotal.toLocaleString()}
+                        {/* Tracking (B/L) Cell: Shows ONLY B or ONLY L based on item configuration */}
+                        <td className="py-2.5 px-2 text-center">
+                          <ItemTrackingCell
+                            mode={getItemTrackingMode(item.itemCode)}
+                            batchCount={itemBatches[item.id]?.length || (item.batchNumber ? 1 : 0)}
+                            locationCount={itemLocations[item.id]?.length || (item.location ? 1 : 0)}
+                            onOpenBatch={() => handleOpenBatchModal(item)}
+                            onOpenLocation={() => handleOpenLocationModal(item)}
+                          />
                         </td>
                       </tr>
                     );

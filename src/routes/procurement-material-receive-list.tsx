@@ -239,13 +239,10 @@ export function MaterialReceiveListPage() {
             </div>
           </div>
 
-          {/* 1. Store-wise Filter / Header Section */}
+          {/* Store-wise Filter / Header Section */}
           <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-border/50 pb-3">
               <div className="flex items-center gap-2">
-                <span className="size-6 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center text-xs font-black">
-                  1
-                </span>
                 <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
                   Store-Wise Filters & Search Criteria
                 </h2>
@@ -260,10 +257,10 @@ export function MaterialReceiveListPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
-              {/* Delivery Warehouse / Store (PRIMARY FILTER) */}
-              <div className="lg:col-span-2">
+              {/* Delivery Store (PRIMARY FILTER) */}
+              <div>
                 <label className="text-[11px] font-bold text-amber-600 uppercase tracking-wider block mb-1">
-                  Delivery Warehouse / Store* (Primary Filter)
+                  Delivery Store *
                 </label>
                 <select
                   value={selectedStore}
@@ -276,40 +273,6 @@ export function MaterialReceiveListPage() {
                       {wh.storeName} ({wh.storeCode})
                     </option>
                   ))}
-                </select>
-              </div>
-
-              {/* Organization / Company */}
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-                  Organization / Company
-                </label>
-                <select
-                  value={selectedOrganization}
-                  onChange={(e) => setSelectedOrganization(e.target.value)}
-                  className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium outline-none"
-                >
-                  <option value="All Organizations">All Organizations</option>
-                  <option value="Pakiza Knit Composite Ltd">Pakiza Knit Composite Ltd</option>
-                  <option value="Pakiza Spinning Mills Ltd">Pakiza Spinning Mills Ltd</option>
-                  <option value="Pakiza Technovation Limited">Pakiza Technovation Limited</option>
-                </select>
-              </div>
-
-              {/* Department */}
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-                  Department
-                </label>
-                <select
-                  value={selectedDepartment}
-                  onChange={(e) => setSelectedDepartment(e.target.value)}
-                  className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium outline-none"
-                >
-                  <option value="All Departments">All Departments</option>
-                  <option value="Information Technology">Information Technology</option>
-                  <option value="Maintenance & Engineering">Maintenance & Engineering</option>
-                  <option value="Dyeing & Finishing">Dyeing & Finishing</option>
                 </select>
               </div>
 
@@ -362,30 +325,30 @@ export function MaterialReceiveListPage() {
                 />
               </div>
 
-              {/* Order Date Range */}
-              <div className="grid grid-cols-2 gap-1.5">
-                <div>
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
-                    Order Date From
-                  </label>
-                  <input
-                    type="date"
-                    value={orderDateFrom}
-                    onChange={(e) => setOrderDateFrom(e.target.value)}
-                    className="w-full px-2 py-1.5 bg-background border border-border rounded-lg text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
-                    Order Date To
-                  </label>
-                  <input
-                    type="date"
-                    value={orderDateTo}
-                    onChange={(e) => setOrderDateTo(e.target.value)}
-                    className="w-full px-2 py-1.5 bg-background border border-border rounded-lg text-xs"
-                  />
-                </div>
+              {/* Order Date From */}
+              <div>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                  Order Date From
+                </label>
+                <input
+                  type="date"
+                  value={orderDateFrom}
+                  onChange={(e) => setOrderDateFrom(e.target.value)}
+                  className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium text-xs outline-none"
+                />
+              </div>
+
+              {/* Order Date To */}
+              <div>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                  Order Date To
+                </label>
+                <input
+                  type="date"
+                  value={orderDateTo}
+                  onChange={(e) => setOrderDateTo(e.target.value)}
+                  className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium text-xs outline-none"
+                />
               </div>
             </div>
           </div>

@@ -580,9 +580,6 @@ export function OpeningStockPage() {
           <div className="bg-card rounded-2xl border border-border/80 p-6 shadow-2xs space-y-6">
             <div className="flex items-center justify-between border-b border-border/60 pb-3">
               <div className="flex items-center gap-2">
-                <span className="size-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-black">
-                  1
-                </span>
                 <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
                   Initial Opening Balance Setup
                 </h2>
@@ -665,9 +662,6 @@ export function OpeningStockPage() {
             <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between border-b border-border/50 pb-2">
                 <div className="flex items-center gap-2">
-                  <span className="size-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-black">
-                    2
-                  </span>
                   <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
                     Opening Stock Line Items
                   </h3>

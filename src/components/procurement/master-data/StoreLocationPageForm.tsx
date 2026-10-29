@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { ArrowLeft, Save, Layers, Edit } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { ArrowLeft, Save, Layers, Edit, CheckSquare, Layers2 } from "lucide-react";
 import { StoreLocation, WarehouseStore } from "@/lib/procurement-master-data";
+import { getOrgAreaSections, AreaSectionOption } from "./WarehouseStorePageForm";
 
 interface StoreLocationPageFormProps {
   mode: "create" | "edit" | "view";
@@ -27,12 +28,14 @@ export function StoreLocationPageForm({
           initialData.trackingMode === "Location" ? !!initialData.defaultLocationName : false,
       };
     }
+    const firstStore = warehouses[0]?.storeName || "PKCL Central Raw Material Warehouse";
     return {
       trackingMode: "Location",
       locationTrackingEnabled: true,
       batchTrackingEnabled: false,
       defaultLocationName: false,
-      store: warehouses[0]?.storeName || "PKCL Central Raw Material Warehouse",
+      store: firstStore,
+      companyAreaSection: warehouses[0]?.companyAreaSection || "",
       locationCode: `LOC-${Math.floor(100 + Math.random() * 900)}`,
       locationName: "Rack A - Shelf 01",
       locationType: "Rack",
@@ -47,6 +50,24 @@ export function StoreLocationPageForm({
     };
   });
 
+  // Selected warehouse for organization-based company area/section options
+  const selectedWarehouse = useMemo(() => {
+    return (
+      warehouses.find(
+        (w) =>
+          w.storeName === formData.store ||
+          w.storeCode === formData.store ||
+          w.id === formData.store
+      ) || warehouses[0]
+    );
+  }, [warehouses, formData.store]);
+
+  // Load area & section options using exact same logic from WarehouseStorePageForm
+  const availableAreaSections = useMemo<AreaSectionOption[]>(() => {
+    const org = selectedWarehouse?.organization || "Pakiza Software Limited";
+    return getOrgAreaSections(org);
+  }, [selectedWarehouse]);
+
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -55,12 +76,14 @@ export function StoreLocationPageForm({
           initialData.trackingMode === "Location" ? !!initialData.defaultLocationName : false,
       });
     } else {
+      const firstStore = warehouses[0]?.storeName || "PKCL Central Raw Material Warehouse";
       setFormData({
         trackingMode: "Location",
         locationTrackingEnabled: true,
         batchTrackingEnabled: false,
         defaultLocationName: false,
-        store: warehouses[0]?.storeName || "PKCL Central Raw Material Warehouse",
+        store: firstStore,
+        companyAreaSection: warehouses[0]?.companyAreaSection || "",
         locationCode: `LOC-${Math.floor(100 + Math.random() * 900)}`,
         locationName: "Rack A - Shelf 01",
         locationType: "Rack",
@@ -76,6 +99,19 @@ export function StoreLocationPageForm({
     }
     setFormErrors({});
   }, [initialData, mode, warehouses]);
+
+  // If companyAreaSection not set or changed, sync if appropriate
+  useEffect(() => {
+    if (!formData.companyAreaSection && availableAreaSections.length > 0) {
+      const defaultVal =
+        selectedWarehouse?.companyAreaSection ||
+        availableAreaSections[0]?.value ||
+        "";
+      if (defaultVal) {
+        setFormData((prev) => ({ ...prev, companyAreaSection: defaultVal }));
+      }
+    }
+  }, [availableAreaSections, selectedWarehouse, formData.companyAreaSection]);
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const isView = mode === "view";
@@ -95,9 +131,12 @@ export function StoreLocationPageForm({
     e.preventDefault();
     if (isView) return;
 
+    const finalLocationCode =
+      formData.locationCode?.trim() ||
+      initialData?.locationCode ||
+      `LOC-${Math.floor(100 + Math.random() * 900)}`;
     const errors: Record<string, string> = {};
     if (formData.trackingMode === "Location") {
-      if (!formData.locationCode?.trim()) errors.locationCode = "Location Code is required";
       if (!formData.locationName?.trim()) errors.locationName = "Location Name is required";
     } else {
       if (!formData.batchNumbering?.trim()) errors.batchNumbering = "Batch Numbering is required";
@@ -108,13 +147,20 @@ export function StoreLocationPageForm({
       return;
     }
 
+    const matchedArea = availableAreaSections.find(
+      (a) => a.value === formData.companyAreaSection || a.label === formData.companyAreaSection
+    );
+    const resolvedAreaName = matchedArea ? matchedArea.label : (formData.companyAreaSection || "");
+
     const payload: StoreLocation = {
       id: initialData?.id || `loc-${Date.now()}`,
       trackingMode: formData.trackingMode || "Location",
       locationTrackingEnabled: formData.trackingMode === "Location",
       batchTrackingEnabled: formData.trackingMode === "Batch",
       store: formData.store || warehouses[0]?.storeName || "",
-      locationCode: formData.locationCode || "",
+      companyAreaSection: formData.companyAreaSection || "",
+      companyAreaSectionName: resolvedAreaName,
+      locationCode: finalLocationCode,
       locationName: formData.locationName || "",
       locationType: (formData.locationType as any) || "Rack",
       locationStatus: (formData.locationStatus as any) || "Active",
@@ -134,6 +180,7 @@ export function StoreLocationPageForm({
 
   return (
     <div className="space-y-6">
+      {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/70">
         <div className="flex items-center gap-3">
           <button
@@ -202,48 +249,75 @@ export function StoreLocationPageForm({
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
-        <div className="bg-card rounded-2xl border border-border/70 p-5 shadow-2xs space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6 max-w-5xl">
+        <div className="bg-card rounded-2xl border border-border/70 p-5 shadow-2xs space-y-5">
+          {/* Section Header */}
           <div className="flex items-center justify-between pb-3 border-b border-border/60">
             <div className="flex items-center gap-2">
               <Layers className="size-4 text-amber-500" />
-              <h2 className="text-sm font-bold text-foreground">Configuration Mode</h2>
+              <h2 className="text-sm font-bold text-foreground">
+                Location & Batch Details
+              </h2>
             </div>
-            {!isView && (
-              <div className="flex items-center gap-2 bg-muted p-1 rounded-xl">
+            <span className="text-[11px] text-muted-foreground font-medium">
+              Standard 2-row configuration layout
+            </span>
+          </div>
+
+          {/* ROW 1: Tracking Mode | Target Store | Company Area/Section | Status */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+            {/* 1. Tracking Mode Toggle (Moved immediately to the left of Target Store) */}
+            <div>
+              <label className="block text-xs font-bold mb-1 text-foreground">
+                Tracking Mode
+              </label>
+              <div className="grid grid-cols-2 h-9 p-0.5 rounded-lg border border-border/80 bg-muted/60">
                 <button
                   type="button"
+                  disabled={isView}
                   onClick={() => handleTrackingModeToggle("Location")}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  className={`h-full text-xs font-bold rounded-md transition cursor-pointer flex items-center justify-center gap-1 ${
                     formData.trackingMode === "Location"
                       ? "bg-amber-500 text-white shadow-2xs"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  } disabled:cursor-not-allowed`}
                 >
-                  Location Tracking
+                  <span>Location</span>
                 </button>
                 <button
                   type="button"
+                  disabled={isView}
                   onClick={() => handleTrackingModeToggle("Batch")}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  className={`h-full text-xs font-bold rounded-md transition cursor-pointer flex items-center justify-center gap-1 ${
                     formData.trackingMode === "Batch"
                       ? "bg-amber-500 text-white shadow-2xs"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  } disabled:cursor-not-allowed`}
                 >
-                  Batch Tracking
+                  <span>Batch</span>
                 </button>
               </div>
-            )}
-          </div>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {/* 2. Target Store */}
             <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">Target Store</label>
+              <label className="block text-xs font-bold mb-1 text-foreground">
+                Target Store <span className="text-rose-500">*</span>
+              </label>
               <select
                 disabled={isView}
                 value={formData.store || ""}
-                onChange={(e) => setFormData({ ...formData, store: e.target.value })}
+                onChange={(e) => {
+                  const newStore = e.target.value;
+                  const targetWh = warehouses.find(
+                    (w) => w.storeName === newStore || w.storeCode === newStore
+                  );
+                  setFormData({
+                    ...formData,
+                    store: newStore,
+                    companyAreaSection: targetWh?.companyAreaSection || formData.companyAreaSection,
+                  });
+                }}
                 className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
               >
                 {warehouses.map((w) => (
@@ -254,111 +328,32 @@ export function StoreLocationPageForm({
               </select>
             </div>
 
-            {formData.trackingMode === "Location" ? (
-              <>
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">
-                    Location Code <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    disabled={isView}
-                    value={formData.locationCode || ""}
-                    onChange={(e) => setFormData({ ...formData, locationCode: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-                  />
-                  {formErrors.locationCode && (
-                    <p className="text-[10px] text-rose-500 mt-1">{formErrors.locationCode}</p>
-                  )}
-                </div>
+            {/* 3. Company Area/Section */}
+            <div>
+              <label className="block text-xs font-bold mb-1 text-foreground">
+                Company Area/Section
+              </label>
+              <select
+                disabled={isView || availableAreaSections.length === 0}
+                value={formData.companyAreaSection || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, companyAreaSection: e.target.value })
+                }
+                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+              >
+                {availableAreaSections.length === 0 ? (
+                  <option value="">No Area/Section available</option>
+                ) : (
+                  availableAreaSections.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
 
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">
-                    Location Name <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    disabled={isView}
-                    value={formData.locationName || ""}
-                    onChange={(e) => setFormData({ ...formData, locationName: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">Location Type</label>
-                  <select
-                    disabled={isView}
-                    value={formData.locationType || "Rack"}
-                    onChange={(e) => setFormData({ ...formData, locationType: e.target.value as any })}
-                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-                  >
-                    <option value="Rack">Rack</option>
-                    <option value="Shelf">Shelf</option>
-                    <option value="Bin">Bin</option>
-                    <option value="Floor">Floor</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-2 pt-1 sm:col-span-2 md:col-span-3">
-                  <input
-                    type="checkbox"
-                    id="defaultLocationName"
-                    disabled={isView}
-                    checked={!!formData.defaultLocationName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, defaultLocationName: e.target.checked })
-                    }
-                    className="size-4 rounded border-border text-amber-500 focus:ring-amber-500/20 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-                  />
-                  <label
-                    htmlFor="defaultLocationName"
-                    className="text-xs font-semibold text-foreground cursor-pointer select-none"
-                  >
-                    Default Location Name
-                  </label>
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">
-                    Batch Numbering <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    disabled={isView}
-                    value={formData.batchNumbering || ""}
-                    onChange={(e) => setFormData({ ...formData, batchNumbering: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">Create Date</label>
-                  <input
-                    type="date"
-                    disabled={isView}
-                    value={formData.createDate || ""}
-                    onChange={(e) => setFormData({ ...formData, createDate: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">Expire Date</label>
-                  <input
-                    type="date"
-                    disabled={isView}
-                    value={formData.expireDate || ""}
-                    onChange={(e) => setFormData({ ...formData, expireDate: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-                  />
-                </div>
-              </>
-            )}
-
+            {/* 4. Status */}
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">Status</label>
               <select
@@ -372,9 +367,136 @@ export function StoreLocationPageForm({
               </select>
             </div>
           </div>
+
+          {/* ROW 2: Conditional Fields (Location Tracking vs Batch Tracking) */}
+          {formData.trackingMode === "Location" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start pt-2 border-t border-border/40">
+              {/* Col 1: Location Name (Location Code hidden from visible form) */}
+              <div>
+                <label className="block text-xs font-bold mb-1 text-foreground">
+                  Location Name <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  disabled={isView}
+                  value={formData.locationName || ""}
+                  onChange={(e) => setFormData({ ...formData, locationName: e.target.value })}
+                  placeholder="e.g. Rack A - Shelf 01"
+                  className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+                />
+                {formErrors.locationName && (
+                  <p className="text-[10px] text-rose-500 mt-1">{formErrors.locationName}</p>
+                )}
+              </div>
+
+              {/* Col 2: Location Type */}
+              <div>
+                <label className="block text-xs font-bold mb-1 text-foreground">
+                  Location Type
+                </label>
+                <select
+                  disabled={isView}
+                  value={formData.locationType || "Rack"}
+                  onChange={(e) =>
+                    setFormData({ ...formData, locationType: e.target.value as any })
+                  }
+                  className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+                >
+                  <option value="Rack">Rack</option>
+                  <option value="Shelf">Shelf</option>
+                  <option value="Bin">Bin</option>
+                  <option value="Floor">Floor</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              {/* Col 3: Default Location Name Checkbox */}
+              <div>
+                <label className="block text-xs font-bold mb-1 text-foreground">
+                  Default Flag
+                </label>
+                <label className="h-9 px-3 rounded-lg border border-border/80 bg-background flex items-center gap-2 cursor-pointer select-none hover:bg-muted/20 transition-colors">
+                  <input
+                    type="checkbox"
+                    id="defaultLocationName"
+                    disabled={isView}
+                    checked={!!formData.defaultLocationName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, defaultLocationName: e.target.checked })
+                    }
+                    className="size-4 rounded border-border text-amber-500 focus:ring-amber-500/20 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  />
+                  <span className="text-xs font-semibold text-foreground">
+                    Default Location Name
+                  </span>
+                </label>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start pt-2 border-t border-border/40">
+              {/* Col 1: Batch Numbering */}
+              <div>
+                <label className="block text-xs font-bold mb-1 text-foreground">
+                  Batch Numbering <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  disabled={isView}
+                  value={formData.batchNumbering || ""}
+                  onChange={(e) => setFormData({ ...formData, batchNumbering: e.target.value })}
+                  placeholder="e.g. BATCH-2026-001"
+                  className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+                />
+                {formErrors.batchNumbering && (
+                  <p className="text-[10px] text-rose-500 mt-1">{formErrors.batchNumbering}</p>
+                )}
+              </div>
+
+              {/* Col 2: Create Date */}
+              <div>
+                <label className="block text-xs font-bold mb-1 text-foreground">Create Date</label>
+                <input
+                  type="date"
+                  disabled={isView}
+                  value={formData.createDate || ""}
+                  onChange={(e) => setFormData({ ...formData, createDate: e.target.value })}
+                  className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+                />
+              </div>
+
+              {/* Col 3: Expire Date */}
+              <div>
+                <label className="block text-xs font-bold mb-1 text-foreground">Expire Date</label>
+                <input
+                  type="date"
+                  disabled={isView}
+                  value={formData.expireDate || ""}
+                  onChange={(e) => setFormData({ ...formData, expireDate: e.target.value })}
+                  className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+                />
+              </div>
+
+              {/* Col 4: Batch Status / Identifier Indicator */}
+              <div>
+                <label className="block text-xs font-bold mb-1 text-foreground">
+                  Batch Status
+                </label>
+                <select
+                  disabled={isView}
+                  value={formData.batchStatus || "Active"}
+                  onChange={(e) => setFormData({ ...formData, batchStatus: e.target.value as any })}
+                  className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-3">
+        {/* Form Action Buttons */}
+        <div className="flex items-center justify-end gap-3 pt-2">
           <button
             type="button"
             onClick={onCancel}

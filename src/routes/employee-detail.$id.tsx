@@ -37,7 +37,17 @@ import {
   Info,
   Power,
   HelpCircle,
+  QrCode,
+  ExternalLink,
+  Globe,
 } from "lucide-react";
+import {
+  SocialMediaIcon,
+  getSafeExternalUrl,
+  getPlatformDisplayName,
+  SocialMediaLink,
+} from "@/components/social-media/SocialMediaUtils";
+import { getCardByEmployeeId } from "@/lib/digital-business-card-service";
 
 export const Route = createFileRoute("/employee-detail/$id")({
   component: EmployeeDetailPage,
@@ -291,13 +301,25 @@ function EmployeeDetailPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-3 shrink-0 sm:self-start">
+                  <div className="flex items-center gap-2.5 flex-wrap shrink-0 sm:self-start">
+                    <Link
+                      to="/digital-business-card/$id"
+                      params={{ id: getCardByEmployeeId(selectedEmp.id)?.publicToken || selectedEmp.id }}
+                      target="_blank"
+                      className="h-9 px-3.5 rounded-xl border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 hover:shadow-md hover:-translate-y-0.5"
+                    >
+                      <QrCode className="size-3.5 text-sky-600" /> Digital Business Card
+                    </Link>
                     <button className="h-9 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-sm transition-all flex items-center gap-2 hover:shadow-md hover:-translate-y-0.5">
                       <FileDown className="size-3.5 text-slate-400" /> Download PDF
                     </button>
-                    <button className="h-9 px-4 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-sm hover:bg-indigo-700 hover:shadow-[0_4px_12px_rgba(79,70,229,0.2)] transition-all flex items-center gap-2 hover:-translate-y-0.5">
+                    <Link
+                      to="/add-employee"
+                      search={{ id: selectedEmp.id } as any}
+                      className="h-9 px-4 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-sm hover:bg-indigo-700 hover:shadow-[0_4px_12px_rgba(79,70,229,0.2)] transition-all flex items-center gap-2 hover:-translate-y-0.5"
+                    >
                       <UserCog className="size-3.5 text-indigo-200" /> Edit Profile
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -820,10 +842,22 @@ function EmployeeDetailPage() {
                     </div>
 
                     {/* 6. Contact Information */}
-                    <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
-                      <h4 className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 mb-5 flex items-center gap-2">
-                        <PhoneCall className="size-4" /> Contact Information
-                      </h4>
+                    <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)] space-y-5">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 flex items-center gap-2">
+                          <PhoneCall className="size-4" /> Contact Information
+                        </h4>
+                        <Link
+                          to="/digital-business-card/$id"
+                          params={{ id: getCardByEmployeeId(selectedEmp.id)?.publicToken || selectedEmp.id }}
+                          target="_blank"
+                          className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1"
+                        >
+                          <QrCode className="size-3.5" />
+                          <span>View Public Business Card</span>
+                        </Link>
+                      </div>
+
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-6">
                         <div className="space-y-1">
                           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Office Email</div>
@@ -845,6 +879,47 @@ function EmployeeDetailPage() {
                           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Personal Contact No</div>
                           <div className="text-sm font-bold text-slate-900 font-mono">{selectedEmp.phone !== "—" ? selectedEmp.phone : selectedEmp.personalContact || "017130XXXXX"}</div>
                         </div>
+                      </div>
+
+                      {/* Social Media Links display */}
+                      <div className="pt-4 border-t border-slate-100 space-y-2.5">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                          <Globe className="size-3.5 text-sky-500" />
+                          Social Media Links & Digital Profiles
+                        </div>
+
+                        {Array.isArray(selectedEmp.socialMediaLinks) && selectedEmp.socialMediaLinks.length > 0 ? (
+                          <div className="flex flex-wrap gap-2.5">
+                            {selectedEmp.socialMediaLinks.map((link: SocialMediaLink, i: number) => {
+                              const safeHref = getSafeExternalUrl(link.url);
+                              const displayName = getPlatformDisplayName(link);
+                              return (
+                                <a
+                                  key={link.id || i}
+                                  href={safeHref}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-sky-300 text-xs font-semibold text-slate-700 transition shadow-2xs"
+                                >
+                                  <SocialMediaIcon platform={link.platform} className="size-3.5" />
+                                  <span>{displayName}</span>
+                                  <ExternalLink className="size-3 text-slate-400" />
+                                </a>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-slate-400 italic flex items-center gap-2">
+                            <span>No social media links published yet.</span>
+                            <Link
+                              to="/add-employee"
+                              search={{ id: selectedEmp.id } as any}
+                              className="text-xs text-indigo-600 hover:underline font-semibold not-italic"
+                            >
+                              + Add Social Links
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     </div>
 

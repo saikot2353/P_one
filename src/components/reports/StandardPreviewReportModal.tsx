@@ -12,6 +12,8 @@ export type ReportType =
   | "opening-stock"
   | "purchase-requisition"
   | "monthly-budget-requisition"
+  | "comparative-statement"
+  | "purchase-order"
   | "supplier-bill";
 
 export interface StandardReportData {
@@ -29,6 +31,10 @@ export interface StandardReportData {
   companyAddress?: string;
   department?: string;
   status?: string;
+  hideLogo?: boolean;
+  hideDocHeaderInfo?: boolean;
+  hideCompanyHeader?: boolean;
+  orientation?: "portrait" | "landscape";
   metadata?: Array<{ label: string; value: string | React.ReactNode; highlight?: boolean }>;
   metaFields?: Array<{ label: string; value: string | React.ReactNode; highlight?: boolean }>;
   tableHeaders?: string[];
@@ -72,45 +78,91 @@ export function StandardPreviewReportModal({
   const docDate = activeData.documentDate || activeData.reportDate || new Date().toISOString().slice(0, 10);
   const metadataList = activeData.metadata || activeData.metaFields || [];
 
+  const isMonthlyBudget = activeData.reportType === "monthly-budget-requisition";
+  const shouldHideLogo =
+    activeData.hideLogo ||
+    activeData.reportType === "purchase-requisition" ||
+    activeData.reportType === "monthly-budget-requisition" ||
+    activeData.reportType === "purchase-order" ||
+    activeData.reportType === "comparative-statement" ||
+    activeData.reportType === "mrr" ||
+    docTitle === "STORE MATERIAL ISSUE SLIP" ||
+    docTitle === "MATERIAL RECEIVE REPORT (MRR)";
+  const shouldHideDocHeaderInfo = activeData.hideDocHeaderInfo || isMonthlyBudget;
+
   // Generate table headers & rows if items are provided directly
   let headers = activeData.tableHeaders || [];
   let rows = activeData.tableRows || [];
 
   if (rows.length === 0 && activeData.items && activeData.items.length > 0) {
-    headers = [
-      "SL",
-      "Item Description & Spec",
-      "Brand / Origin",
-      "UOM",
-      "Quantity",
-      "Unit Price",
-      "Total Amount",
-      "Remarks / Tracking",
-    ];
-    rows = activeData.items.map((it, idx) => [
-      it.sl || idx + 1,
-      React.createElement(
-        "div",
-        null,
-        React.createElement("div", { className: "font-bold text-slate-900" }, it.itemName),
-        React.createElement("div", { className: "text-[9.5px] text-slate-500 font-mono" }, it.itemCode || it.specification)
-      ),
-      it.brandOrigin || `${it.brand || "Standard"} / ${it.origin || "Local"}`,
-      it.uom || "PCS",
-      it.quantity || it.currentBillQty || it.openingQuantity || it.currentReturnQty || it.orderedQty || 0,
-      `৳ ${(it.unitPrice || it.unitCost || 0).toLocaleString()}`,
-      `৳ ${(it.totalAmount || it.lineAmount || it.totalValue || it.lineTotal || 0).toLocaleString()}`,
-      it.remarks || it.batchNumber || it.location || "Verified",
-    ]);
+    if (isMonthlyBudget) {
+      headers = [
+        "SL",
+        "Item Description & Spec",
+        "Brand / Origin",
+        "UOM",
+        "Quantity",
+        "Remarks / Tracking",
+      ];
+      rows = activeData.items.map((it, idx) => [
+        it.sl || idx + 1,
+        React.createElement(
+          "div",
+          null,
+          React.createElement("div", { className: "font-bold text-slate-900" }, it.itemName),
+          React.createElement("div", { className: "text-[9.5px] text-slate-500 font-mono" }, it.itemCode || it.specification)
+        ),
+        it.brandOrigin || `${it.brand || "Standard"} / ${it.origin || "Local"}`,
+        it.uom || "PCS",
+        (it.quantity || it.estimatedQuantity || 0).toLocaleString(),
+        it.remarks || it.batchNumber || it.location || "Verified",
+      ]);
+    } else {
+      headers = [
+        "SL",
+        "Item Description & Spec",
+        "Brand / Origin",
+        "UOM",
+        "Quantity",
+        "Unit Price",
+        "Total Amount",
+        "Remarks / Tracking",
+      ];
+      rows = activeData.items.map((it, idx) => [
+        it.sl || idx + 1,
+        React.createElement(
+          "div",
+          null,
+          React.createElement("div", { className: "font-bold text-slate-900" }, it.itemName),
+          React.createElement("div", { className: "text-[9.5px] text-slate-500 font-mono" }, it.itemCode || it.specification)
+        ),
+        it.brandOrigin || `${it.brand || "Standard"} / ${it.origin || "Local"}`,
+        it.uom || "PCS",
+        it.quantity || it.currentBillQty || it.openingQuantity || it.currentReturnQty || it.orderedQty || 0,
+        `৳ ${(it.unitPrice || it.unitCost || 0).toLocaleString()}`,
+        `৳ ${(it.totalAmount || it.lineAmount || it.totalValue || it.lineTotal || 0).toLocaleString()}`,
+        it.remarks || it.batchNumber || it.location || "Verified",
+      ]);
+    }
   }
 
   // Summary cards fallback from financials
-  const summaryList = activeData.summaryCards || (activeData.financials ? activeData.financials.map(f => ({
+  let summaryList = activeData.summaryCards || (activeData.financials ? activeData.financials.map(f => ({
     label: f.label,
     value: f.value,
     isBold: f.isTotal,
     isHighlight: f.isTotal || f.highlight,
   })) : []);
+
+  if (isMonthlyBudget) {
+    // Remove Total Line Items and Estimated Budget Value from monthly budget preview
+    summaryList = summaryList.filter(
+      (s) =>
+        !s.label.toLowerCase().includes("total line items") &&
+        !s.label.toLowerCase().includes("estimated budget value") &&
+        !s.label.toLowerCase().includes("total estimated qty")
+    );
+  }
 
   const noteText = activeData.notes || activeData.remarks;
 
@@ -123,7 +175,7 @@ export function StandardPreviewReportModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-card border border-border rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col max-h-[92vh] overflow-hidden text-slate-900">
+      <div className={`bg-white dark:bg-card border border-border rounded-2xl shadow-2xl w-full ${activeData.orientation === "landscape" ? "max-w-6xl" : "max-w-5xl"} flex flex-col max-h-[92vh] overflow-hidden text-slate-900`}>
         {/* Top Control Bar (Hidden on print) */}
         <div className="p-3.5 sm:px-6 border-b border-border flex justify-between items-center bg-slate-100 dark:bg-slate-900 print:hidden shrink-0">
           <div className="flex items-center gap-2">
@@ -153,18 +205,20 @@ export function StandardPreviewReportModal({
 
         {/* Printable Document Body */}
         <div className="p-6 sm:p-10 overflow-y-auto flex-1 bg-white text-slate-900 text-xs font-sans space-y-6 print:p-0 print:overflow-visible">
-          {/* Official Pakiza Header */}
+          {/* Official Document Header */}
           <div className="border-b-2 border-slate-900 pb-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <img
-                  src={pakizaLogo}
-                  alt="Pakiza Logo"
-                  className="h-12 w-auto object-contain"
-                />
-              </div>
+              {!shouldHideLogo && (
+                <div className="flex items-center gap-3">
+                  <img
+                    src={pakizaLogo}
+                    alt="Pakiza Logo"
+                    className="h-12 w-auto object-contain"
+                  />
+                </div>
+              )}
 
-              <div className="text-center flex-1">
+              <div className={`text-center flex-1 ${shouldHideLogo ? "sm:text-left" : ""}`}>
                 <h1 className="text-lg font-black tracking-wide uppercase text-slate-950">
                   {activeData.companyName || "PAKIZA KNIT COMPOSITE LTD."}
                 </h1>
@@ -178,16 +232,18 @@ export function StandardPreviewReportModal({
                 </div>
               </div>
 
-              <div className="text-right text-[11px] text-slate-600 space-y-0.5 shrink-0 border border-slate-300 rounded p-2 bg-slate-50 min-w-[170px]">
-                <div>
-                  <span className="font-bold text-slate-800">Doc No: </span>
-                  <span className="font-mono font-bold text-blue-700">{docNo}</span>
+              {!shouldHideDocHeaderInfo && (
+                <div className="text-right text-[11px] text-slate-600 space-y-0.5 shrink-0 border border-slate-300 rounded p-2 bg-slate-50 min-w-[170px]">
+                  <div>
+                    <span className="font-bold text-slate-800">Doc No: </span>
+                    <span className="font-mono font-bold text-blue-700">{docNo}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-slate-800">Date: </span>
+                    <span>{docDate}</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-bold text-slate-800">Date: </span>
-                  <span>{docDate}</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 

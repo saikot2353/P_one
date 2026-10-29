@@ -55,6 +55,11 @@ export const nav: NavItem[] = [
     icon: Settings,
     subitems: [
       {
+        label: "Procurement Configuration",
+        to: "/procurement-configuration",
+        activeRoutes: ["/procurement-configuration"],
+      },
+      {
         label: "Vendor Category",
         to: "/procurement-master-data",
         search: { tab: "vendor-category" },

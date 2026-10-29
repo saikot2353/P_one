@@ -49,6 +49,9 @@ import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
 import { Route as CurrencySetupRouteImport } from './routes/currency-setup'
 import { Route as DeptWiseSalarySheetRouteImport } from './routes/dept-wise-salary-sheet'
+import { Route as DigitalBusinessCardRouteImport } from './routes/digital-business-card'
+import { Route as DigitalBusinessCardAnalyticsRouteImport } from './routes/digital-business-card-analytics'
+import { Route as DigitalBusinessCardsAdminRouteImport } from './routes/digital-business-cards-admin'
 import { Route as DisciplinaryCaseFilesRouteImport } from './routes/disciplinary-case-files'
 import { Route as DisciplinaryLeftyRouteImport } from './routes/disciplinary-lefty'
 import { Route as DisciplinaryShowcauseNoticesRouteImport } from './routes/disciplinary-showcause-notices'
@@ -223,7 +226,13 @@ import { Route as MmFabricBookingRouteImport } from './routes/mm-fabric-booking'
 import { Route as MmFabricBookingApprovalRouteImport } from './routes/mm-fabric-booking-approval'
 import { Route as MmFabricBookingApprovalDetailsRouteImport } from './routes/mm-fabric-booking-approval-details'
 import { Route as MmFabricBookingRegisterRouteImport } from './routes/mm-fabric-booking-register'
+import { Route as MmFabricConsumptionCadRouteImport } from './routes/mm-fabric-consumption-cad'
+import { Route as MmFabricConsumptionCadRegisterRouteImport } from './routes/mm-fabric-consumption-cad-register'
+import { Route as MmFabricConsumptionRegisterRouteImport } from './routes/mm-fabric-consumption-register'
 import { Route as MmFabricEstimationRegisterRouteImport } from './routes/mm-fabric-estimation-register'
+import { Route as MmManualBookingRouteImport } from './routes/mm-manual-booking'
+import { Route as MmManualBookingRegisterRouteImport } from './routes/mm-manual-booking-register'
+import { Route as MmMarketingTargetPlanningRouteImport } from './routes/mm-marketing-target-planning'
 import { Route as MmOrderClosureRouteImport } from './routes/mm-order-closure'
 import { Route as MmOrderEntryRouteImport } from './routes/mm-order-entry'
 import { Route as MmPiRouteImport } from './routes/mm-pi'
@@ -231,8 +240,12 @@ import { Route as MmPiApprovalDetailsRouteImport } from './routes/mm-pi-approval
 import { Route as MmPiVerificationApprovalRouteImport } from './routes/mm-pi-verification-approval'
 import { Route as MmPolicyConfigRouteImport } from './routes/mm-policy-config'
 import { Route as MmPreCostingRouteImport } from './routes/mm-pre-costing'
+import { Route as MmProductionFileRouteImport } from './routes/mm-production-file'
+import { Route as MmProductionFileApprovalRouteImport } from './routes/mm-production-file-approval'
+import { Route as MmProductionFileRegisterRouteImport } from './routes/mm-production-file-register'
 import { Route as MmProformaInvoiceCreateRouteImport } from './routes/mm-proforma-invoice-create'
 import { Route as MmReportsRouteImport } from './routes/mm-reports'
+import { Route as MmTargetVsAchievementReportRouteImport } from './routes/mm-target-vs-achievement-report'
 import { Route as MobileBillingDepartmentRouteImport } from './routes/mobile-billing-department'
 import { Route as MobileBillingEmployeeRouteImport } from './routes/mobile-billing-employee'
 import { Route as MobileBillingEntryRouteImport } from './routes/mobile-billing-entry'
@@ -242,6 +255,7 @@ import { Route as MonthlyLeftySalarySheetRouteImport } from './routes/monthly-le
 import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salary-details'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
+import { Route as MyDigitalBusinessCardRouteImport } from './routes/my-digital-business-card'
 import { Route as MyProfileRouteImport } from './routes/my-profile'
 import { Route as NoticeRouteImport } from './routes/notice'
 import { Route as OrganizationMasterSetupRouteImport } from './routes/organization-master-setup'
@@ -303,6 +317,7 @@ import { Route as ProcurementConfigPurchaseOptionRouteImport } from './routes/pr
 import { Route as ProcurementConfigSupplierNameRouteImport } from './routes/procurement-config-supplier-name'
 import { Route as ProcurementConfigSupplierOpeningRouteImport } from './routes/procurement-config-supplier-opening'
 import { Route as ProcurementConfigTermsRouteImport } from './routes/procurement-config-terms'
+import { Route as ProcurementConfigurationRouteImport } from './routes/procurement-configuration'
 import { Route as ProcurementCsApprovalRouteImport } from './routes/procurement-cs-approval'
 import { Route as ProcurementCsBatchListRouteImport } from './routes/procurement-cs-batch-list'
 import { Route as ProcurementCsCreateBatchRouteImport } from './routes/procurement-cs-create-batch'
@@ -360,6 +375,7 @@ import { Route as SeparationResignationRequestRouteImport } from './routes/separ
 import { Route as SetHodRouteImport } from './routes/set-hod'
 import { Route as SetManagerRouteImport } from './routes/set-manager'
 import { Route as ShapnocheckRouteImport } from './routes/shapnocheck'
+import { Route as ShareMyCardRouteImport } from './routes/share-my-card'
 import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
 import { Route as ShiftRosterAssignmentRouteImport } from './routes/shift-roster-assignment'
 import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
@@ -392,6 +408,8 @@ import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-bud
 import { Route as ZakatExecutiveReportRouteImport } from './routes/zakat-executive-report'
 import { Route as ZakatListRouteImport } from './routes/zakat-list'
 import { Route as AccountsConfigFinancialPeriodSetupRouteImport } from './routes/accounts-config.financial-period-setup'
+import { Route as DigitalBusinessCardIndexRouteImport } from './routes/digital-business-card.index'
+import { Route as DigitalBusinessCardIdRouteImport } from './routes/digital-business-card.$id'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
 import { Route as RecruitmentDetailIdRouteImport } from './routes/recruitment-detail.$id'
 import { Route as RecruitmentHrAssessmentIdRouteImport } from './routes/recruitment-hr-assessment.$id'
@@ -599,6 +617,23 @@ const DeptWiseSalarySheetRoute = DeptWiseSalarySheetRouteImport.update({
   path: '/dept-wise-salary-sheet',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DigitalBusinessCardRoute = DigitalBusinessCardRouteImport.update({
+  id: '/digital-business-card',
+  path: '/digital-business-card',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DigitalBusinessCardAnalyticsRoute =
+  DigitalBusinessCardAnalyticsRouteImport.update({
+    id: '/digital-business-card-analytics',
+    path: '/digital-business-card-analytics',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DigitalBusinessCardsAdminRoute =
+  DigitalBusinessCardsAdminRouteImport.update({
+    id: '/digital-business-cards-admin',
+    path: '/digital-business-cards-admin',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DisciplinaryCaseFilesRoute = DisciplinaryCaseFilesRouteImport.update({
   id: '/disciplinary-case-files',
   path: '/disciplinary-case-files',
@@ -1514,10 +1549,43 @@ const MmFabricBookingRegisterRoute = MmFabricBookingRegisterRouteImport.update({
   path: '/mm-fabric-booking-register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MmFabricConsumptionCadRoute = MmFabricConsumptionCadRouteImport.update({
+  id: '/mm-fabric-consumption-cad',
+  path: '/mm-fabric-consumption-cad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmFabricConsumptionCadRegisterRoute =
+  MmFabricConsumptionCadRegisterRouteImport.update({
+    id: '/mm-fabric-consumption-cad-register',
+    path: '/mm-fabric-consumption-cad-register',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MmFabricConsumptionRegisterRoute =
+  MmFabricConsumptionRegisterRouteImport.update({
+    id: '/mm-fabric-consumption-register',
+    path: '/mm-fabric-consumption-register',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MmFabricEstimationRegisterRoute =
   MmFabricEstimationRegisterRouteImport.update({
     id: '/mm-fabric-estimation-register',
     path: '/mm-fabric-estimation-register',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MmManualBookingRoute = MmManualBookingRouteImport.update({
+  id: '/mm-manual-booking',
+  path: '/mm-manual-booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmManualBookingRegisterRoute = MmManualBookingRegisterRouteImport.update({
+  id: '/mm-manual-booking-register',
+  path: '/mm-manual-booking-register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmMarketingTargetPlanningRoute =
+  MmMarketingTargetPlanningRouteImport.update({
+    id: '/mm-marketing-target-planning',
+    path: '/mm-marketing-target-planning',
     getParentRoute: () => rootRouteImport,
   } as any)
 const MmOrderClosureRoute = MmOrderClosureRouteImport.update({
@@ -1556,6 +1624,23 @@ const MmPreCostingRoute = MmPreCostingRouteImport.update({
   path: '/mm-pre-costing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MmProductionFileRoute = MmProductionFileRouteImport.update({
+  id: '/mm-production-file',
+  path: '/mm-production-file',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MmProductionFileApprovalRoute =
+  MmProductionFileApprovalRouteImport.update({
+    id: '/mm-production-file-approval',
+    path: '/mm-production-file-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MmProductionFileRegisterRoute =
+  MmProductionFileRegisterRouteImport.update({
+    id: '/mm-production-file-register',
+    path: '/mm-production-file-register',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MmProformaInvoiceCreateRoute = MmProformaInvoiceCreateRouteImport.update({
   id: '/mm-proforma-invoice-create',
   path: '/mm-proforma-invoice-create',
@@ -1566,6 +1651,12 @@ const MmReportsRoute = MmReportsRouteImport.update({
   path: '/mm-reports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MmTargetVsAchievementReportRoute =
+  MmTargetVsAchievementReportRouteImport.update({
+    id: '/mm-target-vs-achievement-report',
+    path: '/mm-target-vs-achievement-report',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MobileBillingDepartmentRoute = MobileBillingDepartmentRouteImport.update({
   id: '/mobile-billing-department',
   path: '/mobile-billing-department',
@@ -1610,6 +1701,11 @@ const MonthlySalaryProcessRoute = MonthlySalaryProcessRouteImport.update({
 const MyDashboardRoute = MyDashboardRouteImport.update({
   id: '/my-dashboard',
   path: '/my-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyDigitalBusinessCardRoute = MyDigitalBusinessCardRouteImport.update({
+  id: '/my-digital-business-card',
+  path: '/my-digital-business-card',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyProfileRoute = MyProfileRouteImport.update({
@@ -1947,6 +2043,12 @@ const ProcurementConfigTermsRoute = ProcurementConfigTermsRouteImport.update({
   path: '/procurement-config-terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProcurementConfigurationRoute =
+  ProcurementConfigurationRouteImport.update({
+    id: '/procurement-configuration',
+    path: '/procurement-configuration',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ProcurementCsApprovalRoute = ProcurementCsApprovalRouteImport.update({
   id: '/procurement-cs-approval',
   path: '/procurement-cs-approval',
@@ -2261,6 +2363,11 @@ const ShapnocheckRoute = ShapnocheckRouteImport.update({
   path: '/shapnocheck',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShareMyCardRoute = ShareMyCardRouteImport.update({
+  id: '/share-my-card',
+  path: '/share-my-card',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShiftControlCenterRoute = ShiftControlCenterRouteImport.update({
   id: '/shift-control-center',
   path: '/shift-control-center',
@@ -2427,6 +2534,17 @@ const AccountsConfigFinancialPeriodSetupRoute =
     path: '/accounts-config/financial-period-setup',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DigitalBusinessCardIndexRoute =
+  DigitalBusinessCardIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DigitalBusinessCardRoute,
+  } as any)
+const DigitalBusinessCardIdRoute = DigitalBusinessCardIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DigitalBusinessCardRoute,
+} as any)
 const EmployeeDetailIdRoute = EmployeeDetailIdRouteImport.update({
   id: '/employee-detail/$id',
   path: '/employee-detail/$id',
@@ -2491,6 +2609,9 @@ export interface FileRoutesByFullPath {
   '/create-roster': typeof CreateRosterRoute
   '/currency-setup': typeof CurrencySetupRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
+  '/digital-business-card': typeof DigitalBusinessCardRouteWithChildren
+  '/digital-business-card-analytics': typeof DigitalBusinessCardAnalyticsRoute
+  '/digital-business-cards-admin': typeof DigitalBusinessCardsAdminRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
@@ -2665,7 +2786,13 @@ export interface FileRoutesByFullPath {
   '/mm-fabric-booking-approval': typeof MmFabricBookingApprovalRoute
   '/mm-fabric-booking-approval-details': typeof MmFabricBookingApprovalDetailsRoute
   '/mm-fabric-booking-register': typeof MmFabricBookingRegisterRoute
+  '/mm-fabric-consumption-cad': typeof MmFabricConsumptionCadRoute
+  '/mm-fabric-consumption-cad-register': typeof MmFabricConsumptionCadRegisterRoute
+  '/mm-fabric-consumption-register': typeof MmFabricConsumptionRegisterRoute
   '/mm-fabric-estimation-register': typeof MmFabricEstimationRegisterRoute
+  '/mm-manual-booking': typeof MmManualBookingRoute
+  '/mm-manual-booking-register': typeof MmManualBookingRegisterRoute
+  '/mm-marketing-target-planning': typeof MmMarketingTargetPlanningRoute
   '/mm-order-closure': typeof MmOrderClosureRoute
   '/mm-order-entry': typeof MmOrderEntryRoute
   '/mm-pi': typeof MmPiRoute
@@ -2673,8 +2800,12 @@ export interface FileRoutesByFullPath {
   '/mm-pi-verification-approval': typeof MmPiVerificationApprovalRoute
   '/mm-policy-config': typeof MmPolicyConfigRoute
   '/mm-pre-costing': typeof MmPreCostingRoute
+  '/mm-production-file': typeof MmProductionFileRoute
+  '/mm-production-file-approval': typeof MmProductionFileApprovalRoute
+  '/mm-production-file-register': typeof MmProductionFileRegisterRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
   '/mm-reports': typeof MmReportsRoute
+  '/mm-target-vs-achievement-report': typeof MmTargetVsAchievementReportRoute
   '/mobile-billing-department': typeof MobileBillingDepartmentRoute
   '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
   '/mobile-billing-entry': typeof MobileBillingEntryRoute
@@ -2684,6 +2815,7 @@ export interface FileRoutesByFullPath {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/my-digital-business-card': typeof MyDigitalBusinessCardRoute
   '/my-profile': typeof MyProfileRoute
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
@@ -2745,6 +2877,7 @@ export interface FileRoutesByFullPath {
   '/procurement-config-supplier-name': typeof ProcurementConfigSupplierNameRoute
   '/procurement-config-supplier-opening': typeof ProcurementConfigSupplierOpeningRoute
   '/procurement-config-terms': typeof ProcurementConfigTermsRoute
+  '/procurement-configuration': typeof ProcurementConfigurationRoute
   '/procurement-cs-approval': typeof ProcurementCsApprovalRoute
   '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
   '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
@@ -2802,6 +2935,7 @@ export interface FileRoutesByFullPath {
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
   '/shapnocheck': typeof ShapnocheckRoute
+  '/share-my-card': typeof ShareMyCardRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/shift-roster-assignment': typeof ShiftRosterAssignmentRoute
   '/ssp-approval': typeof SspApprovalRoute
@@ -2834,10 +2968,12 @@ export interface FileRoutesByFullPath {
   '/zakat-executive-report': typeof ZakatExecutiveReportRoute
   '/zakat-list': typeof ZakatListRoute
   '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
+  '/digital-business-card/$id': typeof DigitalBusinessCardIdRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
   '/recruitment-ie-assessment/$id': typeof RecruitmentIeAssessmentIdRoute
+  '/digital-business-card/': typeof DigitalBusinessCardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -2880,6 +3016,8 @@ export interface FileRoutesByTo {
   '/create-roster': typeof CreateRosterRoute
   '/currency-setup': typeof CurrencySetupRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
+  '/digital-business-card-analytics': typeof DigitalBusinessCardAnalyticsRoute
+  '/digital-business-cards-admin': typeof DigitalBusinessCardsAdminRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
@@ -3054,7 +3192,13 @@ export interface FileRoutesByTo {
   '/mm-fabric-booking-approval': typeof MmFabricBookingApprovalRoute
   '/mm-fabric-booking-approval-details': typeof MmFabricBookingApprovalDetailsRoute
   '/mm-fabric-booking-register': typeof MmFabricBookingRegisterRoute
+  '/mm-fabric-consumption-cad': typeof MmFabricConsumptionCadRoute
+  '/mm-fabric-consumption-cad-register': typeof MmFabricConsumptionCadRegisterRoute
+  '/mm-fabric-consumption-register': typeof MmFabricConsumptionRegisterRoute
   '/mm-fabric-estimation-register': typeof MmFabricEstimationRegisterRoute
+  '/mm-manual-booking': typeof MmManualBookingRoute
+  '/mm-manual-booking-register': typeof MmManualBookingRegisterRoute
+  '/mm-marketing-target-planning': typeof MmMarketingTargetPlanningRoute
   '/mm-order-closure': typeof MmOrderClosureRoute
   '/mm-order-entry': typeof MmOrderEntryRoute
   '/mm-pi': typeof MmPiRoute
@@ -3062,8 +3206,12 @@ export interface FileRoutesByTo {
   '/mm-pi-verification-approval': typeof MmPiVerificationApprovalRoute
   '/mm-policy-config': typeof MmPolicyConfigRoute
   '/mm-pre-costing': typeof MmPreCostingRoute
+  '/mm-production-file': typeof MmProductionFileRoute
+  '/mm-production-file-approval': typeof MmProductionFileApprovalRoute
+  '/mm-production-file-register': typeof MmProductionFileRegisterRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
   '/mm-reports': typeof MmReportsRoute
+  '/mm-target-vs-achievement-report': typeof MmTargetVsAchievementReportRoute
   '/mobile-billing-department': typeof MobileBillingDepartmentRoute
   '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
   '/mobile-billing-entry': typeof MobileBillingEntryRoute
@@ -3073,6 +3221,7 @@ export interface FileRoutesByTo {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/my-digital-business-card': typeof MyDigitalBusinessCardRoute
   '/my-profile': typeof MyProfileRoute
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
@@ -3134,6 +3283,7 @@ export interface FileRoutesByTo {
   '/procurement-config-supplier-name': typeof ProcurementConfigSupplierNameRoute
   '/procurement-config-supplier-opening': typeof ProcurementConfigSupplierOpeningRoute
   '/procurement-config-terms': typeof ProcurementConfigTermsRoute
+  '/procurement-configuration': typeof ProcurementConfigurationRoute
   '/procurement-cs-approval': typeof ProcurementCsApprovalRoute
   '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
   '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
@@ -3191,6 +3341,7 @@ export interface FileRoutesByTo {
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
   '/shapnocheck': typeof ShapnocheckRoute
+  '/share-my-card': typeof ShareMyCardRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/shift-roster-assignment': typeof ShiftRosterAssignmentRoute
   '/ssp-approval': typeof SspApprovalRoute
@@ -3223,10 +3374,12 @@ export interface FileRoutesByTo {
   '/zakat-executive-report': typeof ZakatExecutiveReportRoute
   '/zakat-list': typeof ZakatListRoute
   '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
+  '/digital-business-card/$id': typeof DigitalBusinessCardIdRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
   '/recruitment-ie-assessment/$id': typeof RecruitmentIeAssessmentIdRoute
+  '/digital-business-card': typeof DigitalBusinessCardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -3270,6 +3423,9 @@ export interface FileRoutesById {
   '/create-roster': typeof CreateRosterRoute
   '/currency-setup': typeof CurrencySetupRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
+  '/digital-business-card': typeof DigitalBusinessCardRouteWithChildren
+  '/digital-business-card-analytics': typeof DigitalBusinessCardAnalyticsRoute
+  '/digital-business-cards-admin': typeof DigitalBusinessCardsAdminRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
@@ -3444,7 +3600,13 @@ export interface FileRoutesById {
   '/mm-fabric-booking-approval': typeof MmFabricBookingApprovalRoute
   '/mm-fabric-booking-approval-details': typeof MmFabricBookingApprovalDetailsRoute
   '/mm-fabric-booking-register': typeof MmFabricBookingRegisterRoute
+  '/mm-fabric-consumption-cad': typeof MmFabricConsumptionCadRoute
+  '/mm-fabric-consumption-cad-register': typeof MmFabricConsumptionCadRegisterRoute
+  '/mm-fabric-consumption-register': typeof MmFabricConsumptionRegisterRoute
   '/mm-fabric-estimation-register': typeof MmFabricEstimationRegisterRoute
+  '/mm-manual-booking': typeof MmManualBookingRoute
+  '/mm-manual-booking-register': typeof MmManualBookingRegisterRoute
+  '/mm-marketing-target-planning': typeof MmMarketingTargetPlanningRoute
   '/mm-order-closure': typeof MmOrderClosureRoute
   '/mm-order-entry': typeof MmOrderEntryRoute
   '/mm-pi': typeof MmPiRoute
@@ -3452,8 +3614,12 @@ export interface FileRoutesById {
   '/mm-pi-verification-approval': typeof MmPiVerificationApprovalRoute
   '/mm-policy-config': typeof MmPolicyConfigRoute
   '/mm-pre-costing': typeof MmPreCostingRoute
+  '/mm-production-file': typeof MmProductionFileRoute
+  '/mm-production-file-approval': typeof MmProductionFileApprovalRoute
+  '/mm-production-file-register': typeof MmProductionFileRegisterRoute
   '/mm-proforma-invoice-create': typeof MmProformaInvoiceCreateRoute
   '/mm-reports': typeof MmReportsRoute
+  '/mm-target-vs-achievement-report': typeof MmTargetVsAchievementReportRoute
   '/mobile-billing-department': typeof MobileBillingDepartmentRoute
   '/mobile-billing-employee': typeof MobileBillingEmployeeRoute
   '/mobile-billing-entry': typeof MobileBillingEntryRoute
@@ -3463,6 +3629,7 @@ export interface FileRoutesById {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/my-digital-business-card': typeof MyDigitalBusinessCardRoute
   '/my-profile': typeof MyProfileRoute
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
@@ -3524,6 +3691,7 @@ export interface FileRoutesById {
   '/procurement-config-supplier-name': typeof ProcurementConfigSupplierNameRoute
   '/procurement-config-supplier-opening': typeof ProcurementConfigSupplierOpeningRoute
   '/procurement-config-terms': typeof ProcurementConfigTermsRoute
+  '/procurement-configuration': typeof ProcurementConfigurationRoute
   '/procurement-cs-approval': typeof ProcurementCsApprovalRoute
   '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
   '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
@@ -3581,6 +3749,7 @@ export interface FileRoutesById {
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
   '/shapnocheck': typeof ShapnocheckRoute
+  '/share-my-card': typeof ShareMyCardRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/shift-roster-assignment': typeof ShiftRosterAssignmentRoute
   '/ssp-approval': typeof SspApprovalRoute
@@ -3613,10 +3782,12 @@ export interface FileRoutesById {
   '/zakat-executive-report': typeof ZakatExecutiveReportRoute
   '/zakat-list': typeof ZakatListRoute
   '/accounts-config/financial-period-setup': typeof AccountsConfigFinancialPeriodSetupRoute
+  '/digital-business-card/$id': typeof DigitalBusinessCardIdRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
   '/recruitment-ie-assessment/$id': typeof RecruitmentIeAssessmentIdRoute
+  '/digital-business-card/': typeof DigitalBusinessCardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -3661,6 +3832,9 @@ export interface FileRouteTypes {
     | '/create-roster'
     | '/currency-setup'
     | '/dept-wise-salary-sheet'
+    | '/digital-business-card'
+    | '/digital-business-card-analytics'
+    | '/digital-business-cards-admin'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
     | '/disciplinary-showcause-notices'
@@ -3835,7 +4009,13 @@ export interface FileRouteTypes {
     | '/mm-fabric-booking-approval'
     | '/mm-fabric-booking-approval-details'
     | '/mm-fabric-booking-register'
+    | '/mm-fabric-consumption-cad'
+    | '/mm-fabric-consumption-cad-register'
+    | '/mm-fabric-consumption-register'
     | '/mm-fabric-estimation-register'
+    | '/mm-manual-booking'
+    | '/mm-manual-booking-register'
+    | '/mm-marketing-target-planning'
     | '/mm-order-closure'
     | '/mm-order-entry'
     | '/mm-pi'
@@ -3843,8 +4023,12 @@ export interface FileRouteTypes {
     | '/mm-pi-verification-approval'
     | '/mm-policy-config'
     | '/mm-pre-costing'
+    | '/mm-production-file'
+    | '/mm-production-file-approval'
+    | '/mm-production-file-register'
     | '/mm-proforma-invoice-create'
     | '/mm-reports'
+    | '/mm-target-vs-achievement-report'
     | '/mobile-billing-department'
     | '/mobile-billing-employee'
     | '/mobile-billing-entry'
@@ -3854,6 +4038,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/my-digital-business-card'
     | '/my-profile'
     | '/notice'
     | '/organization-master-setup'
@@ -3915,6 +4100,7 @@ export interface FileRouteTypes {
     | '/procurement-config-supplier-name'
     | '/procurement-config-supplier-opening'
     | '/procurement-config-terms'
+    | '/procurement-configuration'
     | '/procurement-cs-approval'
     | '/procurement-cs-batch-list'
     | '/procurement-cs-create-batch'
@@ -3972,6 +4158,7 @@ export interface FileRouteTypes {
     | '/set-hod'
     | '/set-manager'
     | '/shapnocheck'
+    | '/share-my-card'
     | '/shift-control-center'
     | '/shift-roster-assignment'
     | '/ssp-approval'
@@ -4004,10 +4191,12 @@ export interface FileRouteTypes {
     | '/zakat-executive-report'
     | '/zakat-list'
     | '/accounts-config/financial-period-setup'
+    | '/digital-business-card/$id'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
     | '/recruitment-ie-assessment/$id'
+    | '/digital-business-card/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -4050,6 +4239,8 @@ export interface FileRouteTypes {
     | '/create-roster'
     | '/currency-setup'
     | '/dept-wise-salary-sheet'
+    | '/digital-business-card-analytics'
+    | '/digital-business-cards-admin'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
     | '/disciplinary-showcause-notices'
@@ -4224,7 +4415,13 @@ export interface FileRouteTypes {
     | '/mm-fabric-booking-approval'
     | '/mm-fabric-booking-approval-details'
     | '/mm-fabric-booking-register'
+    | '/mm-fabric-consumption-cad'
+    | '/mm-fabric-consumption-cad-register'
+    | '/mm-fabric-consumption-register'
     | '/mm-fabric-estimation-register'
+    | '/mm-manual-booking'
+    | '/mm-manual-booking-register'
+    | '/mm-marketing-target-planning'
     | '/mm-order-closure'
     | '/mm-order-entry'
     | '/mm-pi'
@@ -4232,8 +4429,12 @@ export interface FileRouteTypes {
     | '/mm-pi-verification-approval'
     | '/mm-policy-config'
     | '/mm-pre-costing'
+    | '/mm-production-file'
+    | '/mm-production-file-approval'
+    | '/mm-production-file-register'
     | '/mm-proforma-invoice-create'
     | '/mm-reports'
+    | '/mm-target-vs-achievement-report'
     | '/mobile-billing-department'
     | '/mobile-billing-employee'
     | '/mobile-billing-entry'
@@ -4243,6 +4444,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/my-digital-business-card'
     | '/my-profile'
     | '/notice'
     | '/organization-master-setup'
@@ -4304,6 +4506,7 @@ export interface FileRouteTypes {
     | '/procurement-config-supplier-name'
     | '/procurement-config-supplier-opening'
     | '/procurement-config-terms'
+    | '/procurement-configuration'
     | '/procurement-cs-approval'
     | '/procurement-cs-batch-list'
     | '/procurement-cs-create-batch'
@@ -4361,6 +4564,7 @@ export interface FileRouteTypes {
     | '/set-hod'
     | '/set-manager'
     | '/shapnocheck'
+    | '/share-my-card'
     | '/shift-control-center'
     | '/shift-roster-assignment'
     | '/ssp-approval'
@@ -4393,10 +4597,12 @@ export interface FileRouteTypes {
     | '/zakat-executive-report'
     | '/zakat-list'
     | '/accounts-config/financial-period-setup'
+    | '/digital-business-card/$id'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
     | '/recruitment-ie-assessment/$id'
+    | '/digital-business-card'
   id:
     | '__root__'
     | '/'
@@ -4439,6 +4645,9 @@ export interface FileRouteTypes {
     | '/create-roster'
     | '/currency-setup'
     | '/dept-wise-salary-sheet'
+    | '/digital-business-card'
+    | '/digital-business-card-analytics'
+    | '/digital-business-cards-admin'
     | '/disciplinary-case-files'
     | '/disciplinary-lefty'
     | '/disciplinary-showcause-notices'
@@ -4613,7 +4822,13 @@ export interface FileRouteTypes {
     | '/mm-fabric-booking-approval'
     | '/mm-fabric-booking-approval-details'
     | '/mm-fabric-booking-register'
+    | '/mm-fabric-consumption-cad'
+    | '/mm-fabric-consumption-cad-register'
+    | '/mm-fabric-consumption-register'
     | '/mm-fabric-estimation-register'
+    | '/mm-manual-booking'
+    | '/mm-manual-booking-register'
+    | '/mm-marketing-target-planning'
     | '/mm-order-closure'
     | '/mm-order-entry'
     | '/mm-pi'
@@ -4621,8 +4836,12 @@ export interface FileRouteTypes {
     | '/mm-pi-verification-approval'
     | '/mm-policy-config'
     | '/mm-pre-costing'
+    | '/mm-production-file'
+    | '/mm-production-file-approval'
+    | '/mm-production-file-register'
     | '/mm-proforma-invoice-create'
     | '/mm-reports'
+    | '/mm-target-vs-achievement-report'
     | '/mobile-billing-department'
     | '/mobile-billing-employee'
     | '/mobile-billing-entry'
@@ -4632,6 +4851,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/my-digital-business-card'
     | '/my-profile'
     | '/notice'
     | '/organization-master-setup'
@@ -4693,6 +4913,7 @@ export interface FileRouteTypes {
     | '/procurement-config-supplier-name'
     | '/procurement-config-supplier-opening'
     | '/procurement-config-terms'
+    | '/procurement-configuration'
     | '/procurement-cs-approval'
     | '/procurement-cs-batch-list'
     | '/procurement-cs-create-batch'
@@ -4750,6 +4971,7 @@ export interface FileRouteTypes {
     | '/set-hod'
     | '/set-manager'
     | '/shapnocheck'
+    | '/share-my-card'
     | '/shift-control-center'
     | '/shift-roster-assignment'
     | '/ssp-approval'
@@ -4782,10 +5004,12 @@ export interface FileRouteTypes {
     | '/zakat-executive-report'
     | '/zakat-list'
     | '/accounts-config/financial-period-setup'
+    | '/digital-business-card/$id'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
     | '/recruitment-ie-assessment/$id'
+    | '/digital-business-card/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -4829,6 +5053,9 @@ export interface RootRouteChildren {
   CreateRosterRoute: typeof CreateRosterRoute
   CurrencySetupRoute: typeof CurrencySetupRoute
   DeptWiseSalarySheetRoute: typeof DeptWiseSalarySheetRoute
+  DigitalBusinessCardRoute: typeof DigitalBusinessCardRouteWithChildren
+  DigitalBusinessCardAnalyticsRoute: typeof DigitalBusinessCardAnalyticsRoute
+  DigitalBusinessCardsAdminRoute: typeof DigitalBusinessCardsAdminRoute
   DisciplinaryCaseFilesRoute: typeof DisciplinaryCaseFilesRoute
   DisciplinaryLeftyRoute: typeof DisciplinaryLeftyRoute
   DisciplinaryShowcauseNoticesRoute: typeof DisciplinaryShowcauseNoticesRoute
@@ -5003,7 +5230,13 @@ export interface RootRouteChildren {
   MmFabricBookingApprovalRoute: typeof MmFabricBookingApprovalRoute
   MmFabricBookingApprovalDetailsRoute: typeof MmFabricBookingApprovalDetailsRoute
   MmFabricBookingRegisterRoute: typeof MmFabricBookingRegisterRoute
+  MmFabricConsumptionCadRoute: typeof MmFabricConsumptionCadRoute
+  MmFabricConsumptionCadRegisterRoute: typeof MmFabricConsumptionCadRegisterRoute
+  MmFabricConsumptionRegisterRoute: typeof MmFabricConsumptionRegisterRoute
   MmFabricEstimationRegisterRoute: typeof MmFabricEstimationRegisterRoute
+  MmManualBookingRoute: typeof MmManualBookingRoute
+  MmManualBookingRegisterRoute: typeof MmManualBookingRegisterRoute
+  MmMarketingTargetPlanningRoute: typeof MmMarketingTargetPlanningRoute
   MmOrderClosureRoute: typeof MmOrderClosureRoute
   MmOrderEntryRoute: typeof MmOrderEntryRoute
   MmPiRoute: typeof MmPiRoute
@@ -5011,8 +5244,12 @@ export interface RootRouteChildren {
   MmPiVerificationApprovalRoute: typeof MmPiVerificationApprovalRoute
   MmPolicyConfigRoute: typeof MmPolicyConfigRoute
   MmPreCostingRoute: typeof MmPreCostingRoute
+  MmProductionFileRoute: typeof MmProductionFileRoute
+  MmProductionFileApprovalRoute: typeof MmProductionFileApprovalRoute
+  MmProductionFileRegisterRoute: typeof MmProductionFileRegisterRoute
   MmProformaInvoiceCreateRoute: typeof MmProformaInvoiceCreateRoute
   MmReportsRoute: typeof MmReportsRoute
+  MmTargetVsAchievementReportRoute: typeof MmTargetVsAchievementReportRoute
   MobileBillingDepartmentRoute: typeof MobileBillingDepartmentRoute
   MobileBillingEmployeeRoute: typeof MobileBillingEmployeeRoute
   MobileBillingEntryRoute: typeof MobileBillingEntryRoute
@@ -5022,6 +5259,7 @@ export interface RootRouteChildren {
   MonthlySalaryDetailsRoute: typeof MonthlySalaryDetailsRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
+  MyDigitalBusinessCardRoute: typeof MyDigitalBusinessCardRoute
   MyProfileRoute: typeof MyProfileRoute
   NoticeRoute: typeof NoticeRoute
   OrganizationMasterSetupRoute: typeof OrganizationMasterSetupRoute
@@ -5083,6 +5321,7 @@ export interface RootRouteChildren {
   ProcurementConfigSupplierNameRoute: typeof ProcurementConfigSupplierNameRoute
   ProcurementConfigSupplierOpeningRoute: typeof ProcurementConfigSupplierOpeningRoute
   ProcurementConfigTermsRoute: typeof ProcurementConfigTermsRoute
+  ProcurementConfigurationRoute: typeof ProcurementConfigurationRoute
   ProcurementCsApprovalRoute: typeof ProcurementCsApprovalRoute
   ProcurementCsBatchListRoute: typeof ProcurementCsBatchListRoute
   ProcurementCsCreateBatchRoute: typeof ProcurementCsCreateBatchRoute
@@ -5140,6 +5379,7 @@ export interface RootRouteChildren {
   SetHodRoute: typeof SetHodRoute
   SetManagerRoute: typeof SetManagerRoute
   ShapnocheckRoute: typeof ShapnocheckRoute
+  ShareMyCardRoute: typeof ShareMyCardRoute
   ShiftControlCenterRoute: typeof ShiftControlCenterRoute
   ShiftRosterAssignmentRoute: typeof ShiftRosterAssignmentRoute
   SspApprovalRoute: typeof SspApprovalRoute
@@ -5458,6 +5698,27 @@ declare module '@tanstack/react-router' {
       path: '/dept-wise-salary-sheet'
       fullPath: '/dept-wise-salary-sheet'
       preLoaderRoute: typeof DeptWiseSalarySheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/digital-business-card': {
+      id: '/digital-business-card'
+      path: '/digital-business-card'
+      fullPath: '/digital-business-card'
+      preLoaderRoute: typeof DigitalBusinessCardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/digital-business-card-analytics': {
+      id: '/digital-business-card-analytics'
+      path: '/digital-business-card-analytics'
+      fullPath: '/digital-business-card-analytics'
+      preLoaderRoute: typeof DigitalBusinessCardAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/digital-business-cards-admin': {
+      id: '/digital-business-cards-admin'
+      path: '/digital-business-cards-admin'
+      fullPath: '/digital-business-cards-admin'
+      preLoaderRoute: typeof DigitalBusinessCardsAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/disciplinary-case-files': {
@@ -6678,11 +6939,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MmFabricBookingRegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mm-fabric-consumption-cad': {
+      id: '/mm-fabric-consumption-cad'
+      path: '/mm-fabric-consumption-cad'
+      fullPath: '/mm-fabric-consumption-cad'
+      preLoaderRoute: typeof MmFabricConsumptionCadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-fabric-consumption-cad-register': {
+      id: '/mm-fabric-consumption-cad-register'
+      path: '/mm-fabric-consumption-cad-register'
+      fullPath: '/mm-fabric-consumption-cad-register'
+      preLoaderRoute: typeof MmFabricConsumptionCadRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-fabric-consumption-register': {
+      id: '/mm-fabric-consumption-register'
+      path: '/mm-fabric-consumption-register'
+      fullPath: '/mm-fabric-consumption-register'
+      preLoaderRoute: typeof MmFabricConsumptionRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mm-fabric-estimation-register': {
       id: '/mm-fabric-estimation-register'
       path: '/mm-fabric-estimation-register'
       fullPath: '/mm-fabric-estimation-register'
       preLoaderRoute: typeof MmFabricEstimationRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-manual-booking': {
+      id: '/mm-manual-booking'
+      path: '/mm-manual-booking'
+      fullPath: '/mm-manual-booking'
+      preLoaderRoute: typeof MmManualBookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-manual-booking-register': {
+      id: '/mm-manual-booking-register'
+      path: '/mm-manual-booking-register'
+      fullPath: '/mm-manual-booking-register'
+      preLoaderRoute: typeof MmManualBookingRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-marketing-target-planning': {
+      id: '/mm-marketing-target-planning'
+      path: '/mm-marketing-target-planning'
+      fullPath: '/mm-marketing-target-planning'
+      preLoaderRoute: typeof MmMarketingTargetPlanningRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mm-order-closure': {
@@ -6734,6 +7037,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MmPreCostingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mm-production-file': {
+      id: '/mm-production-file'
+      path: '/mm-production-file'
+      fullPath: '/mm-production-file'
+      preLoaderRoute: typeof MmProductionFileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-production-file-approval': {
+      id: '/mm-production-file-approval'
+      path: '/mm-production-file-approval'
+      fullPath: '/mm-production-file-approval'
+      preLoaderRoute: typeof MmProductionFileApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-production-file-register': {
+      id: '/mm-production-file-register'
+      path: '/mm-production-file-register'
+      fullPath: '/mm-production-file-register'
+      preLoaderRoute: typeof MmProductionFileRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mm-proforma-invoice-create': {
       id: '/mm-proforma-invoice-create'
       path: '/mm-proforma-invoice-create'
@@ -6746,6 +7070,13 @@ declare module '@tanstack/react-router' {
       path: '/mm-reports'
       fullPath: '/mm-reports'
       preLoaderRoute: typeof MmReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mm-target-vs-achievement-report': {
+      id: '/mm-target-vs-achievement-report'
+      path: '/mm-target-vs-achievement-report'
+      fullPath: '/mm-target-vs-achievement-report'
+      preLoaderRoute: typeof MmTargetVsAchievementReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mobile-billing-department': {
@@ -6809,6 +7140,13 @@ declare module '@tanstack/react-router' {
       path: '/my-dashboard'
       fullPath: '/my-dashboard'
       preLoaderRoute: typeof MyDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-digital-business-card': {
+      id: '/my-digital-business-card'
+      path: '/my-digital-business-card'
+      fullPath: '/my-digital-business-card'
+      preLoaderRoute: typeof MyDigitalBusinessCardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-profile': {
@@ -7238,6 +7576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcurementConfigTermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/procurement-configuration': {
+      id: '/procurement-configuration'
+      path: '/procurement-configuration'
+      fullPath: '/procurement-configuration'
+      preLoaderRoute: typeof ProcurementConfigurationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/procurement-cs-approval': {
       id: '/procurement-cs-approval'
       path: '/procurement-cs-approval'
@@ -7637,6 +7982,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShapnocheckRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/share-my-card': {
+      id: '/share-my-card'
+      path: '/share-my-card'
+      fullPath: '/share-my-card'
+      preLoaderRoute: typeof ShareMyCardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shift-control-center': {
       id: '/shift-control-center'
       path: '/shift-control-center'
@@ -7861,6 +8213,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountsConfigFinancialPeriodSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/digital-business-card/': {
+      id: '/digital-business-card/'
+      path: '/'
+      fullPath: '/digital-business-card/'
+      preLoaderRoute: typeof DigitalBusinessCardIndexRouteImport
+      parentRoute: typeof DigitalBusinessCardRoute
+    }
+    '/digital-business-card/$id': {
+      id: '/digital-business-card/$id'
+      path: '/$id'
+      fullPath: '/digital-business-card/$id'
+      preLoaderRoute: typeof DigitalBusinessCardIdRouteImport
+      parentRoute: typeof DigitalBusinessCardRoute
+    }
     '/employee-detail/$id': {
       id: '/employee-detail/$id'
       path: '/employee-detail/$id'
@@ -7891,6 +8257,19 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface DigitalBusinessCardRouteChildren {
+  DigitalBusinessCardIdRoute: typeof DigitalBusinessCardIdRoute
+  DigitalBusinessCardIndexRoute: typeof DigitalBusinessCardIndexRoute
+}
+
+const DigitalBusinessCardRouteChildren: DigitalBusinessCardRouteChildren = {
+  DigitalBusinessCardIdRoute: DigitalBusinessCardIdRoute,
+  DigitalBusinessCardIndexRoute: DigitalBusinessCardIndexRoute,
+}
+
+const DigitalBusinessCardRouteWithChildren =
+  DigitalBusinessCardRoute._addFileChildren(DigitalBusinessCardRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -7933,6 +8312,9 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRosterRoute: CreateRosterRoute,
   CurrencySetupRoute: CurrencySetupRoute,
   DeptWiseSalarySheetRoute: DeptWiseSalarySheetRoute,
+  DigitalBusinessCardRoute: DigitalBusinessCardRouteWithChildren,
+  DigitalBusinessCardAnalyticsRoute: DigitalBusinessCardAnalyticsRoute,
+  DigitalBusinessCardsAdminRoute: DigitalBusinessCardsAdminRoute,
   DisciplinaryCaseFilesRoute: DisciplinaryCaseFilesRoute,
   DisciplinaryLeftyRoute: DisciplinaryLeftyRoute,
   DisciplinaryShowcauseNoticesRoute: DisciplinaryShowcauseNoticesRoute,
@@ -8111,7 +8493,13 @@ const rootRouteChildren: RootRouteChildren = {
   MmFabricBookingApprovalRoute: MmFabricBookingApprovalRoute,
   MmFabricBookingApprovalDetailsRoute: MmFabricBookingApprovalDetailsRoute,
   MmFabricBookingRegisterRoute: MmFabricBookingRegisterRoute,
+  MmFabricConsumptionCadRoute: MmFabricConsumptionCadRoute,
+  MmFabricConsumptionCadRegisterRoute: MmFabricConsumptionCadRegisterRoute,
+  MmFabricConsumptionRegisterRoute: MmFabricConsumptionRegisterRoute,
   MmFabricEstimationRegisterRoute: MmFabricEstimationRegisterRoute,
+  MmManualBookingRoute: MmManualBookingRoute,
+  MmManualBookingRegisterRoute: MmManualBookingRegisterRoute,
+  MmMarketingTargetPlanningRoute: MmMarketingTargetPlanningRoute,
   MmOrderClosureRoute: MmOrderClosureRoute,
   MmOrderEntryRoute: MmOrderEntryRoute,
   MmPiRoute: MmPiRoute,
@@ -8119,8 +8507,12 @@ const rootRouteChildren: RootRouteChildren = {
   MmPiVerificationApprovalRoute: MmPiVerificationApprovalRoute,
   MmPolicyConfigRoute: MmPolicyConfigRoute,
   MmPreCostingRoute: MmPreCostingRoute,
+  MmProductionFileRoute: MmProductionFileRoute,
+  MmProductionFileApprovalRoute: MmProductionFileApprovalRoute,
+  MmProductionFileRegisterRoute: MmProductionFileRegisterRoute,
   MmProformaInvoiceCreateRoute: MmProformaInvoiceCreateRoute,
   MmReportsRoute: MmReportsRoute,
+  MmTargetVsAchievementReportRoute: MmTargetVsAchievementReportRoute,
   MobileBillingDepartmentRoute: MobileBillingDepartmentRoute,
   MobileBillingEmployeeRoute: MobileBillingEmployeeRoute,
   MobileBillingEntryRoute: MobileBillingEntryRoute,
@@ -8130,6 +8522,7 @@ const rootRouteChildren: RootRouteChildren = {
   MonthlySalaryDetailsRoute: MonthlySalaryDetailsRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,
+  MyDigitalBusinessCardRoute: MyDigitalBusinessCardRoute,
   MyProfileRoute: MyProfileRoute,
   NoticeRoute: NoticeRoute,
   OrganizationMasterSetupRoute: OrganizationMasterSetupRoute,
@@ -8195,6 +8588,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProcurementConfigSupplierNameRoute: ProcurementConfigSupplierNameRoute,
   ProcurementConfigSupplierOpeningRoute: ProcurementConfigSupplierOpeningRoute,
   ProcurementConfigTermsRoute: ProcurementConfigTermsRoute,
+  ProcurementConfigurationRoute: ProcurementConfigurationRoute,
   ProcurementCsApprovalRoute: ProcurementCsApprovalRoute,
   ProcurementCsBatchListRoute: ProcurementCsBatchListRoute,
   ProcurementCsCreateBatchRoute: ProcurementCsCreateBatchRoute,
@@ -8257,6 +8651,7 @@ const rootRouteChildren: RootRouteChildren = {
   SetHodRoute: SetHodRoute,
   SetManagerRoute: SetManagerRoute,
   ShapnocheckRoute: ShapnocheckRoute,
+  ShareMyCardRoute: ShareMyCardRoute,
   ShiftControlCenterRoute: ShiftControlCenterRoute,
   ShiftRosterAssignmentRoute: ShiftRosterAssignmentRoute,
   SspApprovalRoute: SspApprovalRoute,

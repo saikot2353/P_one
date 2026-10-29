@@ -29,6 +29,7 @@ export interface MRItem {
   requisitionStore?: string;
   uom: string;
   requestedQuantity: number;
+  approvedQuantity?: number;
   availableStock: number;
   issuedQuantity: number;
   remainingQuantity: number;

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import MarketingMerchandisingLayout from "../components/marketing-merchandising/MarketingMerchandisingLayout";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
   MMRepository,
   MMProformaInvoice,
@@ -208,6 +209,35 @@ function MMProformaInvoiceCreatePage() {
   const [docNo, setDocNo] = useState<string>("");
   const [businessUnit, setBusinessUnit] = useState<string>("Unit 2 - Garments");
   const [deliveryTerms, setDeliveryTerms] = useState<string>("FOB Savar");
+  const [lcNumber, setLcNumber] = useState<string>("");
+  const [lcId, setLcId] = useState<string>("");
+
+  const scLcMasterList = useMemo(() => MMRepository.getSCLCs(), []);
+
+  const handleLcChange = (val: string) => {
+    const found = scLcMasterList.find((item) => item.id === val || item.scLcNo === val);
+    if (found) {
+      setLcId(found.id);
+      setLcNumber(found.scLcNo);
+    } else {
+      setLcId(val);
+      setLcNumber(val);
+    }
+  };
+
+  const lcOptions = useMemo(() => {
+    const list = scLcMasterList.map((item) => ({
+      value: item.id,
+      label: `${item.scLcNo} (${item.type} - ${item.buyer})`,
+    }));
+    if (lcNumber && !scLcMasterList.some((item) => item.id === lcId || item.scLcNo === lcNumber)) {
+      list.unshift({
+        value: lcId || lcNumber,
+        label: lcNumber,
+      });
+    }
+    return list;
+  }, [scLcMasterList, lcId, lcNumber]);
 
   // Section B & C: Attached Bookings & Populated Items State
   const [attachedBookings, setAttachedBookings] = useState<MMPIAllocatedBooking[]>([]);
@@ -263,7 +293,8 @@ function MMProformaInvoiceCreatePage() {
     setFabricBookings(loadedBookings);
 
     const loadedAccBookings = MMRepository.getAccessoriesBookings();
-    setAccBookings(loadedAccBookings);
+    const loadedManualBookings = MMRepository.getManualBookings();
+    setAccBookings([...loadedAccBookings, ...loadedManualBookings]);
 
     const loadedPis = MMRepository.getPIs();
     setAllPis(loadedPis);
@@ -298,8 +329,10 @@ function MMProformaInvoiceCreatePage() {
       const firstId = effectiveBookingIds[0];
       const isAccessories =
         searchSource?.toLowerCase() === "accessories" ||
+        searchSource?.toLowerCase() === "manual-booking" ||
         searchItem?.toLowerCase() === "accessories" ||
         firstId.startsWith("acc-") ||
+        firstId.startsWith("mb-") ||
         accBookings.some((ab) => effectiveBookingIds.includes(ab.id) || effectiveBookingIds.includes(ab.bookingNo));
 
       if (isAccessories) {
@@ -704,7 +737,7 @@ function MMProformaInvoiceCreatePage() {
         const styleNo = item.styleNo || itemAny.style || booking.lines?.[0]?.style || "STYLE-2026";
         const buyer = (booking.lines?.[0] as any)?.buyerNameSnapshot || "H&M Europe";
         const season = resolveSeasonForJob(jobId, styleNo);
-        const qty = item.bookedQty || itemAny.bookQty || 0;
+        const qty = item.bookedQty || itemAny.marketQty || itemAny.bookQty || 0;
         const rate = item.bookedRate || itemAny.rate || 0;
         const amountUsd = item.totalAmount || itemAny.total || Number((qty * rate).toFixed(2));
         const gmtQty = itemAny.gmtQty || booking.totalBookedQty || 10000;
@@ -723,11 +756,11 @@ function MMProformaInvoiceCreatePage() {
           affectedGmtQty: gmtQty,
           qtyDz: qtyDz,
           itemCategory: "Accessories",
-          itemDescription: item.itemDescription || itemAny.accessoryName || "Accessories Item",
-          specification: item.specification || `${item.color || ""} ${item.sizeOrDimension || itemAny.size || ""}`.trim(),
+          itemDescription: item.itemDescription || itemAny.itemName || itemAny.accessoryName || "Accessories Item",
+          specification: item.specification || itemAny.itemCode || `${item.color || ""} ${item.sizeOrDimension || itemAny.size || ""}`.trim(),
           color: item.color || "",
           dzConsump: Number((qty / (qtyDz || 1)).toFixed(2)),
-          unit: item.unit || "Pcs",
+          unit: itemAny.marketUnit || item.unit || "Pcs",
           quantity: qty,
           unitPrice: rate,
           totalAmount: amountUsd,
@@ -985,6 +1018,8 @@ function MMProformaInvoiceCreatePage() {
     setDocNo(pi.docNo || "");
     setBusinessUnit(pi.businessUnit || "Unit 2 - Garments");
     setDeliveryTerms(pi.deliveryTerms || "FOB Savar");
+    setLcNumber(pi.lcNumber || pi.lcReferenceNo || "");
+    setLcId(pi.lcId || "");
     setAttachedBookings(pi.allocatedBookings || []);
     setActiveBookingId(pi.activeBookingId || pi.allocatedBookings[0]?.bookingId || "");
     setPiItems(pi.items || []);
@@ -1838,6 +1873,9 @@ function MMProformaInvoiceCreatePage() {
       amendmentReason: amendmentReason,
       bblcReferenceNo: bblcNo,
       docNo: docNo,
+      lcReferenceNo: lcNumber,
+      lcNumber: lcNumber,
+      lcId: lcId,
       status: overrideStatus || status,
       allocatedBookings: attachedBookings,
       items: previewBookingItems.length > 0 ? previewBookingItems : piItems,
@@ -1860,6 +1898,17 @@ function MMProformaInvoiceCreatePage() {
     }
 
     MMRepository.savePI(piRecordToSave);
+
+    // Update piReference on any attached Manual Booking
+    const currentManualBookings = MMRepository.getManualBookings();
+    attachedBookings.forEach((ab) => {
+      const mb = currentManualBookings.find((m) => m.id === ab.bookingId || m.bookingNo === ab.bookingNo);
+      if (mb) {
+        mb.piReference = piRecordToSave.piNo;
+        MMRepository.saveManualBooking(mb);
+      }
+    });
+
     setAllPis(MMRepository.getPIs());
 
     setSuccessMessage(`Proforma Invoice draft (${piNumber}) successfully saved to Local Storage.`);
@@ -1973,6 +2022,9 @@ function MMProformaInvoiceCreatePage() {
       amendmentReason: amendmentReason,
       bblcReferenceNo: bblcNo,
       docNo: docNo,
+      lcReferenceNo: lcNumber,
+      lcNumber: lcNumber,
+      lcId: lcId,
       status: "Pending Approval",
       submittedBy: submitter,
       submittedDate: submissionTimestamp,
@@ -1993,6 +2045,17 @@ function MMProformaInvoiceCreatePage() {
     };
 
     MMRepository.savePI(piRecordToSave);
+
+    // Update piReference on any attached Manual Booking
+    const currentManualBookings = MMRepository.getManualBookings();
+    attachedBookings.forEach((ab) => {
+      const mb = currentManualBookings.find((m) => m.id === ab.bookingId || m.bookingNo === ab.bookingNo);
+      if (mb) {
+        mb.piReference = piRecordToSave.piNo;
+        MMRepository.saveManualBooking(mb);
+      }
+    });
+
     setStatus("Pending Approval");
     setAllPis(MMRepository.getPIs());
     setCurrentId(recordId);
@@ -2330,7 +2393,7 @@ function MMProformaInvoiceCreatePage() {
                 </div>
               </div>
 
-              {/* Column 5: BBLC No & Delivery Terms */}
+              {/* Column 5: BBLC No & LC Number */}
               <div className="space-y-4">
                 <div>
                   <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">BBLC No</label>
@@ -2345,13 +2408,16 @@ function MMProformaInvoiceCreatePage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Delivery Terms</label>
-                  <input
-                    type="text"
-                    value={deliveryTerms}
-                    onChange={(e) => setDeliveryTerms(e.target.value)}
-                    placeholder="e.g. FOB Savar"
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:ring-1 focus:ring-teal-500 text-xs font-semibold"
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    LC Number
+                  </label>
+                  <SearchableSelect
+                    value={lcId || lcNumber}
+                    onChange={handleLcChange}
+                    options={lcOptions}
+                    placeholder="Search or select LC Number..."
+                    allowCustom={true}
+                    className="w-full text-xs font-semibold"
                   />
                 </div>
               </div>

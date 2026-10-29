@@ -114,15 +114,42 @@ export interface MMBuyerQuotation {
 // ----------------------------------------------------------------------------
 // 3. Style-Wise Pre-Costing Model (Item-level persistent identifiers)
 // ----------------------------------------------------------------------------
+export interface MMPreCostPO {
+  id: string;
+  sl?: number;
+  poNumber: string;
+  poQuantity: number;
+  rate: number;
+  value: number;
+  remarks?: string;
+}
+
 export interface MMPreCostItem {
+  id?: string;
+  sl?: number;
   preCostItemId: string; // Unique persistent identifier (e.g. PCI-001)
-  category: "Fabric" | "Accessories" | "Trims" | "Embellishment" | "Wash" | "Commercial" | "CM";
+  category: "Fabric" | "Accessories" | "Trims" | "Embellishment" | "Wash" | "Commercial" | "CM" | string;
+  head?: string; // Costing Head
+  item?: string; // Item Name
   itemCode: string;
   itemDescription: string;
+  description?: string;
   specification: string;
   bodyPartOrUsedPlace: string;
+  usedPlace?: string;
+  color?: string;
+  codeNo?: string;
+  nStatus?: string; // Nominee status ('Nominated' | 'Non-Nominee' | 'Buyer Nominee' | 'Self Source')
+  supplier?: string;
+  effectedQty?: number;
+  consumption?: number;
   consumptionPerPc: number;
   unit: string; // 'Yds', 'Kg', 'Dzn', 'Gross', 'Pcs', 'Mtr'
+  requiredQty?: number;
+  finalQty?: number;
+  rate?: number;
+  amount?: number;
+  preCostPct?: number;
   wastagePct: number;
   requiredQtyWithWastage: number; // for 1 pc / dozen basis
   unitRate: number; // in USD
@@ -131,9 +158,83 @@ export interface MMPreCostItem {
   notes?: string;
 }
 
+export interface MMPreCostAuditEntry {
+  id?: string;
+  versionNumber: number;
+  previousVersionNumber?: number;
+  amendmentReason?: string;
+  createdBy: string;
+  createdDate: string;
+  submittedBy?: string;
+  submittedDate?: string;
+  approvedBy?: string;
+  approvalDate?: string;
+  rejectedBy?: string;
+  rejectionDate?: string;
+  decisionComments?: string;
+  status: ApprovalStatus;
+}
+
+export interface MMPreCostVersionSnapshot {
+  versionNumber: number;
+  previousVersionNumber?: number;
+  amendmentReason?: string;
+  createdBy: string;
+  createdDate: string;
+  submittedBy?: string;
+  submittedDate?: string;
+  approvedBy?: string;
+  approvalDate?: string;
+  rejectedBy?: string;
+  rejectionDate?: string;
+  decisionComments?: string;
+  status: ApprovalStatus;
+  header: {
+    preCostId: string;
+    preCostNo: string;
+    preCostDate: string;
+    contractNo: string;
+    ourRef: string;
+    acHolder: string;
+    buyer: string;
+    merchandiser: string;
+    style: string;
+    note: string;
+    smv: number;
+    currency: string;
+  };
+  poRows: MMPreCostPO[];
+  items: MMPreCostItem[];
+  summary: {
+    gmtQty: number;
+    rate: number;
+    value: number;
+    smv: number;
+    orderQty: number;
+    remarks: string;
+    totalGmtQty: number;
+    totalGmtValue: number;
+    totalCost: number;
+    surplus: number;
+    surplusPcs: number;
+    smvCost: number;
+  };
+}
+
 export interface MMPreCosting {
   id: string;
   preCostId: string; // e.g. PC-2026-001
+  preCostNo?: string;
+  preCostDate?: string;
+  contractNo?: string;
+  ourRef?: string;
+  acHolder?: string;
+  buyer?: string;
+  merchandiser?: string;
+  style?: string;
+  note?: string;
+  smv?: number;
+  smvCost?: number;
   jobNo?: string; // Associated Job No.
   quotationId?: string;
   quotationNo?: string;
@@ -151,7 +252,16 @@ export interface MMPreCosting {
   isCurrentActive: boolean;
   status: ApprovalStatus;
   amendmentReason?: string;
+  poRows?: MMPreCostPO[];
   items: MMPreCostItem[];
+  // Summary
+  gmtQty?: number;
+  rate?: number;
+  totalGmtQty?: number;
+  totalGmtValue?: number;
+  totalCost?: number;
+  surplus?: number;
+  surplusPcs?: number;
   cmCostPerDzn: number;
   commercialCostPct: number;
   commercialCostPerDzn: number;
@@ -162,9 +272,17 @@ export interface MMPreCosting {
   offeredFobPerPc: number;
   approvedBy?: string;
   approvalDate?: string;
+  rejectedBy?: string;
+  rejectionDate?: string;
   rejectionReason?: string;
+  decisionComments?: string;
   createdBy: string;
   createdDate: string;
+  submittedBy?: string;
+  submittedDate?: string;
+  // Complete Version History Snapshots
+  versions?: MMPreCostVersionSnapshot[];
+  auditHistory?: MMPreCostAuditEntry[];
   // History preservation for amendment comparison
   previousVersionSnapshot?: {
     version: number;
@@ -417,13 +535,32 @@ export const MM_MERCHANTS_MASTER: MMMerchantMaster[] = [
 export interface MMBuyerMaster {
   id: string;
   name: string;
+  buyerName?: string;
   country: string;
   accountHolder: string;
   departments: { id: string; name: string; code: string }[];
   styles: { id: string; styleNo: string; description: string; garmentItem: string }[];
+  sizeRanges?: string[];
+  configuredSizes?: string[];
 }
 
 export const MM_BUYERS_MASTER: MMBuyerMaster[] = [
+  {
+    id: "byr-00",
+    name: "MARLIN MEDIA",
+    country: "United States",
+    accountHolder: "Tanvir Ahmed (Merchandiser)",
+    departments: [
+      { id: "dept-mm-01", name: "Mens Outerwear & Casual", code: "DEPT-MM-01" },
+      { id: "dept-mm-02", name: "Sportswear & Jackets", code: "DEPT-MM-02" },
+    ],
+    styles: [
+      { id: "sty-mm-01", styleNo: "APEROL-BASEBALL-JACKET", description: "Men Baseball Jacket with Rib Trim", garmentItem: "Baseball Jacket" },
+      { id: "sty-mm-02", styleNo: "MM-JK-402", description: "Varsity Wool Bomber Jacket", garmentItem: "Bomber Jacket" },
+    ],
+    sizeRanges: ["S TO L", "S TO XXL", "XS TO XL", "S, M, L, XL, XXL"],
+    configuredSizes: ["S", "M", "L", "XL", "XXL"],
+  },
   {
     id: "byr-01",
     name: "H&M Hennes & Mauritz",
@@ -439,6 +576,8 @@ export const MM_BUYERS_MASTER: MMBuyerMaster[] = [
       { id: "sty-hm-02", styleNo: "HM-KT-9022", description: "Basic Crewneck T-Shirt", garmentItem: "Crewneck Tee" },
       { id: "sty-hm-03", styleNo: "HM-WV-3104", description: "Ladies Denim Jacket", garmentItem: "Denim Jacket" },
     ],
+    sizeRanges: ["XS TO XXL", "S TO XL", "XS TO L", "XS, S, M, L, XL, XXL"],
+    configuredSizes: ["XS", "S", "M", "L", "XL", "XXL"],
   },
   {
     id: "byr-02",
@@ -454,6 +593,8 @@ export const MM_BUYERS_MASTER: MMBuyerMaster[] = [
       { id: "sty-zr-01", styleNo: "ZR-WV-4019", description: "Men Slim Fit Cotton Twill Chino Trouser", garmentItem: "Chino Trouser" },
       { id: "sty-zr-02", styleNo: "ZR-KT-1120", description: "Men Oversized Heavyweight Tee", garmentItem: "Crewneck Tee" },
     ],
+    sizeRanges: ["30 TO 38", "30-36", "XS TO XXL", "30, 32, 34, 36, 38"],
+    configuredSizes: ["30", "32", "34", "36", "38", "XS", "S", "M", "L", "XL", "XXL"],
   },
   {
     id: "byr-03",
@@ -468,6 +609,8 @@ export const MM_BUYERS_MASTER: MMBuyerMaster[] = [
       { id: "sty-ms-01", styleNo: "MS-KT-5520", description: "Men Pique Polo Shirt", garmentItem: "Polo Shirt" },
       { id: "sty-ms-02", styleNo: "MS-WV-7710", description: "Non-Iron Formal Shirt", garmentItem: "Dress Shirt" },
     ],
+    sizeRanges: ["8 TO 20", "8-18", "10-20", "S TO XL", "8, 10, 12, 14, 16, 18, 20"],
+    configuredSizes: ["8", "10", "12", "14", "16", "18", "20", "S", "M", "L", "XL"],
   },
   {
     id: "byr-04",
@@ -481,6 +624,8 @@ export const MM_BUYERS_MASTER: MMBuyerMaster[] = [
     styles: [
       { id: "sty-nx-01", styleNo: "NX-KT-3341", description: "Kids Striped Cotton Jumper", garmentItem: "Crewneck Tee" },
     ],
+    sizeRanges: ["6 TO 18", "8 TO 16", "3T TO 7T", "S TO XL", "6, 8, 10, 12, 14, 16, 18"],
+    configuredSizes: ["6", "8", "10", "12", "14", "16", "18", "S", "M", "L", "XL"],
   },
   {
     id: "byr-05",
@@ -494,6 +639,8 @@ export const MM_BUYERS_MASTER: MMBuyerMaster[] = [
     styles: [
       { id: "sty-tg-01", styleNo: "TG-KT-6012", description: "Standard Fit Short Sleeve Crew", garmentItem: "Crewneck Tee" },
     ],
+    sizeRanges: ["S TO XL", "XS TO XXL", "1X TO 3X", "XS, S, M, L, XL, XXL"],
+    configuredSizes: ["XS", "S", "M", "L", "XL", "XXL", "1X", "2X", "3X"],
   },
 ];
 
@@ -1137,6 +1284,9 @@ export interface MMAccessoriesBookingItem {
   sizeOrDimension: string;
   color: string;
   unit: string;
+  marketUnit?: string;
+  conversionFactor?: number;
+  marketQty?: number;
   requiredQty: number;
   bookedQty: number;
   bookedRate: number;
@@ -1179,6 +1329,9 @@ export interface MMAccessoriesBookingSizeDetail {
   gmtQty: number;
   reqQty: number;
   unit: string;
+  marketUnit?: string;
+  conversionFactor?: number;
+  marketQty?: number;
   bookedWastagePct: number;
   bookQty: number;
   storeRcvdQty: number;
@@ -1263,6 +1416,12 @@ export interface MMAccessoriesBooking {
   updatedAt?: string;
 }
 
+export type MMManualBooking = MMAccessoriesBooking;
+export type MMManualBookingLine = MMAccessoriesBookingLine;
+export type MMManualBookingItem = MMAccessoriesBookingItem;
+export type MMManualBookingAllocation = MMAccessoriesBookingAllocation;
+export type MMManualBookingSizeDetail = MMAccessoriesBookingSizeDetail;
+
 // ----------------------------------------------------------------------------
 // 8. PI (Proforma Invoice) Management Model
 // ----------------------------------------------------------------------------
@@ -1344,6 +1503,8 @@ export interface MMProformaInvoice {
   bblcReferenceNo?: string;
   docNo?: string;
   lcReferenceNo?: string;
+  lcNumber?: string;
+  lcId?: string;
   status: PIStatus;
   allocatedBookings: MMPIAllocatedBooking[];
   items: MMPIItem[];
@@ -4651,6 +4812,104 @@ export const INITIAL_MM_AUDIT_LOGS: MMAuditLogEntry[] = [
 ];
 
 // ============================================================================
+// Production File Management Models & Types
+// ============================================================================
+
+export type ProductionFileSourceType = "Confirm Order Entry" | "Pre Costing";
+
+export interface ProductionFilePOItem {
+  id: string;
+  po: string;
+  poQty: number;
+}
+
+export type ProductionFileAttachmentCategory =
+  | "BOM Sheet"
+  | "Trims Layout"
+  | "CAD Marker"
+  | "PO Sheet"
+  | "Sample Comments / TechPack / Measurement Sheet"
+  | "Embellishment"
+  | "Others";
+
+export const PRODUCTION_FILE_ATTACHMENT_CATEGORIES: ProductionFileAttachmentCategory[] = [
+  "BOM Sheet",
+  "Trims Layout",
+  "CAD Marker",
+  "PO Sheet",
+  "Sample Comments / TechPack / Measurement Sheet",
+  "Embellishment",
+  "Others",
+];
+
+export interface ProductionFileAttachment {
+  id: string;
+  category: ProductionFileAttachmentCategory;
+  fileName: string;
+  fileSize: string;
+  fileType: string;
+  uploadDate: string;
+  fileUrl?: string;
+  version?: number;
+  isNewInAmendment?: boolean;
+  title?: string;
+  note?: string;
+  uploadedBy?: string;
+}
+
+export type ProductionFileStatus = "Draft" | "Submitted" | "Approved" | "Rejected";
+
+export interface ProductionFileApprovalHistory {
+  id: string;
+  timestamp: string;
+  action: "Created" | "Submitted" | "Approved" | "Rejected" | "Resubmitted" | "Draft Saved";
+  userName: string;
+  userRole?: string;
+  comments?: string;
+  rejectionReason?: string;
+}
+
+export interface MMProductionFileRecord {
+  id: string;
+  fileRefNo: string;
+  sourceType: ProductionFileSourceType;
+  sourceRecordId: string;
+  sourceReference: string; // The selected Job ID or Pre Costing No
+  jobNo: string;
+  preCostNo?: string;
+  styleNo: string;
+  styleDescription?: string;
+  buyerName?: string;
+  season?: string;
+  poItems: ProductionFilePOItem[];
+  totalPoQty: number;
+  attachments: ProductionFileAttachment[];
+  status: ProductionFileStatus;
+  notes?: string;
+  createdBy: string;
+  createdDate: string;
+  lastUpdatedBy?: string;
+  lastUpdatedDate?: string;
+  submittedBy?: string;
+  submittedDate?: string;
+  approvedBy?: string;
+  approvedDate?: string;
+  approvalComments?: string;
+  rejectedBy?: string;
+  rejectedDate?: string;
+  rejectionReason?: string;
+  // Versioning and Amendment fields
+  version: number;
+  versionType: "Original" | "Amendment";
+  isCurrentActive: boolean;
+  parentFileId?: string;
+  previousVersionId?: string;
+  amendmentReason?: string;
+  amendmentChangeSummary?: string;
+  history: ProductionFileApprovalHistory[];
+}
+
+// ============================================================================
 // LocalStorage Persistence Service & Repository
 // ============================================================================
 
@@ -4671,6 +4930,14 @@ const STORAGE_KEYS = {
   ACCESSORIES_ESTIMATIONS: "cripton_mm_accessories_estimations_v1",
   FABRIC_MASTER: "cripton_mm_fabric_master_v1",
   SUPPLIERS_MASTER: "cripton_mm_suppliers_master_v1",
+  SEASONS_MASTER: "cripton_mm_seasons_master_v1",
+  ACCESSORIES_MASTER: "cripton_mm_accessories_master_v1",
+  PRE_COSTING_ATTACHMENTS: "cripton_mm_pre_costing_attachments_v1",
+  FABRIC_CONSUMPTION_CAD: "cripton_mm_fabric_consumption_cad_v1",
+  PRODUCTION_FILES: "cripton_mm_production_files_v1",
+  ORDER_ENTRY_UI_STATE: "cripton_mm_order_entry_ui_state_v1",
+  ORDER_ENTRY_DRAFT: "cripton_mm_order_entry_draft_v1",
+  MANUAL_BOOKINGS: "cripton_mm_manual_bookings_v1",
 };
 
 export class MMRepository {
@@ -4771,7 +5038,7 @@ export class MMRepository {
     };
 
     const v2Orders = this.get<MMMainOrder[] | null>(STORAGE_KEYS.ORDERS_V2, null);
-    if (v2Orders && Array.isArray(v2Orders) && v2Orders.length > 0) {
+    if (v2Orders !== null && Array.isArray(v2Orders)) {
       let changed = false;
       const enriched = v2Orders.map((o) => {
         const res = enrichJobNo(o);
@@ -4799,14 +5066,24 @@ export class MMRepository {
       return merged;
     }
     this.set(STORAGE_KEYS.ORDERS_V2, INITIAL_MM_ORDERS);
+    this.set(STORAGE_KEYS.ORDERS, INITIAL_MM_ORDERS);
     return INITIAL_MM_ORDERS;
   }
 
   static saveOrder(order: MMMainOrder): void {
     const list = this.getOrders();
-    const idx = list.findIndex((o) => o.id === order.id);
+    const idx = list.findIndex(
+      (o) =>
+        (Boolean(order.id) && o.id === order.id) ||
+        (Boolean(order.orderNo && o.orderNo) && (o.orderNo || "").trim().toUpperCase() === (order.orderNo || "").trim().toUpperCase()) ||
+        (Boolean(order.jobNo && o.jobNo) && (o.jobNo || "").trim().toUpperCase() === (order.jobNo || "").trim().toUpperCase())
+    );
     if (idx >= 0) {
-      list[idx] = order;
+      list[idx] = {
+        ...list[idx],
+        ...order,
+        id: list[idx].id || order.id,
+      };
     } else {
       list.unshift(order);
     }
@@ -4818,6 +5095,44 @@ export class MMRepository {
     const list = this.getOrders().filter((o) => o.id !== orderId);
     this.set(STORAGE_KEYS.ORDERS_V2, list);
     this.set(STORAGE_KEYS.ORDERS, list);
+  }
+
+  static generateOrderNo(): string {
+    const orders = this.getOrders();
+    let maxNum = 42;
+    orders.forEach((o) => {
+      const match = (o.orderNo || "").match(/ORD-\d{4}-(\d+)/);
+      if (match) {
+        const n = parseInt(match[1], 10);
+        if (!isNaN(n) && n > maxNum) maxNum = n;
+      }
+    });
+    const currentYear = new Date().getFullYear();
+    return `ORD-${currentYear}-${String(maxNum + 1).padStart(4, "0")}`;
+  }
+
+  static getOrderEntryUiState(): { activeTab?: "register" | "entry" | "fabric-estimation"; editingOrderId?: string | null } | null {
+    return this.get(STORAGE_KEYS.ORDER_ENTRY_UI_STATE, null);
+  }
+
+  static saveOrderEntryUiState(state: { activeTab?: "register" | "entry" | "fabric-estimation"; editingOrderId?: string | null }): void {
+    this.set(STORAGE_KEYS.ORDER_ENTRY_UI_STATE, state);
+  }
+
+  static getOrderEntryDraft(): any | null {
+    return this.get(STORAGE_KEYS.ORDER_ENTRY_DRAFT, null);
+  }
+
+  static saveOrderEntryDraft(draft: any | null): void {
+    if (draft === null) {
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem(STORAGE_KEYS.ORDER_ENTRY_DRAFT);
+        } catch {}
+      }
+    } else {
+      this.set(STORAGE_KEYS.ORDER_ENTRY_DRAFT, draft);
+    }
   }
 
   // 5. BOMs
@@ -4943,6 +5258,135 @@ export class MMRepository {
       list.unshift(booking);
     }
     this.set(STORAGE_KEYS.ACCESSORIES_BOOKINGS, list);
+  }
+
+  // 7.1 Manual Bookings (Dedicated Independent Storage)
+  static getManualBookings(): MMAccessoriesBooking[] {
+    return this.get<MMAccessoriesBooking[]>(STORAGE_KEYS.MANUAL_BOOKINGS, []);
+  }
+
+  static getManualBookingById(id: string): MMAccessoriesBooking | undefined {
+    const list = this.getManualBookings();
+    return list.find((b) => b.id === id || b.bookingNo === id);
+  }
+
+  static saveManualBooking(booking: MMAccessoriesBooking): void {
+    const list = this.getManualBookings();
+    const idx = list.findIndex((b) => b.id === booking.id || b.bookingNo === booking.bookingNo);
+    if (idx >= 0) {
+      list[idx] = booking;
+    } else {
+      list.unshift(booking);
+    }
+    this.set(STORAGE_KEYS.MANUAL_BOOKINGS, list);
+  }
+
+  static deleteManualBooking(id: string): boolean {
+    const list = this.getManualBookings();
+    const filtered = list.filter((b) => b.id !== id && b.bookingNo !== id);
+    if (filtered.length !== list.length) {
+      this.set(STORAGE_KEYS.MANUAL_BOOKINGS, filtered);
+      return true;
+    }
+    return false;
+  }
+
+  static submitManualBooking(bookingId: string, user: string = "Tanvir Ahmed"): boolean {
+    const list = this.getManualBookings();
+    const booking = list.find((b) => b.id === bookingId || b.bookingNo === bookingId);
+    if (!booking) return false;
+    const prevStatus = booking.status || "Draft";
+    booking.status = "Pending";
+    booking.submittedBy = user;
+    booking.submittedDate = new Date().toISOString();
+    booking.updatedAt = new Date().toISOString();
+    if (!booking.approvalHistory) booking.approvalHistory = [];
+    booking.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: booking.id,
+      bookingNo: booking.bookingNo,
+      action: "Submitted",
+      previousStatus: prevStatus,
+      newStatus: "Pending",
+      performedBy: user,
+      timestamp: new Date().toISOString(),
+      comment: "Submitted for authorization",
+    });
+    this.set(STORAGE_KEYS.MANUAL_BOOKINGS, list);
+    return true;
+  }
+
+  static approveManualBooking(bookingId: string, approver: string = "Authorized Approver", comment?: string): boolean {
+    const list = this.getManualBookings();
+    const booking = list.find((b) => b.id === bookingId || b.bookingNo === bookingId);
+    if (!booking) return false;
+    const prevStatus = booking.status || "Pending";
+    booking.status = "Approved";
+    booking.approvedBy = approver;
+    booking.approvalDate = new Date().toISOString();
+    booking.updatedAt = new Date().toISOString();
+    if (!booking.approvalHistory) booking.approvalHistory = [];
+    booking.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: booking.id,
+      bookingNo: booking.bookingNo,
+      action: "Approved",
+      previousStatus: prevStatus,
+      newStatus: "Approved",
+      performedBy: approver,
+      timestamp: new Date().toISOString(),
+      comment: comment || "Manual Booking officially approved",
+    });
+    this.set(STORAGE_KEYS.MANUAL_BOOKINGS, list);
+    return true;
+  }
+
+  static rejectManualBooking(bookingId: string, approver: string = "Authorized Approver", reason: string): boolean {
+    const list = this.getManualBookings();
+    const booking = list.find((b) => b.id === bookingId || b.bookingNo === bookingId);
+    if (!booking) return false;
+    const prevStatus = booking.status || "Pending";
+    booking.status = "Rejected";
+    booking.rejectionReason = reason;
+    booking.updatedAt = new Date().toISOString();
+    if (!booking.approvalHistory) booking.approvalHistory = [];
+    booking.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: booking.id,
+      bookingNo: booking.bookingNo,
+      action: "Rejected",
+      previousStatus: prevStatus,
+      newStatus: "Rejected",
+      performedBy: approver,
+      timestamp: new Date().toISOString(),
+      comment: reason,
+    });
+    this.set(STORAGE_KEYS.MANUAL_BOOKINGS, list);
+    return true;
+  }
+
+  static returnManualBooking(bookingId: string, approver: string = "Authorized Approver", comment: string): boolean {
+    const list = this.getManualBookings();
+    const booking = list.find((b) => b.id === bookingId || b.bookingNo === bookingId);
+    if (!booking) return false;
+    const prevStatus = booking.status || "Pending";
+    booking.status = "Returned";
+    booking.returnReason = comment;
+    booking.updatedAt = new Date().toISOString();
+    if (!booking.approvalHistory) booking.approvalHistory = [];
+    booking.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: booking.id,
+      bookingNo: booking.bookingNo,
+      action: "Returned",
+      previousStatus: prevStatus,
+      newStatus: "Returned",
+      performedBy: approver,
+      timestamp: new Date().toISOString(),
+      comment: comment,
+    });
+    this.set(STORAGE_KEYS.MANUAL_BOOKINGS, list);
+    return true;
   }
 
   // Fabric Booking Approval Workflow
@@ -5759,6 +6203,396 @@ export class MMRepository {
     }
     this.set(STORAGE_KEYS.SUPPLIERS_MASTER, list);
   }
+
+  // SC / LC Master Selection Library
+  static getSCLCs(): MMSCLCMaster[] {
+    return MM_SC_LC_MASTER;
+  }
+
+  // 16. Seasons Master Selection Library
+  static getSeasons(): MMSeasonMasterItem[] {
+    return this.get<MMSeasonMasterItem[]>(STORAGE_KEYS.SEASONS_MASTER, INITIAL_MM_SEASONS_MASTER);
+  }
+
+  static saveSeason(season: MMSeasonMasterItem): void {
+    const list = this.getSeasons();
+    const idx = list.findIndex((s) => s.id === season.id || s.seasonName.toLowerCase() === season.seasonName.toLowerCase());
+    if (idx >= 0) {
+      list[idx] = season;
+    } else {
+      list.unshift(season);
+    }
+    this.set(STORAGE_KEYS.SEASONS_MASTER, list);
+  }
+
+  // 17. Accessories Master Selection Library
+  static getAccessoriesMaster(): MMAccessoriesMasterItem[] {
+    return this.get<MMAccessoriesMasterItem[]>(STORAGE_KEYS.ACCESSORIES_MASTER, INITIAL_MM_ACCESSORIES_MASTER);
+  }
+
+  static saveAccessoriesMasterItem(item: MMAccessoriesMasterItem): void {
+    const list = this.getAccessoriesMaster();
+    const idx = list.findIndex((a) => a.id === item.id || a.itemCode === item.itemCode);
+    if (idx >= 0) {
+      list[idx] = item;
+    } else {
+      list.unshift(item);
+    }
+    this.set(STORAGE_KEYS.ACCESSORIES_MASTER, list);
+  }
+
+  // 18. Pre Costing Attachments Library
+  static getPreCostingAttachments(preCostId?: string, version?: number): MMPreCostAttachmentRecord[] {
+    const list = this.get<MMPreCostAttachmentRecord[]>(STORAGE_KEYS.PRE_COSTING_ATTACHMENTS, INITIAL_MM_PRE_COST_ATTACHMENTS);
+    if (!preCostId) return list;
+    return list.filter((a) => a.preCostId === preCostId && (version === undefined || a.version === version));
+  }
+
+  static savePreCostingAttachments(attachments: MMPreCostAttachmentRecord[]): void {
+    this.set(STORAGE_KEYS.PRE_COSTING_ATTACHMENTS, attachments);
+  }
+
+  // 19. Fabric Consumption CAD Requests & Responses
+  static getFabricConsumptionCadList(): MMFabricConsumptionCadRecord[] {
+    return this.get<MMFabricConsumptionCadRecord[]>(
+      STORAGE_KEYS.FABRIC_CONSUMPTION_CAD,
+      INITIAL_MM_FABRIC_CONSUMPTION_CAD
+    );
+  }
+
+  static saveFabricConsumptionCadList(list: MMFabricConsumptionCadRecord[]): void {
+    this.set(STORAGE_KEYS.FABRIC_CONSUMPTION_CAD, list);
+  }
+
+  static getFabricConsumptionCadById(id: string): MMFabricConsumptionCadRecord | null {
+    const list = this.getFabricConsumptionCadList();
+    return list.find((item) => item.id === id || item.requestNo === id) || null;
+  }
+
+  static saveFabricConsumptionCadRecord(record: MMFabricConsumptionCadRecord): void {
+    const list = this.getFabricConsumptionCadList();
+    const index = list.findIndex((item) => item.id === record.id);
+    if (index >= 0) {
+      list[index] = record;
+    } else {
+      list.unshift(record);
+    }
+    this.saveFabricConsumptionCadList(list);
+  }
+
+  static deleteFabricConsumptionCadRecord(id: string): void {
+    const list = this.getFabricConsumptionCadList();
+    const filtered = list.filter((item) => item.id !== id);
+    this.saveFabricConsumptionCadList(filtered);
+  }
+
+  static getCadBodyParts(): string[] {
+    return this.get<string[]>("cripton_cad_body_parts_master_v1", DEFAULT_CAD_BODY_PARTS);
+  }
+
+  static addCadBodyPart(name: string): boolean {
+    const trimmed = name.trim();
+    if (!trimmed) return false;
+    const current = this.getCadBodyParts();
+    const exists = current.some((p) => p.toLowerCase() === trimmed.toLowerCase());
+    if (exists) return false;
+    const updated = [...current, trimmed];
+    this.set("cripton_cad_body_parts_master_v1", updated);
+    return true;
+  }
+
+  static getBuyerConfiguredSizes(buyerName: string): { sizeRanges: string[]; configuredSizes: string[] } {
+    const buyer = MM_BUYERS_MASTER.find((b) => b.name === buyerName);
+    if (buyer) {
+      return {
+        sizeRanges: buyer.sizeRanges || ["S TO XL"],
+        configuredSizes: buyer.configuredSizes || ["S", "M", "L", "XL"],
+      };
+    }
+    return {
+      sizeRanges: ["S TO L", "S TO XL", "XS TO XXL"],
+      configuredSizes: ["S", "M", "L", "XL"],
+    };
+  }
+
+  // 20. Production File Management
+  static getProductionFiles(): MMProductionFileRecord[] {
+    return this.get<MMProductionFileRecord[]>(
+      STORAGE_KEYS.PRODUCTION_FILES,
+      INITIAL_MM_PRODUCTION_FILES
+    );
+  }
+
+  static saveProductionFiles(list: MMProductionFileRecord[]): void {
+    this.set(STORAGE_KEYS.PRODUCTION_FILES, list);
+  }
+
+  static getProductionFileById(id: string): MMProductionFileRecord | null {
+    const list = this.getProductionFiles();
+    return list.find((item) => item.id === id || item.fileRefNo === id) || null;
+  }
+
+  static saveProductionFile(record: MMProductionFileRecord): void {
+    const list = this.getProductionFiles();
+    const index = list.findIndex((item) => item.id === record.id || item.fileRefNo === record.fileRefNo);
+    if (index >= 0) {
+      list[index] = record;
+    } else {
+      list.unshift(record);
+    }
+    this.saveProductionFiles(list);
+  }
+
+  static deleteProductionFile(id: string): void {
+    const list = this.getProductionFiles();
+    const filtered = list.filter((item) => item.id !== id && item.fileRefNo !== id);
+    this.saveProductionFiles(filtered);
+  }
+
+  static approveProductionFile(id: string, approverName: string, comments?: string): boolean {
+    const list = this.getProductionFiles();
+    const index = list.findIndex((item) => item.id === id || item.fileRefNo === id);
+    if (index === -1) return false;
+    const item = list[index];
+    if (item.status === "Approved") return false;
+    const now = new Date().toISOString().replace("T", " ").substring(0, 16);
+    
+    // If approving an amendment, deactivate previous versions in this file group
+    const rootRef = item.parentFileId || item.fileRefNo;
+    list.forEach((r) => {
+      if ((r.fileRefNo === rootRef || r.parentFileId === rootRef) && r.id !== item.id) {
+        r.isCurrentActive = false;
+      }
+    });
+
+    item.status = "Approved";
+    item.isCurrentActive = true;
+    item.approvedBy = approverName;
+    item.approvedDate = now;
+    item.approvalComments = comments || "";
+    item.history = [
+      ...(item.history || []),
+      {
+        id: "pfh-" + Date.now(),
+        timestamp: now,
+        action: "Approved",
+        userName: approverName,
+        userRole: "Production Approver",
+        comments: comments || (item.versionType === "Amendment" ? `Approved Amendment Version ${item.version}` : "Approved for production file release"),
+      },
+    ];
+    this.saveProductionFiles(list);
+    return true;
+  }
+
+  static rejectProductionFile(id: string, approverName: string, reason: string): boolean {
+    const list = this.getProductionFiles();
+    const index = list.findIndex((item) => item.id === id || item.fileRefNo === id);
+    if (index === -1) return false;
+    const item = list[index];
+    const now = new Date().toISOString().replace("T", " ").substring(0, 16);
+    item.status = "Rejected";
+    item.isCurrentActive = false;
+    item.rejectedBy = approverName;
+    item.rejectedDate = now;
+    item.rejectionReason = reason;
+
+    // If an amendment is rejected, ensure the previously approved version remains isCurrentActive = true
+    if (item.versionType === "Amendment" && item.previousVersionId) {
+      const prev = list.find((r) => r.id === item.previousVersionId);
+      if (prev && prev.status === "Approved") {
+        prev.isCurrentActive = true;
+      }
+    }
+
+    item.history = [
+      ...(item.history || []),
+      {
+        id: "pfh-" + Date.now(),
+        timestamp: now,
+        action: "Rejected",
+        userName: approverName,
+        userRole: "Production Approver",
+        rejectionReason: reason,
+        comments: reason,
+      },
+    ];
+    this.saveProductionFiles(list);
+    return true;
+  }
+
+  static createAmendment(baseApprovedRecordId: string, amendmentReason: string, userName: string): MMProductionFileRecord | null {
+    const list = this.getProductionFiles();
+    const baseRecord = list.find((item) => item.id === baseApprovedRecordId);
+    if (!baseRecord || baseRecord.status !== "Approved") return null;
+
+    // Check if there is already a pending amendment for this file
+    const rootRef = baseRecord.parentFileId || baseRecord.fileRefNo;
+    const hasPending = list.some(
+      (r) =>
+        (r.fileRefNo === rootRef || r.parentFileId === rootRef) &&
+        (r.status === "Submitted" || r.status === "Draft") &&
+        r.versionType === "Amendment"
+    );
+    if (hasPending) {
+      return null;
+    }
+
+    const allRelated = list.filter((r) => r.fileRefNo === rootRef || r.parentFileId === rootRef);
+    const maxVersion = Math.max(...allRelated.map((r) => r.version || 1), 1);
+    const nextVersion = maxVersion + 1;
+    const now = new Date().toISOString().replace("T", " ").substring(0, 16);
+
+    // Deep clone attachments, keeping them marked with their original version
+    const baseAttachments: ProductionFileAttachment[] = (baseRecord.attachments || []).map((att) => ({
+      ...att,
+      version: att.version || baseRecord.version || 1,
+      isNewInAmendment: false,
+    }));
+
+    const newAmendmentRecord: MMProductionFileRecord = {
+      id: `pf-rec-amd-${Date.now()}`,
+      fileRefNo: rootRef,
+      version: nextVersion,
+      versionType: "Amendment",
+      isCurrentActive: false,
+      parentFileId: rootRef,
+      previousVersionId: baseRecord.id,
+      amendmentReason,
+      sourceType: baseRecord.sourceType,
+      sourceRecordId: baseRecord.sourceRecordId,
+      sourceReference: baseRecord.sourceReference,
+      jobNo: baseRecord.jobNo,
+      preCostNo: baseRecord.preCostNo,
+      styleNo: baseRecord.styleNo,
+      styleDescription: baseRecord.styleDescription,
+      buyerName: baseRecord.buyerName,
+      season: baseRecord.season,
+      poItems: [...baseRecord.poItems],
+      totalPoQty: baseRecord.totalPoQty,
+      attachments: baseAttachments,
+      status: "Draft",
+      notes: baseRecord.notes || "",
+      createdBy: userName,
+      createdDate: now,
+      history: [
+        ...(baseRecord.history || []),
+        {
+          id: "pfh-" + Date.now(),
+          timestamp: now,
+          action: "Created",
+          userName,
+          userRole: "Merchandiser",
+          comments: `Amendment Version ${nextVersion} initialized. Reason: ${amendmentReason}`,
+        },
+      ],
+    };
+
+    list.unshift(newAmendmentRecord);
+    this.saveProductionFiles(list);
+    return newAmendmentRecord;
+  }
+
+  static getVersionHistory(fileRefNoOrId: string): MMProductionFileRecord[] {
+    const list = this.getProductionFiles();
+    const target = list.find((r) => r.id === fileRefNoOrId || r.fileRefNo === fileRefNoOrId);
+    if (!target) return [];
+    const rootRef = target.parentFileId || target.fileRefNo;
+    return list
+      .filter((r) => r.fileRefNo === rootRef || r.parentFileId === rootRef)
+      .sort((a, b) => (b.version || 1) - (a.version || 1));
+  }
+
+  static getSourceOptionsForProductionFile(): {
+    confirmOrders: Array<{
+      id: string;
+      jobNo: string;
+      orderNo: string;
+      styleNo: string;
+      buyerName: string;
+      season: string;
+      preCostId?: string;
+      totalQty: number;
+      poItems: ProductionFilePOItem[];
+    }>;
+    preCostings: Array<{
+      id: string;
+      preCostNo: string;
+      jobNo: string;
+      styleNo: string;
+      buyerName: string;
+      season: string;
+      totalQty: number;
+      poItems: ProductionFilePOItem[];
+    }>;
+  } {
+    const orders = this.getOrders();
+    const confirmOrders = orders.map((o) => {
+      const jobNo = o.jobNo || o.orderNo || `JOB-${o.id}`;
+      const poItems: ProductionFilePOItem[] = [];
+      if (o.poDetails && o.poDetails.length > 0) {
+        o.poDetails.forEach((p, idx) => {
+          poItems.push({
+            id: p.id || `po-${idx + 1}`,
+            po: p.poNumber || p.po || `PO-${idx + 1}`,
+            poQty: Number(p.qty) || 0,
+          });
+        });
+      } else if (o.buyerPoNumber) {
+        poItems.push({
+          id: `po-${o.id}`,
+          po: o.buyerPoNumber,
+          poQty: Number(o.orderQuantity) || 0,
+        });
+      }
+      const totalQty = poItems.reduce((acc, curr) => acc + curr.poQty, 0) || Number(o.orderQuantity) || 0;
+      return {
+        id: o.id,
+        jobNo,
+        orderNo: o.orderNo,
+        styleNo: o.styleNo || "",
+        buyerName: o.buyerName || "",
+        season: o.season || "",
+        preCostId: o.preCostId,
+        totalQty,
+        poItems,
+      };
+    });
+
+    const preCosts = this.getPreCostings();
+    const preCostings = preCosts.map((pc) => {
+      const preCostNo = pc.preCostNo || pc.preCostId || `PC-${pc.id}`;
+      const poItems: ProductionFilePOItem[] = [];
+      if (pc.poRows && pc.poRows.length > 0) {
+        pc.poRows.forEach((r, idx) => {
+          poItems.push({
+            id: r.id || `pc-po-${idx + 1}`,
+            po: r.poNumber || `PO-PC-${idx + 1}`,
+            poQty: Number(r.poQuantity) || 0,
+          });
+        });
+      } else if (pc.contractNo) {
+        poItems.push({
+          id: `pc-po-${pc.id}`,
+          po: pc.contractNo,
+          poQty: Number(pc.orderQuantity || pc.gmtQty || 0),
+        });
+      }
+      const totalQty = poItems.reduce((acc, curr) => acc + curr.poQty, 0) || Number(pc.orderQuantity || pc.gmtQty || 0);
+      return {
+        id: pc.id,
+        preCostNo,
+        jobNo: pc.jobNo || "",
+        styleNo: pc.styleNo || pc.style || "",
+        buyerName: pc.buyerName || pc.buyer || "",
+        season: pc.season || "",
+        totalQty,
+        poItems,
+      };
+    });
+
+    return { confirmOrders, preCostings };
+  }
 }
 
 export const INITIAL_MM_FABRIC_MASTER: MMFabricMasterItem[] = [
@@ -6004,5 +6838,1209 @@ export const INITIAL_MM_SUPPLIERS_MASTER: MMSupplierMasterItem[] = [
     phone: "+880 1719-012345",
     email: "bdinfo@averydennison.com",
     status: "Active",
+  },
+];
+
+// ----------------------------------------------------------------------------
+// Season Master Model & Seed Data
+// ----------------------------------------------------------------------------
+export interface MMSeasonMasterItem {
+  id: string;
+  seasonName: string;
+  code?: string;
+  status: "Active" | "Inactive";
+}
+
+export const INITIAL_MM_SEASONS_MASTER: MMSeasonMasterItem[] = [
+  { id: "sea-01", seasonName: "Autumn / Winter 2026", code: "AW26", status: "Active" },
+  { id: "sea-02", seasonName: "Spring / Summer 2027", code: "SS27", status: "Active" },
+  { id: "sea-03", seasonName: "Summer 2026", code: "SU26", status: "Active" },
+  { id: "sea-04", seasonName: "Spring 2026", code: "SP26", status: "Active" },
+  { id: "sea-05", seasonName: "Fall 2026", code: "FA26", status: "Active" },
+  { id: "sea-06", seasonName: "Winter 2026", code: "WI26", status: "Active" },
+  { id: "sea-07", seasonName: "ANS-SS27", code: "ANS-SS27", status: "Active" },
+  { id: "sea-08", seasonName: "AW25", code: "AW25", status: "Active" },
+  { id: "sea-09", seasonName: "AW26MC", code: "AW26MC", status: "Active" },
+];
+
+// ----------------------------------------------------------------------------
+// Accessories Master Model & Seed Data
+// ----------------------------------------------------------------------------
+export interface MMAccessoriesMasterItem {
+  id: string;
+  itemCode: string;
+  itemName: string;
+  category: "Sewing Trims" | "Finishing Trims" | "Wash" | "Accessories";
+  description: string;
+  unit: string;
+  defaultRate?: number;
+}
+
+export const INITIAL_MM_ACCESSORIES_MASTER: MMAccessoriesMasterItem[] = [
+  // Sewing Trims
+  {
+    id: "acc-m-001",
+    itemCode: "ACC-BTN-01",
+    itemName: "18L 4-Hole Pearl Button (11.5mm)",
+    category: "Sewing Trims",
+    description: "Engraved Pearl Finish 18L Button (11.5mm) 4-Hole",
+    unit: "Pcs",
+    defaultRate: 0.015,
+  },
+  {
+    id: "acc-m-002",
+    itemCode: "ACC-BTN-02",
+    itemName: "24L Metal Shank Button (Antique Brass)",
+    category: "Sewing Trims",
+    description: "Embossed antique brass jeans shank button",
+    unit: "Pcs",
+    defaultRate: 0.035,
+  },
+  {
+    id: "acc-m-003",
+    itemCode: "ACC-BTN-03",
+    itemName: "20L Horn Finish Button",
+    category: "Sewing Trims",
+    description: "Horn finish 20L 4-hole tailored button",
+    unit: "Pcs",
+    defaultRate: 0.022,
+  },
+  {
+    id: "acc-m-004",
+    itemCode: "ACC-THD-01",
+    itemName: "Astra 40/2 Spun Poly Sewing Thread",
+    category: "Sewing Trims",
+    description: "Astra 40/2 high tenacity 5000M spool sewing thread",
+    unit: "Cone",
+    defaultRate: 1.85,
+  },
+  {
+    id: "acc-m-005",
+    itemCode: "TRM-THR-01",
+    itemName: "Poly Core Spun 50/2 Sewing Thread",
+    category: "Sewing Trims",
+    description: "High strength poly-core spun thread for overlock & seam",
+    unit: "Cone",
+    defaultRate: 2.10,
+  },
+  {
+    id: "acc-m-006",
+    itemCode: "ACC-ZIP-01",
+    itemName: "#5 Brass Metal Zipper Closed End 18cm",
+    category: "Sewing Trims",
+    description: "YKK type #5 antique brass metal teeth zipper",
+    unit: "Pcs",
+    defaultRate: 0.28,
+  },
+  {
+    id: "acc-m-007",
+    itemCode: "ACC-ELAS-01",
+    itemName: "Woven Elastic Tape 1.5 Inch",
+    category: "Sewing Trims",
+    description: "High recovery polyester/latex woven elastic webbing",
+    unit: "Yds",
+    defaultRate: 0.18,
+  },
+  {
+    id: "acc-m-008",
+    itemCode: "ACC-TWL-01",
+    itemName: "Cotton Twill Tape 10mm Herringbone",
+    category: "Sewing Trims",
+    description: "100% natural cotton herringbone twill binding tape",
+    unit: "Yds",
+    defaultRate: 0.08,
+  },
+  {
+    id: "acc-m-009",
+    itemCode: "ACC-INT-01",
+    itemName: "Fusible Interlining 100% Microdot",
+    category: "Sewing Trims",
+    description: "Woven PES coating collar and placket fusible interlining",
+    unit: "Yds",
+    defaultRate: 0.45,
+  },
+
+  // Finishing Trims
+  {
+    id: "acc-m-010",
+    itemCode: "ACC-LBL-01",
+    itemName: "Center Fold Woven Main Label (25x55mm)",
+    category: "Finishing Trims",
+    description: "High definition damask woven brand neck label",
+    unit: "Pcs",
+    defaultRate: 0.045,
+  },
+  {
+    id: "acc-m-011",
+    itemCode: "ACC-LBL-02",
+    itemName: "Satin Care & Composition Label with Barcode",
+    category: "Finishing Trims",
+    description: "Thermal transfer printed soft satin wash care label",
+    unit: "Pcs",
+    defaultRate: 0.025,
+  },
+  {
+    id: "acc-m-012",
+    itemCode: "ACC-LBL-03",
+    itemName: "Heat Transfer Neck Label (Tagless)",
+    category: "Finishing Trims",
+    description: "Eco-friendly screen printed tagless transfer label",
+    unit: "Pcs",
+    defaultRate: 0.038,
+  },
+  {
+    id: "acc-m-013",
+    itemCode: "ACC-TAG-01",
+    itemName: "FSC Certified Recycled Hang Tag",
+    category: "Finishing Trims",
+    description: "350 GSM craft paper hangtag with wax cotton string & seal",
+    unit: "Pcs",
+    defaultRate: 0.065,
+  },
+  {
+    id: "acc-m-014",
+    itemCode: "ACC-PAC-01",
+    itemName: "Self-Adhesive Poly Bag 12x18 inch (0.05mm)",
+    category: "Finishing Trims",
+    description: "Recycled LDPE transparent garment poly bag with warning text",
+    unit: "Pcs",
+    defaultRate: 0.042,
+  },
+  {
+    id: "acc-m-015",
+    itemCode: "ACC-CTN-01",
+    itemName: "7-Ply Master Corrugated Shipping Carton",
+    category: "Finishing Trims",
+    description: "Heavy duty export master shipping carton (60x40x35 cm)",
+    unit: "Pcs",
+    defaultRate: 1.65,
+  },
+  {
+    id: "acc-m-016",
+    itemCode: "ACC-SIL-01",
+    itemName: "Silica Gel Desiccant Packet 2g",
+    category: "Finishing Trims",
+    description: "Non-toxic moisture absorber packet for export carton",
+    unit: "Pcs",
+    defaultRate: 0.012,
+  },
+
+  // Wash Treatments
+  {
+    id: "acc-m-017",
+    itemCode: "WSH-ENZ-01",
+    itemName: "Enzyme Silicon Bio-Wash Treatment",
+    category: "Wash",
+    description: "Cellulase bio-polishing wash with silicone softener handle",
+    unit: "Pcs",
+    defaultRate: 0.15,
+  },
+  {
+    id: "acc-m-018",
+    itemCode: "WSH-CHINO-01",
+    itemName: "Garment Enzyme Wash with Softener",
+    category: "Wash",
+    description: "Neutral enzyme stone-less wash for casual twills & chinos",
+    unit: "Pcs",
+    defaultRate: 0.22,
+  },
+  {
+    id: "acc-m-019",
+    itemCode: "WSH-ACID-01",
+    itemName: "Acid Wash & Vintage Tinting Treatment",
+    category: "Wash",
+    description: "Permanganate spray vintage contrast marble wash",
+    unit: "Pcs",
+    defaultRate: 0.35,
+  },
+  {
+    id: "acc-m-020",
+    itemCode: "WSH-BLEACH-01",
+    itemName: "Light Bleach with Neutralizer Wash",
+    category: "Wash",
+    description: "Controlled hypochlorite bleach with anti-chlor neutralization",
+    unit: "Pcs",
+    defaultRate: 0.18,
+  },
+];
+
+// ----------------------------------------------------------------------------
+// Pre Costing Attachments Model & Seed Data
+// ----------------------------------------------------------------------------
+export interface MMPreCostAttachmentRecord {
+  id: string;
+  preCostId: string;
+  version: number;
+  fileName: string;
+  title: string;
+  documentType?: string;
+  note: string;
+  fileSize: string;
+  fileSizeBytes: number;
+  uploadedBy: string;
+  uploadTime: string;
+  storageType: "file" | "image";
+  dataUrl?: string;
+}
+
+export const INITIAL_MM_PRE_COST_ATTACHMENTS: MMPreCostAttachmentRecord[] = [
+  {
+    id: "pca-001",
+    preCostId: "PC-2026-001",
+    version: 1,
+    fileName: "HM_KT_8841_TechPack_v2.pdf",
+    title: "Buyer Approved Style Tech Pack v2",
+    documentType: "Technical Spec Sheet",
+    note: "Specification sheet with measurement specs and seam tolerances",
+    fileSize: "2.4 MB",
+    fileSizeBytes: 2516582,
+    uploadedBy: "Tanvir Ahmed (Merchandiser)",
+    uploadTime: "2026-09-15 11:20",
+    storageType: "file",
+  },
+  {
+    id: "pca-002",
+    preCostId: "PC-2026-001",
+    version: 1,
+    fileName: "Henley_Front_Back_CAD_Sketch.png",
+    title: "Henley Neckline CAD & Flat Sketch",
+    documentType: "Technical Spec Sheet",
+    note: "Front 3-button placket detail and ribbed neckline construction",
+    fileSize: "1.1 MB",
+    fileSizeBytes: 1153433,
+    uploadedBy: "Tanvir Ahmed (Merchandiser)",
+    uploadTime: "2026-09-15 11:35",
+    storageType: "image",
+    dataUrl:
+      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'><rect width='400' height='300' fill='%23f1f5f9'/><path d='M140,80 Q200,120 260,80 L310,130 L270,160 L260,260 L140,260 L130,160 L90,130 Z' fill='%23cbd5e1' stroke='%23475569' stroke-width='3'/><path d='M180,95 L180,160 L220,160 L220,95' fill='%23ffffff' stroke='%23475569' stroke-width='2'/><circle cx='200' cy='110' r='3' fill='%23334155'/><circle cx='200' cy='130' r='3' fill='%23334155'/><circle cx='200' cy='150' r='3' fill='%23334155'/><text x='200' y='285' font-family='sans-serif' font-size='12' font-weight='bold' text-anchor='middle' fill='%23475569'>Henley T-Shirt Flat CAD</text></svg>",
+  },
+  {
+    id: "pca-003",
+    preCostId: "PC-2026-001",
+    version: 1,
+    fileName: "Verdant_Green_Rib_Swatch_Scan.jpg",
+    title: "Fabric Swatch — Verdant Green Rib",
+    documentType: "Lab Dip Approval",
+    note: "Approved shade matching Pantone 18-5616 TCX under D65 / TL84",
+    fileSize: "890 KB",
+    fileSizeBytes: 911360,
+    uploadedBy: "Tanvir Ahmed (Merchandiser)",
+    uploadTime: "2026-09-15 11:45",
+    storageType: "image",
+    dataUrl:
+      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'><rect width='400' height='300' fill='%2322543d'/><pattern id='rib' width='10' height='10' patternUnits='userSpaceOnUse'><line x1='0' y1='0' x2='0' y2='10' stroke='%23276749' stroke-width='4'/></pattern><rect width='400' height='300' fill='url(%23rib)'/><rect x='30' y='210' width='340' height='60' rx='8' fill='%23ffffff' opacity='0.9'/><text x='200' y='235' font-family='sans-serif' font-size='13' font-weight='bold' text-anchor='middle' fill='%231a202c'>2x2 Rib Swatch — Verdant Green</text><text x='200' y='255' font-family='sans-serif' font-size='11' text-anchor='middle' fill='%234a5568'>100% Cotton Bio-Washed 220 GSM</text></svg>",
+  },
+];
+
+// ============================================================================
+// Fabric Consumption (CAD) Workflow Models & Seed Data
+// Based on APEROL-BASEBALL-JACKET.xltx Approved Structure
+// ============================================================================
+
+export type MMCadCalculationMode = "Auto" | "Manual";
+export type MMCadDiaMake = "OPEN" | "TUBE";
+export type MMCadRequestStatus = "Draft" | "Pending CAD" | "In Progress" | "CAD Submitted" | "Closed";
+export type MMCadResponseStatus = "Not Received" | "In Progress" | "Received";
+
+export interface MMCadItemRow {
+  id: string;
+  sl: number;
+  bodyPart: string;
+  markerLength: number;
+  diaFinish: number;
+  diaCut: number; // Formula: diaFinish - cuttableFinish
+  markerQty: number;
+  fabricGsm: number;
+  calculationMode: MMCadCalculationMode; // "Auto" | "Manual" (Default: "Auto")
+  finishKgConsumption: number; // Auto: (markerLength * diaFinish * fabricGsm / law / markerQty) * condumption
+  waste10Consumption: number; // Formula: finishKgConsumption * 1.1
+  diaMake: MMCadDiaMake; // "OPEN" | "TUBE"
+  law: number; // Default: 1550
+  condumption: number; // 12 for DZ, 1 for PCS (Default: 12)
+  cuttableFinish: number; // Default: 2
+  consumptionRatio: number; // Formula: row finishKgConsumption / totalFinishKg * 100
+  remarks?: string;
+}
+
+export interface MMFabricConsumptionAttachment {
+  id: string;
+  requestId: string;
+  fileName: string;
+  title: string;
+  documentType?: string;
+  note?: string;
+  fileSize: string;
+  fileSizeBytes?: number;
+  uploadedBy: string;
+  uploadedRole?: "Merchant" | "CAD";
+  uploadTime: string;
+  storageType?: "file" | "image";
+  dataUrl?: string;
+}
+
+export interface MMFabricConsumptionCadRecord {
+  id: string;
+  requestNo: string;
+  requestDate: string;
+  jobId: string;
+  buyer: string;
+  styleOrder: string;
+  efficiency: string;
+  sizeRange: string;
+  fabrication: string;
+  season?: string;
+  merchandiser: string;
+  requestRemarks?: string;
+  submittedDate?: string;
+
+  // CAD Response
+  cadAssignedTo?: string;
+  cadResponseDate?: string;
+  cadSubmittedBy?: string;
+  cadSubmissionTimestamp?: string;
+  status: MMCadRequestStatus;
+  cadResponseStatus: MMCadResponseStatus;
+
+  // Detailed CAD calculation data
+  rows: MMCadItemRow[];
+  totalFinishKg: number;
+  totalWaste10Kg: number;
+  wash10Pct: number; // SUM(Waste+10% Consumption)
+  notes?: string;
+  comments?: string;
+
+  // Attached documents from Merchant and CAD teams
+  attachments?: MMFabricConsumptionAttachment[];
+
+  history?: Array<{
+    timestamp: string;
+    user: string;
+    action: string;
+    status: string;
+    notes?: string;
+  }>;
+}
+
+export const DEFAULT_CAD_BODY_PARTS: string[] = [
+  "BODY+PKT+BON+FNL+FAC",
+  "SLEEVE",
+  "UPPER POCKET S/J",
+  "BOTTOM RIB",
+  "CUFF RIB",
+  "NECK RIB",
+  "BACK TAPE S/J",
+];
+
+// Helper to recalculate a single CAD row
+export function calculateCadRow(
+  row: Partial<MMCadItemRow>,
+  totalFinishKg: number = 0
+): MMCadItemRow {
+  const markerLength = Number(row.markerLength) || 0;
+  const diaFinish = Number(row.diaFinish) || 0;
+  const cuttableFinish = row.cuttableFinish !== undefined ? Number(row.cuttableFinish) : 2;
+  const diaCut = Number((diaFinish - cuttableFinish).toFixed(2));
+  const markerQty = Number(row.markerQty) || 1;
+  const fabricGsm = Number(row.fabricGsm) || 0;
+  const law = Number(row.law) || 1550;
+
+  // Condumption: 12 for DZ, 1 for PCS (Default: 12)
+  let condumption = 12;
+  if (row.condumption !== undefined) {
+    if (typeof row.condumption === "string") {
+      condumption = (row.condumption as string).toUpperCase().includes("PCS") || row.condumption === "1" ? 1 : 12;
+    } else {
+      condumption = Number(row.condumption) === 1 ? 1 : 12;
+    }
+  }
+
+  const calculationMode = row.calculationMode || "Auto";
+
+  let finishKgConsumption = 0;
+  let waste10Consumption = 0;
+
+  if (calculationMode === "Auto") {
+    if (law > 0 && markerQty > 0) {
+      finishKgConsumption = Number(
+        (((markerLength * diaFinish * fabricGsm) / law / markerQty) * condumption).toFixed(3)
+      );
+    }
+    waste10Consumption = Number((finishKgConsumption * 1.1).toFixed(3));
+  } else {
+    // In Manual mode, CAD users can manually specify both finishKgConsumption and waste10Consumption
+    finishKgConsumption = Number(Number(row.finishKgConsumption || 0).toFixed(3));
+    waste10Consumption =
+      row.waste10Consumption !== undefined && row.waste10Consumption !== null
+        ? Number(Number(row.waste10Consumption).toFixed(3))
+        : Number((finishKgConsumption * 1.1).toFixed(3));
+  }
+
+  const consumptionRatio =
+    totalFinishKg > 0 ? Number(((finishKgConsumption / totalFinishKg) * 100).toFixed(2)) : 0;
+
+  return {
+    id: row.id || `cad-row-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+    sl: row.sl || 1,
+    bodyPart: row.bodyPart || "BODY",
+    markerLength,
+    diaFinish,
+    diaCut,
+    markerQty,
+    fabricGsm,
+    calculationMode,
+    finishKgConsumption,
+    waste10Consumption,
+    diaMake: row.diaMake || "OPEN",
+    law,
+    condumption,
+    cuttableFinish,
+    consumptionRatio,
+    remarks: row.remarks || "",
+  };
+}
+
+// Helper to recalculate all CAD rows and summary totals
+export function calculateCadTable(rows: MMCadItemRow[]): {
+  rows: MMCadItemRow[];
+  totalFinishKg: number;
+  totalWaste10Kg: number;
+  wash10Pct: number;
+} {
+  // Pass 1: calculate values without ratio
+  const intermediate = rows.map((r, idx) =>
+    calculateCadRow({ ...r, sl: idx + 1 }, 0)
+  );
+
+  const totalFinishKg = Number(
+    intermediate.reduce((acc, r) => acc + (Number(r.finishKgConsumption) || 0), 0).toFixed(3)
+  );
+  const totalWaste10Kg = Number(
+    intermediate.reduce((acc, r) => acc + (Number(r.waste10Consumption) || 0), 0).toFixed(3)
+  );
+  const wash10Pct = totalWaste10Kg; // Per workbook: WASH 10% = SUM(all applicable Waste+10% rows)
+
+  // Pass 2: calculate ratios
+  const finalRows = intermediate.map((r) => ({
+    ...r,
+    consumptionRatio:
+      totalFinishKg > 0
+        ? Number(((r.finishKgConsumption / totalFinishKg) * 100).toFixed(2))
+        : 0,
+  }));
+
+  return {
+    rows: finalRows,
+    totalFinishKg,
+    totalWaste10Kg,
+    wash10Pct,
+  };
+}
+
+// 7 Default Rows from APEROL-BASEBALL-JACKET.xltx
+export const INITIAL_APEROL_CAD_ROWS: MMCadItemRow[] = [
+  {
+    id: "cad-r-01",
+    sl: 1,
+    bodyPart: "BODY+PKT+BON+FNL+FAC",
+    markerLength: 227.0,
+    diaFinish: 72.0,
+    diaCut: 70.0,
+    markerQty: 9,
+    fabricGsm: 370,
+    calculationMode: "Auto",
+    finishKgConsumption: 5201.961,
+    waste10Consumption: 5722.157,
+    diaMake: "OPEN",
+    law: 1550,
+    condumption: 12,
+    cuttableFinish: 2,
+    consumptionRatio: 54.75,
+  },
+  {
+    id: "cad-r-02",
+    sl: 2,
+    bodyPart: "SLEEVE",
+    markerLength: 120.0,
+    diaFinish: 72.0,
+    diaCut: 70.0,
+    markerQty: 9,
+    fabricGsm: 370,
+    calculationMode: "Auto",
+    finishKgConsumption: 2749.935,
+    waste10Consumption: 3024.929,
+    diaMake: "OPEN",
+    law: 1550,
+    condumption: 12,
+    cuttableFinish: 2,
+    consumptionRatio: 28.94,
+  },
+  {
+    id: "cad-r-03",
+    sl: 3,
+    bodyPart: "UPPER POCKET S/J",
+    markerLength: 42.0,
+    diaFinish: 72.0,
+    diaCut: 70.0,
+    markerQty: 18,
+    fabricGsm: 160,
+    calculationMode: "Auto",
+    finishKgConsumption: 208.103,
+    waste10Consumption: 228.914,
+    diaMake: "OPEN",
+    law: 1550,
+    condumption: 12,
+    cuttableFinish: 2,
+    consumptionRatio: 2.19,
+  },
+  {
+    id: "cad-r-04",
+    sl: 4,
+    bodyPart: "BOTTOM RIB",
+    markerLength: 7.5,
+    diaFinish: 44.0,
+    diaCut: 42.0,
+    markerQty: 1,
+    fabricGsm: 350,
+    calculationMode: "Auto",
+    finishKgConsumption: 894.194,
+    waste10Consumption: 983.613,
+    diaMake: "OPEN",
+    law: 1550,
+    condumption: 12,
+    cuttableFinish: 2,
+    consumptionRatio: 9.41,
+  },
+  {
+    id: "cad-r-05",
+    sl: 5,
+    bodyPart: "CUFF RIB",
+    markerLength: 7.5,
+    diaFinish: 44.0,
+    diaCut: 42.0,
+    markerQty: 2,
+    fabricGsm: 350,
+    calculationMode: "Auto",
+    finishKgConsumption: 447.097,
+    waste10Consumption: 491.806,
+    diaMake: "OPEN",
+    law: 1550,
+    condumption: 12,
+    cuttableFinish: 2,
+    consumptionRatio: 4.71,
+  },
+  {
+    id: "cad-r-06",
+    sl: 6,
+    bodyPart: "NECK RIB",
+    markerLength: 5.5,
+    diaFinish: 44.0,
+    diaCut: 42.0,
+    markerQty: 2,
+    fabricGsm: 700,
+    calculationMode: "Manual",
+    finishKgConsumption: 0.642,
+    waste10Consumption: 0.707,
+    diaMake: "OPEN",
+    law: 1550,
+    condumption: 12,
+    cuttableFinish: 2,
+    consumptionRatio: 0.01,
+  },
+  {
+    id: "cad-r-07",
+    sl: 7,
+    bodyPart: "BACK TAPE S/J",
+    markerLength: 0.0,
+    diaFinish: 72.0,
+    diaCut: 70.0,
+    markerQty: 12,
+    fabricGsm: 160,
+    calculationMode: "Manual",
+    finishKgConsumption: 0.04,
+    waste10Consumption: 0.044,
+    diaMake: "OPEN",
+    law: 1550,
+    condumption: 12,
+    cuttableFinish: 2,
+    consumptionRatio: 0.0,
+  },
+];
+
+export const INITIAL_MM_FABRIC_CONSUMPTION_CAD: MMFabricConsumptionCadRecord[] = [
+  // Record 1: The exact APEROL-BASEBALL-JACKET workbook calculation
+  {
+    id: "fcad-rec-001",
+    requestNo: "FCAD-2026-0001",
+    requestDate: "2026-10-24",
+    jobId: "JOB-2026-0081",
+    buyer: "MARLIN MEDIA",
+    styleOrder: "APEROL-BASEBALL-JACKET",
+    efficiency: "85%",
+    sizeRange: "S TO L",
+    fabrication: "BODY+SLV 370 GSM",
+    season: "Autumn / Winter 2026",
+    merchandiser: "Tanvir Ahmed (Merchandiser)",
+    requestRemarks: "Please calculate marker consumption for baseball jacket body, sleeves, rib trims, and pocketing.",
+    submittedDate: "2026-10-24 14:30",
+    cadAssignedTo: "Kazi Mofizul (CAD In-Charge)",
+    cadResponseDate: "2026-10-25 11:15",
+    cadSubmittedBy: "Kazi Mofizul (CAD In-Charge)",
+    cadSubmissionTimestamp: "2026-10-25 11:15",
+    status: "CAD Submitted",
+    cadResponseStatus: "Received",
+    rows: INITIAL_APEROL_CAD_ROWS,
+    totalFinishKg: 9501.972,
+    totalWaste10Kg: 10452.17,
+    wash10Pct: 10452.17,
+    notes: "..",
+    comments: "ONE BODY ONE WAY CUTTING.",
+    attachments: [
+      {
+        id: "att-fcad-001",
+        requestId: "fcad-rec-001",
+        fileName: "APEROL_Baseball_Jacket_Tech_Pack.pdf",
+        title: "Tech Pack & Measurement Specs",
+        documentType: "Buyer Tech Pack",
+        note: "Initial tech pack from Marlin Media with garment construction details",
+        fileSize: "1.2 MB",
+        fileSizeBytes: 1258291,
+        uploadedBy: "Tanvir Ahmed (Merchandiser)",
+        uploadedRole: "Merchant",
+        uploadTime: "2026-10-24 10:20",
+        storageType: "file",
+      },
+      {
+        id: "att-fcad-002",
+        requestId: "fcad-rec-001",
+        fileName: "CAD_Marker_Estimation_Layout_Aperol.pdf",
+        title: "CAD Marker Nesting & Shrinkage Report",
+        documentType: "CAD Marker Report",
+        note: "Generated 7-body part marker with 85% marker efficiency",
+        fileSize: "845 KB",
+        fileSizeBytes: 865280,
+        uploadedBy: "Kazi Mofizul (CAD In-Charge)",
+        uploadedRole: "CAD",
+        uploadTime: "2026-10-25 11:10",
+        storageType: "file",
+      },
+    ],
+    history: [
+      {
+        timestamp: "2026-10-24 10:15",
+        user: "Tanvir Ahmed (Merchandiser)",
+        action: "Request Created",
+        status: "Draft",
+        notes: "Created initial fabric consumption request for APEROL-BASEBALL-JACKET",
+      },
+      {
+        timestamp: "2026-10-24 14:30",
+        user: "Tanvir Ahmed (Merchandiser)",
+        action: "Submitted to CAD",
+        status: "Pending CAD",
+        notes: "Request submitted to CAD queue with fabric specs",
+      },
+      {
+        timestamp: "2026-10-25 09:00",
+        user: "Kazi Mofizul (CAD In-Charge)",
+        action: "CAD Processing Started",
+        status: "In Progress",
+        notes: "Marker nesting and body part breakdown drafted",
+      },
+      {
+        timestamp: "2026-10-25 11:15",
+        user: "Kazi Mofizul (CAD In-Charge)",
+        action: "CAD Response Submitted",
+        status: "CAD Submitted",
+        notes: "Calculated with 7 body-parts, ONE BODY ONE WAY CUTTING. Consumption Received by Merchant.",
+      },
+    ],
+  },
+  // Record 2: Pending CAD response
+  {
+    id: "fcad-rec-002",
+    requestNo: "FCAD-2026-0002",
+    requestDate: "2026-10-26",
+    jobId: "JOB-2026-0042",
+    buyer: "H&M Hennes & Mauritz",
+    styleOrder: "HM-KT-8841",
+    efficiency: "80%",
+    sizeRange: "XS TO XXL",
+    fabrication: "100% Cotton 1x1 Rib 210 GSM",
+    season: "Autumn / Winter 2026",
+    merchandiser: "Tanvir Ahmed (Merchandiser)",
+    requestRemarks: "Ladies Ribbed Henley Neck T-Shirt. Check neckband and placket consumption.",
+    submittedDate: "2026-10-26 09:45",
+    cadAssignedTo: "Nasir Uddin (CAD Specialist)",
+    status: "Pending CAD",
+    cadResponseStatus: "Not Received",
+    rows: [],
+    totalFinishKg: 0,
+    totalWaste10Kg: 0,
+    wash10Pct: 0,
+    notes: "",
+    comments: "",
+    history: [
+      {
+        timestamp: "2026-10-26 09:45",
+        user: "Tanvir Ahmed (Merchandiser)",
+        action: "Submitted to CAD",
+        status: "Pending CAD",
+        notes: "Submitted to CAD department for marker planning",
+      },
+    ],
+  },
+  // Record 3: In Progress (CAD draft saved, awaiting final submission)
+  {
+    id: "fcad-rec-003",
+    requestNo: "FCAD-2026-0003",
+    requestDate: "2026-10-25",
+    jobId: "JOB-2026-0055",
+    buyer: "Zara (Inditex)",
+    styleOrder: "ZR-WV-4019",
+    efficiency: "82%",
+    sizeRange: "30 TO 38",
+    fabrication: "98% Cotton 2% Spandex Twill 280 GSM",
+    season: "Summer 2026",
+    merchandiser: "Nafis Imtiaz (Senior Merchandiser)",
+    requestRemarks: "Men Slim Fit Cotton Twill Chino Trouser. Calculate pocket bags and waistband separately.",
+    submittedDate: "2026-10-25 16:10",
+    cadAssignedTo: "Kazi Mofizul (CAD In-Charge)",
+    status: "In Progress",
+    cadResponseStatus: "In Progress",
+    rows: [
+      {
+        id: "cad-r-03-01",
+        sl: 1,
+        bodyPart: "BODY TROUSER PANELS",
+        markerLength: 180.0,
+        diaFinish: 58.0,
+        diaCut: 56.0,
+        markerQty: 6,
+        fabricGsm: 280,
+        calculationMode: "Auto",
+        finishKgConsumption: 2603.871,
+        waste10Consumption: 2864.258,
+        diaMake: "OPEN",
+        law: 1550,
+        condumption: 12,
+        cuttableFinish: 2,
+        consumptionRatio: 86.84,
+      },
+      {
+        id: "cad-r-03-02",
+        sl: 2,
+        bodyPart: "WAISTBAND",
+        markerLength: 22.0,
+        diaFinish: 58.0,
+        diaCut: 56.0,
+        markerQty: 6,
+        fabricGsm: 280,
+        calculationMode: "Auto",
+        finishKgConsumption: 318.251,
+        waste10Consumption: 350.076,
+        diaMake: "OPEN",
+        law: 1550,
+        condumption: 12,
+        cuttableFinish: 2,
+        consumptionRatio: 10.61,
+      },
+      {
+        id: "cad-r-03-03",
+        sl: 3,
+        bodyPart: "BELT LOOPS",
+        markerLength: 5.3,
+        diaFinish: 58.0,
+        diaCut: 56.0,
+        markerQty: 6,
+        fabricGsm: 280,
+        calculationMode: "Auto",
+        finishKgConsumption: 76.671,
+        waste10Consumption: 84.338,
+        diaMake: "OPEN",
+        law: 1550,
+        condumption: 12,
+        cuttableFinish: 2,
+        consumptionRatio: 2.56,
+      },
+    ],
+    totalFinishKg: 2998.793,
+    totalWaste10Kg: 3298.672,
+    wash10Pct: 3298.672,
+    notes: "CAD draft in progress. Awaiting shrinkage test confirmation from wash lab.",
+    comments: "Marker width 56 inch cuttable.",
+    history: [
+      {
+        timestamp: "2026-10-25 16:10",
+        user: "Nafis Imtiaz (Senior Merchandiser)",
+        action: "Submitted to CAD",
+        status: "Pending CAD",
+      },
+      {
+        timestamp: "2026-10-26 11:30",
+        user: "Kazi Mofizul (CAD In-Charge)",
+        action: "CAD Draft Saved",
+        status: "In Progress",
+        notes: "Preliminary calculations saved as draft (Merchant sees In Progress, Not Received)",
+      },
+    ],
+  },
+  // Record 4: Merchant Draft (Not yet submitted to CAD)
+  {
+    id: "fcad-rec-004",
+    requestNo: "FCAD-2026-0004",
+    requestDate: "2026-10-26",
+    jobId: "JOB-2026-0063",
+    buyer: "Marks & Spencer",
+    styleOrder: "MS-KT-108",
+    efficiency: "85%",
+    sizeRange: "S TO XL",
+    fabrication: "Single Jersey 180 GSM",
+    season: "Spring / Summer 2027",
+    merchandiser: "Tanvir Ahmed (Merchandiser)",
+    requestRemarks: "Draft request for basic crewneck t-shirt.",
+    status: "Draft",
+    cadResponseStatus: "Not Received",
+    rows: [],
+    totalFinishKg: 0,
+    totalWaste10Kg: 0,
+    wash10Pct: 0,
+    notes: "",
+    comments: "",
+    history: [
+      {
+        timestamp: "2026-10-26 14:00",
+        user: "Tanvir Ahmed (Merchandiser)",
+        action: "Draft Created",
+        status: "Draft",
+      },
+    ],
+  },
+];
+
+// ============================================================================
+// Initial MM Production Files (4 Realistic Seed Records)
+// ============================================================================
+export const INITIAL_MM_PRODUCTION_FILES: MMProductionFileRecord[] = [
+  {
+    id: "pf-rec-001",
+    fileRefNo: "PF-2026-0001",
+    version: 1,
+    versionType: "Original",
+    isCurrentActive: true,
+    sourceType: "Confirm Order Entry",
+    sourceRecordId: "ord-001",
+    sourceReference: "JOB-2026-0001",
+    jobNo: "JOB-2026-0001",
+    preCostNo: "PC-2026-001",
+    styleNo: "HM-KT-8841",
+    styleDescription: "Henley T-Shirt - Ladies Casual & Tops",
+    buyerName: "H&M Hennes & Mauritz",
+    season: "Autumn / Winter 2026",
+    poItems: [
+      { id: "po-pf-001-1", po: "PO-HM-99881-A", poQty: 25000 },
+      { id: "po-pf-001-2", po: "PO-HM-99881-B", poQty: 20000 },
+    ],
+    totalPoQty: 45000,
+    attachments: [
+      {
+        id: "att-001-1",
+        category: "BOM Sheet",
+        fileName: "BOM_HM_8841_Final_Approved.pdf",
+        fileSize: "1.8 MB",
+        fileType: "pdf",
+        uploadDate: "2026-10-20 09:40",
+        version: 1,
+      },
+      {
+        id: "att-001-2",
+        category: "Trims Layout",
+        fileName: "Trims_Layout_Card_HM8841.pdf",
+        fileSize: "2.4 MB",
+        fileType: "pdf",
+        uploadDate: "2026-10-20 09:45",
+        version: 1,
+      },
+      {
+        id: "att-001-3",
+        category: "CAD Marker",
+        fileName: "CAD_Marker_Efficiency_86pct_HM8841.xlsx",
+        fileSize: "850 KB",
+        fileType: "xlsx",
+        uploadDate: "2026-10-20 10:00",
+        version: 1,
+      },
+      {
+        id: "att-001-4",
+        category: "PO Sheet",
+        fileName: "Buyer_Official_PO_HM99881.pdf",
+        fileSize: "1.2 MB",
+        fileType: "pdf",
+        uploadDate: "2026-10-20 10:15",
+        version: 1,
+      },
+      {
+        id: "att-001-5",
+        category: "Sample Comments / TechPack / Measurement Sheet",
+        fileName: "TechPack_HM_AW26_Final_Signoff.pdf",
+        fileSize: "5.2 MB",
+        fileType: "pdf",
+        uploadDate: "2026-10-20 10:20",
+        version: 1,
+      },
+      {
+        id: "att-001-6",
+        category: "Embellishment",
+        fileName: "Chest_Placement_Print_Artwork.pdf",
+        fileSize: "980 KB",
+        fileType: "pdf",
+        uploadDate: "2026-10-20 10:30",
+        version: 1,
+      },
+      {
+        id: "att-001-7",
+        category: "Others",
+        fileName: "Fabric_Inspection_GradeA_Certificate.pdf",
+        fileSize: "750 KB",
+        fileType: "pdf",
+        uploadDate: "2026-10-20 10:35",
+        version: 1,
+      },
+    ],
+    status: "Approved",
+    notes: "Production file complete with all 7 signed documents. Marker released to cutting floor Unit-2.",
+    createdBy: "Tanvir Ahmed (Merchandiser)",
+    createdDate: "2026-10-20 09:30",
+    submittedBy: "Tanvir Ahmed (Merchandiser)",
+    submittedDate: "2026-10-21 11:15",
+    approvedBy: "Rafiqul Islam (Production GM)",
+    approvedDate: "2026-10-22 14:00",
+    approvalComments: "Approved for bulk fabric cutting and marker release. Check needle detector calibration before pack.",
+    history: [
+      {
+        id: "pfh-001-1",
+        timestamp: "2026-10-20 09:30",
+        action: "Created",
+        userName: "Tanvir Ahmed (Merchandiser)",
+        userRole: "Merchandiser",
+        comments: "Initial draft created from Confirm Order Entry JOB-2026-0001",
+      },
+      {
+        id: "pfh-001-2",
+        timestamp: "2026-10-21 11:15",
+        action: "Submitted",
+        userName: "Tanvir Ahmed (Merchandiser)",
+        userRole: "Merchandiser",
+        comments: "All 7 attachments verified and submitted for production approval",
+      },
+      {
+        id: "pfh-001-3",
+        timestamp: "2026-10-22 14:00",
+        action: "Approved",
+        userName: "Rafiqul Islam (Production GM)",
+        userRole: "Production Approver",
+        comments: "Approved for bulk fabric cutting and marker release.",
+      },
+    ],
+  },
+  {
+    id: "pf-rec-002",
+    fileRefNo: "PF-2026-0002",
+    version: 1,
+    versionType: "Original",
+    isCurrentActive: true,
+    sourceType: "Pre Costing",
+    sourceRecordId: "pc-002",
+    sourceReference: "PC-2026-002",
+    jobNo: "JOB-2026-0002",
+    preCostNo: "PC-2026-002",
+    styleNo: "ZARA-TR-204",
+    styleDescription: "Casual Chino Pant - Men's Bottoms",
+    buyerName: "Inditex (Zara)",
+    season: "Autumn / Winter 2026",
+    poItems: [
+      { id: "po-pf-002-1", po: "PO-ZR-4401-1", poQty: 18000 },
+      { id: "po-pf-002-2", po: "PO-ZR-4401-2", poQty: 14000 },
+    ],
+    totalPoQty: 32000,
+    attachments: [
+      {
+        id: "att-002-1",
+        category: "BOM Sheet",
+        fileName: "Zara_TR204_BOM_Approved.pdf",
+        fileSize: "2.1 MB",
+        fileType: "pdf",
+        uploadDate: "2026-10-25 10:15",
+        version: 1,
+      },
+      {
+        id: "att-002-2",
+        category: "CAD Marker",
+        fileName: "Zara_Marker_Width58_Ratio.xlsx",
+        fileSize: "1.1 MB",
+        fileType: "xlsx",
+        uploadDate: "2026-10-25 10:30",
+        version: 1,
+      },
+      {
+        id: "att-002-3",
+        category: "PO Sheet",
+        fileName: "Inditex_Official_PO4401.pdf",
+        fileSize: "1.5 MB",
+        fileType: "pdf",
+        uploadDate: "2026-10-25 10:45",
+        version: 1,
+      },
+      {
+        id: "att-002-4",
+        category: "Sample Comments / TechPack / Measurement Sheet",
+        fileName: "Zara_Fit_Comments_Rev2.pdf",
+        fileSize: "3.4 MB",
+        fileType: "pdf",
+        uploadDate: "2026-10-25 11:00",
+        version: 1,
+      },
+    ],
+    status: "Submitted",
+    notes: "Awaiting Production GM approval. Fabric received at warehouse.",
+    createdBy: "Nafis Imtiaz (Senior Merchandiser)",
+    createdDate: "2026-10-25 10:00",
+    submittedBy: "Nafis Imtiaz (Senior Merchandiser)",
+    submittedDate: "2026-10-25 16:45",
+    history: [
+      {
+        id: "pfh-002-1",
+        timestamp: "2026-10-25 10:00",
+        action: "Created",
+        userName: "Nafis Imtiaz (Senior Merchandiser)",
+        userRole: "Merchandiser",
+        comments: "File initialized from Pre Costing PC-2026-002",
+      },
+      {
+        id: "pfh-002-2",
+        timestamp: "2026-10-25 16:45",
+        action: "Submitted",
+        userName: "Nafis Imtiaz (Senior Merchandiser)",
+        userRole: "Merchandiser",
+        comments: "Submitted for approval queue review",
+      },
+    ],
+  },
+  {
+    id: "pf-rec-003",
+    fileRefNo: "PF-2026-0003",
+    version: 1,
+    versionType: "Original",
+    isCurrentActive: false,
+    sourceType: "Confirm Order Entry",
+    sourceRecordId: "ord-003",
+    sourceReference: "JOB-2026-0003",
+    jobNo: "JOB-2026-0003",
+    preCostNo: "PC-2026-003",
+    styleNo: "NK-SP-501",
+    styleDescription: "Sports Hooded Jacket - Athletic Outerwear",
+    buyerName: "Next Sourcing",
+    season: "Autumn / Winter 2026",
+    poItems: [
+      { id: "po-pf-003-1", po: "PO-NX-78901", poQty: 28000 },
+    ],
+    totalPoQty: 28000,
+    attachments: [
+      {
+        id: "att-003-1",
+        category: "BOM Sheet",
+        fileName: "Next_NK501_BOM_v1.pdf",
+        fileSize: "1.5 MB",
+        fileType: "pdf",
+        uploadDate: "2026-10-23 11:10",
+        version: 1,
+      },
+      {
+        id: "att-003-2",
+        category: "CAD Marker",
+        fileName: "CAD_Marker_54in_Draft.xlsx",
+        fileSize: "900 KB",
+        fileType: "xlsx",
+        uploadDate: "2026-10-23 11:20",
+        version: 1,
+      },
+    ],
+    status: "Rejected",
+    notes: "Rejected due to missing trims layout and marker width mismatch. Requires revision before re-submission.",
+    createdBy: "Tanvir Ahmed (Merchandiser)",
+    createdDate: "2026-10-23 11:00",
+    submittedBy: "Tanvir Ahmed (Merchandiser)",
+    submittedDate: "2026-10-23 15:30",
+    rejectedBy: "Rafiqul Islam (Production GM)",
+    rejectedDate: "2026-10-24 10:20",
+    rejectionReason: "Trims layout and Embellishment artwork sheets are missing. CAD marker width does not match fabric cuttable width 56 inch. Please correct and re-submit.",
+    history: [
+      {
+        id: "pfh-003-1",
+        timestamp: "2026-10-23 11:00",
+        action: "Created",
+        userName: "Tanvir Ahmed (Merchandiser)",
+        userRole: "Merchandiser",
+      },
+      {
+        id: "pfh-003-2",
+        timestamp: "2026-10-23 15:30",
+        action: "Submitted",
+        userName: "Tanvir Ahmed (Merchandiser)",
+        userRole: "Merchandiser",
+      },
+      {
+        id: "pfh-003-3",
+        timestamp: "2026-10-24 10:20",
+        action: "Rejected",
+        userName: "Rafiqul Islam (Production GM)",
+        userRole: "Production Approver",
+        rejectionReason: "Trims layout and Embellishment artwork sheets are missing. CAD marker width does not match fabric cuttable width 56 inch. Please correct and re-submit.",
+        comments: "Trims layout and Embellishment artwork sheets are missing. CAD marker width does not match fabric cuttable width 56 inch.",
+      },
+    ],
+  },
+  {
+    id: "pf-rec-004",
+    fileRefNo: "PF-2026-0004",
+    version: 1,
+    versionType: "Original",
+    isCurrentActive: true,
+    sourceType: "Confirm Order Entry",
+    sourceRecordId: "ord-004",
+    sourceReference: "JOB-2026-0063",
+    jobNo: "JOB-2026-0063",
+    styleNo: "MS-KT-108",
+    styleDescription: "Crewneck Basic Tee - Menswear",
+    buyerName: "Marks & Spencer",
+    season: "Spring / Summer 2027",
+    poItems: [
+      { id: "po-pf-004-1", po: "PO-MS-11029", poQty: 15000 },
+    ],
+    totalPoQty: 15000,
+    attachments: [
+      {
+        id: "att-004-1",
+        category: "BOM Sheet",
+        fileName: "MS_KT108_Prelim_BOM.pdf",
+        fileSize: "980 KB",
+        fileType: "pdf",
+        uploadDate: "2026-10-26 14:15",
+        version: 1,
+      },
+    ],
+    status: "Draft",
+    notes: "Preliminary draft. Awaiting trims layout card and techpack updates from buyer.",
+    createdBy: "Tanvir Ahmed (Merchandiser)",
+    createdDate: "2026-10-26 14:00",
+    history: [
+      {
+        id: "pfh-004-1",
+        timestamp: "2026-10-26 14:00",
+        action: "Draft Saved",
+        userName: "Tanvir Ahmed (Merchandiser)",
+        userRole: "Merchandiser",
+        comments: "Draft saved. Will attach remaining items when received.",
+      },
+    ],
   },
 ];

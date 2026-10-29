@@ -136,16 +136,7 @@ export function ItemGroupModal({
               )}
             </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-bold mb-1 text-foreground">Description</label>
-              <textarea
-                rows={2}
-                value={formData.description || ""}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Optional description of materials under this group..."
-                className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
-              />
-            </div>
+
 
             <div className="flex items-center gap-2 pt-1 sm:col-span-2">
               <input

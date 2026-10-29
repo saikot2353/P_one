@@ -21,7 +21,6 @@ import {
   FileCheck2,
   Tag,
   ShieldCheck,
-  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -456,7 +455,7 @@ function InterCompanyTransferFormPage() {
   const validationErrors = useMemo(() => {
     const errs: string[] = [];
     if (transferType === "Inter-Company" && !taggedReqNumber) {
-      errs.push("For Inter-Company Transfer, tagging an approved Transfer Requisition is mandatory.");
+      errs.push("Tagging an approved Transfer Requisition is required.");
     }
     if (transferReason === "Other" && !reasonDetails.trim()) {
       errs.push("Reason Details is mandatory when Transfer Reason is 'Other'.");
@@ -659,8 +658,7 @@ function InterCompanyTransferFormPage() {
             <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3">
               <AlertTriangle className="size-5 text-rose-600 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-xs font-bold text-rose-800">Please correct following validation errors:</h4>
-                <ul className="text-xs text-rose-700 mt-1 list-disc list-inside space-y-0.5 font-medium">
+                <ul className="text-xs text-rose-700 list-disc list-inside space-y-0.5 font-medium">
                   {validationErrors.map((err, i) => (
                     <li key={i}>{err}</li>
                   ))}
@@ -742,8 +740,8 @@ function InterCompanyTransferFormPage() {
                 )}
               </div>
 
-              {/* Tagged Requisition or Warning Indicator */}
-              {taggedReqNumber ? (
+              {/* Tagged Requisition Indicator */}
+              {taggedReqNumber && (
                 <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2 text-xs">
                   <div className="flex items-center gap-2 truncate">
                     <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
@@ -764,33 +762,6 @@ function InterCompanyTransferFormPage() {
                       Remove Tag
                     </button>
                   )}
-                </div>
-              ) : transferType === "Inter-Company" ? (
-                <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 flex items-start sm:items-center justify-between gap-2 text-xs">
-                  <div className="flex items-start sm:items-center gap-2 text-amber-900">
-                    <AlertTriangle className="size-4 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
-                    <span>
-                      <strong>Multi-Company Transfer Rule:</strong> Transfer Requisition is{" "}
-                      <span className="font-bold underline text-amber-950">mandatory</span> and approval is required. Please tag an approved requisition before submitting.
-                    </span>
-                  </div>
-                  {!isViewMode && (
-                    <button
-                      type="button"
-                      onClick={() => setReqModalOpen(true)}
-                      className="text-xs font-bold text-indigo-700 hover:text-indigo-900 underline cursor-pointer shrink-0 whitespace-nowrap ml-2"
-                    >
-                      Select Requisition →
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 flex items-center gap-2 text-xs text-blue-900">
-                  <Info className="size-4 text-blue-600 shrink-0" />
-                  <span>
-                    <strong>Intra-Company Transfer Rule:</strong> Transfer Requisition is{" "}
-                    <strong>not mandatory</strong> and approval is <strong>not required</strong>. Goods can be transferred directly from one store to another within the same company.
-                  </span>
                 </div>
               )}
             </div>

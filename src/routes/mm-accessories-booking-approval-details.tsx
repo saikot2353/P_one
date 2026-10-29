@@ -34,6 +34,7 @@ import { toast } from "sonner";
 interface SearchParams {
   id?: string;
   bookingNo?: string;
+  type?: string;
 }
 
 export const Route = createFileRoute("/mm-accessories-booking-approval-details")({
@@ -49,6 +50,7 @@ export const Route = createFileRoute("/mm-accessories-booking-approval-details")
   validateSearch: (search: Record<string, unknown>): SearchParams => ({
     id: typeof search.id === "string" ? search.id : (search.bookingNo as string) || (search.id as string) || undefined,
     bookingNo: typeof search.bookingNo === "string" ? search.bookingNo : undefined,
+    type: typeof search.type === "string" ? search.type : undefined,
   }),
   component: MMAccessoriesBookingApprovalDetailsPage,
 });
@@ -61,9 +63,25 @@ function MMAccessoriesBookingApprovalDetailsPage() {
 
   const [booking, setBooking] = useState<MMAccessoriesBooking | null>(() => {
     if (typeof window === "undefined" || !targetId) return null;
+    if (search.type === "manual") {
+      const manual = MMRepository.getManualBookingById(targetId) || MMRepository.getManualBookings().find(
+        (b) => b.id === rawId || b.id === targetId || b.bookingNo === rawId || b.bookingNo === targetId
+      );
+      if (manual) return manual;
+    }
     const list = MMRepository.getAccessoriesBookings();
+    const foundAcc = list.find(
+      (b) =>
+        b.id === rawId ||
+        b.id === targetId ||
+        b.bookingNo === rawId ||
+        b.bookingNo === targetId ||
+        decodeURIComponent(b.bookingNo || "") === targetId
+    );
+    if (foundAcc) return foundAcc;
+    const manualList = MMRepository.getManualBookings();
     return (
-      list.find(
+      manualList.find(
         (b) =>
           b.id === rawId ||
           b.id === targetId ||
@@ -92,8 +110,20 @@ function MMAccessoriesBookingApprovalDetailsPage() {
       setBooking(null);
       return;
     }
+    if (search.type === "manual") {
+      const manual = MMRepository.getManualBookingById(targetId) || MMRepository.getManualBookings().find(
+        (b) => b.id === rawId || b.id === targetId || b.bookingNo === rawId || b.bookingNo === targetId
+      );
+      if (manual) {
+        setBooking(manual);
+        setOrders(MMRepository.getOrders());
+        setEstimations(MMRepository.getAccessoriesEstimations());
+        setPreCostings(MMRepository.getPreCostings());
+        return;
+      }
+    }
     const list = MMRepository.getAccessoriesBookings();
-    const found =
+    let found =
       list.find(
         (b) =>
           b.id === rawId ||
@@ -102,6 +132,18 @@ function MMAccessoriesBookingApprovalDetailsPage() {
           b.bookingNo === targetId ||
           decodeURIComponent(b.bookingNo || "") === targetId
       ) || null;
+    if (!found) {
+      const manualList = MMRepository.getManualBookings();
+      found =
+        manualList.find(
+          (b) =>
+            b.id === rawId ||
+            b.id === targetId ||
+            b.bookingNo === rawId ||
+            b.bookingNo === targetId ||
+            decodeURIComponent(b.bookingNo || "") === targetId
+        ) || null;
+    }
     setBooking(found);
     setOrders(MMRepository.getOrders());
     setEstimations(MMRepository.getAccessoriesEstimations());
@@ -469,20 +511,33 @@ function MMAccessoriesBookingApprovalDetailsPage() {
     };
   }, [comparisonRows]);
 
+  const isManual = useMemo(() => {
+    if (!booking) return search.type === "manual";
+    if (search.type === "manual") return true;
+    if (booking.bookType === "Block Booking" || booking.bookingNo.startsWith("MB-")) return true;
+    return !!MMRepository.getManualBookingById(booking.id);
+  }, [booking, search.type]);
+
   // Approve action handler
   const handleApprove = () => {
-    const success = MMRepository.approveAccessoriesBooking(
-      booking.id,
-      approverName,
-      approveComment.trim() || undefined
-    );
+    const success = isManual
+      ? MMRepository.approveManualBooking(
+          booking.id,
+          approverName,
+          approveComment.trim() || undefined
+        )
+      : MMRepository.approveAccessoriesBooking(
+          booking.id,
+          approverName,
+          approveComment.trim() || undefined
+        );
     if (success) {
-      toast.success(`Accessories Booking ${booking.bookingNo} has been successfully Approved.`);
+      toast.success(`${isManual ? "Manual" : "Accessories"} Booking ${booking.bookingNo} has been successfully Approved.`);
       setIsApproveOpen(false);
       setApproveComment("");
       loadBooking();
     } else {
-      toast.error("Failed to approve Accessories Booking.");
+      toast.error(`Failed to approve ${isManual ? "Manual" : "Accessories"} Booking.`);
     }
   };
 
@@ -492,14 +547,16 @@ function MMAccessoriesBookingApprovalDetailsPage() {
       toast.error("Please enter a rejection reason.");
       return;
     }
-    const success = MMRepository.rejectAccessoriesBooking(booking.id, approverName, rejectReason);
+    const success = isManual
+      ? MMRepository.rejectManualBooking(booking.id, approverName, rejectReason)
+      : MMRepository.rejectAccessoriesBooking(booking.id, approverName, rejectReason);
     if (success) {
-      toast.success(`Accessories Booking ${booking.bookingNo} has been Rejected.`);
+      toast.success(`${isManual ? "Manual" : "Accessories"} Booking ${booking.bookingNo} has been Rejected.`);
       setIsRejectOpen(false);
       setRejectReason("");
       loadBooking();
     } else {
-      toast.error("Failed to reject Accessories Booking.");
+      toast.error(`Failed to reject ${isManual ? "Manual" : "Accessories"} Booking.`);
     }
   };
 
@@ -509,21 +566,23 @@ function MMAccessoriesBookingApprovalDetailsPage() {
       toast.error("Please explain what correction is required.");
       return;
     }
-    const success = MMRepository.returnAccessoriesBooking(booking.id, approverName, returnComment);
+    const success = isManual
+      ? MMRepository.returnManualBooking(booking.id, approverName, returnComment)
+      : MMRepository.returnAccessoriesBooking(booking.id, approverName, returnComment);
     if (success) {
-      toast.success(`Accessories Booking ${booking.bookingNo} has been Returned for correction.`);
+      toast.success(`${isManual ? "Manual" : "Accessories"} Booking ${booking.bookingNo} has been Returned for correction.`);
       setIsReturnOpen(false);
       setReturnComment("");
       loadBooking();
     } else {
-      toast.error("Failed to return Accessories Booking.");
+      toast.error(`Failed to return ${isManual ? "Manual" : "Accessories"} Booking.`);
     }
   };
 
   return (
     <MarketingMerchandisingLayout
       activePath="/mm-accessories-booking-approval"
-      title={`Accessories Booking: ${booking.bookingNo}`}
+      title={`${isManual ? "Manual" : "Accessories"} Booking: ${booking.bookingNo}`}
       breadcrumbs={[
         { label: "Marketing & Merchandising", to: "/mm-dashboard" },
         { label: "Booking Information", to: "/mm-accessories-booking-approval" },
@@ -661,7 +720,7 @@ function MMAccessoriesBookingApprovalDetailsPage() {
           <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">
             <Building2 className="w-4 h-4 text-teal-600 dark:text-teal-400" />
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">
-              Accessories Booking Information
+              {isManual ? "Manual Booking Information" : "Accessories Booking Information"}
             </h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-xs">

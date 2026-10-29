@@ -45,6 +45,7 @@ import {
   MonthlyBudgetRequisition,
   InternalRequisition,
 } from "@/lib/procurement-requisition-data";
+import { getEffectiveProcurementConfig } from "@/lib/procurement-config-data";
 import {
   getStoredData,
   WarehouseStore,
@@ -172,14 +173,10 @@ function PurchaseRequisitionPage() {
       metadata: [
         { label: "PR Number", value: active.prNumber || "PR-2026-0001", highlight: true },
         { label: "Requisition Date", value: active.prDate || "—" },
-        { label: "Company", value: active.company || "Pakiza Knit Composite Ltd" },
         { label: "Department", value: active.department || "—" },
         { label: "Requested By", value: `${active.requestedBy || "Staff"} (${active.designation || "Executive"})` },
         { label: "Required Date", value: active.requiredDate || "—" },
         { label: "Priority", value: active.priority || "Normal", highlight: active.priority === "Urgent" },
-        { label: "Delivery Warehouse", value: active.warehouseName ? `${active.warehouseName} (${active.warehouseCode || ""})` : "Central Warehouse" },
-        { label: "Linked Budgets", value: (active.budgetRequisitions || []).map((b: any) => b.requisitionNumber).join(", ") || "N/A" },
-        { label: "Linked Internal Reqs", value: (active.internalRequisitions || []).map((i: any) => i.requisitionNumber).join(", ") || "N/A" },
       ],
       items: currentItems.map((item, idx) => ({
         sl: idx + 1,
@@ -227,6 +224,11 @@ function PurchaseRequisitionPage() {
   const [itemSearchOpen, setItemSearchOpen] = useState(false);
   const [itemSearchRowIndex, setItemSearchRowIndex] = useState<number | null>(null);
   const [itemSearchQuery, setItemSearchQuery] = useState("");
+  const [categoryAlert, setCategoryAlert] = useState<{
+    open: boolean;
+    message: string;
+    category?: string;
+  } | null>(null);
 
   // Summary Metrics
   const metrics = useMemo(() => {
@@ -269,7 +271,7 @@ function PurchaseRequisitionPage() {
       requiredDate: new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0],
       priority: "Normal",
       purpose: "",
-      itemCategory: categories[0]?.categoryName || "General",
+      itemCategory: "", // Default: All Categories
       budgetRequisitions: [],
       internalRequisitions: [],
       status: "Draft",
@@ -350,21 +352,20 @@ function PurchaseRequisitionPage() {
   // Dynamic Item Row manipulation
   const handleAddItemRow = () => {
     const nextSl = formItems.length + 1;
-    const defaultItem = catalogItems[0];
     const newRow: PRItem = {
       id: `pri-${Date.now()}-${Math.random()}`,
       sl: nextSl,
-      itemId: defaultItem?.id || "",
-      itemCode: defaultItem?.itemCode || `ITEM-${nextSl}`,
-      itemName: defaultItem?.itemName || "Select Item",
-      specification: defaultItem?.specification || defaultItem?.description || "",
-      brand: defaultItem?.brand || "Standard OEM",
-      origin: defaultItem?.origin || "Imported",
-      itemCategory: defaultItem?.itemCategory || "General",
-      uom: defaultItem?.stockUOM || defaultItem?.purchaseUOM || "PCS",
+      itemId: "",
+      itemCode: "",
+      itemName: "",
+      specification: "",
+      brand: "",
+      origin: "",
+      itemCategory: "",
+      uom: "PCS",
       requestedQuantity: 1,
-      estimatedUnitPrice: defaultItem?.standardPurchasePrice || 1000,
-      estimatedAmount: defaultItem?.standardPurchasePrice || 1000,
+      estimatedUnitPrice: 0,
+      estimatedAmount: 0,
       remarks: "",
     };
     setFormItems((prev) => [...prev, newRow]);
@@ -384,19 +385,6 @@ function PurchaseRequisitionPage() {
       const copy = [...prev];
       const target = { ...copy[index], [field]: value };
 
-      if (field === "itemId") {
-        const found = catalogItems.find((ci) => ci.id === value);
-        if (found) {
-          target.itemCode = found.itemCode;
-          target.itemName = found.itemName;
-          target.specification = found.specification || found.description || "";
-          target.brand = found.brand || "Standard OEM";
-          target.origin = found.origin || "Imported";
-          target.itemCategory = found.itemCategory || "";
-          target.uom = found.stockUOM || found.purchaseUOM || "PCS";
-        }
-      }
-
       if (field === "requestedQuantity" || field === "estimatedUnitPrice") {
         const qty = field === "requestedQuantity" ? Number(value) || 0 : target.requestedQuantity;
         const price = field === "estimatedUnitPrice" ? Number(value) || 0 : target.estimatedUnitPrice;
@@ -411,6 +399,25 @@ function PurchaseRequisitionPage() {
   // Select item from Item Search Modal
   const handleSelectItemFromSearch = (selectedItem: ItemProductMaster) => {
     if (itemSearchRowIndex === null) return;
+    const procConfig = getEffectiveProcurementConfig(formData.company);
+
+    if (!procConfig.allowMultipleCategories) {
+      const establishedRow = formItems.find(
+        (it, idx) => idx !== itemSearchRowIndex && it.itemName && it.itemCategory
+      );
+      const establishedCat = establishedRow?.itemCategory?.trim();
+      const selectedCat = (selectedItem.itemCategory || "").trim();
+
+      if (establishedCat && selectedCat && establishedCat.toLowerCase() !== selectedCat.toLowerCase()) {
+        setCategoryAlert({
+          open: true,
+          category: establishedCat,
+          message: `Items from different categories cannot be added to the same Purchase Requisition. This requisition is locked to category "${establishedCat}". The item "${selectedItem.itemName}" belongs to "${selectedCat}". You must select an item from the same category.`,
+        });
+        return;
+      }
+    }
+
     setFormItems((prev) => {
       const copy = [...prev];
       const target = { ...copy[itemSearchRowIndex] };
@@ -523,6 +530,21 @@ function PurchaseRequisitionPage() {
       setFormErrors(errors);
       toast.error("Please fill in all mandatory fields.");
       return;
+    }
+
+    const procConfig = getEffectiveProcurementConfig(formData.company);
+    if (!procConfig.allowMultipleCategories) {
+      const distinctCats = Array.from(
+        new Set(formItems.filter((i) => i.itemName && i.itemCategory).map((i) => i.itemCategory!.trim()))
+      );
+      if (distinctCats.length > 1) {
+        setCategoryAlert({
+          open: true,
+          category: distinctCats[0],
+          message: `Items from different categories cannot be added to the same Purchase Requisition (${distinctCats.join(", ")}). You must select items from the same category under company configuration.`,
+        });
+        return;
+      }
     }
 
     const newStatus = isSubmit ? "Pending Approval" : "Draft";
@@ -654,8 +676,8 @@ function PurchaseRequisitionPage() {
           {/* LIST VIEW */}
           {pageMode === "list" && (
             <div className="space-y-6">
-              {/* Summary Metric Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+              {/* Summary Metric Cards (Total Est. Value removed per requirement) */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                 <div className="bg-card p-4 rounded-xl border border-border/80 shadow-2xs flex items-center justify-between">
                   <div>
                     <div className="text-[11px] font-bold text-muted-foreground uppercase">Total PRs</div>
@@ -693,18 +715,6 @@ function PurchaseRequisitionPage() {
                   </div>
                   <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
                     <CheckCircle2 className="size-4" />
-                  </div>
-                </div>
-
-                <div className="bg-card p-4 rounded-xl border border-border/80 shadow-2xs col-span-2 lg:col-span-1 flex items-center justify-between">
-                  <div>
-                    <div className="text-[11px] font-bold text-muted-foreground uppercase">Total Est. Value</div>
-                    <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-0.5">
-                      ৳ {(metrics.totalValue / 1000).toFixed(0)}k
-                    </div>
-                  </div>
-                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
-                    <Layers className="size-4" />
                   </div>
                 </div>
               </div>
@@ -775,13 +785,10 @@ function PurchaseRequisitionPage() {
                       <tr>
                         <th className="py-3 px-3.5">PR Number</th>
                         <th className="py-3 px-3.5">PR Date</th>
-                        <th className="py-3 px-3.5">Company</th>
                         <th className="py-3 px-3.5">Department</th>
                         <th className="py-3 px-3.5">Requested By</th>
                         <th className="py-3 px-3.5">Required Date</th>
                         <th className="py-3 px-3.5">Priority</th>
-                        <th className="py-3 px-3.5 font-mono">Items</th>
-                        <th className="py-3 px-3.5">Est. Amount</th>
                         <th className="py-3 px-3.5">Status</th>
                         <th className="py-3 px-3.5 text-right">Actions</th>
                       </tr>
@@ -789,7 +796,7 @@ function PurchaseRequisitionPage() {
                     <tbody className="divide-y divide-border/60">
                       {filteredRequisitions.length === 0 ? (
                         <tr>
-                          <td colSpan={11} className="py-12 text-center text-muted-foreground">
+                          <td colSpan={8} className="py-12 text-center text-muted-foreground">
                             No Purchase Requisitions found matching your filters.
                           </td>
                         </tr>
@@ -800,9 +807,6 @@ function PurchaseRequisitionPage() {
                               {pr.prNumber}
                             </td>
                             <td className="py-2.5 px-3.5 text-muted-foreground">{pr.prDate}</td>
-                            <td className="py-2.5 px-3.5 text-foreground font-medium truncate max-w-[140px]">
-                              {pr.company}
-                            </td>
                             <td className="py-2.5 px-3.5">{pr.department}</td>
                             <td className="py-2.5 px-3.5 font-medium text-foreground">{pr.requestedBy}</td>
                             <td className="py-2.5 px-3.5 text-muted-foreground">{pr.requiredDate}</td>
@@ -818,10 +822,6 @@ function PurchaseRequisitionPage() {
                               >
                                 {pr.priority}
                               </span>
-                            </td>
-                            <td className="py-2.5 px-3.5 font-mono font-bold">{pr.items?.length || 0}</td>
-                            <td className="py-2.5 px-3.5 font-mono font-bold text-amber-600 dark:text-amber-400">
-                              ৳ {(pr.totalEstimatedAmount || 0).toLocaleString()}
                             </td>
                             <td className="py-2.5 px-3.5">
                               <span
@@ -932,24 +932,14 @@ function PurchaseRequisitionPage() {
                 </div>
               </div>
 
-              {/* SECTION 1: PR HEADER INFORMATION */}
+              {/* SECTION: PR HEADER INFORMATION (Requirement: Section numbering removed, PR Number & Company removed, 5 cols layout) */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 pb-2 border-b border-border/50">
                   <FileText className="size-4 text-amber-500" />
-                  <h2 className="text-sm font-bold text-foreground">1. PR Header Information</h2>
+                  <h2 className="text-sm font-bold text-foreground">PR Header Information</h2>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold mb-1 text-foreground">PR Number</label>
-                    <input
-                      type="text"
-                      disabled
-                      value={formData.prNumber || ""}
-                      className="w-full h-8.5 px-3 rounded-lg border border-border/80 bg-muted/50 text-xs font-mono font-bold text-muted-foreground outline-none"
-                    />
-                  </div>
-
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   <div>
                     <label className="block text-xs font-bold mb-1 text-foreground">PR Date</label>
                     <input
@@ -959,23 +949,6 @@ function PurchaseRequisitionPage() {
                       onChange={(e) => setFormData({ ...formData, prDate: e.target.value })}
                       className="w-full h-8.5 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:opacity-70"
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold mb-1 text-foreground">Company *</label>
-                    <select
-                      disabled={pageMode === "view"}
-                      value={formData.company || ""}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="w-full h-8.5 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:opacity-70"
-                    >
-                      {companyList.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                    {formErrors.company && <p className="text-[10px] text-rose-500 mt-1">{formErrors.company}</p>}
                   </div>
 
                   <div>
@@ -1038,19 +1011,6 @@ function PurchaseRequisitionPage() {
                     </select>
                   </div>
 
-                  <div className="sm:col-span-2 lg:col-span-3">
-                    <label className="block text-xs font-bold mb-1 text-foreground">Purpose / Justification *</label>
-                    <textarea
-                      rows={2}
-                      disabled={pageMode === "view"}
-                      value={formData.purpose || ""}
-                      onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                      placeholder="Explain reason for the requisition, project reference, or department requirement..."
-                      className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs resize-none focus:border-amber-500 outline-none disabled:opacity-70"
-                    />
-                    {formErrors.purpose && <p className="text-[10px] text-rose-500 mt-1">{formErrors.purpose}</p>}
-                  </div>
-
                   <div>
                     <label className="block text-xs font-bold mb-1 text-foreground">Item Category</label>
                     <select
@@ -1068,8 +1028,21 @@ function PurchaseRequisitionPage() {
                     </select>
                   </div>
 
-                  {/* Budget Requisition & Internal Requisition Displayed Side by Side */}
-                  <div className="sm:col-span-2 lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2 md:col-span-3 lg:col-span-3">
+                    <label className="block text-xs font-bold mb-1 text-foreground">Purpose / Justification *</label>
+                    <textarea
+                      rows={2}
+                      disabled={pageMode === "view"}
+                      value={formData.purpose || ""}
+                      onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+                      placeholder="Explain reason for the requisition, project reference, or department requirement..."
+                      className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs resize-none focus:border-amber-500 outline-none disabled:opacity-70"
+                    />
+                    {formErrors.purpose && <p className="text-[10px] text-rose-500 mt-1">{formErrors.purpose}</p>}
+                  </div>
+
+                  {/* Budget Requisition & Internal Requisition Displayed Side by Side in 2 Columns */}
+                  <div className="sm:col-span-2 md:col-span-3 lg:col-span-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Budget Requisition Multi-Select Field */}
                     <div className="p-3.5 rounded-xl border border-border/80 bg-muted/20 space-y-2.5">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -1197,12 +1170,12 @@ function PurchaseRequisitionPage() {
                 </div>
               </div>
 
-              {/* SECTION 2: PR ITEM DETAILS (Dynamic Multi-Row Table) */}
+              {/* SECTION: PR ITEM DETAILS (Dynamic Multi-Row Table) */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between pb-2 border-b border-border/50">
                   <div className="flex items-center gap-2">
                     <Layers className="size-4 text-amber-500" />
-                    <h2 className="text-sm font-bold text-foreground">2. PR Item Details</h2>
+                    <h2 className="text-sm font-bold text-foreground">PR Item Details</h2>
                   </div>
 
                   {pageMode !== "view" && (
@@ -1242,22 +1215,24 @@ function PurchaseRequisitionPage() {
                           <td className="py-2 px-3">
                             {pageMode === "view" ? (
                               <div>
-                                <span className="font-bold text-foreground">{item.itemName}</span>
+                                <span className="font-bold text-foreground">{item.itemName || "—"}</span>
                                 <div className="text-[10px] font-mono text-muted-foreground">{item.itemCode}</div>
                               </div>
                             ) : (
                               <div className="flex items-center gap-1.5">
-                                <select
-                                  value={item.itemId}
-                                  onChange={(e) => handleItemChange(index, "itemId", e.target.value)}
-                                  className="w-full h-8 px-2 rounded-md border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
-                                >
-                                  {catalogItems.map((ci) => (
-                                    <option key={ci.id} value={ci.id}>
-                                      {ci.itemName} ({ci.itemCode})
-                                    </option>
-                                  ))}
-                                </select>
+                                <input
+                                  type="text"
+                                  readOnly
+                                  disabled
+                                  value={item.itemName ? `${item.itemName} (${item.itemCode || ""})` : ""}
+                                  placeholder="Click search to select item..."
+                                  onClick={() => {
+                                    setItemSearchRowIndex(index);
+                                    setItemSearchQuery("");
+                                    setItemSearchOpen(true);
+                                  }}
+                                  className="w-full h-8 px-2 rounded-md border border-border/80 bg-muted/40 text-xs font-semibold text-foreground cursor-pointer focus:border-amber-500 outline-none truncate"
+                                />
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -1265,7 +1240,7 @@ function PurchaseRequisitionPage() {
                                     setItemSearchQuery("");
                                     setItemSearchOpen(true);
                                   }}
-                                  className="p-1.5 rounded-md border border-border/80 bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer shrink-0"
+                                  className="p-1.5 rounded-md border border-border/80 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 transition cursor-pointer shrink-0"
                                   title="Search Item Master (Name, Code, Spec, Brand, Origin, UOM)"
                                 >
                                   <Search className="size-3.5" />
@@ -1377,12 +1352,12 @@ function PurchaseRequisitionPage() {
                 </div>
               </div>
 
-              {/* SECTION 3: ATTACHMENTS */}
+              {/* SECTION: ATTACHMENTS (Requirement: Section numbering removed) */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between pb-2 border-b border-border/50">
                   <div className="flex items-center gap-2">
                     <Paperclip className="size-4 text-amber-500" />
-                    <h2 className="text-sm font-bold text-foreground">3. Supporting Attachments</h2>
+                    <h2 className="text-sm font-bold text-foreground">Supporting Attachments</h2>
                   </div>
 
                   {pageMode !== "view" && (
@@ -1440,61 +1415,7 @@ function PurchaseRequisitionPage() {
                 )}
               </div>
 
-              {/* SECTION 4: APPROVAL TIMELINE & AUDIT HISTORY */}
-              <div className="space-y-4 pt-2 border-t border-border/70">
-                <div className="flex items-center gap-2 pb-2">
-                  <ShieldCheck className="size-4 text-amber-500" />
-                  <h2 className="text-sm font-bold text-foreground">4. Approval Progression Workflow</h2>
-                </div>
-
-                <div className="p-4 rounded-xl border border-border/80 bg-muted/20 space-y-4">
-                  {/* Timeline visual */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-                    {[
-                      { step: 1, label: "Requester Submission", status: "Approved" },
-                      { step: 2, label: "Department Approval", status: formData.status === "Draft" ? "Pending" : "Approved" },
-                      { step: 3, label: "Head Approval", status: formData.status === "Approved" ? "Approved" : "Pending" },
-                      { step: 4, label: "Procurement Approval", status: formData.status === "Approved" ? "Approved" : "Pending" },
-                    ].map((st, idx) => (
-                      <div key={st.step} className="flex items-center gap-2 flex-1">
-                        <div
-                          className={`size-6 rounded-full flex items-center justify-center font-bold text-[11px] shrink-0 ${
-                            st.status === "Approved"
-                              ? "bg-emerald-500 text-white"
-                              : "bg-muted text-muted-foreground border border-border"
-                          }`}
-                        >
-                          {st.status === "Approved" ? <Check className="size-3.5" /> : st.step}
-                        </div>
-                        <div className="leading-tight">
-                          <div className="font-bold text-foreground text-[11px]">{st.label}</div>
-                          <div className="text-[10px] text-muted-foreground">{st.status}</div>
-                        </div>
-                        {idx < 3 && <ChevronRight className="size-4 text-muted-foreground/40 hidden sm:block ml-auto" />}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Audit History steps */}
-                  {selectedRecord?.approvalHistory && selectedRecord.approvalHistory.length > 0 && (
-                    <div className="pt-3 border-t border-border/60">
-                      <div className="text-xs font-bold text-foreground mb-2">Audit History</div>
-                      <div className="space-y-2">
-                        {selectedRecord.approvalHistory.map((step, idx) => (
-                          <div key={idx} className="p-2.5 rounded-lg bg-card border border-border/60 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                            <div>
-                              <span className="font-bold text-foreground">{step.stageName}: </span>
-                              <span className="text-muted-foreground">{step.approverName} ({step.designation})</span>
-                              {step.remarks && <p className="text-[11px] text-muted-foreground italic mt-0.5">&quot;{step.remarks}&quot;</p>}
-                            </div>
-                            <div className="text-[10px] font-mono text-muted-foreground shrink-0">{step.dateTime}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              {/* Requirement: Approval Progression Workflow section removed from visible form while preserving underlying routing */}
 
               {/* BOTTOM ACTIONS */}
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-border/70">
@@ -1844,6 +1765,42 @@ function PurchaseRequisitionPage() {
         }}
         data={previewReportData}
       />
+
+      {/* Multiple Categories Rule Inline / In-App Alert Modal */}
+      {categoryAlert?.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-card border border-rose-500/40 rounded-2xl p-5 shadow-2xl max-w-md w-full space-y-4 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-600 border border-rose-500/20">
+                <AlertCircle className="size-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-foreground">Category Policy Notice</h3>
+                <p className="text-xs text-muted-foreground">Single Category Requisition Rule</p>
+              </div>
+            </div>
+
+            <div className="text-xs text-foreground/90 leading-relaxed bg-rose-500/5 p-3.5 rounded-xl border border-rose-500/20 space-y-2">
+              <p>{categoryAlert.message}</p>
+              {categoryAlert.category && (
+                <div className="text-[11px] text-rose-600 dark:text-rose-400 font-semibold">
+                  Locked Category: <strong className="font-mono">{categoryAlert.category}</strong>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={() => setCategoryAlert(null)}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition shadow-xs cursor-pointer"
+              >
+                Understood
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

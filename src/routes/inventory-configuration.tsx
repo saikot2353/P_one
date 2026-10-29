@@ -228,6 +228,7 @@ function InventoryConfigurationPage() {
   const searchParams = Route.useSearch();
   const rawTab: InventoryConfigTab = searchParams.tab || "warehouse-store";
   const activeTab = (rawTab === "item-group" ? "item-sub-group" : rawTab) as InventoryConfigTab;
+  const isModalTab = ["store-location", "item-category", "brand", "origin", "uom"].includes(activeTab);
 
   // Master Data State shared with Procurement via LocalStorage keys
   const [warehouses, setWarehouses] = useState<WarehouseStore[]>(() =>
@@ -830,8 +831,8 @@ function InventoryConfigurationPage() {
             )}
           </div>
 
-          {/* DEDICATED FORM PAGE VIEWS (Not Modals) */}
-          {pageMode !== "list" && (
+          {/* DEDICATED FORM PAGE VIEWS (For warehouse-store, item-group, item-sub-group) */}
+          {pageMode !== "list" && !isModalTab && (
             <div className="bg-card rounded-2xl border border-border/80 p-5 lg:p-7 shadow-xs">
               {activeTab === "warehouse-store" && (
                 <WarehouseStorePageForm
@@ -846,26 +847,6 @@ function InventoryConfigurationPage() {
                     } else {
                       setWarehouses((prev) => prev.map((w) => (w.id === saved.id ? saved : w)));
                       toast.success("Warehouse updated successfully.");
-                    }
-                    setPageMode("list");
-                  }}
-                  onCancel={() => setPageMode("list")}
-                  onSwitchToEdit={() => setPageMode("edit")}
-                />
-              )}
-
-              {activeTab === "store-location" && (
-                <StoreLocationPageForm
-                  mode={pageMode}
-                  initialData={selectedRecord}
-                  warehouses={warehouses}
-                  onSave={(saved) => {
-                    if (pageMode === "create") {
-                      setLocations((prev) => [saved, ...prev]);
-                      toast.success("Location / Batch created.");
-                    } else {
-                      setLocations((prev) => prev.map((l) => (l.id === saved.id ? saved : l)));
-                      toast.success("Location / Batch updated.");
                     }
                     setPageMode("list");
                   }}
@@ -926,88 +907,11 @@ function InventoryConfigurationPage() {
                   onSwitchToEdit={() => setPageMode("edit")}
                 />
               )}
-
-              {activeTab === "item-category" && (
-                <ItemCategoryPageForm
-                  mode={pageMode}
-                  initialData={selectedRecord}
-                  onSave={(saved) => {
-                    if (pageMode === "create") {
-                      setItemCategories((prev) => [saved, ...prev]);
-                      toast.success("Item Category created.");
-                    } else {
-                      setItemCategories((prev) => prev.map((c) => (c.id === saved.id ? saved : c)));
-                      toast.success("Item Category updated.");
-                    }
-                    setPageMode("list");
-                  }}
-                  onCancel={() => setPageMode("list")}
-                  onSwitchToEdit={() => setPageMode("edit")}
-                />
-              )}
-
-              {activeTab === "brand" && (
-                <BrandMasterPageForm
-                  mode={pageMode}
-                  initialData={selectedRecord}
-                  origins={origins}
-                  onSave={(saved) => {
-                    if (pageMode === "create") {
-                      setBrands((prev) => [saved, ...prev]);
-                      toast.success("Brand created.");
-                    } else {
-                      setBrands((prev) => prev.map((b) => (b.id === saved.id ? saved : b)));
-                      toast.success("Brand updated.");
-                    }
-                    setPageMode("list");
-                  }}
-                  onCancel={() => setPageMode("list")}
-                  onSwitchToEdit={() => setPageMode("edit")}
-                />
-              )}
-
-              {activeTab === "origin" && (
-                <OriginMasterPageForm
-                  mode={pageMode}
-                  initialData={selectedRecord}
-                  onSave={(saved) => {
-                    if (pageMode === "create") {
-                      setOrigins((prev) => [saved, ...prev]);
-                      toast.success("Origin created successfully.");
-                    } else {
-                      setOrigins((prev) => prev.map((o) => (o.id === saved.id ? saved : o)));
-                      toast.success("Origin updated successfully.");
-                    }
-                    setPageMode("list");
-                  }}
-                  onCancel={() => setPageMode("list")}
-                  onSwitchToEdit={() => setPageMode("edit")}
-                />
-              )}
-
-              {activeTab === "uom" && (
-                <UOMMasterPageForm
-                  mode={pageMode}
-                  initialData={selectedRecord}
-                  onSave={(saved) => {
-                    if (pageMode === "create") {
-                      setUoms((prev) => [saved, ...prev]);
-                      toast.success("UOM created successfully.");
-                    } else {
-                      setUoms((prev) => prev.map((u) => (u.id === saved.id ? saved : u)));
-                      toast.success("UOM updated successfully.");
-                    }
-                    setPageMode("list");
-                  }}
-                  onCancel={() => setPageMode("list")}
-                  onSwitchToEdit={() => setPageMode("edit")}
-                />
-              )}
             </div>
           )}
 
           {/* LIST PAGE */}
-          {pageMode === "list" && (
+          {(pageMode === "list" || isModalTab) && (
             <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
               {/* Filter / Search Console */}
               <div className="p-4 border-b border-border/70 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
@@ -1629,13 +1533,10 @@ function InventoryConfigurationPage() {
                         {/* WAREHOUSE STORE */}
                         {activeTab === "warehouse-store" && (
                           <>
-                            <th className="py-3 px-3.5">Store Code</th>
                             <th className="py-3 px-3.5">Store Name</th>
-                            <th className="py-3 px-3.5">Organization</th>
                             <th className="py-3 px-3.5">Store Manager</th>
                             <th className="py-3 px-3.5">Contact Number</th>
                             <th className="py-3 px-3.5">Valuation</th>
-                            <th className="py-3 px-3.5">Assigned Staff</th>
                             <th className="py-3 px-3.5">Status</th>
                           </>
                         )}
@@ -1645,6 +1546,7 @@ function InventoryConfigurationPage() {
                           <>
                             <th className="py-3 px-3.5">Location / Batch Code</th>
                             <th className="py-3 px-3.5">Store / Facility</th>
+                            <th className="py-3 px-3.5">Company Area/Section</th>
                             <th className="py-3 px-3.5">Tracking Mode</th>
                             <th className="py-3 px-3.5">Location Name / Batch #</th>
                             <th className="py-3 px-3.5">Rack / Dates</th>
@@ -1662,11 +1564,10 @@ function InventoryConfigurationPage() {
                           </>
                         )}
 
-                        {/* ITEM CATEGORY */}
+                        {/* ITEM CATEGORY (Item Category / Category Name column removed) */}
                         {activeTab === "item-category" && (
                           <>
                             <th className="py-3 px-3.5">Category Code</th>
-                            <th className="py-3 px-3.5">Category Name</th>
                             <th className="py-3 px-3.5">Description</th>
                             <th className="py-3 px-3.5">Status</th>
                           </>
@@ -1696,9 +1597,7 @@ function InventoryConfigurationPage() {
                         {/* UOM */}
                         {activeTab === "uom" && (
                           <>
-                            <th className="py-3 px-3.5">UOM Code / ID</th>
                             <th className="py-3 px-3.5">UOM Name</th>
-                            <th className="py-3 px-3.5">Conversion Factor</th>
                             <th className="py-3 px-3.5">Status</th>
                           </>
                         )}
@@ -1721,22 +1620,13 @@ function InventoryConfigurationPage() {
                             {/* WAREHOUSE STORE */}
                             {activeTab === "warehouse-store" && (
                               <>
-                                <td className="py-2.5 px-3.5 font-mono font-bold text-foreground">
-                                  {item.storeCode}
-                                </td>
                                 <td className="py-2.5 px-3.5 font-bold text-foreground">
                                   {item.storeName}
                                 </td>
-                                <td className="py-2.5 px-3.5">{item.organization}</td>
                                 <td className="py-2.5 px-3.5 font-medium">{item.storeManager || "—"}</td>
                                 <td className="py-2.5 px-3.5 font-mono">{item.contactNumber || "—"}</td>
                                 <td className="py-2.5 px-3.5 font-mono text-[11px]">
                                   {item.stockValuationMethod || "FIFO"}
-                                </td>
-                                <td className="py-2.5 px-3.5">
-                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                    {item.permissions?.length || 0} Staff
-                                  </span>
                                 </td>
                                 <td className="py-2.5 px-3.5">
                                   <span
@@ -1756,10 +1646,13 @@ function InventoryConfigurationPage() {
                             {activeTab === "store-location" && (
                               <>
                                 <td className="py-2.5 px-3.5 font-mono font-bold text-foreground">
-                                  {item.locationCode || item.batchCode}
+                                  {item.locationCode || item.batchCode || item.batchNumbering}
                                 </td>
                                 <td className="py-2.5 px-3.5 font-bold text-foreground">
-                                  {item.warehouseName || "Main Central Warehouse"}
+                                  {item.warehouseName || item.store || "Main Central Warehouse"}
+                                </td>
+                                <td className="py-2.5 px-3.5 text-foreground font-medium">
+                                  {item.companyAreaSectionName || item.companyAreaSection || "Central Warehouse Area"}
                                 </td>
                                 <td className="py-2.5 px-3.5">
                                   <span
@@ -1833,9 +1726,6 @@ function InventoryConfigurationPage() {
                                 <td className="py-2.5 px-3.5 font-mono font-bold text-foreground">
                                   {item.categoryCode}
                                 </td>
-                                <td className="py-2.5 px-3.5 font-bold text-foreground">
-                                  {item.categoryName}
-                                </td>
                                 <td className="py-2.5 px-3.5 text-muted-foreground truncate max-w-xs">
                                   {item.description || "—"}
                                 </td>
@@ -1907,13 +1797,9 @@ function InventoryConfigurationPage() {
                             {/* UOM */}
                             {activeTab === "uom" && (
                               <>
-                                <td className="py-2.5 px-3.5 font-mono font-bold text-foreground">
-                                  {item.uomCode}
-                                </td>
                                 <td className="py-2.5 px-3.5 font-bold text-foreground">
                                   {item.uomName}
                                 </td>
-                                <td className="py-2.5 px-3.5 font-mono">{item.conversionFactor ?? 1}</td>
                                 <td className="py-2.5 px-3.5">
                                   <span
                                     className={`text-[9.5px] font-extrabold px-2 py-0.5 rounded-full border ${
@@ -2011,6 +1897,110 @@ function InventoryConfigurationPage() {
         </main>
       </div>
 
+      {/* MODAL CONFIGURATION FOR STORE-LOCATION, ITEM-CATEGORY, BRAND, ORIGIN, UOM */}
+      {pageMode !== "list" && isModalTab && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-card w-full max-w-4xl rounded-2xl border border-border shadow-2xl p-5 lg:p-7 my-8 max-h-[90vh] overflow-y-auto">
+            {activeTab === "store-location" && (
+              <StoreLocationPageForm
+                mode={pageMode}
+                initialData={selectedRecord}
+                warehouses={warehouses}
+                onSave={(saved) => {
+                  if (pageMode === "create") {
+                    setLocations((prev) => [saved, ...prev]);
+                    toast.success("Location / Batch created.");
+                  } else {
+                    setLocations((prev) => prev.map((l) => (l.id === saved.id ? saved : l)));
+                    toast.success("Location / Batch updated.");
+                  }
+                  setPageMode("list");
+                }}
+                onCancel={() => setPageMode("list")}
+                onSwitchToEdit={() => setPageMode("edit")}
+              />
+            )}
+
+            {activeTab === "item-category" && (
+              <ItemCategoryPageForm
+                mode={pageMode}
+                initialData={selectedRecord}
+                onSave={(saved) => {
+                  if (pageMode === "create") {
+                    setItemCategories((prev) => [saved, ...prev]);
+                    toast.success("Item Category created.");
+                  } else {
+                    setItemCategories((prev) => prev.map((c) => (c.id === saved.id ? saved : c)));
+                    toast.success("Item Category updated.");
+                  }
+                  setPageMode("list");
+                }}
+                onCancel={() => setPageMode("list")}
+                onSwitchToEdit={() => setPageMode("edit")}
+              />
+            )}
+
+            {activeTab === "brand" && (
+              <BrandMasterPageForm
+                mode={pageMode}
+                initialData={selectedRecord}
+                origins={origins}
+                onSave={(saved) => {
+                  if (pageMode === "create") {
+                    setBrands((prev) => [saved, ...prev]);
+                    toast.success("Brand created.");
+                  } else {
+                    setBrands((prev) => prev.map((b) => (b.id === saved.id ? saved : b)));
+                    toast.success("Brand updated.");
+                  }
+                  setPageMode("list");
+                }}
+                onCancel={() => setPageMode("list")}
+                onSwitchToEdit={() => setPageMode("edit")}
+              />
+            )}
+
+            {activeTab === "origin" && (
+              <OriginMasterPageForm
+                mode={pageMode}
+                initialData={selectedRecord}
+                onSave={(saved) => {
+                  if (pageMode === "create") {
+                    setOrigins((prev) => [saved, ...prev]);
+                    toast.success("Origin created successfully.");
+                  } else {
+                    setOrigins((prev) => prev.map((o) => (o.id === saved.id ? saved : o)));
+                    toast.success("Origin updated successfully.");
+                  }
+                  setPageMode("list");
+                }}
+                onCancel={() => setPageMode("list")}
+                onSwitchToEdit={() => setPageMode("edit")}
+              />
+            )}
+
+            {activeTab === "uom" && (
+              <UOMMasterPageForm
+                mode={pageMode}
+                initialData={selectedRecord}
+                onSave={(saved) => {
+                  if (pageMode === "create") {
+                    setUoms((prev) => [saved, ...prev]);
+                    toast.success("UOM created successfully.");
+                  } else {
+                    setUoms((prev) => prev.map((u) => (u.id === saved.id ? saved : u)));
+                    toast.success("UOM updated successfully.");
+                  }
+                  setPageMode("list");
+                }}
+                onCancel={() => setPageMode("list")}
+                onSwitchToEdit={() => setPageMode("edit")}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
       {/* SUB GROUP CREATION / EDIT MODAL */}
       {isSubGroupModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
@@ -2085,17 +2075,7 @@ function InventoryConfigurationPage() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold mb-1 text-foreground">Description</label>
-                <textarea
-                  rows={2}
-                  value={subGroupFormValues.description || ""}
-                  onChange={(e) =>
-                    setSubGroupFormValues({ ...subGroupFormValues, description: e.target.value })
-                  }
-                  className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs resize-none focus:border-amber-500 outline-none"
-                />
-              </div>
+
 
               {(() => {
                 const parentGroup = itemGroups.find((g) => g.id === subGroupFormValues.itemGroupId);

@@ -92,6 +92,7 @@ export default function MonthlyBudgetRequisitionPage() {
   const [itemSearchOpen, setItemSearchOpen] = useState(false);
   const [itemSearchRowIndex, setItemSearchRowIndex] = useState<number | null>(null);
   const [itemSearchQuery, setItemSearchQuery] = useState("");
+  const [duplicateAlertItem, setDuplicateAlertItem] = useState<string | null>(null);
 
   useEffect(() => {
     setRequisitions(getStoredMonthlyBudgetRequisitions());
@@ -157,14 +158,14 @@ export default function MonthlyBudgetRequisitionPage() {
       documentDate: (active as any).requisitionDate || new Date().toISOString().slice(0, 10),
       department: (active as any).department || "Spinning & Production",
       status: (active as any).status || "Approved",
+      hideLogo: true,
+      hideDocHeaderInfo: true,
+      hideCompanyHeader: true,
       metadata: [
         { label: "MBR Number", value: (active as any).requisitionNumber || (active as any).requisitionId || "MBR-2026-001", highlight: true },
         { label: "Requisition Date", value: (active as any).requisitionDate || "—" },
         { label: "Budget Month", value: (active as any).budgetMonth || "—", highlight: true },
-        { label: "Company / Organization", value: (active as any).organization || (active as any).company || "Pakiza Knit Composite Ltd." },
         { label: "Department", value: (active as any).department || "—" },
-        { label: "Total Line Items", value: `${itemsList.length} items` },
-        { label: "Total Estimated Qty", value: `${totalQty.toLocaleString()} units` },
       ],
       items: itemsList.map((item: any, idx: number) => ({
         sl: idx + 1,
@@ -174,14 +175,10 @@ export default function MonthlyBudgetRequisitionPage() {
         brandOrigin: `${item.brand || "Standard"} / ${item.origin || "Local"}`,
         uom: item.uom,
         quantity: item.estimatedQuantity || 0,
-        unitPrice: item.estimatedUnitPrice || undefined,
-        totalAmount: item.estimatedAmount || undefined,
         remarks: item.remarks || (item.prId ? `PR: ${item.prId}` : undefined),
       })),
       financials: [
         { label: "Total Budget Quantity", value: `${totalQty.toLocaleString()} units` },
-        { label: "Total Line Items", value: `${itemsList.length} items` },
-        ...(totalVal > 0 ? [{ label: "Estimated Budget Value", value: `৳ ${totalVal.toLocaleString("en-BD", { minimumFractionDigits: 2 })}`, isTotal: true }] : []),
       ],
       remarks: (active as any).remarks || "Monthly material requirement budget plan approved for operational purchase.",
       signatures: [
@@ -325,6 +322,21 @@ export default function MonthlyBudgetRequisitionPage() {
 
   const handleSelectItemFromModal = (selected: ItemProductMaster) => {
     if (itemSearchRowIndex === null) return;
+
+    // Check for duplicate item in requisition
+    const isDuplicate = formData.items.some(
+      (it, idx) =>
+        idx !== itemSearchRowIndex &&
+        ((it.itemCode && it.itemCode === selected.itemCode) ||
+          (it.itemName && it.itemName.trim().toLowerCase() === selected.itemName.trim().toLowerCase()))
+    );
+
+    if (isDuplicate) {
+      setItemSearchOpen(false);
+      setDuplicateAlertItem(selected.itemName);
+      return;
+    }
+
     const updated = [...formData.items];
     const unitPrice = selected.standardCost || (selected as any).standardPurchasePrice || selected.lastPurchasePrice || 100;
     const qty = updated[itemSearchRowIndex].estimatedQuantity || 1;
@@ -701,7 +713,7 @@ export default function MonthlyBudgetRequisitionPage() {
                       <tr className="border-b border-slate-200 bg-slate-100/75 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
                         <th className="py-3 px-4">Budget Requisition #</th>
                         <th className="py-3 px-4">Budget Month</th>
-                        <th className="py-3 px-4">Organization & Dept</th>
+                        <th className="py-3 px-4">Department</th>
                         <th className="py-3 px-4 text-center">Items</th>
                         <th className="py-3 px-4 text-center">Status</th>
                         <th className="py-3 px-4 text-right">Actions</th>
@@ -740,8 +752,7 @@ export default function MonthlyBudgetRequisitionPage() {
                               </span>
                             </td>
                             <td className="py-3.5 px-4">
-                              <div className="font-medium text-slate-800">{org}</div>
-                              <div className="text-xs text-slate-500">{req.department}</div>
+                              <div className="font-medium text-slate-800">{req.department}</div>
                             </td>
                             <td className="py-3.5 px-4 text-center">
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
@@ -983,17 +994,7 @@ export default function MonthlyBudgetRequisitionPage() {
                   {viewMode === "create" ? "Create Monthly Budget Requisition" : "Edit Monthly Budget Requisition"}
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Requisition No.*</label>
-                    <input
-                      type="text"
-                      readOnly
-                      disabled
-                      value={formData.requisitionNumber}
-                      className="w-full px-3 py-2 border border-slate-200 bg-slate-100 text-slate-500 rounded-lg cursor-not-allowed font-mono font-medium outline-none"
-                    />
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-xs">
                   <div>
                     <label className="block font-semibold text-slate-700 mb-1">Requisition Date*</label>
                     <input
@@ -1013,23 +1014,6 @@ export default function MonthlyBudgetRequisitionPage() {
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Status</label>
-                    <span className="inline-block w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg font-semibold text-slate-700">
-                      {formData.status}
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Organization*</label>
-                    <input
-                      type="text"
-                      readOnly
-                      disabled
-                      value={formData.organization}
-                      className="w-full px-3 py-2 border border-slate-200 bg-slate-100 text-slate-600 rounded-lg cursor-not-allowed outline-none font-medium"
-                    />
-                  </div>
-                  <div>
                     <label className="block font-semibold text-slate-700 mb-1">Department*</label>
                     <input
                       type="text"
@@ -1039,13 +1023,19 @@ export default function MonthlyBudgetRequisitionPage() {
                       className="w-full px-3 py-2 border border-slate-200 bg-slate-100 text-slate-600 rounded-lg cursor-not-allowed outline-none font-medium"
                     />
                   </div>
-                  <div className="col-span-1 sm:col-span-2">
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">Status</label>
+                    <span className="inline-block w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg font-semibold text-slate-700">
+                      {formData.status}
+                    </span>
+                  </div>
+                  <div>
                     <label className="block font-semibold text-slate-700 mb-1">Remarks & Operational Notes</label>
                     <input
                       type="text"
                       value={formData.remarks}
                       onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
-                      placeholder="e.g. Estimated spares requirement for monthly machinery maintenance"
+                      placeholder="e.g. Spares requirement"
                       className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                     />
                   </div>
@@ -1376,6 +1366,37 @@ export default function MonthlyBudgetRequisitionPage() {
           )}
         </main>
       </div>
+
+      {/* Duplicate Item Alert Modal */}
+      {duplicateAlertItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-xl shadow-2xl border border-rose-200 max-w-md w-full p-5 animate-in fade-in zoom-in duration-150">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold text-slate-900">Duplicate Item Detected</h4>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                  The item <strong className="text-rose-700 font-semibold">&ldquo;{duplicateAlertItem}&rdquo;</strong> has already been added to this Monthly Budget Requisition.
+                </p>
+                <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                  Each item may only be added once per requisition. You can adjust the estimated quantity on the existing item line if more units are needed.
+                </p>
+                <div className="mt-4 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setDuplicateAlertItem(null)}
+                    className="px-4 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition cursor-pointer"
+                  >
+                    Close & Keep Existing
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Standard Preview Report Modal */}
       <StandardPreviewReportModal

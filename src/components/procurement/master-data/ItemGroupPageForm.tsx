@@ -200,17 +200,7 @@ export function ItemGroupPageForm({
               </label>
             </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-bold mb-1 text-foreground">Description</label>
-              <textarea
-                rows={3}
-                disabled={isView}
-                value={formData.description || ""}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Primary grouping classification and product lines included..."
-                className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs resize-none focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-            </div>
+
           </div>
         </div>
 

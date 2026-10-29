@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { employeesData } from "@/routes/personnel-list";
+import { getCardByEmployeeId } from "@/lib/digital-business-card-service";
 import {
   UserRound,
   Printer,
@@ -869,7 +870,17 @@ function IDCardSetupPage() {
           {/* Left Column: QR Code Container + Left Details */}
           <div className="w-[47%] flex flex-col justify-between h-full py-1">
             {/* Elegant QR Code Frame */}
-            <div className="relative size-20 bg-white border border-slate-200 rounded-2xl p-2.5 flex items-center justify-center self-center shadow-sm">
+            <div
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  const card = getCardByEmployeeId(emp.id);
+                  const tokenOrId = card?.publicToken || emp.id;
+                  window.open(`/digital-business-card/${tokenOrId}`, "_blank");
+                }
+              }}
+              title="Scan QR or click to open Employee Digital Business Card"
+              className="relative size-20 bg-white border border-slate-200 rounded-2xl p-2.5 flex items-center justify-center self-center shadow-sm cursor-pointer hover:scale-105 transition-transform"
+            >
               {renderQRCodeSVG()}
               {/* Inner white ring for QR frame */}
               <div className="absolute -inset-[1px] rounded-2xl border-[1.5px] border-white pointer-events-none" />
@@ -1002,7 +1013,17 @@ function IDCardSetupPage() {
         {/* Content */}
         <div className="flex-1 flex gap-5 items-center py-2 z-10">
           {/* QR Code */}
-          <div className="size-15 bg-white border border-slate-200 p-1.5 rounded-xl flex items-center justify-center shrink-0 shadow-3xs">
+          <div
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                const card = getCardByEmployeeId(emp.id);
+                const tokenOrId = card?.publicToken || emp.id;
+                window.open(`/digital-business-card/${tokenOrId}`, "_blank");
+              }
+            }}
+            title="Scan QR or click to open Employee Digital Business Card"
+            className="size-15 bg-white border border-slate-200 p-1.5 rounded-xl flex items-center justify-center shrink-0 shadow-3xs cursor-pointer hover:scale-105 transition-transform"
+          >
             {renderQRCodeSVG()}
           </div>
 

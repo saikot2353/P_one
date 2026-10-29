@@ -172,6 +172,16 @@ export const nav: NavItem[] = [
     ],
   },
   {
+    label: "Digital Business Card",
+    icon: CreditCard,
+    subitems: [
+      { label: "My Digital Business Card", to: "/my-digital-business-card" },
+      { label: "Share My Card", to: "/share-my-card" },
+      { label: "Business Card Management", to: "/digital-business-cards-admin" },
+      { label: "Card Analytics", to: "/digital-business-card-analytics" },
+    ],
+  },
+  {
     label: "Attendance",
     icon: Fingerprint,
     subitems: [
@@ -342,14 +352,14 @@ export const nav: NavItem[] = [
           { label: "Zakat List", to: "/zakat-list" },
           { label: "Asset Master Data", to: "/zakat-asset-master" },
           { label: "Zakat Report Report", to: "/zakat-executive-report" },
-        ]
+        ],
       },
       {
         label: "Financial Aid",
         subitems: [
           { label: "Budget Configuration", to: "/financial-aid-budget-configuration" },
           { label: "Financial Aid List", to: "/financial-aid-list" },
-        ]
+        ],
       },
     ],
   },
@@ -379,7 +389,11 @@ export const nav: NavItem[] = [
       { label: "OT Requisition List", to: "/manage-overtime", search: { tab: "requisition-list" } },
       { label: "Submit OT Req", to: "/manage-overtime", search: { tab: "submit" } },
       { label: "Submitted OT List", to: "/manage-overtime", search: { tab: "submitted-list" } },
-      { label: "Individual OT Review", to: "/manage-overtime", search: { tab: "individual-review" } },
+      {
+        label: "Individual OT Review",
+        to: "/manage-overtime",
+        search: { tab: "individual-review" },
+      },
       { label: "Lunce Requisition", to: "/lunch-requisition" },
       { label: "Festival Allowance", to: "/festival-allowance" },
     ],
@@ -454,7 +468,7 @@ export const nav: NavItem[] = [
         label: "Final Settlement",
         subitems: [
           { label: "Execute Final Settlement", to: "/final-settlement" },
-          { label: "Final Settlement Configuration", to: "/final-settlement-configuration" }
+          { label: "Final Settlement Configuration", to: "/final-settlement-configuration" },
         ],
       },
       { label: "Payroll Configuration", to: "/payroll-configure" },
@@ -615,7 +629,7 @@ export function Sidebar() {
         try {
           const parsed = JSON.parse(saved);
           return { ...parsed, ...initial };
-        } catch (e) { }
+        } catch (e) {}
       }
     }
     return initial;
@@ -671,7 +685,28 @@ export function Sidebar() {
     }));
   };
 
-  const filteredNav = nav;
+  const userRole =
+    typeof window !== "undefined"
+      ? (() => {
+          try {
+            const u = localStorage.getItem("cripton_current_user");
+            if (u) return JSON.parse(u).role?.toLowerCase();
+          } catch (e) {}
+          return "admin";
+        })()
+      : "admin";
+
+  const filteredNav = nav.map((item) => {
+    if (item.label === "Digital Business Card" && item.subitems) {
+      const isRegularEmp = userRole === "employee";
+      const filteredSubs = item.subitems.filter((sub) => {
+        if (isRegularEmp && sub.to === "/digital-business-cards-admin") return false;
+        return true;
+      });
+      return { ...item, subitems: filteredSubs };
+    }
+    return item;
+  });
 
   if (typeof window !== "undefined" && window.location.search.includes("embed=true")) {
     return null;
@@ -907,7 +942,8 @@ export function Sidebar() {
                                     ].join(" ")}
                                   >
                                     {nested.subitems.map((deep) => {
-                                      const isDeepActive = deep.to !== "/" && deep.to === currentPath;
+                                      const isDeepActive =
+                                        deep.to !== "/" && deep.to === currentPath;
                                       return (
                                         <Link
                                           key={deep.label}
@@ -922,7 +958,9 @@ export function Sidebar() {
                                           <span
                                             className={[
                                               "w-1.5 h-1.5 rounded-full shrink-0",
-                                              isDeepActive ? "bg-primary" : "bg-sidebar-foreground/20",
+                                              isDeepActive
+                                                ? "bg-primary"
+                                                : "bg-sidebar-foreground/20",
                                             ].join(" ")}
                                           />
                                           <span className="truncate">{deep.label}</span>

@@ -35,7 +35,6 @@ export function VendorCategoryPageForm({
     if (isView) return;
 
     const errors: Record<string, string> = {};
-    if (!formData.categoryCode?.trim()) errors.categoryCode = "Category Code is required";
     if (!formData.categoryName?.trim()) errors.categoryName = "Category Name is required";
 
     if (Object.keys(errors).length > 0) {
@@ -131,23 +130,7 @@ export function VendorCategoryPageForm({
             <h2 className="text-sm font-bold text-foreground">Category Specification</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">
-                Category Code <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                disabled={isView}
-                value={formData.categoryCode || ""}
-                onChange={(e) => setFormData({ ...formData, categoryCode: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-              {formErrors.categoryCode && (
-                <p className="text-[10px] text-rose-500 mt-1">{formErrors.categoryCode}</p>
-              )}
-            </div>
-
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Category Name <span className="text-rose-500">*</span>
@@ -165,7 +148,7 @@ export function VendorCategoryPageForm({
               )}
             </div>
 
-            <div className="sm:col-span-2">
+            <div>
               <label className="block text-xs font-bold mb-1 text-foreground">Status</label>
               <select
                 disabled={isView}
@@ -178,18 +161,6 @@ export function VendorCategoryPageForm({
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-bold mb-1 text-foreground">Description</label>
-              <textarea
-                rows={3}
-                disabled={isView}
-                value={formData.description || ""}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Classification scope, industry domain, sourcing criteria..."
-                className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs resize-none focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
             </div>
           </div>
         </div>
