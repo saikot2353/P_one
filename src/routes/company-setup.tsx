@@ -6887,28 +6887,36 @@ export function CompanySetupView({
                           {/* Specific Person Fields */}
                           {cfg.loanApplicantType === "Specific Person" && (
                             <>
-                              {/* Employee ID */}
+                              {/* Employee ID (Searchable Multi-Select) */}
                               <div className={wrap}>
                                 <label className={lbl}>
                                   Select Employee ID <span className="text-rose-500">*</span>
                                 </label>
-                                <select
-                                  value={cfg.loanSpecificEmployeeId || ""}
-                                  onChange={(e) => {
-                                    const selectedId = e.target.value;
-                                    const emp = MOCK_LOAN_EMPLOYEES.find((item) => item.id === selectedId);
-                                    update("loanSpecificEmployeeId", selectedId);
-                                    update("loanSpecificEmployeeName", emp ? emp.name : "");
+                                <MultiSelect
+                                  options={MOCK_LOAN_EMPLOYEES.map((emp) => ({
+                                    value: emp.id,
+                                    label: `${emp.id} — ${emp.name}`,
+                                  }))}
+                                  selected={
+                                    cfg.loanSpecificEmployeeId
+                                      ? cfg.loanSpecificEmployeeId
+                                          .split(",")
+                                          .map((s) => s.trim())
+                                          .filter(Boolean)
+                                      : []
+                                  }
+                                  onChange={(newIds) => {
+                                    const idStr = newIds.join(", ");
+                                    const namesStr = newIds
+                                      .map((id) => MOCK_LOAN_EMPLOYEES.find((e) => e.id === id)?.name || id)
+                                      .join(", ");
+                                    update("loanSpecificEmployeeId", idStr);
+                                    update("loanSpecificEmployeeName", namesStr);
                                   }}
-                                  className={sel}
-                                >
-                                  <option value="">-- Select Employee ID --</option>
-                                  {MOCK_LOAN_EMPLOYEES.map((emp) => (
-                                    <option key={emp.id} value={emp.id}>
-                                      {emp.id} — {emp.name}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="Search & select employee(s)..."
+                                  className="h-10 rounded-lg border-border/60 bg-muted/10 hover:bg-muted/20 text-sm"
+                                  maxDisplay={1}
+                                />
                               </div>
 
                               {/* Employee Name (Clean Auto-populated) */}
@@ -6921,11 +6929,19 @@ export function CompanySetupView({
                                   readOnly
                                   value={
                                     cfg.loanSpecificEmployeeName ||
-                                    MOCK_LOAN_EMPLOYEES.find((e) => e.id === cfg.loanSpecificEmployeeId)?.name ||
-                                    ""
+                                    (() => {
+                                      const ids = (cfg.loanSpecificEmployeeId || "")
+                                        .split(",")
+                                        .map((s) => s.trim())
+                                        .filter(Boolean);
+                                      return ids
+                                        .map((id) => MOCK_LOAN_EMPLOYEES.find((e) => e.id === id)?.name || id)
+                                        .join(", ");
+                                    })()
                                   }
                                   placeholder="Auto-populated from Employee ID"
                                   className={`${inp} bg-muted/40 cursor-not-allowed font-medium text-foreground`}
+                                  title={cfg.loanSpecificEmployeeName}
                                 />
                               </div>
                             </>
