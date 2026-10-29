@@ -935,24 +935,6 @@ function WorkingHourAnalysisPage() {
                   <span>SEARCH</span>
                 </button>
               </div>
-
-              {/* Informational Blue Week Details Banner (as featured in screenshot) */}
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1 font-semibold text-xs text-blue-600 dark:text-blue-400">
-                <div className="leading-relaxed">
-                  <span className="font-bold">Week-1:</span> <span className="font-extrabold text-blue-700 dark:text-blue-300">2026-09-01</span> to <span className="font-extrabold text-blue-700 dark:text-blue-300">2026-09-04</span>;{" "}
-                  <span className="font-bold">Week-2:</span> <span className="font-extrabold text-blue-700 dark:text-blue-300">2026-09-05</span> to <span className="font-extrabold text-blue-700 dark:text-blue-300">2026-09-11</span>;{" "}
-                  <span className="font-bold">Week-3:</span> <span className="font-extrabold text-blue-700 dark:text-blue-300">2026-09-12</span> to <span className="font-extrabold text-blue-700 dark:text-blue-300">2026-09-18</span>;{" "}
-                  <span className="font-bold">Week-4:</span> <span className="font-extrabold text-blue-700 dark:text-blue-300">2026-09-19</span> to <span className="font-extrabold text-blue-700 dark:text-blue-300">2026-09-25</span>;{" "}
-                  <span className="font-bold">Week-5:</span> <span className="font-extrabold text-blue-700 dark:text-blue-300">2026-09-26</span> to <span className="font-extrabold text-blue-700 dark:text-blue-300">2026-09-30</span>;
-                </div>
-                <div>
-                  <span className="font-bold">WeekTop1:</span> <span className="font-black text-blue-700 dark:text-blue-300">50</span>,{" "}
-                  <span className="font-bold">WeekTop2:</span> <span className="font-black text-blue-700 dark:text-blue-300">90</span>,{" "}
-                  <span className="font-bold">WeekTop3:</span> <span className="font-black text-blue-700 dark:text-blue-300">71</span>,{" "}
-                  <span className="font-bold">WeekTop4:</span> <span className="font-black text-blue-700 dark:text-blue-300">83</span>,{" "}
-                  <span className="font-bold">WeekTop5:</span> <span className="font-black text-blue-700 dark:text-blue-300">60</span>
-                </div>
-              </div>
             </div>
           </div>
 
