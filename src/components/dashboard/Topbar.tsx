@@ -612,9 +612,27 @@ const searchableMenus: SearchMenuLink[] = [
   },
   {
     label: "Increment History",
-    parent: "Evaluation",
+    parent: "HR Reports",
     to: "/increment-history",
     description: "Historical increment records log for all employees",
+  },
+  {
+    label: "Increment QueueList",
+    parent: "HR Reports",
+    to: "/increment-queuelist",
+    description: "Increment queue and verification list report",
+  },
+  {
+    label: "Pending OT Request",
+    parent: "HR Reports",
+    to: "/pending-ot-request",
+    description: "Employee overtime requisitions and pending allowance report",
+  },
+  {
+    label: "Working Hour Analysis",
+    parent: "HR Reports",
+    to: "/working-hour-analysis",
+    description: "Employee weekly working hours and overtime threshold analysis",
   },
   {
     label: "Approve Increment Gadget",

@@ -67,6 +67,7 @@ import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EmployeeSalaryHistoryRouteImport } from './routes/employee-salary-history'
 import { Route as EmployeeTaxPayRouteImport } from './routes/employee-tax-pay'
 import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
+import { Route as ExtraOtReportRouteImport } from './routes/extra-ot-report'
 import { Route as FestivalAllowanceRouteImport } from './routes/festival-allowance'
 import { Route as FestivalAllowanceApprovalRouteImport } from './routes/festival-allowance-approval'
 import { Route as FestivalAllowanceCheckHrRouteImport } from './routes/festival-allowance-check-hr'
@@ -89,23 +90,27 @@ import { Route as HrReportContinuousAbsentRouteImport } from './routes/hr-report
 import { Route as HrReportDailyAttendanceRouteImport } from './routes/hr-report-daily-attendance'
 import { Route as HrReportEmployeeCountRouteImport } from './routes/hr-report-employee-count'
 import { Route as HrReportEmployeeInfoComplianceRouteImport } from './routes/hr-report-employee-info-compliance'
+import { Route as HrReportIncrementQueuelistRouteImport } from './routes/hr-report-increment-queuelist'
 import { Route as HrReportLeaveDetailsRouteImport } from './routes/hr-report-leave-details'
 import { Route as HrReportLeaveSummaryRouteImport } from './routes/hr-report-leave-summary'
 import { Route as HrReportMonthlyAttendanceRouteImport } from './routes/hr-report-monthly-attendance'
 import { Route as HrReportNewJoiningInfoRouteImport } from './routes/hr-report-new-joining-info'
 import { Route as HrReportNightCardRouteImport } from './routes/hr-report-night-card'
 import { Route as HrReportOvertimeSummaryRouteImport } from './routes/hr-report-overtime-summary'
+import { Route as HrReportPendingOtRequestRouteImport } from './routes/hr-report-pending-ot-request'
 import { Route as HrReportSeparationListRouteImport } from './routes/hr-report-separation-list'
 import { Route as HrReportSimRequisitionRouteImport } from './routes/hr-report-sim-requisition'
 import { Route as HrReportTiffinAllowanceAllRouteImport } from './routes/hr-report-tiffin-allowance-all'
 import { Route as HrReportTiffinCardRouteImport } from './routes/hr-report-tiffin-card'
 import { Route as HrReportWithoutInOutAttendanceRouteImport } from './routes/hr-report-without-in-out-attendance'
+import { Route as HrReportWorkingHourAnalysisRouteImport } from './routes/hr-report-working-hour-analysis'
 import { Route as HrReportsRouteImport } from './routes/hr-reports'
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
 import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncrementHistoryRouteImport } from './routes/increment-history'
 import { Route as IncrementMultipleRouteImport } from './routes/increment-multiple'
+import { Route as IncrementQueuelistRouteImport } from './routes/increment-queuelist'
 import { Route as IncrementReportRouteImport } from './routes/increment-report'
 import { Route as InvConfigBrandRouteImport } from './routes/inv-config-brand'
 import { Route as InvConfigGroupNameRouteImport } from './routes/inv-config-group-name'
@@ -251,6 +256,7 @@ import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salar
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MyProfileRouteImport } from './routes/my-profile'
+import { Route as NightAllowanceReportRouteImport } from './routes/night-allowance-report'
 import { Route as NoticeRouteImport } from './routes/notice'
 import { Route as OrganizationMasterSetupRouteImport } from './routes/organization-master-setup'
 import { Route as OtSheetHolidayRouteImport } from './routes/ot-sheet-holiday'
@@ -280,6 +286,7 @@ import { Route as PayrollSalarySubmitRouteImport } from './routes/payroll-salary
 import { Route as PayslipPrintRouteImport } from './routes/payslip-print'
 import { Route as PendingApprovalsRouteImport } from './routes/pending-approvals'
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
+import { Route as PendingOtRequestRouteImport } from './routes/pending-ot-request'
 import { Route as PermissionManagementRouteImport } from './routes/permission-management'
 import { Route as PersonalInfoApprovalRouteImport } from './routes/personal-info-approval'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
@@ -398,6 +405,7 @@ import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as WelfareVerificationRouteImport } from './routes/welfare-verification'
 import { Route as WorkFlowRouteImport } from './routes/work-flow'
 import { Route as WorkFlowsRouteImport } from './routes/work-flows'
+import { Route as WorkingHourAnalysisRouteImport } from './routes/working-hour-analysis'
 import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
 import { Route as YearlyBonusReportRouteImport } from './routes/yearly-bonus-report'
 import { Route as ZakatAndFinancialAidRouteImport } from './routes/zakat-and-financial-aid'
@@ -706,6 +714,11 @@ const EnrollFingerprintRoute = EnrollFingerprintRouteImport.update({
   path: '/enroll-fingerprint',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExtraOtReportRoute = ExtraOtReportRouteImport.update({
+  id: '/extra-ot-report',
+  path: '/extra-ot-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FestivalAllowanceRoute = FestivalAllowanceRouteImport.update({
   id: '/festival-allowance',
   path: '/festival-allowance',
@@ -828,6 +841,12 @@ const HrReportEmployeeInfoComplianceRoute =
     path: '/hr-report-employee-info-compliance',
     getParentRoute: () => rootRouteImport,
   } as any)
+const HrReportIncrementQueuelistRoute =
+  HrReportIncrementQueuelistRouteImport.update({
+    id: '/hr-report-increment-queuelist',
+    path: '/hr-report-increment-queuelist',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HrReportLeaveDetailsRoute = HrReportLeaveDetailsRouteImport.update({
   id: '/hr-report-leave-details',
   path: '/hr-report-leave-details',
@@ -859,6 +878,12 @@ const HrReportOvertimeSummaryRoute = HrReportOvertimeSummaryRouteImport.update({
   path: '/hr-report-overtime-summary',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HrReportPendingOtRequestRoute =
+  HrReportPendingOtRequestRouteImport.update({
+    id: '/hr-report-pending-ot-request',
+    path: '/hr-report-pending-ot-request',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HrReportSeparationListRoute = HrReportSeparationListRouteImport.update({
   id: '/hr-report-separation-list',
   path: '/hr-report-separation-list',
@@ -884,6 +909,12 @@ const HrReportWithoutInOutAttendanceRoute =
   HrReportWithoutInOutAttendanceRouteImport.update({
     id: '/hr-report-without-in-out-attendance',
     path: '/hr-report-without-in-out-attendance',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const HrReportWorkingHourAnalysisRoute =
+  HrReportWorkingHourAnalysisRouteImport.update({
+    id: '/hr-report-working-hour-analysis',
+    path: '/hr-report-working-hour-analysis',
     getParentRoute: () => rootRouteImport,
   } as any)
 const HrReportsRoute = HrReportsRouteImport.update({
@@ -914,6 +945,11 @@ const IncrementHistoryRoute = IncrementHistoryRouteImport.update({
 const IncrementMultipleRoute = IncrementMultipleRouteImport.update({
   id: '/increment-multiple',
   path: '/increment-multiple',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncrementQueuelistRoute = IncrementQueuelistRouteImport.update({
+  id: '/increment-queuelist',
+  path: '/increment-queuelist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IncrementReportRoute = IncrementReportRouteImport.update({
@@ -1675,6 +1711,11 @@ const MyProfileRoute = MyProfileRouteImport.update({
   path: '/my-profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NightAllowanceReportRoute = NightAllowanceReportRouteImport.update({
+  id: '/night-allowance-report',
+  path: '/night-allowance-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NoticeRoute = NoticeRouteImport.update({
   id: '/notice',
   path: '/notice',
@@ -1824,6 +1865,11 @@ const PendingApprovalsRoute = PendingApprovalsRouteImport.update({
 const PendingManualAttendanceRoute = PendingManualAttendanceRouteImport.update({
   id: '/pending-manual-attendance',
   path: '/pending-manual-attendance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PendingOtRequestRoute = PendingOtRequestRouteImport.update({
+  id: '/pending-ot-request',
+  path: '/pending-ot-request',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PermissionManagementRoute = PermissionManagementRouteImport.update({
@@ -2474,6 +2520,11 @@ const WorkFlowsRoute = WorkFlowsRouteImport.update({
   path: '/work-flows',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkingHourAnalysisRoute = WorkingHourAnalysisRouteImport.update({
+  id: '/working-hour-analysis',
+  path: '/working-hour-analysis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const YearlyBonusProcessRoute = YearlyBonusProcessRouteImport.update({
   id: '/yearly-bonus-process',
   path: '/yearly-bonus-process',
@@ -2598,6 +2649,7 @@ export interface FileRoutesByFullPath {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/extra-ot-report': typeof ExtraOtReportRoute
   '/festival-allowance': typeof FestivalAllowanceRoute
   '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
   '/festival-allowance-check-hr': typeof FestivalAllowanceCheckHrRoute
@@ -2620,23 +2672,27 @@ export interface FileRoutesByFullPath {
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
   '/hr-report-employee-info-compliance': typeof HrReportEmployeeInfoComplianceRoute
+  '/hr-report-increment-queuelist': typeof HrReportIncrementQueuelistRoute
   '/hr-report-leave-details': typeof HrReportLeaveDetailsRoute
   '/hr-report-leave-summary': typeof HrReportLeaveSummaryRoute
   '/hr-report-monthly-attendance': typeof HrReportMonthlyAttendanceRoute
   '/hr-report-new-joining-info': typeof HrReportNewJoiningInfoRoute
   '/hr-report-night-card': typeof HrReportNightCardRoute
   '/hr-report-overtime-summary': typeof HrReportOvertimeSummaryRoute
+  '/hr-report-pending-ot-request': typeof HrReportPendingOtRequestRoute
   '/hr-report-separation-list': typeof HrReportSeparationListRoute
   '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
   '/hr-report-tiffin-allowance-all': typeof HrReportTiffinAllowanceAllRoute
   '/hr-report-tiffin-card': typeof HrReportTiffinCardRoute
   '/hr-report-without-in-out-attendance': typeof HrReportWithoutInOutAttendanceRoute
+  '/hr-report-working-hour-analysis': typeof HrReportWorkingHourAnalysisRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
   '/increment-history': typeof IncrementHistoryRoute
   '/increment-multiple': typeof IncrementMultipleRoute
+  '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
   '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
@@ -2782,6 +2838,7 @@ export interface FileRoutesByFullPath {
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/my-profile': typeof MyProfileRoute
+  '/night-allowance-report': typeof NightAllowanceReportRoute
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
@@ -2811,6 +2868,7 @@ export interface FileRoutesByFullPath {
   '/payslip-print': typeof PayslipPrintRoute
   '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
+  '/pending-ot-request': typeof PendingOtRequestRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personal-info-approval': typeof PersonalInfoApprovalRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -2929,6 +2987,7 @@ export interface FileRoutesByFullPath {
   '/welfare-verification': typeof WelfareVerificationRoute
   '/work-flow': typeof WorkFlowRoute
   '/work-flows': typeof WorkFlowsRoute
+  '/working-hour-analysis': typeof WorkingHourAnalysisRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-and-financial-aid': typeof ZakatAndFinancialAidRoute
@@ -3001,6 +3060,7 @@ export interface FileRoutesByTo {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/extra-ot-report': typeof ExtraOtReportRoute
   '/festival-allowance': typeof FestivalAllowanceRoute
   '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
   '/festival-allowance-check-hr': typeof FestivalAllowanceCheckHrRoute
@@ -3023,23 +3083,27 @@ export interface FileRoutesByTo {
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
   '/hr-report-employee-info-compliance': typeof HrReportEmployeeInfoComplianceRoute
+  '/hr-report-increment-queuelist': typeof HrReportIncrementQueuelistRoute
   '/hr-report-leave-details': typeof HrReportLeaveDetailsRoute
   '/hr-report-leave-summary': typeof HrReportLeaveSummaryRoute
   '/hr-report-monthly-attendance': typeof HrReportMonthlyAttendanceRoute
   '/hr-report-new-joining-info': typeof HrReportNewJoiningInfoRoute
   '/hr-report-night-card': typeof HrReportNightCardRoute
   '/hr-report-overtime-summary': typeof HrReportOvertimeSummaryRoute
+  '/hr-report-pending-ot-request': typeof HrReportPendingOtRequestRoute
   '/hr-report-separation-list': typeof HrReportSeparationListRoute
   '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
   '/hr-report-tiffin-allowance-all': typeof HrReportTiffinAllowanceAllRoute
   '/hr-report-tiffin-card': typeof HrReportTiffinCardRoute
   '/hr-report-without-in-out-attendance': typeof HrReportWithoutInOutAttendanceRoute
+  '/hr-report-working-hour-analysis': typeof HrReportWorkingHourAnalysisRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
   '/increment-history': typeof IncrementHistoryRoute
   '/increment-multiple': typeof IncrementMultipleRoute
+  '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
   '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
@@ -3185,6 +3249,7 @@ export interface FileRoutesByTo {
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/my-profile': typeof MyProfileRoute
+  '/night-allowance-report': typeof NightAllowanceReportRoute
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
@@ -3214,6 +3279,7 @@ export interface FileRoutesByTo {
   '/payslip-print': typeof PayslipPrintRoute
   '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
+  '/pending-ot-request': typeof PendingOtRequestRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personal-info-approval': typeof PersonalInfoApprovalRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -3332,6 +3398,7 @@ export interface FileRoutesByTo {
   '/welfare-verification': typeof WelfareVerificationRoute
   '/work-flow': typeof WorkFlowRoute
   '/work-flows': typeof WorkFlowsRoute
+  '/working-hour-analysis': typeof WorkingHourAnalysisRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-and-financial-aid': typeof ZakatAndFinancialAidRoute
@@ -3405,6 +3472,7 @@ export interface FileRoutesById {
   '/employee-salary-history': typeof EmployeeSalaryHistoryRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
+  '/extra-ot-report': typeof ExtraOtReportRoute
   '/festival-allowance': typeof FestivalAllowanceRoute
   '/festival-allowance-approval': typeof FestivalAllowanceApprovalRoute
   '/festival-allowance-check-hr': typeof FestivalAllowanceCheckHrRoute
@@ -3427,23 +3495,27 @@ export interface FileRoutesById {
   '/hr-report-daily-attendance': typeof HrReportDailyAttendanceRoute
   '/hr-report-employee-count': typeof HrReportEmployeeCountRoute
   '/hr-report-employee-info-compliance': typeof HrReportEmployeeInfoComplianceRoute
+  '/hr-report-increment-queuelist': typeof HrReportIncrementQueuelistRoute
   '/hr-report-leave-details': typeof HrReportLeaveDetailsRoute
   '/hr-report-leave-summary': typeof HrReportLeaveSummaryRoute
   '/hr-report-monthly-attendance': typeof HrReportMonthlyAttendanceRoute
   '/hr-report-new-joining-info': typeof HrReportNewJoiningInfoRoute
   '/hr-report-night-card': typeof HrReportNightCardRoute
   '/hr-report-overtime-summary': typeof HrReportOvertimeSummaryRoute
+  '/hr-report-pending-ot-request': typeof HrReportPendingOtRequestRoute
   '/hr-report-separation-list': typeof HrReportSeparationListRoute
   '/hr-report-sim-requisition': typeof HrReportSimRequisitionRoute
   '/hr-report-tiffin-allowance-all': typeof HrReportTiffinAllowanceAllRoute
   '/hr-report-tiffin-card': typeof HrReportTiffinCardRoute
   '/hr-report-without-in-out-attendance': typeof HrReportWithoutInOutAttendanceRoute
+  '/hr-report-working-hour-analysis': typeof HrReportWorkingHourAnalysisRoute
   '/hr-reports': typeof HrReportsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
   '/increment-history': typeof IncrementHistoryRoute
   '/increment-multiple': typeof IncrementMultipleRoute
+  '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
   '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
@@ -3589,6 +3661,7 @@ export interface FileRoutesById {
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/my-profile': typeof MyProfileRoute
+  '/night-allowance-report': typeof NightAllowanceReportRoute
   '/notice': typeof NoticeRoute
   '/organization-master-setup': typeof OrganizationMasterSetupRoute
   '/ot-sheet-holiday': typeof OtSheetHolidayRoute
@@ -3618,6 +3691,7 @@ export interface FileRoutesById {
   '/payslip-print': typeof PayslipPrintRoute
   '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
+  '/pending-ot-request': typeof PendingOtRequestRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personal-info-approval': typeof PersonalInfoApprovalRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -3736,6 +3810,7 @@ export interface FileRoutesById {
   '/welfare-verification': typeof WelfareVerificationRoute
   '/work-flow': typeof WorkFlowRoute
   '/work-flows': typeof WorkFlowsRoute
+  '/working-hour-analysis': typeof WorkingHourAnalysisRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
   '/yearly-bonus-report': typeof YearlyBonusReportRoute
   '/zakat-and-financial-aid': typeof ZakatAndFinancialAidRoute
@@ -3810,6 +3885,7 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/extra-ot-report'
     | '/festival-allowance'
     | '/festival-allowance-approval'
     | '/festival-allowance-check-hr'
@@ -3832,23 +3908,27 @@ export interface FileRouteTypes {
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
     | '/hr-report-employee-info-compliance'
+    | '/hr-report-increment-queuelist'
     | '/hr-report-leave-details'
     | '/hr-report-leave-summary'
     | '/hr-report-monthly-attendance'
     | '/hr-report-new-joining-info'
     | '/hr-report-night-card'
     | '/hr-report-overtime-summary'
+    | '/hr-report-pending-ot-request'
     | '/hr-report-separation-list'
     | '/hr-report-sim-requisition'
     | '/hr-report-tiffin-allowance-all'
     | '/hr-report-tiffin-card'
     | '/hr-report-without-in-out-attendance'
+    | '/hr-report-working-hour-analysis'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
     | '/increment-history'
     | '/increment-multiple'
+    | '/increment-queuelist'
     | '/increment-report'
     | '/inv-config-brand'
     | '/inv-config-group-name'
@@ -3994,6 +4074,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/my-profile'
+    | '/night-allowance-report'
     | '/notice'
     | '/organization-master-setup'
     | '/ot-sheet-holiday'
@@ -4023,6 +4104,7 @@ export interface FileRouteTypes {
     | '/payslip-print'
     | '/pending-approvals'
     | '/pending-manual-attendance'
+    | '/pending-ot-request'
     | '/permission-management'
     | '/personal-info-approval'
     | '/personnel-approval'
@@ -4141,6 +4223,7 @@ export interface FileRouteTypes {
     | '/welfare-verification'
     | '/work-flow'
     | '/work-flows'
+    | '/working-hour-analysis'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
     | '/zakat-and-financial-aid'
@@ -4213,6 +4296,7 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/extra-ot-report'
     | '/festival-allowance'
     | '/festival-allowance-approval'
     | '/festival-allowance-check-hr'
@@ -4235,23 +4319,27 @@ export interface FileRouteTypes {
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
     | '/hr-report-employee-info-compliance'
+    | '/hr-report-increment-queuelist'
     | '/hr-report-leave-details'
     | '/hr-report-leave-summary'
     | '/hr-report-monthly-attendance'
     | '/hr-report-new-joining-info'
     | '/hr-report-night-card'
     | '/hr-report-overtime-summary'
+    | '/hr-report-pending-ot-request'
     | '/hr-report-separation-list'
     | '/hr-report-sim-requisition'
     | '/hr-report-tiffin-allowance-all'
     | '/hr-report-tiffin-card'
     | '/hr-report-without-in-out-attendance'
+    | '/hr-report-working-hour-analysis'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
     | '/increment-history'
     | '/increment-multiple'
+    | '/increment-queuelist'
     | '/increment-report'
     | '/inv-config-brand'
     | '/inv-config-group-name'
@@ -4397,6 +4485,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/my-profile'
+    | '/night-allowance-report'
     | '/notice'
     | '/organization-master-setup'
     | '/ot-sheet-holiday'
@@ -4426,6 +4515,7 @@ export interface FileRouteTypes {
     | '/payslip-print'
     | '/pending-approvals'
     | '/pending-manual-attendance'
+    | '/pending-ot-request'
     | '/permission-management'
     | '/personal-info-approval'
     | '/personnel-approval'
@@ -4544,6 +4634,7 @@ export interface FileRouteTypes {
     | '/welfare-verification'
     | '/work-flow'
     | '/work-flows'
+    | '/working-hour-analysis'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
     | '/zakat-and-financial-aid'
@@ -4616,6 +4707,7 @@ export interface FileRouteTypes {
     | '/employee-salary-history'
     | '/employee-tax-pay'
     | '/enroll-fingerprint'
+    | '/extra-ot-report'
     | '/festival-allowance'
     | '/festival-allowance-approval'
     | '/festival-allowance-check-hr'
@@ -4638,23 +4730,27 @@ export interface FileRouteTypes {
     | '/hr-report-daily-attendance'
     | '/hr-report-employee-count'
     | '/hr-report-employee-info-compliance'
+    | '/hr-report-increment-queuelist'
     | '/hr-report-leave-details'
     | '/hr-report-leave-summary'
     | '/hr-report-monthly-attendance'
     | '/hr-report-new-joining-info'
     | '/hr-report-night-card'
     | '/hr-report-overtime-summary'
+    | '/hr-report-pending-ot-request'
     | '/hr-report-separation-list'
     | '/hr-report-sim-requisition'
     | '/hr-report-tiffin-allowance-all'
     | '/hr-report-tiffin-card'
     | '/hr-report-without-in-out-attendance'
+    | '/hr-report-working-hour-analysis'
     | '/hr-reports'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
     | '/increment-history'
     | '/increment-multiple'
+    | '/increment-queuelist'
     | '/increment-report'
     | '/inv-config-brand'
     | '/inv-config-group-name'
@@ -4800,6 +4896,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/my-profile'
+    | '/night-allowance-report'
     | '/notice'
     | '/organization-master-setup'
     | '/ot-sheet-holiday'
@@ -4829,6 +4926,7 @@ export interface FileRouteTypes {
     | '/payslip-print'
     | '/pending-approvals'
     | '/pending-manual-attendance'
+    | '/pending-ot-request'
     | '/permission-management'
     | '/personal-info-approval'
     | '/personnel-approval'
@@ -4947,6 +5045,7 @@ export interface FileRouteTypes {
     | '/welfare-verification'
     | '/work-flow'
     | '/work-flows'
+    | '/working-hour-analysis'
     | '/yearly-bonus-process'
     | '/yearly-bonus-report'
     | '/zakat-and-financial-aid'
@@ -5020,6 +5119,7 @@ export interface RootRouteChildren {
   EmployeeSalaryHistoryRoute: typeof EmployeeSalaryHistoryRoute
   EmployeeTaxPayRoute: typeof EmployeeTaxPayRoute
   EnrollFingerprintRoute: typeof EnrollFingerprintRoute
+  ExtraOtReportRoute: typeof ExtraOtReportRoute
   FestivalAllowanceRoute: typeof FestivalAllowanceRoute
   FestivalAllowanceApprovalRoute: typeof FestivalAllowanceApprovalRoute
   FestivalAllowanceCheckHrRoute: typeof FestivalAllowanceCheckHrRoute
@@ -5042,23 +5142,27 @@ export interface RootRouteChildren {
   HrReportDailyAttendanceRoute: typeof HrReportDailyAttendanceRoute
   HrReportEmployeeCountRoute: typeof HrReportEmployeeCountRoute
   HrReportEmployeeInfoComplianceRoute: typeof HrReportEmployeeInfoComplianceRoute
+  HrReportIncrementQueuelistRoute: typeof HrReportIncrementQueuelistRoute
   HrReportLeaveDetailsRoute: typeof HrReportLeaveDetailsRoute
   HrReportLeaveSummaryRoute: typeof HrReportLeaveSummaryRoute
   HrReportMonthlyAttendanceRoute: typeof HrReportMonthlyAttendanceRoute
   HrReportNewJoiningInfoRoute: typeof HrReportNewJoiningInfoRoute
   HrReportNightCardRoute: typeof HrReportNightCardRoute
   HrReportOvertimeSummaryRoute: typeof HrReportOvertimeSummaryRoute
+  HrReportPendingOtRequestRoute: typeof HrReportPendingOtRequestRoute
   HrReportSeparationListRoute: typeof HrReportSeparationListRoute
   HrReportSimRequisitionRoute: typeof HrReportSimRequisitionRoute
   HrReportTiffinAllowanceAllRoute: typeof HrReportTiffinAllowanceAllRoute
   HrReportTiffinCardRoute: typeof HrReportTiffinCardRoute
   HrReportWithoutInOutAttendanceRoute: typeof HrReportWithoutInOutAttendanceRoute
+  HrReportWorkingHourAnalysisRoute: typeof HrReportWorkingHourAnalysisRoute
   HrReportsRoute: typeof HrReportsRoute
   IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
   IncrementRoute: typeof IncrementRoute
   IncrementHistoryRoute: typeof IncrementHistoryRoute
   IncrementMultipleRoute: typeof IncrementMultipleRoute
+  IncrementQueuelistRoute: typeof IncrementQueuelistRoute
   IncrementReportRoute: typeof IncrementReportRoute
   InvConfigBrandRoute: typeof InvConfigBrandRoute
   InvConfigGroupNameRoute: typeof InvConfigGroupNameRoute
@@ -5204,6 +5308,7 @@ export interface RootRouteChildren {
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
   MyProfileRoute: typeof MyProfileRoute
+  NightAllowanceReportRoute: typeof NightAllowanceReportRoute
   NoticeRoute: typeof NoticeRoute
   OrganizationMasterSetupRoute: typeof OrganizationMasterSetupRoute
   OtSheetHolidayRoute: typeof OtSheetHolidayRoute
@@ -5233,6 +5338,7 @@ export interface RootRouteChildren {
   PayslipPrintRoute: typeof PayslipPrintRoute
   PendingApprovalsRoute: typeof PendingApprovalsRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
+  PendingOtRequestRoute: typeof PendingOtRequestRoute
   PermissionManagementRoute: typeof PermissionManagementRoute
   PersonalInfoApprovalRoute: typeof PersonalInfoApprovalRoute
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
@@ -5351,6 +5457,7 @@ export interface RootRouteChildren {
   WelfareVerificationRoute: typeof WelfareVerificationRoute
   WorkFlowRoute: typeof WorkFlowRoute
   WorkFlowsRoute: typeof WorkFlowsRoute
+  WorkingHourAnalysisRoute: typeof WorkingHourAnalysisRoute
   YearlyBonusProcessRoute: typeof YearlyBonusProcessRoute
   YearlyBonusReportRoute: typeof YearlyBonusReportRoute
   ZakatAndFinancialAidRoute: typeof ZakatAndFinancialAidRoute
@@ -5773,6 +5880,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnrollFingerprintRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/extra-ot-report': {
+      id: '/extra-ot-report'
+      path: '/extra-ot-report'
+      fullPath: '/extra-ot-report'
+      preLoaderRoute: typeof ExtraOtReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/festival-allowance': {
       id: '/festival-allowance'
       path: '/festival-allowance'
@@ -5927,6 +6041,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrReportEmployeeInfoComplianceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr-report-increment-queuelist': {
+      id: '/hr-report-increment-queuelist'
+      path: '/hr-report-increment-queuelist'
+      fullPath: '/hr-report-increment-queuelist'
+      preLoaderRoute: typeof HrReportIncrementQueuelistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hr-report-leave-details': {
       id: '/hr-report-leave-details'
       path: '/hr-report-leave-details'
@@ -5969,6 +6090,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrReportOvertimeSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr-report-pending-ot-request': {
+      id: '/hr-report-pending-ot-request'
+      path: '/hr-report-pending-ot-request'
+      fullPath: '/hr-report-pending-ot-request'
+      preLoaderRoute: typeof HrReportPendingOtRequestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hr-report-separation-list': {
       id: '/hr-report-separation-list'
       path: '/hr-report-separation-list'
@@ -6002,6 +6130,13 @@ declare module '@tanstack/react-router' {
       path: '/hr-report-without-in-out-attendance'
       fullPath: '/hr-report-without-in-out-attendance'
       preLoaderRoute: typeof HrReportWithoutInOutAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr-report-working-hour-analysis': {
+      id: '/hr-report-working-hour-analysis'
+      path: '/hr-report-working-hour-analysis'
+      fullPath: '/hr-report-working-hour-analysis'
+      preLoaderRoute: typeof HrReportWorkingHourAnalysisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hr-reports': {
@@ -6044,6 +6179,13 @@ declare module '@tanstack/react-router' {
       path: '/increment-multiple'
       fullPath: '/increment-multiple'
       preLoaderRoute: typeof IncrementMultipleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/increment-queuelist': {
+      id: '/increment-queuelist'
+      path: '/increment-queuelist'
+      fullPath: '/increment-queuelist'
+      preLoaderRoute: typeof IncrementQueuelistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/increment-report': {
@@ -7061,6 +7203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/night-allowance-report': {
+      id: '/night-allowance-report'
+      path: '/night-allowance-report'
+      fullPath: '/night-allowance-report'
+      preLoaderRoute: typeof NightAllowanceReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notice': {
       id: '/notice'
       path: '/notice'
@@ -7262,6 +7411,13 @@ declare module '@tanstack/react-router' {
       path: '/pending-manual-attendance'
       fullPath: '/pending-manual-attendance'
       preLoaderRoute: typeof PendingManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pending-ot-request': {
+      id: '/pending-ot-request'
+      path: '/pending-ot-request'
+      fullPath: '/pending-ot-request'
+      preLoaderRoute: typeof PendingOtRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/permission-management': {
@@ -8090,6 +8246,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkFlowsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/working-hour-analysis': {
+      id: '/working-hour-analysis'
+      path: '/working-hour-analysis'
+      fullPath: '/working-hour-analysis'
+      preLoaderRoute: typeof WorkingHourAnalysisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/yearly-bonus-process': {
       id: '/yearly-bonus-process'
       path: '/yearly-bonus-process'
@@ -8236,6 +8399,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmployeeSalaryHistoryRoute: EmployeeSalaryHistoryRoute,
   EmployeeTaxPayRoute: EmployeeTaxPayRoute,
   EnrollFingerprintRoute: EnrollFingerprintRoute,
+  ExtraOtReportRoute: ExtraOtReportRoute,
   FestivalAllowanceRoute: FestivalAllowanceRoute,
   FestivalAllowanceApprovalRoute: FestivalAllowanceApprovalRoute,
   FestivalAllowanceCheckHrRoute: FestivalAllowanceCheckHrRoute,
@@ -8259,23 +8423,27 @@ const rootRouteChildren: RootRouteChildren = {
   HrReportDailyAttendanceRoute: HrReportDailyAttendanceRoute,
   HrReportEmployeeCountRoute: HrReportEmployeeCountRoute,
   HrReportEmployeeInfoComplianceRoute: HrReportEmployeeInfoComplianceRoute,
+  HrReportIncrementQueuelistRoute: HrReportIncrementQueuelistRoute,
   HrReportLeaveDetailsRoute: HrReportLeaveDetailsRoute,
   HrReportLeaveSummaryRoute: HrReportLeaveSummaryRoute,
   HrReportMonthlyAttendanceRoute: HrReportMonthlyAttendanceRoute,
   HrReportNewJoiningInfoRoute: HrReportNewJoiningInfoRoute,
   HrReportNightCardRoute: HrReportNightCardRoute,
   HrReportOvertimeSummaryRoute: HrReportOvertimeSummaryRoute,
+  HrReportPendingOtRequestRoute: HrReportPendingOtRequestRoute,
   HrReportSeparationListRoute: HrReportSeparationListRoute,
   HrReportSimRequisitionRoute: HrReportSimRequisitionRoute,
   HrReportTiffinAllowanceAllRoute: HrReportTiffinAllowanceAllRoute,
   HrReportTiffinCardRoute: HrReportTiffinCardRoute,
   HrReportWithoutInOutAttendanceRoute: HrReportWithoutInOutAttendanceRoute,
+  HrReportWorkingHourAnalysisRoute: HrReportWorkingHourAnalysisRoute,
   HrReportsRoute: HrReportsRoute,
   IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,
   IncrementRoute: IncrementRoute,
   IncrementHistoryRoute: IncrementHistoryRoute,
   IncrementMultipleRoute: IncrementMultipleRoute,
+  IncrementQueuelistRoute: IncrementQueuelistRoute,
   IncrementReportRoute: IncrementReportRoute,
   InvConfigBrandRoute: InvConfigBrandRoute,
   InvConfigGroupNameRoute: InvConfigGroupNameRoute,
@@ -8424,6 +8592,7 @@ const rootRouteChildren: RootRouteChildren = {
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,
   MyProfileRoute: MyProfileRoute,
+  NightAllowanceReportRoute: NightAllowanceReportRoute,
   NoticeRoute: NoticeRoute,
   OrganizationMasterSetupRoute: OrganizationMasterSetupRoute,
   OtSheetHolidayRoute: OtSheetHolidayRoute,
@@ -8453,6 +8622,7 @@ const rootRouteChildren: RootRouteChildren = {
   PayslipPrintRoute: PayslipPrintRoute,
   PendingApprovalsRoute: PendingApprovalsRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,
+  PendingOtRequestRoute: PendingOtRequestRoute,
   PermissionManagementRoute: PermissionManagementRoute,
   PersonalInfoApprovalRoute: PersonalInfoApprovalRoute,
   PersonnelApprovalRoute: PersonnelApprovalRoute,
@@ -8581,6 +8751,7 @@ const rootRouteChildren: RootRouteChildren = {
   WelfareVerificationRoute: WelfareVerificationRoute,
   WorkFlowRoute: WorkFlowRoute,
   WorkFlowsRoute: WorkFlowsRoute,
+  WorkingHourAnalysisRoute: WorkingHourAnalysisRoute,
   YearlyBonusProcessRoute: YearlyBonusProcessRoute,
   YearlyBonusReportRoute: YearlyBonusReportRoute,
   ZakatAndFinancialAidRoute: ZakatAndFinancialAidRoute,

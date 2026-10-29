@@ -34,6 +34,11 @@ import {
   Printer,
   Sparkles,
   Info,
+  User,
+  ChevronDown,
+  Check,
+  RotateCcw,
+  SlidersHorizontal,
 } from "lucide-react";
 import {
   FemaleEmployee,
@@ -41,6 +46,7 @@ import {
   MaternityDocument,
   INITIAL_FEMALE_EMPLOYEES,
   getMaternityRequests,
+  saveMaternityRequests,
   createWelfareMaternityRequest,
   submitWelfareLeaveScheduleToHr,
   checkMaternityEligibility,
@@ -64,16 +70,144 @@ function MaternityWelfareVerificationPage() {
   const [requests, setRequests] = useState<MaternityRequest[]>([]);
   const [activeTab, setActiveTab] = useState<"ALL" | "INTAKE" | "MEDICAL" | "SCHEDULE" | "HR" | "APPROVED">("ALL");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDepartment, setSelectedDepartment] = useState("ALL");
+  // Filter States
+  const [filterCompany, setFilterCompany] = useState("ALL");
+  const [filterArea, setFilterArea] = useState("ALL");
+  const [filterDepartment, setFilterDepartment] = useState("ALL");
+  const [filterSection, setFilterSection] = useState("ALL");
+  const [filterFromDate, setFilterFromDate] = useState("");
+  const [filterToDate, setFilterToDate] = useState("");
+  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [filterStage, setFilterStage] = useState("ALL");
+  const [filterEmployeeType, setFilterEmployeeType] = useState("ALL");
+
+  const companyOptions = useMemo(
+    () => ["ALL", "Pakiza Knit Composite Ltd", "Pakiza Apparels Ltd", "Pakiza Spinning Mills Ltd"],
+    []
+  );
+
+  const areaOptions = useMemo(
+    () => ["ALL", "Gazipur", "Dhaka", "Savar", "Ashulia", "Narayanganj"],
+    []
+  );
+
+  const departmentOptions = useMemo(() => {
+    const set = new Set<string>();
+    requests.forEach((r) => {
+      if (r.employee.department) set.add(r.employee.department);
+    });
+    INITIAL_FEMALE_EMPLOYEES.forEach((e) => {
+      if (e.department) set.add(e.department);
+    });
+    return ["ALL", ...Array.from(set).sort()];
+  }, [requests]);
+
+  const sectionOptions = useMemo(() => {
+    const set = new Set<string>();
+    requests.forEach((r) => {
+      if (filterDepartment === "ALL" || r.employee.department === filterDepartment) {
+        if (r.employee.section) set.add(r.employee.section);
+      }
+    });
+    INITIAL_FEMALE_EMPLOYEES.forEach((e) => {
+      if (filterDepartment === "ALL" || e.department === filterDepartment) {
+        if (e.section) set.add(e.section);
+      }
+    });
+    return ["ALL", ...Array.from(set).sort()];
+  }, [requests, filterDepartment]);
+
+  const statusOptions = ["ALL", "Working", "On Leave", "Active", "Pending", "Approved"];
+
+  const stageOptions = [
+    { label: "All Stages", value: "ALL" },
+    { label: "Welfare Initiated (At Medical)", value: "WELFARE_INITIATED" },
+    { label: "Medical Follow-up Scheduled", value: "MEDICAL_FOLLOWUP" },
+    { label: "Medical Verified (Ready to Schedule)", value: "MEDICAL_VERIFIED" },
+    { label: "Leave Scheduled (Forwarded to HR)", value: "WELFARE_LEAVE_SCHEDULED" },
+    { label: "HR Approved", value: "HR_APPROVED" },
+  ];
+
+  const employeeTypeOptions = ["ALL", "Worker", "Staff", "Executive", "Management"];
+
+  const handleResetFilters = () => {
+    setFilterCompany("ALL");
+    setFilterArea("ALL");
+    setFilterDepartment("ALL");
+    setFilterSection("ALL");
+    setFilterFromDate("");
+    setFilterToDate("");
+    setFilterStatus("ALL");
+    setFilterStage("ALL");
+    setFilterEmployeeType("ALL");
+    setSearchTerm("");
+    setActiveTab("ALL");
+  };
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filterCompany !== "ALL") count++;
+    if (filterArea !== "ALL") count++;
+    if (filterDepartment !== "ALL") count++;
+    if (filterSection !== "ALL") count++;
+    if (filterFromDate) count++;
+    if (filterToDate) count++;
+    if (filterStatus !== "ALL") count++;
+    if (filterStage !== "ALL") count++;
+    if (filterEmployeeType !== "ALL") count++;
+    if (searchTerm) count++;
+    return count;
+  }, [
+    filterCompany,
+    filterArea,
+    filterDepartment,
+    filterSection,
+    filterFromDate,
+    filterToDate,
+    filterStatus,
+    filterStage,
+    filterEmployeeType,
+    searchTerm,
+  ]);
 
   // Modals
   const [isNewIntakeOpen, setIsNewIntakeOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isViewDossierOpen, setIsViewDossierOpen] = useState(false);
   const [activeRequest, setActiveRequest] = useState<MaternityRequest | null>(null);
+  const [selectedDocToView, setSelectedDocToView] = useState<{
+    doc: MaternityDocument;
+    employeeName: string;
+    employeeId: string;
+    nid?: string;
+  } | null>(null);
 
   // New Intake Form States (Employee not pre-selected by default)
   const [selectedEmpId, setSelectedEmpId] = useState<string>("");
+  const [isEmpDropdownOpen, setIsEmpDropdownOpen] = useState(false);
+  const [empSearchQuery, setEmpSearchQuery] = useState("");
+  const empDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (empDropdownRef.current && !empDropdownRef.current.contains(event.target as Node)) {
+        setIsEmpDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredFemaleEmployees = useMemo(() => {
+    if (!empSearchQuery.trim()) return INITIAL_FEMALE_EMPLOYEES;
+    const q = empSearchQuery.toLowerCase();
+    return INITIAL_FEMALE_EMPLOYEES.filter(
+      (emp) =>
+        emp.name.toLowerCase().includes(q) ||
+        (emp.nameBn && emp.nameBn.toLowerCase().includes(q)) ||
+        emp.id.toLowerCase().includes(q)
+    );
+  }, [empSearchQuery]);
   const [welfareOfficerName, setWelfareOfficerName] = useState("Rozina Akter (Welfare Lead)");
   const [welfareOfficerId, setWelfareOfficerId] = useState("WLF-012");
   const [informedDate, setInformedDate] = useState("2026-10-28");
@@ -92,6 +226,119 @@ function MaternityWelfareVerificationPage() {
   const [documentRows, setDocumentRows] = useState<DocumentRowItem[]>([
     { id: "doc-1", title: "Pregnancy Medical Certificate", fileName: "", fileSize: "" },
   ]);
+
+
+  // View Modal Leave Scheduling Form States (Stage 2)
+  const [viewModalEdd, setViewModalEdd] = useState("");
+  const [viewModalStartDate, setViewModalStartDate] = useState("");
+  const [viewModalEndDate, setViewModalEndDate] = useState("");
+  const [viewModalLeaveAddress, setViewModalLeaveAddress] = useState("");
+  const [viewModalRemarks, setViewModalRemarks] = useState("");
+  const [isEditingSchedule, setIsEditingSchedule] = useState(false);
+
+  // Helper to calculate 112-day statutory maternity leave from EDD
+  const calculateLeavePeriodFromEdd = (eddDateStr: string) => {
+    if (!eddDateStr) return { start: "", end: "", totalDays: 112 };
+    try {
+      const parts = eddDateStr.split("-").map(Number);
+      if (parts.length !== 3 || parts.some(isNaN)) return { start: "", end: "", totalDays: 112 };
+      const edd = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+      if (isNaN(edd.getTime())) return { start: "", end: "", totalDays: 112 };
+
+      // 56 days (8 weeks) prior to EDD
+      const start = new Date(edd);
+      start.setDate(edd.getDate() - 56);
+
+      // 55 days post EDD (total 112 calendar days)
+      const end = new Date(edd);
+      end.setDate(edd.getDate() + 55);
+
+      const fmt = (d: Date) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const dayStr = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${dayStr}`;
+      };
+
+      return {
+        start: fmt(start),
+        end: fmt(end),
+        totalDays: 112,
+      };
+    } catch {
+      return { start: "", end: "", totalDays: 112 };
+    }
+  };
+
+  const handleViewModalEddChange = (newEdd: string) => {
+    setViewModalEdd(newEdd);
+    if (newEdd) {
+      const calc = calculateLeavePeriodFromEdd(newEdd);
+      setViewModalStartDate(calc.start);
+      setViewModalEndDate(calc.end);
+    } else {
+      setViewModalStartDate("");
+      setViewModalEndDate("");
+    }
+  };
+
+  const openViewDossier = (req: MaternityRequest) => {
+    setActiveRequest(req);
+    setIsEditingSchedule(false);
+    const edd = req.medicalStage.expectedDeliveryDate || "";
+    setViewModalEdd(edd);
+    if (req.welfareStage2.expectedLeaveStartDate && req.welfareStage2.expectedLeaveEndDate) {
+      setViewModalStartDate(req.welfareStage2.expectedLeaveStartDate);
+      setViewModalEndDate(req.welfareStage2.expectedLeaveEndDate);
+    } else if (edd) {
+      const calc = calculateLeavePeriodFromEdd(edd);
+      setViewModalStartDate(calc.start);
+      setViewModalEndDate(calc.end);
+    } else {
+      setViewModalStartDate("");
+      setViewModalEndDate("");
+    }
+    setViewModalLeaveAddress(req.welfareStage2.leaveAddress || req.employee.presentAddress || "");
+    setViewModalRemarks(
+      req.welfareStage2.welfareOfficerRemarks ||
+        "Employee completed full statutory continuous service. Verified by attending medical officer with confirmed expected delivery date. Recommended for 16 weeks (112 days) statutory maternity leave."
+    );
+    setIsViewDossierOpen(true);
+  };
+
+  const handleSaveViewModalSchedule = () => {
+    if (!activeRequest) return;
+    if (!viewModalEdd) {
+      showToast("⚠️ Please enter the Expected Delivery Date (EDD).");
+      return;
+    }
+
+    const updated = submitWelfareLeaveScheduleToHr(activeRequest.id, {
+      startDate: viewModalStartDate,
+      endDate: viewModalEndDate,
+      totalDays: 112,
+      leaveAddress: viewModalLeaveAddress,
+      emergencyContact:
+        activeRequest.welfareStage2.emergencyContactPerson || activeRequest.employee.spouseName || "Spouse",
+      emergencyPhone: activeRequest.welfareStage2.emergencyPhone || activeRequest.employee.phone,
+      welfareRemarks: viewModalRemarks,
+    });
+
+    if (updated) {
+      updated.medicalStage.expectedDeliveryDate = viewModalEdd;
+      const current = getMaternityRequests();
+      const idx = current.findIndex((r) => r.id === updated.id);
+      if (idx !== -1) {
+        current[idx] = updated;
+        saveMaternityRequests(current);
+      }
+      setActiveRequest(updated);
+      setRequests(getMaternityRequests());
+      showToast(
+        `✅ Leave schedule saved for ${activeRequest.employee.name} (${viewModalStartDate} to ${viewModalEndDate}) and forwarded to HR!`
+      );
+    }
+  };
 
   // Leave Scheduling Form States (Stage 2)
   const [scheduleStartDate, setScheduleStartDate] = useState("");
@@ -150,57 +397,119 @@ function MaternityWelfareVerificationPage() {
   // Filtered requests
   const filteredRequests = useMemo(() => {
     return requests.filter((r) => {
-      // Tab filter
-      if (activeTab === "INTAKE" && r.currentStage !== "WELFARE_INITIATED") return false;
-      if (activeTab === "MEDICAL" && r.currentStage !== "MEDICAL_FOLLOWUP" && r.currentStage !== "WELFARE_INITIATED")
+
+      // 1. Company filter
+      if (filterCompany !== "ALL") {
+        const comp = (r.employee.unit || "").toLowerCase();
+        const fComp = filterCompany.toLowerCase();
+        if (!comp.includes(fComp) && !fComp.includes("pakiza")) return false;
+      }
+
+      // 2. Area filter
+      if (filterArea !== "ALL") {
+        const addr = (
+          (r.employee.presentAddress || "") +
+          " " +
+          (r.employee.permanentAddress || "") +
+          " " +
+          (r.employee.unit || "")
+        ).toLowerCase();
+        if (!addr.includes(filterArea.toLowerCase())) return false;
+      }
+
+      // 3. Department filter
+      if (filterDepartment !== "ALL" && r.employee.department !== filterDepartment) {
         return false;
-      if (activeTab === "SCHEDULE" && r.currentStage !== "MEDICAL_VERIFIED") return false;
-      if (activeTab === "HR" && r.currentStage !== "WELFARE_LEAVE_SCHEDULED") return false;
-      if (activeTab === "APPROVED" && r.currentStage !== "HR_APPROVED") return false;
+      }
 
-      // Department filter
-      if (selectedDepartment !== "ALL" && r.employee.department !== selectedDepartment) return false;
+      // 4. Section filter
+      if (filterSection !== "ALL" && r.employee.section !== filterSection) {
+        return false;
+      }
 
-      // Search term
+      // 5. Date range filter
+      const intakeDate = r.welfareStage1.intakeDate || r.createdAt.substring(0, 10);
+      if (filterFromDate && intakeDate < filterFromDate) {
+        return false;
+      }
+      if (filterToDate && intakeDate > filterToDate) {
+        return false;
+      }
+
+      // 6. Status filter
+      if (filterStatus !== "ALL") {
+        const st = (r.statusLabel || "Working").toLowerCase();
+        const fSt = filterStatus.toLowerCase();
+        if (fSt === "approved" && r.currentStage !== "HR_APPROVED") return false;
+        if (fSt === "on leave" && r.currentStage !== "HR_APPROVED") return false;
+        if (fSt === "pending" && r.currentStage === "HR_APPROVED") return false;
+        if (!st.includes(fSt) && fSt !== "active" && fSt !== "working") return false;
+      }
+
+      // 7. Stage filter (means in which stage the request is now)
+      if (filterStage !== "ALL" && r.currentStage !== filterStage) {
+        return false;
+      }
+
+      // 8. Employee Type filter
+      if (filterEmployeeType !== "ALL") {
+        const desig = (r.employee.designation || "").toLowerCase();
+        const fType = filterEmployeeType.toLowerCase();
+        if (fType === "worker") {
+          const isWorker =
+            desig.includes("operator") ||
+            desig.includes("worker") ||
+            desig.includes("loader") ||
+            desig.includes("helper") ||
+            desig.includes("iron") ||
+            desig.includes("inspector");
+          if (!isWorker) return false;
+        } else if (fType === "executive" || fType === "management") {
+          const isExec =
+            desig.includes("executive") ||
+            desig.includes("manager") ||
+            desig.includes("lead") ||
+            desig.includes("officer");
+          if (!isExec) return false;
+        } else if (fType === "staff") {
+          const isStaff =
+            !desig.includes("operator") && !desig.includes("helper") && !desig.includes("loader");
+          if (!isStaff) return false;
+        }
+      }
+
+      // 9. Search term
       if (searchTerm) {
         const query = searchTerm.toLowerCase();
         const matchesEmp =
           r.employee.name.toLowerCase().includes(query) ||
+          (r.employee.nameBn && r.employee.nameBn.toLowerCase().includes(query)) ||
           r.employee.id.includes(query) ||
           r.id.toLowerCase().includes(query) ||
-          r.employee.department.toLowerCase().includes(query);
+          r.employee.department.toLowerCase().includes(query) ||
+          r.employee.section.toLowerCase().includes(query);
         if (!matchesEmp) return false;
       }
 
       return true;
     });
-  }, [requests, activeTab, selectedDepartment, searchTerm]);
+  }, [
+    requests,
+    filterCompany,
+    filterArea,
+    filterDepartment,
+    filterSection,
+    filterFromDate,
+    filterToDate,
+    filterStatus,
+    filterStage,
+    filterEmployeeType,
+    searchTerm,
+  ]);
 
   // Handle open Schedule Leave modal for returned medical record
   const openScheduleModal = (req: MaternityRequest) => {
-    setActiveRequest(req);
-    const eddStr = req.medicalStage.expectedDeliveryDate;
-    if (eddStr) {
-      const edd = new Date(eddStr);
-      const start = new Date(edd);
-      start.setDate(edd.getDate() - 56);
-      const end = new Date(edd);
-      end.setDate(edd.getDate() + 55);
-
-      setScheduleStartDate(req.welfareStage2.expectedLeaveStartDate || start.toISOString().substring(0, 10));
-      setScheduleEndDate(req.welfareStage2.expectedLeaveEndDate || end.toISOString().substring(0, 10));
-    } else {
-      setScheduleStartDate("2026-11-01");
-      setScheduleEndDate("2027-02-20");
-    }
-    setScheduleTotalDays(112);
-    setEmergencyContact(req.employee.spouseName || req.employee.emergencyContact || "Spouse");
-    setEmergencyPhone(req.employee.emergencyContact || req.employee.phone);
-    setLeaveAddress(req.employee.presentAddress || "");
-    setWelfareScheduleNotes(
-      `Expected delivery date (${eddStr || "Confirmed"}) reviewed. Maternity leave duration scheduled for 112 days in accordance with Labor Act 2006. Medical examination cleared. Recommended for HR approval.`
-    );
-    setIsScheduleModalOpen(true);
+    openViewDossier(req);
   };
 
   // Submit Leave Schedule to HR
@@ -275,9 +584,9 @@ function MaternityWelfareVerificationPage() {
       showToast("❌ Please select a female employee to proceed.");
       return;
     }
-    if (!currentEligibility || !currentEligibility.isEligible) {
-      showToast("❌ Cannot submit: Employee does not meet the minimum 6 months service requirement.");
-      return;
+    // Soft warning if ineligible but allow welfare intake recording
+    if (currentEligibility && !currentEligibility.isEligible) {
+      console.warn("Employee has less than 6 months service; proceeding with Welfare record (Eligibility: NO).");
     }
 
     const finalDocs: MaternityDocument[] = documentRows
@@ -396,89 +705,228 @@ function MaternityWelfareVerificationPage() {
             </div>
           </div>
 
-          {/* Filter Bar & Tabs */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3 shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              {/* Tabs */}
-              <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800/60 rounded-xl text-xs font-medium">
-                <button
-                  onClick={() => setActiveTab("ALL")}
-                  className={`px-3 py-1.5 rounded-lg transition ${
-                    activeTab === "ALL"
-                      ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  All ({requests.length})
-                </button>
-                <button
-                  onClick={() => setActiveTab("INTAKE")}
-                  className={`px-3 py-1.5 rounded-lg transition ${
-                    activeTab === "INTAKE"
-                      ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  Awaiting Medical Exam
-                </button>
-                <button
-                  onClick={() => setActiveTab("SCHEDULE")}
-                  className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-                    activeTab === "SCHEDULE"
-                      ? "bg-amber-500 text-white font-semibold shadow-sm"
-                      : "text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40"
-                  }`}
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Ready to Schedule Dates ({stats.readyForSchedule})
-                </button>
-                <button
-                  onClick={() => setActiveTab("HR")}
-                  className={`px-3 py-1.5 rounded-lg transition ${
-                    activeTab === "HR"
-                      ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  Forwarded to HR ({stats.atHr})
-                </button>
-                <button
-                  onClick={() => setActiveTab("APPROVED")}
-                  className={`px-3 py-1.5 rounded-lg transition ${
-                    activeTab === "APPROVED"
-                      ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  Approved ({stats.approved})
-                </button>
+          {/* Enhanced Filter Section */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-pink-50 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 flex items-center justify-center">
+                  <SlidersHorizontal className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    Filter Maternity Records
+                    {activeFilterCount > 0 && (
+                      <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-pink-100 dark:bg-pink-950 text-pink-700 dark:text-pink-300">
+                        {activeFilterCount} active
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Filter by organization hierarchy, geography, timeline, status, and workflow stage.
+                  </p>
+                </div>
               </div>
 
-              {/* Department & Search */}
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <select
-                  value={selectedDepartment}
-                  onChange={(e) => setSelectedDepartment(e.target.value)}
-                  className="px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none"
+              {activeFilterCount > 0 && (
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="self-start sm:self-auto text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
                 >
-                  <option value="ALL">All Departments</option>
-                  <option value="Admin and Compliance">Admin and Compliance</option>
-                  <option value="Sample & CAD">Sample & CAD</option>
-                  <option value="Quality Assurance">Quality Assurance</option>
-                  <option value="Production RMG">Production RMG</option>
-                  <option value="Merchandising">Merchandising</option>
-                </select>
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Reset Filters
+                </button>
+              )}
+            </div>
 
-                <div className="relative flex-1 sm:w-64">
+            {/* Filter Form Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 text-xs">
+              {/* 1. Company */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Company
+                </label>
+                <select
+                  value={filterCompany}
+                  onChange={(e) => setFilterCompany(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {companyOptions.map((comp) => (
+                    <option key={comp} value={comp}>
+                      {comp === "ALL" ? "All Companies" : comp}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 2. Area */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Area
+                </label>
+                <select
+                  value={filterArea}
+                  onChange={(e) => setFilterArea(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {areaOptions.map((area) => (
+                    <option key={area} value={area}>
+                      {area === "ALL" ? "All Areas" : area}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 3. Department */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Department
+                </label>
+                <select
+                  value={filterDepartment}
+                  onChange={(e) => {
+                    setFilterDepartment(e.target.value);
+                    setFilterSection("ALL");
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {departmentOptions.map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept === "ALL" ? "All Departments" : dept}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 4. Section */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Section
+                </label>
+                <select
+                  value={filterSection}
+                  onChange={(e) => setFilterSection(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {sectionOptions.map((sec) => (
+                    <option key={sec} value={sec}>
+                      {sec === "ALL" ? "All Sections" : sec}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 5. Date Range: From Date */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  From Date
+                </label>
+                <input
+                  type="date"
+                  value={filterFromDate}
+                  onChange={(e) => setFilterFromDate(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                />
+              </div>
+
+              {/* 6. Date Range: To Date */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  To Date
+                </label>
+                <input
+                  type="date"
+                  value={filterToDate}
+                  onChange={(e) => setFilterToDate(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                />
+              </div>
+
+              {/* 7. Status */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Status
+                </label>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {statusOptions.map((st) => (
+                    <option key={st} value={st}>
+                      {st === "ALL" ? "All Statuses" : st}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 8. Stage (means in which stage the request is now) */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Stage
+                </label>
+                <select
+                  value={filterStage}
+                  onChange={(e) => setFilterStage(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {stageOptions.map((st) => (
+                    <option key={st.value} value={st.value}>
+                      {st.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 9. Employee Type */}
+              <div className="sm:col-span-2 md:col-span-1 lg:col-span-2">
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Employee Type
+                </label>
+                <select
+                  value={filterEmployeeType}
+                  onChange={(e) => setFilterEmployeeType(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {employeeTypeOptions.map((tp) => (
+                    <option key={tp} value={tp}>
+                      {tp === "ALL" ? "All Employee Types" : tp}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 10. Search Input */}
+              <div className="sm:col-span-2 md:col-span-2 lg:col-span-2">
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Search
+                </label>
+                <div className="relative">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                   <input
                     type="text"
-                    placeholder="Search employee, ID, ref..."
+                    placeholder="Search by employee name, ID, department, case ref..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none"
+                    className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
                   />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 transition"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
+              </div>
+            </div>
+
+            {/* Result Count Footer */}
+            <div className="pt-2 flex items-center justify-end">
+              <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Showing <strong className="text-slate-800 dark:text-slate-200">{filteredRequests.length}</strong> of {requests.length} records
               </div>
             </div>
           </div>
@@ -489,11 +937,13 @@ function MaternityWelfareVerificationPage() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-100/70 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
+                    <th className="py-3.5 px-3 text-center w-12">SL</th>
                     <th className="py-3.5 px-4">Case Ref / Date</th>
                     <th className="py-3.5 px-4">Employee Information</th>
-                    <th className="py-3.5 px-4">Continuous Service (Labor Law &ge;6m)</th>
+                    <th className="py-3.5 px-4">Joining Date</th>
+                    <th className="py-3.5 px-4">Service Period</th>
                     <th className="py-3.5 px-4">Previous Leaves</th>
-                    <th className="py-3.5 px-4">Current Workflow Stage</th>
+                    <th className="py-3.5 px-4">Current Stage</th>
                     <th className="py-3.5 px-4">Medical EDD</th>
                     <th className="py-3.5 px-4">Scheduled Leave</th>
                     <th className="py-3.5 px-4 text-right">Actions</th>
@@ -502,13 +952,13 @@ function MaternityWelfareVerificationPage() {
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                   {filteredRequests.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="py-12 text-center text-slate-400 dark:text-slate-500">
+                      <td colSpan={10} className="py-12 text-center text-slate-400 dark:text-slate-500">
                         <HeartPulse className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                         No maternity records found for the selected filter.
                       </td>
                     </tr>
                   ) : (
-                    filteredRequests.map((req) => {
+                    filteredRequests.map((req, idx) => {
                       const isReadyToSchedule = req.currentStage === "MEDICAL_VERIFIED";
                       const isApproved = req.currentStage === "HR_APPROVED";
 
@@ -517,43 +967,57 @@ function MaternityWelfareVerificationPage() {
                           key={req.id}
                           className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition group"
                         >
+                          {/* SL Column */}
+                          <td className="py-3.5 px-3 text-center font-mono font-medium text-slate-500 dark:text-slate-400">
+                            {idx + 1}
+                          </td>
+
+                          {/* Case Ref / Date */}
                           <td className="py-3.5 px-4 font-mono font-semibold text-slate-900 dark:text-white">
                             <div>{req.id}</div>
                             <div className="text-[10px] text-slate-400 font-normal">{req.welfareStage1.intakeDate}</div>
                           </td>
 
+                          {/* Employee Information (only One Name, ID, Department) */}
                           <td className="py-3.5 px-4">
-                            <div>
-                              <p className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                            <div className="space-y-0.5">
+                              <p className="font-semibold text-slate-900 dark:text-slate-100">
                                 {req.employee.name}
-                                {req.employee.nameBn && (
-                                  <span className="text-[10px] text-slate-400">({req.employee.nameBn})</span>
-                                )}
+                              </p>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                                ID: {req.employee.id}
                               </p>
                               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                                ID: {req.employee.id} &bull; {req.employee.designation}
-                              </p>
-                              <p className="text-[10px] text-slate-400">
-                                {req.employee.department} &bull; {req.employee.section}
+                                {req.employee.department}
                               </p>
                             </div>
                           </td>
 
+                          {/* Joining Date (left side of Service Period) */}
+                          <td className="py-3.5 px-4 font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
+                            {req.employee.joiningDate.includes("-")
+                              ? req.employee.joiningDate.split("-").reverse().join("/")
+                              : req.employee.joiningDate}
+                          </td>
+
+                          {/* Service Period */}
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-1.5">
                               {req.welfareStage1.isEligible ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                                   <ShieldCheck className="w-3.5 h-3.5" />
-                                  Eligible ({req.welfareStage1.serviceDurationText})
+                                  {req.welfareStage1.serviceDurationText ||
+                                    checkMaternityEligibility(req.employee.joiningDate).durationFormatted}
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
                                   <ShieldAlert className="w-3.5 h-3.5" />
-                                  Ineligible (&lt; 6 months)
+                                  {req.welfareStage1.serviceDurationText ||
+                                    checkMaternityEligibility(req.employee.joiningDate).durationFormatted}{" "}
+                                  (&lt; 6m)
                                 </span>
                               )}
                             </div>
-                            <p className="text-[10px] text-slate-400 mt-0.5">Joined: {req.employee.joiningDate}</p>
                           </td>
 
                           <td className="py-3.5 px-4">
@@ -646,11 +1110,8 @@ function MaternityWelfareVerificationPage() {
                               )}
 
                               <button
-                                onClick={() => {
-                                  setActiveRequest(req);
-                                  setIsViewDossierOpen(true);
-                                }}
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                onClick={() => openViewDossier(req)}
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                                 title="View Dossier"
                               >
                                 <Eye className="w-4 h-4" />
@@ -673,7 +1134,7 @@ function MaternityWelfareVerificationPage() {
       {/* ========================================================================= */}
       {isNewIntakeOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-3xl shadow-2xl my-8 overflow-hidden animate-in fade-in zoom-in-95 flex flex-col max-h-[90vh]">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-5xl shadow-2xl my-8 overflow-hidden animate-in fade-in zoom-in-95 flex flex-col max-h-[90vh]">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-r from-pink-50/80 via-white to-rose-50/80 dark:from-pink-950/30 dark:via-slate-900 dark:to-rose-950/30 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3">
@@ -714,27 +1175,95 @@ function MaternityWelfareVerificationPage() {
                   <span className="text-[11px] text-slate-500">Continuous Service Check</span>
                 </div>
 
-                <div>
+                {/* Searchable Female Employee Dropdown */}
+                <div className="relative" ref={empDropdownRef}>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Select Female Employee *
                   </label>
-                  <select
-                    value={selectedEmpId}
-                    onChange={(e) => setSelectedEmpId(e.target.value)}
-                    required
-                    className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  <div
+                    onClick={() => setIsEmpDropdownOpen((prev) => !prev)}
+                    className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-between cursor-pointer focus-within:ring-2 focus-within:ring-pink-500 shadow-2xs transition"
                   >
-                    <option value="">-- Select Female Employee --</option>
-                    {INITIAL_FEMALE_EMPLOYEES.map((emp) => {
-                      const elig = checkMaternityEligibility(emp.joiningDate);
-                      return (
-                        <option key={emp.id} value={emp.id}>
-                          {emp.name} ({emp.id}) — {emp.designation}, {emp.department} [Joined: {emp.joiningDate} &bull;{" "}
-                          {elig.isEligible ? "ELIGIBLE" : "INELIGIBLE (<6m)"}]
-                        </option>
-                      );
-                    })}
-                  </select>
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <Search className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                      {isEmpDropdownOpen ? (
+                        <input
+                          type="text"
+                          autoFocus
+                          value={empSearchQuery}
+                          onChange={(e) => setEmpSearchQuery(e.target.value)}
+                          placeholder="Search female employee by name or ID..."
+                          className="w-full bg-transparent border-none outline-none text-xs text-slate-900 dark:text-white placeholder:text-slate-400 p-0"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      ) : currentSelectedEmp ? (
+                        <span className="truncate text-slate-900 dark:text-white font-medium">
+                          {currentSelectedEmp.name} <span className="font-mono text-slate-500 dark:text-slate-400">({currentSelectedEmp.id})</span>
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">Select female employee (searchable)...</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      {currentSelectedEmp && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedEmpId("");
+                            setEmpSearchQuery("");
+                          }}
+                          className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-slate-600 transition"
+                          title="Clear selection"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <ChevronDown
+                        className={`w-4 h-4 text-slate-400 transition-transform ${isEmpDropdownOpen ? "rotate-180" : ""}`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Dropdown Options List */}
+                  {isEmpDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 animate-in fade-in-50 zoom-in-95">
+                      {filteredFemaleEmployees.length === 0 ? (
+                        <div className="p-4 text-center text-xs text-slate-400">
+                          No female employee found matching "{empSearchQuery}"
+                        </div>
+                      ) : (
+                        filteredFemaleEmployees.map((emp) => {
+                          const isSelected = emp.id === selectedEmpId;
+                          return (
+                            <button
+                              key={emp.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedEmpId(emp.id);
+                                setIsEmpDropdownOpen(false);
+                                setEmpSearchQuery("");
+                              }}
+                              className={`w-full px-3.5 py-2.5 text-left text-xs flex items-center justify-between hover:bg-pink-50/80 dark:hover:bg-pink-950/40 transition cursor-pointer ${
+                                isSelected
+                                  ? "bg-pink-50 dark:bg-pink-950/50 text-pink-700 dark:text-pink-300 font-semibold"
+                                  : "text-slate-800 dark:text-slate-200"
+                              }`}
+                            >
+                              <span className="font-medium text-slate-900 dark:text-slate-100">{emp.name}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
+                                  ({emp.id})
+                                </span>
+                                {isSelected && <Check className="w-3.5 h-3.5 text-pink-600" />}
+                              </div>
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* When no employee is selected yet */}
@@ -750,81 +1279,169 @@ function MaternityWelfareVerificationPage() {
                 {/* When an employee is selected: Display Particulars & Eligibility */}
                 {currentSelectedEmp && currentEligibility && (
                   <div className="space-y-3 pt-1">
-                    {/* 4-Column Particulars Overview */}
-                    <div className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700/80">
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                        <div>
-                          <p className="text-[10px] text-slate-400 uppercase tracking-wide">Designation</p>
-                          <p className="font-semibold text-slate-800 dark:text-slate-200">
-                            {currentSelectedEmp.designation}
-                          </p>
-                          <p className="text-[10px] text-slate-500">{currentSelectedEmp.department}</p>
+                    {/* EMPLOYEE DETAILS CARD (MATCHING SPECIFICATION IMAGE) */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xs">
+                      {/* Section Title Header */}
+                      <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/80">
+                        <div className="w-5 h-5 rounded-full border border-blue-500/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                          <User className="w-3 h-3" />
+                        </div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                          EMPLOYEE DETAILS
+                        </h4>
+                      </div>
+
+                      {/* Content: Photo + 2-Column Attributes */}
+                      <div className="flex flex-col sm:flex-row gap-5 items-start">
+                        {/* Avatar / Photo */}
+                        <div className="flex-shrink-0">
+                          <img
+                            src={
+                              currentSelectedEmp.avatar ||
+                              "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"
+                            }
+                            alt={currentSelectedEmp.name}
+                            className="w-20 h-24 sm:w-24 sm:h-28 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shadow-xs bg-slate-100 dark:bg-slate-800"
+                          />
                         </div>
 
-                        <div>
-                          <p className="text-[10px] text-slate-400 uppercase tracking-wide">Monthly Salary</p>
-                          <p className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                            {currentSelectedEmp.grossSalary.toLocaleString()} BDT
-                          </p>
-                          <p className="text-[10px] text-slate-500">{currentSelectedEmp.section}</p>
-                        </div>
+                        {/* Two Columns Grid */}
+                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-xs">
+                          {/* Column 1 */}
+                          <div className="space-y-2">
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Employee Name:
+                              </span>
+                              <span className="font-semibold text-slate-900 dark:text-slate-100">
+                                {currentSelectedEmp.name}
+                              </span>
+                            </div>
 
-                        <div>
-                          <p className="text-[10px] text-slate-400 uppercase tracking-wide">Joining Date &amp; Tenure</p>
-                          <p className="font-semibold text-slate-800 dark:text-slate-200">
-                            {currentSelectedEmp.joiningDate}
-                          </p>
-                          <p className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
-                            {currentEligibility.durationFormatted}
-                          </p>
-                        </div>
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Designation:
+                              </span>
+                              <span className="font-medium text-slate-800 dark:text-slate-200">
+                                {currentSelectedEmp.designation}
+                              </span>
+                            </div>
 
-                        <div>
-                          <p className="text-[10px] text-slate-400 uppercase tracking-wide">Phone &amp; NID</p>
-                          <p className="font-semibold text-slate-800 dark:text-slate-200">
-                            {currentSelectedEmp.phone}
-                          </p>
-                          <p className="text-[10px] font-mono text-slate-500">{currentSelectedEmp.nid}</p>
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Section:
+                              </span>
+                              <span className="font-medium text-slate-800 dark:text-slate-200">
+                                {currentSelectedEmp.section}
+                              </span>
+                            </div>
+
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Location:
+                              </span>
+                              <span className="font-medium text-slate-800 dark:text-slate-200">
+                                {currentSelectedEmp.unit ? `${currentSelectedEmp.unit} - Operation` : "PSL -Operation"}
+                              </span>
+                            </div>
+
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Contact:
+                              </span>
+                              <span className="font-medium text-slate-800 dark:text-slate-200">
+                                {currentSelectedEmp.phone}
+                              </span>
+                            </div>
+
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Service Period:
+                              </span>
+                              <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                                {currentEligibility.durationFormatted}
+                              </span>
+                            </div>
+
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Address:
+                              </span>
+                              <span className="font-medium text-slate-700 dark:text-slate-300 flex-1 leading-snug">
+                                {currentSelectedEmp.presentAddress ||
+                                  currentSelectedEmp.permanentAddress ||
+                                  "Megh Roddur By 1st Choice Real Estate Ltd., 148 West Rayer Bazar West Dhanmondi, Bangladesh"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Column 2 */}
+                          <div className="space-y-2">
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Employee ID:
+                              </span>
+                              <span className="font-mono font-medium text-slate-800 dark:text-slate-200">
+                                {currentSelectedEmp.id}
+                              </span>
+                            </div>
+
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Department:
+                              </span>
+                              <span className="font-medium text-slate-800 dark:text-slate-200">
+                                {currentSelectedEmp.department}
+                              </span>
+                            </div>
+
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Date of Joining:
+                              </span>
+                              <span className="font-medium text-slate-800 dark:text-slate-200">
+                                {currentSelectedEmp.joiningDate.includes("-")
+                                  ? currentSelectedEmp.joiningDate.split("-").reverse().join("/")
+                                  : currentSelectedEmp.joiningDate}
+                              </span>
+                            </div>
+
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Business Unit:
+                              </span>
+                              <span className="font-medium text-slate-800 dark:text-slate-200">
+                                {currentSelectedEmp.unit || "PSL"}
+                              </span>
+                            </div>
+
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Eligibility:
+                              </span>
+                              <span
+                                className={`font-bold uppercase ${
+                                  currentEligibility.isEligible
+                                    ? "text-emerald-600 dark:text-emerald-400"
+                                    : "text-rose-600 dark:text-rose-400"
+                                }`}
+                              >
+                                {currentEligibility.isEligible ? "YES" : "NO"}
+                              </span>
+                            </div>
+
+                            <div className="flex items-baseline">
+                              <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                                Documents:
+                              </span>
+                              <span className="font-medium text-slate-600 dark:text-slate-400">
+                                Available
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
-
-                    {/* Statutory Eligibility Banner */}
-                    {currentEligibility.isEligible ? (
-                      <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
-                              ELIGIBLE FOR STATUTORY MATERNITY BENEFIT (LABOR ACT SECTION 46)
-                            </p>
-                            <p className="text-[11px] text-emerald-700 dark:text-emerald-300">
-                              Continuous service tenure: <strong>{currentEligibility.durationFormatted}</strong> (Meets &ge; 6 months requirement).
-                            </p>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-600 text-white flex-shrink-0">
-                          Eligible &ge; 6m
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <ShieldAlert className="w-5 h-5 text-rose-600 dark:text-rose-400 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs font-bold text-rose-900 dark:text-rose-200">
-                              INELIGIBLE: LESS THAN 6 MONTHS SERVICE ({currentEligibility.durationFormatted})
-                            </p>
-                            <p className="text-[11px] text-rose-700 dark:text-rose-300">
-                              Employee has not completed 6 months continuous service. Submission is locked in compliance with labor law.
-                            </p>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-600 text-white flex-shrink-0">
-                          Ineligible (&lt; 6m)
-                        </span>
-                      </div>
-                    )}
 
                     {/* Previous Maternity Leave History */}
                     {currentSelectedEmp.previousMaternityLeaves.length > 0 ? (
@@ -887,10 +1504,10 @@ function MaternityWelfareVerificationPage() {
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Consultation Date *
+                      Medical Verification Date *
                     </label>
                     <input
                       type="date"
@@ -899,6 +1516,7 @@ function MaternityWelfareVerificationPage() {
                       required
                       className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-pink-500"
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">Date the employee goes for Medical Verification</p>
                   </div>
 
                   <div>
@@ -914,18 +1532,6 @@ function MaternityWelfareVerificationPage() {
                       <option value="2nd Trimester (13-26 wks)">2nd Trimester (13-26 wks)</option>
                       <option value="3rd Trimester (27+ wks)">3rd Trimester (27+ wks)</option>
                     </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Welfare Officer Name
-                    </label>
-                    <input
-                      type="text"
-                      value={welfareOfficerName}
-                      onChange={(e) => setWelfareOfficerName(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
-                    />
                   </div>
                 </div>
 
@@ -943,7 +1549,7 @@ function MaternityWelfareVerificationPage() {
                 </div>
               </div>
 
-              {/* SECTION 3: REQUIRED MEDICAL REPORTS & VERIFICATION DOCUMENTS */}
+              {/* SECTION 3: DOCUMENTS SECTION */}
               <div className="bg-slate-50/60 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3.5">
                 <div className="flex items-center justify-between border-b border-slate-200/70 dark:border-slate-800 pb-2">
                   <div className="flex items-center gap-2">
@@ -951,7 +1557,7 @@ function MaternityWelfareVerificationPage() {
                       3
                     </span>
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Required Medical Reports &amp; Verification Documents
+                      Documents Section
                     </h3>
                   </div>
                   <span className="text-[11px] text-pink-600 dark:text-pink-400 font-semibold">
@@ -1071,15 +1677,10 @@ function MaternityWelfareVerificationPage() {
                 <span className="text-[11px] text-slate-500">
                   {!currentSelectedEmp ? (
                     <span className="text-slate-400">Please select an employee</span>
-                  ) : currentEligibility?.isEligible ? (
+                  ) : (
                     <span className="text-emerald-600 font-semibold flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       Ready to submit to Medical Verification
-                    </span>
-                  ) : (
-                    <span className="text-rose-600 font-semibold flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      Service tenure &lt; 6 months (Submission locked)
                     </span>
                   )}
                 </span>
@@ -1095,10 +1696,10 @@ function MaternityWelfareVerificationPage() {
 
                   <button
                     type="submit"
-                    disabled={!currentSelectedEmp || !currentEligibility?.isEligible}
+                    disabled={!currentSelectedEmp}
                     className={`px-5 py-2 text-xs font-semibold rounded-xl text-white shadow-md flex items-center gap-2 transition ${
-                      currentSelectedEmp && currentEligibility?.isEligible
-                        ? "bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 shadow-pink-600/25"
+                      currentSelectedEmp
+                        ? "bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 shadow-pink-600/25 cursor-pointer"
                         : "bg-slate-300 dark:bg-slate-700 cursor-not-allowed opacity-60 text-slate-500"
                     }`}
                   >
@@ -1285,113 +1886,960 @@ function MaternityWelfareVerificationPage() {
       {/* ========================================================================= */}
       {isViewDossierOpen && activeRequest && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl shadow-2xl my-8 overflow-hidden animate-in fade-in zoom-in-95">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-5xl shadow-2xl my-8 overflow-hidden animate-in fade-in zoom-in-95">
             <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-mono font-bold text-pink-600">{activeRequest.id}</span>
+              <div className="flex items-center gap-2.5">
+                <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-md bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                  {activeRequest.id}
+                </span>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                  Maternity Case Dossier: {activeRequest.employee.name}
+                  Maternity Case Dossier &bull; {activeRequest.employee.name}
                 </h2>
               </div>
               <button
                 onClick={() => setIsViewDossierOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto text-xs">
-              {/* Profile Bar */}
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700">
-                <div>
-                  <p className="text-sm font-bold text-slate-900 dark:text-white">{activeRequest.employee.name}</p>
-                  <p className="text-slate-500">
-                    ID: {activeRequest.employee.id} &bull; {activeRequest.employee.designation} &bull; {activeRequest.employee.department}
-                  </p>
-                  <p className="text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
-                    Service: {activeRequest.welfareStage1.serviceDurationText} (Joined {activeRequest.employee.joiningDate})
-                  </p>
+              {/* 1. EMPLOYEE DETAILS SECTION */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                  <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+                    <User className="w-3 h-3" />
+                  </div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                    EMPLOYEE DETAILS
+                  </h4>
                 </div>
-              </div>
 
-              {/* Welfare Stage 1 Summary */}
-              <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2">
-                <h4 className="font-bold text-pink-600 dark:text-pink-400 uppercase tracking-wide text-[11px]">
-                  Welfare Intake & Counseling
-                </h4>
-                <p className="text-slate-700 dark:text-slate-300">{activeRequest.welfareStage1.counselingNotes}</p>
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {activeRequest.welfareStage1.attachedDocuments.map((doc) => (
-                    <span
-                      key={doc.id}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pink-50 text-pink-700 dark:bg-pink-950 dark:text-pink-300 border border-pink-200 text-[11px]"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      {doc.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
+                <div className="flex flex-col sm:flex-row gap-5 items-start">
+                  {/* Photo Avatar */}
+                  <div className="flex-shrink-0">
+                    <img
+                      src={
+                        activeRequest.employee.avatar ||
+                        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"
+                      }
+                      alt={activeRequest.employee.name}
+                      className="w-24 h-28 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shadow-xs bg-slate-100 dark:bg-slate-800"
+                    />
+                  </div>
 
-              {/* Medical Stage Summary */}
-              <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2">
-                <h4 className="font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide text-[11px]">
-                  Medical Verification & Clinical Findings
-                </h4>
-                {activeRequest.medicalStage.checkupVisits.length > 0 ? (
-                  <div className="space-y-2">
-                    {activeRequest.medicalStage.checkupVisits.map((v) => (
-                      <div
-                        key={v.visitId}
-                        className="p-2.5 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900 text-[11px]"
-                      >
-                        <div className="flex items-center justify-between font-semibold text-blue-950 dark:text-blue-200">
-                          <span>Visit #{v.visitNumber} ({v.visitDate}) - {v.doctorName}</span>
-                          <span>BP: {v.bloodPressure} &bull; Fetal HR: {v.fetalHeartRate}</span>
-                        </div>
-                        <p className="text-slate-600 dark:text-slate-400 mt-0.5">{v.clinicalFindings}</p>
-                        {v.nextFollowupDate && (
-                          <p className="text-indigo-600 font-semibold mt-0.5">Next Follow-up: {v.nextFollowupDate}</p>
-                        )}
+                  {/* Two Columns Grid */}
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-xs">
+                    {/* Column 1 */}
+                    <div className="space-y-2">
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Employee Name:
+                        </span>
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">
+                          {activeRequest.employee.name}
+                        </span>
                       </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Designation:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.designation}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Section:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.section}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Location:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.unit ? `${activeRequest.employee.unit} - Operation` : "Unit-01 - Operation"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Contact:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.phone}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Service Period:
+                        </span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">
+                          {activeRequest.welfareStage1.serviceDurationText ||
+                            checkMaternityEligibility(activeRequest.employee.joiningDate).durationFormatted}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Address:
+                        </span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300 flex-1 leading-snug">
+                          {activeRequest.employee.presentAddress ||
+                            activeRequest.employee.permanentAddress ||
+                            "House 24, Road 4, Sector 10, Uttara, Dhaka"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Column 2 */}
+                    <div className="space-y-2">
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Employee ID:
+                        </span>
+                        <span className="font-mono font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.id}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Department:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.department}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Date of Joining:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.joiningDate.includes("-")
+                            ? activeRequest.employee.joiningDate.split("-").reverse().join("/")
+                            : activeRequest.employee.joiningDate}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Business Unit:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.unit || "Unit-01"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Eligibility:
+                        </span>
+                        <span
+                          className={`font-bold uppercase ${
+                            activeRequest.welfareStage1.isEligible
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-rose-600 dark:text-rose-400"
+                          }`}
+                        >
+                          {activeRequest.welfareStage1.isEligible ? "YES" : "NO"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Documents:
+                        </span>
+                        <span className="font-medium text-slate-600 dark:text-slate-400">
+                          Available
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. PREVIOUS MATERNITY HISTORY */}
+              {activeRequest.employee.previousMaternityLeaves &&
+                activeRequest.employee.previousMaternityLeaves.length > 0 && (
+                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900">
+                    <div className="px-4 py-2.5 bg-slate-100/70 dark:bg-slate-800/60 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center justify-between">
+                      <span>
+                        Previous Maternity History ({activeRequest.employee.previousMaternityLeaves.length} Recorded)
+                      </span>
+                    </div>
+                    <table className="w-full text-xs text-left">
+                      <thead className="text-[10px] uppercase text-slate-500 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30">
+                        <tr>
+                          <th className="py-2.5 px-3.5 font-bold">CHILD</th>
+                          <th className="py-2.5 px-3.5 font-bold">LEAVE PERIOD</th>
+                          <th className="py-2.5 px-3.5 font-bold">DELIVERY DATE</th>
+                          <th className="py-2.5 px-3.5 font-bold">DAYS</th>
+                          <th className="py-2.5 px-3.5 font-bold">BENEFIT</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {activeRequest.employee.previousMaternityLeaves.map((hist, idx) => (
+                          <tr key={hist.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                            <td className="py-2.5 px-3.5 font-bold text-slate-800 dark:text-slate-200">
+                              Baby #{hist.childNumber || idx + 1}
+                            </td>
+                            <td className="py-2.5 px-3.5 text-slate-600 dark:text-slate-400">
+                              {hist.leaveStartDate} to {hist.leaveEndDate}
+                            </td>
+                            <td className="py-2.5 px-3.5 text-slate-800 dark:text-slate-200 font-medium">
+                              {hist.deliveryDate}
+                            </td>
+                            <td className="py-2.5 px-3.5 font-semibold text-slate-700 dark:text-slate-300">
+                              {hist.totalDays}d
+                            </td>
+                            <td className="py-2.5 px-3.5 font-mono font-semibold text-slate-800 dark:text-slate-200">
+                              {hist.benefitDisbursedBdt.toLocaleString()} BDT
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+              {/* 3. WELFARE INTAKE & COUNSELING */}
+              <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 bg-white dark:bg-slate-900 shadow-2xs">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+                      <HeartPulse className="w-3 h-3" />
+                    </div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                      WELFARE INTAKE &amp; COUNSELING
+                    </h4>
+                  </div>
+                  <span className="text-[11px] font-medium text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
+                    Intake Date: {activeRequest.welfareStage1.intakeDate}
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl p-3 text-slate-700 dark:text-slate-300 text-xs leading-relaxed border border-slate-200/60 dark:border-slate-800">
+                  <p className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Counseling Notes &amp; Observations:</p>
+                  <p>{activeRequest.welfareStage1.counselingNotes}</p>
+                </div>
+
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <Paperclip className="w-3.5 h-3.5 text-slate-400" />
+                      Attached Verification Documents ({activeRequest.welfareStage1.attachedDocuments.length})
+                    </p>
+                    <span className="text-[10px] text-slate-400 font-medium">Click any document to view preview</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                    {activeRequest.welfareStage1.attachedDocuments.map((doc) => (
+                      <button
+                        key={doc.id}
+                        type="button"
+                        onClick={() =>
+                          setSelectedDocToView({
+                            doc,
+                            employeeName: activeRequest.employee.name,
+                            employeeId: activeRequest.employee.id,
+                            nid: activeRequest.employee.nid,
+                          })
+                        }
+                        className="group flex items-center justify-between p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 hover:bg-slate-100 dark:bg-slate-800/40 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition text-left cursor-pointer shadow-2xs"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                            <FileText className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-slate-900 dark:group-hover:text-white">
+                              {doc.name}
+                            </p>
+                            <p className="text-[10px] text-slate-400 font-mono">
+                              {doc.size} &bull; {doc.type.replace(/_/g, " ")}
+                            </p>
+                          </div>
+                        </div>
+
+                        <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white flex-shrink-0 ml-2">
+                          <Eye className="w-3.5 h-3.5" />
+                          View
+                        </span>
+                      </button>
                     ))}
-                    {activeRequest.medicalStage.expectedDeliveryDate && (
-                      <p className="font-bold text-pink-600 pt-1">
-                        Confirmed Expected Delivery Date (EDD): {activeRequest.medicalStage.expectedDeliveryDate}
-                      </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. MEDICAL VERIFICATION & CLINICAL FINDINGS */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs space-y-4">
+                <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+                    <Stethoscope className="w-3 h-3" />
+                  </div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                    MEDICAL VERIFICATION &amp; CLINICAL FINDINGS
+                  </h4>
+                </div>
+
+                {/* Medical Overview Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 text-xs">
+                  <div>
+                    <span className="text-[10px] uppercase text-slate-400 dark:text-slate-500 block">Attending Doctor</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 block truncate">
+                      {activeRequest.medicalStage.assignedDoctor || "Dr. Farzana Yasmin"}
+                    </span>
+                    <span className="text-[10px] text-slate-500 block">BMDC #{activeRequest.medicalStage.doctorRegNo || "A-45920"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-slate-400 dark:text-slate-500 block">Clinical Fitness</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 block">
+                      {activeRequest.medicalStage.clinicalFitness || "Fit for Light Duty"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-slate-400 dark:text-slate-500 block">Verification Status</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      {activeRequest.medicalStage.isFinalCheckupDone ? "Clinically Verified" : "In Progress"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-slate-400 dark:text-slate-500 block">Verification Date</span>
+                    <span className="font-medium text-slate-700 dark:text-slate-300 block">
+                      {activeRequest.medicalStage.medicalVerifiedAt || "2026-09-15"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Clinical Consultations Table */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                      Recorded Clinical Consultations &amp; Visits ({activeRequest.medicalStage.checkupVisits.length})
+                    </span>
+                    {activeRequest.medicalStage.checkupVisits.length > 0 && activeRequest.medicalStage.checkupVisits[0].nextFollowupDate && (
+                      <span className="text-[10px] text-slate-500">
+                        Next Follow-up: <strong className="text-slate-700 dark:text-slate-300">{activeRequest.medicalStage.checkupVisits[0].nextFollowupDate}</strong>
+                      </span>
                     )}
                   </div>
-                ) : (
-                  <p className="text-slate-400 italic">No clinical visits logged yet.</p>
+
+                  {activeRequest.medicalStage.checkupVisits.length > 0 ? (
+                    <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                      <table className="w-full text-xs text-left">
+                        <thead className="text-[10px] uppercase text-slate-500 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60">
+                          <tr>
+                            <th className="py-2.5 px-3 font-semibold">Visit</th>
+                            <th className="py-2.5 px-3 font-semibold">Date</th>
+                            <th className="py-2.5 px-3 font-semibold">Vitals</th>
+                            <th className="py-2.5 px-3 font-semibold">Gestation</th>
+                            <th className="py-2.5 px-3 font-semibold">Clinical Findings &amp; Advice</th>
+                            <th className="py-2.5 px-3 font-semibold text-right">Doctor</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {activeRequest.medicalStage.checkupVisits.map((v) => (
+                            <tr key={v.visitId} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
+                              <td className="py-2.5 px-3 font-semibold text-slate-800 dark:text-slate-200">
+                                Visit #{v.visitNumber}
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-600 dark:text-slate-400">
+                                {v.visitDate}
+                              </td>
+                              <td className="py-2.5 px-3 font-mono text-[11px] text-slate-700 dark:text-slate-300">
+                                BP: {v.bloodPressure} &bull; HR: {v.fetalHeartRate}
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-700 dark:text-slate-300">
+                                {v.gestationalWeeks ? `${v.gestationalWeeks} wks` : "26 wks"}
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-600 dark:text-slate-400 max-w-xs leading-relaxed">
+                                <p>{v.clinicalFindings}</p>
+                                {v.prescribedVitamins && (
+                                  <p className="text-[10px] text-slate-400 mt-0.5">Rx: {v.prescribedVitamins}</p>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-600 dark:text-slate-400 text-right whitespace-nowrap">
+                                {v.doctorName}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="py-4 text-center text-slate-400 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl text-xs">
+                      No clinical checkup visits logged yet.
+                    </div>
+                  )}
+                </div>
+
+                {/* Doctor's Final Remarks */}
+                {activeRequest.medicalStage.doctorFinalRemarks && (
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 text-xs">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 block mb-0.5">
+                      Doctor's Final Assessment:
+                    </span>
+                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {activeRequest.medicalStage.doctorFinalRemarks}
+                    </p>
+                  </div>
                 )}
               </div>
 
-              {/* Welfare Stage 2 & HR Summary */}
-              {activeRequest.welfareStage2.expectedLeaveStartDate && (
-                <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2">
-                  <h4 className="font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide text-[11px]">
-                    Leave Schedule & Welfare Recommendation
+              {/* 5. LEAVE SCHEDULE & WELFARE RECOMMENDATION */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs space-y-4">
+                {/* Section Header */}
+                <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+                    <Calendar className="w-3 h-3" />
+                  </div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                    LEAVE SCHEDULE &amp; WELFARE RECOMMENDATION
                   </h4>
-                  <p className="text-slate-700 dark:text-slate-300">
-                    Period: <strong>{activeRequest.welfareStage2.expectedLeaveStartDate}</strong> to{" "}
-                    <strong>{activeRequest.welfareStage2.expectedLeaveEndDate}</strong> (
-                    {activeRequest.welfareStage2.totalLeaveDays} Days)
-                  </p>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Remarks: {activeRequest.welfareStage2.welfareOfficerRemarks}
-                  </p>
                 </div>
-              )}
+
+                {(() => {
+                  const isScheduleAlreadyGiven = Boolean(
+                    activeRequest.welfareStage2?.expectedLeaveStartDate &&
+                    activeRequest.welfareStage2?.expectedLeaveEndDate
+                  );
+
+                  // CASE 1: Schedule is already given -> Show overview strip (image part) without input fields
+                  if (isScheduleAlreadyGiven && !isEditingSchedule) {
+                    return (
+                      <div className="space-y-4">
+                        {/* 4-column overview card from screenshot */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 text-xs">
+                          <div>
+                            <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
+                              EXPECTED DELIVERY DATE
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-slate-100 block mt-1 text-sm font-mono">
+                              {activeRequest.medicalStage?.expectedDeliveryDate || viewModalEdd || "---"}
+                            </span>
+                            <span className="text-[10px] text-slate-400">Medical EDD</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
+                              LEAVE START DATE
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-slate-100 block mt-1 text-sm font-mono">
+                              {activeRequest.welfareStage2.expectedLeaveStartDate}
+                            </span>
+                            <span className="text-[10px] text-slate-400">56d pre-delivery</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
+                              LEAVE END DATE
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-slate-100 block mt-1 text-sm font-mono">
+                              {activeRequest.welfareStage2.expectedLeaveEndDate}
+                            </span>
+                            <span className="text-[10px] text-slate-400">55d post-delivery</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
+                              TOTAL DURATION
+                            </span>
+                            <span className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1 mt-1 text-sm">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                              112 Days (16 Wks)
+                            </span>
+                            <span className="text-[10px] text-slate-400">BLA Sec. 46/47</span>
+                          </div>
+                        </div>
+
+                        {/* Given Address During Leave & Welfare Recommendation */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                          <div className="p-3.5 rounded-xl bg-slate-50/60 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-800">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block mb-1">
+                              Address During Leave
+                            </span>
+                            <p className="font-medium text-slate-800 dark:text-slate-200 leading-snug">
+                              {activeRequest.welfareStage2.leaveAddress || activeRequest.employee.presentAddress || "Same as present residence"}
+                            </p>
+                          </div>
+                          <div className="p-3.5 rounded-xl bg-slate-50/60 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-800">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block mb-1">
+                              Welfare Recommendation &amp; Remarks
+                            </span>
+                            <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                              {activeRequest.welfareStage2.welfareOfficerRemarks || "Recommended for 16 weeks (112 days) statutory maternity leave."}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Status Strip & Edit Schedule Button */}
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>
+                              Schedule Confirmed &bull; Status:{" "}
+                              <strong>
+                                {activeRequest.currentStage === "HR_APPROVED" ? "Approved by HR" : "Forwarded to HR"}
+                              </strong>
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setIsEditingSchedule(true)}
+                            className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition cursor-pointer"
+                          >
+                            Edit Schedule
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // CASE 2: When case returned from Medical Verification stage OR user clicked Edit -> Show input fields WITHOUT the image part
+                  const isReturnedFromMedicalOrReady =
+                    activeRequest.medicalStage.expectedDeliveryDate ||
+                    activeRequest.medicalStage.isFinalCheckupDone ||
+                    activeRequest.currentStage === "MEDICAL_VERIFIED" ||
+                    activeRequest.currentStage === "WELFARE_LEAVE_SCHEDULED" ||
+                    activeRequest.currentStage === "HR_APPROVED" ||
+                    isEditingSchedule;
+
+                  if (isReturnedFromMedicalOrReady) {
+                    return (
+                      <div className="space-y-4">
+                        {/* Notice info */}
+                        <div className="p-3 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/70 dark:border-blue-800/50 flex items-start gap-2.5">
+                          <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                          <p className="text-xs text-blue-800 dark:text-blue-300">
+                            Enter the <strong>Expected Delivery Date (EDD)</strong>. The system will automatically calculate the 112 calendar days (8 weeks pre-delivery and 8 weeks post-delivery) in compliance with Bangladesh Labor Act Sec. 46 &amp; 47.
+                          </p>
+                        </div>
+
+                        {/* Input Fields */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                              Expected Delivery Date (EDD) <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                              type="date"
+                              value={viewModalEdd}
+                              onChange={(e) => handleViewModalEddChange(e.target.value)}
+                              className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-1 focus:ring-slate-400 focus:outline-none transition shadow-2xs"
+                            />
+                            {viewModalStartDate && viewModalEndDate ? (
+                              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1.5">
+                                ✓ Auto-calculated Leave: <strong>{viewModalStartDate}</strong> to <strong>{viewModalEndDate}</strong> (112 Days / 16 Wks)
+                              </p>
+                            ) : (
+                              <span className="text-[10px] text-slate-400 block mt-1">
+                                Auto-calculates 56 days pre-delivery and 55 days post-delivery.
+                              </span>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                              Address During Leave <span className="text-slate-400 font-normal">(Optional)</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={viewModalLeaveAddress}
+                              onChange={(e) => setViewModalLeaveAddress(e.target.value)}
+                              placeholder="Leave address if different from present residence"
+                              className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-1 focus:ring-slate-400 focus:outline-none transition shadow-2xs"
+                            />
+                            <span className="text-[10px] text-slate-400 block mt-1">
+                              Residence where employee stays during maternity period.
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Welfare Remarks */}
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                            Welfare Officer Recommendation &amp; Remarks
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={viewModalRemarks}
+                            onChange={(e) => setViewModalRemarks(e.target.value)}
+                            placeholder="Welfare department remarks for HR approval..."
+                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-1 focus:ring-slate-400 focus:outline-none transition shadow-2xs leading-relaxed"
+                          />
+                        </div>
+
+                        {/* Action Footer */}
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                          <div className="text-[11px] text-slate-500">
+                            {viewModalStartDate && viewModalEndDate ? (
+                              <span className="text-slate-600 dark:text-slate-400">
+                                Scheduled: <strong className="text-slate-800 dark:text-slate-200">{viewModalStartDate}</strong> to <strong className="text-slate-800 dark:text-slate-200">{viewModalEndDate}</strong> (112 Days)
+                              </span>
+                            ) : (
+                              <span className="text-slate-400">Please select an Expected Delivery Date</span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {isEditingSchedule && (
+                              <button
+                                type="button"
+                                onClick={() => setIsEditingSchedule(false)}
+                                className="px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                              >
+                                Cancel
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleSaveViewModalSchedule();
+                                setIsEditingSchedule(false);
+                              }}
+                              disabled={!viewModalEdd || !viewModalStartDate || !viewModalEndDate}
+                              className={`px-4 py-2 text-xs font-semibold rounded-xl text-white shadow-xs flex items-center gap-2 transition ${
+                                viewModalEdd && viewModalStartDate && viewModalEndDate
+                                  ? "bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white cursor-pointer"
+                                  : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                              }`}
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                              {activeRequest.currentStage === "MEDICAL_VERIFIED"
+                                ? "Submit Leave Schedule to HR"
+                                : "Save & Update Schedule"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // CASE 3: Case has not returned from Medical Verification yet
+                  return (
+                    <div className="p-4 rounded-xl bg-slate-50/60 dark:bg-slate-800/30 border border-slate-200/80 dark:border-slate-800 text-center space-y-1">
+                      <Clock className="w-5 h-5 mx-auto text-slate-400 mb-1" />
+                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Awaiting Medical Follow-Up Completion
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                        Once the Medical Officer finishes clinical verification and confirms the Expected Delivery Date, the leave scheduling form will activate here.
+                      </p>
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
 
             <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex justify-end">
               <button
                 onClick={() => setIsViewDossierOpen(false)}
-                className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 text-white hover:bg-slate-700"
+                className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 text-white hover:bg-slate-700 cursor-pointer"
               >
                 Close Dossier
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 4: DOCUMENT PREVIEW MODAL                                            */}
+      {/* ========================================================================= */}
+      {selectedDocToView && (
+        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl shadow-2xl my-8 overflow-hidden animate-in fade-in zoom-in-95 flex flex-col max-h-[90vh]">
+            {/* Document Header */}
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shadow-xs">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-md">
+                    {selectedDocToView.doc.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Patient: {selectedDocToView.employeeName} ({selectedDocToView.employeeId}) &bull; {selectedDocToView.doc.size}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  title="Print Document"
+                >
+                  <Printer className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDocToView(null)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  title="Close Preview"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Document Viewer Body */}
+            <div className="p-6 overflow-y-auto flex-1 bg-slate-100/60 dark:bg-slate-950/60">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-xs max-w-xl mx-auto space-y-4">
+                {/* Clinical Letterhead */}
+                <div className="border-b-2 border-slate-800 dark:border-slate-300 pb-3 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <HeartPulse className="w-6 h-6 text-rose-500" />
+                    <h2 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white uppercase">
+                      Central Maternity &amp; Women Health Clinic
+                    </h2>
+                  </div>
+                  <p className="text-[10px] text-slate-500">
+                    Department of Obstetrics, Gynaecology &amp; Fetal Medicine &bull; License #DHK-MED-92418
+                  </p>
+                  <p className="text-[10px] text-slate-400">
+                    Industrial Health Complex, Plot 14, Sector 7, Uttara, Dhaka-1230 &bull; Phone: +880 1711-000000
+                  </p>
+                </div>
+
+                {/* Patient Particulars Bar */}
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] border border-slate-200 dark:border-slate-700">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">Patient Name</span>
+                    <strong className="text-slate-800 dark:text-slate-200">{selectedDocToView.employeeName}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">Employee ID</span>
+                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                      {selectedDocToView.employeeId}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">Document Date</span>
+                    <span className="text-slate-700 dark:text-slate-300">{selectedDocToView.doc.uploadDate}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">Doc Ref</span>
+                    <span className="font-mono text-slate-700 dark:text-slate-300">{selectedDocToView.doc.id}</span>
+                  </div>
+                </div>
+
+                {/* DYNAMIC DOCUMENT CONTENT */}
+                {selectedDocToView.doc.type === "USG_Report" ||
+                selectedDocToView.doc.name.toLowerCase().includes("usg") ||
+                selectedDocToView.doc.name.toLowerCase().includes("scan") ? (
+                  /* USG REPORT VIEW */
+                  <div className="space-y-3 text-xs">
+                    <div className="text-center py-1 bg-blue-50 dark:bg-blue-950/40 rounded border border-blue-200 dark:border-blue-800">
+                      <h4 className="font-bold text-blue-900 dark:text-blue-200 uppercase tracking-wider text-[11px]">
+                        Ultrasonography of Gravid Uterus (2nd Trimester Anomaly Scan)
+                      </h4>
+                    </div>
+
+                    <div className="space-y-2 text-slate-700 dark:text-slate-300 leading-relaxed text-[11px]">
+                      <p>
+                        <strong>Clinical Indication:</strong> Routine antenatal screening, gestational age determination, fetal anatomy scan.
+                      </p>
+                      <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-1.5 bg-slate-50/30">
+                        <p className="font-bold text-slate-900 dark:text-white text-xs border-b pb-1">
+                          Ultrasound Findings:
+                        </p>
+                        <p>&bull; <strong>Gestational Sac:</strong> Single intrauterine gestation noted with active fetal cardiac motion.</p>
+                        <p>&bull; <strong>Fetal Heart Rate (FHR):</strong> 142 beats per minute, regular rhythm.</p>
+                        <p>&bull; <strong>Fetal Presentation:</strong> Cephalic, spine situated to the maternal left.</p>
+                        <p>&bull; <strong>Liquor / Amniotic Fluid:</strong> Adequate in quantity (AFI: 14.2 cm).</p>
+                        <p>&bull; <strong>Placenta:</strong> Posterior, upper segment, Grade-II maturity. No signs of placenta praevia.</p>
+                        <p>&bull; <strong>Biometry:</strong> BPD: 66 mm &bull; FL: 48 mm &bull; AC: 218 mm.</p>
+                        <p>&bull; <strong>Estimated Gestational Age:</strong> 26 Weeks &plusmn; 1 Week.</p>
+                      </div>
+
+                      <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+                        <p className="font-bold text-emerald-900 dark:text-emerald-200 text-xs">
+                          Impression / Conclusion:
+                        </p>
+                        <p className="text-emerald-800 dark:text-emerald-300 text-[11px]">
+                          Single live intrauterine pregnancy of 26 weeks gestational age. Normal fetal growth parameters and no gross anatomical defects detected at this stage.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-between items-end text-[10px] text-slate-500">
+                      <div>
+                        <p>Instrument: GE Voluson E8 Expert 3D/4D</p>
+                        <p>Hospital Barcode: #USG-2026-98124</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-serif italic font-bold text-slate-800 dark:text-slate-200 text-xs">
+                          Dr. Nahid Sultana
+                        </div>
+                        <p className="font-semibold text-slate-700 dark:text-slate-300">MBBS, FCPS (Radiology &amp; Imaging)</p>
+                        <p>Consultant Radiologist &bull; BMDC #A-31294</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : selectedDocToView.doc.type === "Prescription" ||
+                  selectedDocToView.doc.name.toLowerCase().includes("prescription") ||
+                  selectedDocToView.doc.name.toLowerCase().includes("slip") ? (
+                  /* PRESCRIPTION VIEW */
+                  <div className="space-y-3 text-xs">
+                    <div className="text-center py-1 bg-purple-50 dark:bg-purple-950/40 rounded border border-purple-200 dark:border-purple-800">
+                      <h4 className="font-bold text-purple-900 dark:text-purple-200 uppercase tracking-wider text-[11px]">
+                        Antenatal Consultation &amp; Medical Prescription Slip
+                      </h4>
+                    </div>
+
+                    <div className="space-y-2 text-[11px] text-slate-700 dark:text-slate-300">
+                      <div className="grid grid-cols-2 gap-2 p-2 rounded bg-slate-50 dark:bg-slate-800 border">
+                        <div>
+                          <strong>Clinical Diagnosis:</strong> Gravida-2, 26 weeks gestation
+                        </div>
+                        <div>
+                          <strong>Vitals:</strong> BP: 118/76 mmHg | Pulse: 78 bpm | Hb: 11.6 g/dL
+                        </div>
+                      </div>
+
+                      <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-2">
+                        <span className="font-serif text-lg font-bold text-slate-900 dark:text-white">Rx</span>
+                        <div className="space-y-1.5 pl-3 border-l-2 border-purple-300">
+                          <p>1. <strong>Tab. Calcium Carbonate 500mg</strong> &mdash; 1 + 0 + 1 (After meals daily)</p>
+                          <p>2. <strong>Cap. Iron Polymaltose Complex</strong> &mdash; 0 + 1 + 0 (After lunch daily)</p>
+                          <p>3. <strong>Tab. Folic Acid 5mg</strong> &mdash; 1 + 0 + 0 (Morning)</p>
+                          <p>4. <strong>Nutritional Dietary Advice:</strong> High protein, boiled milk, green leafy vegetables.</p>
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                        <p className="font-bold text-amber-900 dark:text-amber-200 text-xs">Workplace Advice:</p>
+                        <p className="text-amber-800 dark:text-amber-300 text-[11px]">
+                          Advised light duties. Avoid heavy lifting (&gt; 5 kg), continuous standing exceeding 60 minutes, and extreme vibration zones in production line.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-between items-end text-[10px] text-slate-500">
+                      <div>
+                        <p>Follow-up Recommended: Every 2 weeks</p>
+                        <p>Hospital Reg: #OPD-2026-4418</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-serif italic font-bold text-slate-800 dark:text-slate-200 text-xs">
+                          Dr. Farzana Yasmin
+                        </div>
+                        <p className="font-semibold text-slate-700 dark:text-slate-300">MBBS, DGO (Obstetrics &amp; Gynae)</p>
+                        <p>Medical Officer &bull; BMDC Reg #A-45920</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : selectedDocToView.doc.type === "NID" ||
+                  selectedDocToView.doc.name.toLowerCase().includes("nid") ? (
+                  /* NID CARD VIEW */
+                  <div className="space-y-3 text-xs">
+                    <div className="text-center py-1 bg-emerald-50 dark:bg-emerald-950/40 rounded border border-emerald-200 dark:border-emerald-800">
+                      <h4 className="font-bold text-emerald-900 dark:text-emerald-200 uppercase tracking-wider text-[11px]">
+                        National Identity Card Verification (Bangladesh Election Commission)
+                      </h4>
+                    </div>
+
+                    <div className="border-2 border-emerald-500/40 rounded-xl p-4 bg-gradient-to-br from-emerald-50/40 via-white to-teal-50/40 dark:from-emerald-950/30 dark:via-slate-800 dark:to-teal-950/30 space-y-3 shadow-xs">
+                      <div className="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">
+                            BD
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-900 dark:text-white text-xs">Government of the People&apos;s Republic of Bangladesh</p>
+                            <p className="text-[10px] text-slate-500">National ID Card / জাতীয় পরিচয়পত্র</p>
+                          </div>
+                        </div>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 border border-emerald-300">
+                          VERIFIED
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3 text-[11px]">
+                        <div className="col-span-2 space-y-1">
+                          <p><span className="text-slate-400">Name:</span> <strong className="text-slate-800 dark:text-slate-200">{selectedDocToView.employeeName}</strong></p>
+                          <p><span className="text-slate-400">NID No:</span> <strong className="font-mono text-emerald-700 dark:text-emerald-300">{selectedDocToView.nid || "19922692019000341"}</strong></p>
+                          <p><span className="text-slate-400">Date of Birth:</span> <span className="text-slate-700 dark:text-slate-300">15 Apr 1992</span></p>
+                          <p><span className="text-slate-400">Address:</span> <span className="text-slate-700 dark:text-slate-300">House 24, Road 4, Sector 10, Uttara, Dhaka</span></p>
+                        </div>
+                        <div className="flex flex-col items-center justify-center p-2 border border-slate-200 rounded-lg bg-white/70 dark:bg-slate-900/70 text-center">
+                          <div className="w-14 h-16 bg-slate-200 dark:bg-slate-700 rounded mb-1 flex items-center justify-center text-slate-400">
+                            <User className="w-7 h-7" />
+                          </div>
+                          <span className="text-[9px] font-mono text-slate-400">EC-SMART-NID</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* GENERAL DOCTOR'S CERTIFICATE / DECLARATION VIEW */
+                  <div className="space-y-3 text-xs">
+                    <div className="text-center py-1 bg-pink-50 dark:bg-pink-950/40 rounded border border-pink-200 dark:border-pink-800">
+                      <h4 className="font-bold text-pink-900 dark:text-pink-200 uppercase tracking-wider text-[11px]">
+                        Pregnancy Medical Certificate &amp; Fitness Declaration
+                      </h4>
+                    </div>
+
+                    <div className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50/50 space-y-3 text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">
+                      <p>
+                        This is to certify that <strong>{selectedDocToView.employeeName}</strong> (ID: {selectedDocToView.employeeId})
+                        was clinically examined at our clinic on {selectedDocToView.doc.uploadDate}.
+                      </p>
+                      <p>
+                        Upon thorough obstetric examination, she has been confirmed pregnant with an estimated gestational age of <strong>26 weeks</strong>.
+                        Her pregnancy is progressing normally with normal vitals and fetal heart activity.
+                      </p>
+                      <div className="p-2.5 rounded bg-pink-50/60 dark:bg-pink-950/30 border border-pink-200 text-pink-900 dark:text-pink-200">
+                        <strong>Expected Delivery Date (EDD):</strong> 28 December 2026.
+                      </div>
+                      <p>
+                        This certificate is issued to fulfill statutory maternity notification requirements under
+                        Section 46 of the Bangladesh Labor Act 2006.
+                      </p>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-between items-end text-[10px] text-slate-500">
+                      <div>
+                        <p>Hospital Seal: &check; VERIFIED</p>
+                        <p>Certificate Ref: #PMC-2026-8812</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-serif italic font-bold text-slate-800 dark:text-slate-200 text-xs">
+                          Dr. Farzana Yasmin
+                        </div>
+                        <p className="font-semibold text-slate-700 dark:text-slate-300">MBBS, DGO</p>
+                        <p>Medical Officer &bull; BMDC #A-45920</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                  <span className="text-[10px] text-emerald-600 font-medium flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Verified Authenticated Medical Record
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDocToView(null)}
+                    className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-white hover:bg-slate-700 dark:bg-slate-200 dark:text-slate-900 transition cursor-pointer"
+                  >
+                    Close Preview
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

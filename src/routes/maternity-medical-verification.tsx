@@ -28,13 +28,19 @@ import {
   Download,
   ExternalLink,
   FileCheck,
+  SlidersHorizontal,
+  RotateCcw,
+  User,
+  Paperclip,
 } from "lucide-react";
 import {
   MaternityRequest,
   MaternityDocument,
   MedicalCheckupVisit,
+  INITIAL_FEMALE_EMPLOYEES,
   getMaternityRequests,
   logMedicalVisitAndProcess,
+  checkMaternityEligibility,
 } from "@/lib/maternityLeaveStore";
 
 export const Route = createFileRoute("/maternity-medical-verification")({
@@ -53,9 +59,106 @@ export const Route = createFileRoute("/maternity-medical-verification")({
 
 function MaternityMedicalVerificationPage() {
   const [requests, setRequests] = useState<MaternityRequest[]>([]);
-  const [activeTab, setActiveTab] = useState<"ALL" | "PENDING_INITIAL" | "FOLLOWUP" | "COMPLETED">("ALL");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDept, setSelectedDept] = useState("ALL");
+
+  // Comprehensive Filter States
+  const [filterCompany, setFilterCompany] = useState("ALL");
+  const [filterArea, setFilterArea] = useState("ALL");
+  const [filterDepartment, setFilterDepartment] = useState("ALL");
+  const [filterSection, setFilterSection] = useState("ALL");
+  const [filterFromDate, setFilterFromDate] = useState("");
+  const [filterToDate, setFilterToDate] = useState("");
+  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [filterStage, setFilterStage] = useState("ALL");
+  const [filterEmployeeType, setFilterEmployeeType] = useState("ALL");
+
+  const companyOptions = useMemo(
+    () => ["ALL", "Pakiza Knit Composite Ltd", "Pakiza Apparels Ltd", "Pakiza Spinning Mills Ltd"],
+    []
+  );
+
+  const areaOptions = useMemo(
+    () => ["ALL", "Gazipur", "Dhaka", "Savar", "Ashulia", "Narayanganj"],
+    []
+  );
+
+  const departmentOptions = useMemo(() => {
+    const set = new Set<string>();
+    requests.forEach((r) => {
+      if (r.employee.department) set.add(r.employee.department);
+    });
+    INITIAL_FEMALE_EMPLOYEES.forEach((e) => {
+      if (e.department) set.add(e.department);
+    });
+    return ["ALL", ...Array.from(set).sort()];
+  }, [requests]);
+
+  const sectionOptions = useMemo(() => {
+    const set = new Set<string>();
+    requests.forEach((r) => {
+      if (filterDepartment === "ALL" || r.employee.department === filterDepartment) {
+        if (r.employee.section) set.add(r.employee.section);
+      }
+    });
+    INITIAL_FEMALE_EMPLOYEES.forEach((e) => {
+      if (filterDepartment === "ALL" || e.department === filterDepartment) {
+        if (e.section) set.add(e.section);
+      }
+    });
+    return ["ALL", ...Array.from(set).sort()];
+  }, [requests, filterDepartment]);
+
+  const statusOptions = ["ALL", "Working", "On Leave", "Active", "Pending", "Approved"];
+
+  const stageOptions = [
+    { label: "All Stages", value: "ALL" },
+    { label: "Welfare Initiated (At Medical)", value: "WELFARE_INITIATED" },
+    { label: "Medical Follow-up Scheduled", value: "MEDICAL_FOLLOWUP" },
+    { label: "Medical Verified (Ready to Schedule)", value: "MEDICAL_VERIFIED" },
+    { label: "Leave Scheduled (Forwarded to HR)", value: "WELFARE_LEAVE_SCHEDULED" },
+    { label: "HR Approved", value: "HR_APPROVED" },
+  ];
+
+  const employeeTypeOptions = ["ALL", "Worker", "Staff", "Executive", "Management"];
+
+  const handleResetFilters = () => {
+    setFilterCompany("ALL");
+    setFilterArea("ALL");
+    setFilterDepartment("ALL");
+    setFilterSection("ALL");
+    setFilterFromDate("");
+    setFilterToDate("");
+    setFilterStatus("ALL");
+    setFilterStage("ALL");
+    setFilterEmployeeType("ALL");
+    setSearchTerm("");
+  };
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filterCompany !== "ALL") count++;
+    if (filterArea !== "ALL") count++;
+    if (filterDepartment !== "ALL") count++;
+    if (filterSection !== "ALL") count++;
+    if (filterFromDate) count++;
+    if (filterToDate) count++;
+    if (filterStatus !== "ALL") count++;
+    if (filterStage !== "ALL") count++;
+    if (filterEmployeeType !== "ALL") count++;
+    if (searchTerm) count++;
+    return count;
+  }, [
+    filterCompany,
+    filterArea,
+    filterDepartment,
+    filterSection,
+    filterFromDate,
+    filterToDate,
+    filterStatus,
+    filterStage,
+    filterEmployeeType,
+    searchTerm,
+  ]);
 
   // Clinical Examination Modal
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
@@ -114,55 +217,113 @@ function MaternityMedicalVerificationPage() {
     return () => window.removeEventListener("maternity-data-updated", handleUpdate);
   }, []);
 
-  // Filter requests that are relevant to Medical: WELFARE_INITIATED, MEDICAL_FOLLOWUP, or already MEDICAL_VERIFIED/beyond
-  const stats = useMemo(() => {
-    const queue = requests.filter(
-      (r) =>
-        r.currentStage === "WELFARE_INITIATED" ||
-        r.currentStage === "MEDICAL_FOLLOWUP" ||
-        r.currentStage === "MEDICAL_VERIFIED"
-    );
-    const initialPending = requests.filter((r) => r.currentStage === "WELFARE_INITIATED").length;
-    const followups = requests.filter((r) => r.currentStage === "MEDICAL_FOLLOWUP").length;
-    const completed = requests.filter(
-      (r) =>
-        r.currentStage === "MEDICAL_VERIFIED" ||
-        r.currentStage === "WELFARE_LEAVE_SCHEDULED" ||
-        r.currentStage === "HR_APPROVED"
-    ).length;
-
-    return { totalQueue: queue.length, initialPending, followups, completed };
-  }, [requests]);
-
   const filteredRequests = useMemo(() => {
     return requests.filter((r) => {
-      // Tab filter
-      if (activeTab === "PENDING_INITIAL" && r.currentStage !== "WELFARE_INITIATED") return false;
-      if (activeTab === "FOLLOWUP" && r.currentStage !== "MEDICAL_FOLLOWUP") return false;
-      if (
-        activeTab === "COMPLETED" &&
-        r.currentStage !== "MEDICAL_VERIFIED" &&
-        r.currentStage !== "WELFARE_LEAVE_SCHEDULED" &&
-        r.currentStage !== "HR_APPROVED"
-      )
+      // 1. Company filter
+      if (filterCompany !== "ALL") {
+        const empComp = r.employee.unit || "";
+        if (!empComp.toLowerCase().includes(filterCompany.toLowerCase().split(" ")[0])) {
+          return false;
+        }
+      }
+
+      // 2. Area filter
+      if (filterArea !== "ALL") {
+        const addr = `${r.employee.presentAddress} ${r.employee.permanentAddress}`.toLowerCase();
+        if (!addr.includes(filterArea.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 3. Department filter
+      if (filterDepartment !== "ALL" && r.employee.department !== filterDepartment) {
         return false;
+      }
 
-      // Department filter
-      if (selectedDept !== "ALL" && r.employee.department !== selectedDept) return false;
+      // 4. Section filter
+      if (filterSection !== "ALL" && r.employee.section !== filterSection) {
+        return false;
+      }
 
-      // Search term
+      // 5. Date Range (Intake Date)
+      const recordDate = r.welfareStage1.intakeDate;
+      if (filterFromDate && recordDate < filterFromDate) {
+        return false;
+      }
+      if (filterToDate && recordDate > filterToDate) {
+        return false;
+      }
+
+      // 6. Status filter
+      if (filterStatus !== "ALL") {
+        const st = (r.statusLabel || "Working").toLowerCase();
+        const fSt = filterStatus.toLowerCase();
+        if (fSt === "approved" && r.currentStage !== "HR_APPROVED") return false;
+        if (fSt === "on leave" && r.currentStage !== "HR_APPROVED") return false;
+        if (fSt === "pending" && r.currentStage === "HR_APPROVED") return false;
+        if (!st.includes(fSt) && fSt !== "active" && fSt !== "working") return false;
+      }
+
+      // 7. Stage filter
+      if (filterStage !== "ALL" && r.currentStage !== filterStage) {
+        return false;
+      }
+
+      // 8. Employee Type filter
+      if (filterEmployeeType !== "ALL") {
+        const desig = (r.employee.designation || "").toLowerCase();
+        const fType = filterEmployeeType.toLowerCase();
+        if (fType === "worker") {
+          const isWorker =
+            desig.includes("operator") ||
+            desig.includes("worker") ||
+            desig.includes("loader") ||
+            desig.includes("helper") ||
+            desig.includes("iron") ||
+            desig.includes("inspector");
+          if (!isWorker) return false;
+        } else if (fType === "executive" || fType === "management") {
+          const isExec =
+            desig.includes("executive") ||
+            desig.includes("manager") ||
+            desig.includes("lead") ||
+            desig.includes("officer");
+          if (!isExec) return false;
+        } else if (fType === "staff") {
+          const isStaff =
+            !desig.includes("operator") && !desig.includes("helper") && !desig.includes("loader");
+          if (!isStaff) return false;
+        }
+      }
+
+      // 9. Search term
       if (searchTerm) {
         const query = searchTerm.toLowerCase();
-        const matches =
+        const matchesEmp =
           r.employee.name.toLowerCase().includes(query) ||
+          (r.employee.nameBn && r.employee.nameBn.toLowerCase().includes(query)) ||
           r.employee.id.includes(query) ||
-          r.id.toLowerCase().includes(query);
-        if (!matches) return false;
+          r.id.toLowerCase().includes(query) ||
+          r.employee.department.toLowerCase().includes(query) ||
+          r.employee.section.toLowerCase().includes(query);
+        if (!matchesEmp) return false;
       }
 
       return true;
     });
-  }, [requests, activeTab, selectedDept, searchTerm]);
+  }, [
+    requests,
+    filterCompany,
+    filterArea,
+    filterDepartment,
+    filterSection,
+    filterFromDate,
+    filterToDate,
+    filterStatus,
+    filterStage,
+    filterEmployeeType,
+    searchTerm,
+  ]);
 
   // Open Examination Modal
   const openExamModal = (req: MaternityRequest) => {
@@ -296,75 +457,227 @@ function MaternityMedicalVerificationPage() {
             </div>
           </div>
 
-          {/* Filter Bar */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3 shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800/60 rounded-xl text-xs font-medium">
-                <button
-                  onClick={() => setActiveTab("ALL")}
-                  className={`px-3 py-1.5 rounded-lg transition ${
-                    activeTab === "ALL"
-                      ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  All ({requests.length})
-                </button>
-                <button
-                  onClick={() => setActiveTab("PENDING_INITIAL")}
-                  className={`px-3 py-1.5 rounded-lg transition ${
-                    activeTab === "PENDING_INITIAL"
-                      ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  New Awaiting Checkup ({stats.initialPending})
-                </button>
-                <button
-                  onClick={() => setActiveTab("FOLLOWUP")}
-                  className={`px-3 py-1.5 rounded-lg transition ${
-                    activeTab === "FOLLOWUP"
-                      ? "bg-indigo-600 text-white font-semibold shadow-sm"
-                      : "text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
-                  }`}
-                >
-                  Follow-ups Scheduled ({stats.followups})
-                </button>
-                <button
-                  onClick={() => setActiveTab("COMPLETED")}
-                  className={`px-3 py-1.5 rounded-lg transition ${
-                    activeTab === "COMPLETED"
-                      ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  EDD Finalized &amp; Sent ({stats.completed})
-                </button>
+          {/* Enhanced Filter Section matching image */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-pink-50 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 flex items-center justify-center">
+                  <SlidersHorizontal className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    Filter Maternity Records
+                    {activeFilterCount > 0 && (
+                      <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-pink-100 dark:bg-pink-950 text-pink-700 dark:text-pink-300">
+                        {activeFilterCount} active
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Filter by organization hierarchy, geography, timeline, status, and workflow stage.
+                  </p>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <select
-                  value={selectedDept}
-                  onChange={(e) => setSelectedDept(e.target.value)}
-                  className="px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+              {activeFilterCount > 0 && (
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-slate-200 dark:border-slate-700 transition"
                 >
-                  <option value="ALL">All Departments</option>
-                  <option value="Admin and Compliance">Admin and Compliance</option>
-                  <option value="Sample & CAD">Sample & CAD</option>
-                  <option value="Quality Assurance">Quality Assurance</option>
-                  <option value="Production RMG">Production RMG</option>
-                </select>
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Reset Filters
+                </button>
+              )}
+            </div>
 
-                <div className="relative flex-1 sm:w-64">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
+              {/* 1. Company */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Company
+                </label>
+                <select
+                  value={filterCompany}
+                  onChange={(e) => setFilterCompany(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {companyOptions.map((c) => (
+                    <option key={c} value={c}>
+                      {c === "ALL" ? "All Companies" : c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 2. Area */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Area
+                </label>
+                <select
+                  value={filterArea}
+                  onChange={(e) => setFilterArea(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {areaOptions.map((a) => (
+                    <option key={a} value={a}>
+                      {a === "ALL" ? "All Areas" : a}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 3. Department */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Department
+                </label>
+                <select
+                  value={filterDepartment}
+                  onChange={(e) => {
+                    setFilterDepartment(e.target.value);
+                    setFilterSection("ALL");
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {departmentOptions.map((d) => (
+                    <option key={d} value={d}>
+                      {d === "ALL" ? "All Departments" : d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 4. Section */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Section
+                </label>
+                <select
+                  value={filterSection}
+                  onChange={(e) => setFilterSection(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {sectionOptions.map((sec) => (
+                    <option key={sec} value={sec}>
+                      {sec === "ALL" ? "All Sections" : sec}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 5. Date Range: From Date */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  From Date
+                </label>
+                <input
+                  type="date"
+                  value={filterFromDate}
+                  onChange={(e) => setFilterFromDate(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                />
+              </div>
+
+              {/* 6. Date Range: To Date */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  To Date
+                </label>
+                <input
+                  type="date"
+                  value={filterToDate}
+                  onChange={(e) => setFilterToDate(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                />
+              </div>
+
+              {/* 7. Status */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Status
+                </label>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {statusOptions.map((st) => (
+                    <option key={st} value={st}>
+                      {st === "ALL" ? "All Statuses" : st}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 8. Stage */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Stage
+                </label>
+                <select
+                  value={filterStage}
+                  onChange={(e) => setFilterStage(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {stageOptions.map((sg) => (
+                    <option key={sg.value} value={sg.value}>
+                      {sg.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 9. Employee Type */}
+              <div className="sm:col-span-2 md:col-span-1 lg:col-span-2">
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Employee Type
+                </label>
+                <select
+                  value={filterEmployeeType}
+                  onChange={(e) => setFilterEmployeeType(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
+                >
+                  {employeeTypeOptions.map((tp) => (
+                    <option key={tp} value={tp}>
+                      {tp === "ALL" ? "All Employee Types" : tp}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 10. Search Input */}
+              <div className="sm:col-span-2 md:col-span-2 lg:col-span-2">
+                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Search
+                </label>
+                <div className="relative">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                   <input
                     type="text"
-                    placeholder="Search patient, ID, ref..."
+                    placeholder="Search by employee name, ID, department, case ref..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                    className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs"
                   />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 transition"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
+              </div>
+            </div>
+
+            {/* Result Count Footer */}
+            <div className="pt-2 flex items-center justify-end">
+              <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Showing <strong className="text-slate-800 dark:text-slate-200">{filteredRequests.length}</strong> of {requests.length} records
               </div>
             </div>
           </div>
@@ -375,26 +688,25 @@ function MaternityMedicalVerificationPage() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-100/70 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
+                    <th className="py-3.5 px-3 text-center w-12">SL</th>
                     <th className="py-3.5 px-4">Case Ref</th>
-                    <th className="py-3.5 px-4">Patient / Employee</th>
+                    <th className="py-3.5 px-4">Employee Information</th>
                     <th className="py-3.5 px-4">Welfare Intake Info</th>
                     <th className="py-3.5 px-4">Checkup Visits Done</th>
                     <th className="py-3.5 px-4">Follow-up Schedule</th>
-                    <th className="py-3.5 px-4">Clinical Findings / Vitals</th>
-                    <th className="py-3.5 px-4">Confirmed EDD</th>
                     <th className="py-3.5 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                   {filteredRequests.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="py-12 text-center text-slate-400">
+                      <td colSpan={7} className="py-12 text-center text-slate-400">
                         <Stethoscope className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                         No patients found matching the criteria.
                       </td>
                     </tr>
                   ) : (
-                    filteredRequests.map((req) => {
+                    filteredRequests.map((req, idx) => {
                       const visits = req.medicalStage.checkupVisits || [];
                       const lastVisit = visits[visits.length - 1];
                       const isNeedsExam =
@@ -405,26 +717,33 @@ function MaternityMedicalVerificationPage() {
                           key={req.id}
                           className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition group"
                         >
+                          {/* SL Column */}
+                          <td className="py-3.5 px-3 text-center font-mono font-medium text-slate-500 dark:text-slate-400">
+                            {idx + 1}
+                          </td>
+
+                          {/* Case Ref */}
                           <td className="py-3.5 px-4 font-mono font-semibold text-slate-900 dark:text-white">
                             <div>{req.id}</div>
                             <span className="text-[10px] text-slate-400">Intake: {req.welfareStage1.intakeDate}</span>
                           </td>
 
+                          {/* Employee Information (only Name, ID, Department) */}
                           <td className="py-3.5 px-4">
-                            <div>
-                              <p className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                            <div className="space-y-0.5">
+                              <p className="font-semibold text-slate-900 dark:text-slate-100">
                                 {req.employee.name}
                               </p>
-                              <p className="text-[11px] text-slate-500">
-                                ID: {req.employee.id} &bull; {req.employee.designation}
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                                ID: {req.employee.id}
                               </p>
-                              <p className="text-[10px] text-slate-400">
-                                {req.employee.department} &bull; Age:{" "}
-                                {new Date().getFullYear() - new Date(req.employee.dob).getFullYear()}
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                {req.employee.department}
                               </p>
                             </div>
                           </td>
 
+                          {/* Welfare Intake Info */}
                           <td className="py-3.5 px-4">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-pink-50 text-pink-700 dark:bg-pink-950 dark:text-pink-300 border border-pink-200">
                               {req.welfareStage1.tentativeTrimester}
@@ -434,6 +753,7 @@ function MaternityMedicalVerificationPage() {
                             </p>
                           </td>
 
+                          {/* Checkup Visits Done */}
                           <td className="py-3.5 px-4">
                             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200">
                               <Activity className="w-3.5 h-3.5" />
@@ -441,6 +761,7 @@ function MaternityMedicalVerificationPage() {
                             </span>
                           </td>
 
+                          {/* Follow-up Schedule */}
                           <td className="py-3.5 px-4">
                             {lastVisit && lastVisit.nextFollowupDate ? (
                               <div>
@@ -465,34 +786,7 @@ function MaternityMedicalVerificationPage() {
                             )}
                           </td>
 
-                          <td className="py-3.5 px-4">
-                            {lastVisit ? (
-                              <div>
-                                <p className="font-semibold text-slate-800 dark:text-slate-200">
-                                  BP: {lastVisit.bloodPressure} &bull; FHR: {lastVisit.fetalHeartRate}
-                                </p>
-                                <p className="text-[10px] text-slate-500">
-                                  Gest. Age: {lastVisit.gestationalWeeks} wks &bull; Hb: {lastVisit.hemoglobin}
-                                </p>
-                              </div>
-                            ) : (
-                              <span className="text-slate-400 italic">No vitals recorded</span>
-                            )}
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            {req.medicalStage.expectedDeliveryDate ? (
-                              <div className="inline-flex flex-col">
-                                <span className="font-bold text-pink-600 dark:text-pink-400 text-xs">
-                                  {req.medicalStage.expectedDeliveryDate}
-                                </span>
-                                <span className="text-[10px] text-slate-400">Confirmed by Doctor</span>
-                              </div>
-                            ) : (
-                              <span className="text-slate-400 italic text-[11px]">To be set on final checkup</span>
-                            )}
-                          </td>
-
+                          {/* Actions */}
                           <td className="py-3.5 px-4 text-right">
                             <div className="flex items-center justify-end gap-2">
                               {isNeedsExam && (
@@ -503,6 +797,16 @@ function MaternityMedicalVerificationPage() {
                                   <Stethoscope className="w-3.5 h-3.5" />
                                   {visits.length === 0 ? "Perform Checkup" : "Follow-up / Finalize"}
                                 </button>
+                              )}
+
+                              {req.currentStage === "MEDICAL_VERIFIED" && !req.welfareStage2.expectedLeaveStartDate && (
+                                <Link
+                                  to="/maternity-welfare-verification"
+                                  className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white shadow-xs flex items-center gap-1 transition"
+                                >
+                                  <Calendar className="w-3.5 h-3.5" />
+                                  Schedule at Welfare
+                                </Link>
                               )}
 
                               <button
@@ -533,7 +837,7 @@ function MaternityMedicalVerificationPage() {
       {/* ========================================================================= */}
       {isExamModalOpen && activeRequest && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl shadow-2xl my-8 overflow-hidden animate-in fade-in zoom-in-95">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-5xl lg:max-w-6xl shadow-2xl my-8 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95">
             {/* Header */}
             <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -558,31 +862,245 @@ function MaternityMedicalVerificationPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveCheckup} className="p-6 space-y-6 max-h-[80vh] overflow-y-auto text-xs">
-              {/* Patient Dossier Bar & Uploaded Reports Preview */}
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                    {activeRequest.employee.name}
-                  </h3>
-                  <p className="text-slate-500">
-                    ID: {activeRequest.employee.id} &bull; {activeRequest.employee.designation} &bull;{" "}
-                    {activeRequest.employee.department}
-                  </p>
-                  <p className="text-slate-500">
-                    Spouse: {activeRequest.employee.spouseName} &bull; Phone: {activeRequest.employee.phone}
-                  </p>
+            <form onSubmit={handleSaveCheckup} className="p-6 space-y-6 flex-1 overflow-y-auto text-xs">
+              {/* 1. EMPLOYEE DETAILS (Image 1) */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                  <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+                    <User className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                    EMPLOYEE DETAILS
+                  </h4>
                 </div>
 
-                <div className="w-full md:w-auto">
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                      <FileText className="w-3.5 h-3.5 text-blue-600" />
-                      Welfare Submitted Documents ({activeRequest.welfareStage1.attachedDocuments.length}):
-                    </p>
-                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">Click to open &amp; view</span>
+                <div className="flex flex-col sm:flex-row gap-5 items-start">
+                  {/* Photo Avatar */}
+                  <div className="flex-shrink-0">
+                    <img
+                      src={
+                        activeRequest.employee.avatar ||
+                        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"
+                      }
+                      alt={activeRequest.employee.name}
+                      className="w-24 h-28 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shadow-xs bg-slate-100 dark:bg-slate-800"
+                    />
                   </div>
-                  <div className="flex flex-wrap gap-2">
+
+                  {/* Two Columns Grid */}
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-xs">
+                    {/* Column 1 */}
+                    <div className="space-y-2">
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Employee Name:
+                        </span>
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">
+                          {activeRequest.employee.name}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Designation:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.designation}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Section:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.section}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Location:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.unit ? `${activeRequest.employee.unit} - Operation` : "Unit-01 - Operation"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Contact:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.phone}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Service Period:
+                        </span>
+                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                          {activeRequest.welfareStage1.serviceDurationText ||
+                            checkMaternityEligibility(activeRequest.employee.joiningDate).durationFormatted}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Address:
+                        </span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300 flex-1 leading-snug">
+                          {activeRequest.employee.presentAddress ||
+                            activeRequest.employee.permanentAddress ||
+                            "House 24, Road 4, Sector 10, Uttara, Dhaka"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Column 2 */}
+                    <div className="space-y-2">
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Employee ID:
+                        </span>
+                        <span className="font-mono font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.id}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Department:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.department}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Date of Joining:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.joiningDate.includes("-")
+                            ? activeRequest.employee.joiningDate.split("-").reverse().join("/")
+                            : activeRequest.employee.joiningDate}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Business Unit:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {activeRequest.employee.unit || "Unit-01"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Eligibility:
+                        </span>
+                        <span
+                          className={`font-bold uppercase ${
+                            activeRequest.welfareStage1.isEligible
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-rose-600 dark:text-rose-400"
+                          }`}
+                        >
+                          {activeRequest.welfareStage1.isEligible ? "YES" : "NO"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Documents:
+                        </span>
+                        <span className="font-medium text-slate-600 dark:text-slate-400">
+                          Available
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. PREVIOUS MATERNITY HISTORY */}
+              {activeRequest.employee.previousMaternityLeaves &&
+                activeRequest.employee.previousMaternityLeaves.length > 0 && (
+                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900 shadow-2xs">
+                    <div className="px-4 py-2.5 bg-amber-50/70 dark:bg-amber-950/20 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center justify-between border-b border-amber-200/50 dark:border-amber-900/30">
+                      <span>
+                        Previous Maternity History ({activeRequest.employee.previousMaternityLeaves.length} Recorded)
+                      </span>
+                    </div>
+                    <table className="w-full text-xs text-left">
+                      <thead className="text-[10px] uppercase text-slate-500 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30">
+                        <tr>
+                          <th className="py-2.5 px-3.5 font-bold">CHILD</th>
+                          <th className="py-2.5 px-3.5 font-bold">LEAVE PERIOD</th>
+                          <th className="py-2.5 px-3.5 font-bold">DELIVERY DATE</th>
+                          <th className="py-2.5 px-3.5 font-bold">DAYS</th>
+                          <th className="py-2.5 px-3.5 font-bold">BENEFIT</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {activeRequest.employee.previousMaternityLeaves.map((hist, idx) => (
+                          <tr key={hist.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                            <td className="py-2.5 px-3.5 font-bold text-slate-800 dark:text-slate-200">
+                              Baby #{hist.childNumber || idx + 1}
+                            </td>
+                            <td className="py-2.5 px-3.5 text-slate-600 dark:text-slate-400">
+                              {hist.leaveStartDate} to {hist.leaveEndDate}
+                            </td>
+                            <td className="py-2.5 px-3.5 text-slate-800 dark:text-slate-200 font-medium">
+                              {hist.deliveryDate}
+                            </td>
+                            <td className="py-2.5 px-3.5 font-semibold text-emerald-600 dark:text-emerald-400">
+                              {hist.totalDays}d
+                            </td>
+                            <td className="py-2.5 px-3.5 font-bold text-slate-900 dark:text-slate-100">
+                              {hist.benefitDisbursedBdt.toLocaleString()} BDT
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+              {/* 3. WELFARE INTAKE & COUNSELING */}
+              <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 bg-white dark:bg-slate-900 shadow-2xs">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+                      <HeartPulse className="w-3 h-3 text-rose-500" />
+                    </div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                      WELFARE INTAKE &amp; COUNSELING
+                    </h4>
+                  </div>
+                  <span className="text-[11px] font-medium text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
+                    Intake Date: {activeRequest.welfareStage1.intakeDate}
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl p-3 text-slate-700 dark:text-slate-300 text-xs leading-relaxed border border-slate-200/60 dark:border-slate-800">
+                  <p className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Counseling Notes &amp; Observations:</p>
+                  <p>{activeRequest.welfareStage1.counselingNotes}</p>
+                </div>
+
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <Paperclip className="w-3.5 h-3.5 text-slate-400" />
+                      Attached Verification Documents ({activeRequest.welfareStage1.attachedDocuments.length})
+                    </p>
+                    <span className="text-[10px] text-slate-400 font-medium">Click any document to view preview</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
                     {activeRequest.welfareStage1.attachedDocuments.map((doc) => (
                       <button
                         key={doc.id}
@@ -595,73 +1113,116 @@ function MaternityMedicalVerificationPage() {
                             nid: activeRequest.employee.nid,
                           })
                         }
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50/60 dark:hover:bg-blue-950/40 text-slate-800 dark:text-slate-200 font-medium text-xs shadow-2xs transition group cursor-pointer"
-                        title={`Click to open ${doc.name}`}
+                        className="group flex items-center justify-between p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 hover:bg-slate-100 dark:bg-slate-800/40 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition text-left cursor-pointer shadow-2xs"
                       >
-                        <FileText className="w-3.5 h-3.5 text-blue-500 group-hover:scale-110 transition" />
-                        <span className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                          {doc.name}
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                            <FileText className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-slate-900 dark:group-hover:text-white">
+                              {doc.name}
+                            </p>
+                            <p className="text-[10px] text-slate-400 font-mono">
+                              {doc.size} &bull; {doc.type.replace(/_/g, " ")}
+                            </p>
+                          </div>
+                        </div>
+
+                        <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white flex-shrink-0 ml-2">
+                          <Eye className="w-3.5 h-3.5" />
+                          View
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono">({doc.size})</span>
-                        <Eye className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 ml-0.5" />
                       </button>
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Previous Checkup Visits History Timeline */}
-              {activeRequest.medicalStage.checkupVisits.length > 0 && (
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                    Previous Checkup Visits Log (Visit History)
-                  </label>
-                  <div className="space-y-2 border border-slate-200 dark:border-slate-800 rounded-xl p-3 bg-slate-50/50 dark:bg-slate-900/50">
-                    {activeRequest.medicalStage.checkupVisits.map((v) => (
-                      <div
-                        key={v.visitId}
-                        className="p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
-                      >
-                        <div>
-                          <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                            <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-[10px]">
-                              Visit #{v.visitNumber}
-                            </span>
-                            <span>Date: {v.visitDate}</span>
-                            <span className="text-slate-400 font-normal">by {v.doctorName}</span>
-                          </div>
-                          <p className="text-slate-600 dark:text-slate-300 mt-1">
-                            <strong>Findings:</strong> {v.clinicalFindings}
-                          </p>
-                          <p className="text-slate-500 mt-0.5">
-                            <strong>Rx:</strong> {v.prescribedVitamins}
-                          </p>
-                        </div>
-
-                        <div className="text-left sm:text-right flex-shrink-0">
-                          <p className="font-semibold text-blue-600 dark:text-blue-400">
-                            BP: {v.bloodPressure} &bull; FHR: {v.fetalHeartRate}
-                          </p>
-                          <p className="text-slate-400 text-[10px]">
-                            Weight: {v.weightKg} kg &bull; Gest. Age: {v.gestationalWeeks} wks
-                          </p>
-                          {v.nextFollowupDate && (
-                            <span className="mt-1 inline-block text-[10px] font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded">
-                              Follow-up Date: {v.nextFollowupDate}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              {/* 4. Previous Checkup Visits Log (Visit History - Image 2) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                    RECORDED CLINICAL CONSULTATIONS &amp; VISITS ({activeRequest.medicalStage.checkupVisits.length})
+                  </h4>
+                  {(() => {
+                    const latestVisitWithFollowup = [...activeRequest.medicalStage.checkupVisits]
+                      .reverse()
+                      .find((v) => v.nextFollowupDate);
+                    return latestVisitWithFollowup?.nextFollowupDate ? (
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        Next Follow-up:{" "}
+                        <strong className="text-slate-900 dark:text-white font-bold">
+                          {latestVisitWithFollowup.nextFollowupDate}
+                        </strong>
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
-              )}
 
-              {/* New Checkup Clinical Inputs */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                  Input Today&apos;s Checkup Results (Visit #{(activeRequest.medicalStage.checkupVisits.length || 0) + 1})
-                </label>
+                {activeRequest.medicalStage.checkupVisits.length > 0 ? (
+                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900 shadow-2xs">
+                    <table className="w-full text-xs text-left">
+                      <thead className="text-[10px] uppercase text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40">
+                        <tr>
+                          <th className="py-3 px-4 font-bold">VISIT</th>
+                          <th className="py-3 px-4 font-bold">DATE</th>
+                          <th className="py-3 px-4 font-bold">VITALS</th>
+                          <th className="py-3 px-4 font-bold">GESTATION</th>
+                          <th className="py-3 px-4 font-bold">CLINICAL FINDINGS &amp; ADVICE</th>
+                          <th className="py-3 px-4 font-bold text-right">DOCTOR</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {[...activeRequest.medicalStage.checkupVisits]
+                          .sort((a, b) => a.visitNumber - b.visitNumber)
+                          .map((v) => (
+                            <tr key={v.visitId} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                              <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white whitespace-nowrap">
+                                Visit #{v.visitNumber}
+                              </td>
+                              <td className="py-3.5 px-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                                {v.visitDate}
+                              </td>
+                              <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">
+                                BP: {v.bloodPressure} &bull; HR: {v.fetalHeartRate.includes("bpm") ? v.fetalHeartRate : `${v.fetalHeartRate} bpm`}
+                              </td>
+                              <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                {v.gestationalWeeks ? `${v.gestationalWeeks} wks` : "24 wks"}
+                              </td>
+                              <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <p>{v.clinicalFindings}</p>
+                                {v.prescribedVitamins && (
+                                  <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                                    Rx: {v.prescribedVitamins}
+                                  </p>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 text-slate-600 dark:text-slate-400 text-right whitespace-nowrap">
+                                {v.doctorName}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="py-6 text-center text-slate-400 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl text-xs">
+                    No clinical checkup visits logged yet.
+                  </div>
+                )}
+              </div>
+
+              {/* 5. Input Today's Checkup Results */}
+              <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 bg-white dark:bg-slate-900 shadow-2xs">
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                  <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+                    <Stethoscope className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                    Input Today&apos;s Checkup Results (Visit #{(activeRequest.medicalStage.checkupVisits.length || 0) + 1})
+                  </h4>
+                </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div>
@@ -755,67 +1316,66 @@ function MaternityMedicalVerificationPage() {
                     />
                   </div>
                 </div>
+
+                {/* Observations & Prescriptions */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+                      Clinical Examination Findings &amp; Observations *
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={clinicalFindings}
+                      onChange={(e) => setClinicalFindings(e.target.value)}
+                      placeholder="Write a comments (if required)"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-2xs resize-y min-h-[50px]"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+                      Prescribed Supplements &amp; Dietary Advice
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={prescribedVitamins}
+                      onChange={(e) => setPrescribedVitamins(e.target.value)}
+                      placeholder="Write a comments (if required)"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-2xs resize-y min-h-[50px]"
+                    />
+                  </div>
+                </div>
               </div>
 
-              {/* Observations & Prescriptions */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Clinical Examination Findings &amp; Observations *
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={clinicalFindings}
-                    onChange={(e) => setClinicalFindings(e.target.value)}
-                    placeholder="Write a comments (if required)"
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-2xs resize-y min-h-[50px]"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Prescribed Supplements &amp; Dietary Advice
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={prescribedVitamins}
-                    onChange={(e) => setPrescribedVitamins(e.target.value)}
-                    placeholder="Write a comments (if required)"
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-2xs resize-y min-h-[50px]"
-                  />
-                </div>
-              </div>
-
-              {/* CRITICAL WORKFLOW SELECTION: SCHEDULE FOLLOW-UP VS COMPLETE FINAL CHECKUP & CONFIRM EDD */}
-              <div className="p-4 rounded-xl border-2 border-dashed border-blue-300 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-950/20 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+              {/* 6. Mark as Final Medical Checkup & Confirm Expected Delivery Date (EDD) */}
+              <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 bg-white dark:bg-slate-900 shadow-2xs">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2.5">
                     <input
                       type="checkbox"
                       id="isFinalAssessment"
                       checked={isFinalCheckup}
                       onChange={(e) => setIsFinalCheckup(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
                     />
-                    <label htmlFor="isFinalAssessment" className="text-sm font-bold text-blue-950 dark:text-blue-200 cursor-pointer">
+                    <label htmlFor="isFinalAssessment" className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 cursor-pointer">
                       Mark as Final Medical Checkup &amp; Confirm Expected Delivery Date (EDD)
                     </label>
                   </div>
-                  <span className="text-[11px] font-medium text-blue-700 dark:text-blue-300">
-                    {isFinalCheckup ? "Final Stage &rarr; Returns to Welfare" : "Patient to Return for Follow-up"}
-                  </span>
+                  {isFinalCheckup && (
+                    <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/50">
+                      Final Stage &rarr; Returns to Welfare
+                    </span>
+                  )}
                 </div>
 
                 {!isFinalCheckup ? (
                   /* Schedule Next Follow-up Date (Requirement) */
-                  <div className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 space-y-2">
-                    <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300 font-bold">
-                      <CalendarPlus className="w-4 h-4" />
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-3">
+                    <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold">
+                      <CalendarPlus className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       <span>Schedule Next Follow-up Date for Re-examination</span>
                     </div>
-                    <p className="text-slate-500">
-                      As per the process, the medical officer calls her for follow-up and gives her the next follow-up date.
-                    </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                       <div>
                         <label className="block text-slate-600 dark:text-slate-400 mb-1">
@@ -843,9 +1403,9 @@ function MaternityMedicalVerificationPage() {
                   </div>
                 ) : (
                   /* Final Checkup & EDD Entry (Requirement) */
-                  <div className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800 space-y-3 animate-in fade-in">
-                    <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-bold">
-                      <Baby className="w-4 h-4" />
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-3 animate-in fade-in">
+                    <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold">
+                      <Baby className="w-4 h-4 text-pink-600 dark:text-pink-400" />
                       <span>Confirmed Expected Delivery Date (EDD) &amp; Medical Clearance</span>
                     </div>
 
@@ -895,7 +1455,6 @@ function MaternityMedicalVerificationPage() {
                   </div>
                 )}
               </div>
-
 
               {/* Submit Buttons */}
               <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
