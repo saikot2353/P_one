@@ -39,6 +39,8 @@ import {
   Power,
   Sparkles,
   Eye,
+  HandCoins,
+  Info,
 } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -1593,7 +1595,25 @@ interface CompanyBasicSettings {
   sandwichEmployeeType: string;
   lateTimeCalculation: string;
   halfLeave: string;
+  // Loan Setup
+  loanApplicantType: string;
+  loanSpecificEmployeeId: string;
+  loanSpecificEmployeeName: string;
+  loanDynamicRole: string;
+  loanApprovalRequired: string;
 }
+
+export const MOCK_LOAN_EMPLOYEES = [
+  { id: "2023043910", name: "Tahmid Afsar", designation: "Software Engineer", department: "IT Division" },
+  { id: "2018010173", name: "Md. Golam Mowdud", designation: "Manager", department: "Inventory Management" },
+  { id: "2023046001", name: "Sohanur Rahman Sohan", designation: "Executive", department: "Finance Division" },
+  { id: "2024049326", name: "Hanif Uddin", designation: "Sr. Executive", department: "IT Division" },
+  { id: "2022035599", name: "Tahmid Afsar Shapno", designation: "HR Director", department: "HR & Admin" },
+  { id: "2021032646", name: "Sadiqul Islam", designation: "Deputy Manager", department: "Sales & Marketing" },
+  { id: "2023051028", name: "Dipon Saha", designation: "Manager", department: "Dyeing Unit" },
+  { id: "2024010502", name: "Md. Karim Uddin", designation: "Senior Operator", department: "Garment Production" },
+  { id: "2023043021", name: "Easin Mia", designation: "Receptionist", department: "General Administration" },
+];
 
 const DEFAULT_COMPANY_SETTINGS: CompanyBasicSettings = {
   companyType: "Knit",
@@ -1632,6 +1652,12 @@ const DEFAULT_COMPANY_SETTINGS: CompanyBasicSettings = {
   sandwichEmployeeType: "ALL",
   lateTimeCalculation: "Late Time",
   halfLeave: "No",
+  // Loan Setup Defaults
+  loanApplicantType: "Own",
+  loanSpecificEmployeeId: "2023043910",
+  loanSpecificEmployeeName: "Tahmid Afsar",
+  loanDynamicRole: "Both (Manager & HOD)",
+  loanApprovalRequired: "Yes",
 };
 
 const DEFAULT_HOLIDAYS: DefaultHoliday[] = [
@@ -6387,8 +6413,9 @@ export function CompanySetupView({
           settingsCompany &&
           (() => {
             const sl = settingsCompany.sl;
-            const cfg: CompanyBasicSettings = companySettings[sl] ?? {
+            const cfg: CompanyBasicSettings = {
               ...DEFAULT_COMPANY_SETTINGS,
+              ...(companySettings[sl] ?? {}),
             };
             const update = (field: keyof CompanyBasicSettings, val: string) => {
               setCompanySettings((prev) => ({
@@ -6436,7 +6463,7 @@ export function CompanySetupView({
                               Company Basic Settings
                             </h2>
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                              35 Fields Configured
+                              {Object.keys(DEFAULT_COMPANY_SETTINGS).length} Fields Configured
                             </span>
                           </div>
                           <div className="flex items-center gap-2 mt-0.5">
@@ -6814,6 +6841,188 @@ export function CompanySetupView({
                               className={inp}
                               placeholder="70"
                             />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 5.1 Loan Setup */}
+                    {isTabVisible("salary") && (
+                      <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
+                        <SectionHeader
+                          title="Loan Setup"
+                          badge={
+                            cfg.loanApplicantType === "Specific Person"
+                              ? "4 Fields"
+                              : cfg.loanApplicantType === "Dynamic"
+                              ? "3 Fields"
+                              : "2 Fields"
+                          }
+                          icon={HandCoins}
+                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+                          {/* 1. Who Can Apply for Loan */}
+                          <div className={wrap}>
+                            <label className={lbl}>
+                              Who Can Apply for Loan <span className="text-rose-500">*</span>
+                            </label>
+                            <select
+                              value={cfg.loanApplicantType || "Own"}
+                              onChange={(e) => {
+                                const newType = e.target.value;
+                                update("loanApplicantType", newType);
+                                if (newType === "Specific Person" && !cfg.loanSpecificEmployeeId) {
+                                  update("loanSpecificEmployeeId", MOCK_LOAN_EMPLOYEES[0].id);
+                                  update("loanSpecificEmployeeName", MOCK_LOAN_EMPLOYEES[0].name);
+                                }
+                              }}
+                              className={sel}
+                            >
+                              <option value="Own">Own</option>
+                              <option value="Specific Person">Specific Person</option>
+                              <option value="Dynamic">Dynamic</option>
+                            </select>
+                          </div>
+
+                          {/* Specific Person Fields */}
+                          {cfg.loanApplicantType === "Specific Person" && (
+                            <>
+                              {/* Employee ID */}
+                              <div className={wrap}>
+                                <label className={lbl}>
+                                  Select Employee ID <span className="text-rose-500">*</span>
+                                </label>
+                                <select
+                                  value={cfg.loanSpecificEmployeeId || ""}
+                                  onChange={(e) => {
+                                    const selectedId = e.target.value;
+                                    const emp = MOCK_LOAN_EMPLOYEES.find((item) => item.id === selectedId);
+                                    update("loanSpecificEmployeeId", selectedId);
+                                    update("loanSpecificEmployeeName", emp ? emp.name : "");
+                                  }}
+                                  className={sel}
+                                >
+                                  <option value="">-- Select Employee ID --</option>
+                                  {MOCK_LOAN_EMPLOYEES.map((emp) => (
+                                    <option key={emp.id} value={emp.id}>
+                                      {emp.id} — {emp.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              {/* Employee Name (Clean Auto-populated) */}
+                              <div className={wrap}>
+                                <label className={lbl}>
+                                  Employee Name <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  readOnly
+                                  value={
+                                    cfg.loanSpecificEmployeeName ||
+                                    MOCK_LOAN_EMPLOYEES.find((e) => e.id === cfg.loanSpecificEmployeeId)?.name ||
+                                    ""
+                                  }
+                                  placeholder="Auto-populated from Employee ID"
+                                  className={`${inp} bg-muted/40 cursor-not-allowed font-medium text-foreground`}
+                                />
+                              </div>
+                            </>
+                          )}
+
+                          {/* Dynamic Fields */}
+                          {cfg.loanApplicantType === "Dynamic" && (
+                            <>
+                              {/* Eligible Role */}
+                              <div className={wrap}>
+                                <label className={lbl}>
+                                  Eligible Role <span className="text-rose-500">*</span>
+                                </label>
+                                <select
+                                  value={cfg.loanDynamicRole || "Both (Manager & HOD)"}
+                                  onChange={(e) => update("loanDynamicRole", e.target.value)}
+                                  className={sel}
+                                >
+                                  <option value="Both (Manager & HOD)">Both (Manager & HOD)</option>
+                                  <option value="Manager Only">Manager Only</option>
+                                  <option value="HOD Only">HOD Only</option>
+                                </select>
+                              </div>
+
+                              {/* Quick Role Selection Buttons */}
+                              <div className={wrap}>
+                                <label className={lbl}>
+                                  Role Selection <span className="text-muted-foreground font-normal">(Toggle)</span>
+                                </label>
+                                <div className="flex items-center gap-2 h-10">
+                                  {[
+                                    { label: "Manager", key: "Manager" },
+                                    { label: "HOD", key: "HOD" },
+                                  ].map((r) => {
+                                    const active =
+                                      cfg.loanDynamicRole?.includes(r.key) ||
+                                      cfg.loanDynamicRole === "Both (Manager & HOD)";
+                                    return (
+                                      <button
+                                        key={r.key}
+                                        type="button"
+                                        onClick={() => {
+                                          const hasMgr = cfg.loanDynamicRole?.includes("Manager");
+                                          const hasHOD = cfg.loanDynamicRole?.includes("HOD");
+                                          if (r.key === "Manager") {
+                                            if (!hasMgr) {
+                                              update("loanDynamicRole", hasHOD ? "Both (Manager & HOD)" : "Manager Only");
+                                            } else {
+                                              update("loanDynamicRole", hasHOD ? "HOD Only" : "Manager Only");
+                                            }
+                                          } else {
+                                            if (!hasHOD) {
+                                              update("loanDynamicRole", hasMgr ? "Both (Manager & HOD)" : "HOD Only");
+                                            } else {
+                                              update("loanDynamicRole", hasMgr ? "Manager Only" : "HOD Only");
+                                            }
+                                          }
+                                        }}
+                                        className={`flex-1 h-10 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all border cursor-pointer ${
+                                          active
+                                            ? "bg-primary/10 text-primary border-primary/30 shadow-2xs"
+                                            : "bg-muted/30 text-muted-foreground border-border/60 hover:bg-muted/60 hover:text-foreground"
+                                        }`}
+                                      >
+                                        <span>{active ? "✓" : "+"}</span>
+                                        <span>{r.label}</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </>
+                          )}
+
+                          {/* Own Info Helper (Clean, height-matched single-row pill) */}
+                          {(!cfg.loanApplicantType || cfg.loanApplicantType === "Own") && (
+                            <div className="col-span-1 sm:col-span-2 flex items-center gap-2.5 px-3.5 rounded-lg bg-primary/5 border border-primary/15 text-xs text-muted-foreground h-10 self-end">
+                              <Info className="size-4 text-primary shrink-0" />
+                              <p className="text-xs text-foreground font-medium truncate">
+                                <span className="font-semibold text-primary">Own (Self-Service):</span> All employees can apply directly via SSP
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Loan Approval Required */}
+                          <div className={wrap}>
+                            <label className={lbl}>
+                              Loan Approval Required <span className="text-rose-500">*</span>
+                            </label>
+                            <select
+                              value={cfg.loanApprovalRequired || "Yes"}
+                              onChange={(e) => update("loanApprovalRequired", e.target.value)}
+                              className={sel}
+                            >
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
                           </div>
                         </div>
                       </div>
