@@ -72,6 +72,18 @@ const searchableMenus: SearchMenuLink[] = [
     description: "View and filter complete staff profiles",
   },
   {
+    label: "Employee Account Information",
+    parent: "Personnel Info",
+    to: "/employee-account-information",
+    description: "Manage employee bank accounts, cash/bank payments, and tax amounts",
+  },
+  {
+    label: "Bulk Account Upload",
+    parent: "Personnel Info",
+    to: "/bulk-account-upload",
+    description: "Bulk assign bank accounts, import CSV records, and update payment parameters",
+  },
+  {
     label: "ID Card Setup",
     parent: "Personnel Info",
     to: "/id-card-setup",
@@ -183,15 +195,33 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Apply bulk leave for multiple employees across departments and lines",
   },
   {
+    label: "Maternity Welfare Verification & Intake",
+    parent: "Maternity Leave",
+    to: "/maternity-welfare-verification",
+    description: "Welfare pregnancy intake, 6-month statutory service eligibility check, and document upload",
+  },
+  {
+    label: "Maternity Medical Verification & Follow-up Clinic",
+    parent: "Maternity Leave",
+    to: "/maternity-medical-verification",
+    description: "Medical officer clinical examinations, vitals logging, scheduled follow-up visits, and EDD confirmation",
+  },
+  {
+    label: "Maternity Leave HR Verification & Approval",
+    parent: "Maternity Leave",
+    to: "/maternity-hr-verification",
+    description: "HR statutory audit, 112 days leave sanction order issuance, and maternity benefit approval",
+  },
+  {
     label: "Maternity Payment Registry & Disbursement",
-    parent: "Leave",
+    parent: "Maternity Leave",
     to: "/maternity-payment",
     description:
       "Manage maternity leave payment records, 112/120 day disbursements and applications",
   },
   {
     label: "Maternity Payment Statement Report",
-    parent: "Leave",
+    parent: "Maternity Leave",
     to: "/maternity-payment-report",
     description:
       "View department-wise maternity payment report, 1st & 2nd installment disbursements",
@@ -377,6 +407,7 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Warning Letters", parent: "Disciplinary Action", to: "/disciplinary-warning-letters" },
   { label: "Case Files", parent: "Disciplinary Action", to: "/disciplinary-case-files" },
   // Manage Overtime
+  { label: "OT Status Update", parent: "Manage Overtime", to: "/ot-status-update" },
   { label: "Overtime Requests", parent: "Manage Overtime", to: "/" },
   { label: "OT Calculations", parent: "Manage Overtime", to: "/" },
   { label: "OT Approvals", parent: "Manage Overtime", to: "/" },
@@ -558,7 +589,13 @@ const searchableMenus: SearchMenuLink[] = [
     label: "Candidate Selection",
     parent: "e-Recruitment",
     to: "/recruitment-candidate-selection",
-    description: "Job-wise candidate review, selection & link generation",
+    description: "Job-wise candidate review, selection & salary entry",
+  },
+  {
+    label: "Candidate Selection Approval",
+    parent: "e-Recruitment",
+    to: "/recruitment-candidate-selection-approval",
+    description: "Multi-tier approval console, balance modification & history",
   },
   // {
   //   label: "Approved Candidates",
@@ -624,9 +661,27 @@ const searchableMenus: SearchMenuLink[] = [
   },
   {
     label: "Increment History",
-    parent: "Evaluation",
+    parent: "HR Reports",
     to: "/increment-history",
     description: "Historical increment records log for all employees",
+  },
+  {
+    label: "Increment QueueList",
+    parent: "HR Reports",
+    to: "/increment-queuelist",
+    description: "Increment queue and verification list report",
+  },
+  {
+    label: "Pending OT Request",
+    parent: "HR Reports",
+    to: "/pending-ot-request",
+    description: "Employee overtime requisitions and pending allowance report",
+  },
+  {
+    label: "Working Hour Analysis",
+    parent: "HR Reports",
+    to: "/working-hour-analysis",
+    description: "Employee weekly working hours and overtime threshold analysis",
   },
   {
     label: "Approve Increment Gadget",
@@ -1148,21 +1203,18 @@ export function Topbar() {
                         setIsSearchOpen(false);
                         setSearchQuery("");
                       }}
-                      className={`w-full group text-left flex items-center gap-3 p-2.5 rounded-xl transition duration-150 border ${
-                        isFocused
+                      className={`w-full group text-left flex items-center gap-3 p-2.5 rounded-xl transition duration-150 border ${isFocused
                           ? "bg-primary/[0.08] dark:bg-primary/[0.12] border-primary/20 text-primary"
                           : "hover:bg-slate-50/70 dark:hover:bg-slate-900/40 border-transparent text-slate-700 dark:text-slate-350"
-                      }`}
+                        }`}
                     >
                       {/* Left: Beautiful visually distinct Category Icon Box */}
                       <div
-                        className={`size-8 rounded-lg flex items-center justify-center border shrink-0 transition-transform duration-300 ${
-                          isFocused ? "scale-105" : ""
-                        } ${
-                          isActiveRoute
+                        className={`size-8 rounded-lg flex items-center justify-center border shrink-0 transition-transform duration-300 ${isFocused ? "scale-105" : ""
+                          } ${isActiveRoute
                             ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                             : "bg-slate-100 border-slate-200/40 text-slate-400 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-500"
-                        }`}
+                          }`}
                       >
                         <CategoryIcon className="size-4" />
                       </div>
@@ -1174,11 +1226,10 @@ export function Topbar() {
                             {item.label}
                           </span>
                           <span
-                            className={`px-1.5 py-0.2 rounded text-[7.5px] font-black uppercase tracking-wider scale-90 ${
-                              isActiveRoute
+                            className={`px-1.5 py-0.2 rounded text-[7.5px] font-black uppercase tracking-wider scale-90 ${isActiveRoute
                                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                                 : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
-                            }`}
+                              }`}
                           >
                             {item.parent}
                           </span>

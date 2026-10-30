@@ -52,6 +52,18 @@ const searchableMenus: SearchMenuLink[] = [
     description: "View and filter complete staff profiles",
   },
   {
+    label: "Employee Account Information",
+    parent: "Personnel Info",
+    to: "/employee-account-information",
+    description: "Manage employee bank accounts, cash/bank payments, and tax amounts",
+  },
+  {
+    label: "Bulk Account Upload",
+    parent: "Personnel Info",
+    to: "/bulk-account-upload",
+    description: "Bulk assign bank accounts, import CSV records, and update payment parameters",
+  },
+  {
     label: "ID Card Setup",
     parent: "Personnel Info",
     to: "/id-card-setup",
@@ -273,6 +285,7 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Warning Letters", parent: "Disciplinary Action", to: "/" },
   { label: "Show Cause Notices", parent: "Disciplinary Action", to: "/" },
   // Manage Overtime
+  { label: "OT Status Update", parent: "Manage Overtime", to: "/ot-status-update" },
   { label: "Overtime Requests", parent: "Manage Overtime", to: "/" },
   { label: "OT Calculations", parent: "Manage Overtime", to: "/" },
   { label: "OT Approvals", parent: "Manage Overtime", to: "/" },

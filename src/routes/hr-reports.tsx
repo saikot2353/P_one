@@ -59,6 +59,18 @@ function HRReportsPage() {
           desc: "Status and history of company SIM card requisitions.",
           to: "/hr-report-sim-requisition",
         },
+        {
+          title: "Increment History",
+          icon: BarChart3,
+          desc: "Chronological audit log of employee salary increments and promotion records.",
+          to: "/increment-history",
+        },
+        {
+          title: "Increment QueueList",
+          icon: BarChart3,
+          desc: "Verification and queue list for employee salary increment proposals.",
+          to: "/increment-queuelist",
+        },
       ],
     },
     {
@@ -163,6 +175,18 @@ function HRReportsPage() {
           icon: Printer,
           desc: "Print approved overtime requisitions and slips.",
           to: "#",
+        },
+        {
+          title: "Pending OT Request",
+          icon: Clock,
+          desc: "Employee overtime requisitions and pending allowance queue.",
+          to: "/pending-ot-request",
+        },
+        {
+          title: "Working Hour Analysis",
+          icon: BarChart3,
+          desc: "Employee weekly working hour trends, daily peaks, and overtime limit analysis.",
+          to: "/working-hour-analysis",
         },
         {
           title: "Tiffin Allowance All",

@@ -105,10 +105,12 @@ export function CurrencySetupView({
   // Currencies state from localStorage
   const [setups, setSetups] = useState<CurrencySetup[]>(() => {
     try {
-      const stored = localStorage.getItem("accounts:currencies");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (typeof window !== "undefined" && window.localStorage) {
+        const stored = localStorage.getItem("accounts:currencies");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
       }
     } catch (e) {
       console.error(e);
@@ -119,10 +121,12 @@ export function CurrencySetupView({
   // Rates state from localStorage
   const [rates, setRates] = useState<CurrencyRate[]>(() => {
     try {
-      const stored = localStorage.getItem("accounts:currency_rates");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (typeof window !== "undefined" && window.localStorage) {
+        const stored = localStorage.getItem("accounts:currency_rates");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
       }
     } catch (e) {
       console.error(e);
@@ -133,7 +137,9 @@ export function CurrencySetupView({
   // Persist
   useEffect(() => {
     try {
-      localStorage.setItem("accounts:currencies", JSON.stringify(setups));
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("accounts:currencies", JSON.stringify(setups));
+      }
     } catch (e) {
       console.error(e);
     }
@@ -141,7 +147,9 @@ export function CurrencySetupView({
 
   useEffect(() => {
     try {
-      localStorage.setItem("accounts:currency_rates", JSON.stringify(rates));
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("accounts:currency_rates", JSON.stringify(rates));
+      }
     } catch (e) {
       console.error(e);
     }
