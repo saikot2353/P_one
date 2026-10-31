@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import type { RequisitionViewData } from "@/components/ssp/GeneralStoreRequisitionModal";
 
 export const Route = createFileRoute("/ssp-store-requisition")({
   head: () => ({
