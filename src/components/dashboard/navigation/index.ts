@@ -9,7 +9,7 @@ import { sspNav } from "./ssp.nav";
 import { configureNav } from "./configure.nav";
 import { approvalsNav } from "./approvals.nav";
 import { personnelNav } from "./personnel.nav";
-import { attendanceNav } from "./attendance.nav";
+import { attendanceNav, shiftNav } from "./attendance.nav";
 import { leaveNav } from "./leave.nav";
 import { recruitmentNav } from "./recruitment.nav";
 import { budgetTransferNav } from "./budget-transfer.nav";
@@ -51,7 +51,7 @@ export const nav: NavItem[] = [
   payrollCompensationNav[0], // KPI Performance
   payrollCompensationNav[1], // Evaluation
   ...recruitmentNav,
-  attendanceNav[2], // Manage Shift (also placed in shift workflow)
+  ...shiftNav, // Manage Shift
   ...budgetTransferNav,
   ...corePolicyNav,
   ...separationNav,

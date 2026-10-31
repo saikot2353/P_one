@@ -20,6 +20,9 @@ export const attendanceNav: NavItem[] = [
       { label: "Company Holiday", to: "/company-holiday" },
     ],
   },
+];
+
+export const shiftNav: NavItem[] = [
   {
     label: "Manage Shift",
     icon: Clock,
@@ -29,4 +32,5 @@ export const attendanceNav: NavItem[] = [
     ],
   },
 ];
+
 
