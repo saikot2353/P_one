@@ -1292,7 +1292,7 @@ function MaternityWelfareVerificationPage() {
                       </div>
 
                       {/* Content: Photo + 2-Column Attributes */}
-                      <div className="flex flex-col sm:flex-row gap-5 items-start">
+                      <div className="flex flex-row gap-5 items-start">
                         {/* Avatar / Photo */}
                         <div className="flex-shrink-0">
                           <img
@@ -1916,7 +1916,7 @@ function MaternityWelfareVerificationPage() {
                   </h4>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-5 items-start">
+                <div className="flex flex-row gap-5 items-start">
                   {/* Photo Avatar */}
                   <div className="flex-shrink-0">
                     <img
@@ -2435,14 +2435,10 @@ function MaternityWelfareVerificationPage() {
                               onChange={(e) => handleViewModalEddChange(e.target.value)}
                               className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-1 focus:ring-slate-400 focus:outline-none transition shadow-2xs"
                             />
-                            {viewModalStartDate && viewModalEndDate ? (
+                            {viewModalStartDate && viewModalEndDate && (
                               <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1.5">
                                 ✓ Auto-calculated Leave: <strong>{viewModalStartDate}</strong> to <strong>{viewModalEndDate}</strong> (112 Days / 16 Wks)
                               </p>
-                            ) : (
-                              <span className="text-[10px] text-slate-400 block mt-1">
-                                Auto-calculates 56 days pre-delivery and 55 days post-delivery.
-                              </span>
                             )}
                           </div>
 
@@ -2457,9 +2453,6 @@ function MaternityWelfareVerificationPage() {
                               placeholder="Leave address if different from present residence"
                               className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-1 focus:ring-slate-400 focus:outline-none transition shadow-2xs"
                             />
-                            <span className="text-[10px] text-slate-400 block mt-1">
-                              Residence where employee stays during maternity period.
-                            </span>
                           </div>
                         </div>
 
@@ -2477,48 +2470,15 @@ function MaternityWelfareVerificationPage() {
                           />
                         </div>
 
-                        {/* Action Footer */}
-                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                          <div className="text-[11px] text-slate-500">
-                            {viewModalStartDate && viewModalEndDate ? (
-                              <span className="text-slate-600 dark:text-slate-400">
-                                Scheduled: <strong className="text-slate-800 dark:text-slate-200">{viewModalStartDate}</strong> to <strong className="text-slate-800 dark:text-slate-200">{viewModalEndDate}</strong> (112 Days)
-                              </span>
-                            ) : (
-                              <span className="text-slate-400">Please select an Expected Delivery Date</span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            {isEditingSchedule && (
-                              <button
-                                type="button"
-                                onClick={() => setIsEditingSchedule(false)}
-                                className="px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                              >
-                                Cancel
-                              </button>
-                            )}
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                handleSaveViewModalSchedule();
-                                setIsEditingSchedule(false);
-                              }}
-                              disabled={!viewModalEdd || !viewModalStartDate || !viewModalEndDate}
-                              className={`px-4 py-2 text-xs font-semibold rounded-xl text-white shadow-xs flex items-center gap-2 transition ${
-                                viewModalEdd && viewModalStartDate && viewModalEndDate
-                                  ? "bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white cursor-pointer"
-                                  : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
-                              }`}
-                            >
-                              <Send className="w-3.5 h-3.5" />
-                              {activeRequest.currentStage === "MEDICAL_VERIFIED"
-                                ? "Submit Leave Schedule to HR"
-                                : "Save & Update Schedule"}
-                            </button>
-                          </div>
+                        {/* Calculated Schedule Info */}
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500">
+                          {viewModalStartDate && viewModalEndDate ? (
+                            <span className="text-slate-600 dark:text-slate-400">
+                              Calculated Leave Period: <strong className="text-slate-800 dark:text-slate-200">{viewModalStartDate}</strong> to <strong className="text-slate-800 dark:text-slate-200">{viewModalEndDate}</strong> (112 Statutory Days)
+                            </span>
+                          ) : (
+                            <span className="text-slate-400">Please select an Expected Delivery Date to calculate statutory leave period.</span>
+                          )}
                         </div>
                       </div>
                     );
@@ -2540,14 +2500,59 @@ function MaternityWelfareVerificationPage() {
               </div>
             </div>
 
-            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex justify-end">
-              <button
-                onClick={() => setIsViewDossierOpen(false)}
-                className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 text-white hover:bg-slate-700 cursor-pointer"
-              >
-                Close Dossier
-              </button>
-            </div>
+            {/* Modal Footer: Action Buttons */}
+            {(() => {
+              const isScheduleAlreadyGiven = Boolean(
+                activeRequest.welfareStage2?.expectedLeaveStartDate &&
+                activeRequest.welfareStage2?.expectedLeaveEndDate
+              );
+              const isReturnedFromMedicalOrReady =
+                Boolean(activeRequest.medicalStage.expectedDeliveryDate) ||
+                activeRequest.medicalStage.isFinalCheckupDone ||
+                activeRequest.currentStage === "MEDICAL_VERIFIED" ||
+                activeRequest.currentStage === "WELFARE_LEAVE_SCHEDULED" ||
+                activeRequest.currentStage === "HR_APPROVED" ||
+                isEditingSchedule;
+              const showSubmitButton = isReturnedFromMedicalOrReady && (!isScheduleAlreadyGiven || isEditingSchedule);
+
+              return (
+                <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditingSchedule(false);
+                      setIsViewDossierOpen(false);
+                    }}
+                    className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  >
+                    {isEditingSchedule ? "Cancel" : "Close"}
+                  </button>
+
+                  {showSubmitButton && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleSaveViewModalSchedule();
+                        if (viewModalEdd && viewModalStartDate && viewModalEndDate) {
+                          setIsEditingSchedule(false);
+                        }
+                      }}
+                      disabled={!viewModalEdd || !viewModalStartDate || !viewModalEndDate}
+                      className={`px-5 py-2 text-xs font-semibold rounded-xl text-white shadow-md flex items-center gap-2 transition ${
+                        viewModalEdd && viewModalStartDate && viewModalEndDate
+                          ? "bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white cursor-pointer"
+                          : "bg-slate-300 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                      }`}
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      {activeRequest.currentStage === "MEDICAL_VERIFIED"
+                        ? "Submit Leave Schedule to HR"
+                        : "Save & Update Schedule"}
+                    </button>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
