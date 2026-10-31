@@ -108,6 +108,7 @@ export const nav: NavItem[] = [
       { label: "Education & Training", to: "/configure-education" },
       { label: "Leave & Policies", to: "/configure-policies" },
       { label: "Maternity Configuration", to: "/maternity-configuration" },
+      { label: "Maternity Verification Setup", to: "/maternity-verification-setup" },
       { label: "Letter Setup", to: "/configure-letter" },
       { label: "Lunch rate festival", to: "/lunch-rate-festival" },
     ],

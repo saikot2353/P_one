@@ -199,6 +199,7 @@ import { Route as MaternityHrVerificationRouteImport } from './routes/maternity-
 import { Route as MaternityMedicalVerificationRouteImport } from './routes/maternity-medical-verification'
 import { Route as MaternityPaymentRouteImport } from './routes/maternity-payment'
 import { Route as MaternityPaymentReportRouteImport } from './routes/maternity-payment-report'
+import { Route as MaternityVerificationSetupRouteImport } from './routes/maternity-verification-setup'
 import { Route as MaternityWelfareVerificationRouteImport } from './routes/maternity-welfare-verification'
 import { Route as MerchandisingBomRouteImport } from './routes/merchandising-bom'
 import { Route as MerchandisingCadRouteImport } from './routes/merchandising-cad'
@@ -1406,6 +1407,12 @@ const MaternityPaymentReportRoute = MaternityPaymentReportRouteImport.update({
   path: '/maternity-payment-report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MaternityVerificationSetupRoute =
+  MaternityVerificationSetupRouteImport.update({
+    id: '/maternity-verification-setup',
+    path: '/maternity-verification-setup',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MaternityWelfareVerificationRoute =
   MaternityWelfareVerificationRouteImport.update({
     id: '/maternity-welfare-verification',
@@ -2774,6 +2781,7 @@ export interface FileRoutesByFullPath {
   '/maternity-medical-verification': typeof MaternityMedicalVerificationRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
+  '/maternity-verification-setup': typeof MaternityVerificationSetupRoute
   '/maternity-welfare-verification': typeof MaternityWelfareVerificationRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
@@ -3184,6 +3192,7 @@ export interface FileRoutesByTo {
   '/maternity-medical-verification': typeof MaternityMedicalVerificationRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
+  '/maternity-verification-setup': typeof MaternityVerificationSetupRoute
   '/maternity-welfare-verification': typeof MaternityWelfareVerificationRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
@@ -3595,6 +3604,7 @@ export interface FileRoutesById {
   '/maternity-medical-verification': typeof MaternityMedicalVerificationRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
+  '/maternity-verification-setup': typeof MaternityVerificationSetupRoute
   '/maternity-welfare-verification': typeof MaternityWelfareVerificationRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
@@ -4007,6 +4017,7 @@ export interface FileRouteTypes {
     | '/maternity-medical-verification'
     | '/maternity-payment'
     | '/maternity-payment-report'
+    | '/maternity-verification-setup'
     | '/maternity-welfare-verification'
     | '/merchandising-bom'
     | '/merchandising-cad'
@@ -4417,6 +4428,7 @@ export interface FileRouteTypes {
     | '/maternity-medical-verification'
     | '/maternity-payment'
     | '/maternity-payment-report'
+    | '/maternity-verification-setup'
     | '/maternity-welfare-verification'
     | '/merchandising-bom'
     | '/merchandising-cad'
@@ -4827,6 +4839,7 @@ export interface FileRouteTypes {
     | '/maternity-medical-verification'
     | '/maternity-payment'
     | '/maternity-payment-report'
+    | '/maternity-verification-setup'
     | '/maternity-welfare-verification'
     | '/merchandising-bom'
     | '/merchandising-cad'
@@ -5238,6 +5251,7 @@ export interface RootRouteChildren {
   MaternityMedicalVerificationRoute: typeof MaternityMedicalVerificationRoute
   MaternityPaymentRoute: typeof MaternityPaymentRoute
   MaternityPaymentReportRoute: typeof MaternityPaymentReportRoute
+  MaternityVerificationSetupRoute: typeof MaternityVerificationSetupRoute
   MaternityWelfareVerificationRoute: typeof MaternityWelfareVerificationRoute
   MerchandisingBomRoute: typeof MerchandisingBomRoute
   MerchandisingCadRoute: typeof MerchandisingCadRoute
@@ -6788,6 +6802,13 @@ declare module '@tanstack/react-router' {
       path: '/maternity-payment-report'
       fullPath: '/maternity-payment-report'
       preLoaderRoute: typeof MaternityPaymentReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maternity-verification-setup': {
+      id: '/maternity-verification-setup'
+      path: '/maternity-verification-setup'
+      fullPath: '/maternity-verification-setup'
+      preLoaderRoute: typeof MaternityVerificationSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/maternity-welfare-verification': {
@@ -8512,6 +8533,7 @@ const rootRouteChildren: RootRouteChildren = {
   MaternityMedicalVerificationRoute: MaternityMedicalVerificationRoute,
   MaternityPaymentRoute: MaternityPaymentRoute,
   MaternityPaymentReportRoute: MaternityPaymentReportRoute,
+  MaternityVerificationSetupRoute: MaternityVerificationSetupRoute,
   MaternityWelfareVerificationRoute: MaternityWelfareVerificationRoute,
   MerchandisingBomRoute: MerchandisingBomRoute,
   MerchandisingCadRoute: MerchandisingCadRoute,

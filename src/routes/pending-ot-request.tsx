@@ -746,7 +746,8 @@ export function PendingOTRequestPage() {
                   </select>
                 </div>
 
-                {/* 9. Requisition Type */}
+                {/* 9. Requisition Type (Commented out / Omitted) */}
+                {/*
                 <div className="space-y-1">
                   <label className="font-semibold text-slate-700 dark:text-slate-300 block">
                     Requisition Type
@@ -763,9 +764,10 @@ export function PendingOTRequestPage() {
                     <option value="Holiday OT">Holiday OT</option>
                   </select>
                 </div>
+                */}
 
                 {/* 10. Employee Id */}
-                <div className="space-y-1 xl:col-span-2">
+                <div className="space-y-1 xl:col-span-3">
                   <label className="font-semibold text-slate-700 dark:text-slate-300 block">
                     Employee Id
                   </label>
