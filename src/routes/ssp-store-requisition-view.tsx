@@ -35,10 +35,10 @@ import {
 } from "./-ssp-implementation-data";
 
 export const Route = createFileRoute("/ssp-store-requisition-view")({
-  validateSearch: (search: Record<string, unknown>) => {
+  validateSearch: (search: Record<string, unknown>): { id?: string; from?: string } => {
     return {
       id: (search.id as string) || "",
-      from: (search.from as string) || "",
+      from: (search.from as string) || undefined,
     };
   },
   head: () => ({

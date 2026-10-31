@@ -375,7 +375,7 @@ const INITIAL_WORKING_HOURS: WorkingHourRecord[] = [
   },
 ];
 
-function WorkingHourAnalysisPage() {
+export function WorkingHourAnalysisPage() {
   // Filter States matching the reference image
   const [year, setYear] = useState("2026");
   const [month, setMonth] = useState("Sep");

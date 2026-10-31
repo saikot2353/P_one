@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Route as WorkingHourRoute } from "./working-hour-analysis";
+import { WorkingHourAnalysisPage } from "./working-hour-analysis";
 
 export const Route = createFileRoute("/hr-report-working-hour-analysis")({
   head: () => ({
@@ -11,5 +11,5 @@ export const Route = createFileRoute("/hr-report-working-hour-analysis")({
       },
     ],
   }),
-  component: WorkingHourRoute.options.component,
+  component: WorkingHourAnalysisPage,
 });
