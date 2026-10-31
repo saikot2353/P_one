@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Route as WorkingHourRoute } from "./working-hour-analysis";
 
+function WorkingHourAnalysisProxy() {
+  const Component = WorkingHourRoute.options.component;
+  return Component ? <Component /> : null;
+}
+
 export const Route = createFileRoute("/hr-report-working-hour-analysis")({
   head: () => ({
     meta: [
@@ -11,5 +16,5 @@ export const Route = createFileRoute("/hr-report-working-hour-analysis")({
       },
     ],
   }),
-  component: WorkingHourRoute.options.component,
+  component: WorkingHourAnalysisProxy,
 });

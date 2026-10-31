@@ -244,11 +244,22 @@ export function MaterialReceiveMRRPage() {
         "Brand / Origin",
         "UOM",
         "Ordered Qty",
-        "Receive Qty",
+        "Regular Qty",
+        "FOC Qty",
+        "Total Received",
         "Accepted",
         "Rejected",
+        "Payable Value",
       ],
       tableRows: mrrItems.map((item, idx) => {
+        const foc = Number(item.focQty) || 0;
+        const reg = Number(item.currentReceiveQty) || 0;
+        const totalLineReceived = reg + foc;
+        const payableVal = (reg * (item.unitPrice || 0)).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+
         return [
           idx + 1,
           <div>
@@ -258,15 +269,33 @@ export function MaterialReceiveMRRPage() {
           `${item.brand} / ${item.origin}`,
           item.uom,
           item.orderedQty,
-          item.currentReceiveQty,
-          item.acceptedQty ?? item.currentReceiveQty,
+          reg,
+          foc > 0 ? (
+            <span className="font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+              +{foc} (FOC)
+            </span>
+          ) : (
+            "—"
+          ),
+          totalLineReceived,
+          item.acceptedQty ?? totalLineReceived,
           item.rejectedQty ?? 0,
+          `৳ ${payableVal}`,
         ];
       }),
       summaryCards: [
-        { label: "Total Received Qty", value: totalReceived },
-        { label: "Quality Accepted Qty", value: totalAccepted },
-        { label: "Quality Rejected Qty", value: totalRejected },
+        { label: "Regular Received Qty", value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0), 0) },
+        { label: "FOC (Free of Cost) Qty", value: mrrItems.reduce((acc, i) => acc + (Number(i.focQty) || 0), 0) },
+        {
+          label: "Total Physical Received Qty",
+          value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0) + (Number(i.focQty) || 0), 0),
+        },
+        {
+          label: "Payable Value (Excl. FOC)",
+          value: `৳ ${mrrItems
+            .reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0) * (Number(i.unitPrice) || 0), 0)
+            .toLocaleString()}`,
+        },
       ],
       signatures: [
         { role: "Store Officer", name: receivedBy, designation: "Received By" },
@@ -786,6 +815,11 @@ export function MaterialReceiveMRRPage() {
                             onChange={(e) => handleUpdateQty(item.id, Number(e.target.value))}
                             className="w-20 text-right font-mono font-bold px-2 py-1 bg-background border border-primary/40 rounded focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-xs disabled:opacity-75 disabled:cursor-not-allowed"
                           />
+                          {item.focQty ? (
+                            <div className="text-[10px] text-emerald-600 font-bold mt-0.5">
+                              +{item.focQty} FOC
+                            </div>
+                          ) : null}
                         </td>
                         <td className="py-2.5 px-3 text-right font-mono font-bold text-amber-600">
                           {Math.max(
@@ -885,12 +919,19 @@ export function MaterialReceiveMRRPage() {
             return (
               <LocationAllocationModal
                 isOpen={true}
+                showFocButton={true}
                 onClose={() => setActiveLocationItemId(null)}
                 itemName={item.itemName}
                 itemCode={item.itemCode}
                 transactionQty={item.currentReceiveQty}
                 uom={item.uom}
                 currentStore={selectedStore}
+                focQty={item.focQty || 0}
+                onSaveFoc={(focQty, focAllocations) => {
+                  setMrrItems((prev) =>
+                    prev.map((i) => (i.id === item.id ? { ...i, focQty, focAllocations } : i))
+                  );
+                }}
                 initialEntries={
                   itemLocations[item.id] ||
                   (item.location ? [{ locationName: item.location, quantity: item.currentReceiveQty }] : [])
@@ -914,12 +955,19 @@ export function MaterialReceiveMRRPage() {
             return (
               <BatchAllocationModal
                 isOpen={true}
+                showFocButton={true}
                 onClose={() => setActiveBatchItemId(null)}
                 itemName={item.itemName}
                 itemCode={item.itemCode}
                 transactionQty={item.currentReceiveQty}
                 uom={item.uom}
                 currentStore={selectedStore}
+                focQty={item.focQty || 0}
+                onSaveFoc={(focQty, focAllocations) => {
+                  setMrrItems((prev) =>
+                    prev.map((i) => (i.id === item.id ? { ...i, focQty, focAllocations } : i))
+                  );
+                }}
                 initialEntries={
                   itemBatches[item.id] ||
                   (item.batchNumber

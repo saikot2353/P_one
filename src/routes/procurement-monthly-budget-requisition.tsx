@@ -28,6 +28,8 @@ import {
   DollarSign,
   Package,
   Printer,
+  Tag,
+  Link2,
 } from "lucide-react";
 import {
   StandardPreviewReportModal,
@@ -52,6 +54,10 @@ import {
   ItemCategory,
   DEFAULT_ITEM_CATEGORIES,
 } from "@/lib/procurement-master-data";
+import {
+  getStoredMaterialRequisitions,
+  MaterialRequisition,
+} from "@/lib/inventory-requisition-issue-data";
 
 interface BudgetSearch {
   action?: "list" | "create" | "edit" | "view";
@@ -134,8 +140,79 @@ export default function MonthlyBudgetRequisitionPage() {
     status: "Draft",
     totalEstimatedBudget: 0,
     items: [],
+    taggedInternalRequisitions: [],
     auditHistory: [],
   });
+
+  // Tag Internal Requisition Modal State
+  const [tagModalOpen, setTagModalOpen] = useState(false);
+  const [tagSearchQuery, setTagSearchQuery] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+
+  const approvedInternalReqs = useMemo(() => {
+    const all = getStoredMaterialRequisitions();
+    return all.filter((mr) => mr.status === "Approved");
+  }, []);
+
+  const filteredApprovedReqs = useMemo(() => {
+    if (!tagSearchQuery.trim()) return approvedInternalReqs;
+    const q = tagSearchQuery.toLowerCase();
+    return approvedInternalReqs.filter(
+      (mr) =>
+        (mr.mrNumber && mr.mrNumber.toLowerCase().includes(q)) ||
+        (mr.requestedBy && mr.requestedBy.toLowerCase().includes(q)) ||
+        (mr.department && mr.department.toLowerCase().includes(q))
+    );
+  }, [approvedInternalReqs, tagSearchQuery]);
+
+  const handleTagSingle = (mr: MaterialRequisition) => {
+    const current = formData.taggedInternalRequisitions || [];
+    if (current.some((t) => t.id === mr.id || t.mrNumber === mr.mrNumber)) {
+      toast.info(`Internal requisition ${mr.mrNumber} is already tagged.`);
+      return;
+    }
+    const newTag = {
+      id: mr.id,
+      mrNumber: mr.mrNumber,
+      approvedDate: mr.approvedDate || mr.requisitionDate,
+      requestedBy: mr.requestedBy,
+      department: mr.department,
+    };
+    setFormData((prev) => ({
+      ...prev,
+      taggedInternalRequisitions: [...(prev.taggedInternalRequisitions || []), newTag],
+    }));
+    toast.success(`Tagged ${mr.mrNumber}`);
+  };
+
+  const handleConfirmBatchTag = () => {
+    const current = formData.taggedInternalRequisitions || [];
+    const toAdd: Array<{ id: string; mrNumber: string; approvedDate?: string; requestedBy: string; department: string }> = [];
+    selectedTagIds.forEach((id) => {
+      const mr = approvedInternalReqs.find((r) => r.id === id);
+      if (mr && !current.some((t) => t.id === mr.id || t.mrNumber === mr.mrNumber) && !toAdd.some((t) => t.id === mr.id)) {
+        toAdd.push({
+          id: mr.id,
+          mrNumber: mr.mrNumber,
+          approvedDate: mr.approvedDate || mr.requisitionDate,
+          requestedBy: mr.requestedBy,
+          department: mr.department,
+        });
+      }
+    });
+
+    if (toAdd.length === 0) {
+      toast.info("Selected requisitions are already tagged.");
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        taggedInternalRequisitions: [...(prev.taggedInternalRequisitions || []), ...toAdd],
+      }));
+      toast.success(`Tagged ${toAdd.length} internal requisition(s)`);
+    }
+    setSelectedTagIds([]);
+    setTagModalOpen(false);
+  };
 
   // Preview Report State
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
@@ -203,6 +280,7 @@ export default function MonthlyBudgetRequisitionPage() {
       remarks: "Monthly planned requirements for operational spare parts and general materials.",
       status: "Draft",
       totalEstimatedBudget: 0,
+      taggedInternalRequisitions: [],
       items: [
         {
           id: generateId(),
@@ -905,6 +983,38 @@ export default function MonthlyBudgetRequisitionPage() {
                 </div>
               </div>
 
+              {/* Tagged Internal Requisitions (View Mode) */}
+              {activeRequisition.taggedInternalRequisitions && activeRequisition.taggedInternalRequisitions.length > 0 && (
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                  <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                    <Link2 className="w-4 h-4 text-indigo-600" />
+                    Tagged Internal Requisitions ({activeRequisition.taggedInternalRequisitions.length})
+                  </h3>
+                  <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 text-[11px] uppercase tracking-wider">
+                          <th className="py-2 px-3">Internal Requisition ID</th>
+                          <th className="py-2 px-3">Approval Date</th>
+                          <th className="py-2 px-3">Requested By</th>
+                          <th className="py-2 px-3">Department</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {activeRequisition.taggedInternalRequisitions.map((t) => (
+                          <tr key={t.id} className="hover:bg-slate-50/50">
+                            <td className="py-2 px-3 font-semibold text-indigo-600">{t.mrNumber}</td>
+                            <td className="py-2 px-3 text-slate-600">{t.approvedDate || "—"}</td>
+                            <td className="py-2 px-3 font-medium text-slate-800">{t.requestedBy}</td>
+                            <td className="py-2 px-3 text-slate-600">{t.department}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
               {/* Items Table with Issue ID & PR ID */}
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-4 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between">
@@ -1040,6 +1150,83 @@ export default function MonthlyBudgetRequisitionPage() {
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Tag Approved Internal Requisitions Section */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Link2 className="w-4 h-4 text-indigo-600" />
+                      Tag Approved Internal Requisitions
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Attach approved store/material requisitions into this monthly budget allocation.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTagSearchQuery("");
+                      setSelectedTagIds([]);
+                      setTagModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition shadow-sm cursor-pointer"
+                  >
+                    <Tag className="w-3.5 h-3.5" />
+                    Tag
+                  </button>
+                </div>
+
+                {formData.taggedInternalRequisitions && formData.taggedInternalRequisitions.length > 0 ? (
+                  <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 text-[11px] uppercase tracking-wider">
+                          <th className="py-2.5 px-3">Internal Requisition ID</th>
+                          <th className="py-2.5 px-3">Approval Date</th>
+                          <th className="py-2.5 px-3">Requested By</th>
+                          <th className="py-2.5 px-3">Department</th>
+                          <th className="py-2.5 px-3 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {formData.taggedInternalRequisitions.map((tagReq) => (
+                          <tr key={tagReq.id} className="hover:bg-slate-50/50 transition">
+                            <td className="py-2 px-3 font-semibold text-indigo-600">{tagReq.mrNumber}</td>
+                            <td className="py-2 px-3 text-slate-600">{tagReq.approvedDate || "—"}</td>
+                            <td className="py-2 px-3 font-medium text-slate-800">{tagReq.requestedBy}</td>
+                            <td className="py-2 px-3 text-slate-600">{tagReq.department}</td>
+                            <td className="py-2 px-3 text-right">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    taggedInternalRequisitions: (prev.taggedInternalRequisitions || []).filter(
+                                      (t) => t.id !== tagReq.id
+                                    ),
+                                  }));
+                                  toast.success(`Removed tag for ${tagReq.mrNumber}`);
+                                }}
+                                className="p-1 hover:bg-red-50 text-red-600 rounded transition cursor-pointer"
+                                title="Remove Tag"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="p-4 text-center border border-dashed border-slate-200 rounded-lg bg-slate-50/50">
+                    <p className="text-xs text-slate-500">
+                      No internal requisitions tagged. Click <strong className="text-indigo-600 font-semibold">Tag</strong> above to link approved requisitions.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Items Estimation Table */}
@@ -1393,6 +1580,149 @@ export default function MonthlyBudgetRequisitionPage() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Tag Approved Internal Requisitions */}
+      {tagModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden">
+            <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-indigo-600" />
+                  Tag Approved Internal Requisitions
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Select one or more approved internal requisitions to attach to this monthly budget.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setTagModalOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-500 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Search Filter & Multi-select header */}
+            <div className="p-3 border-b border-slate-100 flex items-center justify-between gap-3 bg-white">
+              <div className="relative flex-1">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={tagSearchQuery}
+                  onChange={(e) => setTagSearchQuery(e.target.value)}
+                  placeholder="Search by ID, Requester, or Department..."
+                  className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <button
+                type="button"
+                disabled={selectedTagIds.length === 0}
+                onClick={handleConfirmBatchTag}
+                className="px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition shadow-xs cursor-pointer shrink-0"
+              >
+                Tag Selected ({selectedTagIds.length})
+              </button>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-y-auto flex-1 p-3">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 text-[11px] uppercase tracking-wider">
+                    <th className="py-2.5 px-3 w-8">
+                      <input
+                        type="checkbox"
+                        checked={filteredApprovedReqs.length > 0 && selectedTagIds.length === filteredApprovedReqs.length}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedTagIds(filteredApprovedReqs.map((r) => r.id));
+                          } else {
+                            setSelectedTagIds([]);
+                          }
+                        }}
+                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                    </th>
+                    <th className="py-2.5 px-3">Internal Requisition ID</th>
+                    <th className="py-2.5 px-3">Approval Date</th>
+                    <th className="py-2.5 px-3">Requested By</th>
+                    <th className="py-2.5 px-3">Department</th>
+                    <th className="py-2.5 px-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredApprovedReqs.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-slate-400">
+                        No approved internal requisitions found matching search criteria.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredApprovedReqs.map((req) => {
+                      const isTagged = (formData.taggedInternalRequisitions || []).some(
+                        (t) => t.id === req.id || t.mrNumber === req.mrNumber
+                      );
+                      const isChecked = selectedTagIds.includes(req.id);
+
+                      return (
+                        <tr key={req.id} className={`hover:bg-slate-50 transition ${isTagged ? "bg-slate-50/70" : ""}`}>
+                          <td className="py-2 px-3">
+                            <input
+                              type="checkbox"
+                              disabled={isTagged}
+                              checked={isChecked}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedTagIds((prev) => [...prev, req.id]);
+                                } else {
+                                  setSelectedTagIds((prev) => prev.filter((id) => id !== req.id));
+                                }
+                              }}
+                              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-40"
+                            />
+                          </td>
+                          <td className="py-2 px-3 font-semibold text-indigo-600">{req.mrNumber}</td>
+                          <td className="py-2 px-3 text-slate-600">{req.approvedDate || req.requisitionDate || "—"}</td>
+                          <td className="py-2 px-3 font-medium text-slate-800">{req.requestedBy}</td>
+                          <td className="py-2 px-3 text-slate-600">{req.department}</td>
+                          <td className="py-2 px-3 text-right">
+                            {isTagged ? (
+                              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                <CheckCircle2 className="w-3 h-3" /> Tagged
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleTagSingle(req)}
+                                className="px-2.5 py-1 text-[11px] font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded transition cursor-pointer"
+                              >
+                                Tag
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="p-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
+              <span>Total Approved Available: {filteredApprovedReqs.length}</span>
+              <button
+                type="button"
+                onClick={() => setTagModalOpen(false)}
+                className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-200 rounded-lg transition cursor-pointer"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

@@ -22,6 +22,7 @@ import {
   ItemGroup,
   DEFAULT_ITEM_GROUPS,
   DEFAULT_ITEM_SUB_GROUPS,
+  DEFAULT_ITEMS,
   DEFAULT_STORE_LOCATIONS,
   StoreLocation,
   getStoredData,
@@ -224,6 +225,11 @@ export function ItemCreationPageForm({
     return getStoredData("proc_item_sub_groups_v2", DEFAULT_ITEM_SUB_GROUPS);
   });
 
+  const catalogItems = useMemo(
+    () => getStoredData<ItemProductMaster[]>("proc_items_v2", DEFAULT_ITEMS),
+    [],
+  );
+
   useEffect(() => {
     if (allItemGroups && allItemGroups.length > 0) setItemGroups(allItemGroups);
   }, [allItemGroups]);
@@ -414,6 +420,7 @@ export function ItemCreationPageForm({
         warehouses: existingWarehouses,
         conversionFactor: initialData.conversionFactor ?? 1,
         serviceFlag: initialData.serviceFlag ?? inheritedServiceFlag,
+        fixedAssetFlag: initialData.fixedAssetFlag ?? false,
         valuationMethod: initialData.valuationMethod ?? "FIFO",
       };
     }
@@ -426,6 +433,7 @@ export function ItemCreationPageForm({
       subGroupName: targetSubGroup?.subGroupName || "",
       subGroupBreadcrumb: subGroupBreadcrumb || "",
       serviceFlag: inheritedServiceFlag,
+      fixedAssetFlag: false,
       valuationMethod: "FIFO",
       itemCategoryId: itemCategories[0]?.id || "",
       itemCategory: itemCategories[0]?.categoryName || "",
@@ -586,6 +594,7 @@ export function ItemCreationPageForm({
       batchTrackingRequired: !!formData.batchTrackingRequired,
       serialNumberTrackingRequired: !!formData.serialNumberTrackingRequired,
       serviceFlag: !!formData.serviceFlag,
+      fixedAssetFlag: !!formData.fixedAssetFlag,
       valuationMethod: formData.valuationMethod || "FIFO",
       defaultWarehouse: primaryWh,
       warehouses: formData.warehouses || [],
@@ -794,6 +803,9 @@ export function ItemCreationPageForm({
                         Boolean(treeSearch.trim()) &&
                         (node.subGroupName.toLowerCase().includes(treeSearch.toLowerCase()) ||
                           node.subGroupCode.toLowerCase().includes(treeSearch.toLowerCase()));
+                      const subGroupItemCount = catalogItems.filter(
+                        (it) => it.subGroupId === node.id,
+                      ).length;
 
                       return (
                         <div key={node.id} className="space-y-1">
@@ -833,9 +845,11 @@ export function ItemCreationPageForm({
                               <span className="font-semibold text-foreground truncate">
                                 {node.subGroupName}
                               </span>
-                              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted/70 text-muted-foreground shrink-0">
-                                {node.subGroupCode}
-                              </span>
+                              {subGroupItemCount > 0 && (
+                                <span className="text-[10px] font-bold font-mono px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 shrink-0">
+                                  C:{subGroupItemCount}
+                                </span>
+                              )}
                               {node.serviceFlag && (
                                 <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 shrink-0">
                                   SERVICE
@@ -915,9 +929,6 @@ export function ItemCreationPageForm({
                         <Layers className="size-4 text-amber-500 shrink-0" />
                         <span className="font-extrabold text-foreground truncate">
                           {grp.groupName}
-                        </span>
-                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-background border border-border text-muted-foreground shrink-0">
-                          {grp.groupCode}
                         </span>
                         {grp.serviceFlag && (
                           <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 shrink-0">
@@ -1321,6 +1332,24 @@ export function ItemCreationPageForm({
               </label>
             </div>
 
+            <div className="flex items-center justify-between p-2.5 rounded-xl border border-border/70 bg-muted/20">
+              <div>
+                <div className="text-xs font-bold text-foreground">Fixed Asset</div>
+                <div className="text-[10px] text-muted-foreground">
+                  Capital equipment / asset item
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  disabled={isView}
+                  checked={!!formData.fixedAssetFlag}
+                  onChange={(e) => setFormData({ ...formData, fixedAssetFlag: e.target.checked })}
+                  className="size-4.5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+            </div>
+
             <div className="col-span-full">
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Specification & Description
@@ -1436,20 +1465,7 @@ export function ItemCreationPageForm({
               />
             </div>
 
-            <div className="bg-amber-500/5 p-2 rounded-xl border border-amber-500/20">
-              <label className="block text-xs font-extrabold mb-1 text-amber-700 dark:text-amber-400">
-                Safety Stock (Buffer)
-              </label>
-              <input
-                type="number"
-                disabled={isView}
-                value={formData.safetyStock ?? 15}
-                onChange={(e) =>
-                  setFormData({ ...formData, safetyStock: Number(e.target.value) })
-                }
-                className="w-full h-8 px-3 rounded-lg border border-amber-500/40 bg-background text-xs font-bold text-foreground focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-            </div>
+
 
             <div className="flex items-center justify-between p-3 rounded-xl border border-border/70 bg-muted/20 sm:col-span-2">
               <div>

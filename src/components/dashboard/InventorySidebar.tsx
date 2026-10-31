@@ -25,6 +25,7 @@ import {
   SlidersHorizontal,
   FileX2,
   BarChart3,
+  Handshake,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -217,6 +218,48 @@ export const nav: NavItem[] = [
       {
         label: "New Transfer Receipt",
         to: "/inv-intercompany-receive",
+      },
+    ],
+  },
+  {
+    label: "Stock Loan",
+    icon: Handshake,
+    subitems: [
+      {
+        label: "Loan Requisition",
+        to: "/inv-loan-requisition-list",
+      },
+      {
+        label: "New Loan Requisition",
+        to: "/inv-loan-requisition",
+      },
+      {
+        label: "Loan Requisition Approval",
+        to: "/inv-loan-requisition-approval",
+      },
+      {
+        label: "Loan Issue Register",
+        to: "/inv-loan-issue-list",
+      },
+      {
+        label: "New Loan Issue",
+        to: "/inv-loan-issue",
+      },
+      {
+        label: "Loan Receiving Register",
+        to: "/inv-loan-receive-list",
+      },
+      {
+        label: "New Loan Receipt",
+        to: "/inv-loan-receive",
+      },
+      {
+        label: "Loan Issue Against Receive",
+        to: "/inv-loan-issue-against-receive-list",
+      },
+      {
+        label: "Loan Receive Against Issue",
+        to: "/inv-loan-receive-against-issue-list",
       },
     ],
   },

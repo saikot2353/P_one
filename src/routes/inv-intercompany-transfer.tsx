@@ -199,6 +199,7 @@ function InterCompanyTransferFormPage() {
         origin: it.origin || "Bangladesh",
         uom: it.uom,
         availableStock: availStock,
+        trRequisitionQty: qty,
         transferQty: qty,
         unitPrice: rate,
         totalValue: qty * rate,
@@ -986,6 +987,7 @@ function InterCompanyTransferFormPage() {
                       <th className="py-3 px-3 min-w-[120px]">Brand / Origin</th>
                       <th className="py-3 px-2 text-center w-16">UOM</th>
                       <th className="py-3 px-3 text-right w-28">Available Stock</th>
+                      <th className="py-3 px-3 text-right w-28 text-slate-700">TR Requisition Qty</th>
                       <th className="py-3 px-3 text-right w-32 bg-indigo-50/50 text-indigo-900 font-black">
                         Transfer Qty *
                       </th>
@@ -996,7 +998,7 @@ function InterCompanyTransferFormPage() {
                   <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                     {items.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="py-8 text-center text-slate-400">
+                        <td colSpan={10} className="py-8 text-center text-slate-400">
                           No items added yet. Click &quot;Add Line Item&quot; to begin.
                         </td>
                       </tr>
@@ -1061,6 +1063,10 @@ function InterCompanyTransferFormPage() {
 
                             <td className="py-3 px-3 text-right font-mono font-bold text-slate-600">
                               {row.availableStock.toLocaleString()}
+                            </td>
+
+                            <td className="py-3 px-3 text-right font-mono font-bold text-slate-700 bg-slate-50/40">
+                              {row.trRequisitionQty !== undefined ? row.trRequisitionQty.toLocaleString() : "—"}
                             </td>
 
                             {/* Transfer Qty Input */}

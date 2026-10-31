@@ -1,0 +1,1066 @@
+import { useState, useMemo, useEffect } from "react";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { InventorySidebar } from "@/components/dashboard/InventorySidebar";
+import { InventoryTopbar } from "@/components/dashboard/InventoryTopbar";
+import {
+  ArrowLeftRight,
+  ArrowLeft,
+  Plus,
+  Trash2,
+  CheckCircle2,
+  Printer,
+  AlertTriangle,
+  Building2,
+  Package,
+  Layers,
+  Search,
+  Save,
+  Send,
+  Eye,
+  X,
+  FileCheck2,
+  Info,
+  XCircle,
+  RotateCcw,
+  ShieldCheck,
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  StockLoanRequisition,
+  LoanRequisitionItem,
+  LoanType,
+  LoanRequisitionStatus,
+  MASTER_COMPANIES,
+  getStoredStockLoanRequisitions,
+  saveStoredStockLoanRequisitions,
+  saveStockLoanRequisition,
+} from "@/lib/inventory-stock-loan-data";
+import { getAvailableStockForItem } from "@/lib/inventory-requisition-issue-data";
+import {
+  DEFAULT_WAREHOUSES,
+  DEFAULT_ITEMS,
+  ItemProductMaster,
+  WarehouseStore,
+  getStoredData,
+} from "@/lib/procurement-master-data";
+import {
+  StandardPreviewReportModal,
+  StandardReportData,
+} from "@/components/reports/StandardPreviewReportModal";
+
+export const Route = createFileRoute("/inv-loan-requisition")({
+  validateSearch: (
+    search: Record<string, unknown>
+  ): { id?: string; mode?: "view" | "edit" | "approval" } => ({
+    id: search.id as string | undefined,
+    mode: search.mode as "view" | "edit" | "approval" | undefined,
+  }),
+  head: () => ({
+    meta: [
+      { title: "Loan Requisition Entry — Inventory ERP" },
+      {
+        name: "description",
+        content: "Submit inter-company and intra-company loan requisitions with multi-store item allocation.",
+      },
+    ],
+  }),
+  component: StockLoanRequisitionFormPage,
+});
+
+function StockLoanRequisitionFormPage() {
+  const navigate = useNavigate();
+  const searchParams = Route.useSearch();
+  const isApprovalMode = searchParams.mode === "approval";
+  const isViewMode = searchParams.mode === "view" || isApprovalMode;
+  const editingRequisitionId = searchParams.id;
+
+  const [approvalActionModal, setApprovalActionModal] = useState<"Approve" | "Reject" | "Return" | null>(null);
+  const [approvalComment, setApprovalComment] = useState("");
+
+  const rawWarehouses = getStoredData<WarehouseStore[]>("proc_warehouses_v2", DEFAULT_WAREHOUSES);
+  const warehouses = useMemo(() => {
+    const list = rawWarehouses && rawWarehouses.length > 0 ? rawWarehouses : DEFAULT_WAREHOUSES;
+    return list.map((w) => ({
+      ...w,
+      storeName: w.storeName || (w as any).name || w.storeCode,
+    }));
+  }, [rawWarehouses]);
+
+  const catalogItems = getStoredData<ItemProductMaster[]>("proc_items_v2", DEFAULT_ITEMS);
+
+  // Load existing requisition if editing or viewing
+  const existingReq = useMemo(() => {
+    if (!editingRequisitionId) return null;
+    const all = getStoredStockLoanRequisitions();
+    return all.find((r) => r.id === editingRequisitionId || r.requisitionNumber === editingRequisitionId) || null;
+  }, [editingRequisitionId]);
+
+  // Header State
+  const [requisitionNumber] = useState<string>(() => {
+    if (existingReq) return existingReq.requisitionNumber;
+    return `LR-2026-${String(Math.floor(100 + Math.random() * 900))}`;
+  });
+
+  const [requisitionDate, setRequisitionDate] = useState<string>(() => {
+    return existingReq?.requisitionDate || new Date().toISOString().slice(0, 10);
+  });
+
+  const [requestedBy] = useState<string>(() => {
+    return existingReq?.requestedBy || "Tahmid Afsar Shapno (Store Manager)";
+  });
+
+  const [remarks, setRemarks] = useState<string>(() => {
+    return existingReq?.remarks || "";
+  });
+
+  // Requisitioning Entity (From / Requester)
+  const [requisitioningCompany, setRequisitioningCompany] = useState<string>(() => {
+    return existingReq?.requisitioningCompany || "Pakiza Knit Composite Ltd";
+  });
+
+  const [requisitioningStore, setRequisitioningStore] = useState<string>(() => {
+    return existingReq?.requisitioningStore || "PKCL Central Raw Material Warehouse";
+  });
+
+  // Requested From Entity (To / Source Supplier)
+  const [requestedFromCompany, setRequestedFromCompany] = useState<string>(() => {
+    return existingReq?.requestedFromCompany || "Pakiza Spinning Mills Ltd";
+  });
+
+  const [requestedFromStore, setRequestedFromStore] = useState<string>(() => {
+    return existingReq?.requestedFromStore || "Spinning Spare Parts & Consumables Store";
+  });
+
+  // Determine Loan Type
+  const loanType: LoanType = useMemo(() => {
+    return requisitioningCompany === requestedFromCompany ? "Intra-Company" : "Inter-Company";
+  }, [requisitioningCompany, requestedFromCompany]);
+
+  // Stores under Requisitioning Company
+  const requisitioningStores = useMemo(() => {
+    const list = warehouses.filter((w) => w.organization === requisitioningCompany && w.status === "Active");
+    return list.length > 0 ? list : warehouses;
+  }, [warehouses, requisitioningCompany]);
+
+  // Stores under Requested From Company
+  const requestedFromStores = useMemo(() => {
+    const list = warehouses.filter((w) => w.organization === requestedFromCompany && w.status === "Active");
+    return list.length > 0 ? list : warehouses;
+  }, [warehouses, requestedFromCompany]);
+
+  // Items State
+  const [items, setItems] = useState<LoanRequisitionItem[]>(() => {
+    if (existingReq) return existingReq.items;
+    return [
+      {
+        id: `tr-row-1`,
+        sl: 1,
+        itemCode: "ITM-YRN-30-1",
+        itemName: "100% Combed Cotton Yarn Ne 30/1",
+        specification: "100% Combed Cotton, Ne 30/1 ring spun, Auto coned",
+        brand: "Pakiza Spin",
+        origin: "Bangladesh",
+        uom: "KG",
+        requiredQty: 250,
+        issuedQty: 0,
+        availableStock: 25000,
+        estimatedUnitPrice: 420,
+        totalEstimatedValue: 105000,
+        remarks: "Production batch allocation",
+      },
+    ];
+  });
+
+  // Item Search Modal State
+  const [itemSearchOpen, setItemSearchOpen] = useState(false);
+  const [itemSearchQuery, setItemSearchQuery] = useState("");
+
+  const filteredCatalogItems = useMemo(() => {
+    if (!itemSearchQuery.trim()) return catalogItems;
+    const q = itemSearchQuery.toLowerCase();
+    return catalogItems.filter(
+      (c) =>
+        c.itemName.toLowerCase().includes(q) ||
+        c.itemCode.toLowerCase().includes(q) ||
+        (c.specification && c.specification.toLowerCase().includes(q))
+    );
+  }, [catalogItems, itemSearchQuery]);
+
+  const handleAddCatalogItem = (catItem: ItemProductMaster) => {
+    if (items.some((i) => i.itemCode === catItem.itemCode)) {
+      toast.error(`Item "${catItem.itemName}" is already in this requisition.`);
+      return;
+    }
+
+    const newItem: LoanRequisitionItem = {
+      id: `tr-item-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      sl: items.length + 1,
+      itemCode: catItem.itemCode,
+      itemName: catItem.itemName,
+      specification: catItem.specification || "-",
+      brand: catItem.brand || "Standard",
+      origin: catItem.origin || "Bangladesh",
+      uom: catItem.stockUOM || "PCS",
+      requiredQty: 10,
+      issuedQty: 0,
+      availableStock: catItem.maximumStock || 100,
+      estimatedUnitPrice: catItem.standardPurchasePrice || 250,
+      totalEstimatedValue: 10 * (catItem.standardPurchasePrice || 250),
+      remarks: "",
+    };
+
+    setItems((prev) => [...prev, newItem]);
+    setItemSearchOpen(false);
+    toast.success(`Added "${catItem.itemName}" to requisition.`);
+  };
+
+  const handleRemoveItem = (id: string) => {
+    if (isViewMode) return;
+    if (items.length === 1) {
+      toast.error("Requisition must have at least one item.");
+      return;
+    }
+    setItems((prev) => prev.filter((i) => i.id !== id).map((it, idx) => ({ ...it, sl: idx + 1 })));
+  };
+
+  const handleUpdateItem = (id: string, field: "requiredQty" | "remarks", value: any) => {
+    if (isViewMode) return;
+    setItems((prev) =>
+      prev.map((it) => {
+        if (it.id !== id) return it;
+        if (field === "requiredQty") {
+          const qty = Math.max(1, Number(value) || 1);
+          return {
+            ...it,
+            requiredQty: qty,
+            totalEstimatedValue: qty * it.estimatedUnitPrice,
+          };
+        }
+        return { ...it, [field]: value };
+      })
+    );
+  };
+
+  // Totals
+  const totalRequiredQty = useMemo(() => {
+    return items.reduce((sum, it) => sum + (Number(it.requiredQty) || 0), 0);
+  }, [items]);
+
+  const totalEstimatedValue = useMemo(() => {
+    return items.reduce((sum, it) => sum + (Number(it.totalEstimatedValue) || 0), 0);
+  }, [items]);
+
+  // Validation
+  const validationErrors = useMemo(() => {
+    const errs: string[] = [];
+    if (!requisitionNumber.trim()) errs.push("Requisition Number is required.");
+    if (!requisitioningCompany) errs.push("Requisitioning Company is required.");
+    if (!requisitioningStore) errs.push("Requisitioning Store is required.");
+    if (!requestedFromCompany) errs.push("Requested From Company is required.");
+    if (!requestedFromStore) errs.push("Requested From Store is required.");
+    if (items.length === 0) errs.push("At least one required item must be added.");
+    items.forEach((it) => {
+      if (it.requiredQty <= 0) {
+        errs.push(`${it.itemName}: Required quantity must be greater than zero.`);
+      }
+    });
+    return errs;
+  }, [requisitionNumber, requisitioningCompany, requisitioningStore, requestedFromCompany, requestedFromStore, items]);
+
+  // Save / Submit Handlers
+  const handleSaveRequisition = (targetStatus: "Draft" | "Approval Pending") => {
+    if (validationErrors.length > 0) {
+      toast.error(validationErrors[0]);
+      return;
+    }
+
+    const payload: StockLoanRequisition = {
+      id: existingReq?.id || `tr-${Date.now()}`,
+      requisitionNumber,
+      requisitionDate,
+      loanType,
+      requisitioningCompany,
+      requisitioningStore,
+      requestedFromCompany,
+      requestedFromStore,
+      requestedBy,
+      remarks,
+      totalItems: items.length,
+      totalRequiredQty,
+      totalEstimatedValue,
+      status: targetStatus,
+      items,
+      createdAt: existingReq?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    saveStockLoanRequisition(payload);
+
+    if (targetStatus === "Approval Pending") {
+      if (loanType === "Inter-Company") {
+        toast.success(
+          `Inter-Company Requisition "${requisitionNumber}" submitted! It now appears in the Approval Pending list for "${requestedFromCompany}".`
+        );
+      } else {
+        toast.success(`Intra-Company Requisition "${requisitionNumber}" submitted successfully.`);
+      }
+    } else {
+      toast.success(`Loan Requisition draft "${requisitionNumber}" saved successfully!`);
+    }
+
+    navigate({ to: "/inv-loan-requisition-list" });
+  };
+
+  // Approval Execution Handler
+  const handleExecuteApproval = () => {
+    if (!approvalActionModal || !existingReq) return;
+
+    if ((approvalActionModal === "Reject" || approvalActionModal === "Return") && !approvalComment.trim()) {
+      toast.error(`Please provide remarks/justification to ${approvalActionModal === "Reject" ? "reject" : "return"} this requisition.`);
+      return;
+    }
+
+    if (approvalActionModal === "Approve") {
+      for (const it of items) {
+        const appQty = it.approvedQty ?? it.requiredQty;
+        if (appQty > it.requiredQty) {
+          toast.error(`Approved quantity for "${it.itemName}" (${appQty}) cannot exceed requested quantity (${it.requiredQty}).`);
+          return;
+        }
+      }
+    }
+
+    const all = getStoredStockLoanRequisitions();
+    const updated = all.map((r) => {
+      if (r.id !== existingReq.id && r.requisitionNumber !== existingReq.requisitionNumber) return r;
+      if (approvalActionModal === "Approve") {
+        return {
+          ...r,
+          status: "Approved" as const,
+          items: items.map((it) => ({
+            ...it,
+            approvedQty: it.approvedQty ?? it.requiredQty,
+          })),
+          approvedBy: "Engr. Tanvir Ahmed (Authorized Operations Approver)",
+          approvalDate: new Date().toISOString().slice(0, 10),
+          approvalRemarks: approvalComment.trim() || "Approved for Loan Issue fulfillment.",
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      if (approvalActionModal === "Reject") {
+        return {
+          ...r,
+          status: "Rejected" as const,
+          rejectedRemarks: approvalComment.trim(),
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      if (approvalActionModal === "Return") {
+        return {
+          ...r,
+          status: "Returned for Correction" as const,
+          returnedRemarks: approvalComment.trim(),
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      return r;
+    });
+
+    saveStoredStockLoanRequisitions(updated);
+    toast.success(
+      `Requisition ${existingReq.requisitionNumber} ${
+        approvalActionModal === "Approve" ? "Approved" : approvalActionModal === "Reject" ? "Rejected" : "Returned for correction"
+      } successfully.`
+    );
+    setApprovalActionModal(null);
+    navigate({ to: "/inv-loan-requisition-approval" });
+  };
+
+  // Preview Report Modal
+  const [previewReportOpen, setPreviewReportOpen] = useState(false);
+  const previewReportData: StandardReportData = useMemo(() => {
+    return {
+      reportType: "loan-requisition",
+      reportTitle: "Official Preview Report – Loan Requisition",
+      title: "Loan Requisition",
+      documentNumber: requisitionNumber,
+      documentNo: requisitionNumber,
+      documentDate: requisitionDate,
+      department: "Central Inventory & Materials Supply",
+      status: existingReq?.status || "Approval Pending",
+      metadata: [
+        { label: "Requisition No", value: requisitionNumber, highlight: true },
+        { label: "Requisition Date", value: requisitionDate },
+        { label: "Requisitioning Company", value: requisitioningCompany },
+        { label: "Requisitioning Store", value: requisitioningStore },
+        { label: "Requested From Company", value: requestedFromCompany, highlight: true },
+        { label: "Requested From Store", value: requestedFromStore },
+        { label: "Requested By", value: requestedBy },
+      ],
+      tableHeaders: ["SL", "Item Description", "Specification", "UOM", "Requested Qty", "Remarks"],
+      tableRows: items.map((it, idx) => [
+        idx + 1,
+        <div key={idx}>
+          <div className="font-bold text-slate-900">{it.itemName}</div>
+          <div className="text-[10px] text-slate-500 font-mono">{it.itemCode}</div>
+        </div>,
+        it.specification || "-",
+        it.uom,
+        it.requiredQty.toLocaleString(),
+        it.remarks || "-",
+      ]),
+      summaryCards: [
+        { label: "Total Requested Qty", value: `${totalRequiredQty.toLocaleString()} units` },
+      ],
+      signatures: [
+        { role: "Requisitioner", name: requestedBy, designation: "Store Officer" },
+        { role: "Store In-charge", name: "Md. Anik Islam", designation: "Asst. Manager" },
+        { role: "Authorized Approver", name: "Engr. Tanvir Ahmed", designation: "Head of Operations" },
+      ],
+    };
+  }, [
+    requisitionNumber,
+    requisitionDate,
+    requisitioningCompany,
+    requisitioningStore,
+    requestedFromCompany,
+    requestedFromStore,
+    requestedBy,
+    items,
+    totalRequiredQty,
+    existingReq,
+  ]);
+
+  return (
+    <div className="flex h-screen bg-slate-50/50 font-sans text-slate-900 overflow-hidden">
+      <InventorySidebar />
+
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <InventoryTopbar />
+
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+          {/* Top Bar & Breadcrumbs */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200">
+            <div className="flex items-center gap-3">
+              <Link
+                to={isApprovalMode ? "/inv-loan-requisition-approval" : "/inv-loan-requisition-list"}
+                className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition shadow-xs"
+                title={isApprovalMode ? "Back to Approval Desk" : "Back to Requisition Register"}
+              >
+                <ArrowLeft className="size-4" />
+              </Link>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-slate-500">
+                    Stock Loans / {isApprovalMode ? "Requisition Approval Review" : "Loan Requisition"}
+                  </span>
+                  {loanType !== "Inter-Company" && (
+                    <>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+                        {loanType}
+                      </span>
+                    </>
+                  )}
+                  {existingReq && (
+                    <span
+                      className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
+                        existingReq.status === "Approved"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : existingReq.status === "Approval Pending"
+                            ? "bg-amber-50 text-amber-700 border-amber-200"
+                            : existingReq.status === "Returned for Correction"
+                              ? "bg-orange-50 text-orange-700 border-orange-200"
+                              : existingReq.status === "Rejected"
+                                ? "bg-rose-50 text-rose-700 border-rose-200"
+                                : "bg-slate-50 text-slate-700 border-slate-200"
+                      }`}
+                    >
+                      {existingReq.status}
+                    </span>
+                  )}
+                </div>
+                <h1 className="text-xl font-black text-slate-900 tracking-tight mt-0.5">
+                  {isApprovalMode
+                    ? `Loan Requisition Approval — ${requisitionNumber}`
+                    : isViewMode
+                      ? `Loan Requisition Dossier — ${requisitionNumber}`
+                      : existingReq
+                        ? `Edit Loan Requisition — ${requisitionNumber}`
+                        : "New Loan Requisition"}
+                </h1>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setPreviewReportOpen(true)}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition shadow-xs cursor-pointer"
+              >
+                <Printer className="size-3.5" />
+                <span>Preview Report</span>
+              </button>
+
+              {isApprovalMode && existingReq && (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setApprovalActionModal("Approve");
+                      setApprovalComment("Approved for warehouse loan dispatch.");
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  >
+                    <CheckCircle2 className="size-3.5" />
+                    <span>Approve</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setApprovalActionModal("Return");
+                      setApprovalComment("");
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  >
+                    <RotateCcw className="size-3.5" />
+                    <span>Return</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setApprovalActionModal("Reject");
+                      setApprovalComment("");
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  >
+                    <XCircle className="size-3.5" />
+                    <span>Reject</span>
+                  </button>
+                </div>
+              )}
+
+              {!isViewMode && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleSaveRequisition("Draft")}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition shadow-xs cursor-pointer"
+                  >
+                    <Save className="size-3.5" />
+                    <span>Save Draft</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSaveRequisition("Approval Pending")}
+                    className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-sm cursor-pointer"
+                  >
+                    <Send className="size-3.5" />
+                    <span>Submit Requisition</span>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Intra-Company Policy Banner (Inter-Company policy text removed per requirement) */}
+          {loanType !== "Inter-Company" && (
+            <div className="p-4 rounded-2xl border flex items-start gap-3 text-xs leading-relaxed bg-blue-50/70 border-blue-200 text-blue-900">
+              <Info className="size-4 shrink-0 mt-0.5 text-blue-600" />
+              <div>
+                <strong className="font-bold block text-sm">
+                  Intra-Company Stock Loan Policy
+                </strong>
+                <p className="mt-0.5">
+                  Both stores belong to the same company (<span className="font-bold">{requisitioningCompany}</span>).
+                  Loan Requisition is <span className="font-bold">optional</span> and approval is <span className="font-bold">not required</span>; goods can alternatively be loanred directly via Loan Issue.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Requisition Header Info */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+              <Building2 className="size-4 text-blue-600" />
+              <h2 className="text-sm font-bold text-slate-900">Requisition & Entity Routing</h2>
+            </div>
+
+            {/* Row 1: Two columns (Requested From Entity on left, Requisitioning Entity on right) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Requested From (Source) Entity */}
+              <div className="p-3.5 bg-amber-50/50 border border-amber-200/80 rounded-xl space-y-3">
+                <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider block">
+                  Requested From Entity (Goods Provider / Source)
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold mb-1 text-slate-700">
+                      Requested From Company <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      disabled={isViewMode}
+                      value={requestedFromCompany}
+                      onChange={(e) => {
+                        const comp = e.target.value;
+                        setRequestedFromCompany(comp);
+                        const subWh = warehouses.filter((w) => w.organization === comp && w.status === "Active");
+                        if (subWh[0]) setRequestedFromStore(subWh[0].storeName);
+                      }}
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
+                    >
+                      {MASTER_COMPANIES.map((mc) => (
+                        <option key={mc.id} value={mc.name}>
+                          {mc.name} ({mc.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold mb-1 text-slate-700">
+                      Requested From Store <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      disabled={isViewMode}
+                      value={requestedFromStore}
+                      onChange={(e) => setRequestedFromStore(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
+                    >
+                      {requestedFromStores.map((w) => (
+                        <option key={w.id} value={w.storeName}>
+                          {w.storeName} ({w.storeCode})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Requisitioning (Requester) Entity */}
+              <div className="p-3.5 bg-blue-50/50 border border-blue-200/80 rounded-xl space-y-3">
+                <span className="text-[11px] font-bold text-blue-800 uppercase tracking-wider block">
+                  Requisitioning Entity (Goods Recipient)
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold mb-1 text-slate-700">
+                      Requisitioning Company <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      readOnly
+                      value={requisitioningCompany}
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 text-xs font-semibold text-slate-700 cursor-not-allowed outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold mb-1 text-slate-700">
+                      Requisitioning Store <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      disabled={isViewMode}
+                      value={requisitioningStore}
+                      onChange={(e) => setRequisitioningStore(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
+                    >
+                      {requisitioningStores.map((w) => (
+                        <option key={w.id} value={w.storeName}>
+                          {w.storeName} ({w.storeCode})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2: Three fields in the same row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+              <div>
+                <label className="block text-xs font-bold mb-1 text-slate-700">
+                  Requisition Date <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  disabled={isViewMode}
+                  value={requisitionDate}
+                  onChange={(e) => setRequisitionDate(e.target.value)}
+                  className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold mb-1 text-slate-700">
+                  Requested By
+                </label>
+                <input
+                  type="text"
+                  readOnly
+                  value={requestedBy}
+                  className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 text-xs font-medium text-slate-600 outline-none cursor-not-allowed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold mb-1 text-slate-700">
+                  Requisition Remarks / Justification
+                </label>
+                <input
+                  type="text"
+                  disabled={isViewMode}
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  placeholder="Specify reason for requisition, production batch order #, urgency details..."
+                  className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Required Items and Quantities */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Package className="size-4 text-blue-600" />
+                <h2 className="text-sm font-bold text-slate-900">
+                  Required Items & Requisition Quantities
+                </h2>
+              </div>
+
+              {!isViewMode && (
+                <button
+                  type="button"
+                  onClick={() => setItemSearchOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                >
+                  <Plus className="size-3.5" />
+                  <span>Add Item from Catalog</span>
+                </button>
+              )}
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-100 font-semibold text-slate-700 text-[11px]">
+                    <th className="py-2.5 px-3 w-10 text-center">#</th>
+                    <th className="py-2.5 px-3 min-w-[220px]">Item Description</th>
+                    <th className="py-2.5 px-3 min-w-[180px]">Specification</th>
+                    <th className="py-2.5 px-3 w-28">Brand / Origin</th>
+                    <th className="py-2.5 px-3 w-16 text-center">UOM</th>
+                    <th className="py-2.5 px-3 w-28 text-right">Required Qty</th>
+                    <th className="py-2.5 px-3 w-28 text-right bg-emerald-50/70 text-emerald-900 font-bold">Approve Qty</th>
+                    <th className="py-2.5 px-3 min-w-[150px]">Remarks</th>
+                    {!isViewMode && <th className="py-2.5 px-3 w-12 text-center">Action</th>}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {items.map((it, idx) => (
+                    <tr key={it.id} className="hover:bg-slate-50/70 transition">
+                      <td className="py-2.5 px-3 text-center text-slate-400 font-mono text-[11px]">
+                        {idx + 1}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <div className="font-bold text-slate-900">{it.itemName}</div>
+                        <div className="font-mono text-[10px] text-blue-600">{it.itemCode}</div>
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-500 text-[11px] max-w-[220px] truncate" title={it.specification}>
+                        {it.specification || "-"}
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-600 text-[11px]">
+                        {it.brand} / {it.origin}
+                      </td>
+                      <td className="py-2.5 px-3 text-center font-bold text-slate-700">
+                        {it.uom}
+                      </td>
+                      <td className="py-2.5 px-3 text-right">
+                        {isViewMode && !isApprovalMode ? (
+                          <span className="font-bold text-slate-900">{it.requiredQty.toLocaleString()}</span>
+                        ) : isApprovalMode ? (
+                          <span className="font-bold text-slate-900">{it.requiredQty.toLocaleString()}</span>
+                        ) : (
+                          <input
+                            type="number"
+                            min="1"
+                            value={it.requiredQty}
+                            onChange={(e) => handleUpdateItem(it.id, "requiredQty", e.target.value)}
+                            className="w-24 h-8 px-2 rounded border border-slate-200 text-right font-bold text-slate-900 focus:border-blue-500 outline-none text-xs"
+                          />
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-right bg-emerald-50/30">
+                        {isApprovalMode ? (
+                          <input
+                            type="number"
+                            min="0"
+                            max={it.requiredQty}
+                            value={it.approvedQty ?? it.requiredQty}
+                            onChange={(e) => {
+                              const val = Number(e.target.value) || 0;
+                              if (val > it.requiredQty) {
+                                toast.error(`Approve Qty (${val}) cannot exceed Required Qty (${it.requiredQty})`);
+                              }
+                              handleUpdateItem(it.id, "approvedQty" as any, Math.min(val, it.requiredQty));
+                            }}
+                            className="w-24 h-8 px-2 rounded border border-emerald-300 text-right font-bold text-emerald-900 focus:border-emerald-500 outline-none text-xs bg-white"
+                          />
+                        ) : (
+                          <span className="font-bold text-emerald-900">
+                            {(it.approvedQty ?? it.requiredQty).toLocaleString()}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {isViewMode ? (
+                          <span className="text-slate-500 text-[11px]">{it.remarks || "-"}</span>
+                        ) : (
+                          <input
+                            type="text"
+                            value={it.remarks || ""}
+                            onChange={(e) => handleUpdateItem(it.id, "remarks", e.target.value)}
+                            placeholder="Line remarks..."
+                            className="w-full h-8 px-2 rounded border border-slate-200 text-xs text-slate-700 focus:border-blue-500 outline-none"
+                          />
+                        )}
+                      </td>
+                      {!isViewMode && (
+                        <td className="py-2.5 px-3 text-center">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(it.id)}
+                            className="p-1 rounded text-slate-400 hover:text-rose-600 transition cursor-pointer"
+                            title="Remove item"
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Table Footer Totals */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+              <div className="text-slate-500">
+                Total Line Items: <span className="font-bold text-slate-800">{items.length}</span>
+              </div>
+              <div className="flex items-center gap-6">
+                <div>
+                  <span className="text-slate-500">Total Required Qty: </span>
+                  <span className="font-bold text-slate-900 text-sm">
+                    {totalRequiredQty.toLocaleString()} units
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {/* Catalog Item Search Modal */}
+      {itemSearchOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
+                  <Package className="size-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">Add Item from Catalog</h2>
+                  <p className="text-xs text-slate-500">Select items to add to this Loan Requisition</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setItemSearchOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <div className="p-4 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-4">
+              <div className="relative flex-1">
+                <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={itemSearchQuery}
+                  onChange={(e) => setItemSearchQuery(e.target.value)}
+                  placeholder="Search item by code, name, specification, brand, origin..."
+                  className="w-full h-9 pl-9 pr-4 rounded-xl border border-slate-200 bg-white text-xs text-slate-900 focus:border-blue-500 outline-none"
+                  autoFocus
+                />
+              </div>
+              <div className="text-xs font-semibold text-slate-500 shrink-0">
+                Found {filteredCatalogItems.length} items
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-100 font-semibold text-slate-700 text-[11px]">
+                    <th className="py-2.5 px-3 w-28">Code</th>
+                    <th className="py-2.5 px-3 min-w-[200px]">Item</th>
+                    <th className="py-2.5 px-3 min-w-[220px]">Specification</th>
+                    <th className="py-2.5 px-3 w-16 text-center">UOM</th>
+                    <th className="py-2.5 px-3 w-24">Brand</th>
+                    <th className="py-2.5 px-3 w-24">Origin</th>
+                    <th className="py-2.5 px-3 w-24 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredCatalogItems.map((cat) => {
+                    const isAlready = items.some((i) => i.itemCode === cat.itemCode);
+                    return (
+                      <tr key={cat.id} className="hover:bg-slate-50/70 transition">
+                        <td className="py-2.5 px-3 font-mono font-bold text-blue-600 text-[11px]">
+                          {cat.itemCode}
+                        </td>
+                        <td className="py-2.5 px-3 font-bold text-slate-900">
+                          {cat.itemName}
+                        </td>
+                        <td className="py-2.5 px-3 text-slate-600 text-[11px]">
+                          {cat.specification || "-"}
+                        </td>
+                        <td className="py-2.5 px-3 text-center font-bold text-slate-700">
+                          {cat.stockUOM || "PCS"}
+                        </td>
+                        <td className="py-2.5 px-3 text-slate-600 text-[11px]">
+                          {cat.brand || "-"}
+                        </td>
+                        <td className="py-2.5 px-3 text-slate-600 text-[11px]">
+                          {cat.origin || "-"}
+                        </td>
+                        <td className="py-2.5 px-3 text-center">
+                          {isAlready ? (
+                            <span className="px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-400">
+                              Added
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleAddCatalogItem(cat)}
+                              className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition cursor-pointer"
+                            >
+                              + Select
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setItemSearchOpen(false)}
+                className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs transition cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Approval Action Confirmation Modal */}
+      {approvalActionModal && existingReq && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck
+                  className={`size-5 ${
+                    approvalActionModal === "Approve"
+                      ? "text-emerald-600"
+                      : approvalActionModal === "Reject"
+                        ? "text-rose-600"
+                        : "text-orange-600"
+                  }`}
+                />
+                <h3 className="text-sm font-bold text-slate-900">
+                  {approvalActionModal} Loan Requisition
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setApprovalActionModal(null)}
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4 text-xs">
+              <p className="text-slate-600 leading-relaxed">
+                You are about to <strong>{approvalActionModal.toLowerCase()}</strong> Loan Requisition{" "}
+                <span className="font-mono font-bold text-blue-700">{existingReq.requisitionNumber}</span>.
+              </p>
+
+              <div>
+                <label className="block text-xs font-bold mb-1 text-slate-700">
+                  Remarks / Justification {approvalActionModal !== "Approve" && <span className="text-rose-500">*</span>}
+                </label>
+                <textarea
+                  rows={3}
+                  value={approvalComment}
+                  onChange={(e) => setApprovalComment(e.target.value)}
+                  placeholder={
+                    approvalActionModal === "Approve"
+                      ? "Enter approval notes (optional)..."
+                      : `Enter reason to ${approvalActionModal.toLowerCase()} this requisition...`
+                  }
+                  className="w-full p-2.5 rounded-xl border border-slate-200 bg-white text-xs resize-none outline-none focus:border-indigo-500"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setApprovalActionModal(null)}
+                className="px-4 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleExecuteApproval}
+                className={`px-5 py-1.5 rounded-lg text-white font-bold text-xs transition shadow-xs cursor-pointer ${
+                  approvalActionModal === "Approve"
+                    ? "bg-emerald-600 hover:bg-emerald-700"
+                    : approvalActionModal === "Reject"
+                      ? "bg-rose-600 hover:bg-rose-700"
+                      : "bg-orange-600 hover:bg-orange-700"
+                }`}
+              >
+                Confirm {approvalActionModal}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Standard Preview Report Modal */}
+      {previewReportOpen && (
+        <StandardPreviewReportModal
+          isOpen={previewReportOpen}
+          onClose={() => setPreviewReportOpen(false)}
+          data={previewReportData}
+        />
+      )}
+    </div>
+  );
+}
