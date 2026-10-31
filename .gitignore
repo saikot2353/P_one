@@ -33,3 +33,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Auto-generated TanStack Router tree (generated on dev/build/postinstall)
+src/routeTree.gen.ts
+
