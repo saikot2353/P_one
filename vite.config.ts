@@ -30,6 +30,13 @@ export default defineConfig(({ mode }) => {
     },
 
     ssr: {
+      external: [
+        "xlsx",
+        "recharts",
+        "jodit",
+        "jodit-react",
+        "@svg-maps/world",
+      ],
       noExternal: ["tslib", "react-remove-scroll", "react-remove-scroll-bar"],
     },
 
@@ -49,6 +56,8 @@ export default defineConfig(({ mode }) => {
               if (id.includes("@svg-maps")) return "vendor-maps";
               if (id.includes("lucide-react")) return "vendor-lucide";
               if (id.includes("@radix-ui")) return "vendor-radix";
+              if (id.includes("date-fns")) return "vendor-date";
+              if (id.includes("lodash")) return "vendor-lodash";
             }
           },
         },
@@ -58,7 +67,9 @@ export default defineConfig(({ mode }) => {
     plugins: [
       tanstackStart(),
 
-      nitro(),
+      nitro({
+        preset: "vercel",
+      }),
 
       react(),
 
