@@ -365,24 +365,6 @@ export const nav: NavItem[] = [
       { label: "Asset Master Data", to: "/zakat-asset-master" },
       { label: "Zakat Executive Report", to: "/zakat-executive-report" },
       { label: "Financial Aid Report", to: "/financial-aid-report" },
-      {
-        label: "Zakat Management",
-        hidden: true,
-        subitems: [
-          { label: "Budget Configuration", to: "/zakat-budget-configuration" },
-          { label: "Zakat List", to: "/zakat-list" },
-          { label: "Asset Master Data", to: "/zakat-asset-master" },
-          { label: "Zakat Report Report", to: "/zakat-executive-report" },
-        ],
-      },
-      {
-        label: "Financial Aid",
-        hidden: true,
-        subitems: [
-          { label: "Budget Configuration", to: "/financial-aid-budget-configuration" },
-          { label: "Financial Aid List", to: "/financial-aid-list" },
-        ],
-      },
     ],
   },
   {
