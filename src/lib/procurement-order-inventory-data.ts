@@ -173,6 +173,9 @@ export interface MRRItem {
   // Inspection fields
   acceptedQty?: number;
   rejectedQty?: number;
+  // FOC fields
+  focQty?: number;
+  focAllocations?: any[];
 }
 
 export interface MaterialReceive {

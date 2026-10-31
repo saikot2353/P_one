@@ -79,8 +79,24 @@ export function StandardPreviewReportModal({
   const metadataList = activeData.metadata || activeData.metaFields || [];
 
   const isMonthlyBudget = activeData.reportType === "monthly-budget-requisition";
+  const isInventoryReport =
+    (typeof window !== "undefined" && window.location.pathname.includes("/inv-")) ||
+    (typeof activeData.reportType === "string" && (
+      activeData.reportType.startsWith("inv") ||
+      activeData.reportType.startsWith("loan") ||
+      activeData.reportType.startsWith("stock") ||
+      activeData.reportType.startsWith("transfer") ||
+      activeData.reportType === "direct-mrr" ||
+      activeData.reportType === "supplier-return" ||
+      activeData.reportType === "opening-stock"
+    )) ||
+    activeData.department?.toLowerCase().includes("inventory") ||
+    activeData.department?.toLowerCase().includes("materials") ||
+    activeData.department?.toLowerCase().includes("store");
+
   const shouldHideLogo =
     activeData.hideLogo ||
+    isInventoryReport ||
     activeData.reportType === "purchase-requisition" ||
     activeData.reportType === "monthly-budget-requisition" ||
     activeData.reportType === "purchase-order" ||

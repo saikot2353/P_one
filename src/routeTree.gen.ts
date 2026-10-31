@@ -133,6 +133,17 @@ import { Route as InvIssueListRouteImport } from './routes/inv-issue-list'
 import { Route as InvIssueMrrReturnRouteImport } from './routes/inv-issue-mrr-return'
 import { Route as InvIssueRegularRouteImport } from './routes/inv-issue-regular'
 import { Route as InvIssueReturnRouteImport } from './routes/inv-issue-return'
+import { Route as InvLoanIssueRouteImport } from './routes/inv-loan-issue'
+import { Route as InvLoanIssueAgainstReceiveRouteImport } from './routes/inv-loan-issue-against-receive'
+import { Route as InvLoanIssueAgainstReceiveListRouteImport } from './routes/inv-loan-issue-against-receive-list'
+import { Route as InvLoanIssueListRouteImport } from './routes/inv-loan-issue-list'
+import { Route as InvLoanReceiveRouteImport } from './routes/inv-loan-receive'
+import { Route as InvLoanReceiveAgainstIssueRouteImport } from './routes/inv-loan-receive-against-issue'
+import { Route as InvLoanReceiveAgainstIssueListRouteImport } from './routes/inv-loan-receive-against-issue-list'
+import { Route as InvLoanReceiveListRouteImport } from './routes/inv-loan-receive-list'
+import { Route as InvLoanRequisitionRouteImport } from './routes/inv-loan-requisition'
+import { Route as InvLoanRequisitionApprovalRouteImport } from './routes/inv-loan-requisition-approval'
+import { Route as InvLoanRequisitionListRouteImport } from './routes/inv-loan-requisition-list'
 import { Route as InvMaterialRequisitionRouteImport } from './routes/inv-material-requisition'
 import { Route as InvMaterialRequisitionApprovalListRouteImport } from './routes/inv-material-requisition-approval-list'
 import { Route as InvMaterialRequisitionListRouteImport } from './routes/inv-material-requisition-list'
@@ -1082,6 +1093,66 @@ const InvIssueRegularRoute = InvIssueRegularRouteImport.update({
 const InvIssueReturnRoute = InvIssueReturnRouteImport.update({
   id: '/inv-issue-return',
   path: '/inv-issue-return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvLoanIssueRoute = InvLoanIssueRouteImport.update({
+  id: '/inv-loan-issue',
+  path: '/inv-loan-issue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvLoanIssueAgainstReceiveRoute =
+  InvLoanIssueAgainstReceiveRouteImport.update({
+    id: '/inv-loan-issue-against-receive',
+    path: '/inv-loan-issue-against-receive',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvLoanIssueAgainstReceiveListRoute =
+  InvLoanIssueAgainstReceiveListRouteImport.update({
+    id: '/inv-loan-issue-against-receive-list',
+    path: '/inv-loan-issue-against-receive-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvLoanIssueListRoute = InvLoanIssueListRouteImport.update({
+  id: '/inv-loan-issue-list',
+  path: '/inv-loan-issue-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvLoanReceiveRoute = InvLoanReceiveRouteImport.update({
+  id: '/inv-loan-receive',
+  path: '/inv-loan-receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvLoanReceiveAgainstIssueRoute =
+  InvLoanReceiveAgainstIssueRouteImport.update({
+    id: '/inv-loan-receive-against-issue',
+    path: '/inv-loan-receive-against-issue',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvLoanReceiveAgainstIssueListRoute =
+  InvLoanReceiveAgainstIssueListRouteImport.update({
+    id: '/inv-loan-receive-against-issue-list',
+    path: '/inv-loan-receive-against-issue-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvLoanReceiveListRoute = InvLoanReceiveListRouteImport.update({
+  id: '/inv-loan-receive-list',
+  path: '/inv-loan-receive-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvLoanRequisitionRoute = InvLoanRequisitionRouteImport.update({
+  id: '/inv-loan-requisition',
+  path: '/inv-loan-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvLoanRequisitionApprovalRoute =
+  InvLoanRequisitionApprovalRouteImport.update({
+    id: '/inv-loan-requisition-approval',
+    path: '/inv-loan-requisition-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InvLoanRequisitionListRoute = InvLoanRequisitionListRouteImport.update({
+  id: '/inv-loan-requisition-list',
+  path: '/inv-loan-requisition-list',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvMaterialRequisitionRoute = InvMaterialRequisitionRouteImport.update({
@@ -2833,6 +2904,17 @@ export interface FileRoutesByFullPath {
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
   '/inv-issue-return': typeof InvIssueReturnRoute
+  '/inv-loan-issue': typeof InvLoanIssueRoute
+  '/inv-loan-issue-against-receive': typeof InvLoanIssueAgainstReceiveRoute
+  '/inv-loan-issue-against-receive-list': typeof InvLoanIssueAgainstReceiveListRoute
+  '/inv-loan-issue-list': typeof InvLoanIssueListRoute
+  '/inv-loan-receive': typeof InvLoanReceiveRoute
+  '/inv-loan-receive-against-issue': typeof InvLoanReceiveAgainstIssueRoute
+  '/inv-loan-receive-against-issue-list': typeof InvLoanReceiveAgainstIssueListRoute
+  '/inv-loan-receive-list': typeof InvLoanReceiveListRoute
+  '/inv-loan-requisition': typeof InvLoanRequisitionRoute
+  '/inv-loan-requisition-approval': typeof InvLoanRequisitionApprovalRoute
+  '/inv-loan-requisition-list': typeof InvLoanRequisitionListRoute
   '/inv-material-requisition': typeof InvMaterialRequisitionRoute
   '/inv-material-requisition-approval-list': typeof InvMaterialRequisitionApprovalListRoute
   '/inv-material-requisition-list': typeof InvMaterialRequisitionListRoute
@@ -3261,6 +3343,17 @@ export interface FileRoutesByTo {
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
   '/inv-issue-return': typeof InvIssueReturnRoute
+  '/inv-loan-issue': typeof InvLoanIssueRoute
+  '/inv-loan-issue-against-receive': typeof InvLoanIssueAgainstReceiveRoute
+  '/inv-loan-issue-against-receive-list': typeof InvLoanIssueAgainstReceiveListRoute
+  '/inv-loan-issue-list': typeof InvLoanIssueListRoute
+  '/inv-loan-receive': typeof InvLoanReceiveRoute
+  '/inv-loan-receive-against-issue': typeof InvLoanReceiveAgainstIssueRoute
+  '/inv-loan-receive-against-issue-list': typeof InvLoanReceiveAgainstIssueListRoute
+  '/inv-loan-receive-list': typeof InvLoanReceiveListRoute
+  '/inv-loan-requisition': typeof InvLoanRequisitionRoute
+  '/inv-loan-requisition-approval': typeof InvLoanRequisitionApprovalRoute
+  '/inv-loan-requisition-list': typeof InvLoanRequisitionListRoute
   '/inv-material-requisition': typeof InvMaterialRequisitionRoute
   '/inv-material-requisition-approval-list': typeof InvMaterialRequisitionApprovalListRoute
   '/inv-material-requisition-list': typeof InvMaterialRequisitionListRoute
@@ -3691,6 +3784,17 @@ export interface FileRoutesById {
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
   '/inv-issue-return': typeof InvIssueReturnRoute
+  '/inv-loan-issue': typeof InvLoanIssueRoute
+  '/inv-loan-issue-against-receive': typeof InvLoanIssueAgainstReceiveRoute
+  '/inv-loan-issue-against-receive-list': typeof InvLoanIssueAgainstReceiveListRoute
+  '/inv-loan-issue-list': typeof InvLoanIssueListRoute
+  '/inv-loan-receive': typeof InvLoanReceiveRoute
+  '/inv-loan-receive-against-issue': typeof InvLoanReceiveAgainstIssueRoute
+  '/inv-loan-receive-against-issue-list': typeof InvLoanReceiveAgainstIssueListRoute
+  '/inv-loan-receive-list': typeof InvLoanReceiveListRoute
+  '/inv-loan-requisition': typeof InvLoanRequisitionRoute
+  '/inv-loan-requisition-approval': typeof InvLoanRequisitionApprovalRoute
+  '/inv-loan-requisition-list': typeof InvLoanRequisitionListRoute
   '/inv-material-requisition': typeof InvMaterialRequisitionRoute
   '/inv-material-requisition-approval-list': typeof InvMaterialRequisitionApprovalListRoute
   '/inv-material-requisition-list': typeof InvMaterialRequisitionListRoute
@@ -4122,6 +4226,17 @@ export interface FileRouteTypes {
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
     | '/inv-issue-return'
+    | '/inv-loan-issue'
+    | '/inv-loan-issue-against-receive'
+    | '/inv-loan-issue-against-receive-list'
+    | '/inv-loan-issue-list'
+    | '/inv-loan-receive'
+    | '/inv-loan-receive-against-issue'
+    | '/inv-loan-receive-against-issue-list'
+    | '/inv-loan-receive-list'
+    | '/inv-loan-requisition'
+    | '/inv-loan-requisition-approval'
+    | '/inv-loan-requisition-list'
     | '/inv-material-requisition'
     | '/inv-material-requisition-approval-list'
     | '/inv-material-requisition-list'
@@ -4550,6 +4665,17 @@ export interface FileRouteTypes {
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
     | '/inv-issue-return'
+    | '/inv-loan-issue'
+    | '/inv-loan-issue-against-receive'
+    | '/inv-loan-issue-against-receive-list'
+    | '/inv-loan-issue-list'
+    | '/inv-loan-receive'
+    | '/inv-loan-receive-against-issue'
+    | '/inv-loan-receive-against-issue-list'
+    | '/inv-loan-receive-list'
+    | '/inv-loan-requisition'
+    | '/inv-loan-requisition-approval'
+    | '/inv-loan-requisition-list'
     | '/inv-material-requisition'
     | '/inv-material-requisition-approval-list'
     | '/inv-material-requisition-list'
@@ -4979,6 +5105,17 @@ export interface FileRouteTypes {
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
     | '/inv-issue-return'
+    | '/inv-loan-issue'
+    | '/inv-loan-issue-against-receive'
+    | '/inv-loan-issue-against-receive-list'
+    | '/inv-loan-issue-list'
+    | '/inv-loan-receive'
+    | '/inv-loan-receive-against-issue'
+    | '/inv-loan-receive-against-issue-list'
+    | '/inv-loan-receive-list'
+    | '/inv-loan-requisition'
+    | '/inv-loan-requisition-approval'
+    | '/inv-loan-requisition-list'
     | '/inv-material-requisition'
     | '/inv-material-requisition-approval-list'
     | '/inv-material-requisition-list'
@@ -5409,6 +5546,17 @@ export interface RootRouteChildren {
   InvIssueMrrReturnRoute: typeof InvIssueMrrReturnRoute
   InvIssueRegularRoute: typeof InvIssueRegularRoute
   InvIssueReturnRoute: typeof InvIssueReturnRoute
+  InvLoanIssueRoute: typeof InvLoanIssueRoute
+  InvLoanIssueAgainstReceiveRoute: typeof InvLoanIssueAgainstReceiveRoute
+  InvLoanIssueAgainstReceiveListRoute: typeof InvLoanIssueAgainstReceiveListRoute
+  InvLoanIssueListRoute: typeof InvLoanIssueListRoute
+  InvLoanReceiveRoute: typeof InvLoanReceiveRoute
+  InvLoanReceiveAgainstIssueRoute: typeof InvLoanReceiveAgainstIssueRoute
+  InvLoanReceiveAgainstIssueListRoute: typeof InvLoanReceiveAgainstIssueListRoute
+  InvLoanReceiveListRoute: typeof InvLoanReceiveListRoute
+  InvLoanRequisitionRoute: typeof InvLoanRequisitionRoute
+  InvLoanRequisitionApprovalRoute: typeof InvLoanRequisitionApprovalRoute
+  InvLoanRequisitionListRoute: typeof InvLoanRequisitionListRoute
   InvMaterialRequisitionRoute: typeof InvMaterialRequisitionRoute
   InvMaterialRequisitionApprovalListRoute: typeof InvMaterialRequisitionApprovalListRoute
   InvMaterialRequisitionListRoute: typeof InvMaterialRequisitionListRoute
@@ -6580,6 +6728,83 @@ declare module '@tanstack/react-router' {
       path: '/inv-issue-return'
       fullPath: '/inv-issue-return'
       preLoaderRoute: typeof InvIssueReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-issue': {
+      id: '/inv-loan-issue'
+      path: '/inv-loan-issue'
+      fullPath: '/inv-loan-issue'
+      preLoaderRoute: typeof InvLoanIssueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-issue-against-receive': {
+      id: '/inv-loan-issue-against-receive'
+      path: '/inv-loan-issue-against-receive'
+      fullPath: '/inv-loan-issue-against-receive'
+      preLoaderRoute: typeof InvLoanIssueAgainstReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-issue-against-receive-list': {
+      id: '/inv-loan-issue-against-receive-list'
+      path: '/inv-loan-issue-against-receive-list'
+      fullPath: '/inv-loan-issue-against-receive-list'
+      preLoaderRoute: typeof InvLoanIssueAgainstReceiveListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-issue-list': {
+      id: '/inv-loan-issue-list'
+      path: '/inv-loan-issue-list'
+      fullPath: '/inv-loan-issue-list'
+      preLoaderRoute: typeof InvLoanIssueListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-receive': {
+      id: '/inv-loan-receive'
+      path: '/inv-loan-receive'
+      fullPath: '/inv-loan-receive'
+      preLoaderRoute: typeof InvLoanReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-receive-against-issue': {
+      id: '/inv-loan-receive-against-issue'
+      path: '/inv-loan-receive-against-issue'
+      fullPath: '/inv-loan-receive-against-issue'
+      preLoaderRoute: typeof InvLoanReceiveAgainstIssueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-receive-against-issue-list': {
+      id: '/inv-loan-receive-against-issue-list'
+      path: '/inv-loan-receive-against-issue-list'
+      fullPath: '/inv-loan-receive-against-issue-list'
+      preLoaderRoute: typeof InvLoanReceiveAgainstIssueListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-receive-list': {
+      id: '/inv-loan-receive-list'
+      path: '/inv-loan-receive-list'
+      fullPath: '/inv-loan-receive-list'
+      preLoaderRoute: typeof InvLoanReceiveListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-requisition': {
+      id: '/inv-loan-requisition'
+      path: '/inv-loan-requisition'
+      fullPath: '/inv-loan-requisition'
+      preLoaderRoute: typeof InvLoanRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-requisition-approval': {
+      id: '/inv-loan-requisition-approval'
+      path: '/inv-loan-requisition-approval'
+      fullPath: '/inv-loan-requisition-approval'
+      preLoaderRoute: typeof InvLoanRequisitionApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-loan-requisition-list': {
+      id: '/inv-loan-requisition-list'
+      path: '/inv-loan-requisition-list'
+      fullPath: '/inv-loan-requisition-list'
+      preLoaderRoute: typeof InvLoanRequisitionListRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inv-material-requisition': {
@@ -8845,6 +9070,17 @@ const rootRouteChildren: RootRouteChildren = {
   InvIssueMrrReturnRoute: InvIssueMrrReturnRoute,
   InvIssueRegularRoute: InvIssueRegularRoute,
   InvIssueReturnRoute: InvIssueReturnRoute,
+  InvLoanIssueRoute: InvLoanIssueRoute,
+  InvLoanIssueAgainstReceiveRoute: InvLoanIssueAgainstReceiveRoute,
+  InvLoanIssueAgainstReceiveListRoute: InvLoanIssueAgainstReceiveListRoute,
+  InvLoanIssueListRoute: InvLoanIssueListRoute,
+  InvLoanReceiveRoute: InvLoanReceiveRoute,
+  InvLoanReceiveAgainstIssueRoute: InvLoanReceiveAgainstIssueRoute,
+  InvLoanReceiveAgainstIssueListRoute: InvLoanReceiveAgainstIssueListRoute,
+  InvLoanReceiveListRoute: InvLoanReceiveListRoute,
+  InvLoanRequisitionRoute: InvLoanRequisitionRoute,
+  InvLoanRequisitionApprovalRoute: InvLoanRequisitionApprovalRoute,
+  InvLoanRequisitionListRoute: InvLoanRequisitionListRoute,
   InvMaterialRequisitionRoute: InvMaterialRequisitionRoute,
   InvMaterialRequisitionApprovalListRoute:
     InvMaterialRequisitionApprovalListRoute,

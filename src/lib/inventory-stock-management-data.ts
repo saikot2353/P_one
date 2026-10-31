@@ -44,6 +44,7 @@ export interface InterCompanyTransferItem {
   origin: string;
   uom: string;
   availableStock: number;
+  trRequisitionQty?: number;
   transferQty: number;
   unitPrice: number;
   totalValue: number;

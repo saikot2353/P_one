@@ -1780,9 +1780,6 @@ function ProcurementMasterDataPage() {
                                         className="font-bold text-foreground hover:text-amber-500 text-left truncate flex items-center gap-2 cursor-pointer"
                                       >
                                         <span>{node.subGroupName}</span>
-                                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted/60 text-muted-foreground">
-                                          {node.subGroupCode}
-                                        </span>
                                         {node.serviceFlag && (
                                           <span className="text-[9px] px-1.5 py-0.2 rounded font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 shrink-0">
                                             SERVICE
@@ -1793,6 +1790,11 @@ function ProcurementMasterDataPage() {
 
                                     {/* Action Buttons */}
                                     <div className="flex items-center gap-1 shrink-0 ml-2">
+                                      {items.filter((it) => it.subGroupId === node.id).length > 0 && (
+                                        <span className="text-[10px] font-semibold text-muted-foreground px-1.5 py-0.5 rounded bg-background border border-border/60">
+                                          C:{items.filter((it) => it.subGroupId === node.id).length}
+                                        </span>
+                                      )}
                                       <button
                                         type="button"
                                         onClick={() => handleOpenAddChildSubGroup(node)}
@@ -1914,9 +1916,6 @@ function ProcurementMasterDataPage() {
                                       className="font-extrabold text-foreground hover:text-amber-500 text-left truncate flex items-center gap-2 cursor-pointer"
                                     >
                                       <span className="font-bold">{grp.groupName}</span>
-                                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-background border border-border text-muted-foreground">
-                                        {grp.groupCode}
-                                      </span>
                                       {grp.serviceFlag && (
                                         <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
                                           SERVICE GROUP

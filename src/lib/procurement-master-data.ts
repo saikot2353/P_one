@@ -361,6 +361,7 @@ export interface ItemProductMaster {
   partNumber?: string;
   origin?: string;
   serviceFlag?: boolean;
+  fixedAssetFlag?: boolean;
   valuationMethod?: "FIFO" | "LIFO" | "Weighted Average";
   status: "Active" | "Inactive";
   createDate?: string;
