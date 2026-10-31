@@ -23,9 +23,18 @@ import {
   Building2,
   Clock,
   Sparkles,
+  Check,
+  X,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import {
+  type FestivalPayCheckRow,
+  getFestivalAllowanceCheckRecords,
+  updateFestivalCheckRecordStatus,
+  bulkUpdateFestivalCheckRecordStatus,
+} from "@/lib/festivalAllowanceStore";
 
 export const Route = createFileRoute("/festival-allowance-check-hr")({
   head: () => ({
@@ -41,209 +50,18 @@ export const Route = createFileRoute("/festival-allowance-check-hr")({
   component: FestivalAllowanceCheckHrPage,
 });
 
-export interface FestivalPayCheckRow {
-  id: string;
-  sl: number;
-  empId: string;
-  name: string;
-  type: string;
-  department: string;
-  section: string;
-  designation: string;
-  basic: number;
-  gross: number;
-  totalDay: number;
-  perDayRate: number;
-  payableAmt: number;
-  otHour: number;
-  rate: number;
-  otAmount: number;
-  lunchBill: number;
-  netPay: number;
-  bankName: string;
-  unit: string;
-  systemOffice: "System" | "Office";
-  year: string;
-  month: string;
-  status: "Pending" | "Approved" | "Reject";
-}
-
-const STORAGE_KEY = "hris_festival_allowance_check_hr_records_v1";
-
-const INITIAL_RECORDS: FestivalPayCheckRow[] = [
-  {
-    id: "fpc-1",
-    sl: 1,
-    empId: "2025053380",
-    name: "Miraz Uddin",
-    type: "Office Executive",
-    department: "Business Development",
-    section: "Core Sales",
-    designation: "Jr. Executive",
-    basic: 14400.0,
-    gross: 24000.0,
-    totalDay: 1,
-    perDayRate: 2000.0,
-    payableAmt: 2000.0,
-    otHour: 0.0,
-    rate: 0.0,
-    otAmount: 0.0,
-    lunchBill: 0.0,
-    netPay: 2000.0,
-    bankName: "Dutch-Bangla Bank Ltd.",
-    unit: "Unit-01",
-    systemOffice: "Office",
-    year: "2026",
-    month: "Oct",
-    status: "Pending",
-  },
-  {
-    id: "fpc-2",
-    sl: 2,
-    empId: "2025054315",
-    name: "Md. Shahinur Alahi Khan",
-    type: "Office Executive",
-    department: "Business Development",
-    section: "Core Sales",
-    designation: "Asst. Manager",
-    basic: 31800.0,
-    gross: 53000.0,
-    totalDay: 1,
-    perDayRate: 3000.0,
-    payableAmt: 3000.0,
-    otHour: 0.0,
-    rate: 0.0,
-    otAmount: 0.0,
-    lunchBill: 0.0,
-    netPay: 3000.0,
-    bankName: "Dutch-Bangla Bank Ltd.",
-    unit: "Unit-01",
-    systemOffice: "Office",
-    year: "2026",
-    month: "Oct",
-    status: "Pending",
-  },
-  {
-    id: "fpc-3",
-    sl: 3,
-    empId: "2026058686",
-    name: "Md. Abdur Rahaman",
-    type: "Office Executive",
-    department: "Business Innovation",
-    section: "Business Innovation",
-    designation: "Executive",
-    basic: 30000.0,
-    gross: 50000.0,
-    totalDay: 1,
-    perDayRate: 2500.0,
-    payableAmt: 2500.0,
-    otHour: 0.0,
-    rate: 0.0,
-    otAmount: 0.0,
-    lunchBill: 0.0,
-    netPay: 2500.0,
-    bankName: "Rocket-Dutch-Bangla Bank Ltd.",
-    unit: "Unit-02",
-    systemOffice: "System",
-    year: "2026",
-    month: "Oct",
-    status: "Pending",
-  },
-  {
-    id: "fpc-4",
-    sl: 4,
-    empId: "2025054707",
-    name: "Allama Bakhtiyar Nafis",
-    type: "Office Executive",
-    department: "Business Innovation",
-    section: "WEB-Team",
-    designation: "Jr. Executive",
-    basic: 15000.0,
-    gross: 25000.0,
-    totalDay: 1,
-    perDayRate: 2000.0,
-    payableAmt: 2000.0,
-    otHour: 0.0,
-    rate: 0.0,
-    otAmount: 0.0,
-    lunchBill: 0.0,
-    netPay: 2000.0,
-    bankName: "Dutch-Bangla Bank Ltd.",
-    unit: "Unit-02",
-    systemOffice: "Office",
-    year: "2026",
-    month: "Oct",
-    status: "Pending",
-  },
-  {
-    id: "fpc-5",
-    sl: 5,
-    empId: "2023045146",
-    name: "Asif Hossain",
-    type: "Worker",
-    department: "HR, Admin and Compliance",
-    section: "Admin",
-    designation: "Driver",
-    basic: 12500.0,
-    gross: 21200.0,
-    totalDay: 1,
-    perDayRate: 1250.0,
-    payableAmt: 1250.0,
-    otHour: 0.0,
-    rate: 0.0,
-    otAmount: 0.0,
-    lunchBill: 0.0,
-    netPay: 1250.0,
-    bankName: "Rocket-Dutch-Bangla Bank Ltd.",
-    unit: "Unit-01",
-    systemOffice: "Office",
-    year: "2026",
-    month: "Oct",
-    status: "Approved",
-  },
-  {
-    id: "fpc-6",
-    sl: 6,
-    empId: "2023046544",
-    name: "Mazharul Haque",
-    type: "Office Executive",
-    department: "Implementation & Business Analysis",
-    section: "ERP Team",
-    designation: "Deputy Manager",
-    basic: 40800.0,
-    gross: 68000.0,
-    totalDay: 1,
-    perDayRate: 3000.0,
-    payableAmt: 3000.0,
-    otHour: 0.0,
-    rate: 0.0,
-    otAmount: 0.0,
-    lunchBill: 0.0,
-    netPay: 3000.0,
-    bankName: "Dutch-Bangla Bank Ltd.",
-    unit: "Unit-03",
-    systemOffice: "System",
-    year: "2026",
-    month: "Oct",
-    status: "Pending",
-  },
-];
-
 const YEARS = [
+  "ALL",
   "2026",
   "2025",
   "2024",
   "2023",
   "2022",
   "2021",
-  "2020",
-  "2019",
-  "2018",
-  "2017",
-  "2016",
 ];
 
 const MONTHS = [
+  "ALL",
   "Jan",
   "Feb",
   "Mar",
@@ -259,29 +77,33 @@ const MONTHS = [
 ];
 
 const STATUS_OPTIONS = ["ALL", "Pending", "Approved", "Reject"];
-const BANK_OPTIONS = [
-  "ALL",
-  "Dutch-Bangla Bank Ltd.",
-  "Rocket-Dutch-Bangla Bank Ltd.",
-];
-const EMPLOYEE_TYPES = ["ALL", "Office Executive", "Worker", "Staff"];
-const SECTIONS = [
-  "ALL",
-  "Core Sales",
-  "Business Innovation",
-  "WEB-Team",
-  "Admin",
-  "ERP Team",
-];
-const UNITS = ["ALL", "Unit-01", "Unit-02", "Unit-03", "Head Office"];
+const EMPLOYEE_TYPES = ["ALL", "Office Executive", "Worker", "Staff", "Office Staff", "Management"];
 
 export function FestivalAllowanceCheckHrPage() {
-  const [records, setRecords] = useState<FestivalPayCheckRow[]>(INITIAL_RECORDS);
+  const [records, setRecords] = useState<FestivalPayCheckRow[]>(() =>
+    getFestivalAllowanceCheckRecords()
+  );
+
+  const loadData = () => {
+    setRecords(getFestivalAllowanceCheckRecords());
+  };
+
+  useEffect(() => {
+    loadData();
+    const handleChanged = () => {
+      loadData();
+    };
+    window.addEventListener("festival_allowances_changed", handleChanged);
+    return () => {
+      window.removeEventListener("festival_allowances_changed", handleChanged);
+    };
+  }, []);
 
   // Filters state
-  const [selectedYear, setSelectedYear] = useState("2026");
-  const [selectedMonth, setSelectedMonth] = useState("Oct");
+  const [selectedYear, setSelectedYear] = useState("ALL");
+  const [selectedMonth, setSelectedMonth] = useState("ALL");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
+  const [selectedDepartment, setSelectedDepartment] = useState("ALL");
   const [selectedBank, setSelectedBank] = useState("ALL");
   const [selectedEmpType, setSelectedEmpType] = useState("ALL");
   const [selectedSection, setSelectedSection] = useState("ALL");
@@ -293,30 +115,38 @@ export function FestivalAllowanceCheckHrPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [quickFilter, setQuickFilter] = useState("");
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setRecords(parsed);
-          }
-        }
-      } catch (e) {
-        console.error("Failed to load records from localStorage", e);
-      }
-    }
-  }, []);
+  // Dynamic filter options based on available records
+  const departmentOptions = useMemo(() => {
+    const set = new Set<string>();
+    records.forEach((r) => {
+      if (r.department) set.add(r.department);
+    });
+    return ["ALL", ...Array.from(set).sort()];
+  }, [records]);
 
-  // Save helper
-  const updateRecordsState = (updated: FestivalPayCheckRow[]) => {
-    setRecords(updated);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    }
-  };
+  const sectionOptions = useMemo(() => {
+    const set = new Set<string>();
+    records.forEach((r) => {
+      if (r.section) set.add(r.section);
+    });
+    return ["ALL", ...Array.from(set).sort()];
+  }, [records]);
+
+  const unitOptions = useMemo(() => {
+    const set = new Set<string>();
+    records.forEach((r) => {
+      if (r.unit) set.add(r.unit);
+    });
+    return ["ALL", ...Array.from(set).sort()];
+  }, [records]);
+
+  const bankOptions = useMemo(() => {
+    const set = new Set<string>();
+    records.forEach((r) => {
+      if (r.bankName) set.add(r.bankName);
+    });
+    return ["ALL", ...Array.from(set).sort()];
+  }, [records]);
 
   // Filtered records
   const filteredRecords = useMemo(() => {
@@ -324,6 +154,7 @@ export function FestivalAllowanceCheckHrPage() {
       if (selectedYear !== "ALL" && r.year !== selectedYear) return false;
       if (selectedMonth !== "ALL" && r.month !== selectedMonth) return false;
       if (selectedStatus !== "ALL" && r.status !== selectedStatus) return false;
+      if (selectedDepartment !== "ALL" && r.department !== selectedDepartment) return false;
       if (selectedBank !== "ALL" && r.bankName !== selectedBank) return false;
       if (selectedEmpType !== "ALL" && r.type !== selectedEmpType) return false;
       if (selectedSection !== "ALL" && r.section !== selectedSection) return false;
@@ -356,6 +187,7 @@ export function FestivalAllowanceCheckHrPage() {
     selectedYear,
     selectedMonth,
     selectedStatus,
+    selectedDepartment,
     selectedBank,
     selectedEmpType,
     selectedSection,
@@ -387,9 +219,10 @@ export function FestivalAllowanceCheckHrPage() {
 
   // Reset filters
   const handleResetFilters = () => {
-    setSelectedYear("2026");
-    setSelectedMonth("Oct");
+    setSelectedYear("ALL");
+    setSelectedMonth("ALL");
     setSelectedStatus("ALL");
+    setSelectedDepartment("ALL");
     setSelectedBank("ALL");
     setSelectedEmpType("ALL");
     setSelectedSection("ALL");
@@ -418,12 +251,11 @@ export function FestivalAllowanceCheckHrPage() {
 
   // Single status change
   const handleStatusChange = (id: string, newStatus: "Approved" | "Reject") => {
-    const updated = records.map((r) =>
-      r.id === id ? { ...r, status: newStatus } : r
-    );
-    updateRecordsState(updated);
+    updateFestivalCheckRecordStatus(id, newStatus);
+    loadData();
+    const item = records.find((r) => r.id === id);
     toast.success(
-      `Festival Allowance ${newStatus.toLowerCase()} for ${records.find((r) => r.id === id)?.name}`
+      `Festival Allowance ${newStatus.toLowerCase()} for ${item?.name || "employee"}`
     );
   };
 
@@ -433,12 +265,10 @@ export function FestivalAllowanceCheckHrPage() {
       toast.warning("Please select at least one employee from the list.");
       return;
     }
-    const updated = records.map((r) =>
-      selectedIds.includes(r.id) ? { ...r, status: newStatus } : r
-    );
-    updateRecordsState(updated);
+    const count = bulkUpdateFestivalCheckRecordStatus(selectedIds, newStatus);
+    loadData();
     toast.success(
-      `Successfully marked ${selectedIds.length} employee(s) as ${newStatus}.`
+      `Successfully marked ${count} employee(s) as ${newStatus}.`
     );
     setSelectedIds([]);
   };
@@ -457,10 +287,10 @@ export function FestivalAllowanceCheckHrPage() {
         Basic: r.basic.toFixed(2),
         Gross: r.gross.toFixed(2),
         "Total Day": r.totalDay,
-        "Per Day Rate": r.perDayRate.toFixed(6),
+        "Per Day Rate": r.perDayRate.toFixed(2),
         "Payable Amt": r.payableAmt.toFixed(2),
         "OT Hour": r.otHour.toFixed(2),
-        Rate: r.rate.toFixed(6),
+        Rate: r.rate.toFixed(2),
         "OT Amount": r.otAmount.toFixed(2),
         "Lunch Bill": r.lunchBill.toFixed(2),
         "Net Pay": r.netPay.toFixed(2),
@@ -505,51 +335,66 @@ export function FestivalAllowanceCheckHrPage() {
                 <span>Manage Allowance</span>
                 <ChevronRight className="size-2.5" />
                 <span className="text-primary font-black">
-                  Fastival allowance Check (HR)
+                  Festival Allowance Check (HR)
                 </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-black text-foreground tracking-tight flex items-center gap-2">
                 <Coins className="size-6 text-primary" />
-                <span>Fastival allowance Check (HR)</span>
+                <span>Festival Allowance Check (HR)</span>
               </h1>
               <p className="text-xs text-muted-foreground">
-                Verify, audit, and approve monthly festival allowance disbursements and duty rates.
+                Verify, audit, and approve monthly festival allowance disbursements and duty rates for HR.
               </p>
             </div>
 
-            {/* Quick Actions */}
-            <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Quick Actions & Navigation */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Link
+                to="/festival-allowance"
+                className="px-3 py-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                title="Go to Festival Allowance Entry"
+              >
+                <Coins className="size-3.5" />
+                <span>Allowance Entry</span>
+              </Link>
+              <Link
+                to="/festival-allowance-approval"
+                className="px-3 py-1.5 rounded-xl border border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-400 hover:bg-purple-500/20 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                title="Go to Approval Hub"
+              >
+                <CheckCircle2 className="size-3.5" />
+                <span>Approval Hub</span>
+              </Link>
+              <Link
+                to="/festival-allowance-payment-sheet"
+                className="px-3 py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                title="Go to Payment Sheet"
+              >
+                <Banknote className="size-3.5" />
+                <span>Payment Sheet</span>
+              </Link>
               <button
                 type="button"
                 onClick={handleExportExcel}
-                className="px-3 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                className="px-3 py-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
                 title="Export as Excel file"
               >
-                <FileSpreadsheet className="size-4" />
+                <FileSpreadsheet className="size-3.5" />
                 <span>Excel</span>
               </button>
               <button
                 type="button"
                 onClick={handlePrint}
-                className="px-3 py-2 rounded-xl border border-border bg-card hover:bg-muted text-foreground text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                className="px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-foreground text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
                 title="Print Festival Allowance Table"
               >
-                <Printer className="size-4 text-muted-foreground" />
+                <Printer className="size-3.5 text-muted-foreground" />
                 <span>Print</span>
-              </button>
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400 hover:bg-rose-500/20 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
-                title="Download or Print as PDF"
-              >
-                <FileText className="size-4" />
-                <span>PDF</span>
               </button>
             </div>
           </div>
 
-          {/* Filter Bar (Exact Match to Prompt) */}
+          {/* Filter Bar */}
           <div className="bg-card border border-border/80 rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-border/60 pb-3">
               <div className="flex items-center gap-2">
@@ -568,7 +413,7 @@ export function FestivalAllowanceCheckHrPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3.5 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3.5 text-xs">
               {/* Year */}
               <div>
                 <label className="block text-[11px] font-bold text-muted-foreground mb-1">
@@ -579,7 +424,6 @@ export function FestivalAllowanceCheckHrPage() {
                   onChange={(e) => setSelectedYear(e.target.value)}
                   className="w-full h-9 px-2.5 rounded-xl border border-border bg-background text-foreground text-xs outline-none focus:border-primary transition"
                 >
-                  <option value="ALL">ALL Years</option>
                   {YEARS.map((y) => (
                     <option key={y} value={y}>
                       {y}
@@ -598,10 +442,45 @@ export function FestivalAllowanceCheckHrPage() {
                   onChange={(e) => setSelectedMonth(e.target.value)}
                   className="w-full h-9 px-2.5 rounded-xl border border-border bg-background text-foreground text-xs outline-none focus:border-primary transition"
                 >
-                  <option value="ALL">ALL Months</option>
                   {MONTHS.map((m) => (
                     <option key={m} value={m}>
                       {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Department */}
+              <div>
+                <label className="block text-[11px] font-bold text-muted-foreground mb-1">
+                  Department
+                </label>
+                <select
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-xl border border-border bg-background text-foreground text-xs outline-none focus:border-primary transition"
+                >
+                  {departmentOptions.map((dep) => (
+                    <option key={dep} value={dep}>
+                      {dep}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Section */}
+              <div>
+                <label className="block text-[11px] font-bold text-muted-foreground mb-1">
+                  Section
+                </label>
+                <select
+                  value={selectedSection}
+                  onChange={(e) => setSelectedSection(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-xl border border-border bg-background text-foreground text-xs outline-none focus:border-primary transition"
+                >
+                  {sectionOptions.map((sec) => (
+                    <option key={sec} value={sec}>
+                      {sec}
                     </option>
                   ))}
                 </select>
@@ -635,7 +514,7 @@ export function FestivalAllowanceCheckHrPage() {
                   onChange={(e) => setSelectedBank(e.target.value)}
                   className="w-full h-9 px-2.5 rounded-xl border border-border bg-background text-foreground text-xs outline-none focus:border-primary transition"
                 >
-                  {BANK_OPTIONS.map((bk) => (
+                  {bankOptions.map((bk) => (
                     <option key={bk} value={bk}>
                       {bk}
                     </option>
@@ -661,24 +540,6 @@ export function FestivalAllowanceCheckHrPage() {
                 </select>
               </div>
 
-              {/* Section */}
-              <div>
-                <label className="block text-[11px] font-bold text-muted-foreground mb-1">
-                  Section
-                </label>
-                <select
-                  value={selectedSection}
-                  onChange={(e) => setSelectedSection(e.target.value)}
-                  className="w-full h-9 px-2.5 rounded-xl border border-border bg-background text-foreground text-xs outline-none focus:border-primary transition"
-                >
-                  {SECTIONS.map((sec) => (
-                    <option key={sec} value={sec}>
-                      {sec}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               {/* Unit */}
               <div>
                 <label className="block text-[11px] font-bold text-muted-foreground mb-1">
@@ -689,7 +550,7 @@ export function FestivalAllowanceCheckHrPage() {
                   onChange={(e) => setSelectedUnit(e.target.value)}
                   className="w-full h-9 px-2.5 rounded-xl border border-border bg-background text-foreground text-xs outline-none focus:border-primary transition"
                 >
-                  {UNITS.map((u) => (
+                  {unitOptions.map((u) => (
                     <option key={u} value={u}>
                       {u}
                     </option>
@@ -700,7 +561,7 @@ export function FestivalAllowanceCheckHrPage() {
               {/* EmpId */}
               <div>
                 <label className="block text-[11px] font-bold text-muted-foreground mb-1">
-                  EmpId
+                  EmpId Search
                 </label>
                 <input
                   type="text"
@@ -712,7 +573,7 @@ export function FestivalAllowanceCheckHrPage() {
               </div>
 
               {/* System / Office */}
-              <div className="col-span-1 sm:col-span-2">
+              <div>
                 <label className="block text-[11px] font-bold text-muted-foreground mb-1">
                   System / Office Source
                 </label>
@@ -727,7 +588,7 @@ export function FestivalAllowanceCheckHrPage() {
                     />
                     <span>All</span>
                   </label>
-                  <label className="flex items-center gap-1.5 text-xs text-foreground cursor-pointer ml-2">
+                  <label className="flex items-center gap-1.5 text-xs text-foreground cursor-pointer ml-1">
                     <input
                       type="radio"
                       name="systemOffice"
@@ -737,7 +598,7 @@ export function FestivalAllowanceCheckHrPage() {
                     />
                     <span>System</span>
                   </label>
-                  <label className="flex items-center gap-1.5 text-xs text-foreground cursor-pointer ml-2">
+                  <label className="flex items-center gap-1.5 text-xs text-foreground cursor-pointer ml-1">
                     <input
                       type="radio"
                       name="systemOffice"
@@ -749,42 +610,90 @@ export function FestivalAllowanceCheckHrPage() {
                   </label>
                 </div>
               </div>
+            </div>
+          </div>
 
-              {/* Search Button */}
-              <div className="col-span-1 sm:col-span-2 flex items-end">
-                <button
-                  type="button"
-                  onClick={() => toast.success(`Search completed. Showing ${filteredRecords.length} entries.`)}
-                  className="w-full h-9 px-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer shadow-xs active:scale-[0.99]"
-                >
-                  <Search className="size-3.5" />
-                  <span>Search</span>
-                </button>
+          {/* Aggregate Metric Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+            <div className="bg-card border border-border/80 rounded-2xl p-3.5 shadow-2xs">
+              <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider block mb-1">
+                Total Employees
+              </span>
+              <div className="text-xl font-black text-foreground">
+                {stats.totalCount}
+              </div>
+            </div>
+            <div className="bg-card border border-border/80 rounded-2xl p-3.5 shadow-2xs">
+              <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider block mb-1">
+                Total Duty Days
+              </span>
+              <div className="text-xl font-black text-foreground">
+                {stats.totalDays}
+              </div>
+            </div>
+            <div className="bg-card border border-border/80 rounded-2xl p-3.5 shadow-2xs">
+              <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider block mb-1">
+                Total Gross
+              </span>
+              <div className="text-xl font-black text-foreground font-mono">
+                {stats.totalGross.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
+            <div className="bg-card border border-border/80 rounded-2xl p-3.5 shadow-2xs">
+              <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider block mb-1">
+                Total Payable
+              </span>
+              <div className="text-xl font-black text-foreground font-mono">
+                {stats.totalPayable.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
+            <div className="bg-card border border-border/80 rounded-2xl p-3.5 shadow-2xs">
+              <span className="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 tracking-wider block mb-1">
+                Total Net Pay
+              </span>
+              <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                {stats.totalNetPay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
+            <div className="bg-card border border-border/80 rounded-2xl p-3.5 shadow-2xs">
+              <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider block mb-1">
+                Approval Status
+              </span>
+              <div className="text-sm font-bold text-foreground flex items-center gap-2 mt-1">
+                <span className="text-emerald-600 font-bold">{stats.approvedCount} Appr.</span>
+                <span>/</span>
+                <span className="text-amber-600 font-bold">{stats.pendingCount} Pend.</span>
               </div>
             </div>
           </div>
 
-          {/* Table Container & Bulk Actions */}
-          <div className="bg-card border border-border/80 rounded-2xl shadow-2xs overflow-hidden space-y-0">
-            {/* Table Header Bar */}
-            <div className="p-4 border-b border-border/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-muted/20">
+          {/* Table Container */}
+          <div className="bg-card border border-border/80 rounded-2xl shadow-2xs overflow-hidden">
+            {/* Table Action Bar */}
+            <div className="p-4 border-b border-border/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-muted/20">
               <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={quickFilter}
-                  onChange={(e) => setQuickFilter(e.target.value)}
-                  placeholder="Quick search employee, dept, designation..."
-                  className="w-64 sm:w-80 h-8.5 px-3 rounded-lg border border-border bg-background text-xs outline-none focus:border-primary transition"
-                />
-              </div>
-
-              {/* Bulk Actions */}
-              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-foreground">
+                  Showing {filteredRecords.length} record(s)
+                </span>
                 {selectedIds.length > 0 && (
-                  <span className="text-xs font-semibold text-muted-foreground mr-1">
+                  <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
                     {selectedIds.length} selected
                   </span>
                 )}
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="relative">
+                  <Search className="size-3.5 text-muted-foreground absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    value={quickFilter}
+                    onChange={(e) => setQuickFilter(e.target.value)}
+                    placeholder="Quick search table..."
+                    className="h-8.5 pl-8 pr-3 rounded-lg border border-border bg-background text-xs outline-none focus:border-primary transition w-48 sm:w-56"
+                  />
+                </div>
+
                 <button
                   type="button"
                   disabled={selectedIds.length === 0}
@@ -794,6 +703,7 @@ export function FestivalAllowanceCheckHrPage() {
                   <CheckCircle2 className="size-3.5" />
                   <span>Approve Selected</span>
                 </button>
+
                 <button
                   type="button"
                   disabled={selectedIds.length === 0}
@@ -833,27 +743,28 @@ export function FestivalAllowanceCheckHrPage() {
                     <th className="py-3 px-2 w-10 text-center">#</th>
                     <th className="py-3 px-3 min-w-[100px]">Emp ID</th>
                     <th className="py-3 px-3 min-w-[160px]">Name</th>
-                    <th className="py-3 px-3 min-w-[120px]">Type</th>
-                    <th className="py-3 px-3 min-w-[160px]">Department</th>
-                    <th className="py-3 px-3 min-w-[130px]">Section</th>
-                    <th className="py-3 px-3 min-w-[130px]">Designation</th>
+                    <th className="py-3 px-3 min-w-[110px]">Type</th>
+                    <th className="py-3 px-3 min-w-[150px]">Department</th>
+                    <th className="py-3 px-3 min-w-[120px]">Section</th>
+                    <th className="py-3 px-3 min-w-[120px]">Designation</th>
                     <th className="py-3 px-3 text-right min-w-[90px]">Basic</th>
                     <th className="py-3 px-3 text-right min-w-[90px]">Gross</th>
                     <th className="py-3 px-2 text-center min-w-[70px]">Total Day</th>
-                    <th className="py-3 px-3 text-right min-w-[110px]">Per Day Rate</th>
+                    <th className="py-3 px-3 text-right min-w-[100px]">Per Day Rate</th>
                     <th className="py-3 px-3 text-right min-w-[100px]">Payable Amt</th>
                     <th className="py-3 px-2 text-right min-w-[75px]">OT Hour</th>
-                    <th className="py-3 px-3 text-right min-w-[95px]">Rate</th>
+                    <th className="py-3 px-3 text-right min-w-[85px]">Rate</th>
                     <th className="py-3 px-2 text-right min-w-[80px]">OT Amount</th>
                     <th className="py-3 px-2 text-right min-w-[80px]">Lunch Bill</th>
                     <th className="py-3 px-3 text-right min-w-[100px] text-primary">Net Pay</th>
                     <th className="py-3 px-3 text-center min-w-[90px]">Status</th>
+                    <th className="py-3 px-3 text-center min-w-[90px]">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {filteredRecords.length === 0 ? (
                     <tr>
-                      <td colSpan={19} className="py-12 text-center text-muted-foreground">
+                      <td colSpan={20} className="py-12 text-center text-muted-foreground">
                         <Users className="size-8 mx-auto mb-2 opacity-40" />
                         <p className="font-semibold text-xs">No festival allowance records found</p>
                         <p className="text-[11px] text-muted-foreground/80 mt-0.5">
@@ -946,7 +857,7 @@ export function FestivalAllowanceCheckHrPage() {
 
                           {/* Per Day Rate */}
                           <td className="py-3 px-3 text-right font-mono text-muted-foreground align-middle">
-                            {row.perDayRate.toFixed(6)}
+                            {row.perDayRate.toFixed(2)}
                           </td>
 
                           {/* Payable Amt */}
@@ -961,7 +872,7 @@ export function FestivalAllowanceCheckHrPage() {
 
                           {/* Rate */}
                           <td className="py-3 px-3 text-right font-mono text-muted-foreground align-middle">
-                            {row.rate.toFixed(6)}
+                            {row.rate.toFixed(2)}
                           </td>
 
                           {/* OT Amount */}
@@ -997,6 +908,30 @@ export function FestivalAllowanceCheckHrPage() {
                                 Pending
                               </span>
                             )}
+                          </td>
+
+                          {/* Action Buttons */}
+                          <td className="py-3 px-3 text-center align-middle whitespace-nowrap">
+                            <div className="flex items-center justify-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleStatusChange(row.id, "Approved")}
+                                disabled={row.status === "Approved"}
+                                className="p-1 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed text-emerald-600 border border-emerald-500/20 transition cursor-pointer"
+                                title="Approve this employee"
+                              >
+                                <Check className="size-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleStatusChange(row.id, "Reject")}
+                                disabled={row.status === "Reject"}
+                                className="p-1 rounded-md bg-rose-500/10 hover:bg-rose-500/20 disabled:opacity-40 disabled:cursor-not-allowed text-rose-600 border border-rose-500/20 transition cursor-pointer"
+                                title="Reject this employee"
+                              >
+                                <X className="size-3.5" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -1051,7 +986,7 @@ export function FestivalAllowanceCheckHrPage() {
                       <td className="py-3 px-3 text-right font-mono font-black text-emerald-600 dark:text-emerald-400">
                         {stats.totalNetPay.toFixed(2)}
                       </td>
-                      <td></td>
+                      <td colSpan={2}></td>
                     </tr>
                   </tfoot>
                 )}
