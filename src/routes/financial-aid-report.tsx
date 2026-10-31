@@ -552,8 +552,6 @@ function FinancialAidReportPage() {
       countDirectEmployee,
       totalViaAgent,
       countViaAgent,
-      totalDirectExternal,
-      countDirectExternal,
       channelMatrix,
       purposeBreakdown,
       totalRecords: targetRecords.length,
