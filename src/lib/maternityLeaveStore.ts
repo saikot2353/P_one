@@ -917,9 +917,11 @@ export function logMedicalVisitAndProcess(
   target.medicalStage.checkupVisits = updatedVisits;
   target.updatedAt = new Date().toISOString().replace("T", " ").substring(0, 19);
 
-  if (isFinalCheckup && eddDate) {
+  if (isFinalCheckup) {
     target.medicalStage.isFinalCheckupDone = true;
-    target.medicalStage.expectedDeliveryDate = eddDate;
+    if (eddDate) {
+      target.medicalStage.expectedDeliveryDate = eddDate;
+    }
     if (clinicalFitness) target.medicalStage.clinicalFitness = clinicalFitness;
     if (finalRemarks) target.medicalStage.doctorFinalRemarks = finalRemarks;
     target.medicalStage.medicalVerifiedAt = new Date().toISOString().replace("T", " ").substring(0, 19);
@@ -928,16 +930,18 @@ export function logMedicalVisitAndProcess(
     target.currentStage = "MEDICAL_VERIFIED";
     target.statusLabel = "Medical Verified (Ready for Leave Scheduling in Welfare)";
 
-    // Pre-calculate suggested leave dates (typically 56 days before EDD to 56 days after EDD = 112 days)
-    const edd = new Date(eddDate);
-    const startDate = new Date(edd);
-    startDate.setDate(edd.getDate() - 56);
-    const endDate = new Date(edd);
-    endDate.setDate(edd.getDate() + 55);
+    if (eddDate) {
+      // Pre-calculate suggested leave dates (typically 56 days before EDD to 56 days after EDD = 112 days)
+      const edd = new Date(eddDate);
+      const startDate = new Date(edd);
+      startDate.setDate(edd.getDate() - 56);
+      const endDate = new Date(edd);
+      endDate.setDate(edd.getDate() + 55);
 
-    target.welfareStage2.expectedLeaveStartDate = startDate.toISOString().substring(0, 10);
-    target.welfareStage2.expectedLeaveEndDate = endDate.toISOString().substring(0, 10);
-    target.welfareStage2.totalLeaveDays = 112;
+      target.welfareStage2.expectedLeaveStartDate = startDate.toISOString().substring(0, 10);
+      target.welfareStage2.expectedLeaveEndDate = endDate.toISOString().substring(0, 10);
+      target.welfareStage2.totalLeaveDays = 112;
+    }
   } else {
     // Scheduled follow-up visit
     target.currentStage = "MEDICAL_FOLLOWUP";
