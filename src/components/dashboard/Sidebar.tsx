@@ -39,6 +39,7 @@ import {
   DoorOpen,
   FileSpreadsheet,
   Smartphone,
+  Network,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -47,6 +48,7 @@ export interface NestedItem {
   search?: Record<string, any>;
   subitems?: NestedItem[];
   count?: number;
+  hidden?: boolean;
 }
 
 export interface SubItem {
@@ -55,6 +57,7 @@ export interface SubItem {
   search?: Record<string, any>;
   subitems?: NestedItem[];
   count?: number;
+  hidden?: boolean;
 }
 
 export interface NavItem {
@@ -66,6 +69,7 @@ export interface NavItem {
   search?: Record<string, any>;
   count?: number;
   activeRoutes?: string[];
+  hidden?: boolean;
 }
 
 export const nav: NavItem[] = [
@@ -78,6 +82,7 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "New Requisition", to: "/ssp-new-requisition" },
       { label: "My Requisition", to: "/ssp-my-requisition" },
+      { label: "Implementation", to: "/ssp-implementation" },
       {
         label: "Attendance",
         subitems: [
@@ -163,6 +168,8 @@ export const nav: NavItem[] = [
     icon: UserRound,
     subitems: [
       { label: "Personnel List", to: "/personnel-list" },
+      { label: "Employee Account Information", to: "/employee-account-information" },
+      { label: "Bulk Account Upload", to: "/bulk-account-upload" },
       { label: "ID Card Setup", to: "/id-card-setup" },
       { label: "Employee Doc Issue", to: "/employee-doc-issue" },
       { label: "Set HOD", to: "/set-hod" },
@@ -206,8 +213,11 @@ export const nav: NavItem[] = [
       { label: "Leave Application", to: "/leave-application" },
       { label: "Bulk Leave", to: "/bulk-leave" },
       {
-        label: "Maternity",
+        label: "Maternity Leave",
         subitems: [
+          { label: "Welfare Verification", to: "/maternity-welfare-verification" },
+          { label: "Medical Verification", to: "/maternity-medical-verification" },
+          { label: "HR Verification", to: "/maternity-hr-verification" },
           { label: "Maternity Payment", to: "/maternity-payment" },
           { label: "Maternity Payment Report", to: "/maternity-payment-report" },
         ],
@@ -265,6 +275,7 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "Application Queue", to: "/recruitment-basic-list" },
       { label: "Candidate Selection", to: "/recruitment-candidate-selection" },
+      { label: "Candidate Selection Approval", to: "/recruitment-candidate-selection-approval" },
       // { label: "Settings", to: "/recruitment-settings" },
       // { label: "Approved List", to: "/recruitment-assessment-list" },
     ],
@@ -320,6 +331,11 @@ export const nav: NavItem[] = [
     icon: Briefcase,
   },
   {
+    label: "Department SOP",
+    to: "/department-sop",
+    icon: Network,
+  },
+  {
     label: "Separation",
     icon: LogOut,
     subitems: [
@@ -345,8 +361,13 @@ export const nav: NavItem[] = [
     label: "Welfare & Support",
     icon: HeartHandshake,
     subitems: [
+      { label: "Zakat and Financial Aid", to: "/zakat-and-financial-aid" },
+      { label: "Asset Master Data", to: "/zakat-asset-master" },
+      { label: "Zakat Executive Report", to: "/zakat-executive-report" },
+      { label: "Financial Aid Report", to: "/financial-aid-report" },
       {
         label: "Zakat Management",
+        hidden: true,
         subitems: [
           { label: "Budget Configuration", to: "/zakat-budget-configuration" },
           { label: "Zakat List", to: "/zakat-list" },
@@ -356,6 +377,7 @@ export const nav: NavItem[] = [
       },
       {
         label: "Financial Aid",
+        hidden: true,
         subitems: [
           { label: "Budget Configuration", to: "/financial-aid-budget-configuration" },
           { label: "Financial Aid List", to: "/financial-aid-list" },
@@ -486,6 +508,8 @@ export const nav: NavItem[] = [
           { label: "Earn Leave Pay Report", to: "/earn-leave-pay-report" },
           { label: "Festival Allowance Payment Sheet", to: "/festival-allowance-payment-sheet" },
           { label: "Final Settlement Report", to: "/final-settlement-report" },
+          { label: "Extra OT", to: "/extra-ot-report" },
+          { label: "Night Allowance Report", to: "/night-allowance-report" },
         ],
       },
     ],
@@ -555,11 +579,15 @@ export const nav: NavItem[] = [
       { label: "Without In Out Attendance", to: "/hr-report-without-in-out-attendance" },
       { label: "Absent Counseling Report", to: "/hr-report-absent-counseling" },
       { label: "Print OT Requisition", to: "#" },
+      { label: "Pending OT Request", to: "/pending-ot-request" },
+      { label: "Working Hour Analysis", to: "/working-hour-analysis" },
       { label: "Continuous Absent", to: "/hr-report-continuous-absent" },
       { label: "SIM Requisition Report", to: "/hr-report-sim-requisition" },
       { label: "Tiffin Allowance All", to: "/hr-report-tiffin-allowance-all" },
       { label: "Night Card", to: "/hr-report-night-card" },
       { label: "Tiffin Card", to: "/hr-report-tiffin-card" },
+      { label: "Increment History", to: "/increment-history" },
+      { label: "Increment QueueList", to: "/increment-queuelist" },
     ],
   },
 ];
@@ -696,17 +724,19 @@ export function Sidebar() {
         })()
       : "admin";
 
-  const filteredNav = nav.map((item) => {
-    if (item.label === "Digital Business Card" && item.subitems) {
-      const isRegularEmp = userRole === "employee";
-      const filteredSubs = item.subitems.filter((sub) => {
-        if (isRegularEmp && sub.to === "/digital-business-cards-admin") return false;
-        return true;
-      });
-      return { ...item, subitems: filteredSubs };
-    }
-    return item;
-  });
+  const filteredNav = nav
+    .filter((item) => !item.hidden)
+    .map((item) => {
+      if (item.label === "Digital Business Card" && item.subitems) {
+        const isRegularEmp = userRole === "employee";
+        const filteredSubs = item.subitems.filter((sub) => {
+          if (isRegularEmp && sub.to === "/digital-business-cards-admin") return false;
+          return true;
+        });
+        return { ...item, subitems: filteredSubs };
+      }
+      return item;
+    });
 
   if (typeof window !== "undefined" && window.location.search.includes("embed=true")) {
     return null;
@@ -841,7 +871,9 @@ export function Sidebar() {
                   isOpen ? "max-h-[2500px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
                 ].join(" ")}
               >
-                {item.subitems.map((sub) => {
+                {item.subitems
+                  .filter((sub) => !sub.hidden)
+                  .map((sub) => {
                   if (sub.subitems) {
                     const isSubOpen = openMenus[sub.label];
                     const isSubActive = sub.subitems.some((nested) => {
@@ -894,7 +926,9 @@ export function Sidebar() {
                               : "max-h-0 opacity-0",
                           ].join(" ")}
                         >
-                          {sub.subitems.map((nested) => {
+                          {sub.subitems
+                            .filter((nested) => !nested.hidden)
+                            .map((nested) => {
                             if (nested.subitems) {
                               const isNestedOpen = openMenus[nested.label];
                               const isNestedActive = nested.subitems.some(
