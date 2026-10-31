@@ -120,7 +120,7 @@ export const EMPLOYEE_OPTIONS = [
 
 export const QUANTITY_UNITS = ["Pcs", "Box", "Pack", "Ream", "Unit", "Set", "Meter"];
 
-export function StoreRequisitionPage() {
+function StoreRequisitionPage() {
   const navigate = useNavigate();
 
   // ─── 1. REQUISITION TYPE: ICT vs General ───

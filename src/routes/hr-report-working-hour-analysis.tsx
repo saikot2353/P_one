@@ -1,15 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { WorkingHourAnalysisPage } from "./working-hour-analysis";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/hr-report-working-hour-analysis")({
-  head: () => ({
-    meta: [
-      { title: "Working Hour Analysis — CRIPTON HRIS" },
-      {
-        name: "description",
-        content: "Detailed employee weekly and daily highest working hour analysis report including overtime.",
-      },
-    ],
-  }),
-  component: WorkingHourAnalysisPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/working-hour-analysis" });
+  },
 });

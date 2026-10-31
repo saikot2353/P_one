@@ -38,7 +38,7 @@ export const Route = createFileRoute("/shapnocheck")({
   component: ShapnoCheckPage,
 });
 
-export default function ShapnoCheckPage() {
+function ShapnoCheckPage() {
   const [items] = useState<MerchandisingPageRecord[]>(DEFAULT_MERCHANDISING_PAGES);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMenu, setSelectedMenu] = useState<string>("All");

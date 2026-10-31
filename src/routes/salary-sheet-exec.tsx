@@ -16,7 +16,7 @@ interface SalarySheetFilters {
   line: string;
 }
 
-export function SalarySheetExecPage() {
+function SalarySheetExecPage() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [filters, setFilters] = useState<SalarySheetFilters>({
     year: "2026",

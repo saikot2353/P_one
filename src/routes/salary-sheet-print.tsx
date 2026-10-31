@@ -16,7 +16,7 @@ interface SalarySheetFilters {
   line: string;
 }
 
-export function SalarySheetPrintPage() {
+function SalarySheetPrintPage() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [filters, setFilters] = useState<SalarySheetFilters>({
     year: "2026",

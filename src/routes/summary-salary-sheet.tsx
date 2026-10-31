@@ -27,7 +27,7 @@ export const Route = createFileRoute("/summary-salary-sheet")({
   component: SummarySalarySheetPage,
 });
 
-export function SummarySalarySheetPage() {
+function SummarySalarySheetPage() {
   const [year, setYear] = useState("2026");
   const [month, setMonth] = useState("Feb");
   const [option, setOption] = useState("With Holiday amount");

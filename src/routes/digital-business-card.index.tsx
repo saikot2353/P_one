@@ -16,7 +16,7 @@ export const Route = createFileRoute("/digital-business-card/")({
   component: DigitalBusinessCardIndexPage,
 });
 
-export function DigitalBusinessCardIndexPage() {
+function DigitalBusinessCardIndexPage() {
   const queryId = useMemo(() => {
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
