@@ -44,8 +44,15 @@ function MMAccessoriesBookingApprovalPage() {
   const [supplierFilter, setSupplierFilter] = useState("All");
 
   const loadData = () => {
-    const list = MMRepository.getAccessoriesBookings();
-    setBookings(list);
+    const accList = MMRepository.getAccessoriesBookings();
+    const manualList = MMRepository.getManualBookings();
+    const combined = [...accList];
+    manualList.forEach((mb) => {
+      if (!combined.some((b) => b.id === mb.id || b.bookingNo === mb.bookingNo)) {
+        combined.push(mb);
+      }
+    });
+    setBookings(combined);
   };
 
   useEffect(() => {
@@ -374,6 +381,8 @@ function MMAccessoriesBookingApprovalPage() {
                     const jobSummary = getJobSummary(b);
                     const styleSummary = getStyleSummary(b);
 
+                    const isManual = b.bookType === "Block Booking" || b.bookingNo.startsWith("MB-") || !!MMRepository.getManualBookingById(b.id);
+
                     return (
                       <tr
                         key={b.id}
@@ -381,7 +390,7 @@ function MMAccessoriesBookingApprovalPage() {
                       >
                         <td className="py-2.5 px-3 font-semibold text-teal-700 dark:text-teal-400 whitespace-nowrap">
                           <Link
-                            to="/mm-accessories-booking"
+                            to={isManual ? "/mm-manual-booking" : "/mm-accessories-booking"}
                             search={{ bookingId: b.id }}
                             className="hover:underline flex items-center gap-1"
                           >
@@ -431,7 +440,7 @@ function MMAccessoriesBookingApprovalPage() {
                         <td className="py-2.5 px-3 text-center whitespace-nowrap sticky right-0 bg-white dark:bg-slate-900 shadow-sm">
                           <Link
                             to="/mm-accessories-booking-approval-details"
-                            search={{ id: b.id }}
+                            search={{ id: b.id, type: isManual ? "manual" : undefined } as any}
                             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-teal-50 text-teal-700 hover:bg-teal-100 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200 dark:border-teal-800 transition-colors shadow-xs"
                           >
                             <Eye className="w-3.5 h-3.5" />

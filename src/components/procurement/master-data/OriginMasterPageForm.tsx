@@ -35,7 +35,6 @@ export function OriginMasterPageForm({
     if (isView) return;
 
     const errors: Record<string, string> = {};
-    if (!formData.originCode?.trim()) errors.originCode = "Origin Code is required";
     if (!formData.originName?.trim()) errors.originName = "Origin Name is required";
 
     if (Object.keys(errors).length > 0) {
@@ -45,9 +44,9 @@ export function OriginMasterPageForm({
 
     const payload: Origin = {
       id: initialData?.id || `org-${Date.now()}`,
-      originCode: formData.originCode || `ORG-${Date.now()}`,
+      originCode: formData.originCode?.trim() || initialData?.originCode || `ORG-${Math.floor(100 + Math.random() * 900)}`,
       originName: formData.originName || "",
-      status: formData.status as any || "Active",
+      status: (formData.status as any) || "Active",
       description: formData.description || "",
     };
 
@@ -132,23 +131,7 @@ export function OriginMasterPageForm({
             <h2 className="text-sm font-bold text-foreground">Origin Master Details</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">
-                Origin Code <span className="text-[10px] font-normal text-muted-foreground ml-1">(Auto-generated)</span>
-              </label>
-              <input
-                type="text"
-                disabled={isView}
-                value={formData.originCode || ""}
-                onChange={(e) => setFormData({ ...formData, originCode: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-              {formErrors.originCode && (
-                <p className="text-[10px] text-rose-500 mt-1">{formErrors.originCode}</p>
-              )}
-            </div>
-
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Origin Name <span className="text-rose-500">*</span>
@@ -166,7 +149,7 @@ export function OriginMasterPageForm({
               )}
             </div>
 
-            <div className="sm:col-span-2">
+            <div>
               <label className="block text-xs font-bold mb-1 text-foreground">Status</label>
               <select
                 disabled={isView}

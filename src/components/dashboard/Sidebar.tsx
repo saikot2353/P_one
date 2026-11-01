@@ -180,6 +180,16 @@ export const nav: NavItem[] = [
     ],
   },
   {
+    label: "Digital Business Card",
+    icon: CreditCard,
+    subitems: [
+      { label: "My Digital Business Card", to: "/my-digital-business-card" },
+      { label: "Share My Card", to: "/share-my-card" },
+      { label: "Business Card Management", to: "/digital-business-cards-admin" },
+      { label: "Card Analytics", to: "/digital-business-card-analytics" },
+    ],
+  },
+  {
     label: "Attendance",
     icon: Fingerprint,
     subitems: [
@@ -257,6 +267,7 @@ export const nav: NavItem[] = [
       { label: "Increment (Multi)", to: "/increment-multiple" },
       { label: "Proposed Increment", to: "/propose-increment" },
       { label: "Increment Report", to: "/increment-report" },
+      { label: "Increment History", to: "/increment-history" },
     ],
   },
   {
@@ -413,6 +424,7 @@ export const nav: NavItem[] = [
       { label: "Employee Allowance", to: "/" },
       { label: "Tax Exemption Rules", to: "/" },
       { label: "Allowance Requisition", to: "/allowance-requisition" },
+      { label: "Festival Allowance Check (HR)", to: "/festival-allowance-check-hr" },
     ],
   },
   {
@@ -493,8 +505,6 @@ export const nav: NavItem[] = [
           { label: "Earn Leave Pay Report", to: "/earn-leave-pay-report" },
           { label: "Festival Allowance Payment Sheet", to: "/festival-allowance-payment-sheet" },
           { label: "Final Settlement Report", to: "/final-settlement-report" },
-          { label: "Extra OT", to: "/extra-ot-report" },
-          { label: "Night Allowance Report", to: "/night-allowance-report" },
         ],
       },
     ],
@@ -564,15 +574,11 @@ export const nav: NavItem[] = [
       { label: "Without In Out Attendance", to: "/hr-report-without-in-out-attendance" },
       { label: "Absent Counseling Report", to: "/hr-report-absent-counseling" },
       { label: "Print OT Requisition", to: "#" },
-      { label: "Pending OT Request", to: "/pending-ot-request" },
-      { label: "Working Hour Analysis", to: "/working-hour-analysis" },
       { label: "Continuous Absent", to: "/hr-report-continuous-absent" },
       { label: "SIM Requisition Report", to: "/hr-report-sim-requisition" },
       { label: "Tiffin Allowance All", to: "/hr-report-tiffin-allowance-all" },
       { label: "Night Card", to: "/hr-report-night-card" },
       { label: "Tiffin Card", to: "/hr-report-tiffin-card" },
-      { label: "Increment History", to: "/increment-history" },
-      { label: "Increment QueueList", to: "/increment-queuelist" },
     ],
   },
 ];
@@ -1089,3 +1095,7 @@ export function Sidebar() {
     </aside>
   );
 }
+
+// Aliases for compatibility
+export { Sidebar as HRSidebar };
+export { Sidebar as BaseSidebar };

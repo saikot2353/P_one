@@ -587,11 +587,6 @@ export default function MMPIRegisterPage() {
                           >
                             <span>{pi.piNo}</span>
                           </Link>
-                          {pi.entryNo && (
-                            <span className="block text-[10px] text-slate-400 font-mono">
-                              {pi.entryNo}
-                            </span>
-                          )}
                         </td>
 
                         {/* PI Date */}

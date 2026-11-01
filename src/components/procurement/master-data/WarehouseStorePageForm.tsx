@@ -15,6 +15,7 @@ import {
   Check,
 } from "lucide-react";
 import { WarehouseStore, StorePermissionEmployee } from "@/lib/procurement-master-data";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 // Reference master data for Areas (matching company-setup.tsx & add-employee.tsx Working Area options)
 export interface AreaSectionOption {
@@ -117,7 +118,7 @@ const cleanOrg = (str: string): string =>
     .trim();
 
 // Helper to load organization-specific areas & sections from existing master data
-const getOrgAreaSections = (orgName: string): AreaSectionOption[] => {
+export const getOrgAreaSections = (orgName: string): AreaSectionOption[] => {
   const targetClean = cleanOrg(orgName);
   const options: AreaSectionOption[] = [];
   const addedValues = new Set<string>();
@@ -354,6 +355,25 @@ export function WarehouseStorePageForm({
     }
   };
 
+  const orgOptions = useMemo(
+    () => companyList.map((comp) => ({ value: comp, label: comp })),
+    [companyList]
+  );
+
+  const areaSectionOptions = useMemo(
+    () => availableAreaSections.map((sec) => ({ value: sec.value, label: sec.label })),
+    [availableAreaSections]
+  );
+
+  const storeManagerOptions = useMemo(
+    () =>
+      employeeList.map((emp) => ({
+        value: emp.name,
+        label: `${emp.id} — ${emp.name} (${emp.title || emp.dept})`,
+      })),
+    [employeeList]
+  );
+
   const filteredPermissionEmployees = employeeList.filter((emp) => {
     if (!permissionSearchQuery.trim()) return true;
     const q = permissionSearchQuery.toLowerCase();
@@ -401,8 +421,8 @@ export function WarehouseStorePageForm({
     e.preventDefault();
     if (isView) return;
 
+    const finalStoreCode = formData.storeCode?.trim() || initialData?.storeCode || `WH-${Date.now()}`;
     const errors: Record<string, string> = {};
-    if (!formData.storeCode?.trim()) errors.storeCode = "Store Code is required";
     if (!formData.storeName?.trim()) errors.storeName = "Store Name is required";
     if (
       formData.companyAreaSection &&
@@ -426,7 +446,7 @@ export function WarehouseStorePageForm({
 
     const payload: WarehouseStore = {
       id: initialData?.id || `wh-${Date.now()}`,
-      storeCode: formData.storeCode || `WH-${Date.now()}`,
+      storeCode: finalStoreCode,
       storeName: formData.storeName || "",
       organization: formData.organization || companyList[0] || "Pakiza Knit Composite Ltd",
       companyAreaSection: formData.companyAreaSection || "",
@@ -523,8 +543,8 @@ export function WarehouseStorePageForm({
             <h2 className="text-sm font-bold text-foreground">General Store Information</h2>
           </div>
 
-          {/* Store Name, Organization, and Company Area/Section (Requirement 8) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* General Store Information - 4 columns per row layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Store Name <span className="text-rose-500">*</span>
@@ -546,29 +566,25 @@ export function WarehouseStorePageForm({
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Organization <span className="text-rose-500">*</span>
               </label>
-              <select
-                disabled={isView}
+              <SearchableSelect
+                options={orgOptions}
                 value={formData.organization || companyList[0] || ""}
-                onChange={(e) => handleOrganizationChange(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              >
-                {companyList.map((comp) => (
-                  <option key={comp} value={comp}>
-                    {comp}
-                  </option>
-                ))}
-              </select>
+                onChange={handleOrganizationChange}
+                disabled={isView}
+                placeholder="Select Organization..."
+                className="w-full h-9"
+              />
             </div>
 
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Company Area/Section
               </label>
-              <select
-                disabled={isView || availableAreaSections.length === 0}
+              <SearchableSelect
+                options={areaSectionOptions}
                 value={selectedValue}
-                onChange={(e) => {
-                  setFormData({ ...formData, companyAreaSection: e.target.value });
+                onChange={(val) => {
+                  setFormData({ ...formData, companyAreaSection: val });
                   if (formErrors.companyAreaSection) {
                     setFormErrors((prev) => {
                       const copy = { ...prev };
@@ -577,71 +593,33 @@ export function WarehouseStorePageForm({
                     });
                   }
                 }}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              >
-                <option value="">
-                  {availableAreaSections.length === 0
-                    ? "No areas/sections configured for this organization"
-                    : "-- Select Company Area/Section --"}
-                </option>
-                {/* Fallback option if saved value exists but not in current list */}
-                {formData.companyAreaSection &&
-                  !availableAreaSections.some(
-                    (sec) =>
-                      sec.value === formData.companyAreaSection ||
-                      sec.shortName === formData.companyAreaSection ||
-                      sec.code === formData.companyAreaSection ||
-                      sec.label === formData.companyAreaSection ||
-                      sec.value.toLowerCase() === (formData.companyAreaSection || "").toLowerCase(),
-                  ) && (
-                    <option value={formData.companyAreaSection}>
-                      {formData.companyAreaSection} (Current Selection)
-                    </option>
-                  )}
-                {availableAreaSections.map((sec) => (
-                  <option key={sec.value} value={sec.value}>
-                    {sec.label}
-                  </option>
-                ))}
-              </select>
+                disabled={isView || areaSectionOptions.length === 0}
+                placeholder={
+                  areaSectionOptions.length === 0
+                    ? "No area/section available"
+                    : "Select Area/Section..."
+                }
+                className="w-full h-9"
+              />
               {formErrors.companyAreaSection && (
-                <p className="text-[10px] text-rose-500 mt-1">{formErrors.companyAreaSection}</p>
+                <p className="text-[10px] text-rose-500 mt-1">
+                  {formErrors.companyAreaSection}
+                </p>
               )}
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
-                Store Code <span className="text-rose-500">*</span>
+                Store Manager
               </label>
-              <input
-                type="text"
-                disabled={isView}
-                value={formData.storeCode || ""}
-                onChange={(e) => setFormData({ ...formData, storeCode: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-              {formErrors.storeCode && (
-                <p className="text-[10px] text-rose-500 mt-1">{formErrors.storeCode}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">Store Manager</label>
-              <select
-                disabled={isView}
+              <SearchableSelect
+                options={storeManagerOptions}
                 value={formData.storeManager || ""}
-                onChange={(e) => handleManagerChange(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              >
-                <option value="">-- Select Store Manager --</option>
-                {employeeList.map((emp) => (
-                  <option key={emp.id} value={emp.name}>
-                    {emp.id} — {emp.name} ({emp.title || emp.dept})
-                  </option>
-                ))}
-              </select>
+                onChange={handleManagerChange}
+                disabled={isView}
+                placeholder="Select Store Manager..."
+                className="w-full h-9"
+              />
             </div>
 
             <div>
@@ -678,16 +656,13 @@ export function WarehouseStorePageForm({
           </div>
         </div>
 
-        {/* Section 2: Store Wise Permission */}
+        {/* Section: Store Wise Permission */}
         <div className="bg-card rounded-2xl border border-border/70 p-5 shadow-2xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-border/60">
             <div className="flex items-center gap-2">
               <ShieldCheck className="size-4 text-emerald-500" />
               <div>
                 <h2 className="text-sm font-bold text-foreground">Store Wise Permission</h2>
-                <p className="text-[11px] text-muted-foreground">
-                  Search and assign authorized personnel with permissions to issue, receive, and inspect inventory.
-                </p>
               </div>
             </div>
             <span className="text-xs font-bold text-muted-foreground">
@@ -822,23 +797,6 @@ export function WarehouseStorePageForm({
                     </div>
                   )}
                 </div>
-
-                {/* Select with label "Search Employees" */}
-                <select
-                  value={selectedEmpIdToAdd}
-                  onChange={(e) => {
-                    setSelectedEmpIdToAdd(e.target.value);
-                    setPermissionSearchQuery("");
-                  }}
-                  className="sm:w-64 h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
-                >
-                  <option value="">Search Employees</option>
-                  {employeeList.map((emp) => (
-                    <option key={emp.id} value={emp.id}>
-                      {emp.id} — {emp.name} ({emp.dept} | {emp.title})
-                    </option>
-                  ))}
-                </select>
 
                 <button
                   type="button"

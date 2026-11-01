@@ -33,7 +33,7 @@ import {
   getStoredPoItems,
   getStoredWoItems,
 } from "@/lib/procurement-order-inventory-data";
-import pakizaSoftwareLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
+import { PurchaseOrderReportModal, PurchaseOrderReportData } from "@/components/procurement/PurchaseOrderReportModal";
 
 export const Route = createFileRoute("/procurement-po-work-order-approval")({
   head: () => ({
@@ -62,6 +62,64 @@ export function PurchaseOrderWorkOrderApprovalPage() {
 
   // PDF Preview Modal
   const [pdfPreviewOrder, setPdfPreviewOrder] = useState<PurchaseOrder | null>(null);
+
+  const pdfReportData: PurchaseOrderReportData | null = useMemo(() => {
+    if (!pdfPreviewOrder) return null;
+    const items = poItemsMap[pdfPreviewOrder.orderNumber] || pdfPreviewOrder.items || [];
+    const woItems = woItemsMap[pdfPreviewOrder.orderNumber] || pdfPreviewOrder.woItems || [];
+    const taxAmount = (pdfPreviewOrder as any).taxTotal ?? Math.round((pdfPreviewOrder.subtotal || 0) * 0.03);
+
+    return {
+      orderNumber: pdfPreviewOrder.orderNumber,
+      orderDate: pdfPreviewOrder.orderDate,
+      documentType: pdfPreviewOrder.documentType,
+      supplierName: pdfPreviewOrder.supplierName,
+      supplierAddress: pdfPreviewOrder.supplierAddress || "Tejgaon I/A, Dhaka-1208",
+      supplierContact: pdfPreviewOrder.contactPerson || "Engr. Farhan Ahmed",
+      supplierMobile: pdfPreviewOrder.contactNumber || "+880 1712-345678",
+      paymentMode: pdfPreviewOrder.paymentMode,
+      deliveryWarehouse: pdfPreviewOrder.deliveryWarehouse,
+      workLocation: pdfPreviewOrder.workLocation,
+      prepareBy: pdfPreviewOrder.prepareBy,
+      department: pdfPreviewOrder.department || "Procurement & Commercial",
+      currency: pdfPreviewOrder.currency || "BDT",
+      subtotal: pdfPreviewOrder.subtotal,
+      discountTotal: pdfPreviewOrder.discountTotal,
+      vatTotal: pdfPreviewOrder.vatTotal,
+      taxTotal: taxAmount,
+      grandTotal: pdfPreviewOrder.grandTotal,
+      termsAndConditions: pdfPreviewOrder.termsAndConditions,
+      items: items.map((it) => ({
+        itemName: it.itemName,
+        itemCode: it.itemCode,
+        specification: it.specification,
+        uom: it.uom,
+        quantity: it.orderedQuantity,
+        unitPrice: it.unitPrice,
+        discount: it.discount || 0,
+        vatPercent: it.vatRate,
+        vatAmount: it.vatAmount,
+        taxPercent: it.taxRate,
+        taxAmount: it.taxAmount,
+        lineTotal: it.lineTotal,
+      })),
+      woItems: woItems.map((w) => ({
+        serviceName: w.serviceName,
+        serviceCode: w.serviceCode,
+        workDescription: w.workDescription,
+        specification: w.specification || w.workDescription,
+        uom: w.uom,
+        workOrderQuantity: w.workOrderQuantity,
+        unitRate: w.unitRate,
+        discount: 0,
+        vatPercent: w.vatRate,
+        vatAmount: w.vatAmount,
+        taxPercent: w.taxRate,
+        taxAmount: w.taxAmount,
+        lineTotal: w.lineTotal,
+      })),
+    };
+  }, [pdfPreviewOrder, poItemsMap, woItemsMap]);
 
   // Approval Action Modal State
   const [actionModalOpen, setActionModalOpen] = useState(false);
@@ -314,7 +372,9 @@ export function PurchaseOrderWorkOrderApprovalPage() {
                           <th className="py-2.5 px-3 w-24 text-right font-bold">Order Qty</th>
                           <th className="py-2.5 px-3 w-24 text-right font-bold text-blue-600 dark:text-blue-400">Base Qty</th>
                           <th className="py-2.5 px-3 w-28 text-right font-bold">Unit Price</th>
+                          <th className="py-2.5 px-3 w-20 text-right font-bold">Discount</th>
                           <th className="py-2.5 px-3 w-20 text-right font-bold">VAT</th>
+                          <th className="py-2.5 px-3 w-20 text-right font-bold">Tax</th>
                           <th className="py-2.5 px-3 w-28 text-right font-bold">Total Amount</th>
                         </tr>
                       </thead>
@@ -357,8 +417,14 @@ export function PurchaseOrderWorkOrderApprovalPage() {
                               <td className="py-2 px-3 text-right font-mono text-muted-foreground whitespace-nowrap">
                                 ৳{item.unitPrice.toLocaleString()} <span className="text-[10px] text-muted-foreground">/ {marketUnit}</span>
                               </td>
+                              <td className="py-2 px-3 text-right font-mono text-rose-600 whitespace-nowrap">
+                                {item.discount ? `-৳${Number(item.discount).toLocaleString()}` : "৳0"}
+                              </td>
                               <td className="py-2 px-3 text-right font-mono text-muted-foreground whitespace-nowrap">
                                 {item.vatRate ? `${item.vatRate}% (৳${(item.vatAmount || 0).toLocaleString()})` : "—"}
+                              </td>
+                              <td className="py-2 px-3 text-right font-mono text-muted-foreground whitespace-nowrap">
+                                {item.taxRate ? `${item.taxRate}% (৳${(item.taxAmount || 0).toLocaleString()})` : (item.taxAmount ? `৳${Number(item.taxAmount).toLocaleString()}` : "—")}
                               </td>
                               <td className="py-2 px-3 text-right font-mono font-bold text-foreground whitespace-nowrap">
                                 ৳{item.lineTotal.toLocaleString()}
@@ -408,6 +474,7 @@ export function PurchaseOrderWorkOrderApprovalPage() {
                     <div>Subtotal: <strong className="text-foreground">৳{selectedOrder.subtotal.toLocaleString()}</strong></div>
                     <div>Discount Deducted: <strong className="text-rose-600">-৳{selectedOrder.discountTotal.toLocaleString()}</strong></div>
                     <div>Applicable VAT: <strong className="text-blue-600 dark:text-blue-400">+৳{selectedOrder.vatTotal.toLocaleString()}</strong></div>
+                    <div>Tax (AIT): <strong className="text-amber-600 dark:text-amber-400">+৳{((selectedOrder as any).taxTotal ?? 0).toLocaleString()}</strong></div>
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] text-muted-foreground uppercase font-bold block">
@@ -760,175 +827,12 @@ export function PurchaseOrderWorkOrderApprovalPage() {
         </div>
       )}
 
-      {/* ============================================================== */}
-      {/* 12. OFFICIAL PDF / REPORT VIEW MODAL */}
-      {/* ============================================================== */}
-      {pdfPreviewOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-card border border-border rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
-            <div className="p-4 border-b border-border flex justify-between items-center bg-slate-50/70 dark:bg-slate-900/70">
-              <div className="flex items-center gap-2">
-                <FileText className="size-5 text-blue-600" />
-                <h3 className="text-sm font-bold text-foreground">
-                  Official Document Preview — {pdfPreviewOrder.orderNumber}
-                </h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"
-                >
-                  <Printer className="size-3.5" /> Print Document
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPdfPreviewOrder(null)}
-                  className="size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
-                >
-                  <X className="size-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Printable Document Container */}
-            <div className="p-6 overflow-y-auto flex-1 bg-white text-slate-900 text-xs font-sans space-y-5 print:p-0">
-              {/* Pakiza Official Header */}
-              <div className="border-b-2 border-slate-900 pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-40">
-                    <img src={pakizaSoftwareLogo} alt="Pakiza Logo" className="h-10 w-auto object-contain" />
-                  </div>
-                  <div className="text-center flex-1">
-                    <h1 className="text-base font-black tracking-wide uppercase text-slate-950">
-                      PAKIZA KNIT COMPOSITE LTD.
-                    </h1>
-                    <p className="text-[10px] text-slate-600">
-                      Khan ABC Tradeplex, House #37, Road #2, Dhanmondi, Dhaka-1205
-                    </p>
-                    <span className="inline-block mt-1 px-4 py-0.5 bg-slate-900 text-white font-mono font-black text-xs uppercase tracking-widest rounded-sm">
-                      {pdfPreviewOrder.documentType === "Purchase Order" ? "PURCHASE ORDER" : "WORK ORDER"}
-                    </span>
-                  </div>
-                  <div className="w-40 text-right text-[10px] text-slate-500">
-                    Date: {new Date().toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
-
-              {/* Order Metadata Grid */}
-              <div className="grid grid-cols-2 gap-4 border border-slate-300 rounded-lg p-3 bg-slate-50/50">
-                <div className="space-y-1">
-                  <div><strong>PO/WO No:</strong> <span className="font-mono font-bold text-blue-700">{pdfPreviewOrder.orderNumber}</span></div>
-                  <div><strong>Order Date:</strong> {pdfPreviewOrder.orderDate}</div>
-                  <div><strong>PR Reference:</strong> {pdfPreviewOrder.prIds?.join(", ") || "N/A"}</div>
-                  <div><strong>CS Reference:</strong> {pdfPreviewOrder.csId || "N/A"}</div>
-                  <div><strong>Payment Terms:</strong> {pdfPreviewOrder.paymentMode || "Credit 30 Days"}</div>
-                </div>
-                <div className="space-y-1">
-                  <div><strong>Supplier:</strong> <span className="font-bold">{pdfPreviewOrder.supplierName}</span></div>
-                  <div><strong>Contact Person:</strong> {pdfPreviewOrder.contactPerson}</div>
-                  <div><strong>Mobile:</strong> {pdfPreviewOrder.contactNumber || "N/A"}</div>
-                  <div><strong>Delivery Location:</strong> {pdfPreviewOrder.deliveryWarehouse || pdfPreviewOrder.workLocation}</div>
-                  <div><strong>Prepared By:</strong> {pdfPreviewOrder.prepareBy} ({pdfPreviewOrder.department})</div>
-                </div>
-              </div>
-
-              {/* Line Items Table */}
-              <table className="w-full border-collapse border border-slate-300 text-[11px]">
-                <thead>
-                  <tr className="bg-slate-100 text-slate-700 font-bold uppercase text-[9.5px]">
-                    <th className="border border-slate-300 p-2 text-center w-8">SL</th>
-                    <th className="border border-slate-300 p-2">Item Description &amp; Spec</th>
-                    <th className="border border-slate-300 p-2 text-center">SKU UOM</th>
-                    <th className="border border-slate-300 p-2 text-center">Market Unit</th>
-                    <th className="border border-slate-300 p-2 text-center">Conversion</th>
-                    <th className="border border-slate-300 p-2 text-right">Order Qty</th>
-                    <th className="border border-slate-300 p-2 text-right">Unit Price</th>
-                    <th className="border border-slate-300 p-2 text-right">VAT</th>
-                    <th className="border border-slate-300 p-2 text-right">Total (৳)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(poItemsMap[pdfPreviewOrder.orderNumber] || pdfPreviewOrder.items || []).map((it, idx) => (
-                    <tr key={idx}>
-                      <td className="border border-slate-300 p-2 text-center">{idx + 1}</td>
-                      <td className="border border-slate-300 p-2">
-                        <div className="font-bold">{it.itemName}</div>
-                        <div className="text-[10px] text-slate-500">{it.itemCode} • {it.specification}</div>
-                      </td>
-                      <td className="border border-slate-300 p-2 text-center">{it.uom}</td>
-                      <td className="border border-slate-300 p-2 text-center font-bold">{it.marketUnit || it.purchaseUom || it.uom}</td>
-                      <td className="border border-slate-300 p-2 text-center text-[10px] text-slate-600">
-                        {it.conversion || "1:1 Standard"}
-                      </td>
-                      <td className="border border-slate-300 p-2 text-right font-mono font-bold">{it.orderedQuantity}</td>
-                      <td className="border border-slate-300 p-2 text-right font-mono">৳{it.unitPrice.toLocaleString()}</td>
-                      <td className="border border-slate-300 p-2 text-right font-mono">{it.vatRate ? `${it.vatRate}%` : "—"}</td>
-                      <td className="border border-slate-300 p-2 text-right font-mono font-bold">৳{it.lineTotal.toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {/* Financial Summary */}
-              <div className="flex justify-end">
-                <div className="w-64 space-y-1 bg-slate-50 p-3 border border-slate-300 rounded-lg text-[11px]">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span className="font-mono font-bold">৳{pdfPreviewOrder.subtotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-rose-600">
-                    <span>Discount:</span>
-                    <span className="font-mono font-bold">-৳{pdfPreviewOrder.discountTotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-blue-700">
-                    <span>Applicable VAT:</span>
-                    <span className="font-mono font-bold">+৳{pdfPreviewOrder.vatTotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-base font-black border-t border-slate-400 pt-1 text-slate-950">
-                    <span>Grand Total:</span>
-                    <span className="font-mono">৳{pdfPreviewOrder.grandTotal.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Terms and Conditions */}
-              {pdfPreviewOrder.termsAndConditions && (
-                <div className="space-y-1 pt-2 border-t border-slate-200">
-                  <span className="font-bold text-[10px] uppercase tracking-wider block text-slate-900">
-                    TERMS &amp; CONDITIONS:
-                  </span>
-                  <p className="text-[10px] text-slate-700 whitespace-pre-line leading-relaxed">
-                    {pdfPreviewOrder.termsAndConditions}
-                  </p>
-                </div>
-              )}
-
-              {/* 4-Tier Signatures Block */}
-              <div className="pt-10 grid grid-cols-4 gap-4 text-center text-[10px] font-bold text-slate-700">
-                <div className="border-t border-slate-400 pt-1.5">
-                  <p className="text-slate-950 font-black">{pdfPreviewOrder.prepareBy}</p>
-                  <p className="text-slate-500 font-normal">Prepared By</p>
-                </div>
-                <div className="border-t border-slate-400 pt-1.5">
-                  <p className="text-slate-950 font-black">Engr. Tariqul Islam</p>
-                  <p className="text-slate-500 font-normal">Checked &amp; Verified By</p>
-                </div>
-                <div className="border-t border-slate-400 pt-1.5">
-                  <p className="text-slate-950 font-black">Kamrul Islam</p>
-                  <p className="text-slate-500 font-normal">Head of Procurement</p>
-                </div>
-                <div className="border-t border-slate-400 pt-1.5">
-                  <p className="text-slate-950 font-black">Rafiqul Islam</p>
-                  <p className="text-slate-500 font-normal">Approved By / MD</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Official Purchase Order / Work Order Landscape Report Modal */}
+      <PurchaseOrderReportModal
+        isOpen={!!pdfPreviewOrder}
+        onClose={() => setPdfPreviewOrder(null)}
+        order={pdfReportData}
+      />
     </div>
   );
 }

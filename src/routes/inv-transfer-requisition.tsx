@@ -446,16 +446,14 @@ function TransferRequisitionFormPage() {
                   <span className="text-xs font-semibold text-slate-500">
                     Stock Transfers / {isApprovalMode ? "Requisition Approval Review" : "Transfer Requisition"}
                   </span>
-                  <span className="text-slate-300">•</span>
-                  <span
-                    className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
-                      transferType === "Inter-Company"
-                        ? "bg-purple-50 text-purple-700 border-purple-200"
-                        : "bg-blue-50 text-blue-700 border-blue-200"
-                    }`}
-                  >
-                    {transferType}
-                  </span>
+                  {transferType !== "Inter-Company" && (
+                    <>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+                        {transferType}
+                      </span>
+                    </>
+                  )}
                   {existingReq && (
                     <span
                       className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
@@ -568,150 +566,33 @@ function TransferRequisitionFormPage() {
             </div>
           </div>
 
-          {/* Inter-Company vs. Intra-Company Policy Banner */}
-          <div
-            className={`p-4 rounded-2xl border flex items-start gap-3 text-xs leading-relaxed ${
-              transferType === "Inter-Company"
-                ? "bg-purple-50/70 border-purple-200 text-purple-900"
-                : "bg-blue-50/70 border-blue-200 text-blue-900"
-            }`}
-          >
-            <Info className={`size-4 shrink-0 mt-0.5 ${transferType === "Inter-Company" ? "text-purple-600" : "text-blue-600"}`} />
-            <div>
-              <strong className="font-bold block text-sm">
-                {transferType === "Inter-Company"
-                  ? "Inter-Company Stock Transfer Policy"
-                  : "Intra-Company Stock Transfer Policy"}
-              </strong>
-              {transferType === "Inter-Company" ? (
-                <p className="mt-0.5">
-                  Goods are being requested from a separate legal entity (
-                  <span className="font-bold">{requestedFromCompany}</span>).
-                  <span className="font-bold underline ml-1">Transfer Requisition is mandatory</span> and requires explicit approval by the requested company before goods can be issued via Transfer Issue.
-                </p>
-              ) : (
+          {/* Intra-Company Policy Banner (Inter-Company policy text removed per requirement) */}
+          {transferType !== "Inter-Company" && (
+            <div className="p-4 rounded-2xl border flex items-start gap-3 text-xs leading-relaxed bg-blue-50/70 border-blue-200 text-blue-900">
+              <Info className="size-4 shrink-0 mt-0.5 text-blue-600" />
+              <div>
+                <strong className="font-bold block text-sm">
+                  Intra-Company Stock Transfer Policy
+                </strong>
                 <p className="mt-0.5">
                   Both stores belong to the same company (<span className="font-bold">{requisitioningCompany}</span>).
                   Transfer Requisition is <span className="font-bold">optional</span> and approval is <span className="font-bold">not required</span>; goods can alternatively be transferred directly via Transfer Issue.
                 </p>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Section 1: Requisition Header Info */}
+          {/* Requisition Header Info */}
           <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
               <Building2 className="size-4 text-blue-600" />
-              <h2 className="text-sm font-bold text-slate-900">1. Requisition & Entity Routing</h2>
+              <h2 className="text-sm font-bold text-slate-900">Requisition & Entity Routing</h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-xs font-bold mb-1 text-slate-700">
-                  Requisition ID
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  value={requisitionNumber}
-                  className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 font-mono text-xs font-bold text-blue-700 outline-none cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold mb-1 text-slate-700">
-                  Requisition Date <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  disabled={isViewMode}
-                  value={requisitionDate}
-                  onChange={(e) => setRequisitionDate(e.target.value)}
-                  className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold mb-1 text-slate-700">
-                  Requested By
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  value={requestedBy}
-                  className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 text-xs font-medium text-slate-600 outline-none cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold mb-1 text-slate-700">
-                  Transfer Type
-                </label>
-                <div className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-800">
-                  <span>{transferType}</span>
-                  <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded ${
-                      transferType === "Inter-Company"
-                        ? "bg-purple-100 text-purple-700"
-                        : "bg-blue-100 text-blue-700"
-                    }`}
-                  >
-                    {transferType === "Inter-Company" ? "Approval Req." : "Direct / Optional"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Requisitioning (Requester) Entity */}
-              <div className="p-3.5 bg-blue-50/50 border border-blue-200/80 rounded-xl space-y-3 lg:col-span-2">
-                <span className="text-[11px] font-bold text-blue-800 uppercase tracking-wider block">
-                  Requisitioning Entity (Goods Recipient)
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-bold mb-1 text-slate-700">
-                      Requisitioning Company <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      disabled={isViewMode}
-                      value={requisitioningCompany}
-                      onChange={(e) => {
-                        const comp = e.target.value;
-                        setRequisitioningCompany(comp);
-                        const subWh = warehouses.filter((w) => w.organization === comp && w.status === "Active");
-                        if (subWh[0]) setRequisitioningStore(subWh[0].storeName);
-                      }}
-                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
-                    >
-                      {MASTER_COMPANIES.map((mc) => (
-                        <option key={mc.id} value={mc.name}>
-                          {mc.name} ({mc.code})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold mb-1 text-slate-700">
-                      Requisitioning Store <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      disabled={isViewMode}
-                      value={requisitioningStore}
-                      onChange={(e) => setRequisitioningStore(e.target.value)}
-                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
-                    >
-                      {requisitioningStores.map((w) => (
-                        <option key={w.id} value={w.storeName}>
-                          {w.storeName} ({w.storeCode})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
+            {/* Row 1: Two columns (Requested From Entity on left, Requisitioning Entity on right) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Requested From (Source) Entity */}
-              <div className="p-3.5 bg-amber-50/50 border border-amber-200/80 rounded-xl space-y-3 lg:col-span-2">
+              <div className="p-3.5 bg-amber-50/50 border border-amber-200/80 rounded-xl space-y-3">
                 <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider block">
                   Requested From Entity (Goods Provider / Source)
                 </span>
@@ -759,8 +640,84 @@ function TransferRequisitionFormPage() {
                 </div>
               </div>
 
-              {/* Remarks */}
-              <div className="lg:col-span-4">
+              {/* Requisitioning (Requester) Entity */}
+              <div className="p-3.5 bg-blue-50/50 border border-blue-200/80 rounded-xl space-y-3">
+                <span className="text-[11px] font-bold text-blue-800 uppercase tracking-wider block">
+                  Requisitioning Entity (Goods Recipient)
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold mb-1 text-slate-700">
+                      Requisitioning Company <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      disabled={isViewMode}
+                      value={requisitioningCompany}
+                      onChange={(e) => {
+                        const comp = e.target.value;
+                        setRequisitioningCompany(comp);
+                        const subWh = warehouses.filter((w) => w.organization === comp && w.status === "Active");
+                        if (subWh[0]) setRequisitioningStore(subWh[0].storeName);
+                      }}
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
+                    >
+                      {MASTER_COMPANIES.map((mc) => (
+                        <option key={mc.id} value={mc.name}>
+                          {mc.name} ({mc.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold mb-1 text-slate-700">
+                      Requisitioning Store <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      disabled={isViewMode}
+                      value={requisitioningStore}
+                      onChange={(e) => setRequisitioningStore(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
+                    >
+                      {requisitioningStores.map((w) => (
+                        <option key={w.id} value={w.storeName}>
+                          {w.storeName} ({w.storeCode})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2: Three fields in the same row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+              <div>
+                <label className="block text-xs font-bold mb-1 text-slate-700">
+                  Requisition Date <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  disabled={isViewMode}
+                  value={requisitionDate}
+                  onChange={(e) => setRequisitionDate(e.target.value)}
+                  className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold mb-1 text-slate-700">
+                  Requested By
+                </label>
+                <input
+                  type="text"
+                  readOnly
+                  value={requestedBy}
+                  className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 text-xs font-medium text-slate-600 outline-none cursor-not-allowed"
+                />
+              </div>
+
+              <div>
                 <label className="block text-xs font-bold mb-1 text-slate-700">
                   Requisition Remarks / Justification
                 </label>
@@ -782,7 +739,7 @@ function TransferRequisitionFormPage() {
               <div className="flex items-center gap-2">
                 <Package className="size-4 text-blue-600" />
                 <h2 className="text-sm font-bold text-slate-900">
-                  2. Required Items & Requisition Quantities
+                  Required Items & Requisition Quantities
                 </h2>
               </div>
 

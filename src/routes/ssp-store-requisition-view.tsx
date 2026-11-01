@@ -35,10 +35,10 @@ import {
 } from "./-ssp-implementation-data";
 
 export const Route = createFileRoute("/ssp-store-requisition-view")({
-  validateSearch: (search: Record<string, unknown>) => {
+  validateSearch: (search: Record<string, unknown>): { id?: string; from?: string } => {
     return {
       id: (search.id as string) || "",
-      from: (search.from as string) || "",
+      from: (search.from as string) || undefined,
     };
   },
   head: () => ({
@@ -70,8 +70,8 @@ function StoreRequisitionViewPage() {
       setComments(found.viewData.comments || []);
     } else if (
       search.id === "389201" ||
-      search.id.includes("OB") ||
-      search.id.toLowerCase().includes("behalf")
+      search.id?.includes("OB") ||
+      search.id?.toLowerCase().includes("behalf")
     ) {
       const obRecord = allRecords.find((r) => r.id === "389201");
       if (obRecord) {

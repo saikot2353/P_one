@@ -140,7 +140,7 @@ const DEFAULT_CLEARANCE_LAYERS: ClearanceLayerRow[] = [
   },
 ];
 
-export function SeparationClearanceConfigurationPage() {
+function SeparationClearanceConfigurationPage() {
   const [layers, setLayers] = useState<ClearanceLayerRow[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("separation_clearance_drag_v3");

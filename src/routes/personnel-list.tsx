@@ -43,6 +43,8 @@ import {
   UserCheck,
   UserCog,
   Clock,
+  QrCode,
+  Globe,
   CalendarRange,
   CalendarHeart,
   Power,
@@ -1925,6 +1927,16 @@ export function PersonnelListView({
                             >
                               <Edit3 className="size-3" />
                             </button>
+                            <button
+                              className="size-6 rounded-lg bg-sky-500/10 text-sky-600 border border-sky-500/20 hover:bg-sky-500 hover:text-white transition flex items-center justify-center shadow-3xs cursor-pointer"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                window.open(`/digital-business-card/${e.id}`, "_blank");
+                              }}
+                              title="Open Digital Business Card"
+                            >
+                              <QrCode className="size-3" />
+                            </button>
 
                             {!e.status || e.status === "Working" || e.status === "On Leave" ? (
                               <button
@@ -3497,8 +3509,39 @@ export function PersonnelListView({
                         className="w-full p-2.5 rounded-lg border border-border/70 bg-transparent text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                       />
                     </div>
-                  </div>
-                )}
+
+                    <div className="sm:col-span-2 pt-3 border-t border-border/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="space-y-0.5">
+                          <div className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                            <Globe className="size-3.5 text-sky-500" />
+                            <span>Social Media Links & Digital Business Card</span>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">
+                            Configure dynamic multiple links (LinkedIn, Facebook, WhatsApp, etc.) displayed on public QR-card.
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            to="/digital-business-card/$id"
+                            params={{ id: editEmpModal.id }}
+                            target="_blank"
+                            className="h-8 px-2.5 rounded-lg border border-sky-300 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                          >
+                            <QrCode className="size-3" />
+                            <span>View Card</span>
+                          </Link>
+                          <Link
+                            to="/add-employee"
+                            search={{ id: editEmpModal.id } as any}
+                            className="h-8 px-2.5 rounded-lg border border-border bg-card hover:bg-muted text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                          >
+                            <Edit3 className="size-3 text-primary" />
+                            <span>Open Full Edit File</span>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                 {/* Tab 3: Job & Placement */}
                 {editTab === "job" && (

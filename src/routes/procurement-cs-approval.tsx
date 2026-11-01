@@ -343,10 +343,10 @@ export default function CSApprovalPage() {
                     <tr className="border-b border-slate-200 bg-slate-100/75 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
                       <th className="py-3 px-4">CS Number</th>
                       <th className="py-3 px-4">Linked PR Reference</th>
-                      <th className="py-3 px-4">Organization & Dept</th>
+                      <th className="py-3 px-4">Department</th>
                       <th className="py-3 px-4 text-center">Bidders</th>
                       <th className="py-3 px-4">Recommended Awarded Winner</th>
-                      <th className="py-3 px-4 text-right">Contract Value (BDT)</th>
+                      <th className="py-3 px-4 text-right">Value (BDT)</th>
                       <th className="py-3 px-4 text-center">Status</th>
                       <th className="py-3 px-4 text-right">Action</th>
                     </tr>
@@ -401,8 +401,7 @@ export default function CSApprovalPage() {
                               )}
                             </td>
                             <td className="py-3.5 px-4">
-                              <div className="font-medium text-slate-800">{org}</div>
-                              <div className="text-xs text-slate-500 font-medium">{cs.department || "Procurement & Commercial"}</div>
+                              <div className="font-medium text-slate-800">{cs.department || "Procurement & Commercial"}</div>
                             </td>
                             <td className="py-3.5 px-4 text-center">
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">

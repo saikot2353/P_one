@@ -48,6 +48,7 @@ import {
   StandardPreviewReportModal,
   StandardReportData,
 } from "@/components/reports/StandardPreviewReportModal";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 interface IssueRegularSearch {
   mrId?: string;
@@ -181,10 +182,12 @@ function InvIssueRegularPage() {
       const items: MaterialIssueItem[] = activeMR.items.map((it, idx) => {
         const itemStore = it.requisitionStore || storeToUse;
         const availableStock = getAvailableStockForItem(itemStore, it.itemCode);
+        const effectiveMRQty =
+          it.approvedQuantity !== undefined ? Number(it.approvedQuantity) : Number(it.requestedQuantity);
         const remainingMRQty =
           Number(it.remainingQuantity) > 0
             ? Number(it.remainingQuantity)
-            : Number(it.requestedQuantity) - (Number(it.issuedQuantity) || 0);
+            : effectiveMRQty - (Number(it.issuedQuantity) || 0);
 
         // Default default issue qty: min(remainingMRQty, availableStock)
         const defaultIssueQty = Math.max(0, Math.min(remainingMRQty, availableStock));
@@ -221,6 +224,13 @@ function InvIssueRegularPage() {
       setIssueItems([]);
     }
   }, [activeMR]);
+
+  const warehouseOptions = useMemo(() => {
+    return warehouses.map((w: any) => ({
+      value: w.name || w.storeName,
+      label: `${w.name || w.storeName}${w.storeCode || w.code ? ` (${w.storeCode || w.code})` : ""}`,
+    }));
+  }, [warehouses]);
 
   const handleStoreChange = (newStore: string) => {
     setSelectedIssueStore(newStore);
@@ -265,17 +275,34 @@ function InvIssueRegularPage() {
     toast.info("Item removed from current issue transaction.");
   };
 
-  // Handle Qty Change with strict validation
-  const handleIssueQtyChange = (id: string, newQtyStr: string) => {
-    const qty = Number(newQtyStr) || 0;
+  // Synchronize Issue Quantity directly from Tracking (B/L)
+  const handleTrackingQtyChange = (itemId: string, newQty: number) => {
+    const qty = Math.max(0, newQty);
     setIssueItems((prev) =>
       prev.map((item) => {
-        if (item.id === id) {
-          const maxPermitted = Math.min(item.remainingIssueQty, item.availableStock);
+        if (item.id === itemId) {
+          const trackingMode = getItemTrackingMode(item.itemCode, catalogItems);
+          let newBatches = item.batchAllocations ? [...item.batchAllocations] : [];
+          let newLocations = item.locationAllocations ? [...item.locationAllocations] : [];
+          if (trackingMode === "Batch") {
+            if (newBatches.length > 0) {
+              newBatches = [{ ...newBatches[0], quantity: qty }];
+            } else {
+              newBatches = [{ batchNumber: `BAT-${item.itemCode.slice(-4)}-01`, quantity: qty }];
+            }
+          } else {
+            if (newLocations.length > 0) {
+              newLocations = [{ ...newLocations[0], quantity: qty }];
+            } else {
+              newLocations = [{ locationName: "Default Location", quantity: qty }];
+            }
+          }
           return {
             ...item,
             issueQty: qty,
             totalPrice: qty * (item.unitPrice || 0),
+            batchAllocations: newBatches,
+            locationAllocations: newLocations,
           };
         }
         return item;
@@ -300,11 +327,14 @@ function InvIssueRegularPage() {
 
   const handleSaveLocationAllocations = (allocations: LocationEntry[]) => {
     if (!activeTrackingItem) return;
+    const totalTrackingQty = allocations.reduce((sum, a) => sum + (Number(a.quantity) || 0), 0);
     setIssueItems((prev) =>
       prev.map((it) =>
         it.id === activeTrackingItem.id
           ? {
               ...it,
+              issueQty: totalTrackingQty,
+              totalPrice: totalTrackingQty * (it.unitPrice || 0),
               locationAllocations: allocations.map((a) => ({
                 locationName: a.locationName,
                 quantity: a.quantity,
@@ -319,11 +349,14 @@ function InvIssueRegularPage() {
 
   const handleSaveBatchAllocations = (allocations: BatchEntry[]) => {
     if (!activeTrackingItem) return;
+    const totalTrackingQty = allocations.reduce((sum, b) => sum + (Number(b.quantity) || 0), 0);
     setIssueItems((prev) =>
       prev.map((it) =>
         it.id === activeTrackingItem.id
           ? {
               ...it,
+              issueQty: totalTrackingQty,
+              totalPrice: totalTrackingQty * (it.unitPrice || 0),
               batchAllocations: allocations.map((b) => ({
                 batchNumber: b.batchNumber,
                 quantity: b.quantity,
@@ -419,13 +452,12 @@ function InvIssueRegularPage() {
       reportNumber: issueNumber,
       reportDate: issueDate,
       statusBadge: "Posted",
+      hideLogo: true,
       metaFields: [
         { label: "Material Requisition ID", value: activeMR?.mrNumber || "-" },
-        { label: "Issue Type", value: issueType },
         { label: "Department", value: activeMR?.department || "-" },
         { label: "Issued To", value: activeMR?.requestedBy || "-" },
-        { label: "Warehouse / Store", value: activeMR?.warehouseStore || "-" },
-        { label: "SRN Number", value: srnNo },
+        { label: "Warehouse / Store", value: selectedIssueStore || activeMR?.warehouseStore || "-" },
       ],
       tableHeaders: [
         "SL",
@@ -434,9 +466,7 @@ function InvIssueRegularPage() {
         "UOM",
         "MR REQ QTY",
         "PREV ISSUED",
-        "REMAINING QTY",
         "ISSUE QTY",
-        "AVL STOCK",
       ],
       tableRows: issueItems.map((it, idx) => [
         String(idx + 1),
@@ -445,9 +475,7 @@ function InvIssueRegularPage() {
         it.uom,
         String(it.mrRequestedQty),
         String(it.previouslyIssuedQty),
-        String(it.remainingIssueQty),
         String(it.issueQty),
-        String(it.availableStock),
       ]),
       summaryCards: [
         { label: "Total Items", value: String(issueItems.length) },
@@ -462,7 +490,7 @@ function InvIssueRegularPage() {
         { title: "Receiver Signature", name: activeMR?.requestedBy || "Employee", date: "-" },
       ],
     };
-  }, [activeMR, issueNumber, issueDate, issueType, srnNo, issueItems, totalIssueQuantity]);
+  }, [activeMR, issueNumber, issueDate, selectedIssueStore, issueItems, totalIssueQuantity]);
 
   return (
     <div className="min-h-screen flex bg-slate-50 text-foreground">
@@ -556,37 +584,19 @@ function InvIssueRegularPage() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Select MR Dropdown */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Material Requisition ID (Non-editable, auto-populated from Issue Register) */}
               <div>
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                   Material Requisition ID *
                 </label>
-                <select
-                  disabled={isViewMode}
-                  value={selectedMRId}
-                  onChange={(e) => setSelectedMRId(e.target.value)}
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-mono font-bold text-blue-600 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none disabled:bg-slate-50 disabled:cursor-not-allowed"
-                >
-                  <option value="">-- Choose Approved MR --</option>
-                  {approvedMRs.map((mr) => (
-                    <option key={mr.id} value={mr.id}>
-                      {mr.mrNumber} — {mr.department} ({mr.requestedBy})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Organization */}
-              <div>
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                  Organization
-                </label>
                 <input
                   type="text"
                   readOnly
-                  value={activeMR?.organization || "Pakiza Knit Composite Ltd"}
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-600 cursor-not-allowed outline-none"
+                  disabled
+                  value={activeMR?.mrNumber || selectedMRId || "-"}
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-100 px-3 text-xs font-mono font-bold text-indigo-700 cursor-not-allowed outline-none select-none"
+                  title="Material Requisition ID is automatically populated from the Issue Register."
                 />
               </div>
 
@@ -643,8 +653,32 @@ function InvIssueRegularPage() {
                 />
               </div>
 
+              {/* Issue Store (Immediately after Issue Date *) */}
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                  Issue Store *
+                </label>
+                {isViewMode ? (
+                  <input
+                    type="text"
+                    readOnly
+                    disabled
+                    value={selectedIssueStore}
+                    className="w-full h-9 rounded-lg border border-slate-200 bg-slate-100 px-3 text-xs font-semibold text-slate-800 cursor-not-allowed outline-none select-none"
+                  />
+                ) : (
+                  <SearchableSelect
+                    options={warehouseOptions}
+                    value={selectedIssueStore}
+                    onChange={handleStoreChange}
+                    placeholder="Search and select Issue Store..."
+                    className="h-9 w-full text-xs font-semibold"
+                  />
+                )}
+              </div>
+
               {/* Remarks Field under Material Requisition & Issue Header Section */}
-              <div className="sm:col-span-2 md:col-span-3">
+              <div className="sm:col-span-2 lg:col-span-3">
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                   Remarks / Dispatch Notes
                 </label>
@@ -755,45 +789,57 @@ function InvIssueRegularPage() {
                             {item.availableStock.toLocaleString()}
                           </td>
 
-                          {/* Issue Quantity Input with Max Badge */}
+                          {/* Issue Quantity (Non-editable, synchronized from Tracking B/L) */}
                           <td className="py-3 px-3 text-right bg-indigo-50/30">
                             <div className="flex flex-col items-end gap-1">
-                              {isViewMode ? (
-                                <span className="font-mono font-bold text-xs text-indigo-900">
-                                  {item.issueQty}
-                                </span>
-                              ) : (
-                                <>
-                                  <input
-                                    type="number"
-                                    min="0"
-                                    max={maxPermitted}
-                                    value={item.issueQty}
-                                    onChange={(e) => handleIssueQtyChange(item.id, e.target.value)}
-                                    className={`w-24 h-7 rounded border px-2 text-right font-mono font-bold text-xs outline-none transition-all ${
-                                      hasError
-                                        ? "border-rose-400 bg-rose-50 text-rose-700 ring-2 ring-rose-500/20"
-                                        : "border-indigo-300 bg-white text-indigo-900 focus:ring-2 focus:ring-indigo-500/20"
-                                    }`}
-                                  />
-                                  <span className="text-[9.5px] font-semibold text-slate-400">
-                                    Max: {maxPermitted}
-                                  </span>
-                                </>
-                              )}
+                              <input
+                                type="number"
+                                readOnly
+                                disabled
+                                value={item.issueQty}
+                                className={`w-24 h-7 rounded border px-2 text-right font-mono font-bold text-xs cursor-not-allowed outline-none select-none ${
+                                  hasError
+                                    ? "border-rose-400 bg-rose-50 text-rose-700"
+                                    : "border-slate-200 bg-slate-100 text-indigo-950"
+                                }`}
+                                title="Non-editable: Controlled by the corresponding Tracking (B/L) quantity."
+                              />
+                              <span className="text-[9.5px] font-semibold text-slate-400">
+                                Max: {maxPermitted}
+                              </span>
                             </div>
                           </td>
 
-                          {/* Common Tracking Cell (Batch or Location mutually exclusive) */}
+                          {/* Tracking (B/L) Input & Allocation Modal */}
                           <td className="py-3 px-3 text-center">
-                            <ItemTrackingCell
-                              trackingMode={trackingMode}
-                              mode={trackingMode}
-                              batchAllocations={item.batchAllocations}
-                              locationAllocations={item.locationAllocations}
-                              onOpenModal={() => openTrackingModal(item)}
-                              disabled={!isViewMode && item.issueQty === 0}
-                            />
+                            <div className="flex items-center justify-center gap-1.5">
+                              {isViewMode ? (
+                                <span className="font-mono font-bold text-xs text-slate-700">
+                                  {item.issueQty}
+                                </span>
+                              ) : (
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max={maxPermitted}
+                                  value={item.issueQty === 0 ? "" : item.issueQty}
+                                  onChange={(e) =>
+                                    handleTrackingQtyChange(item.id, Number(e.target.value) || 0)
+                                  }
+                                  placeholder="0"
+                                  className="w-16 h-7 rounded border border-slate-300 bg-white px-1.5 text-right font-mono font-bold text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                                  title="Enter Tracking (B/L) quantity"
+                                />
+                              )}
+                              <ItemTrackingCell
+                                trackingMode={trackingMode}
+                                mode={trackingMode}
+                                batchAllocations={item.batchAllocations}
+                                locationAllocations={item.locationAllocations}
+                                onOpenModal={() => openTrackingModal(item)}
+                                disabled={isViewMode}
+                              />
+                            </div>
                           </td>
 
                           {/* Item-Level Delete Action (only when not in view mode) */}

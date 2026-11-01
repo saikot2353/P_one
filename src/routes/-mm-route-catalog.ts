@@ -735,9 +735,31 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     description: "Pre-costing calculations, fabric/trims consumption, CM estimation, and margin analysis.",
     modificationPercent: 0,
     status: "Baseline (Unchanged)",
-    lastModified: "2026-10-13",
-    totalRevisions: 0,
-    changeHistory: [],
+    lastModified: "2026-10-25",
+    totalRevisions: 3,
+    changeHistory: [
+      {
+        id: "chg-1761371400000",
+        date: "2026-10-25 11:50",
+        type: "Feature",
+        description: "Implemented comprehensive Style-wise Pre Costing Form with Multi-PO Management, auto-consolidated Order Quantity, 17-column item-wise costing table, Draft -> Submit -> Pending Approval -> Approved/Rejected workflow, immutable versioned amendments, side-by-side diff comparison, and formal Pre Costing Report.",
+        percentDelta: 100,
+      },
+      {
+        id: "chg-1761372900000",
+        date: "2026-10-25 12:15",
+        type: "Feature",
+        description: "Overhauled primary route /mm-pre-costing and unified PreCostingManager component supporting Pre-Costing Register, Pre Costing Entry (?tab=create), Amendment & Comparison (?tab=compare), and Pre Costing Report directly in Marketing & Merchandising sidebar.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1761384000000",
+        date: "2026-10-25 18:00",
+        type: "Refactor",
+        description: "Rolled back unintended Pre Costing modifications in the Merchandising module (/merchandising-pre-costing), restoring original Pre Costing Entry Form and View Page to their baseline implementation.",
+        percentDelta: -100,
+      },
+    ],
   },
 
   // ──────────────────────────────────────────────────────────────────────────

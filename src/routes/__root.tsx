@@ -142,7 +142,10 @@ function RootComponent() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const isLoggedIn = localStorage.getItem("cripton_logged_in_strict") === "true";
-      const isPublicPath = currentPath === "/login" || currentPath === "/e-recruitment-form";
+      const isPublicPath =
+        currentPath === "/login" ||
+        currentPath === "/e-recruitment-form" ||
+        currentPath.startsWith("/digital-business-card");
 
       if (!isLoggedIn && !isPublicPath) {
         navigate({ to: "/login" });

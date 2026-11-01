@@ -39,7 +39,6 @@ export function PaymentTermsPageForm({
     if (isView) return;
 
     const errors: Record<string, string> = {};
-    if (!formData.termCode?.trim()) errors.termCode = "Term Code is required";
     if (!formData.termName?.trim()) errors.termName = "Term Name is required";
 
     if (Object.keys(errors).length > 0) {
@@ -136,23 +135,7 @@ export function PaymentTermsPageForm({
             <h2 className="text-sm font-bold text-foreground">Payment Conditions</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">
-                Term Code <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                disabled={isView}
-                value={formData.termCode || ""}
-                onChange={(e) => setFormData({ ...formData, termCode: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-              {formErrors.termCode && (
-                <p className="text-[10px] text-rose-500 mt-1">{formErrors.termCode}</p>
-              )}
-            </div>
-
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-2">
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Term Name <span className="text-rose-500">*</span>
@@ -181,18 +164,6 @@ export function PaymentTermsPageForm({
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
-            </div>
-
-            <div className="sm:col-span-3">
-              <label className="block text-xs font-bold mb-1 text-foreground">Description</label>
-              <textarea
-                rows={2}
-                disabled={isView}
-                value={formData.description || ""}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Detailed terms description or penalties..."
-                className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs resize-none focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
             </div>
           </div>
         </div>

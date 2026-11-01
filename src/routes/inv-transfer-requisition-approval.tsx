@@ -288,14 +288,6 @@ function TransferRequisitionApprovalPage() {
               <div className="p-2 rounded-xl bg-indigo-600 text-white shrink-0">
                 <ShieldCheck className="size-4" />
               </div>
-              <div>
-                <strong className="font-bold text-indigo-950 block text-sm">
-                  Inter-Company Approval Authority Scope
-                </strong>
-                <p className="text-indigo-800 text-[11.5px] mt-0.5">
-                  Requisitions appear in this desk when goods are requested from your company. Select your company entity below:
-                </p>
-              </div>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">

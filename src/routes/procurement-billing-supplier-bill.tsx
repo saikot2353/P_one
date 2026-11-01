@@ -261,7 +261,14 @@ export function SupplierBillPage() {
     setCurrentApprovalStatus(bill.approvalStatus);
     setOtherCharges(bill.otherCharges ?? 0);
     setTaxAmount(bill.tax ?? 0);
-    setSelectedServiceItemIds(bill.otherChargeServiceItemIds ?? []);
+    if ((bill as any).otherChargesBreakdown && (bill as any).otherChargesBreakdown.length > 0) {
+      setSelectedServiceItemIds((bill as any).otherChargesBreakdown.map((b: any) => b.id));
+      const amounts: Record<string, number> = {};
+      (bill as any).otherChargesBreakdown.forEach((b: any) => { amounts[b.id] = b.amount; });
+      setServiceItemAmounts(amounts);
+    } else {
+      setSelectedServiceItemIds(bill.otherChargeServiceItemIds ?? []);
+    }
     setAdjustment(bill.adjustment ?? 0);
     setManualDiscount(bill.discount ?? 0);
     setManualVatAmount(bill.vat ?? 0);
@@ -576,6 +583,15 @@ export function SupplierBillPage() {
       tax: summary.tax,
       otherCharges: summary.otherCharges,
       otherChargeServiceItemIds: selectedServiceItemIds,
+      otherChargesBreakdown: selectedServiceItemIds.map((id) => {
+        const item = availableServiceItems.find((s) => s.id === id);
+        return {
+          id,
+          name: item?.itemName || id,
+          code: item?.itemCode,
+          amount: serviceItemAmounts[id] ?? 0,
+        };
+      }),
       adjustment: summary.adjustment,
       netBillAmount: summary.netBillAmount,
       roundOff: summary.roundOff,
@@ -657,6 +673,7 @@ export function SupplierBillPage() {
         { label: "Subtotal", value: `৳ ${summary.subtotal.toLocaleString()}` },
         { label: "Discount", value: `- ৳ ${summary.discount.toLocaleString()}` },
         { label: "VAT", value: `+ ৳ ${summary.vat.toLocaleString()}` },
+        { label: "Tax", value: `+ ৳ ${summary.tax.toLocaleString()}` },
         { label: "Other Charges", value: `+ ৳ ${summary.otherCharges.toLocaleString()}` },
         { label: "Adjustment", value: `৳ ${summary.adjustment.toLocaleString()}` },
         {
@@ -712,9 +729,6 @@ export function SupplierBillPage() {
                 <CreditCard className="size-7 text-amber-500" />
                 Supplier Bill Management
               </h1>
-              <p className="text-xs text-muted-foreground mt-0.5 font-medium">
-                Create, view, and edit supplier invoices linked strictly with actual verified MRR (Material Receive Report) quantities.
-              </p>
             </div>
 
             {/* Quick Actions & Bill Selector */}
@@ -798,9 +812,6 @@ export function SupplierBillPage() {
                       ? "Edit Supplier Bill against Verified MRR"
                       : "New Supplier Bill Entry against Verified MRR"}
                   </h2>
-                  <p className="text-[11px] text-muted-foreground">
-                    Strict MRR quantity reconciliation and vendor billing validation
-                  </p>
                 </div>
               </div>
 
@@ -822,21 +833,8 @@ export function SupplierBillPage() {
               </div>
             </div>
 
-            {/* 1. Bill Header Information */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-                  Bill ID / Number*
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  disabled
-                  value={billNumber}
-                  className="w-full px-3 py-2 font-mono font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed select-all"
-                />
-              </div>
-
+            {/* Bill Header Information */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-xs">
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                   Bill Date*
@@ -927,28 +925,12 @@ export function SupplierBillPage() {
                   className="w-full px-3 py-2 font-semibold bg-muted/50 border border-border rounded-lg cursor-not-allowed"
                 />
               </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-                  Payment Due Date
-                </label>
-                <input
-                  type="date"
-                  disabled={isReadOnly}
-                  value={paymentDueDate}
-                  onChange={(e) => setPaymentDueDate(e.target.value)}
-                  className="w-full px-3 py-2 font-semibold bg-background border border-border rounded-lg outline-none focus:border-amber-500 disabled:opacity-75 disabled:cursor-not-allowed"
-                />
-              </div>
             </div>
 
-            {/* 2. MRR Reference Section (Multiple MRR Support) */}
+            {/* MRR Reference Section (Multiple MRR Support) */}
             <div className="bg-muted/20 p-4 rounded-xl border border-border space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="size-5 rounded-full bg-amber-500/10 text-amber-600 flex items-center justify-center text-[10px] font-black">
-                    2
-                  </span>
                   <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
                     Linked Material Receive Report (MRR) References
                   </h3>
@@ -988,14 +970,11 @@ export function SupplierBillPage() {
               </div>
             </div>
 
-            {/* 3. Bill Item Details from MRR with Quantity Validation */}
+            {/* Bill Item Details from MRR with Quantity Validation */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                   Bill Item Details (Auto-populated from MRR)
-                  <span className="text-[10px] text-muted-foreground normal-case font-normal">
-                    (Current Bill Qty ≤ MRR Received Qty − Previously Billed Qty)
-                  </span>
                 </h3>
               </div>
 
@@ -1013,6 +992,7 @@ export function SupplierBillPage() {
                         Current Bill Qty*
                       </th>
                       <th className="py-2.5 px-3 text-right font-bold">Unit Price (৳)</th>
+                      <th className="py-2.5 px-3 text-right font-bold">Discount (৳)</th>
                       <th className="py-2.5 px-3 text-right font-bold">VAT</th>
                       <th className="py-2.5 px-3 text-right font-bold text-amber-600">Tax</th>
                       <th className="py-2.5 px-3 text-right font-bold">Line Total (৳)</th>
@@ -1062,6 +1042,9 @@ export function SupplierBillPage() {
                         </td>
                         <td className="py-2 px-3 text-right font-mono text-muted-foreground">
                           ৳ {item.unitPrice.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono text-rose-600">
+                          {item.discount ? `-৳ ${Number(item.discount).toLocaleString()}` : "৳ 0"}
                         </td>
                         <td className="py-2 px-3 text-right font-mono text-muted-foreground">
                           ৳ {item.vatAmount.toLocaleString()}
@@ -1413,7 +1396,7 @@ export function SupplierBillPage() {
               <span className="text-[11px] text-muted-foreground">
                 {isReadOnly
                   ? "Currently viewing submitted bill. Click 'Edit Bill' to make modifications."
-                  : "Click 'Submit for Bill Approval' to advance this supplier invoice to the audit queue."}
+                  : ""}
               </span>
 
               <div className="flex items-center gap-3">

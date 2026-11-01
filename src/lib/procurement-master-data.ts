@@ -65,6 +65,8 @@ export interface StoreLocation {
   // Location Configuration
   locationTrackingEnabled: boolean;
   store: string;
+  companyAreaSection?: string;
+  companyAreaSectionName?: string;
   locationCode: string;
   locationName: string;
   locationType: LocationType;
@@ -359,6 +361,7 @@ export interface ItemProductMaster {
   partNumber?: string;
   origin?: string;
   serviceFlag?: boolean;
+  fixedAssetFlag?: boolean;
   valuationMethod?: "FIFO" | "LIFO" | "Weighted Average";
   status: "Active" | "Inactive";
   createDate?: string;
@@ -767,6 +770,8 @@ export const DEFAULT_STORE_LOCATIONS: StoreLocation[] = [
     locationTrackingEnabled: true,
     store: "WH-PKCL-01",
     warehouseCode: "WH-PKCL-01",
+    companyAreaSection: "Central Warehouse Area",
+    companyAreaSectionName: "Central Warehouse Area (CWA)",
     locationCode: "LOC-RCK-01",
     locationName: "Rack A1 - Raw Cotton Pallet",
     locationType: "Rack",
@@ -785,6 +790,8 @@ export const DEFAULT_STORE_LOCATIONS: StoreLocation[] = [
     locationTrackingEnabled: true,
     store: "WH-PTL-03",
     warehouseCode: "WH-PTL-03",
+    companyAreaSection: "Operations & Logistics Area",
+    companyAreaSectionName: "Operations & Logistics Area (OLA)",
     locationCode: "LOC-SHF-02",
     locationName: "Shelf B - Laptop Storage Units",
     locationType: "Shelf",
@@ -803,6 +810,8 @@ export const DEFAULT_STORE_LOCATIONS: StoreLocation[] = [
     locationTrackingEnabled: false,
     store: "WH-PKCL-01",
     warehouseCode: "WH-PKCL-01",
+    companyAreaSection: "Central Warehouse Area",
+    companyAreaSectionName: "Central Warehouse Area (CWA)",
     locationCode: "LOC-GEN-03",
     locationName: "",
     locationType: "Bin",
@@ -820,6 +829,8 @@ export const DEFAULT_STORE_LOCATIONS: StoreLocation[] = [
     locationTrackingEnabled: false,
     store: "WH-PSML-02",
     warehouseCode: "WH-PSML-02",
+    companyAreaSection: "Main Production Unit",
+    companyAreaSectionName: "Main Production Unit (MPU)",
     locationCode: "LOC-GEN-04",
     locationName: "",
     locationType: "Floor",

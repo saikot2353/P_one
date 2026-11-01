@@ -28,6 +28,7 @@ import {
   AlertTriangle,
   ClipboardList,
   BookmarkCheck,
+  Target,
 } from "lucide-react";
 import { ModuleLauncher } from "../dashboard/ModuleLauncher";
 
@@ -70,10 +71,19 @@ const navGroups: MMNavGroup[] = [
   },
   {
     key: "policy",
-    title: "Company Policy & Config",
+    title: "Company Policy & Configuration",
     icon: Settings,
     to: "/mm-policy-config",
-    badge: "Policies",
+  },
+  {
+    key: "marketingPlanning",
+    title: "Marketing Planning & Performance",
+    icon: Target,
+    to: "/mm-marketing-target-planning",
+    subitems: [
+      { label: "Marketing Target Planning", to: "/mm-marketing-target-planning" },
+      { label: "Target vs Achievement Report", to: "/mm-target-vs-achievement-report" },
+    ],
   },
   {
     key: "quotation",
@@ -92,8 +102,11 @@ const navGroups: MMNavGroup[] = [
     to: "/mm-pre-costing",
     subitems: [
       { label: "Pre-Costing Register", to: "/mm-pre-costing" },
-      { label: "Create Costing", to: "/mm-pre-costing?tab=create" },
+      { label: "Pre Costing Entry", to: "/mm-pre-costing?tab=create" },
       { label: "Amendment & Comparison", to: "/mm-pre-costing?tab=compare" },
+      { label: "Fabric Consumption (CAD)", to: "/mm-fabric-consumption-cad" },
+      { label: "Fabric Consumption Register (Mer)", to: "/mm-fabric-consumption-register" },
+      { label: "Fabric Consumption Register (CAD)", to: "/mm-fabric-consumption-cad-register" },
     ],
   },
   {
@@ -108,6 +121,17 @@ const navGroups: MMNavGroup[] = [
     ],
   },
   {
+    key: "productionFile",
+    title: "Production File Management",
+    icon: FileCheck,
+    to: "/mm-production-file",
+    subitems: [
+      { label: "Production File", to: "/mm-production-file" },
+      { label: "Production File Register", to: "/mm-production-file-register" },
+      { label: "Production File Approval", to: "/mm-production-file-approval" },
+    ],
+  },
+  {
     key: "bookingInfo",
     title: "Booking Information",
     icon: BookmarkCheck,
@@ -117,6 +141,7 @@ const navGroups: MMNavGroup[] = [
       { label: "Accessories Booking Approval", to: "/mm-accessories-booking-approval" },
       { label: "Fabric Booking Register", to: "/mm-fabric-booking-register" },
       { label: "Accessories Booking Register", to: "/mm-accessories-booking-register" },
+      { label: "Manual Booking Registes (Acc)", to: "/mm-manual-booking-register" },
     ],
   },
   {
@@ -375,7 +400,7 @@ export function MarketingMerchandisingLayout({
       <div className="flex flex-1 overflow-hidden">
         {/* ── SIDEBAR ──────────────────────────────────────────────────────── */}
         <aside
-          className={`w-64 border-r shrink-0 flex flex-col justify-between overflow-y-auto transition-colors select-none ${
+          className={`w-64 lg:w-72 border-r shrink-0 flex flex-col justify-between overflow-y-auto transition-colors select-none ${
             theme === "dark" ? "bg-slate-900/70 border-slate-800" : "bg-white border-slate-200 shadow-sm"
           }`}
         >
@@ -401,7 +426,7 @@ export function MarketingMerchandisingLayout({
 
               return (
                 <div key={group.key} className="space-y-0.5">
-                  <div className="flex items-center">
+                  <div className="flex items-center w-full min-w-0">
                     <Link
                       to={group.to}
                       onClick={() => {
@@ -409,7 +434,8 @@ export function MarketingMerchandisingLayout({
                           toggleGroup(group.key);
                         }
                       }}
-                      className={`flex-1 flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all group ${
+                      title={group.title}
+                      className={`flex-1 min-w-0 flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all group ${
                         isActive
                           ? "bg-teal-600 text-white shadow-sm shadow-teal-600/30 font-bold"
                           : theme === "dark"
@@ -417,7 +443,7 @@ export function MarketingMerchandisingLayout({
                           : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
                         <Icon
                           className={`w-4 h-4 shrink-0 transition-colors ${
                             isActive ? "text-white" : "text-slate-400 group-hover:text-teal-600 dark:group-hover:text-teal-400"
@@ -425,8 +451,8 @@ export function MarketingMerchandisingLayout({
                         />
                         <span className="truncate">{group.title}</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        {group.badge && (
+                      {group.badge && (
+                        <div className="flex items-center gap-1.5 shrink-0 ml-1.5">
                           <span
                             className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase tracking-wider ${
                               isActive
@@ -436,8 +462,8 @@ export function MarketingMerchandisingLayout({
                           >
                             {group.badge}
                           </span>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </Link>
 
                     {hasSub && (
@@ -448,7 +474,7 @@ export function MarketingMerchandisingLayout({
                           e.stopPropagation();
                           toggleGroup(group.key);
                         }}
-                        className={`p-1.5 ml-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300`}
+                        className={`p-1.5 ml-0.5 shrink-0 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300`}
                         title={isGroupOpen ? "Collapse Submenu" : "Expand Submenu"}
                       >
                         {isGroupOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}

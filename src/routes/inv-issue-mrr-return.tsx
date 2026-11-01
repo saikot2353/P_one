@@ -136,6 +136,24 @@ export function SupplierReturnPage() {
     return availableMrrs[0]?.warehouseStore || currentPo?.deliveryWarehouse || "Pakiza Central Store";
   }, [targetReturn, availableMrrs, currentPo]);
 
+  // Return By auto-populated from currently logged-in user
+  const returnBy = useMemo(() => {
+    if (targetReturn?.returnedBy) return targetReturn.returnedBy;
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("cripton_current_user");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed?.name) return parsed.name;
+          if (parsed?.userId) return parsed.userId;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return "Tahmid Afsar";
+  }, [targetReturn]);
+
   // MRR item flat rows for multi-select
   interface MrrItemRow {
     mrrNumber: string;
@@ -481,6 +499,7 @@ export function SupplierReturnPage() {
       supplierId: currentPo?.supplierId || "sup-1",
       supplierName: currentPo?.supplierName || "Default Supplier",
       storeName: receivingStore,
+      returnedBy: returnBy,
       returnReason: "Defective",
       returnRemarks,
       totalReturnedQty,
@@ -556,27 +575,12 @@ export function SupplierReturnPage() {
           {/* Section 1: Return Header Information & MRR Traceability */}
           <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-2xs space-y-4">
             <div className="flex items-center gap-2 border-b border-border/50 pb-3">
-              <span className="size-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-black">
-                1
-              </span>
               <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
                 Return Header Information
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-                  Return Number*
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  value={returnNumber}
-                  className="w-full px-3 py-2 font-mono font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed select-all"
-                />
-              </div>
-
               {/* Return Date* (Non-editable) */}
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
@@ -603,7 +607,7 @@ export function SupplierReturnPage() {
               </div>
 
               {/* Step 1: Select PO / WO Number (Displays PO No + PO Date, opens searchable modal) */}
-              <div>
+              <div className="lg:col-span-2">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                   Select PO / WO Number*
                 </label>
@@ -629,7 +633,7 @@ export function SupplierReturnPage() {
               </div>
 
               {/* Supplier / Vendor (Auto-populated from PO, non-editable) */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-4">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
                   <Lock className="size-3 text-muted-foreground" /> Supplier / Vendor
                 </label>
@@ -641,7 +645,7 @@ export function SupplierReturnPage() {
                 />
               </div>
 
-              {/* Receive Store (Auto-populated from MRR, non-editable) */}
+              {/* Receiving Store (Auto-populated from MRR, non-editable) */}
               <div className="lg:col-span-2">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
                   <Lock className="size-3 text-muted-foreground" /> Receiving Store
@@ -650,6 +654,19 @@ export function SupplierReturnPage() {
                   type="text"
                   readOnly
                   value={receivingStore}
+                  className="w-full px-3 py-2 font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-foreground"
+                />
+              </div>
+
+              {/* Return By (Auto-populated from logged-in user, non-editable) */}
+              <div className="lg:col-span-2">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
+                  <Lock className="size-3 text-muted-foreground" /> Return By
+                </label>
+                <input
+                  type="text"
+                  readOnly
+                  value={returnBy}
                   className="w-full px-3 py-2 font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-foreground"
                 />
               </div>
@@ -674,9 +691,6 @@ export function SupplierReturnPage() {
             <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-2xs space-y-4">
               <div className="flex items-center justify-between border-b border-border/50 pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="size-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-black">
-                    2
-                  </span>
                   <div>
                     <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
                       MRR Selection (Items linked to {selectedPoNumber})
@@ -759,9 +773,6 @@ export function SupplierReturnPage() {
           <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-border/50 pb-3">
               <div className="flex items-center gap-2">
-                <span className="size-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-black">
-                  {isViewMode ? "2" : "3"}
-                </span>
                 <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
                   Return Item Details
                 </h2>

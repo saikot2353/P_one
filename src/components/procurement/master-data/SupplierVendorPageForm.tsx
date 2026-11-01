@@ -76,7 +76,6 @@ export function SupplierVendorPageForm({
     if (isView) return;
 
     const errors: Record<string, string> = {};
-    if (!formData.vendorCode?.trim()) errors.vendorCode = "Supplier Code is required";
     if (!formData.vendorName?.trim()) errors.vendorName = "Supplier / Vendor Name is required";
     if (!formData.mobileNumber?.trim()) errors.mobileNumber = "Mobile Number is required";
 
@@ -196,24 +195,8 @@ export function SupplierVendorPageForm({
             <h2 className="text-sm font-bold text-foreground">Supplier / Vendor Profile</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">
-                Supplier Code <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                disabled={isView}
-                value={formData.vendorCode || ""}
-                onChange={(e) => setFormData({ ...formData, vendorCode: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-              {formErrors.vendorCode && (
-                <p className="text-[10px] text-rose-500 mt-1">{formErrors.vendorCode}</p>
-              )}
-            </div>
-
-            <div className="sm:col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-2">
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Supplier / Vendor Name <span className="text-rose-500">*</span>
               </label>
@@ -388,7 +371,7 @@ export function SupplierVendorPageForm({
             {/* Auto-derived Local / Foreign Status Indicator */}
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
-                Origin Status (Local / Foreign Flag)
+                Origin Status
               </label>
               <div className="w-full h-9 px-3 rounded-lg border border-border/80 bg-muted/40 flex items-center justify-between text-xs">
                 <span
@@ -402,7 +385,7 @@ export function SupplierVendorPageForm({
                 </span>
                 <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
                   <Globe className="size-3 text-muted-foreground" />
-                  Auto-determined
+                  Auto
                 </span>
               </div>
             </div>
@@ -458,18 +441,7 @@ export function SupplierVendorPageForm({
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">Create Date</label>
-              <input
-                type="date"
-                disabled={isView}
-                value={formData.createDate || ""}
-                onChange={(e) => setFormData({ ...formData, createDate: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-            </div>
-
-            <div className="sm:col-span-3">
+            <div className="col-span-full">
               <label className="block text-xs font-bold mb-1 text-foreground">Full Address</label>
               <textarea
                 rows={2}

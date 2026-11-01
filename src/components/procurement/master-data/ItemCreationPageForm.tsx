@@ -22,6 +22,9 @@ import {
   ItemGroup,
   DEFAULT_ITEM_GROUPS,
   DEFAULT_ITEM_SUB_GROUPS,
+  DEFAULT_ITEMS,
+  DEFAULT_STORE_LOCATIONS,
+  StoreLocation,
   getStoredData,
   setStoredData,
   ItemCategory,
@@ -30,6 +33,7 @@ import {
   UOM,
   WarehouseStore,
 } from "@/lib/procurement-master-data";
+import { SearchableSelect as UiSearchableSelect } from "@/components/ui/searchable-select";
 import { ItemGroupModal } from "@/components/procurement/master-data/ItemGroupModal";
 import {
   buildSubGroupTreeNodes,
@@ -221,6 +225,11 @@ export function ItemCreationPageForm({
     return getStoredData("proc_item_sub_groups_v2", DEFAULT_ITEM_SUB_GROUPS);
   });
 
+  const catalogItems = useMemo(
+    () => getStoredData<ItemProductMaster[]>("proc_items_v2", DEFAULT_ITEMS),
+    [],
+  );
+
   useEffect(() => {
     if (allItemGroups && allItemGroups.length > 0) setItemGroups(allItemGroups);
   }, [allItemGroups]);
@@ -411,6 +420,7 @@ export function ItemCreationPageForm({
         warehouses: existingWarehouses,
         conversionFactor: initialData.conversionFactor ?? 1,
         serviceFlag: initialData.serviceFlag ?? inheritedServiceFlag,
+        fixedAssetFlag: initialData.fixedAssetFlag ?? false,
         valuationMethod: initialData.valuationMethod ?? "FIFO",
       };
     }
@@ -423,6 +433,7 @@ export function ItemCreationPageForm({
       subGroupName: targetSubGroup?.subGroupName || "",
       subGroupBreadcrumb: subGroupBreadcrumb || "",
       serviceFlag: inheritedServiceFlag,
+      fixedAssetFlag: false,
       valuationMethod: "FIFO",
       itemCategoryId: itemCategories[0]?.id || "",
       itemCategory: itemCategories[0]?.categoryName || "",
@@ -451,6 +462,10 @@ export function ItemCreationPageForm({
       ],
     };
   });
+
+  const availableStoreLocations = useMemo(() => {
+    return getStoredData<StoreLocation[]>("cripton_store_locations", DEFAULT_STORE_LOCATIONS);
+  }, []);
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const isView = mode === "view";
@@ -579,6 +594,7 @@ export function ItemCreationPageForm({
       batchTrackingRequired: !!formData.batchTrackingRequired,
       serialNumberTrackingRequired: !!formData.serialNumberTrackingRequired,
       serviceFlag: !!formData.serviceFlag,
+      fixedAssetFlag: !!formData.fixedAssetFlag,
       valuationMethod: formData.valuationMethod || "FIFO",
       defaultWarehouse: primaryWh,
       warehouses: formData.warehouses || [],
@@ -787,6 +803,9 @@ export function ItemCreationPageForm({
                         Boolean(treeSearch.trim()) &&
                         (node.subGroupName.toLowerCase().includes(treeSearch.toLowerCase()) ||
                           node.subGroupCode.toLowerCase().includes(treeSearch.toLowerCase()));
+                      const subGroupItemCount = catalogItems.filter(
+                        (it) => it.subGroupId === node.id,
+                      ).length;
 
                       return (
                         <div key={node.id} className="space-y-1">
@@ -826,9 +845,11 @@ export function ItemCreationPageForm({
                               <span className="font-semibold text-foreground truncate">
                                 {node.subGroupName}
                               </span>
-                              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted/70 text-muted-foreground shrink-0">
-                                {node.subGroupCode}
-                              </span>
+                              {subGroupItemCount > 0 && (
+                                <span className="text-[10px] font-bold font-mono px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 shrink-0">
+                                  C:{subGroupItemCount}
+                                </span>
+                              )}
                               {node.serviceFlag && (
                                 <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 shrink-0">
                                   SERVICE
@@ -908,9 +929,6 @@ export function ItemCreationPageForm({
                         <Layers className="size-4 text-amber-500 shrink-0" />
                         <span className="font-extrabold text-foreground truncate">
                           {grp.groupName}
-                        </span>
-                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-background border border-border text-muted-foreground shrink-0">
-                          {grp.groupCode}
                         </span>
                         {grp.serviceFlag && (
                           <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 shrink-0">
@@ -1096,19 +1114,7 @@ export function ItemCreationPageForm({
                       )}
                     </div>
 
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-bold mb-1 text-foreground">
-                        Description
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={subModalValues.description || ""}
-                        onChange={(e) =>
-                          setSubModalValues({ ...subModalValues, description: e.target.value })
-                        }
-                        className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none"
-                      />
-                    </div>
+
 
                     <div className="flex items-center gap-2 pt-1 sm:col-span-2">
                       <input
@@ -1168,7 +1174,7 @@ export function ItemCreationPageForm({
             <h2 className="text-sm font-bold text-foreground">Item Information</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Item Code <span className="text-rose-500">*</span>
@@ -1326,7 +1332,25 @@ export function ItemCreationPageForm({
               </label>
             </div>
 
-            <div className="sm:col-span-3">
+            <div className="flex items-center justify-between p-2.5 rounded-xl border border-border/70 bg-muted/20">
+              <div>
+                <div className="text-xs font-bold text-foreground">Fixed Asset</div>
+                <div className="text-[10px] text-muted-foreground">
+                  Capital equipment / asset item
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  disabled={isView}
+                  checked={!!formData.fixedAssetFlag}
+                  onChange={(e) => setFormData({ ...formData, fixedAssetFlag: e.target.checked })}
+                  className="size-4.5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+            </div>
+
+            <div className="col-span-full">
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Specification & Description
               </label>
@@ -1342,7 +1366,7 @@ export function ItemCreationPageForm({
           </div>
         </div>
 
-        {/* Section 2: Unit of Measurement (UOM) with Conversion Factor */}
+        {/* Section: Unit of Measurement (UOM) with Conversion Factor */}
         <div className="bg-card rounded-2xl border border-border/70 p-5 shadow-2xs space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b border-border/60">
             <Ruler className="size-4 text-emerald-500" />
@@ -1441,20 +1465,7 @@ export function ItemCreationPageForm({
               />
             </div>
 
-            <div className="bg-amber-500/5 p-2 rounded-xl border border-amber-500/20">
-              <label className="block text-xs font-extrabold mb-1 text-amber-700 dark:text-amber-400">
-                Safety Stock (Buffer)
-              </label>
-              <input
-                type="number"
-                disabled={isView}
-                value={formData.safetyStock ?? 15}
-                onChange={(e) =>
-                  setFormData({ ...formData, safetyStock: Number(e.target.value) })
-                }
-                className="w-full h-8 px-3 rounded-lg border border-amber-500/40 bg-background text-xs font-bold text-foreground focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-            </div>
+
 
             <div className="flex items-center justify-between p-3 rounded-xl border border-border/70 bg-muted/20 sm:col-span-2">
               <div>
@@ -1498,16 +1509,13 @@ export function ItemCreationPageForm({
           </div>
         </div>
 
-        {/* Section 4: Multi-Warehouse Section (Requirement 3: below Inventory & Stock Policies) */}
+        {/* Section: Warehouse Allocation */}
         <div className="bg-card rounded-2xl border border-border/70 p-5 shadow-2xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/60">
             <div className="flex items-center gap-2">
               <Building2 className="size-4 text-blue-500" />
               <div>
                 <h2 className="text-sm font-bold text-foreground">Warehouse Allocation</h2>
-                <p className="text-[11px] text-muted-foreground">
-                  Assign multiple warehouses where this item can be stocked, displayed sequentially.
-                </p>
               </div>
             </div>
 
@@ -1530,14 +1538,13 @@ export function ItemCreationPageForm({
                   <th className="py-2.5 px-3 w-12">SL</th>
                   <th className="py-2.5 px-3">Warehouse / Store</th>
                   <th className="py-2.5 px-3">Default Bin / Rack</th>
-                  <th className="py-2.5 px-3 w-28 text-center">Primary Store</th>
                   {!isView && <th className="py-2.5 px-3 text-right w-16">Action</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
                 {(formData.warehouses || []).length === 0 ? (
                   <tr>
-                    <td colSpan={isView ? 4 : 5} className="py-6 text-center text-muted-foreground">
+                    <td colSpan={isView ? 3 : 4} className="py-6 text-center text-muted-foreground">
                       No warehouses allocated. Click "+ Add Warehouse" above.
                     </td>
                   </tr>
@@ -1562,27 +1569,37 @@ export function ItemCreationPageForm({
                         </select>
                       </td>
                       <td className="py-2 px-3">
-                        <input
-                          type="text"
-                          disabled={isView}
-                          value={row.binLocation || ""}
-                          onChange={(e) =>
-                            handleUpdateWarehouseRow(row.id, "binLocation", e.target.value)
-                          }
-                          placeholder="e.g. Rack-B, Bin-04"
-                          className="w-full h-8 px-2.5 rounded-md border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-                        />
-                      </td>
-                      <td className="py-2 px-3 text-center">
-                        <input
-                          type="checkbox"
-                          disabled={isView}
-                          checked={!!row.isPrimary}
-                          onChange={(e) =>
-                            handleUpdateWarehouseRow(row.id, "isPrimary", e.target.checked)
-                          }
-                          className="size-4 accent-amber-500 rounded cursor-pointer"
-                        />
+                        {(() => {
+                          const matchingLocations = availableStoreLocations.filter(
+                            (l) =>
+                              !row.warehouseName ||
+                              l.store === row.warehouseName ||
+                              (l as any).warehouseName === row.warehouseName
+                          );
+                          const locList =
+                            matchingLocations.length > 0
+                              ? matchingLocations
+                              : availableStoreLocations;
+                          const binOptions = locList.map((loc) => ({
+                            value: loc.locationName || loc.locationCode,
+                            label: loc.locationName
+                              ? `${loc.locationName} (${loc.locationCode || `Rack ${(loc as any).rackNumber || "-"}`})`
+                              : loc.locationCode,
+                          }));
+
+                          return (
+                            <UiSearchableSelect
+                              options={binOptions}
+                              value={row.binLocation || ""}
+                              onChange={(val) =>
+                                handleUpdateWarehouseRow(row.id, "binLocation", val)
+                              }
+                              disabled={isView}
+                              placeholder="Select Bin / Rack..."
+                              className="w-full h-8"
+                            />
+                          );
+                        })()}
                       </td>
                       {!isView && (
                         <td className="py-2 px-3 text-right">

@@ -35,7 +35,6 @@ export function BusinessTypePageForm({
     if (isView) return;
 
     const errors: Record<string, string> = {};
-    if (!formData.typeCode?.trim()) errors.typeCode = "Type Code is required";
     if (!formData.businessTypeName?.trim())
       errors.businessTypeName = "Business Type Name is required";
 
@@ -135,23 +134,6 @@ export function BusinessTypePageForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
-                Type Code <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                disabled={isView}
-                value={formData.typeCode || ""}
-                onChange={(e) => setFormData({ ...formData, typeCode: e.target.value })}
-                placeholder="e.g. BT-MFG, BT-DIST, BT-IMP"
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-              {formErrors.typeCode && (
-                <p className="text-[10px] text-rose-500 mt-1">{formErrors.typeCode}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">
                 Business Type Name <span className="text-rose-500">*</span>
               </label>
               <input
@@ -165,18 +147,6 @@ export function BusinessTypePageForm({
               {formErrors.businessTypeName && (
                 <p className="text-[10px] text-rose-500 mt-1">{formErrors.businessTypeName}</p>
               )}
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-bold mb-1 text-foreground">Description</label>
-              <textarea
-                disabled={isView}
-                rows={3}
-                value={formData.description || ""}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Describe this commercial business type and applicable vendor scopes..."
-                className="w-full p-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
             </div>
 
             <div>

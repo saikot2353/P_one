@@ -770,13 +770,324 @@ function MMOrderEntryPage() {
     return MM_SC_LC_MASTER;
   });
 
-  // Initial load
+  const handleEditOrder = (o: MMMainOrder) => {
+    setEditingOrderId(o.id);
+    setEntryMode(o.entryMode || "New Order");
+    setFormPreCostId(o.preCostId || "");
+    const job = o.jobNo || o.ourRef || o.merchandisingRef || `JOB-2026-${o.orderNo.replace(/\D/g, "")}`;
+    setFormJobNo(job);
+    setFormOurRef(job);
+    setFormOrderType(o.orderType || "Regular");
+    setFormOrderStatus(o.orderStatus === "Draft" ? "Inactive" : o.orderStatus === "Closed" ? "Closed" : "Active");
+    setFormBeneficiaryCompany(o.beneficiaryCompany || o.companyName || "Pakiza Knit Composite Ltd");
+    setFormBuyer(o.buyerName);
+    setFormBuyerDept(o.buyerDepartment);
+    setFormLocalAgent(o.localAgent || "Li & Fung (Bangladesh)");
+    setFormMerchant(o.merchan || "Rashidul Islam (Head of Merchandising)");
+    setFormMerchan(o.merchan || "Rashidul Islam (Head of Merchandising)");
+    setFormSeason(o.season);
+    const buyerMatch = MM_BUYERS_MASTER.find((b) => b.name.toLowerCase() === o.buyerName.toLowerCase());
+    setFormAcHolder(buyerMatch?.accountHolder || o.acHolder || "Rashidul Islam (Head of Merchandising)");
+    setFormDeptCode(o.deptCode || "DEPT-88");
+    setFormCompany(o.companyName);
+    setFormStyle(o.styleNo);
+    setFormGmtItem(o.garmentItem);
+    setFormPlace((o.place as any) || "Top");
+    setFormPackType(o.packType || "Single Poly Pack");
+    if (o.processList && o.processList.length > 0) {
+      setProcessList(o.processList);
+    } else if (o.processName) {
+      setProcessList(o.processName.split("-").map((p, i) => ({ sl: i + 1, processName: p })));
+    }
+    setFormUnitPrice(o.fobUnitPrice);
+    setFormPriceType(o.priceType || "FOB");
+    setFormCurrency(o.currency || "USD");
+    setFormPayTerm(o.payTerm || "LC at Sight");
+    setFormCm(o.cm || 1.25);
+    setFormCmUnit(o.cmUnit || "PCS");
+    setFormPcs(o.pcs || 1);
+    setFormFirstDelDt(o.firstDelDate || o.orderDate || "2026-12-05");
+    setFormConfirmDt(o.confirmDate || o.buyerPoDate || "2026-09-20");
+    setFormExtraCuttingPct(o.extraCuttingPct || 3.0);
+    setFormSmv(o.smv || 14.5);
+    setFormOrderQty(o.orderQuantity);
+    setFormDelDt(o.delDate || o.shipmentDate || "2026-12-15");
+    setFormPcd(o.pcd || "2026-11-10");
+    setFormDestCountry(o.destinationCountry);
+    setFormDelMode(o.deliveryMode);
+    setFormDelPort(o.destinationPort);
+    setFormNote(o.notes);
+    setFormInstructionDetail(o.instructionDetail || "");
+    setFormFabricReq(o.fabricRequirementDetails || "");
+    setFormAccReq(o.accessoriesRequirementDetails || "");
+
+    if (o.deliveryLots && o.deliveryLots.length > 0) {
+      setDeliveryLots(o.deliveryLots);
+    } else {
+      setDeliveryLots([]);
+    }
+    if (o.poDetails && o.poDetails.length > 0) {
+      setPoDetails(o.poDetails);
+    } else {
+      setPoDetails([]);
+    }
+    setActiveTab("entry");
+    MMRepository.saveOrderEntryUiState({ activeTab: "entry", editingOrderId: o.id });
+  };
+
+  const handleStartNewOrder = () => {
+    setEditingOrderId(null);
+    const newJob = MMRepository.generateJobNo();
+    const today = new Date().toISOString().slice(0, 10);
+    setEntryMode("New Order");
+    setFormPreCostId("");
+    setFormOrderType("Regular");
+    setFormOrderStatus("Active");
+    setFormJobNo(newJob);
+    setFormOurRef(newJob);
+    setFormOrderSl("SL-0041");
+    setFormCopyFromOurRef("");
+    setFormBeneficiaryCompany("Pakiza Knit Composite Ltd");
+    setFormBuyer("H&M Hennes & Mauritz");
+    setFormBuyerDept("Ladies Casual & Tops");
+    setFormLocalAgent("Li & Fung (Bangladesh)");
+    setFormMerchant(getLoggedInUserMerchant());
+    setFormMerchan(getLoggedInUserMerchant());
+    setFormSeason("Autumn / Winter 2026");
+    setFormAcHolder("Rashidul Islam (Head of Merchandising)");
+    setFormDeptCode("DEPT-88");
+    setFormCompany("Pakiza Knit Composite Ltd");
+    setFormStyle("");
+    setFormGmtItem("Henley T-Shirt");
+    setFormPlace("Top");
+    setFormPackType("Single Poly Pack");
+    setProcessList([
+      { sl: 1, processName: "Knitting" },
+      { sl: 2, processName: "Dyeing" },
+      { sl: 3, processName: "Cutting" },
+      { sl: 4, processName: "Sewing" },
+      { sl: 5, processName: "Finishing" },
+      { sl: 6, processName: "Packing" },
+    ]);
+    setFormUnitPrice(4.85);
+    setFormPriceType("FOB");
+    setFormCurrency("USD");
+    setFormPayTerm("LC at Sight");
+    setFormCm(1.25);
+    setFormCmUnit("PCS");
+    setFormPcs(1);
+    setFormFirstDelDt(today);
+    setFormConfirmDt(today);
+    setFormExtraCuttingPct(3.0);
+    setFormSmv(14.5);
+    setFormOrderQty(0);
+    setFormDelDt(today);
+    setFormPcd(today);
+    setFormDestCountry("Germany");
+    setFormDelMode("Sea");
+    setFormDelPort("Hamburg Port");
+    setFormDeliveryPlace("Unit 2 Garments Factory");
+    setFormFabricReq("");
+    setFormAccReq("");
+    setFormNote("");
+    setFormInstructionDetail("");
+    setDeliveryLots([]);
+    setPoDetails([]);
+    setActiveTab("entry");
+    MMRepository.saveOrderEntryDraft(null);
+    MMRepository.saveOrderEntryUiState({ activeTab: "entry", editingOrderId: null });
+  };
+
+  const restoreDraft = (draft: any) => {
+    if (!draft) return;
+    if (draft.editingOrderId !== undefined) setEditingOrderId(draft.editingOrderId);
+    if (draft.entryMode !== undefined) setEntryMode(draft.entryMode);
+    if (draft.formPreCostId !== undefined) setFormPreCostId(draft.formPreCostId);
+    if (draft.formOrderType !== undefined) setFormOrderType(draft.formOrderType);
+    if (draft.formOrderStatus !== undefined) setFormOrderStatus(draft.formOrderStatus);
+    if (draft.formJobNo !== undefined) setFormJobNo(draft.formJobNo);
+    if (draft.formOurRef !== undefined) setFormOurRef(draft.formOurRef);
+    if (draft.formOrderSl !== undefined) setFormOrderSl(draft.formOrderSl);
+    if (draft.formCopyFromOurRef !== undefined) setFormCopyFromOurRef(draft.formCopyFromOurRef);
+    if (draft.formBeneficiaryCompany !== undefined) setFormBeneficiaryCompany(draft.formBeneficiaryCompany);
+    if (draft.formBuyer !== undefined) setFormBuyer(draft.formBuyer);
+    if (draft.formBuyerDept !== undefined) setFormBuyerDept(draft.formBuyerDept);
+    if (draft.formLocalAgent !== undefined) setFormLocalAgent(draft.formLocalAgent);
+    if (draft.formMerchant !== undefined) setFormMerchant(draft.formMerchant);
+    if (draft.formMerchan !== undefined) setFormMerchan(draft.formMerchan);
+    if (draft.formSeason !== undefined) setFormSeason(draft.formSeason);
+    if (draft.formAcHolder !== undefined) setFormAcHolder(draft.formAcHolder);
+    if (draft.formDeptCode !== undefined) setFormDeptCode(draft.formDeptCode);
+    if (draft.formCompany !== undefined) setFormCompany(draft.formCompany);
+    if (draft.formStyle !== undefined) setFormStyle(draft.formStyle);
+    if (draft.formGmtItem !== undefined) setFormGmtItem(draft.formGmtItem);
+    if (draft.formPlace !== undefined) setFormPlace(draft.formPlace);
+    if (draft.formPackType !== undefined) setFormPackType(draft.formPackType);
+    if (draft.processList !== undefined) setProcessList(draft.processList);
+    if (draft.formUnitPrice !== undefined) setFormUnitPrice(draft.formUnitPrice);
+    if (draft.formPriceType !== undefined) setFormPriceType(draft.formPriceType);
+    if (draft.formCurrency !== undefined) setFormCurrency(draft.formCurrency);
+    if (draft.formPayTerm !== undefined) setFormPayTerm(draft.formPayTerm);
+    if (draft.formCm !== undefined) setFormCm(draft.formCm);
+    if (draft.formCmUnit !== undefined) setFormCmUnit(draft.formCmUnit);
+    if (draft.formPcs !== undefined) setFormPcs(draft.formPcs);
+    if (draft.formFirstDelDt !== undefined) setFormFirstDelDt(draft.formFirstDelDt);
+    if (draft.formConfirmDt !== undefined) setFormConfirmDt(draft.formConfirmDt);
+    if (draft.formExtraCuttingPct !== undefined) setFormExtraCuttingPct(draft.formExtraCuttingPct);
+    if (draft.formSmv !== undefined) setFormSmv(draft.formSmv);
+    if (draft.formOrderQty !== undefined) setFormOrderQty(draft.formOrderQty);
+    if (draft.formDelDt !== undefined) setFormDelDt(draft.formDelDt);
+    if (draft.formPcd !== undefined) setFormPcd(draft.formPcd);
+    if (draft.formDestCountry !== undefined) setFormDestCountry(draft.formDestCountry);
+    if (draft.formDelMode !== undefined) setFormDelMode(draft.formDelMode);
+    if (draft.formDelPort !== undefined) setFormDelPort(draft.formDelPort);
+    if (draft.formDeliveryPlace !== undefined) setFormDeliveryPlace(draft.formDeliveryPlace);
+    if (draft.formFabricReq !== undefined) setFormFabricReq(draft.formFabricReq);
+    if (draft.formAccReq !== undefined) setFormAccReq(draft.formAccReq);
+    if (draft.formNote !== undefined) setFormNote(draft.formNote);
+    if (draft.formInstructionDetail !== undefined) setFormInstructionDetail(draft.formInstructionDetail);
+    if (draft.deliveryLots !== undefined) setDeliveryLots(draft.deliveryLots);
+    if (draft.poDetails !== undefined) setPoDetails(draft.poDetails);
+  };
+
+  // Initial load & restore UI state / draft from Local Storage
   useEffect(() => {
     const loaded = MMRepository.getOrders();
     setOrders(loaded);
     setPreCostings(MMRepository.getPreCostings());
     setPolicy(MMRepository.getPolicy());
+
+    // Restore UI state and in-progress form/editing state
+    const savedUi = MMRepository.getOrderEntryUiState();
+    if (savedUi) {
+      if (savedUi.activeTab === "entry") {
+        if (savedUi.editingOrderId) {
+          const match = loaded.find((o) => o.id === savedUi.editingOrderId);
+          if (match) {
+            handleEditOrder(match);
+            return;
+          }
+        }
+        const draft = MMRepository.getOrderEntryDraft();
+        if (draft) {
+          restoreDraft(draft);
+          setActiveTab("entry");
+          return;
+        }
+      } else if (savedUi.activeTab === "fabric-estimation") {
+        setActiveTab("fabric-estimation");
+      } else {
+        setActiveTab("register");
+      }
+    }
   }, []);
+
+  // Auto-save form draft to localStorage whenever fields change in entry mode
+  useEffect(() => {
+    if (activeTab !== "entry") return;
+    const draft = {
+      editingOrderId,
+      entryMode,
+      formPreCostId,
+      formOrderType,
+      formOrderStatus,
+      formJobNo,
+      formOurRef,
+      formOrderSl,
+      formCopyFromOurRef,
+      formBeneficiaryCompany,
+      formBuyer,
+      formBuyerDept,
+      formLocalAgent,
+      formMerchant,
+      formMerchan,
+      formSeason,
+      formAcHolder,
+      formDeptCode,
+      formCompany,
+      formStyle,
+      formGmtItem,
+      formPlace,
+      formPackType,
+      processList,
+      formUnitPrice,
+      formPriceType,
+      formCurrency,
+      formPayTerm,
+      formCm,
+      formCmUnit,
+      formPcs,
+      formFirstDelDt,
+      formConfirmDt,
+      formExtraCuttingPct,
+      formSmv,
+      formOrderQty,
+      formDelDt,
+      formPcd,
+      formDestCountry,
+      formDelMode,
+      formDelPort,
+      formDeliveryPlace,
+      formFabricReq,
+      formAccReq,
+      formNote,
+      formInstructionDetail,
+      deliveryLots,
+      poDetails,
+    };
+    MMRepository.saveOrderEntryDraft(draft);
+    MMRepository.saveOrderEntryUiState({ activeTab: "entry", editingOrderId });
+  }, [
+    activeTab,
+    editingOrderId,
+    entryMode,
+    formPreCostId,
+    formOrderType,
+    formOrderStatus,
+    formJobNo,
+    formOurRef,
+    formOrderSl,
+    formCopyFromOurRef,
+    formBeneficiaryCompany,
+    formBuyer,
+    formBuyerDept,
+    formLocalAgent,
+    formMerchant,
+    formMerchan,
+    formSeason,
+    formAcHolder,
+    formDeptCode,
+    formCompany,
+    formStyle,
+    formGmtItem,
+    formPlace,
+    formPackType,
+    processList,
+    formUnitPrice,
+    formPriceType,
+    formCurrency,
+    formPayTerm,
+    formCm,
+    formCmUnit,
+    formPcs,
+    formFirstDelDt,
+    formConfirmDt,
+    formExtraCuttingPct,
+    formSmv,
+    formOrderQty,
+    formDelDt,
+    formPcd,
+    formDestCountry,
+    formDelMode,
+    formDelPort,
+    formDeliveryPlace,
+    formFabricReq,
+    formAccReq,
+    formNote,
+    formInstructionDetail,
+    deliveryLots,
+    poDetails,
+  ]);
 
   // Helper to extract Job ID safely without combining other identifiers
   const getOrderJobId = (o: MMMainOrder): string => {
@@ -2104,25 +2415,26 @@ function MMOrderEntryPage() {
       destinationCountry: p.destCountry,
     }));
 
-    // Auto-generate deliveryLots matching formOrderQty behind the scenes for backward compatibility
-    const activeDeliveryLots: MMDeliveryLotRow[] = [
-      {
-        id: `lot-${Date.now()}`,
-        lotNumber: "LOT-01",
-        quantity: formOrderQty,
-        deliveryDate: formDelDt,
-      },
-    ];
+    // Use user-defined deliveryLots if available, or generate default lot
+    const activeDeliveryLots: MMDeliveryLotRow[] =
+      deliveryLots && deliveryLots.length > 0
+        ? deliveryLots
+        : [
+            {
+              id: `lot-${Date.now()}`,
+              lotNumber: "LOT-01",
+              quantity: formOrderQty,
+              deliveryDate: formDelDt,
+            },
+          ];
 
-    const lotWiseList: MMLotQty[] = [
-      {
-        lotNumber: "LOT-01",
-        deliveryDate: formDelDt,
-        quantity: formOrderQty,
-        deliveryMode: (formDelMode as any) || "Sea",
-        destinationPort: formDelPort,
-      },
-    ];
+    const lotWiseList: MMLotQty[] = activeDeliveryLots.map((l) => ({
+      lotNumber: l.lotNumber,
+      deliveryDate: l.deliveryDate,
+      quantity: l.quantity,
+      deliveryMode: (formDelMode as any) || "Sea",
+      destinationPort: formDelPort,
+    }));
 
     const countryWiseList: MMCountryQty[] = Array.from(new Set(poDetails.map((p) => p.destCountry))).map((ctry) => ({
       country: ctry,
@@ -2132,7 +2444,7 @@ function MMOrderEntryPage() {
     const orderIdToSave = editingOrderId || `ord-${Date.now()}`;
     const nextOrderNumber = editingOrderId
       ? orders.find((o) => o.id === editingOrderId)?.orderNo || "ORD-2026-0099"
-      : `ORD-2026-00${orders.length + 43}`;
+      : MMRepository.generateOrderNo();
 
     const orderRecord: MMMainOrder = {
       id: orderIdToSave,
@@ -2212,7 +2524,11 @@ function MMOrderEntryPage() {
     };
 
     MMRepository.saveOrder(orderRecord);
+    MMRepository.saveOrderEntryDraft(null);
     setOrders(MMRepository.getOrders());
+    MMRepository.saveOrderEntryUiState({ activeTab: "register", editingOrderId: null });
+    setActiveTab("register");
+    setEditingOrderId(null);
     MMRepository.addAuditLog({
       id: `aud-${Date.now()}`,
       timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
@@ -2224,8 +2540,6 @@ function MMOrderEntryPage() {
       comments: `${editingOrderId ? "Updated" : "Created"} Confirm Order ${orderRecord.orderNo} (Job No: ${jobNoToSave}, Buyer: ${formBuyer}, ${orderRecord.orderQuantity.toLocaleString()} pcs, ${currencySymbol}${orderRecord.fobUnitPrice.toFixed(2)} ${formPriceType}). Status: ${formOrderStatus}`,
     });
 
-    setActiveTab("register");
-    setEditingOrderId(null);
     toast.success(
       `Confirm Order ${orderRecord.orderNo} ${editingOrderId ? "updated" : "saved"} successfully (${
         isDraft ? "Saved as Draft" : "Confirmed & Reconciled"
@@ -2233,70 +2547,16 @@ function MMOrderEntryPage() {
     );
   };
 
-  const handleEditOrder = (o: MMMainOrder) => {
-    setEditingOrderId(o.id);
-    setEntryMode(o.entryMode || "New Order");
-    setFormPreCostId(o.preCostId || "");
-    const job = o.jobNo || o.ourRef || o.merchandisingRef || `JOB-2026-${o.orderNo.replace(/\D/g, "")}`;
-    setFormJobNo(job);
-    setFormOurRef(job);
-    setFormOrderType(o.orderType || "Regular");
-    setFormOrderStatus(o.orderStatus === "Draft" ? "Inactive" : o.orderStatus === "Closed" ? "Closed" : "Active");
-    setFormBeneficiaryCompany(o.beneficiaryCompany || o.companyName || "Pakiza Knit Composite Ltd");
-    setFormBuyer(o.buyerName);
-    setFormBuyerDept(o.buyerDepartment);
-    setFormLocalAgent(o.localAgent || "Li & Fung (Bangladesh)");
-    setFormMerchant(o.merchan || "Rashidul Islam (Head of Merchandising)");
-    setFormMerchan(o.merchan || "Rashidul Islam (Head of Merchandising)");
-    setFormSeason(o.season);
-    const buyerMatch = MM_BUYERS_MASTER.find((b) => b.name.toLowerCase() === o.buyerName.toLowerCase());
-    setFormAcHolder(buyerMatch?.accountHolder || o.acHolder || "Rashidul Islam (Head of Merchandising)");
-    setFormDeptCode(o.deptCode || "DEPT-88");
-    setFormCompany(o.companyName);
-    setFormStyle(o.styleNo);
-    setFormGmtItem(o.garmentItem);
-    setFormPlace((o.place as any) || "Top");
-    setFormPackType(o.packType || "Single Poly Pack");
-    if (o.processList && o.processList.length > 0) {
-      setProcessList(o.processList);
-    } else if (o.processName) {
-      setProcessList(o.processName.split("-").map((p, i) => ({ sl: i + 1, processName: p })));
-    }
-    setFormUnitPrice(o.fobUnitPrice);
-    setFormPriceType(o.priceType || "FOB");
-    setFormCurrency(o.currency || "USD");
-    setFormPayTerm(o.payTerm || "LC at Sight");
-    setFormCm(o.cm || 1.25);
-    setFormCmUnit(o.cmUnit || "PCS");
-    setFormPcs(o.pcs || 1);
-    setFormFirstDelDt(o.firstDelDate || o.orderDate || "2026-12-05");
-    setFormConfirmDt(o.confirmDate || o.buyerPoDate || "2026-09-20");
-    setFormExtraCuttingPct(o.extraCuttingPct || 3.0);
-    setFormSmv(o.smv || 14.5);
-    setFormOrderQty(o.orderQuantity);
-    setFormDelDt(o.delDate || o.shipmentDate || "2026-12-15");
-    setFormPcd(o.pcd || "2026-11-10");
-    setFormDestCountry(o.destinationCountry);
-    setFormDelMode(o.deliveryMode);
-    setFormDelPort(o.destinationPort);
-    setFormNote(o.notes);
-    setFormInstructionDetail(o.instructionDetail || "");
-    setFormFabricReq(o.fabricRequirementDetails || "");
-    setFormAccReq(o.accessoriesRequirementDetails || "");
-
-    if (o.deliveryLots && o.deliveryLots.length > 0) {
-      setDeliveryLots(o.deliveryLots);
-    }
-    if (o.poDetails && o.poDetails.length > 0) {
-      setPoDetails(o.poDetails);
-    }
-    setActiveTab("entry");
-  };
-
   const handleDeleteOrder = (orderId: string, orderNo: string) => {
     if (confirm(`Are you sure you want to delete Order '${orderNo}'? This action cannot be undone.`)) {
       MMRepository.deleteOrder(orderId);
       setOrders(MMRepository.getOrders());
+      if (editingOrderId === orderId) {
+        setEditingOrderId(null);
+        MMRepository.saveOrderEntryDraft(null);
+        MMRepository.saveOrderEntryUiState({ activeTab: "register", editingOrderId: null });
+        setActiveTab("register");
+      }
       toast.success(`Order '${orderNo}' deleted successfully.`);
     }
   };
@@ -3185,6 +3445,7 @@ function MMOrderEntryPage() {
                 onClick={() => {
                   setActiveTab("register");
                   setEditingOrderId(null);
+                  MMRepository.saveOrderEntryUiState({ activeTab: "register", editingOrderId: null });
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === "register"
@@ -3196,8 +3457,7 @@ function MMOrderEntryPage() {
               </button>
               <button
                 onClick={() => {
-                  setActiveTab("entry");
-                  setEditingOrderId(null);
+                  handleStartNewOrder();
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                   activeTab === "entry" && !editingOrderId
@@ -4621,6 +4881,7 @@ function MMOrderEntryPage() {
                 onClick={() => {
                   setActiveTab("register");
                   setEditingOrderId(null);
+                  MMRepository.saveOrderEntryUiState({ activeTab: "register", editingOrderId: null });
                 }}
                 className="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100"
               >

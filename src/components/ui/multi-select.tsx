@@ -23,6 +23,8 @@ interface MultiSelectProps {
   onChange: (selected: string[]) => void;
   placeholder?: string;
   className?: string;
+  popoverClassName?: string;
+  maxDisplay?: number;
 }
 
 export function MultiSelect({
@@ -31,6 +33,8 @@ export function MultiSelect({
   onChange,
   placeholder = "Select...",
   className,
+  popoverClassName,
+  maxDisplay = 2,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -67,7 +71,7 @@ export function MultiSelect({
               <span className="text-muted-foreground">{placeholder}</span>
             ) : (
               <>
-                {selected.slice(0, 3).map((val) => {
+                {selected.slice(0, maxDisplay).map((val) => {
                   const label = options.find((o) => o.value === val)?.label || val;
                   return (
                     <span
@@ -79,9 +83,9 @@ export function MultiSelect({
                     </span>
                   );
                 })}
-                {selected.length > 3 && (
+                {selected.length > maxDisplay && (
                   <span className="inline-flex items-center bg-muted text-muted-foreground px-2 py-0.5 rounded-md text-[11px] font-medium leading-tight shrink-0">
-                    +{selected.length - 3} more
+                    +{selected.length - maxDisplay} more
                   </span>
                 )}
               </>
@@ -91,12 +95,12 @@ export function MultiSelect({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0 shadow-lg border-border/50 rounded-xl overflow-hidden z-[100]"
+        className={cn("w-[var(--radix-popover-trigger-width)] min-w-[280px] p-0 shadow-xl border-border/50 rounded-xl overflow-hidden z-[150]", popoverClassName)}
         align="start"
       >
         <Command>
           <CommandInput placeholder="Search..." className="h-9 text-xs" />
-          <CommandList className="max-h-[200px]">
+          <CommandList className="max-h-[220px]">
             <CommandEmpty className="py-3 text-center text-xs text-muted-foreground">
               No results found.
             </CommandEmpty>
@@ -124,13 +128,8 @@ export function MultiSelect({
                   <CommandItem
                     key={option.value}
                     value={option.label}
-                    onSelect={(currentValue) => {
-                      const selectedOption = options.find(
-                        (o) => o.label.toLowerCase() === currentValue.toLowerCase()
-                      );
-                      if (selectedOption) {
-                        handleSelect(selectedOption.value);
-                      }
+                    onSelect={() => {
+                      handleSelect(option.value);
                     }}
                     className="text-xs rounded-lg cursor-pointer data-[selected=true]:bg-primary/10 data-[selected=true]:text-primary my-0.5"
                   >

@@ -242,6 +242,7 @@ function MaterialRequisitionApprovalListPage() {
       };
     }
     return {
+      hideLogo: true,
       companyName: reportTarget.organization || "Pakiza Knit Composite Ltd",
       companyAddress: "Gorat, Ashulia, Savar, Dhaka, Bangladesh",
       reportTitle: "MATERIAL REQUISITION APPROVAL NOTE",
@@ -249,11 +250,11 @@ function MaterialRequisitionApprovalListPage() {
       reportDate: reportTarget.requisitionDate,
       statusBadge: reportTarget.status,
       metaFields: [
-        { label: "Department", value: reportTarget.department },
-        { label: "Requested By", value: reportTarget.requestedBy },
+        { label: "Requisition Date", value: reportTarget.requisitionDate },
         { label: "Required Date", value: reportTarget.requiredDate },
+        { label: "Requested By", value: reportTarget.requestedBy },
+        { label: "Department", value: reportTarget.department },
         { label: "Priority", value: reportTarget.priority },
-        { label: "Warehouse / Store", value: reportTarget.warehouseStore },
         { label: "Submitted Date", value: reportTarget.submittedDate || "-" },
       ],
       tableHeaders: [
@@ -263,9 +264,7 @@ function MaterialRequisitionApprovalListPage() {
         "SPECIFICATION",
         "UOM",
         "REQ QTY",
-        "AVL STOCK",
-        "SHORTAGE",
-        "REMARKS",
+        "APP QTY",
       ],
       tableRows: reportTarget.items.map((it, idx) => [
         String(idx + 1),
@@ -274,20 +273,10 @@ function MaterialRequisitionApprovalListPage() {
         it.specification || "-",
         it.uom,
         String(it.requestedQuantity),
-        String(it.availableStock),
-        String(it.shortageQuantity),
-        it.remarks || "-",
+        String(it.approvedQuantity ?? it.requestedQuantity),
       ]),
       summaryCards: [
-        { label: "Total Items", value: String(reportTarget.totalItems) },
         { label: "Requested Qty", value: String(reportTarget.requestedQuantity) },
-        { label: "Shortage Qty", value: String(reportTarget.shortageQuantity) },
-      ],
-      notes: [
-        `Requisition submitted on ${reportTarget.submittedDate || reportTarget.createdDate}.`,
-        reportTarget.shortageQuantity > 0
-          ? `NOTE: Shortage of ${reportTarget.shortageQuantity} units detected. PR required for deficit.`
-          : "Stock fully available in warehouse store.",
       ],
       signatures: [
         { title: "Requested By", name: reportTarget.requestedBy, date: reportTarget.requisitionDate },
@@ -450,25 +439,6 @@ function MaterialRequisitionApprovalListPage() {
                       onChange={(e) => setRequestedByFilter(e.target.value)}
                       className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                     />
-                  </div>
-
-                  {/* Warehouse / Store */}
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                      Warehouse / Store
-                    </label>
-                    <select
-                      value={warehouseFilter}
-                      onChange={(e) => setWarehouseFilter(e.target.value)}
-                      className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
-                    >
-                      <option value="All">All Warehouses</option>
-                      {warehouses.map((w) => (
-                        <option key={w.id} value={w.name}>
-                          {w.name}
-                        </option>
-                      ))}
-                    </select>
                   </div>
 
                   {/* Priority */}

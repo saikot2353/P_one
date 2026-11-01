@@ -16,6 +16,8 @@ import {
   Building2,
   Calendar,
   Sparkles,
+  ShieldCheck,
+  CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { submitFestivalAllowanceBatch } from "@/lib/festivalAllowanceStore";
@@ -262,20 +264,28 @@ const UNITS = ["ALL", "Unit-01", "Unit-02", "Unit-03", "N/A"];
 export function FestivalAllowancePage() {
   const [records, setRecords] = useState<FestivalAllowanceRow[]>(INITIAL_RECORDS);
 
-  // Load from localStorage on client
+  // Load from localStorage on client and sync live with HR Check updates
   useEffect(() => {
     if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setRecords(parsed);
+      const load = () => {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setRecords(parsed);
+            }
           }
+        } catch (err) {
+          console.error("Failed to load records from localStorage", err);
         }
-      } catch (err) {
-        console.error("Failed to load records from localStorage", err);
-      }
+      };
+
+      load();
+      window.addEventListener("festival_allowances_changed", load);
+      return () => {
+        window.removeEventListener("festival_allowances_changed", load);
+      };
     }
   }, []);
 
@@ -596,6 +606,31 @@ export function FestivalAllowancePage() {
               <p className="text-xs text-muted-foreground mt-1">
                 Review and process festival holiday duties, employee day rates, and net allowance payable.
               </p>
+            </div>
+
+            {/* Quick Navigation Hub */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Link
+                to="/festival-allowance-check-hr"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-background hover:bg-muted text-foreground text-xs font-semibold transition"
+              >
+                <ShieldCheck className="size-3.5 text-primary" />
+                <span>Check (HR)</span>
+              </Link>
+              <Link
+                to="/festival-allowance-approval"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-background hover:bg-muted text-foreground text-xs font-semibold transition"
+              >
+                <CheckCircle2 className="size-3.5 text-emerald-600" />
+                <span>Approval Hub</span>
+              </Link>
+              <Link
+                to="/festival-allowance-payment-sheet"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-background hover:bg-muted text-foreground text-xs font-semibold transition"
+              >
+                <FileSpreadsheet className="size-3.5 text-blue-600" />
+                <span>Payment Sheet</span>
+              </Link>
             </div>
           </div>
 

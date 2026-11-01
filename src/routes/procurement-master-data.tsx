@@ -33,7 +33,9 @@ import {
   ToggleLeft,
   ToggleRight,
   ArrowUpDown,
+  Sliders,
 } from "lucide-react";
+import { ProcurementConfigurationForm } from "@/components/procurement/ProcurementConfigurationForm";
 import {
   DEFAULT_WAREHOUSES,
   DEFAULT_STORE_LOCATIONS,
@@ -118,7 +120,8 @@ export type MasterDataTab =
   | "budget" // Budget Management
   | "budget-approval"
   | "approval-authority"
-  | "document-type-number-series";
+  | "document-type-number-series"
+  | "procurement-configuration";
 
 interface MasterDataSearch {
   tab?: MasterDataTab;
@@ -344,6 +347,18 @@ const TAB_GROUPS: TabGroup[] = [
         icon: Hash,
         countKey: "docSeries",
         desc: "Searchable form numbering schemes & prefixes",
+      },
+    ],
+  },
+  {
+    groupName: "System & Operations Configuration",
+    tabs: [
+      {
+        id: "procurement-configuration",
+        label: "Procurement Configuration",
+        icon: Sliders,
+        countKey: "procConfig",
+        desc: "Company-level multi-category rules and Comparative Statement settings",
       },
     ],
   },
@@ -614,6 +629,7 @@ function ProcurementMasterDataPage() {
       budgetApprovals: budgetApprovals.length,
       authorities: authorities.length,
       docSeries: docSeries.length,
+      procConfig: 1,
     }),
     [
       warehouses,
@@ -1121,7 +1137,7 @@ function ProcurementMasterDataPage() {
               </div>
             </div>
 
-            {pageMode === "list" && (
+            {pageMode === "list" && activeTab !== "procurement-configuration" && (
               <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
                 {EXCEL_UPLOAD_SUPPORTED_TABS[activeTab] && (
                   <button
@@ -1152,8 +1168,8 @@ function ProcurementMasterDataPage() {
             )}
           </div>
 
-          {/* DEDICATED FORM PAGE VIEWS (Step 2 & 3: Not Modals) */}
-          {pageMode !== "list" && (
+          {/* DEDICATED FORM PAGE VIEWS (Step 2 & 3: Not Modals, except vendor-category which is a modal) */}
+          {pageMode !== "list" && activeTab !== "vendor-category" && activeTab !== "procurement-configuration" && (
             <div className="bg-card rounded-2xl border border-border/80 p-5 lg:p-7 shadow-xs">
               {activeTab === "warehouse-store" && (
                 <WarehouseStorePageForm
@@ -1429,27 +1445,6 @@ function ProcurementMasterDataPage() {
                 />
               )}
 
-              {activeTab === "vendor-category" && (
-                <VendorCategoryPageForm
-                  mode={pageMode}
-                  initialData={selectedRecord}
-                  onSave={(saved) => {
-                    if (pageMode === "create") {
-                      setVendorCategories((prev) => [saved, ...prev]);
-                      toast.success("Vendor Category created.");
-                    } else {
-                      setVendorCategories((prev) =>
-                        prev.map((c) => (c.id === saved.id ? saved : c)),
-                      );
-                      toast.success("Vendor Category updated.");
-                    }
-                    setPageMode("list");
-                  }}
-                  onCancel={() => setPageMode("list")}
-                  onSwitchToEdit={() => setPageMode("edit")}
-                />
-              )}
-
               {activeTab === "item-category" && (
                 <ItemCategoryPageForm
                   mode={pageMode}
@@ -1511,8 +1506,39 @@ function ProcurementMasterDataPage() {
             </div>
           )}
 
+          {/* VENDOR CATEGORY MODAL DIALOG */}
+          {activeTab === "vendor-category" && pageMode !== "list" && (
+            <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+              <div className="bg-card w-full max-w-xl rounded-2xl border border-border shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                <VendorCategoryPageForm
+                  mode={pageMode}
+                  initialData={selectedRecord}
+                  onSave={(saved) => {
+                    if (pageMode === "create") {
+                      setVendorCategories((prev) => [saved, ...prev]);
+                      toast.success("Vendor Category created.");
+                    } else {
+                      setVendorCategories((prev) =>
+                        prev.map((c) => (c.id === saved.id ? saved : c)),
+                      );
+                      toast.success("Vendor Category updated.");
+                    }
+                    setPageMode("list");
+                  }}
+                  onCancel={() => setPageMode("list")}
+                  onSwitchToEdit={() => setPageMode("edit")}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* PROCUREMENT CONFIGURATION DIRECT TAB */}
+          {activeTab === "procurement-configuration" && (
+            <ProcurementConfigurationForm />
+          )}
+
           {/* STEP 1: LIST PAGE */}
-          {pageMode === "list" && (
+          {(pageMode === "list" || activeTab === "vendor-category") && activeTab !== "procurement-configuration" && (
             <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
               {/* Filter / Search Console */}
               <div className="p-4 border-b border-border/70 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
@@ -1754,9 +1780,6 @@ function ProcurementMasterDataPage() {
                                         className="font-bold text-foreground hover:text-amber-500 text-left truncate flex items-center gap-2 cursor-pointer"
                                       >
                                         <span>{node.subGroupName}</span>
-                                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted/60 text-muted-foreground">
-                                          {node.subGroupCode}
-                                        </span>
                                         {node.serviceFlag && (
                                           <span className="text-[9px] px-1.5 py-0.2 rounded font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 shrink-0">
                                             SERVICE
@@ -1767,6 +1790,11 @@ function ProcurementMasterDataPage() {
 
                                     {/* Action Buttons */}
                                     <div className="flex items-center gap-1 shrink-0 ml-2">
+                                      {items.filter((it) => it.subGroupId === node.id).length > 0 && (
+                                        <span className="text-[10px] font-semibold text-muted-foreground px-1.5 py-0.5 rounded bg-background border border-border/60">
+                                          C:{items.filter((it) => it.subGroupId === node.id).length}
+                                        </span>
+                                      )}
                                       <button
                                         type="button"
                                         onClick={() => handleOpenAddChildSubGroup(node)}
@@ -1888,9 +1916,6 @@ function ProcurementMasterDataPage() {
                                       className="font-extrabold text-foreground hover:text-amber-500 text-left truncate flex items-center gap-2 cursor-pointer"
                                     >
                                       <span className="font-bold">{grp.groupName}</span>
-                                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-background border border-border text-muted-foreground">
-                                        {grp.groupCode}
-                                      </span>
                                       {grp.serviceFlag && (
                                         <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
                                           SERVICE GROUP
@@ -2147,7 +2172,6 @@ function ProcurementMasterDataPage() {
                           <>
                             <th className="py-3 px-3.5">Store Code</th>
                             <th className="py-3 px-3.5">Store Name</th>
-                            <th className="py-3 px-3.5">Organization</th>
                             <th className="py-3 px-3.5">Store Manager</th>
                             <th className="py-3 px-3.5">Contact No</th>
                             <th className="py-3 px-3.5">Valuation</th>
@@ -2161,6 +2185,7 @@ function ProcurementMasterDataPage() {
                           <>
                             <th className="py-3 px-3.5">Mode</th>
                             <th className="py-3 px-3.5">Target Store</th>
+                            <th className="py-3 px-3.5">Company Area/Section</th>
                             <th className="py-3 px-3.5">Code / Numbering</th>
                             <th className="py-3 px-3.5">Details</th>
                             <th className="py-3 px-3.5">Status</th>
@@ -2172,7 +2197,6 @@ function ProcurementMasterDataPage() {
                           <>
                             <th className="py-3 px-3.5">Category Code</th>
                             <th className="py-3 px-3.5">Category Name</th>
-                            <th className="py-3 px-3.5">Description</th>
                             <th className="py-3 px-3.5">Status</th>
                           </>
                         )}
@@ -2196,7 +2220,6 @@ function ProcurementMasterDataPage() {
                           <>
                             <th className="py-3 px-3.5">Type Code</th>
                             <th className="py-3 px-3.5">Business Type Name</th>
-                            <th className="py-3 px-3.5">Description</th>
                             <th className="py-3 px-3.5">Status</th>
                           </>
                         )}
@@ -2255,9 +2278,7 @@ function ProcurementMasterDataPage() {
                         {/* UOM (Type / Category column REMOVED) */}
                         {activeTab === "uom" && (
                           <>
-                            <th className="py-3 px-3.5">UOM Code / ID</th>
                             <th className="py-3 px-3.5">UOM Name</th>
-                            <th className="py-3 px-3.5">Conversion Factor</th>
                             <th className="py-3 px-3.5">Status</th>
                           </>
                         )}
@@ -2267,7 +2288,6 @@ function ProcurementMasterDataPage() {
                           <>
                             <th className="py-3 px-3.5">Term Code</th>
                             <th className="py-3 px-3.5">Term Name</th>
-                            <th className="py-3 px-3.5">Description</th>
                             <th className="py-3 px-3.5">Status</th>
                           </>
                         )}
@@ -2361,7 +2381,6 @@ function ProcurementMasterDataPage() {
                                 <td className="py-2.5 px-3.5 font-bold text-foreground">
                                   {item.storeName}
                                 </td>
-                                <td className="py-2.5 px-3.5">{item.organization}</td>
                                 <td className="py-2.5 px-3.5 font-medium">{item.storeManager || "—"}</td>
                                 <td className="py-2.5 px-3.5 font-mono">{item.contactNumber || "—"}</td>
                                 <td className="py-2.5 px-3.5 font-mono text-[11px]">
@@ -2392,7 +2411,10 @@ function ProcurementMasterDataPage() {
                                 <td className="py-2.5 px-3.5 font-bold text-amber-600 dark:text-amber-400">
                                   {item.trackingMode || "Location"}
                                 </td>
-                                <td className="py-2.5 px-3.5">{item.store}</td>
+                                <td className="py-2.5 px-3.5 font-medium">{item.store}</td>
+                                <td className="py-2.5 px-3.5 font-medium text-foreground">
+                                  {item.companyAreaSectionName || item.companyAreaSection || "Central Warehouse Area"}
+                                </td>
                                 <td className="py-2.5 px-3.5 font-mono font-bold">
                                   {item.locationCode || item.batchNumbering}
                                 </td>
@@ -2428,9 +2450,6 @@ function ProcurementMasterDataPage() {
                                 </td>
                                 <td className="py-2.5 px-3.5 font-bold text-foreground">
                                   {item.categoryName}
-                                </td>
-                                <td className="py-2.5 px-3.5 text-muted-foreground truncate max-w-xs">
-                                  {item.description || "—"}
                                 </td>
                                 <td className="py-2.5 px-3.5">
                                   <span
@@ -2492,9 +2511,6 @@ function ProcurementMasterDataPage() {
                                 </td>
                                 <td className="py-2.5 px-3.5 font-bold text-foreground">
                                   {item.businessTypeName}
-                                </td>
-                                <td className="py-2.5 px-3.5 text-muted-foreground truncate max-w-xs">
-                                  {item.description || "—"}
                                 </td>
                                 <td className="py-2.5 px-3.5">
                                   <span
@@ -2640,13 +2656,9 @@ function ProcurementMasterDataPage() {
                             {/* UOM (Type / Category column REMOVED) */}
                             {activeTab === "uom" && (
                               <>
-                                <td className="py-2.5 px-3.5 font-mono font-bold text-foreground">
-                                  {item.uomCode}
-                                </td>
                                 <td className="py-2.5 px-3.5 font-bold text-foreground">
                                   {item.uomName}
                                 </td>
-                                <td className="py-2.5 px-3.5 font-mono">{item.conversionFactor ?? 1}</td>
                                 <td className="py-2.5 px-3.5">
                                   <span
                                     className={`text-[9.5px] font-extrabold px-2 py-0.5 rounded-full border ${
@@ -2669,9 +2681,6 @@ function ProcurementMasterDataPage() {
                                 </td>
                                 <td className="py-2.5 px-3.5 font-bold text-foreground">
                                   {item.termName}
-                                </td>
-                                <td className="py-2.5 px-3.5 text-muted-foreground">
-                                  {item.description || "—"}
                                 </td>
                                 <td className="py-2.5 px-3.5">
                                   <span

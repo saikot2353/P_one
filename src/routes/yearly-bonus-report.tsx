@@ -28,7 +28,7 @@ export const Route = createFileRoute("/yearly-bonus-report")({
   component: YearlyBonusReportPage,
 });
 
-export function YearlyBonusReportPage() {
+function YearlyBonusReportPage() {
   // Filter States
   const [year, setYear] = useState("2026");
   const [month, setMonth] = useState("Mar");

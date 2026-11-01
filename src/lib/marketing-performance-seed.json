@@ -1,0 +1,2148 @@
+[
+  {
+    "rowIdx": 4,
+    "buyer": "SIEHAN",
+    "hod": "Mr.Alfaz",
+    "targetQty": 300000.0,
+    "targetFob": 1000000.0,
+    "targetFobExtra": 1150000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 300000.0,
+        "achieveFob": 1000000.0
+      },
+      "feb": {
+        "achieveQty": 300000.0,
+        "achieveFob": 1002000.0
+      },
+      "mar": {
+        "achieveQty": 300000.0,
+        "achieveFob": 1002000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 5,
+    "buyer": "Earnsting Family",
+    "hod": "Mr.Alfaz",
+    "targetQty": 400000.0,
+    "targetFob": 1000000.0,
+    "targetFobExtra": 1150000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 400000.0,
+        "achieveFob": 1000000.0
+      },
+      "feb": {
+        "achieveQty": 300000.0,
+        "achieveFob": 750000.0
+      },
+      "mar": {
+        "achieveQty": 300000.0,
+        "achieveFob": 750000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 6,
+    "buyer": "OVS",
+    "hod": "Mr.Alfaz",
+    "targetQty": 350000.0,
+    "targetFob": 500000.0,
+    "targetFobExtra": 575000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 350000.0,
+        "achieveFob": 500000.0
+      },
+      "feb": {
+        "achieveQty": 250000.0,
+        "achieveFob": 375000.0
+      },
+      "mar": {
+        "achieveQty": 250000.0,
+        "achieveFob": 375000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 7,
+    "buyer": "DPAM",
+    "hod": "Mr.Alfaz",
+    "targetQty": 100000.0,
+    "targetFob": 200000.0,
+    "targetFobExtra": 230000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 100000.0,
+        "achieveFob": 200000.0
+      },
+      "feb": {
+        "achieveQty": 50000.0,
+        "achieveFob": 100000.0
+      },
+      "mar": {
+        "achieveQty": 50000.0,
+        "achieveFob": 100000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 8,
+    "buyer": "KAPPA",
+    "hod": "Mr.Alfaz",
+    "targetQty": 33333.333333333336,
+    "targetFob": 83333.33333333333,
+    "targetFobExtra": 95833.33333333333,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 9,
+    "buyer": "FUSSL",
+    "hod": "Mr.Alfaz",
+    "targetQty": 33333.333333333336,
+    "targetFob": 83333.33333333333,
+    "targetFobExtra": 95833.33333333333,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 10,
+    "buyer": "Admiral",
+    "hod": "Mr.Alfaz",
+    "targetQty": 33333.333333333336,
+    "targetFob": 83333.33333333333,
+    "targetFobExtra": 95833.33333333333,
+    "achievements": {
+      "jan": {
+        "achieveQty": 162451.0,
+        "achieveFob": 397517.0
+      },
+      "feb": {
+        "achieveQty": 100000.0,
+        "achieveFob": 250000.0
+      },
+      "mar": {
+        "achieveQty": 100000.0,
+        "achieveFob": 250000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 11,
+    "buyer": "WORLDBOX",
+    "hod": "Mr.Alfaz",
+    "targetQty": 33333.333333333336,
+    "targetFob": 83333.33333333333,
+    "targetFobExtra": 95833.33333333333,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 12,
+    "buyer": "PREMIER",
+    "hod": "Mr.Alfaz",
+    "targetQty": 33333.333333333336,
+    "targetFob": 83333.33333333333,
+    "targetFobExtra": 95833.33333333333,
+    "achievements": {
+      "jan": {
+        "achieveQty": 5750.0,
+        "achieveFob": 9948.0
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 13,
+    "buyer": "CONNOR",
+    "hod": "Mr.Alfaz",
+    "targetQty": 33333.333333333336,
+    "targetFob": 83333.33333333333,
+    "targetFobExtra": 95833.33333333333,
+    "achievements": {
+      "jan": {
+        "achieveQty": 31799.0,
+        "achieveFob": 92535.0
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 14,
+    "buyer": "JBC",
+    "hod": "Mr.Alfaz",
+    "targetQty": 100000.0,
+    "targetFob": 300000.0,
+    "targetFobExtra": 345000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 100000.0,
+        "achieveFob": 300000.0
+      },
+      "feb": {
+        "achieveQty": 50000.0,
+        "achieveFob": 150000.0
+      },
+      "mar": {
+        "achieveQty": 50000.0,
+        "achieveFob": 150000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 15,
+    "buyer": "DMC",
+    "hod": "Mr.Faysal",
+    "targetQty": 150000.0,
+    "targetFob": 300000.0,
+    "targetFobExtra": 345000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 150000.0,
+        "achieveFob": 300000.0
+      },
+      "feb": {
+        "achieveQty": 100000.0,
+        "achieveFob": 200000.0
+      },
+      "mar": {
+        "achieveQty": 100000.0,
+        "achieveFob": 200000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 16,
+    "buyer": "TERRANOVA",
+    "hod": "Mr.Faysal",
+    "targetQty": 50000.0,
+    "targetFob": 100000.0,
+    "targetFobExtra": 115000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 50000.0,
+        "achieveFob": 100000.0
+      },
+      "feb": {
+        "achieveQty": 30000.0,
+        "achieveFob": 80000.0
+      },
+      "mar": {
+        "achieveQty": 30000.0,
+        "achieveFob": 80000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 17,
+    "buyer": "CALLIOPE",
+    "hod": "Mr.Faysal",
+    "targetQty": 50000.0,
+    "targetFob": 100000.0,
+    "targetFobExtra": 115000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 50000.0,
+        "achieveFob": 100000.0
+      },
+      "feb": {
+        "achieveQty": 30000.0,
+        "achieveFob": 80000.0
+      },
+      "mar": {
+        "achieveQty": 30000.0,
+        "achieveFob": 80000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 18,
+    "buyer": "RAGNO",
+    "hod": "Mr.Faysal",
+    "targetQty": 30000.0,
+    "targetFob": 100000.0,
+    "targetFobExtra": 115000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 19,
+    "buyer": "LPP",
+    "hod": "Mr.Kadry",
+    "targetQty": 400000.0,
+    "targetFob": 500000.0,
+    "targetFobExtra": 575000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 400012.0,
+        "achieveFob": 500000.0
+      },
+      "feb": {
+        "achieveQty": 400000.0,
+        "achieveFob": 500000.0
+      },
+      "mar": {
+        "achieveQty": 400000.0,
+        "achieveFob": 500000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 20,
+    "buyer": "HODO",
+    "hod": "Mr.Kadry",
+    "targetQty": 50000.0,
+    "targetFob": 100000.0,
+    "targetFobExtra": 115000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 21,
+    "buyer": "Future Fashion",
+    "hod": "Mr.Kadry",
+    "targetQty": 50000.0,
+    "targetFob": 100000.0,
+    "targetFobExtra": 115000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 22,
+    "buyer": "Farias",
+    "hod": "Mr.Kadry",
+    "targetQty": null,
+    "targetFob": null,
+    "targetFobExtra": 0.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 148000.0,
+        "achieveFob": 223676.0
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 23,
+    "buyer": "Adapt japan",
+    "hod": "Mr.Kadry",
+    "targetQty": null,
+    "targetFob": null,
+    "targetFobExtra": 0.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 83416.0,
+        "achieveFob": 296670.0
+      },
+      "feb": {
+        "achieveQty": 113926.0,
+        "achieveFob": 336375.0
+      },
+      "mar": {
+        "achieveQty": 50000.0,
+        "achieveFob": 50000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 24,
+    "buyer": "Costco",
+    "hod": "Mr.Kadry",
+    "targetQty": null,
+    "targetFob": null,
+    "targetFobExtra": 0.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": 50000.0,
+        "achieveFob": 100000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 25,
+    "buyer": "Others",
+    "hod": "Mr.Kadry",
+    "targetQty": 150000.0,
+    "targetFob": 300000.0,
+    "targetFobExtra": 345000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": 150000.0,
+        "achieveFob": 300000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 26,
+    "buyer": "PEACOCKS",
+    "hod": "Mr.Rokon",
+    "targetQty": 150000.0,
+    "targetFob": 300000.0,
+    "targetFobExtra": 345000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 150000.0,
+        "achieveFob": 300000.0
+      },
+      "feb": {
+        "achieveQty": 150000.0,
+        "achieveFob": 300000.0
+      },
+      "mar": {
+        "achieveQty": 224407.0,
+        "achieveFob": 473344.0
+      },
+      "apr": {
+        "achieveQty": 21300.0,
+        "achieveFob": 45846.0
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 27,
+    "buyer": "TIFFOSI",
+    "hod": "Mr.Rokon",
+    "targetQty": 160000.0,
+    "targetFob": 400000.0,
+    "targetFobExtra": 460000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 160000.0,
+        "achieveFob": 400000.0
+      },
+      "feb": {
+        "achieveQty": 160000.0,
+        "achieveFob": 400000.0
+      },
+      "mar": {
+        "achieveQty": 160000.0,
+        "achieveFob": 400000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 28,
+    "buyer": "BONMARCHE",
+    "hod": "Mr.Saddam",
+    "targetQty": 125000.0,
+    "targetFob": 500000.0,
+    "targetFobExtra": 575000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 125000.0,
+        "achieveFob": 500000.0
+      },
+      "feb": {
+        "achieveQty": 125000.0,
+        "achieveFob": 500000.0
+      },
+      "mar": {
+        "achieveQty": 125000.0,
+        "achieveFob": 500000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 29,
+    "buyer": "ALPINE PRO.",
+    "hod": "Mr.Saddam",
+    "targetQty": 10000.0,
+    "targetFob": 25000.0,
+    "targetFobExtra": 28750.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 20000.0,
+        "achieveFob": 50000.0
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 30,
+    "buyer": "ARTSANA",
+    "hod": "Mr.Saddam",
+    "targetQty": 10000.0,
+    "targetFob": 25000.0,
+    "targetFobExtra": 28750.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": 20000.0,
+        "achieveFob": 50000.0
+      },
+      "mar": {
+        "achieveQty": 20000.0,
+        "achieveFob": 50000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 31,
+    "buyer": "PEPCO",
+    "hod": "Mr.Sadik",
+    "targetQty": 1100000.0,
+    "targetFob": 1500000.0,
+    "targetFobExtra": 1725000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 2094782.0,
+        "achieveFob": 2440126.0
+      },
+      "feb": {
+        "achieveQty": 2086486.0,
+        "achieveFob": 2657441.0
+      },
+      "mar": {
+        "achieveQty": 1100000.0,
+        "achieveFob": 1500000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 32,
+    "buyer": "PSBL",
+    "hod": "Mr.Sadik",
+    "targetQty": 60000.0,
+    "targetFob": 200000.0,
+    "targetFobExtra": 230000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 33,
+    "buyer": "NEXT(Clover)",
+    "hod": "Mr.Sadik",
+    "targetQty": 400000.0,
+    "targetFob": 700000.0,
+    "targetFobExtra": 805000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 422344.0,
+        "achieveFob": 721812.0
+      },
+      "feb": {
+        "achieveQty": 400000.0,
+        "achieveFob": 695000.0
+      },
+      "mar": {
+        "achieveQty": 350000.0,
+        "achieveFob": 610000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 34,
+    "buyer": "LC WAIKIKI",
+    "hod": "Mr.Sadik",
+    "targetQty": 40000.0,
+    "targetFob": 100000.0,
+    "targetFobExtra": 115000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 24510.0,
+        "achieveFob": 99265.0
+      },
+      "feb": {
+        "achieveQty": 40000.0,
+        "achieveFob": 100000.0
+      },
+      "mar": {
+        "achieveQty": 40000.0,
+        "achieveFob": 100000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 35,
+    "buyer": "NEXT(KNITTEX)",
+    "hod": "Mr.Sadik",
+    "targetQty": 20000.0,
+    "targetFob": 75000.0,
+    "targetFobExtra": 86250.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 35000.0,
+        "achieveFob": 140000.0
+      },
+      "feb": {
+        "achieveQty": 35000.0,
+        "achieveFob": 140000.0
+      },
+      "mar": {
+        "achieveQty": 35000.0,
+        "achieveFob": 140000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 36,
+    "buyer": "The Set",
+    "hod": "Mr.Sadik",
+    "targetQty": 20000.0,
+    "targetFob": 75000.0,
+    "targetFobExtra": 86250.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 50000.0,
+        "achieveFob": 165000.0
+      },
+      "feb": {
+        "achieveQty": 50000.0,
+        "achieveFob": 165000.0
+      },
+      "mar": {
+        "achieveQty": 50000.0,
+        "achieveFob": 165000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 37,
+    "buyer": "Sea Salt",
+    "hod": "Mr.Sadik",
+    "targetQty": 20000.0,
+    "targetFob": 75000.0,
+    "targetFobExtra": 86250.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 38,
+    "buyer": "Zalando",
+    "hod": "Mr.Sadik",
+    "targetQty": 20000.0,
+    "targetFob": 75000.0,
+    "targetFobExtra": 86250.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 50000.0,
+        "achieveFob": 87500.0
+      },
+      "feb": {
+        "achieveQty": 50000.0,
+        "achieveFob": 87500.0
+      },
+      "mar": {
+        "achieveQty": 50000.0,
+        "achieveFob": 87500.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 39,
+    "buyer": "4F",
+    "hod": "Mr.Sadik",
+    "targetQty": null,
+    "targetFob": null,
+    "targetFobExtra": 0.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": 60000.0,
+        "achieveFob": 200000.0
+      },
+      "feb": {
+        "achieveQty": 30000.0,
+        "achieveFob": 100000.0
+      },
+      "mar": {
+        "achieveQty": 30000.0,
+        "achieveFob": 100000.0
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  },
+  {
+    "rowIdx": 40,
+    "buyer": "New Marketing",
+    "hod": "Mr.Sadik",
+    "targetQty": 400000.0,
+    "targetFob": 700000.0,
+    "targetFobExtra": 805000.0,
+    "achievements": {
+      "jan": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "feb": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "mar": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "apr": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "may": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jun": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "jul": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "aug": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "sep": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "oct": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "nov": {
+        "achieveQty": null,
+        "achieveFob": null
+      },
+      "dec": {
+        "achieveQty": null,
+        "achieveFob": null
+      }
+    }
+  }
+]

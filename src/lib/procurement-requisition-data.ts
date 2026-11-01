@@ -118,6 +118,13 @@ export interface PurchaseRequisition {
   // Attachments
   attachments: (PRAttachment | any)[];
   // Approval
+  taggedInternalRequisitions?: Array<{
+    id: string;
+    mrNumber: string;
+    approvedDate?: string;
+    requestedBy: string;
+    department: string;
+  }>;
   status: "Draft" | "Submitted" | "Pending Approval" | "Approved" | "Rejected" | "Returned" | "Cancelled";
   currentApprovalLevel?: number;
   approvalHistory?: PRApprovalStep[];
@@ -206,6 +213,13 @@ export interface MonthlyBudgetRequisition {
   totalEstimatedQuantity?: number;
   estimatedRequirementValue?: number;
   totalEstimatedBudget?: number;
+  taggedInternalRequisitions?: Array<{
+    id: string;
+    mrNumber: string;
+    approvedDate?: string;
+    requestedBy: string;
+    department: string;
+  }>;
   status: "Draft" | "Submitted" | "Pending Approval" | "Approved" | "Rejected" | "Returned" | "Cancelled";
   approvalHistory?: PRApprovalStep[];
   auditHistory?: {

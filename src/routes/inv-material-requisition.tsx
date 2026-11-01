@@ -193,7 +193,12 @@ function MaterialRequisitionPage() {
 
   // Items State
   const [items, setItems] = useState<MRItem[]>(() => {
-    if (currentMR && currentMR.items) return currentMR.items;
+    if (currentMR && currentMR.items) {
+      return currentMR.items.map((it) => ({
+        ...it,
+        approvedQuantity: it.approvedQuantity !== undefined ? it.approvedQuantity : it.requestedQuantity,
+      }));
+    }
     return [];
   });
 
@@ -211,7 +216,12 @@ function MaterialRequisitionPage() {
       setWarehouseStore(currentMR.warehouseStore);
       setPurpose(currentMR.purpose || "");
       setRemarks(currentMR.remarks || "");
-      setItems(currentMR.items || []);
+      setItems(
+        (currentMR.items || []).map((it) => ({
+          ...it,
+          approvedQuantity: it.approvedQuantity !== undefined ? it.approvedQuantity : it.requestedQuantity,
+        }))
+      );
     }
   }, [currentMR]);
 
@@ -392,8 +402,40 @@ function MaterialRequisitionPage() {
   const [approvalModalAction, setApprovalModalAction] = useState<"Approve" | "Reject" | "Return" | null>(null);
   const [approvalComment, setApprovalComment] = useState("");
 
+  const handleApproveQtyChange = (itemId: string, val: string) => {
+    const num = val === "" ? 0 : Number(val);
+    setItems((prev) =>
+      prev.map((it) => {
+        if (it.id === itemId) {
+          return {
+            ...it,
+            approvedQuantity: isNaN(num) ? 0 : num,
+          };
+        }
+        return it;
+      })
+    );
+  };
+
+  const validateApproveQuantities = (): boolean => {
+    for (const item of items) {
+      const approved = item.approvedQuantity !== undefined ? Number(item.approvedQuantity) : Number(item.requestedQuantity);
+      const requested = Number(item.requestedQuantity) || 0;
+      if (isNaN(approved) || approved < 0) {
+        toast.error(`Invalid Approve QTY for "${item.itemName}". Quantity cannot be negative.`);
+        return false;
+      }
+      if (approved > requested) {
+        toast.error(`Approve QTY (${approved}) cannot exceed Requested Qty (${requested}) for "${item.itemName}".`);
+        return false;
+      }
+    }
+    return true;
+  };
+
   // Approver Action Handlers
   const handleApprove = () => {
+    if (!validateApproveQuantities()) return;
     setApprovalModalAction("Approve");
     setApprovalComment("");
   };
@@ -456,12 +498,17 @@ function MaterialRequisitionPage() {
     if (!currentMR || !approvalModalAction) return;
 
     if (approvalModalAction === "Approve") {
+      if (!validateApproveQuantities()) return;
       const updated = requisitions.map((r) => {
         if (r.id === currentMR.id) {
           return {
             ...r,
             status: "Approved" as MRStatus,
             approvedDate: new Date().toISOString().replace("T", " ").slice(0, 16),
+            items: items.map((it) => ({
+              ...it,
+              approvedQuantity: it.approvedQuantity !== undefined ? Number(it.approvedQuantity) : Number(it.requestedQuantity),
+            })),
             approvalHistory: [
               ...(r.approvalHistory || []),
               {
@@ -531,6 +578,7 @@ function MaterialRequisitionPage() {
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
   const previewReportData: StandardReportData = useMemo(() => {
     return {
+      hideLogo: true,
       companyName: organization,
       companyAddress: "Gorat, Ashulia, Savar, Dhaka, Bangladesh",
       reportTitle: "MATERIAL REQUISITION NOTE",
@@ -538,69 +586,33 @@ function MaterialRequisitionPage() {
       reportDate: requisitionDate,
       statusBadge: currentMR?.status || "Draft",
       metaFields: [
-        { label: "Department", value: department },
-        { label: "Requested By", value: requestedBy },
+        { label: "Requisition Date", value: requisitionDate },
         { label: "Required Date", value: requiredDate },
+        { label: "Requested By", value: requestedBy },
+        { label: "Department", value: department },
         { label: "Priority", value: priority },
-        { label: "Warehouse / Store", value: warehouseStore },
         { label: "Purpose", value: purpose || "General Inventory Requisition" },
       ],
-      tableHeaders: isAvailableStockPolicyEnabled
-        ? [
-            "SL",
-            "ITEM CODE",
-            "ITEM DESCRIPTION",
-            "SPECIFICATION",
-            "UOM",
-            "REQ QTY",
-            "AVL STOCK",
-            "SHORTAGE",
-            "REMARKS",
-          ]
-        : [
-            "SL",
-            "ITEM CODE",
-            "ITEM DESCRIPTION",
-            "SPECIFICATION",
-            "UOM",
-            "REQ QTY",
-            "REMARKS",
-          ],
-      tableRows: items.map((it, idx) =>
-        isAvailableStockPolicyEnabled
-          ? [
-              String(idx + 1),
-              it.itemCode,
-              it.itemName,
-              it.specification || "-",
-              it.uom,
-              String(it.requestedQuantity),
-              String(it.availableStock),
-              String(it.shortageQuantity),
-              it.remarks || "-",
-            ]
-          : [
-              String(idx + 1),
-              it.itemCode,
-              it.itemName,
-              it.specification || "-",
-              it.uom,
-              String(it.requestedQuantity),
-              it.remarks || "-",
-            ]
-      ),
-      summaryCards: [
-        { label: "Total Items", value: String(items.length) },
-        { label: "Requested Qty", value: String(totalRequestedQty) },
-        { label: "Issued Qty", value: String(totalIssuedQty) },
-        { label: "Remaining Qty", value: String(totalRemainingQty) },
-        { label: "Shortage Qty", value: String(totalShortageQty) },
+      tableHeaders: [
+        "SL",
+        "ITEM CODE",
+        "ITEM DESCRIPTION",
+        "SPECIFICATION",
+        "UOM",
+        "REQ QTY",
+        "APP QTY",
       ],
-      notes: [
-        `Requisition Date: ${requisitionDate}`,
-        hasShortage
-          ? `CRITICAL SHORTAGE: ${totalShortageQty} units shortage identified. PR required.`
-          : "Stock fully available in warehouse.",
+      tableRows: items.map((it, idx) => [
+        String(idx + 1),
+        it.itemCode,
+        it.itemName,
+        it.specification || "-",
+        it.uom,
+        String(it.requestedQuantity),
+        String(it.approvedQuantity ?? it.requestedQuantity),
+      ]),
+      summaryCards: [
+        { label: "Requested Qty", value: String(totalRequestedQty) },
       ],
       signatures: [
         { title: "Requested By", name: requestedBy, date: requisitionDate },
@@ -622,14 +634,9 @@ function MaterialRequisitionPage() {
     requestedBy,
     requiredDate,
     priority,
-    warehouseStore,
     purpose,
     items,
     totalRequestedQty,
-    totalIssuedQty,
-    totalRemainingQty,
-    totalShortageQty,
-    hasShortage,
   ]);
 
   return (
@@ -677,9 +684,6 @@ function MaterialRequisitionPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Request materials from warehouse inventory with real-time stock & shortage checks
-                </p>
               </div>
             </div>
 
@@ -792,52 +796,21 @@ function MaterialRequisitionPage() {
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Organization / Company with Policy Indicator */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                    Company / Organization *
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {/* MR ID (Visible in Approval review mode) */}
+              {mode === "approve" && (
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                    Requisition ID
                   </label>
-                  <button
-                    type="button"
-                    onClick={handleToggleCompanyPolicy}
-                    className={`text-[9px] font-bold px-1.5 py-0.5 rounded border transition cursor-pointer ${
-                      isAvailableStockPolicyEnabled
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-300"
-                        : "bg-slate-100 text-slate-600 border-slate-300"
-                    }`}
-                    title="Click to toggle Available Stock policy for this company"
-                  >
-                    Policy: {isAvailableStockPolicyEnabled ? "Stock ON" : "Stock OFF"}
-                  </button>
+                  <input
+                    type="text"
+                    readOnly
+                    value={mrNumber}
+                    className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs font-mono font-bold text-blue-600 cursor-not-allowed outline-none"
+                  />
                 </div>
-                <select
-                  disabled={isReadOnly}
-                  value={organization}
-                  onChange={(e) => setOrganization(e.target.value)}
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none disabled:bg-slate-50 disabled:cursor-not-allowed"
-                >
-                  <option value="Pakiza Knit Composite Ltd">Pakiza Knit Composite Ltd</option>
-                  <option value="Pakiza Cotton Mills Ltd">Pakiza Cotton Mills Ltd</option>
-                  <option value="Pakiza Spinning Mills Ltd">Pakiza Spinning Mills Ltd (Policy: Hidden)</option>
-                  <option value="Pakiza Woven Fashion Ltd">Pakiza Woven Fashion Ltd (Policy: Hidden)</option>
-                  <option value="Pakiza Apparels Ltd">Pakiza Apparels Ltd</option>
-                </select>
-              </div>
-
-              {/* MR ID */}
-              <div>
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                  Requisition ID
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  value={mrNumber}
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs font-mono font-bold text-blue-600 cursor-not-allowed outline-none"
-                />
-              </div>
+              )}
 
               {/* Requisition Date */}
               <div>
@@ -912,27 +885,8 @@ function MaterialRequisitionPage() {
                 </select>
               </div>
 
-              {/* Requisition Store (Active Stores) */}
-              <div>
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                  Requisition Store *
-                </label>
-                <select
-                  disabled={isReadOnly}
-                  value={warehouseStore}
-                  onChange={(e) => handleWarehouseChange(e.target.value)}
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none disabled:bg-slate-50 disabled:cursor-not-allowed"
-                >
-                  {warehouses.map((w) => (
-                    <option key={w.id} value={w.storeName}>
-                      {w.storeName} ({w.storeCode})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               {/* Purpose */}
-              <div className="sm:col-span-2 md:col-span-4">
+              <div className="col-span-full">
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                   Requisition Purpose & Justification
                 </label>
@@ -961,36 +915,19 @@ function MaterialRequisitionPage() {
                 <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
                   {items.length} item(s) in requisition
                 </span>
-                <div className="flex items-center gap-3">
-                  <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500">
-                    <span className="text-[10px] uppercase font-bold text-slate-400">Available Stock:</span>
-                    <button
-                      type="button"
-                      onClick={handleToggleCompanyPolicy}
-                      className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border cursor-pointer transition ${
-                        isAvailableStockPolicyEnabled
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100"
-                          : "bg-slate-100 text-slate-500 border-slate-300 hover:bg-slate-200"
-                      }`}
-                    >
-                      {isAvailableStockPolicyEnabled ? "✓ Visible (Policy)" : "✕ Hidden (Policy)"}
-                    </button>
-                  </div>
-
-                  {!isReadOnly && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setItemSearchQuery("");
-                        setItemSearchOpen(true);
-                      }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
-                    >
-                      <Plus className="size-3.5" />
-                      <span>Add Item</span>
-                    </button>
-                  )}
-                </div>
+                {!isReadOnly && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setItemSearchQuery("");
+                      setItemSearchOpen(true);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  >
+                    <Plus className="size-3.5" />
+                    <span>Add Item</span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -1003,12 +940,11 @@ function MaterialRequisitionPage() {
                     <th className="py-3 px-3">Item Description</th>
                     <th className="py-3 px-3">Specification</th>
                     <th className="py-3 px-3">Brand / Origin</th>
-                    <th className="py-3 px-3">Requisition Store</th>
                     <th className="py-3 px-3 text-center w-16">UOM</th>
-                    {isAvailableStockPolicyEnabled && (
-                      <th className="py-3 px-3 text-right w-28">Available Stock</th>
-                    )}
                     <th className="py-3 px-3 text-right w-28">Requested Qty</th>
+                    {(mode === "approve" || currentMR?.status === "Approved") && (
+                      <th className="py-3 px-3 text-right w-28 text-emerald-700">Approve QTY</th>
+                    )}
                     {!isReadOnly && <th className="py-3 px-3 text-center w-14">Action</th>}
                   </tr>
                 </thead>
@@ -1017,13 +953,11 @@ function MaterialRequisitionPage() {
                     <tr>
                       <td
                         colSpan={
-                          isReadOnly
-                            ? isAvailableStockPolicyEnabled
-                              ? 8
-                              : 7
-                            : isAvailableStockPolicyEnabled
-                              ? 9
-                              : 8
+                          4 +
+                          1 +
+                          1 +
+                          ((mode === "approve" || currentMR?.status === "Approved") ? 1 : 0) +
+                          (!isReadOnly ? 1 : 0)
                         }
                         className="py-10 text-center text-slate-400"
                       >
@@ -1050,31 +984,9 @@ function MaterialRequisitionPage() {
                           <td className="py-3 px-3 text-slate-600">
                             {item.brand || "-"} / {item.origin || "-"}
                           </td>
-                          <td className="py-3 px-3">
-                            {isReadOnly ? (
-                              <span className="font-medium text-slate-700">{item.requisitionStore || warehouseStore}</span>
-                            ) : (
-                              <select
-                                value={item.requisitionStore || warehouseStore}
-                                onChange={(e) => handleItemStoreChange(item.id, e.target.value)}
-                                className="h-7 px-2 text-xs rounded border border-slate-200 bg-white font-medium outline-none focus:border-blue-500"
-                              >
-                                {warehouses.map((w) => (
-                                  <option key={w.id} value={w.storeName}>
-                                    {w.storeName}
-                                  </option>
-                                ))}
-                              </select>
-                            )}
-                          </td>
                           <td className="py-3 px-3 text-center font-mono font-bold text-slate-700">
                             {item.uom}
                           </td>
-                          {isAvailableStockPolicyEnabled && (
-                            <td className="py-3 px-3 text-right font-mono font-bold text-emerald-600">
-                              {item.availableStock.toLocaleString()}
-                            </td>
-                          )}
                           <td className="py-3 px-3 text-right">
                             {isReadOnly ? (
                               <span className="font-mono font-bold text-slate-900">
@@ -1090,6 +1002,36 @@ function MaterialRequisitionPage() {
                               />
                             )}
                           </td>
+                          {(mode === "approve" || currentMR?.status === "Approved") && (
+                            <td className="py-3 px-3 text-right">
+                              {mode === "approve" ? (
+                                <div className="flex flex-col items-end">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max={item.requestedQuantity}
+                                    value={item.approvedQuantity ?? item.requestedQuantity}
+                                    onChange={(e) => handleApproveQtyChange(item.id, e.target.value)}
+                                    className={`w-20 h-7 rounded border px-2 text-right font-mono font-bold text-xs outline-none ${
+                                      (item.approvedQuantity ?? item.requestedQuantity) > item.requestedQuantity ||
+                                      (item.approvedQuantity ?? item.requestedQuantity) < 0
+                                        ? "border-rose-500 bg-rose-50 text-rose-700 focus:ring-1 focus:ring-rose-500"
+                                        : "border-emerald-300 bg-emerald-50/50 text-emerald-800 focus:ring-1 focus:ring-emerald-500"
+                                    }`}
+                                  />
+                                  {(item.approvedQuantity ?? item.requestedQuantity) > item.requestedQuantity && (
+                                    <span className="text-[9px] text-rose-600 font-bold mt-0.5 whitespace-nowrap">
+                                      Max: {item.requestedQuantity}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="font-mono font-bold text-emerald-700">
+                                  {(item.approvedQuantity ?? item.requestedQuantity).toLocaleString()}
+                                </span>
+                              )}
+                            </td>
+                          )}
                           {!isReadOnly && (
                             <td className="py-3 px-3 text-center">
                               <button
@@ -1111,8 +1053,31 @@ function MaterialRequisitionPage() {
                     <td colSpan={4} className="py-3 px-4 text-slate-800">
                       Total Items: <span className="font-mono text-blue-600 ml-1">{items.length}</span>
                     </td>
-                    <td colSpan={isReadOnly ? 4 : 5} className="py-3 px-4 text-right text-slate-800">
-                      Total Requested Quantity: <span className="font-mono text-blue-600 ml-1">{totalRequestedQty.toLocaleString()}</span>
+                    <td
+                      colSpan={
+                        (isAvailableStockPolicyEnabled ? 1 : 0) +
+                        1 +
+                        ((mode === "approve" || currentMR?.status === "Approved") ? 1 : 0) +
+                        (!isReadOnly ? 1 : 0)
+                      }
+                      className="py-3 px-4 text-right text-slate-800"
+                    >
+                      <div className="flex items-center justify-end gap-4">
+                        <span>
+                          Total Requested Qty:{" "}
+                          <span className="font-mono text-blue-600 ml-1">
+                            {totalRequestedQty.toLocaleString()}
+                          </span>
+                        </span>
+                        {(mode === "approve" || currentMR?.status === "Approved") && (
+                          <span>
+                            Total Approved Qty:{" "}
+                            <span className="font-mono text-emerald-600 ml-1">
+                              {items.reduce((s, it) => s + (Number(it.approvedQuantity ?? it.requestedQuantity) || 0), 0).toLocaleString()}
+                            </span>
+                          </span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 </tfoot>

@@ -232,7 +232,7 @@ export function SupplierReturnListPage() {
                 <thead>
                   <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border">
                     <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
-                    <th className="py-2.5 px-3 font-bold w-32">Return Voucher</th>
+                    <th className="py-2.5 px-3 font-bold w-32">Return ID</th>
                     <th className="py-2.5 px-3 font-bold w-24">Date</th>
                     <th className="py-2.5 px-3 font-bold">Supplier / Vendor</th>
                     <th className="py-2.5 px-3 font-bold w-28">PO Number</th>

@@ -37,7 +37,10 @@ import {
   LogOut,
 } from "lucide-react";
 import { ModuleLauncher } from "./ModuleLauncher";
-import { getHRNotifications, type HRDocIssueNotification } from "@/routes/employee-doc-verification";
+import {
+  getHRNotifications,
+  type HRDocIssueNotification,
+} from "@/routes/employee-doc-verification";
 
 const HR_NOTIF_KEY = "hr_doc_issue_notifications_v1";
 
@@ -113,7 +116,37 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
   { label: "Personnel QR Scanner", parent: "Personnel Info", to: "/" },
-  { label: "Lefty Management", parent: "Personnel Info", to: "/disciplinary-lefty", description: "Manage unauthorized absence, progressive notices, and cash salary mode" },
+  {
+    label: "Lefty Management",
+    parent: "Personnel Info",
+    to: "/disciplinary-lefty",
+    description: "Manage unauthorized absence, progressive notices, and cash salary mode",
+  },
+  // Digital Business Card
+  {
+    label: "My Digital Business Card",
+    parent: "Digital Business Card",
+    to: "/my-digital-business-card",
+    description: "Manage personal public business card and visibility controls",
+  },
+  {
+    label: "Share My Card",
+    parent: "Digital Business Card",
+    to: "/share-my-card",
+    description: "Share your permanent public QR code, card link, and vCard file",
+  },
+  {
+    label: "Business Card Management",
+    parent: "Digital Business Card",
+    to: "/digital-business-cards-admin",
+    description: "Corporate administration, Admin lock governance, and card registry",
+  },
+  {
+    label: "Card Analytics",
+    parent: "Digital Business Card",
+    to: "/digital-business-card-analytics",
+    description: "View visitor metrics, engagement traffic, and view counts",
+  },
   // Attendance
   {
     label: "Manual Attendance Entry",
@@ -183,50 +216,58 @@ const searchableMenus: SearchMenuLink[] = [
     label: "Maternity Payment Registry & Disbursement",
     parent: "Maternity Leave",
     to: "/maternity-payment",
-    description: "Manage maternity leave payment records, 112/120 day disbursements and applications",
+    description:
+      "Manage maternity leave payment records, 112/120 day disbursements and applications",
   },
   {
     label: "Maternity Payment Statement Report",
     parent: "Maternity Leave",
     to: "/maternity-payment-report",
-    description: "View department-wise maternity payment report, 1st & 2nd installment disbursements",
+    description:
+      "View department-wise maternity payment report, 1st & 2nd installment disbursements",
   },
   {
     label: "Maternity Policy Configuration",
     parent: "Configure",
     to: "/maternity-configuration",
-    description: "Configure maternity leave effective cutoff dates and wage basis rules (Gross Pay vs Net Pay)",
+    description:
+      "Configure maternity leave effective cutoff dates and wage basis rules (Gross Pay vs Net Pay)",
   },
   {
     label: "Lunch Rate Festival",
     parent: "Configure",
     to: "/lunch-rate-festival",
-    description: "Configure and manage festival lunch rates for employees across departments and sections",
+    description:
+      "Configure and manage festival lunch rates for employees across departments and sections",
   },
   // Separation Module
   {
     label: "Resignation Request Queue",
     parent: "Separation",
     to: "/separation-resignation-request",
-    description: "Submit and manage employee resignation requests, notice periods, and handover notes",
+    description:
+      "Submit and manage employee resignation requests, notice periods, and handover notes",
   },
   {
     label: "Multi-Departmental Separation Clearance Matrix",
     parent: "Separation",
     to: "/separation-clearance",
-    description: "Track and grant clearances across Accounts, Admin, ICT, Reporting Boss, HR, and C-Level",
+    description:
+      "Track and grant clearances across Accounts, Admin, ICT, Reporting Boss, HR, and C-Level",
   },
   {
     label: "Separation Payment & Settlement",
     parent: "Separation",
     to: "/separation-payment",
-    description: "Calculate and disburse final settlement payments, gratuity, EL encashment, and loans",
+    description:
+      "Calculate and disburse final settlement payments, gratuity, EL encashment, and loans",
   },
   {
     label: "Separation Exit Documents",
     parent: "Separation",
     to: "/separation-exit-documents",
-    description: "Generate and issue official Release Letters, Experience Certificates, NOC, and Settlement Vouchers",
+    description:
+      "Generate and issue official Release Letters, Experience Certificates, NOC, and Settlement Vouchers",
   },
   {
     label: "Leave Approval Board",
@@ -358,7 +399,11 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Sequential approval board workflow for pending Job Description Sheets",
   },
   // Disciplinary Action
-  { label: "Show Cause Notices", parent: "Disciplinary Action", to: "/disciplinary-showcause-notices" },
+  {
+    label: "Show Cause Notices",
+    parent: "Disciplinary Action",
+    to: "/disciplinary-showcause-notices",
+  },
   { label: "Warning Letters", parent: "Disciplinary Action", to: "/disciplinary-warning-letters" },
   { label: "Case Files", parent: "Disciplinary Action", to: "/disciplinary-case-files" },
   // Manage Overtime
@@ -385,13 +430,15 @@ const searchableMenus: SearchMenuLink[] = [
     label: "Work Flow",
     parent: "Approvals",
     to: "/work-flows",
-    description: "Multi-level approval workflow configuration, layer points, and approver assignment",
+    description:
+      "Multi-level approval workflow configuration, layer points, and approver assignment",
   },
   {
     label: "Sync Requisition",
     parent: "Approvals",
     to: "/sync-requisition",
-    description: "Synchronize requisition workflow layers and re-bind approvals to active organizational layers",
+    description:
+      "Synchronize requisition workflow layers and re-bind approvals to active organizational layers",
   },
   {
     label: "Salary Submit",
@@ -403,7 +450,8 @@ const searchableMenus: SearchMenuLink[] = [
     label: "Check Salary",
     parent: "Payroll",
     to: "/payroll-check-salary",
-    description: "Monthly salary checking, review, and verification module with dual Submit & Review controls",
+    description:
+      "Monthly salary checking, review, and verification module with dual Submit & Review controls",
   },
   {
     label: "Check Salary Vat/Tax",
@@ -421,7 +469,8 @@ const searchableMenus: SearchMenuLink[] = [
     label: "Check Salary Plant Head",
     parent: "Payroll",
     to: "/payroll-check-salary-planthead",
-    description: "Plant Head executive salary checking and approval module with Review & Approve controls",
+    description:
+      "Plant Head executive salary checking and approval module with Review & Approve controls",
   },
   {
     label: "Check Salary Accounts",
@@ -976,7 +1025,9 @@ export function Topbar() {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   // HR Issue Notifications
-  const [hrNotifications, setHrNotifications] = useState<HRDocIssueNotification[]>(() => getHRNotifications());
+  const [hrNotifications, setHrNotifications] = useState<HRDocIssueNotification[]>(() =>
+    getHRNotifications(),
+  );
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const unreadCount = hrNotifications.filter((n) => !n.read).length;
@@ -985,7 +1036,10 @@ export function Topbar() {
     const refresh = () => setHrNotifications(getHRNotifications());
     window.addEventListener("hr-notif-update", refresh);
     window.addEventListener("storage", refresh);
-    return () => { window.removeEventListener("hr-notif-update", refresh); window.removeEventListener("storage", refresh); };
+    return () => {
+      window.removeEventListener("hr-notif-update", refresh);
+      window.removeEventListener("storage", refresh);
+    };
   }, []);
 
   useEffect(() => {
@@ -1303,7 +1357,9 @@ export function Topbar() {
             className="relative size-9 grid place-items-center rounded-lg hover:bg-muted text-foreground/80 hover:text-foreground transition-colors duration-200"
             title="HR Document Issue Notifications"
           >
-            <Bell className={`size-4.5 ${unreadCount > 0 ? "text-orange-500 dark:text-orange-400" : ""}`} />
+            <Bell
+              className={`size-4.5 ${unreadCount > 0 ? "text-orange-500 dark:text-orange-400" : ""}`}
+            />
             {unreadCount > 0 && (
               <span className="absolute top-1 left-1.5 px-1 py-0.5 text-[8px] font-extrabold bg-orange-500 text-white rounded shadow-xs min-w-[14px] text-center animate-pulse">
                 {unreadCount > 9 ? "9+" : unreadCount}
@@ -1330,9 +1386,13 @@ export function Topbar() {
               <div className="px-4 py-3 border-b border-border/60 flex items-center justify-between bg-orange-50/60 dark:bg-orange-950/10">
                 <div className="flex items-center gap-2">
                   <Flag className="size-3.5 text-orange-500" />
-                  <span className="text-xs font-black text-slate-800 dark:text-white">HR Document Issues</span>
+                  <span className="text-xs font-black text-slate-800 dark:text-white">
+                    HR Document Issues
+                  </span>
                   {hrNotifications.length > 0 && (
-                    <span className="px-1.5 py-0.5 text-[9px] font-black bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 rounded-full">{hrNotifications.length}</span>
+                    <span className="px-1.5 py-0.5 text-[9px] font-black bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 rounded-full">
+                      {hrNotifications.length}
+                    </span>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
@@ -1340,13 +1400,17 @@ export function Topbar() {
                     to="/employee-doc-issue"
                     onClick={() => setIsNotifOpen(false)}
                     className="text-[10px] font-bold text-orange-600 dark:text-orange-400 hover:underline"
-                  >Doc Issues →</Link>
+                  >
+                    Doc Issues →
+                  </Link>
                   <span className="text-slate-300 dark:text-slate-700">·</span>
                   <Link
                     to="/employee-doc-verification"
                     onClick={() => setIsNotifOpen(false)}
                     className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline"
-                  >Verification →</Link>
+                  >
+                    Verification →
+                  </Link>
                 </div>
               </div>
               {/* Notification list */}
@@ -1359,24 +1423,48 @@ export function Topbar() {
                 ) : (
                   <div className="divide-y divide-border/60">
                     {hrNotifications.map((n) => (
-                      <div key={n.id} className={`px-4 py-3 flex items-start gap-3 group hover:bg-orange-50/40 dark:hover:bg-orange-950/10 transition-colors ${!n.read ? "bg-orange-50/60 dark:bg-orange-950/5" : ""}`}>
+                      <div
+                        key={n.id}
+                        className={`px-4 py-3 flex items-start gap-3 group hover:bg-orange-50/40 dark:hover:bg-orange-950/10 transition-colors ${!n.read ? "bg-orange-50/60 dark:bg-orange-950/5" : ""}`}
+                      >
                         <div className="size-8 rounded-xl bg-orange-100 dark:bg-orange-950/30 flex items-center justify-center shrink-0 mt-0.5">
                           <Flag className="size-3.5 text-orange-500 dark:text-orange-400" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-[11px] font-black text-slate-900 dark:text-white truncate">{n.employeeName}</span>
-                            {!n.read && <span className="inline-block size-1.5 rounded-full bg-orange-500 shrink-0" />}
+                            <span className="text-[11px] font-black text-slate-900 dark:text-white truncate">
+                              {n.employeeName}
+                            </span>
+                            {!n.read && (
+                              <span className="inline-block size-1.5 rounded-full bg-orange-500 shrink-0" />
+                            )}
                           </div>
-                          <p className="text-[10px] text-orange-700 dark:text-orange-400 font-semibold truncate">{n.docTitle}</p>
-                          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 leading-snug line-clamp-2">{n.issueDescription}</p>
-                          <span className="text-[9px] text-slate-400 font-mono mt-1 block">{new Date(n.raisedAt).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                          <p className="text-[10px] text-orange-700 dark:text-orange-400 font-semibold truncate">
+                            {n.docTitle}
+                          </p>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 leading-snug line-clamp-2">
+                            {n.issueDescription}
+                          </p>
+                          <span className="text-[9px] text-slate-400 font-mono mt-1 block">
+                            {new Date(n.raisedAt).toLocaleString("en-GB", {
+                              day: "2-digit",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
                         </div>
                         <button
-                          onClick={(e) => { e.stopPropagation(); dismissNotification(n.id); setHrNotifications(getHRNotifications()); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dismissNotification(n.id);
+                            setHrNotifications(getHRNotifications());
+                          }}
                           className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0"
                           title="Dismiss"
-                        ><X className="size-3" /></button>
+                        >
+                          <X className="size-3" />
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -1385,9 +1473,16 @@ export function Topbar() {
               {hrNotifications.length > 0 && (
                 <div className="px-4 py-2.5 border-t border-border/60 bg-slate-50/60 dark:bg-slate-900/20">
                   <button
-                    onClick={() => { const updated = getHRNotifications().filter(() => false); localStorage.setItem(HR_NOTIF_KEY, JSON.stringify(updated)); setHrNotifications([]); window.dispatchEvent(new Event("hr-notif-update")); }}
+                    onClick={() => {
+                      const updated = getHRNotifications().filter(() => false);
+                      localStorage.setItem(HR_NOTIF_KEY, JSON.stringify(updated));
+                      setHrNotifications([]);
+                      window.dispatchEvent(new Event("hr-notif-update"));
+                    }}
                     className="w-full text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors text-center"
-                  >Clear all notifications</button>
+                  >
+                    Clear all notifications
+                  </button>
                 </div>
               )}
             </div>
@@ -1407,7 +1502,11 @@ export function Topbar() {
               </div>
             </div>
             <div className="size-9 rounded-full overflow-hidden border border-border/80 shadow-2xs flex-shrink-0 bg-muted">
-              <img src="https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg" alt="Tahmid Afsar" className="size-full object-cover" />
+              <img
+                src="https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+                alt="Tahmid Afsar"
+                className="size-full object-cover"
+              />
             </div>
           </button>
 
@@ -1430,7 +1529,9 @@ export function Topbar() {
               >
                 <div className="px-3 py-2 border-b border-border/60 mb-1">
                   <p className="text-xs font-extrabold">Tahmid Afsar</p>
-                  <p className="text-[10px] text-muted-foreground font-medium truncate">tahmid@pakizasoftware.com</p>
+                  <p className="text-[10px] text-muted-foreground font-medium truncate">
+                    tahmid@pakizasoftware.com
+                  </p>
                 </div>
 
                 <Link

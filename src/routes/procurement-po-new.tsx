@@ -59,6 +59,8 @@ import {
   getStoredWoItems,
   setStoredWoItems,
 } from "@/lib/procurement-order-inventory-data";
+import { PurchaseOrderReportModal, PurchaseOrderReportData } from "@/components/procurement/PurchaseOrderReportModal";
+import { getEffectiveProcurementConfig } from "@/lib/procurement-config-data";
 import pakizaSoftwareLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
 
 function getItemPurchaseHistory(item: { itemName: string; unitPrice?: number; uom?: string }) {
@@ -180,6 +182,18 @@ export function PurchaseOrderWorkOrderPage() {
     specification?: string;
     uom?: string;
     unitPrice?: number;
+  } | null>(null);
+
+  // Procurement Company Configuration
+  const procConfig = useMemo(() => {
+    return getEffectiveProcurementConfig("Pakiza Knit Composite Ltd.");
+  }, []);
+
+  // Category Alert Modal State for multiple-category rule
+  const [categoryAlert, setCategoryAlert] = useState<{
+    attemptedItem: string;
+    attemptedCategory: string;
+    allowedCategory: string;
   } | null>(null);
 
   // Search terms inside modals
@@ -493,6 +507,74 @@ export function PurchaseOrderWorkOrderPage() {
 
   const activeTotals = docType === "Purchase Order" ? poTotals : woTotals;
 
+  const currentReportOrder: PurchaseOrderReportData = useMemo(() => {
+    return {
+      orderNumber,
+      orderDate,
+      documentType: docType,
+      supplierName: currentSupplier?.vendorName || "Supplier",
+      supplierAddress: currentSupplier?.address || "Corporate Facility, Dhaka",
+      supplierContact: currentSupplier?.contactPersonName || (currentSupplier as any)?.contactPerson || "Commercial In-charge",
+      supplierMobile: currentSupplier?.mobileNumber || (currentSupplier as any)?.mobile || "+880 1711-000000",
+      paymentMode,
+      deliveryWarehouse,
+      workLocation,
+      prepareBy,
+      department,
+      currency,
+      subtotal: activeTotals.subtotal,
+      discountTotal: activeTotals.discount,
+      taxTotal: activeTotals.tax,
+      vatTotal: activeTotals.vat,
+      grandTotal: activeTotals.grandTotal,
+      termsAndConditions: tncText,
+      items: poItems.map((it) => ({
+        itemCode: it.itemCode,
+        itemName: it.itemName,
+        specification: it.specification,
+        uom: it.uom,
+        quantity: it.orderedQuantity,
+        unitPrice: it.unitPrice,
+        discount: it.discount || 0,
+        vatPercent: it.vatRate ?? 5,
+        vatAmount: it.vatAmount,
+        taxPercent: it.taxRate ?? 0,
+        taxAmount: it.taxAmount,
+        lineTotal: it.lineTotal,
+      })),
+      woItems: woItems.map((w) => ({
+        serviceCode: w.serviceCode,
+        serviceName: w.serviceName,
+        workDescription: w.workDescription,
+        specification: w.specification,
+        uom: w.uom,
+        workOrderQuantity: w.workOrderQuantity,
+        unitRate: w.unitRate,
+        discount: 0,
+        vatPercent: w.vatRate ?? 5,
+        vatAmount: w.vatAmount,
+        taxPercent: w.taxRate ?? 0,
+        taxAmount: w.taxAmount,
+        lineTotal: w.lineTotal,
+      })),
+    };
+  }, [
+    orderNumber,
+    orderDate,
+    docType,
+    currentSupplier,
+    paymentMode,
+    deliveryWarehouse,
+    workLocation,
+    prepareBy,
+    department,
+    currency,
+    activeTotals,
+    tncText,
+    poItems,
+    woItems,
+  ]);
+
   // 6. Available Catalog Items based on Creation Method
   const catalogItemsForSelection = useMemo(() => {
     const masterItems = getStoredData("cripton_master_items", DEFAULT_ITEMS) as any[];
@@ -631,6 +713,28 @@ export function PurchaseOrderWorkOrderPage() {
       return;
     }
 
+    // Enforce company multiple-category configuration rule
+    if (!procConfig.allowMultipleCategories && poItems.length > 0) {
+      const incomingCategory =
+        (catalogItem as any).category ||
+        (catalogItem as any).categoryName ||
+        (catalogItem as any).itemCategory ||
+        "General Items";
+      const existingCategory =
+        (poItems[0] as any).category ||
+        (poItems[0] as any).itemCategory ||
+        "General Items";
+      if (incomingCategory !== existingCategory) {
+        setItemSearchOpen(false);
+        setCategoryAlert({
+          attemptedItem: catalogItem.itemName,
+          attemptedCategory: incomingCategory,
+          allowedCategory: existingCategory,
+        });
+        return;
+      }
+    }
+
     const defaultUom = catalogItem.uom || "PCS";
     const defaultMu = defaultUom;
     const factor = 1;
@@ -646,6 +750,7 @@ export function PurchaseOrderWorkOrderPage() {
       sl: poItems.length + 1,
       itemCode: catalogItem.itemCode,
       itemName: catalogItem.itemName,
+      category: (catalogItem as any).category || (catalogItem as any).categoryName || (catalogItem as any).itemCategory || "General Items",
       specification: catalogItem.specification || "Standard commercial specification",
       brand: catalogItem.brand || "OEM",
       origin: catalogItem.origin || "Bangladesh",
@@ -960,6 +1065,14 @@ export function PurchaseOrderWorkOrderPage() {
       return;
     }
 
+    if (docType === "Purchase Order" && !procConfig.allowMultipleCategories && poItems.length > 1) {
+      const cats = new Set(poItems.map((p) => (p as any).category || (p as any).itemCategory || "General Items"));
+      if (cats.size > 1) {
+        toast.error("Multiple item categories are not allowed in this Purchase Order according to procurement configuration.");
+        return;
+      }
+    }
+
     const newOrderStatus = asDraft ? "Draft" : "Submitted";
 
     const savedOrder: PurchaseOrder = {
@@ -1130,12 +1243,16 @@ export function PurchaseOrderWorkOrderPage() {
                     desc: "Generate order from approved requisition items",
                     icon: Package,
                   },
-                  {
-                    id: "Comparative Statement",
-                    title: "Comparative Statement",
-                    desc: "Bind vendor & rates from approved CS",
-                    icon: FileSpreadsheet,
-                  },
+                  ...(procConfig.isCSRequired
+                    ? [
+                        {
+                          id: "Comparative Statement",
+                          title: "Comparative Statement",
+                          desc: "Bind vendor & rates from approved CS",
+                          icon: FileSpreadsheet,
+                        },
+                      ]
+                    : []),
                   {
                     id: "Direct Purchase Order / Work Order",
                     title: "Direct PO / WO",
@@ -1179,11 +1296,11 @@ export function PurchaseOrderWorkOrderPage() {
               </div>
             </div>
 
-            {/* SECTION 1: ORDER HEADER INFORMATION (Clean 4-Column Responsive ERP Grid) */}
+            {/* ORDER HEADER INFORMATION */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-border/50">
                 <FileText className="size-4 text-blue-600 dark:text-blue-400" />
-                <h2 className="text-sm font-bold text-foreground">1. Order Header Information</h2>
+                <h2 className="text-sm font-bold text-foreground">Order Header Information</h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1201,19 +1318,7 @@ export function PurchaseOrderWorkOrderPage() {
                   </select>
                 </div>
 
-                {/* Field 2: Order Number */}
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">Order Number *</label>
-                  <input
-                    type="text"
-                    disabled={isViewMode}
-                    value={orderNumber}
-                    onChange={(e) => setOrderNumber(e.target.value)}
-                    className="w-full h-8.5 px-3 rounded-lg border border-border/80 bg-muted/50 text-xs font-mono font-bold text-foreground outline-none disabled:opacity-70 focus:border-blue-500"
-                  />
-                </div>
-
-                {/* Field 3: Order Date */}
+                {/* Field 2: Order Date */}
                 <div>
                   <label className="block text-xs font-bold mb-1 text-foreground">Order Date *</label>
                   <input
@@ -1225,7 +1330,7 @@ export function PurchaseOrderWorkOrderPage() {
                   />
                 </div>
 
-                {/* Field 4: Prepared By */}
+                {/* Field 3: Prepared By */}
                 <div>
                   <label className="block text-xs font-bold mb-1 text-foreground">Prepared By</label>
                   <input
@@ -1237,7 +1342,7 @@ export function PurchaseOrderWorkOrderPage() {
                   />
                 </div>
 
-                {/* Field 5: Department */}
+                {/* Field 4: Department */}
                 <div>
                   <label className="block text-xs font-bold mb-1 text-foreground">Department</label>
                   <input
@@ -1325,32 +1430,19 @@ export function PurchaseOrderWorkOrderPage() {
                   />
                 </div>
 
-                {/* Field 9: Currency & Rate */}
+                {/* Currency */}
                 <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">Currency &amp; Rate</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <select
-                      disabled={isViewMode}
-                      value={currency}
-                      onChange={(e) => setCurrency(e.target.value)}
-                      className="w-full h-8.5 px-2 bg-background border border-border/80 rounded-lg text-xs font-bold outline-none focus:border-blue-500 disabled:opacity-70 cursor-pointer"
-                    >
-                      <option value="BDT">BDT (৳)</option>
-                      <option value="USD">USD ($)</option>
-                      <option value="EUR">EUR (€)</option>
-                    </select>
-                    <input
-                      type="number"
-                      step="0.01"
-                      disabled={isViewMode || currency === "BDT"}
-                      value={currency === "BDT" ? 1.0 : exchangeRate}
-                      onChange={(e) => setExchangeRate(parseFloat(e.target.value) || "")}
-                      placeholder="Rate"
-                      className={`w-full h-8.5 px-2 border border-border/80 rounded-lg text-xs outline-none ${
-                        currency === "BDT" ? "bg-muted/50 cursor-not-allowed" : "bg-background focus:border-blue-500 font-bold"
-                      }`}
-                    />
-                  </div>
+                  <label className="block text-xs font-bold mb-1 text-foreground">Currency</label>
+                  <select
+                    disabled={isViewMode}
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="w-full h-8.5 px-3 bg-background border border-border/80 rounded-lg text-xs font-bold outline-none focus:border-blue-500 disabled:opacity-70 cursor-pointer"
+                  >
+                    <option value="BDT">BDT (৳)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                  </select>
                 </div>
 
                 {/* Field 10: Payment Mode / Terms */}
@@ -1473,13 +1565,13 @@ export function PurchaseOrderWorkOrderPage() {
               </div>
             </div>
 
-            {/* SECTION 2: ORDER ITEM DETAILS */}
+            {/* ORDER ITEM DETAILS */}
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-border/50">
                 <div className="flex items-center gap-2">
                   <Layers className="size-4 text-blue-600 dark:text-blue-400" />
                   <h2 className="text-sm font-bold text-foreground">
-                    2. {docType === "Purchase Order" ? "Order Item Details" : "Service / Scope of Work Details"}
+                    {docType === "Purchase Order" ? "Order Item Details" : "Service / Scope of Work Details"}
                   </h2>
                 </div>
 
@@ -1509,14 +1601,6 @@ export function PurchaseOrderWorkOrderPage() {
                         >
                           <Plus className="size-3.5" />
                           <span>Add Service from Catalog</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleAddWoItem}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-bold transition cursor-pointer"
-                        >
-                          <Plus className="size-3.5" />
-                          <span>Add Custom Line</span>
                         </button>
                       </div>
                     )}
@@ -1937,12 +2021,12 @@ export function PurchaseOrderWorkOrderPage() {
               </div>
             </div>
 
-            {/* SECTION 3: TERMS & CONDITIONS */}
+            {/* TERMS & CONDITIONS */}
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-border/50">
                 <div className="flex items-center gap-2">
                   <FileSpreadsheet className="size-4 text-blue-600 dark:text-blue-400" />
-                  <h2 className="text-sm font-bold text-foreground">3. Terms &amp; Conditions</h2>
+                  <h2 className="text-sm font-bold text-foreground">Terms &amp; Conditions</h2>
                 </div>
 
                 {!isViewMode && (
@@ -1992,12 +2076,12 @@ export function PurchaseOrderWorkOrderPage() {
               </div>
             </div>
 
-            {/* SECTION 4: ORDER ATTACHMENTS (OPTIONAL) */}
+            {/* ORDER ATTACHMENTS (OPTIONAL) */}
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-border/50">
                 <div className="flex items-center gap-2">
                   <Paperclip className="size-4 text-blue-600 dark:text-blue-400" />
-                  <h2 className="text-sm font-bold text-foreground">4. Supporting Attachments</h2>
+                  <h2 className="text-sm font-bold text-foreground">Supporting Attachments</h2>
                 </div>
 
                 {!isViewMode && (
@@ -2624,77 +2708,51 @@ export function PurchaseOrderWorkOrderPage() {
         </div>
       )}
 
-      {/* ============================================================== */}
-      {/* 12. OFFICIAL PURCHASE ORDER / WORK ORDER PDF MODAL */}
-      {/* ============================================================== */}
-      {pdfModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-card border border-border rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-hidden">
-            {/* Header */}
-            <div className="p-4 border-b border-border flex justify-between items-center bg-slate-50/70 dark:bg-slate-900/70">
-              <div className="flex items-center gap-2">
-                <FileText className="size-5 text-blue-600" />
-                <h3 className="text-sm font-bold text-foreground">
-                  Official Document Preview — {orderNumber}
-                </h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"
-                >
-                  <Printer className="size-3.5" /> Print / Save PDF
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPdfModalOpen(false)}
-                  className="size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
-                >
-                  <X className="size-5" />
-                </button>
-              </div>
-            </div>
+      {/* Official Purchase Order / Work Order Landscape Report Modal */}
+      <PurchaseOrderReportModal
+        isOpen={pdfModalOpen}
+        onClose={() => setPdfModalOpen(false)}
+        order={currentReportOrder}
+      />
 
-            {/* Document Body */}
-            <div className="p-6 overflow-y-auto flex-1 bg-white text-slate-900 text-xs font-sans space-y-6 print:p-0">
-              {/* Pakiza Header */}
-              <div className="border-b-2 border-slate-900 pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="w-40">
-                    <img src={pakizaSoftwareLogo} alt="Pakiza Logo" className="h-10 w-auto object-contain" />
+      {/* Multiple Categories Alert Modal */}
+      {categoryAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-xl shadow-2xl border border-rose-200 max-w-md w-full p-5">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold text-slate-900">Multiple Categories Restricted</h4>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Company procurement configuration restricts combining items from different categories into a single Purchase Order.
+                </p>
+                <div className="mt-2.5 p-2.5 rounded-lg bg-rose-50/80 border border-rose-100 text-xs space-y-1">
+                  <div>
+                    <span className="text-slate-500 font-medium">Current Order Category: </span>
+                    <strong className="text-slate-900 font-semibold">{categoryAlert.allowedCategory}</strong>
                   </div>
-                  <div className="text-center flex-1">
-                    <h1 className="text-base font-black tracking-wide uppercase text-slate-950">
-                      PAKIZA KNIT COMPOSITE LTD.
-                    </h1>
-                    <p className="text-[10px] text-slate-600">
-                      Khan ABC Tradeplex, House #37, Road #2, Dhanmondi, Dhaka-1205
-                    </p>
-                    <span className="inline-block mt-1 px-4 py-0.5 bg-slate-900 text-white font-mono font-black text-xs uppercase tracking-widest rounded-sm">
-                      {docType === "Purchase Order" ? "PURCHASE ORDER" : "WORK ORDER"}
-                    </span>
+                  <div>
+                    <span className="text-slate-500 font-medium">Selected Item: </span>
+                    <strong className="text-rose-700 font-semibold">{categoryAlert.attemptedItem}</strong>
                   </div>
-                  <div className="w-40 text-right text-[10px] text-slate-500">
-                    Date: {new Date().toLocaleDateString()}
+                  <div>
+                    <span className="text-slate-500 font-medium">Item Category: </span>
+                    <strong className="text-rose-700 font-semibold">{categoryAlert.attemptedCategory}</strong>
                   </div>
                 </div>
-              </div>
-
-              {/* Order Top / Header Section */}
-              <div className="grid grid-cols-2 gap-4 border border-slate-300 rounded-lg p-4 bg-slate-50/50">
-                <div className="space-y-1.5">
-                  <div><strong>PO/WO No:</strong> <span className="font-mono font-bold text-blue-700">{orderNumber}</span></div>
-                  <div><strong>Order Date:</strong> {orderDate}</div>
-                  <div><strong>Payment Terms:</strong> {paymentMode}</div>
-                  <div><strong>Delivery Location:</strong> {docType === "Purchase Order" ? deliveryWarehouse : workLocation}</div>
-                  <div><strong>Prepared By:</strong> {prepareBy} ({department})</div>
-                </div>
-                <div className="space-y-1.5">
-                  <div><strong>Supplier:</strong> <span className="font-bold">{currentSupplier.vendorName}</span></div>
-                  <div><strong>Address:</strong> {currentSupplier.address}</div>
-                  <div><strong>Contact Person:</strong> {currentSupplier.contactPersonName || (currentSupplier as any).contactPerson || "—"}</div>
-                  <div><strong>Mobile:</strong> {currentSupplier.mobileNumber || (currentSupplier as any).mobile || "—"}</div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Please select an item belonging to the <strong className="text-slate-700 font-semibold">"{categoryAlert.allowedCategory}"</strong> category, or configure multi-category allowance in Procurement Configuration.
+                </p>
+                <div className="mt-4 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setCategoryAlert(null)}
+                    className="px-4 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition cursor-pointer"
+                  >
+                    Understand &amp; Close
+                  </button>
                 </div>
               </div>
             </div>

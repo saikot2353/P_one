@@ -44,7 +44,7 @@ export const Route = createFileRoute("/ssp-implementation")({
   component: SspImplementationPage,
 });
 
-export function SspImplementationPage() {
+function SspImplementationPage() {
   const navigate = useNavigate();
   const [records, setRecords] = useState<StoreImplementationRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState("");

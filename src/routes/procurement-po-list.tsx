@@ -34,6 +34,7 @@ import {
   getStoredWoItems,
   setStoredWoItems,
 } from "@/lib/procurement-order-inventory-data";
+import { PurchaseOrderReportModal, PurchaseOrderReportData } from "@/components/procurement/PurchaseOrderReportModal";
 import pakizaSoftwareLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
 
 export const Route = createFileRoute("/procurement-po-list")({
@@ -100,6 +101,63 @@ export function PurchaseOrderListPage() {
 
   // Document Viewer Modal State
   const [viewingPo, setViewingPo] = useState<PurchaseOrder | null>(null);
+
+  const viewingReportData: PurchaseOrderReportData | null = useMemo(() => {
+    if (!viewingPo) return null;
+    const items = poItemsMap[viewingPo.orderNumber] || viewingPo.items || [];
+    const woItems = woItemsMap[viewingPo.orderNumber] || viewingPo.woItems || [];
+    const taxAmount = (viewingPo as any).taxTotal ?? Math.round((viewingPo.subtotal || 0) * 0.03);
+
+    return {
+      orderNumber: viewingPo.orderNumber,
+      orderDate: viewingPo.orderDate,
+      documentType: viewingPo.documentType,
+      supplierName: viewingPo.supplierName,
+      supplierAddress: (viewingPo as any).supplierAddress || "Tejgaon I/A, Dhaka-1208",
+      supplierContact: (viewingPo as any).contactPerson || (viewingPo as any).supplierContact || "Engr. Farhan Ahmed",
+      supplierMobile: (viewingPo as any).mobile || (viewingPo as any).supplierMobile || "+880 1712-345678",
+      paymentMode: viewingPo.paymentMode,
+      deliveryWarehouse: viewingPo.deliveryWarehouse,
+      prepareBy: viewingPo.prepareBy,
+      department: (viewingPo as any).department || "Procurement & Commercial",
+      currency: (viewingPo as any).currency || "BDT",
+      subtotal: viewingPo.subtotal,
+      discountTotal: viewingPo.discountTotal,
+      taxTotal: taxAmount,
+      vatTotal: viewingPo.vatTotal,
+      grandTotal: viewingPo.grandTotal,
+      termsAndConditions: viewingPo.termsAndConditions,
+      items: items.map((it: any) => ({
+        itemCode: it.itemCode,
+        itemName: it.itemName,
+        specification: it.specification,
+        uom: it.uom,
+        quantity: it.quantity,
+        unitPrice: it.unitPrice,
+        discount: it.discount || 0,
+        vatPercent: it.vatPercent ?? 5,
+        vatAmount: it.vatAmount ?? Math.round((it.quantity * it.unitPrice) * 0.05),
+        taxPercent: it.taxPercent ?? 3,
+        taxAmount: it.taxAmount ?? Math.round((it.quantity * it.unitPrice) * 0.03),
+        lineTotal: it.lineTotal,
+      })),
+      woItems: woItems.map((w: any) => ({
+        serviceCode: w.serviceCode,
+        serviceName: w.serviceName,
+        workDescription: w.workDescription,
+        specification: w.specification,
+        uom: w.uom,
+        workOrderQuantity: w.workOrderQuantity,
+        unitRate: w.unitRate,
+        discount: w.discount || 0,
+        vatPercent: w.vatPercent ?? 5,
+        vatAmount: w.vatAmount ?? Math.round((w.workOrderQuantity * w.unitRate) * 0.05),
+        taxPercent: w.taxPercent ?? 3,
+        taxAmount: w.taxAmount ?? Math.round((w.workOrderQuantity * w.unitRate) * 0.03),
+        lineTotal: w.lineTotal,
+      })),
+    };
+  }, [viewingPo, poItemsMap, woItemsMap]);
 
   // Delete Action
   const handleDeleteOrder = (order: PurchaseOrder) => {
@@ -587,184 +645,12 @@ export function PurchaseOrderListPage() {
           </div>
         </div>
 
-        {/* ============================================================== */}
-        {/* 12. OFFICIAL PURCHASE ORDER / WORK ORDER PDF MODAL */}
-        {/* ============================================================== */}
-        {viewingPo && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-card border border-border rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-hidden">
-              {/* Header */}
-              <div className="p-4 border-b border-border flex justify-between items-center bg-slate-50/70 dark:bg-slate-900/70">
-                <div className="flex items-center gap-2">
-                  <FileText className="size-5 text-blue-600" />
-                  <h3 className="text-sm font-bold text-foreground">
-                    Official {viewingPo.documentType} Document — {viewingPo.orderNumber}
-                  </h3>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"
-                  >
-                    <Printer className="size-3.5" /> Print / Save PDF
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewingPo(null)}
-                    className="size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
-                  >
-                    <X className="size-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Document Body */}
-              <div className="p-6 overflow-y-auto flex-1 bg-white text-slate-900 text-xs font-sans space-y-5 print:p-0">
-                {/* Pakiza Header */}
-                <div className="border-b-2 border-slate-900 pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="w-40">
-                      <img src={pakizaSoftwareLogo} alt="Pakiza Logo" className="h-10 w-auto object-contain" />
-                    </div>
-                    <div className="text-center flex-1">
-                      <h1 className="text-base font-black tracking-wide uppercase text-slate-950">
-                        PAKIZA KNIT COMPOSITE LTD.
-                      </h1>
-                      <p className="text-[10px] text-slate-600">
-                        Khan ABC Tradeplex, House #37, Road #2, Dhanmondi, Dhaka-1205
-                      </p>
-                      <span className="inline-block mt-1 px-4 py-0.5 bg-slate-900 text-white font-mono font-black text-xs uppercase tracking-widest rounded-sm">
-                        {viewingPo.documentType === "Purchase Order" ? "PURCHASE ORDER" : "WORK ORDER"}
-                      </span>
-                    </div>
-                    <div className="w-40 text-right text-[10px] text-slate-500">
-                      Print Date: {new Date().toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Metadata */}
-                <div className="grid grid-cols-2 gap-4 border border-slate-300 rounded-lg p-3 bg-slate-50/50">
-                  <div className="space-y-1">
-                    <div><strong>Order Number:</strong> <span className="font-mono font-bold text-blue-700">{viewingPo.orderNumber}</span></div>
-                    <div><strong>Order Date:</strong> {viewingPo.orderDate}</div>
-                    <div><strong>Payment Terms:</strong> {viewingPo.paymentMode || "Credit 30 Days"}</div>
-                    <div><strong>Delivery Location:</strong> {viewingPo.deliveryWarehouse || viewingPo.workLocation}</div>
-                    <div><strong>Prepared By:</strong> {viewingPo.prepareBy} ({viewingPo.department})</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div><strong>Supplier:</strong> <span className="font-bold">{viewingPo.supplierName}</span></div>
-                    <div><strong>Contact Person:</strong> {viewingPo.contactPerson}</div>
-                    <div><strong>Mobile:</strong> {viewingPo.contactNumber || "N/A"}</div>
-                  </div>
-                </div>
-
-                {/* Line Items Table */}
-                <table className="w-full border-collapse border border-slate-300 text-[11px]">
-                  <thead>
-                    <tr className="bg-slate-100 text-slate-700 font-bold uppercase text-[9.5px]">
-                      <th className="border border-slate-300 p-2 text-center w-8">SL</th>
-                      <th className="border border-slate-300 p-2">Item / Service Description</th>
-                      <th className="border border-slate-300 p-2 text-center">Brand</th>
-                      <th className="border border-slate-300 p-2 text-center">Origin</th>
-                      <th className="border border-slate-300 p-2 text-center">Market Unit</th>
-                      <th className="border border-slate-300 p-2 text-right">Order Qty</th>
-                      <th className="border border-slate-300 p-2 text-right">Unit Price</th>
-                      <th className="border border-slate-300 p-2 text-right">Line Total (৳)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(poItemsMap[viewingPo.orderNumber] || viewingPo.items || []).map((it, idx) => (
-                      <tr key={idx}>
-                        <td className="border border-slate-300 p-2 text-center">{idx + 1}</td>
-                        <td className="border border-slate-300 p-2">
-                          <div className="font-bold">{it.itemName}</div>
-                          <div className="text-[10px] text-slate-500">{it.itemCode} • {it.specification}</div>
-                        </td>
-                        <td className="border border-slate-300 p-2 text-center text-slate-600 font-medium">{(it as any).brand || "Standard"}</td>
-                        <td className="border border-slate-300 p-2 text-center text-slate-600 font-medium">{(it as any).origin || "Local"}</td>
-                        <td className="border border-slate-300 p-2 text-center font-bold">{it.marketUnit || it.purchaseUom || it.uom}</td>
-                        <td className="border border-slate-300 p-2 text-right font-mono font-bold">{it.orderedQuantity}</td>
-                        <td className="border border-slate-300 p-2 text-right font-mono">৳{it.unitPrice.toLocaleString()}</td>
-                        <td className="border border-slate-300 p-2 text-right font-mono font-bold">৳{it.lineTotal.toLocaleString()}</td>
-                      </tr>
-                    ))}
-                    {(poItemsMap[viewingPo.orderNumber] || viewingPo.items || []).length === 0 && (
-                      (woItemsMap[viewingPo.orderNumber] || viewingPo.woItems || []).map((w, idx) => (
-                        <tr key={idx}>
-                          <td className="border border-slate-300 p-2 text-center">{idx + 1}</td>
-                          <td className="border border-slate-300 p-2" colSpan={3}>
-                            <div className="font-bold">{w.serviceName}</div>
-                            <div className="text-[10px] text-slate-500">{w.workDescription} • {w.specification}</div>
-                          </td>
-                          <td className="border border-slate-300 p-2 text-center font-bold">{w.uom}</td>
-                          <td className="border border-slate-300 p-2 text-right font-mono font-bold">{w.workOrderQuantity}</td>
-                          <td className="border border-slate-300 p-2 text-right font-mono">৳{w.unitRate.toLocaleString()}</td>
-                          <td className="border border-slate-300 p-2 text-right font-mono font-bold">৳{w.lineTotal.toLocaleString()}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-
-                {/* Financial Summary */}
-                <div className="flex justify-end">
-                  <div className="w-64 space-y-1 bg-slate-50 p-3 border border-slate-300 rounded-lg text-[11px]">
-                    <div className="flex justify-between">
-                      <span>Subtotal:</span>
-                      <span className="font-mono font-bold">৳{viewingPo.subtotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-rose-600">
-                      <span>Discount:</span>
-                      <span className="font-mono font-bold">-৳{viewingPo.discountTotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-blue-700">
-                      <span>Applicable VAT:</span>
-                      <span className="font-mono font-bold">+৳{viewingPo.vatTotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-base font-black border-t border-slate-400 pt-1 text-slate-950">
-                      <span>Grand Total:</span>
-                      <span className="font-mono">৳{viewingPo.grandTotal.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Terms and Conditions */}
-                {viewingPo.termsAndConditions && (
-                  <div className="space-y-1 pt-2 border-t border-slate-200">
-                    <span className="font-bold text-[10px] uppercase tracking-wider block text-slate-900">
-                      TERMS &amp; CONDITIONS:
-                    </span>
-                    <p className="text-[10px] text-slate-700 whitespace-pre-line leading-relaxed">
-                      {viewingPo.termsAndConditions}
-                    </p>
-                  </div>
-                )}
-
-                {/* Signatures */}
-                <div className="pt-10 grid grid-cols-4 gap-4 text-center text-[10px] font-bold text-slate-700">
-                  <div className="border-t border-slate-400 pt-1.5">
-                    <p className="text-slate-950 font-black">{viewingPo.prepareBy}</p>
-                    <p className="text-slate-500 font-normal">Prepared By</p>
-                  </div>
-                  <div className="border-t border-slate-400 pt-1.5">
-                    <p className="text-slate-950 font-black">Engr. Tariqul Islam</p>
-                    <p className="text-slate-500 font-normal">Checked &amp; Verified By</p>
-                  </div>
-                  <div className="border-t border-slate-400 pt-1.5">
-                    <p className="text-slate-950 font-black">Kamrul Islam</p>
-                    <p className="text-slate-500 font-normal">Head of Procurement</p>
-                  </div>
-                  <div className="border-t border-slate-400 pt-1.5">
-                    <p className="text-slate-950 font-black">Rafiqul Islam</p>
-                    <p className="text-slate-500 font-normal">Authorized MD</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Official Purchase Order / Work Order Landscape Report Modal */}
+        <PurchaseOrderReportModal
+          isOpen={!!viewingPo}
+          onClose={() => setViewingPo(null)}
+          order={viewingReportData}
+        />
       </main>
     </div>
   );

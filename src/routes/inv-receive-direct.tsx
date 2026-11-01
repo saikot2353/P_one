@@ -568,9 +568,6 @@ export function DirectMRRPage() {
           {/* Section 1: Direct MRR Header Information */}
           <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-2xs space-y-4">
             <div className="flex items-center gap-2 border-b border-border/50 pb-3">
-              <span className="size-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-black">
-                1
-              </span>
               <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
                 Direct MRR Header Information
               </h2>
@@ -718,9 +715,6 @@ export function DirectMRRPage() {
           <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-border/50 pb-3">
               <div className="flex items-center gap-2">
-                <span className="size-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-black">
-                  2
-                </span>
                 <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
                   Material Details Table
                 </h2>
@@ -748,9 +742,9 @@ export function DirectMRRPage() {
                     <th className="py-2.5 px-3 text-right font-bold w-24 text-primary">
                       Receive Qty*
                     </th>
-                    <th className="py-2.5 px-2 text-center font-bold w-28">Tracking (B/L)</th>
                     <th className="py-2.5 px-2 text-center font-bold w-24 text-emerald-600">Quality Accepted</th>
                     <th className="py-2.5 px-2 text-center font-bold w-24 text-rose-600">Quality Rejected</th>
+                    <th className="py-2.5 px-2 text-center font-bold w-28">Tracking (B/L)</th>
                     <th className="py-2.5 px-3 text-right font-bold w-28">Unit Price (৳)</th>
                     <th className="py-2.5 px-3 text-right font-bold w-28">Est. Value (৳)</th>
                     <th className="py-2.5 px-3 w-12 text-center">Action</th>
@@ -791,17 +785,6 @@ export function DirectMRRPage() {
                           />
                         </td>
 
-                        {/* Tracking (B or L only) Cell */}
-                        <td className="py-2.5 px-2 text-center">
-                          <ItemTrackingCell
-                            mode={trackingMode}
-                            locationCount={itemLocCount}
-                            batchCount={itemBatchCount}
-                            onOpenLocation={() => handleOpenLocationModal(item)}
-                            onOpenBatch={() => handleOpenBatchModal(item)}
-                          />
-                        </td>
-
                         {/* Item-level Quality Accepted */}
                         <td className="py-2.5 px-2 text-center">
                           <input
@@ -827,6 +810,17 @@ export function DirectMRRPage() {
                               handleUpdateAcceptedRejected(item.id, "rejected", Number(e.target.value))
                             }
                             className="w-16 text-center font-mono font-bold px-1.5 py-1 bg-rose-50/50 dark:bg-rose-950/30 border border-rose-500/40 text-rose-700 dark:text-rose-400 rounded outline-none focus:border-rose-600 text-xs"
+                          />
+                        </td>
+
+                        {/* Tracking (B or L only) Cell */}
+                        <td className="py-2.5 px-2 text-center">
+                          <ItemTrackingCell
+                            mode={trackingMode}
+                            locationCount={itemLocCount}
+                            batchCount={itemBatchCount}
+                            onOpenLocation={() => handleOpenLocationModal(item)}
+                            onOpenBatch={() => handleOpenBatchModal(item)}
                           />
                         </td>
 

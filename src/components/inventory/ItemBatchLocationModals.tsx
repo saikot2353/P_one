@@ -14,6 +14,7 @@ import {
   Building2,
   Calendar,
   Sparkles,
+  Gift,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -55,6 +56,9 @@ interface LocationAllocationModalProps {
   initialEntries?: LocationEntry[];
   currentAllocations?: any[];
   readOnly?: boolean;
+  showFocButton?: boolean;
+  focQty?: number;
+  onSaveFoc?: (focQty: number, focAllocations: any[]) => void;
   onSave: (entries: LocationEntry[]) => void;
 }
 
@@ -71,6 +75,9 @@ export function LocationAllocationModal({
   initialEntries,
   currentAllocations,
   readOnly = false,
+  showFocButton = false,
+  focQty = 0,
+  onSaveFoc,
   onSave,
 }: LocationAllocationModalProps) {
   const effectiveStore = currentStore || storeName || "";
@@ -78,6 +85,12 @@ export function LocationAllocationModal({
   const [storeLocations, setStoreLocations] = useState<StoreLocation[]>([]);
   const [entries, setEntries] = useState<LocationEntry[]>([]);
   const [showNewLocationForm, setShowNewLocationForm] = useState(false);
+
+  // FOC Receiving State
+  const [isFocModalOpen, setIsFocModalOpen] = useState(false);
+  const [focQuantity, setFocQuantity] = useState(focQty || 0);
+  const [selectedFocLocation, setSelectedFocLocation] = useState("");
+  const [focNotes, setFocNotes] = useState("");
 
   // New Location Form Fields
   const [newLocName, setNewLocName] = useState("");
@@ -175,13 +188,30 @@ export function LocationAllocationModal({
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted cursor-pointer"
-          >
-            <X className="size-4.5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {showFocButton && !readOnly && (
+              <button
+                type="button"
+                onClick={() => {
+                  setFocQuantity(focQty || 0);
+                  setSelectedFocLocation(storeLocations[0]?.locationName || "Default Bin");
+                  setIsFocModalOpen(true);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 transition shadow-2xs cursor-pointer"
+                title="Open FOC (Free of Cost) Receiving"
+              >
+                <Gift className="size-3.5 text-emerald-600" />
+                <span>FOC</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted cursor-pointer"
+            >
+              <X className="size-4.5" />
+            </button>
+          </div>
         </div>
 
         {/* New Location Inline Creation Panel */}
@@ -416,6 +446,115 @@ export function LocationAllocationModal({
             </>
           )}
         </div>
+
+        {/* FOC Location Modal Dialog */}
+        {isFocModalOpen && (
+          <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
+            <div className="bg-card border border-emerald-500/40 rounded-2xl shadow-2xl max-w-md w-full p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                    <Gift className="size-4.5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">FOC Receiving (Location-Controlled)</h3>
+                    <p className="text-[11px] text-muted-foreground">
+                      Free of cost allocation for {itemName}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsFocModalOpen(false)}
+                  className="p-1 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted cursor-pointer"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="block font-bold text-foreground mb-1">Free Qty ({uom}) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={focQuantity}
+                    onChange={(e) => setFocQuantity(Number(e.target.value) || 0)}
+                    placeholder="e.g. 5"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground font-mono font-bold focus:border-emerald-500 outline-none"
+                  />
+                  <p className="text-[10.5px] text-muted-foreground mt-1">
+                    Free stock will be added to warehouse inventory at ৳ 0 payable valuation.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-foreground mb-1">Select Location *</label>
+                  <select
+                    value={selectedFocLocation}
+                    onChange={(e) => setSelectedFocLocation(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground font-medium focus:border-emerald-500 outline-none"
+                  >
+                    {storeLocations.map((loc) => (
+                      <option key={loc.id} value={loc.locationName}>
+                        {loc.locationName} ({loc.locationType})
+                      </option>
+                    ))}
+                    {storeLocations.length === 0 && (
+                      <option value="Default Bay">Default Bay</option>
+                    )}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-foreground mb-1">Notes / Sample Reference</label>
+                  <input
+                    type="text"
+                    value={focNotes}
+                    onChange={(e) => setFocNotes(e.target.value)}
+                    placeholder="e.g. Supplier promo bonus / extra allowance"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:border-emerald-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/60">
+                <button
+                  type="button"
+                  onClick={() => setIsFocModalOpen(false)}
+                  className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/80 text-foreground cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (focQuantity < 0) {
+                      toast.error("FOC quantity cannot be negative");
+                      return;
+                    }
+                    const locName = selectedFocLocation.trim() || storeLocations[0]?.locationName || "Default Bay";
+                    if (onSaveFoc) {
+                      onSaveFoc(focQuantity, [
+                        {
+                          locationName: locName,
+                          quantity: focQuantity,
+                          notes: focNotes,
+                        },
+                      ]);
+                    }
+                    toast.success(`FOC Receiving allocated: ${focQuantity} ${uom} to Location ${locName}`);
+                    setIsFocModalOpen(false);
+                  }}
+                  className="px-4 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-xs"
+                >
+                  Confirm FOC
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -438,6 +577,9 @@ interface BatchAllocationModalProps {
   initialEntries?: BatchEntry[];
   currentAllocations?: any[];
   readOnly?: boolean;
+  showFocButton?: boolean;
+  focQty?: number;
+  onSaveFoc?: (focQty: number, focAllocations: any[]) => void;
   onSave: (entries: BatchEntry[]) => void;
 }
 
@@ -454,6 +596,9 @@ export function BatchAllocationModal({
   initialEntries,
   currentAllocations,
   readOnly = false,
+  showFocButton = false,
+  focQty = 0,
+  onSaveFoc,
   onSave,
 }: BatchAllocationModalProps) {
   const effectiveStore = currentStore || storeName || "";
@@ -461,6 +606,14 @@ export function BatchAllocationModal({
   const [storeBatches, setStoreBatches] = useState<StoreLocation[]>([]);
   const [entries, setEntries] = useState<BatchEntry[]>([]);
   const [showNewBatchForm, setShowNewBatchForm] = useState(false);
+
+  // FOC Receiving State (Batch)
+  const [isFocModalOpen, setIsFocModalOpen] = useState(false);
+  const [focQuantity, setFocQuantity] = useState(focQty || 0);
+  const [selectedFocBatch, setSelectedFocBatch] = useState(`BAT-FOC-${itemCode.slice(-4)}`);
+  const [focCreateDate, setFocCreateDate] = useState(new Date().toISOString().slice(0, 10));
+  const [focExpiryDate, setFocExpiryDate] = useState(`${new Date().getFullYear() + 2}-12-31`);
+  const [focNotes, setFocNotes] = useState("");
 
   // New Batch Form Fields
   const [newBatchNumber, setNewBatchNumber] = useState("");
@@ -592,13 +745,30 @@ export function BatchAllocationModal({
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted cursor-pointer"
-          >
-            <X className="size-4.5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {showFocButton && !readOnly && (
+              <button
+                type="button"
+                onClick={() => {
+                  setFocQuantity(focQty || 0);
+                  setSelectedFocBatch(storeBatches[0]?.batchNumbering || `BAT-FOC-${itemCode.slice(-4)}`);
+                  setIsFocModalOpen(true);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 transition shadow-2xs cursor-pointer"
+                title="Open FOC (Free of Cost) Receiving"
+              >
+                <Gift className="size-3.5 text-emerald-600" />
+                <span>FOC</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted cursor-pointer"
+            >
+              <X className="size-4.5" />
+            </button>
+          </div>
         </div>
 
         {/* New Batch Inline Creation Panel */}
@@ -877,6 +1047,121 @@ export function BatchAllocationModal({
             </>
           )}
         </div>
+
+        {/* FOC Batch Modal Dialog */}
+        {isFocModalOpen && (
+          <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
+            <div className="bg-card border border-emerald-500/40 rounded-2xl shadow-2xl max-w-md w-full p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                    <Gift className="size-4.5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">FOC Receiving (Batch-Controlled)</h3>
+                    <p className="text-[11px] text-muted-foreground">
+                      Free of cost allocation for {itemName}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsFocModalOpen(false)}
+                  className="p-1 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted cursor-pointer"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="block font-bold text-foreground mb-1">Free Qty ({uom}) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={focQuantity}
+                    onChange={(e) => setFocQuantity(Number(e.target.value) || 0)}
+                    placeholder="e.g. 5"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground font-mono font-bold focus:border-emerald-500 outline-none"
+                  />
+                  <p className="text-[10.5px] text-muted-foreground mt-1">
+                    Free stock will be added to warehouse inventory at ৳ 0 payable valuation.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block font-bold text-foreground mb-1">FOC Batch Number *</label>
+                    <input
+                      type="text"
+                      value={selectedFocBatch}
+                      onChange={(e) => setSelectedFocBatch(e.target.value)}
+                      placeholder="e.g. BAT-FOC-01"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground font-mono font-bold focus:border-emerald-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-foreground mb-1">Expiry Date</label>
+                    <input
+                      type="date"
+                      value={focExpiryDate}
+                      onChange={(e) => setFocExpiryDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground font-medium focus:border-emerald-500 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-foreground mb-1">Notes / Sample Reference</label>
+                  <input
+                    type="text"
+                    value={focNotes}
+                    onChange={(e) => setFocNotes(e.target.value)}
+                    placeholder="e.g. Supplier promo bonus / extra allowance"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:border-emerald-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/60">
+                <button
+                  type="button"
+                  onClick={() => setIsFocModalOpen(false)}
+                  className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/80 text-foreground cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (focQuantity < 0) {
+                      toast.error("FOC quantity cannot be negative");
+                      return;
+                    }
+                    const batchNum = selectedFocBatch.trim() || `BAT-FOC-${Date.now().toString().slice(-4)}`;
+                    if (onSaveFoc) {
+                      onSaveFoc(focQuantity, [
+                        {
+                          batchNumber: batchNum,
+                          quantity: focQuantity,
+                          createDate: focCreateDate,
+                          expiryDate: focExpiryDate,
+                          notes: focNotes,
+                        },
+                      ]);
+                    }
+                    toast.success(`FOC Receiving allocated: ${focQuantity} ${uom} to Batch ${batchNum}`);
+                    setIsFocModalOpen(false);
+                  }}
+                  className="px-4 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm cursor-pointer"
+                >
+                  Confirm FOC Receiving
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

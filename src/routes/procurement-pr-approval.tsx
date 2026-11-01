@@ -63,6 +63,10 @@ export default function PurchaseRequisitionApprovalPage() {
   const [decisionRemarks, setDecisionRemarks] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // App QTY approver state & validation
+  const [approvedQuantities, setApprovedQuantities] = useState<Record<string, number>>({});
+  const [qtyErrors, setQtyErrors] = useState<Record<string, string>>({});
+
   // Stock Quantity Breakdown Modal State
   const [stockModal, setStockModal] = useState<{
     open: boolean;
@@ -85,6 +89,39 @@ export default function PurchaseRequisitionApprovalPage() {
   const selectedPR = useMemo(() => {
     return prs.find((p) => p.id === selectedPrId) || null;
   }, [prs, selectedPrId]);
+
+  useEffect(() => {
+    if (selectedPR && selectedPR.items) {
+      const initial: Record<string, number> = {};
+      selectedPR.items.forEach((it) => {
+        const reqQty = it.requiredQuantity ?? it.requestedQuantity ?? 1;
+        initial[it.id] = (it as any).approvedQuantity ?? reqQty;
+      });
+      setApprovedQuantities(initial);
+      setQtyErrors({});
+    }
+  }, [selectedPR]);
+
+  const handleApprovedQtyChange = (itemId: string, reqQty: number, valStr: string) => {
+    const val = Number(valStr);
+    if (isNaN(val) || val < 0) {
+      setQtyErrors((prev) => ({ ...prev, [itemId]: "Invalid quantity" }));
+      return;
+    }
+    if (val > reqQty) {
+      setQtyErrors((prev) => ({
+        ...prev,
+        [itemId]: `App QTY cannot exceed Req Qty (${reqQty})`,
+      }));
+    } else {
+      setQtyErrors((prev) => {
+        const copy = { ...prev };
+        delete copy[itemId];
+        return copy;
+      });
+    }
+    setApprovedQuantities((prev) => ({ ...prev, [itemId]: val }));
+  };
 
   // Filtered PR list for review queue
   const filteredPrs = useMemo(() => {
@@ -136,6 +173,11 @@ export default function PurchaseRequisitionApprovalPage() {
       return;
     }
 
+    if (Object.keys(qtyErrors).length > 0) {
+      toast.error("Please resolve approved quantity errors before confirming decision.");
+      return;
+    }
+
     setIsSubmitting(true);
     setTimeout(() => {
       const now = new Date().toISOString().split("T")[0];
@@ -144,6 +186,15 @@ export default function PurchaseRequisitionApprovalPage() {
 
       const updatedPRs = prs.map((p) => {
         if (p.id !== selectedPR.id) return p;
+
+        const updatedItems = (p.items || []).map((it) => {
+          const reqQty = it.requiredQuantity ?? it.requestedQuantity ?? 1;
+          const appQty = approvedQuantities[it.id] != null ? approvedQuantities[it.id] : ((it as any).approvedQuantity ?? reqQty);
+          return {
+            ...it,
+            approvedQuantity: appQty,
+          };
+        });
 
         // Clone approval stages and update
         const updatedStages = [...(p.approvalWorkflow || [])];
@@ -175,6 +226,7 @@ export default function PurchaseRequisitionApprovalPage() {
 
         return {
           ...p,
+          items: updatedItems,
           status: newStatus as any,
           approvalWorkflow: updatedStages,
           auditHistory: [
@@ -387,7 +439,7 @@ export default function PurchaseRequisitionApprovalPage() {
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-100/75 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
                       <th className="py-3 px-4">PR Number & Date</th>
-                      <th className="py-3 px-4">Organization & Dept</th>
+                      <th className="py-3 px-4">Department</th>
                       <th className="py-3 px-4">Requester</th>
                       <th className="py-3 px-4 text-right">Est. Cost (BDT)</th>
                       <th className="py-3 px-4 text-center">Priority</th>
@@ -424,8 +476,7 @@ export default function PurchaseRequisitionApprovalPage() {
                               </div>
                             </td>
                             <td className="py-3.5 px-4">
-                              <div className="font-medium text-slate-800">{org}</div>
-                              <div className="text-xs text-slate-500">{pr.department}</div>
+                              <div className="font-medium text-slate-800">{pr.department}</div>
                             </td>
                             <td className="py-3.5 px-4">
                               <div className="font-medium text-slate-800 flex items-center gap-1.5">
@@ -577,19 +628,13 @@ export default function PurchaseRequisitionApprovalPage() {
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     <div>
-                      <span className="text-slate-400 block mb-0.5">Organization / Company</span>
-                      <span className="font-semibold text-slate-800">
-                        {selectedPR.organization || selectedPR.company || "Pakiza Group"}
-                      </span>
-                    </div>
-                    <div>
                       <span className="text-slate-400 block mb-0.5">Required Date</span>
                       <span className="font-semibold text-slate-800">
                         {selectedPR.requiredByDate || selectedPR.requiredDate || "Immediate"}
                       </span>
                     </div>
-                    <div className="col-span-1 sm:col-span-2">
-                      <span className="text-slate-400 block mb-0.5">Purpose & Justification</span>
+                    <div>
+                      <span className="text-slate-400 block mb-0.5">Purpose &amp; Justification</span>
                       <p className="text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs">
                         {selectedPR.purpose}
                       </p>
@@ -617,15 +662,17 @@ export default function PurchaseRequisitionApprovalPage() {
                           <th className="py-2.5 px-3 w-28">Origin</th>
                           <th className="py-2.5 px-3 w-20">UOM</th>
                           <th className="py-2.5 px-3 text-right w-24">Stock Quantity</th>
-                          <th className="py-2.5 px-3 text-right w-24">Req Qty</th>
-                          <th className="py-2.5 px-3 text-right w-28">Est. Unit Price</th>
-                          <th className="py-2.5 px-3 text-right w-32">Total Est. Price</th>
+                          <th className="py-2.5 px-3 text-right w-20">Req Qty</th>
+                          <th className="py-2.5 px-3 text-right w-28 bg-emerald-50/60 text-emerald-800">App QTY</th>
+                          <th className="py-2.5 px-3 text-right w-24">Est. Unit Price</th>
+                          <th className="py-2.5 px-3 text-right w-28">Total Est. Price</th>
                           <th className="py-2.5 px-3">Remarks</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {(selectedPR.items || []).map((item, idx) => {
                           const reqQty = item.requiredQuantity ?? item.requestedQuantity ?? 1;
+                          const currentAppQty = approvedQuantities[item.id] != null ? approvedQuantities[item.id] : ((item as any).approvedQuantity ?? reqQty);
                           const unitPrice = item.estimatedUnitPrice ?? 0;
                           const lineTotal = item.totalEstimatedPrice ?? item.estimatedAmount ?? (reqQty * unitPrice);
                           const currentStockQty = item.currentStock ?? 150;
@@ -675,6 +722,25 @@ export default function PurchaseRequisitionApprovalPage() {
                               </td>
                               <td className="py-3 px-3 text-right font-bold text-slate-900">
                                 {reqQty.toLocaleString()}
+                              </td>
+                              <td className="py-3 px-3 text-right bg-emerald-50/30">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={reqQty}
+                                  value={currentAppQty}
+                                  onChange={(e) => handleApprovedQtyChange(item.id, reqQty, e.target.value)}
+                                  className={`w-20 text-right font-mono font-bold px-2 py-1 bg-white border rounded focus:ring-2 outline-none text-xs ${
+                                    qtyErrors[item.id]
+                                      ? "border-rose-500 focus:ring-rose-500/20 text-rose-600"
+                                      : "border-emerald-500/50 focus:ring-emerald-500/20 focus:border-emerald-500 text-emerald-800"
+                                  }`}
+                                />
+                                {qtyErrors[item.id] && (
+                                  <div className="text-[9.5px] text-rose-500 font-bold mt-0.5 whitespace-nowrap">
+                                    {qtyErrors[item.id]}
+                                  </div>
+                                )}
                               </td>
                               <td className="py-3 px-3 text-right font-medium text-slate-700">
                                 {unitPrice.toLocaleString("en-BD", { minimumFractionDigits: 2 })}

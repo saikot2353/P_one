@@ -38,6 +38,12 @@ const searchableMenus: SearchMenuLink[] = [
 
   // Master Data
   {
+    label: "Procurement Configuration",
+    parent: "Master Data",
+    to: "/procurement-configuration",
+    description: "Company-level settings for multiple categories and comparative statements",
+  },
+  {
     label: "Warehouse / Store",
     parent: "Master Data",
     to: "/procurement-master-data",

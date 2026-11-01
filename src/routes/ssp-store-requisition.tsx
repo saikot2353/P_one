@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import type { RequisitionViewData } from "@/components/ssp/GeneralStoreRequisitionModal";
 
 export const Route = createFileRoute("/ssp-store-requisition")({
   head: () => ({
@@ -119,7 +120,7 @@ export const EMPLOYEE_OPTIONS = [
 
 export const QUANTITY_UNITS = ["Pcs", "Box", "Pack", "Ream", "Unit", "Set", "Meter"];
 
-export function StoreRequisitionPage() {
+function StoreRequisitionPage() {
   const navigate = useNavigate();
 
   // ─── 1. REQUISITION TYPE: ICT vs General ───

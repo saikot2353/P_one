@@ -249,23 +249,18 @@ export function BudgetManagementPageForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
                 Employee Name <span className="text-rose-500">*</span>
               </label>
-              <select
-                disabled={isView}
-                value={formData.employeeName || ""}
-                onChange={(e) => handleEmployeeChange(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              >
-                {employeeList.map((emp) => (
-                  <option key={emp.id} value={emp.name}>
-                    {emp.name} ({emp.id})
-                  </option>
-                ))}
-              </select>
+              <input
+                type="text"
+                readOnly
+                disabled
+                value={formData.employeeName || "Tahmid Afsar Shapno"}
+                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-muted/50 text-xs font-bold text-foreground cursor-not-allowed select-all"
+              />
             </div>
 
             <div>
@@ -303,28 +298,22 @@ export function BudgetManagementPageForm({
 
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
-                Currency (Default: BDT)
+                Currency
               </label>
-              <input
-                type="text"
+              <select
                 disabled={isView}
                 value={formData.currency || "BDT"}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                 className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">
-                Budget ID <span className="text-[10px] font-normal text-muted-foreground ml-1">(Auto-generated)</span>
-              </label>
-              <input
-                type="text"
-                disabled={isView}
-                value={formData.budgetCode || ""}
-                onChange={(e) => setFormData({ ...formData, budgetCode: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
+              >
+                <option value="BDT">BDT (৳ Bangladeshi Taka)</option>
+                <option value="USD">USD ($ US Dollar)</option>
+                <option value="EUR">EUR (€ Euro)</option>
+                <option value="GBP">GBP (£ British Pound)</option>
+                <option value="CNY">CNY (¥ Chinese Yuan)</option>
+                <option value="INR">INR (₹ Indian Rupee)</option>
+                <option value="AED">AED (د.إ UAE Dirham)</option>
+              </select>
             </div>
 
             <div>
@@ -341,7 +330,7 @@ export function BudgetManagementPageForm({
               </select>
             </div>
 
-            {/* Budget Period Specific Dynamic Fields (Requirement 6) */}
+            {/* Budget Period Specific Dynamic Fields */}
             {formData.budgetPeriod === "Yearly" && (
               <div>
                 <label className="block text-xs font-bold mb-1 text-foreground">

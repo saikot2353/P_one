@@ -39,8 +39,11 @@ export function BrandMasterPageForm({
     e.preventDefault();
     if (isView) return;
 
+    const finalBrandCode =
+      formData.brandCode?.trim() ||
+      initialData?.brandCode ||
+      `BRD-${Math.floor(100 + Math.random() * 900)}`;
     const errors: Record<string, string> = {};
-    if (!formData.brandCode?.trim()) errors.brandCode = "Brand Code is required";
     if (!formData.brandName?.trim()) errors.brandName = "Brand Name is required";
 
     if (Object.keys(errors).length > 0) {
@@ -50,7 +53,7 @@ export function BrandMasterPageForm({
 
     const payload: Brand = {
       id: initialData?.id || `brd-${Date.now()}`,
-      brandCode: formData.brandCode || `BRD-${Date.now()}`,
+      brandCode: finalBrandCode,
       brandName: formData.brandName || "",
       manufacturer: formData.manufacturer || "",
       countryOfOrigin: formData.countryOfOrigin || "Bangladesh",
@@ -142,22 +145,6 @@ export function BrandMasterPageForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1 text-foreground">
-                Brand Code <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                disabled={isView}
-                value={formData.brandCode || ""}
-                onChange={(e) => setFormData({ ...formData, brandCode: e.target.value })}
-                className="w-full h-9 px-3 rounded-lg border border-border/80 bg-background text-xs font-mono font-bold focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
-              {formErrors.brandCode && (
-                <p className="text-[10px] text-rose-500 mt-1">{formErrors.brandCode}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold mb-1 text-foreground">
                 Brand Name <span className="text-rose-500">*</span>
               </label>
               <input
@@ -226,18 +213,6 @@ export function BrandMasterPageForm({
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-bold mb-1 text-foreground">Description</label>
-              <textarea
-                rows={2}
-                disabled={isView}
-                value={formData.description || ""}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Official brand lines, authorized regional dealers..."
-                className="w-full p-2.5 rounded-lg border border-border/80 bg-background text-xs resize-none focus:border-amber-500 outline-none disabled:bg-muted/50 disabled:text-foreground"
-              />
             </div>
           </div>
         </div>
