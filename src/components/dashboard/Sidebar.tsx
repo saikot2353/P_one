@@ -366,22 +366,6 @@ export const nav: NavItem[] = [
       { label: "Asset Master Data", to: "/zakat-asset-master" },
       { label: "Zakat Executive Report", to: "/zakat-executive-report" },
       { label: "Financial Aid Report", to: "/financial-aid-report" },
-      {
-        label: "Zakat Management",
-        hidden: true,
-        subitems: [
-          { label: "Budget Configuration", to: "/zakat-budget-configuration" },
-          { label: "Zakat List", to: "/zakat-list" },
-        ]
-      },
-      {
-        label: "Financial Aid",
-        hidden: true,
-        subitems: [
-          { label: "Budget Configuration", to: "/financial-aid-budget-configuration" },
-          { label: "Financial Aid List", to: "/financial-aid-list" },
-        ]
-      },
     ],
   },
   {
@@ -505,6 +489,8 @@ export const nav: NavItem[] = [
           { label: "Earn Leave Pay Report", to: "/earn-leave-pay-report" },
           { label: "Festival Allowance Payment Sheet", to: "/festival-allowance-payment-sheet" },
           { label: "Final Settlement Report", to: "/final-settlement-report" },
+          { label: "Extra OT", to: "/extra-ot-report" },
+          { label: "Night Allowance Report", to: "/night-allowance-report" },
         ],
       },
     ],
@@ -574,11 +560,15 @@ export const nav: NavItem[] = [
       { label: "Without In Out Attendance", to: "/hr-report-without-in-out-attendance" },
       { label: "Absent Counseling Report", to: "/hr-report-absent-counseling" },
       { label: "Print OT Requisition", to: "#" },
+      { label: "Pending OT Request", to: "/pending-ot-request" },
+      { label: "Working Hour Analysis", to: "/working-hour-analysis" },
       { label: "Continuous Absent", to: "/hr-report-continuous-absent" },
       { label: "SIM Requisition Report", to: "/hr-report-sim-requisition" },
       { label: "Tiffin Allowance All", to: "/hr-report-tiffin-allowance-all" },
       { label: "Night Card", to: "/hr-report-night-card" },
       { label: "Tiffin Card", to: "/hr-report-tiffin-card" },
+      { label: "Increment History", to: "/increment-history" },
+      { label: "Increment QueueList", to: "/increment-queuelist" },
     ],
   },
 ];
