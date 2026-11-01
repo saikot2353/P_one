@@ -6,12 +6,17 @@ import { componentTagger } from "lovable-tagger";
 import path from "path";
 import { nitro } from "nitro/vite";
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   return {
     server: {
       port: 3000,
       host: true,
       strictPort: true,
+      allowedHosts: true,
+      cors: true,
+      fs: {
+        strict: false,
+      },
     },
 
     resolve: {
@@ -67,9 +72,10 @@ export default defineConfig(({ mode }) => {
     plugins: [
       tanstackStart(),
 
-      nitro({
-        preset: "vercel",
-      }),
+      command === "build" &&
+        nitro({
+          preset: "vercel",
+        }),
 
       react(),
 
