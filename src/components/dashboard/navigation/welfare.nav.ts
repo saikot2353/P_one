@@ -6,22 +6,10 @@ export const welfareNav: NavItem[] = [
     label: "Welfare & Support",
     icon: HeartHandshake,
     subitems: [
-      {
-        label: "Zakat Management",
-        subitems: [
-          { label: "Budget Configuration", to: "/zakat-budget-configuration" },
-          { label: "Zakat List", to: "/zakat-list" },
-          { label: "Asset Master Data", to: "/zakat-asset-master" },
-          { label: "Zakat Report Report", to: "/zakat-executive-report" },
-        ],
-      },
-      {
-        label: "Financial Aid",
-        subitems: [
-          { label: "Budget Configuration", to: "/financial-aid-budget-configuration" },
-          { label: "Financial Aid List", to: "/financial-aid-list" },
-        ],
-      },
+      { label: "Zakat and Financial Aid", to: "/zakat-and-financial-aid" },
+      { label: "Asset Master Data", to: "/zakat-asset-master" },
+      { label: "Zakat Executive Report", to: "/zakat-executive-report" },
+      { label: "Financial Aid Report", to: "/financial-aid-report" },
     ],
   },
   {

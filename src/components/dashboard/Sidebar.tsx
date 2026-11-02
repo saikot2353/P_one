@@ -1,21 +1,1090 @@
-import { HRSidebar } from "./HRSidebar";
+import { useState, useEffect, useRef } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import {
+  LayoutDashboard,
+  SlidersHorizontal,
+  UserRound,
+  Clock,
+  Coins,
+  Users,
+  RefreshCw,
+  FileText,
+  BarChart3,
+  ClipboardCheck,
+  CalendarDays,
+  CalendarX,
+  ShieldAlert,
+  Fingerprint,
+  Timer,
+  CreditCard,
+  Cpu,
+  ShieldCheck,
+  Lightbulb,
+  Settings,
+  LifeBuoy,
+  ChevronDown,
+  ChevronRight,
+  File,
+  Briefcase,
+  UserPlus,
+  LogOut,
+  HeartHandshake,
+  Banknote,
+  CheckCircle,
+  Blocks,
+  ArrowLeft,
+  MessageSquare,
+  BookUser,
+  Megaphone,
+  DoorOpen,
+  FileSpreadsheet,
+  Smartphone,
+  Network,
+} from "lucide-react";
 
-export { HRSidebar } from "./HRSidebar";
-export { HRReportsSidebar } from "./HRReportsSidebar";
-export { WelfareSidebar } from "./WelfareSidebar";
-export { PayrollSidebar } from "./PayrollSidebar";
-export { LeaveSidebar } from "./LeaveSidebar";
-export { RecruitmentSidebar } from "./RecruitmentSidebar";
-export { SSPSidebar } from "./SSPSidebar";
-export { BaseSidebar } from "./BaseSidebar";
-export { nav } from "./navigation";
-export type { NestedItem, SubItem, NavItem } from "./navigation";
-
-/**
- * HR & Payroll Module Sidebar.
- * Displays the complete navigation hierarchy for HRIS.
- */
-export function Sidebar() {
-  return <HRSidebar />;
+export interface NestedItem {
+  label: string;
+  to?: string;
+  search?: Record<string, any>;
+  subitems?: NestedItem[];
+  count?: number;
+  hidden?: boolean;
 }
 
+export interface SubItem {
+  label: string;
+  to?: string;
+  search?: Record<string, any>;
+  subitems?: NestedItem[];
+  count?: number;
+  hidden?: boolean;
+}
+
+export interface NavItem {
+  label: string;
+  to?: string;
+  icon: any;
+  active?: boolean;
+  subitems?: SubItem[];
+  search?: Record<string, any>;
+  count?: number;
+  activeRoutes?: string[];
+  hidden?: boolean;
+}
+
+export const nav: NavItem[] = [
+  { label: "Dashboard", to: "/", icon: LayoutDashboard },
+  { label: "Messenger", to: "/messenger", icon: MessageSquare },
+  { label: "Phonebook", to: "/phonebook", icon: BookUser },
+  {
+    label: "SSP",
+    icon: Briefcase,
+    subitems: [
+      { label: "New Requisition", to: "/ssp-new-requisition" },
+      { label: "My Requisition", to: "/ssp-my-requisition" },
+      { label: "Implementation", to: "/ssp-implementation" },
+      {
+        label: "Attendance",
+        subitems: [
+          { label: "My Attendance", to: "/ssp-my-attendance" },
+          { label: "Request Manual Attendance", to: "/ssp-request-manual-attendance" },
+          { label: "Approve Manual Attendance", to: "/ssp-approve-manual-attendance" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Configure",
+    icon: SlidersHorizontal,
+    subitems: [
+      { label: "Structure Setup", to: "/configure-structure" },
+      { label: "Company Setup", to: "/company-setup" },
+      { label: "Personnel File Configure", to: "/configure-personnel" },
+      { label: "Job & Employee Setup", to: "/configure-employment" },
+      { label: "Shift & Time Rules", to: "/configure-time" },
+      { label: "Allowances & Bonuses", to: "/configure-compensation" },
+      { label: "Tax & Compliance Setup", to: "/configure-tax" },
+      { label: "Payroll Configuration", to: "/payroll-configure" },
+      { label: "Education & Training", to: "/configure-education" },
+      { label: "Leave & Policies", to: "/configure-policies" },
+      { label: "Maternity Configuration", to: "/maternity-configuration" },
+      { label: "Letter Setup", to: "/configure-letter" },
+      { label: "Lunch rate festival", to: "/lunch-rate-festival" },
+    ],
+  },
+  {
+    label: "Approvals",
+    icon: CheckCircle,
+    count: 42,
+    subitems: [
+      { label: "All Approvals", to: "/all-approvals" },
+      { label: "All Pending Approval List", to: "/pending-approvals", count: 5 },
+      { label: "Work Flow", to: "/work-flows", count: 6 },
+      { label: "Sync Requisition", to: "/sync-requisition" },
+      {
+        label: "HR Approvals",
+        count: 28,
+        subitems: [
+          { label: "SSP Approval", to: "/ssp-approval", count: 5 },
+          { label: "Personnel Approval", to: "/personnel-approval", count: 2 },
+          { label: "Personal Info Approval", to: "/personal-info-approval", count: 2 },
+          { label: "Employee Doc Verification", to: "/employee-doc-verification", count: 4 },
+          { label: "Manual Attendance", to: "/pending-manual-attendance", count: 7 },
+          {
+            label: "JD Approvals",
+            to: "/hr-policy",
+            search: { mode: "list", filterWorkflow: "HR" },
+            count: 1,
+          },
+          { label: "KPI Approval", to: "/kpi-approval", count: 4 },
+          { label: "Increment Gadget", to: "/approve-increment-gadget", count: 3 },
+          { label: "Increment (HR)", to: "/approve-increment-hr", count: 2 },
+          { label: "Final Increment", to: "/final-approve-increment", count: 1 },
+          { label: "Budget Requisitions", to: "/budget-requisition-approvals" },
+          {
+            label: "Transfer Approvals",
+            to: "/transfer-control-center",
+            search: { tab: "approve" },
+            count: 2,
+          },
+          { label: "Overtime Requisitions", to: "/approve-overtime", count: 1 },
+          { label: "Lunce Requisition approval", to: "/lunch-requisition-approval", count: 2 },
+          { label: "Festival Allowance Approval", to: "/festival-allowance-approval", count: 1 },
+        ],
+      },
+      {
+        label: "Payroll Approval",
+        count: 14,
+        subitems: [
+          { label: "Advance Requisitions", to: "/approve-advance", count: 3 },
+          { label: "Loan Applications", to: "/loan-approval", count: 5 },
+          { label: "Salary Sheets", to: "/check-approve-salary", count: 6 },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Personnel Info",
+    icon: UserRound,
+    subitems: [
+      { label: "Personnel List", to: "/personnel-list" },
+      { label: "Employee Account Information", to: "/employee-account-information" },
+      { label: "Bulk Account Upload", to: "/bulk-account-upload" },
+      { label: "ID Card Setup", to: "/id-card-setup" },
+      { label: "Employee Doc Issue", to: "/employee-doc-issue" },
+      { label: "Set HOD", to: "/set-hod" },
+      { label: "Set Manager", to: "/set-manager" },
+      { label: "Change Employee Status", to: "/change-employee-status" },
+      { label: "Lefty", to: "/disciplinary-lefty" },
+    ],
+  },
+  {
+    label: "Digital Business Card",
+    icon: CreditCard,
+    subitems: [
+      { label: "My Digital Business Card", to: "/my-digital-business-card" },
+      { label: "Share My Card", to: "/share-my-card" },
+      { label: "Business Card Management", to: "/digital-business-cards-admin" },
+      { label: "Card Analytics", to: "/digital-business-card-analytics" },
+    ],
+  },
+  {
+    label: "Attendance",
+    icon: Fingerprint,
+    subitems: [
+      { label: "Manual Attendance", to: "/manual-attendance" },
+      { label: "Employee Job Card", to: "/employee-job-card" },
+      { label: "Allowance Process", to: "/" },
+      { label: "Allowance Requisition", to: "/" },
+    ],
+  },
+  {
+    label: "Roster",
+    icon: CalendarDays,
+    subitems: [
+      { label: "Create Roster", to: "/create-roster" },
+      { label: "Company Holiday", to: "/company-holiday" },
+    ],
+  },
+  {
+    label: "Leave",
+    icon: CalendarX,
+    subitems: [
+      { label: "Leave Application", to: "/leave-application" },
+      { label: "Bulk Leave", to: "/bulk-leave" },
+      {
+        label: "Maternity Leave",
+        subitems: [
+          { label: "Welfare Verification", to: "/maternity-welfare-verification" },
+          { label: "Medical Verification", to: "/maternity-medical-verification" },
+          { label: "HR Verification", to: "/maternity-hr-verification" },
+          { label: "Maternity Payment", to: "/maternity-payment" },
+          { label: "Maternity Payment Report", to: "/maternity-payment-report" },
+        ],
+      },
+      { label: "Leave Approved & List", to: "/leave-list" },
+      { label: "Leave Approve", to: "/leave-approve" },
+      { label: "Earn Leave Process (Year)", to: "/earn-leave-process", search: { type: "year" } },
+      { label: "Earn Leave Process (Month)", to: "/earn-leave-process", search: { type: "month" } },
+      { label: "Earn Leave Submit & List", to: "/earn-leave-workflow" },
+    ],
+  },
+  {
+    label: "Notice",
+    to: "/notice",
+    icon: Megaphone,
+  },
+  {
+    label: "Conference Room",
+    icon: DoorOpen,
+    subitems: [
+      { label: "Conference Room Booking", to: "/conference-room-booking" },
+      { label: "Booking List", to: "/conference-room-booking-list" },
+      { label: "Approval", to: "/conference-room-approval" },
+    ],
+  },
+  {
+    label: "KPI Performance",
+    icon: BarChart3,
+    subitems: [
+      { label: "Dashboard", to: "/kpi-dashboard" },
+      { label: "Cycles", to: "/kpi-cycles" },
+      { label: "Criteria Setup", to: "/kpi-task-name" },
+      { label: "Grade Bands", to: "/kpi-setting" },
+      { label: "My Self-Assessment", to: "/kpi-self-assessment" },
+      { label: "360° Peer Review", to: "/kpi-peer-review" },
+      { label: "Assessment Workflow", to: "/kpi-assessment-workflow" },
+      { label: "Assesment Final Report", to: "/kpi-final-report" },
+      { label: "KPI Reports", to: "/kpi-report" },
+    ],
+  },
+  {
+    label: "Evaluation",
+    icon: ClipboardCheck,
+    subitems: [
+      { label: "Increment (Single)", to: "/increment" },
+      { label: "Increment (Multi)", to: "/increment-multiple" },
+      { label: "Proposed Increment", to: "/propose-increment" },
+      { label: "Increment Report", to: "/increment-report" },
+      { label: "Increment History", to: "/increment-history" },
+    ],
+  },
+  {
+    label: "e-Recruitment",
+    icon: UserPlus,
+    subitems: [
+      { label: "Application Queue", to: "/recruitment-basic-list" },
+      { label: "Candidate Selection", to: "/recruitment-candidate-selection" },
+      { label: "Candidate Selection Approval", to: "/recruitment-candidate-selection-approval" },
+      // { label: "Settings", to: "/recruitment-settings" },
+      // { label: "Approved List", to: "/recruitment-assessment-list" },
+    ],
+  },
+  {
+    label: "IE Recruitment",
+    icon: UserPlus,
+    subitems: [
+      { label: "Organization Setting", to: "/recruitment-basic-setup" },
+      { label: "Basic Entry Form", to: "/recruitment-basic-entry" },
+      { label: "Basic Info List", to: "/recruitment-basic-info-list" },
+      { label: "IE Configuration", to: "/recruitment-configuration" },
+      { label: "IE Assessment", to: "/recruitment-ie-list" },
+      { label: "HR Assessment", to: "/recruitment-hr-list" },
+      { label: "Assessment List", to: "/recruitment-assessment-list" },
+    ],
+  },
+  {
+    label: "Manage Shift",
+    icon: Clock,
+    subitems: [
+      { label: "Initial Shift Setup", to: "/shift-control-center" },
+      { label: "Shift Roster Assignment", to: "/shift-roster-assignment" },
+    ],
+  },
+  {
+    label: "Manpower Budget",
+    icon: Coins,
+    subitems: [
+      { label: "Dashboard & Statement", to: "/budget-statement" },
+      { label: "Budget Planning Hub", to: "/budget-planning" },
+      { label: "My Requisitions", to: "/budget-my-requisitions" },
+      { label: "Overtime Budget", to: "/budget-overtime" },
+      { label: "Over Time Limit", to: "/budget-overtime" },
+    ],
+  },
+  {
+    label: "Transfer",
+    icon: RefreshCw,
+    subitems: [
+      { label: "Transfer History", to: "/transfer-control-center", search: { tab: "history" } },
+      { label: "Print Transfer Letter", to: "/transfer-control-center", search: { tab: "print" } },
+    ],
+  },
+  {
+    label: "HR Policy",
+    to: "/hr-policy",
+    icon: FileText,
+  },
+  {
+    label: "JD List",
+    to: "/jd-list",
+    icon: Briefcase,
+  },
+  {
+    label: "Department SOP",
+    to: "/department-sop",
+    icon: Network,
+  },
+  {
+    label: "Separation",
+    icon: LogOut,
+    subitems: [
+      { label: "Resignation Request", to: "/separation-resignation-request" },
+      { label: "Clearance", to: "/separation-clearance" },
+      { label: "Clearance Approval", to: "/separation-clearance-approval" },
+      { label: "Clearance Configuration", to: "/separation-clearance-configuration" },
+      { label: "Other Separations", to: "/separation-company-initiated" },
+      { label: "Payment", to: "/separation-payment" },
+      { label: "Exit Documents", to: "/separation-exit-documents" },
+    ],
+  },
+  {
+    label: "User Management",
+    icon: Users,
+    subitems: [
+      { label: "User List", to: "/user-management" },
+      { label: "Permission Management", to: "/permission-management" },
+    ],
+  },
+
+  {
+    label: "Welfare & Support",
+    icon: HeartHandshake,
+    subitems: [
+      { label: "Zakat and Financial Aid", to: "/zakat-and-financial-aid" },
+      { label: "Asset Master Data", to: "/zakat-asset-master" },
+      { label: "Zakat Executive Report", to: "/zakat-executive-report" },
+      { label: "Financial Aid Report", to: "/financial-aid-report" },
+    ],
+  },
+  {
+    label: "Counseling",
+    icon: LifeBuoy,
+    subitems: [
+      { label: "Absent Counseling", to: "/absent-counseling" },
+      { label: "Welfare Verification", to: "/welfare-verification" },
+    ],
+  },
+  {
+    label: "Disciplinary Action",
+    icon: ShieldAlert,
+    subitems: [
+      { label: "Show Cause Notices", to: "/disciplinary-showcause-notices" },
+      { label: "Warning Letters", to: "/disciplinary-warning-letters" },
+      { label: "Case Files", to: "/disciplinary-case-files" },
+    ],
+  },
+  {
+    label: "Manage Overtime",
+    icon: Timer,
+    subitems: [
+      { label: "OT Requisition", to: "/manage-overtime", search: { tab: "requisition" } },
+      { label: "Approve OT Requisition", to: "/approve-overtime" },
+      { label: "OT Requisition List", to: "/manage-overtime", search: { tab: "requisition-list" } },
+      { label: "Submit OT Req", to: "/manage-overtime", search: { tab: "submit" } },
+      { label: "Submitted OT List", to: "/manage-overtime", search: { tab: "submitted-list" } },
+      { label: "Individual OT Review", to: "/manage-overtime", search: { tab: "individual-review" } },
+      { label: "OT Status Update", to: "/ot-status-update" },
+      { label: "Lunce Requisition", to: "/lunch-requisition" },
+      { label: "Festival Allowance", to: "/festival-allowance" },
+    ],
+  },
+  {
+    label: "Manage Allowance",
+    icon: CreditCard,
+    subitems: [
+      { label: "Allowance Setup", to: "/" },
+      { label: "Employee Allowance", to: "/" },
+      { label: "Tax Exemption Rules", to: "/" },
+      { label: "Allowance Requisition", to: "/allowance-requisition" },
+      { label: "Festival Allowance Check (HR)", to: "/festival-allowance-check-hr" },
+    ],
+  },
+  {
+    label: "Payroll",
+    icon: Banknote,
+    subitems: [
+      {
+        label: "Advance",
+        subitems: [
+          { label: "Advance Req & List", to: "/payroll-advance" },
+          { label: "Incentive Allowance", to: "/incentive-allowance" },
+        ],
+      },
+      {
+        label: "Loan",
+        subitems: [{ label: "Loan Management", to: "/loan-application" }],
+      },
+      { label: "Deductions", to: "/payroll-deductions" },
+      { label: "Tax Update", to: "/employee-tax-pay" },
+      {
+        label: "Salary Process",
+        subitems: [
+          {
+            label: "Salary Submission",
+            subitems: [
+              { label: "Salary Submit", to: "/payroll-salary-submit" },
+              { label: "Check Salary", to: "/payroll-check-salary" },
+              { label: "Check Salary Vat/Tax", to: "/payroll-check-salary-vattax" },
+              { label: "Check Salary Audit", to: "/payroll-check-salary-audit" },
+              { label: "Check Salary Plant Head", to: "/payroll-check-salary-planthead" },
+              { label: "Check Salary Accounts", to: "/payroll-check-salary-accounts" },
+            ],
+          },
+          {
+            label: "Bonus Submission",
+            subitems: [
+              { label: "Bonus Submit", to: "/payroll-bonus-submit" },
+              { label: "Check Bonus", to: "/payroll-check-bonus" },
+              { label: "Check Bonus Vat/Tax", to: "/payroll-check-bonus-vattax" },
+              { label: "Check Bonus Audit", to: "/payroll-check-bonus-audit" },
+              { label: "Check Bonus Plant Head", to: "/payroll-check-bonus-planthead" },
+              { label: "Check Bonus Accounts", to: "/payroll-check-bonus-accounts" },
+            ],
+          },
+          { label: "Monthly Salary Process", to: "/monthly-salary-process" },
+          { label: "Advance Salary Process", to: "/advance-salary-process" },
+          { label: "Yearly Bonus Process", to: "/yearly-bonus-process" },
+          { label: "Payroll Period Lock & Approval", to: "/payroll-period-lock" },
+        ],
+      },
+      {
+        label: "Benefits",
+        subitems: [
+          { label: "Master Data", to: "/payroll-benefits-master-data" },
+          { label: "Common Benefits", to: "/payroll-benefits-common" },
+          { label: "Monthly Benefits", to: "/payroll-benefits-monthly" },
+        ],
+      },
+      {
+        label: "Final Settlement",
+        subitems: [
+          { label: "Execute Final Settlement", to: "/final-settlement" },
+          { label: "Final Settlement Configuration", to: "/final-settlement-configuration" }
+        ],
+      },
+      { label: "Payroll Configuration", to: "/payroll-configure" },
+      {
+        label: "Payroll Reports",
+        to: "/payroll-reports",
+        subitems: [
+          { label: "Monthly Salary Details", to: "/monthly-salary-details" },
+          { label: "Monthly Lefty Salary Sheet", to: "/monthly-lefty-salary-sheet" },
+          { label: "Employee Salary History", to: "/employee-salary-history" },
+          { label: "Monthly Advance Salary Sheet", to: "/monthly-advance-salary-sheet" },
+          { label: "Summary Salary Sheet", to: "/summary-salary-sheet" },
+          { label: "Holiday Summary Sheet", to: "/holiday-summary-sheet" },
+          { label: "Yearly Bonus Report", to: "/yearly-bonus-report" },
+          { label: "Earn Leave Pay Report", to: "/earn-leave-pay-report" },
+          { label: "Festival Allowance Payment Sheet", to: "/festival-allowance-payment-sheet" },
+          { label: "Final Settlement Report", to: "/final-settlement-report" },
+          { label: "Extra OT", to: "/extra-ot-report" },
+          { label: "Night Allowance Report", to: "/night-allowance-report" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Mobile Billing",
+    icon: Smartphone,
+    subitems: [
+      { label: "Bill Entry", to: "/mobile-billing-entry" },
+      { label: "Department wise billing", to: "/mobile-billing-department" },
+      { label: "Employee wise billing", to: "/mobile-billing-employee" },
+    ],
+  },
+  {
+    label: "Processes",
+    icon: Cpu,
+    subitems: [
+      { label: "Payroll Processing", to: "/" },
+      { label: "End of Month Close", to: "/" },
+      { label: "Year End Process", to: "/" },
+    ],
+  },
+  {
+    label: "Compliance",
+    icon: ShieldCheck,
+    subitems: [
+      { label: "Statutory Compliance", to: "/" },
+      { label: "Tax Reports", to: "/" },
+      { label: "Audit Logs", to: "/" },
+    ],
+  },
+  {
+    label: "Idea Share",
+    icon: Lightbulb,
+    subitems: [
+      { label: "Idea Board", to: "/" },
+      { label: "Innovation Submissions", to: "/" },
+    ],
+  },
+  {
+    label: "Event",
+    icon: CalendarDays,
+    subitems: [
+      { label: "Upcoming Events", to: "/" },
+      { label: "Holiday Celebrations", to: "/" },
+      { label: "Team Building", to: "/" },
+    ],
+  },
+  {
+    label: "HR Reports",
+    icon: FileSpreadsheet,
+    to: "/hr-reports",
+    subitems: [
+      { label: "New Joining Info", to: "/hr-report-new-joining-info" },
+      { label: "Employee Info (Compliance)", to: "/hr-report-employee-info-compliance" },
+      { label: "Separation List", to: "/hr-report-separation-list" },
+      { label: "Employee Count", to: "/hr-report-employee-count" },
+      { label: "Leave Summary", to: "/hr-report-leave-summary" },
+      { label: "Leave", to: "/hr-report-leave-details" },
+      { label: "Daily Attendance Report", to: "/hr-report-daily-attendance" },
+      { label: "Monthly Attendance Report", to: "/hr-report-monthly-attendance" },
+      { label: "Overtime Summary", to: "/hr-report-overtime-summary" },
+      { label: "Absenteeism Summary", to: "/hr-report-absenteeism-summary" },
+      { label: "Attendance Details PrevAbsent", to: "/hr-report-attendance-details-prevabsent" },
+      { label: "Attendance Details", to: "/hr-report-attendance-details" },
+      { label: "Attendance & Overtime", to: "/hr-report-attendance-and-overtime" },
+      { label: "Without In Out Attendance", to: "/hr-report-without-in-out-attendance" },
+      { label: "Absent Counseling Report", to: "/hr-report-absent-counseling" },
+      { label: "Print OT Requisition", to: "#" },
+      { label: "Pending OT Request", to: "/pending-ot-request" },
+      { label: "Working Hour Analysis", to: "/working-hour-analysis" },
+      { label: "Continuous Absent", to: "/hr-report-continuous-absent" },
+      { label: "SIM Requisition Report", to: "/hr-report-sim-requisition" },
+      { label: "Tiffin Allowance All", to: "/hr-report-tiffin-allowance-all" },
+      { label: "Night Card", to: "/hr-report-night-card" },
+      { label: "Tiffin Card", to: "/hr-report-tiffin-card" },
+      { label: "Increment History", to: "/increment-history" },
+      { label: "Increment QueueList", to: "/increment-queuelist" },
+    ],
+  },
+];
+
+export function Sidebar() {
+  const routerState = useRouterState();
+  const currentPath = routerState.location.pathname;
+  const scrollRef = useRef<HTMLElement>(null);
+  const isTransitioning = useRef(false);
+
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    nav.forEach((item) => {
+      if (item.subitems) {
+        const isChildActive = item.subitems.some((sub) => {
+          if (sub.to && sub.to !== "/" && sub.to === currentPath) return true;
+          if (
+            sub.subitems &&
+            sub.subitems.some((nested) => {
+              if (nested.to && nested.to !== "/" && nested.to === currentPath) return true;
+              if (
+                nested.subitems &&
+                nested.subitems.some((deep) => deep.to !== "/" && deep.to === currentPath)
+              )
+                return true;
+              return false;
+            })
+          )
+            return true;
+          return false;
+        });
+        if (isChildActive) {
+          initial[item.label] = true;
+        }
+        item.subitems.forEach((sub) => {
+          if (
+            sub.subitems &&
+            sub.subitems.some((nested) => {
+              if (nested.to && nested.to !== "/" && nested.to === currentPath) return true;
+              if (
+                nested.subitems &&
+                nested.subitems.some((deep) => deep.to !== "/" && deep.to === currentPath)
+              )
+                return true;
+              return false;
+            })
+          ) {
+            initial[sub.label] = true;
+          }
+          if (sub.subitems) {
+            sub.subitems.forEach((nested) => {
+              if (
+                nested.subitems &&
+                nested.subitems.some((deep) => deep.to !== "/" && deep.to === currentPath)
+              ) {
+                initial[nested.label] = true;
+              }
+            });
+          }
+        });
+      }
+    });
+
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("sidebar_menus");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          return { ...parsed, ...initial };
+        } catch (e) { }
+      }
+    }
+    return initial;
+  });
+
+  const isMounted = useRef(false);
+  useEffect(() => {
+    isMounted.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (isMounted.current) {
+      sessionStorage.setItem("sidebar_menus", JSON.stringify(openMenus));
+    }
+  }, [openMenus]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && scrollRef.current) {
+      const savedScroll = sessionStorage.getItem("sidebar_scroll");
+      if (savedScroll) {
+        const targetScroll = parseInt(savedScroll, 10);
+        scrollRef.current.scrollTop = targetScroll;
+        const timer = setTimeout(() => {
+          if (scrollRef.current) {
+            scrollRef.current.scrollTop = targetScroll;
+          }
+        }, 60);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
+
+  const handleScroll = (e: React.UIEvent<HTMLElement>) => {
+    if (isTransitioning.current) return;
+    sessionStorage.setItem("sidebar_scroll", e.currentTarget.scrollTop.toString());
+  };
+
+  const handleNavClick = () => {
+    isTransitioning.current = true;
+    setTimeout(() => {
+      isTransitioning.current = false;
+    }, 400);
+  };
+
+  const toggleMenu = (label: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setOpenMenus((prev) => ({
+      ...prev,
+      [label]: !prev[label],
+    }));
+  };
+
+  const filteredNav = nav.filter((item) => !item.hidden);
+
+  if (typeof window !== "undefined" && window.location.search.includes("embed=true")) {
+    return null;
+  }
+
+  return (
+    <aside className="hidden lg:flex w-64 h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300">
+      <Link
+        to="/module-selection"
+        className="px-5 py-4 flex items-center gap-2.5 border-b border-sidebar-border/80 group transition-all duration-300 hover:bg-sidebar-accent/30 cursor-pointer relative z-50"
+      >
+        {/* Beautiful Hover Tooltip */}
+        <div className="absolute left-[70px] top-[80%] opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 pointer-events-none z-50">
+          <div className="bg-primary text-primary-foreground text-[10px] font-bold px-2.5 py-1.5 rounded-lg shadow-xl flex items-center gap-1.5 whitespace-nowrap">
+            <LayoutDashboard className="size-3" />
+            Switch to Another Module
+          </div>
+        </div>
+
+        {/* 3D Flip Logo */}
+        <div className="relative size-8.5 rounded-xl text-sm tracking-tight [perspective:1000px]">
+          <div className="relative w-full h-full transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+            {/* Front: Logo */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary-glow font-extrabold text-primary-foreground shadow-[0_4px_12px_oklch(0.48_0.19_255/0.25)] flex items-center justify-center rounded-xl [backface-visibility:hidden]">
+              C
+            </div>
+            {/* Back: Back Button */}
+            <div className="absolute inset-0 bg-sidebar-primary text-primary-foreground flex items-center justify-center rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden] shadow-md border-2 border-primary/20">
+              <ArrowLeft className="size-4.5" />
+            </div>
+          </div>
+        </div>
+
+        <div className="leading-tight">
+          <div className="font-extrabold tracking-tight text-[13px] text-sidebar-foreground group-hover:text-primary transition-colors duration-300">
+            CRIPTON
+          </div>
+          <div className="text-[9px] uppercase tracking-[0.25em] font-bold text-sidebar-primary">
+            HRIS
+          </div>
+        </div>
+      </Link>
+      <nav
+        ref={scrollRef}
+        onScroll={handleScroll}
+        onClick={handleNavClick}
+        className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none"
+      >
+        <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">
+          Workspace
+        </div>
+        {filteredNav.map((item) => {
+          const Icon = item.icon;
+
+          // Determine parent active state dynamically
+          const isParentActive =
+            item.to === currentPath ||
+            (item.activeRoutes && item.activeRoutes.some((r) => r === currentPath)) ||
+            (item.subitems &&
+              item.subitems.some((sub) => {
+                if (sub.to && sub.to !== "/" && sub.to === currentPath) return true;
+                if (
+                  sub.subitems &&
+                  sub.subitems.some((nested) => nested.to !== "/" && nested.to === currentPath)
+                )
+                  return true;
+                return false;
+              }));
+
+          if (!item.subitems) {
+            return (
+              <div
+                key={item.label}
+                className="border-b border-sidebar-border/30 last:border-0 pb-1"
+              >
+                <Link
+                  to={item.to || "/"}
+                  search={item.search}
+                  className={[
+                    "group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all duration-200",
+                    isParentActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-2xs"
+                      : "text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                  ].join(" ")}
+                >
+                  <Icon className="size-3.5 transition-transform duration-300 group-hover:scale-110 group-hover:text-sidebar-primary" />
+                  <span>{item.label}</span>
+                  {isParentActive && (
+                    <span className="ml-auto size-1.5 rounded-full bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)] animate-pulse" />
+                  )}
+                </Link>
+              </div>
+            );
+          }
+
+          const isOpen = openMenus[item.label];
+          return (
+            <div
+              key={item.label}
+              className="space-y-0.5 border-b border-sidebar-border/30 last:border-0 pb-1"
+            >
+              <button
+                onClick={(e) => toggleMenu(item.label, e)}
+                className={[
+                  "w-full group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] text-left transition-all duration-200 font-semibold",
+                  isParentActive
+                    ? "bg-sidebar-accent/30 text-sidebar-accent-foreground font-bold"
+                    : "text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                ].join(" ")}
+              >
+                <Icon
+                  className={[
+                    "size-3.5 transition-colors duration-300 group-hover:scale-110 group-hover:text-sidebar-primary",
+                    isParentActive ? "text-success font-black" : "text-sidebar-foreground/60",
+                  ].join(" ")}
+                />
+                <span className="flex-1 truncate">{item.label}</span>
+                {item.count !== undefined && item.count > 0 && (
+                  <span className="bg-amber-500/10 text-amber-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md mr-1 leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
+                    {item.count}
+                  </span>
+                )}
+                {isOpen ? (
+                  <ChevronDown className="size-3.5 text-sidebar-foreground/45 transition-transform duration-300 rotate-180" />
+                ) : (
+                  <ChevronRight className="size-3.5 text-sidebar-foreground/45 transition-transform duration-300" />
+                )}
+              </button>
+              <div
+                className={[
+                  "overflow-hidden transition-all duration-300 space-y-0.5 pl-3.5 bg-sidebar-accent/25 rounded-xl",
+                  isOpen ? "max-h-[2500px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
+                ].join(" ")}
+              >
+                {item.subitems
+                  .filter((sub) => !sub.hidden)
+                  .map((sub) => {
+                  if (sub.subitems) {
+                    const isSubOpen = openMenus[sub.label];
+                    const isSubActive = sub.subitems.some((nested) => {
+                      if (nested.to && nested.to !== "/" && nested.to === currentPath) return true;
+                      if (
+                        nested.subitems &&
+                        nested.subitems.some((deep) => deep.to !== "/" && deep.to === currentPath)
+                      )
+                        return true;
+                      return false;
+                    });
+                    return (
+                      <div key={sub.label} className="space-y-0.5">
+                        <button
+                          onClick={(e) => toggleMenu(sub.label, e)}
+                          className={[
+                            "w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-150",
+                            isSubActive
+                              ? "text-sidebar-foreground font-bold"
+                              : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                          ].join(" ")}
+                        >
+                          <div className="flex items-center gap-2">
+                            <File
+                              className={[
+                                "size-3 shrink-0",
+                                isSubActive
+                                  ? "text-primary font-black"
+                                  : "text-sidebar-foreground/45",
+                              ].join(" ")}
+                            />
+                            <span className="truncate">{sub.label}</span>
+                          </div>
+                          {sub.count !== undefined && sub.count > 0 && (
+                            <span className="bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
+                              {sub.count}
+                            </span>
+                          )}
+                          {isSubOpen ? (
+                            <ChevronDown className="size-3 text-sidebar-foreground/45 transition-transform duration-300 rotate-180" />
+                          ) : (
+                            <ChevronRight className="size-3 text-sidebar-foreground/45 transition-transform duration-300" />
+                          )}
+                        </button>
+                        <div
+                          className={[
+                            "overflow-hidden transition-all duration-300 space-y-0.5 pl-6",
+                            isSubOpen
+                              ? "max-h-[1500px] opacity-100 py-0.5 mt-0.5"
+                              : "max-h-0 opacity-0",
+                          ].join(" ")}
+                        >
+                          {sub.subitems
+                            .filter((nested) => !nested.hidden)
+                            .map((nested) => {
+                            if (nested.subitems) {
+                              const isNestedOpen = openMenus[nested.label];
+                              const isNestedActive = nested.subitems.some(
+                                (deep) => deep.to !== "/" && deep.to === currentPath,
+                              );
+                              return (
+                                <div key={nested.label} className="space-y-0.5">
+                                  <button
+                                    onClick={(e) => toggleMenu(nested.label, e)}
+                                    className={[
+                                      "w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-[10.5px] font-medium transition-all duration-150",
+                                      isNestedActive
+                                        ? "text-sidebar-foreground font-bold"
+                                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                                    ].join(" ")}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <File
+                                        className={[
+                                          "size-3 shrink-0",
+                                          isNestedActive
+                                            ? "text-primary font-black"
+                                            : "text-sidebar-foreground/45",
+                                        ].join(" ")}
+                                      />
+                                      <span className="truncate">{nested.label}</span>
+                                    </div>
+                                    {nested.count !== undefined && nested.count > 0 && (
+                                      <span className="bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none border border-amber-500/20">
+                                        {nested.count}
+                                      </span>
+                                    )}
+                                    {isNestedOpen ? (
+                                      <ChevronDown className="size-3 text-sidebar-foreground/45 transition-transform duration-300 rotate-180" />
+                                    ) : (
+                                      <ChevronRight className="size-3 text-sidebar-foreground/45 transition-transform duration-300" />
+                                    )}
+                                  </button>
+                                  <div
+                                    className={[
+                                      "overflow-hidden transition-all duration-300 space-y-0.5 pl-4 border-l border-sidebar-border/30 ml-3",
+                                      isNestedOpen
+                                        ? "max-h-[300px] opacity-100 py-0.5 mt-0.5"
+                                        : "max-h-0 opacity-0",
+                                    ].join(" ")}
+                                  >
+                                    {nested.subitems.map((deep) => {
+                                      const isDeepActive = deep.to !== "/" && deep.to === currentPath;
+                                      return (
+                                        <Link
+                                          key={deep.label}
+                                          to={deep.to || "#"}
+                                          className={[
+                                            "flex items-center gap-2 px-3 py-1.5 rounded-md text-[10px] font-medium transition-all duration-150",
+                                            isDeepActive
+                                              ? "bg-primary/10 text-primary font-bold shadow-2xs"
+                                              : "text-sidebar-foreground/60 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground",
+                                          ].join(" ")}
+                                        >
+                                          <span
+                                            className={[
+                                              "w-1.5 h-1.5 rounded-full shrink-0",
+                                              isDeepActive ? "bg-primary" : "bg-sidebar-foreground/20",
+                                            ].join(" ")}
+                                          />
+                                          <span className="truncate">{deep.label}</span>
+                                        </Link>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            const isNestedActive = nested.to !== "/" && nested.to === currentPath;
+                            return (
+                              <Link
+                                key={nested.label}
+                                to={nested.to || "#"}
+                                className={[
+                                  "flex items-center gap-2 px-3 py-1.5 rounded-md text-[10px] font-medium transition-all duration-150",
+                                  isNestedActive
+                                    ? "bg-primary/10 text-primary font-bold shadow-2xs"
+                                    : "text-sidebar-foreground/60 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground",
+                                ].join(" ")}
+                              >
+                                <span
+                                  className={[
+                                    "w-1.5 h-1.5 rounded-full shrink-0",
+                                    isNestedActive ? "bg-primary" : "bg-sidebar-foreground/20",
+                                  ].join(" ")}
+                                />
+                                <span className="truncate">{nested.label}</span>
+                                {nested.count !== undefined && nested.count > 0 && (
+                                  <span className="ml-auto bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
+                                    {nested.count}
+                                  </span>
+                                )}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  const searchParams = routerState.location.search as Record<string, any>;
+                  const isSubActive =
+                    sub.to &&
+                    sub.to !== "/" &&
+                    sub.to === currentPath &&
+                    (!sub.search ||
+                      Object.keys(sub.search).every(
+                        (key) => sub.search?.[key] === searchParams[key],
+                      ));
+                  return (
+                    <Link
+                      key={sub.label}
+                      to={sub.to || "/"}
+                      search={sub.search}
+                      className={[
+                        "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-150",
+                        isSubActive
+                          ? "bg-primary/10 text-primary font-bold shadow-2xs"
+                          : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                      ].join(" ")}
+                    >
+                      <File
+                        className={[
+                          "size-3 shrink-0",
+                          isSubActive ? "text-primary font-black" : "text-sidebar-foreground/45",
+                        ].join(" ")}
+                      />
+                      <span className="truncate">{sub.label}</span>
+                      {sub.count !== undefined && sub.count > 0 && (
+                        <span className="ml-auto bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
+                          {sub.count}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </nav>
+      <div className="p-3 border-t border-sidebar-border/60 space-y-1 bg-sidebar-accent/15">
+        <Link
+          to="/configure-structure"
+          className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all"
+        >
+          <Settings className="size-3.5 transition-transform duration-300 group-hover:rotate-45" />{" "}
+          Settings
+        </Link>
+        <Link
+          to="/"
+          className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all"
+        >
+          <LifeBuoy className="size-3.5 transition-transform duration-300 group-hover:scale-110" />{" "}
+          Help & Support
+        </Link>
+        <button
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              localStorage.removeItem("cripton_logged_in_strict");
+              window.location.href = "/login";
+            }
+          }}
+          className="w-full group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all text-left"
+        >
+          <LogOut className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 text-rose-500" />
+          <span className="text-rose-500/90 group-hover:text-rose-500 transition-colors">
+            Log Out
+          </span>
+        </button>
+        <div className="mt-3 mx-1 p-3 rounded-xl bg-sidebar-accent/50 border border-sidebar-border hover:border-sidebar-border/80 transition-all duration-300">
+          <div className="flex items-center gap-2.5">
+            <div className="relative">
+              <div className="size-8 rounded-lg bg-gradient-to-br from-primary to-primary-glow grid place-items-center text-[10px] font-bold text-primary-foreground shadow-sm">
+                TAS
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 size-2 rounded-full bg-success border-2 border-sidebar shadow-[0_0_6px_var(--success)]" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-[11px] font-bold text-sidebar-foreground truncate">
+                Tahmid Afsar Shapno
+              </div>
+              <div className="text-[9px] text-sidebar-foreground/60 truncate font-semibold">
+                HR Director
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+// Aliases for compatibility
+export { Sidebar as HRSidebar };
+export { Sidebar as BaseSidebar };

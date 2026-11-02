@@ -1536,7 +1536,7 @@ function ZakatManagementPage() {
       prev.map((item) => {
         if (item.id !== id) return item;
         if (field === "assetMasterId") {
-          const masterItem = getActiveAssetMasterList().find((m) => m.id === value);
+          const masterItem = getActiveZakatAssetMasterList().find((m) => m.id === value);
           if (masterItem && masterItem.suggestedPurpose) {
             setNewPurposeCategory(masterItem.suggestedPurpose);
           }
