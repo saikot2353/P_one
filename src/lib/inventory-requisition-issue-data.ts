@@ -103,8 +103,8 @@ export interface MaterialIssueItem {
 export interface MaterialIssue {
   id: string;
   issueNumber: string; // e.g. "ISS-2026-0001"
-  mrId: string;
-  mrNumber: string;
+  mrId?: string;
+  mrNumber?: string;
   issueDate: string;
   organization: string;
   department: string;
@@ -112,7 +112,7 @@ export interface MaterialIssue {
   employeeId?: string;
   requiredDate?: string;
   warehouseStore: string;
-  issueType: "Issue Regular" | "Issue Special" | "Department Consumption";
+  issueType: "Issue by Requisition" | "Direct Issue" | "Issue Regular" | "Issue Special" | "Department Consumption" | string;
   srnNo?: string;
   totalItems: number;
   totalIssueQty: number;
@@ -446,6 +446,48 @@ export const DEFAULT_MATERIAL_ISSUES: MaterialIssue[] = [
       },
     ],
     remarks: "Partial issue completed per production schedule.",
+  },
+  {
+    id: "iss-direct-001",
+    issueNumber: "ISS-2026-0099",
+    mrId: "",
+    mrNumber: "",
+    issueDate: "2026-10-15",
+    organization: "Pakiza Knit Composite Ltd",
+    department: "Maintenance",
+    issuedTo: "Engr. Rafiqul Islam (Senior Maintenance Engineer)",
+    employeeId: "EMP-00188",
+    warehouseStore: "PKCL Central Raw Material Warehouse",
+    issueType: "Direct Issue",
+    srnNo: "SRN-2026-8812",
+    totalItems: 1,
+    totalIssueQty: 50,
+    status: "Posted",
+    previouslyReturnedQty: 0,
+    returnableQty: 50,
+    items: [
+      {
+        id: "isi-dir-1",
+        sl: 1,
+        itemCode: "LUB-SYN-ISO68",
+        itemName: "Industrial Gear Oil ISO VG 68",
+        specification: "Synthetic high performance industrial gear & circulation oil",
+        brand: "Mobil",
+        origin: "Singapore",
+        uom: "LTR",
+        mrRequestedQty: 0,
+        previouslyIssuedQty: 0,
+        remainingIssueQty: 0,
+        availableStock: 250,
+        issueQty: 50,
+        unitPrice: 520,
+        totalPrice: 26000,
+        issueStore: "PKCL Central Raw Material Warehouse",
+        batchAllocations: [{ batchNumber: "BAT-LUB-2026-01", quantity: 50 }],
+        remarks: "Emergency direct issue for lubrication overhaul",
+      },
+    ],
+    remarks: "Direct issue for urgent maintenance without prior requisition.",
   },
 ];
 
