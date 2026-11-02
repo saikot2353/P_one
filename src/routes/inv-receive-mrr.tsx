@@ -56,10 +56,11 @@ import {
 } from "@/components/reports/StandardPreviewReportModal";
 
 export const Route = createFileRoute("/inv-receive-mrr")({
-  validateSearch: (search: Record<string, unknown>): { poNumber?: string; warehouse?: string; mode?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { poNumber?: string; warehouse?: string; mode?: string; receiveNo?: string } => ({
     poNumber: search.poNumber as string | undefined,
     warehouse: search.warehouse as string | undefined,
     mode: search.mode as string | undefined,
+    receiveNo: search.receiveNo as string | undefined,
   }),
   head: () => ({
     meta: [
@@ -81,9 +82,11 @@ export function MaterialReceiveMRRPage() {
       poNumber?: string;
       warehouse?: string;
       mode?: string;
+      receiveNo?: string;
     }) || {};
 
   const isViewMode = searchParams.mode === "view";
+  const isEditMode = searchParams.mode === "edit";
 
   const purchaseOrders = useMemo(() => getStoredPurchaseOrders(), []);
   const poItemsMap = useMemo(() => getStoredPoItems(), []);
@@ -91,33 +94,68 @@ export function MaterialReceiveMRRPage() {
     getStoredMaterialReceipts()
   );
 
+  // If a specific receiveNo is requested, locate that receipt
+  const targetReceipt = useMemo(() => {
+    if (searchParams.receiveNo) {
+      return (
+        materialReceipts.find(
+          (r) => r.receiveNumber === searchParams.receiveNo || r.id === searchParams.receiveNo
+        ) || null
+      );
+    }
+    if (isViewMode && searchParams.poNumber) {
+      return (
+        materialReceipts.find((r) => r.poNumber === searchParams.poNumber) || null
+      );
+    }
+    return null;
+  }, [materialReceipts, searchParams.receiveNo, searchParams.poNumber, isViewMode]);
+
   // Active PO reference
-  const selectedPoNumber = searchParams.poNumber || "PO-2026-0001";
+  const selectedPoNumber =
+    targetReceipt?.poNumber || searchParams.poNumber || "PO-2026-0001";
   const currentPo = useMemo(() => {
     return purchaseOrders.find((p) => p.orderNumber === selectedPoNumber) || purchaseOrders[0];
   }, [purchaseOrders, selectedPoNumber]);
 
-  // Warehouse auto-populated from PO/selected store, cannot be changed
-  const selectedStore = searchParams.warehouse || currentPo?.deliveryWarehouse || "Pakiza Technovation Central IT & Hardware Depot";
+  // Warehouse auto-populated from receipt / PO / selected store, cannot be changed
+  const selectedStore =
+    targetReceipt?.warehouseStore ||
+    searchParams.warehouse ||
+    currentPo?.deliveryWarehouse ||
+    "Pakiza Technovation Central IT & Hardware Depot";
 
   // 1. Receive Header Information
-  const [receiveNumber] = useState(
-    () => `MRR-2026-000${Math.floor(10 + Math.random() * 90)}`
+  const [receiveNumber, setReceiveNumber] = useState(
+    () => targetReceipt?.receiveNumber || `MRR-2026-000${Math.floor(10 + Math.random() * 90)}`
   );
-  const [receiveDate, setReceiveDate] = useState(new Date().toISOString().slice(0, 10));
-  const [challanNo, setChallanNo] = useState("CH-2026-9901");
-  const [challanDate, setChallanDate] = useState(new Date().toISOString().slice(0, 10));
-  const [receivedBy] = useState("Tahmid Afsar Shapno - Store Officer");
-  const [remarks, setRemarks] = useState("");
+  const [receiveDate, setReceiveDate] = useState(
+    () => targetReceipt?.receiveDate || new Date().toISOString().slice(0, 10)
+  );
+  const [challanNo, setChallanNo] = useState(
+    () => targetReceipt?.challanNo || "CH-2026-9901"
+  );
+  const [challanDate, setChallanDate] = useState(
+    () => targetReceipt?.challanDate || new Date().toISOString().slice(0, 10)
+  );
+  const [receivedBy, setReceivedBy] = useState(
+    () => targetReceipt?.receivedBy || "Tahmid Afsar Shapno - Store Officer"
+  );
+  const [remarks, setRemarks] = useState(() => targetReceipt?.remarks || "");
 
   // Quality / Inspection Global Remarks
   const [inspectionRemarks, setInspectionRemarks] = useState(
-    "Visual inspection completed, serial numbers recorded, items in good condition."
+    () =>
+      targetReceipt?.inspectionRemarks ||
+      "Visual inspection completed, serial numbers recorded, items in good condition."
   );
 
   // Material Receive Details Items State
-  // Populated using Base/SKU UOM (Order Qty × Conversion Factor)
+  // Populated using Base/SKU UOM (Order Qty × Conversion Factor) or saved receipt items
   const [mrrItems, setMrrItems] = useState<MRRItem[]>(() => {
+    if (targetReceipt && targetReceipt.items && targetReceipt.items.length > 0) {
+      return targetReceipt.items;
+    }
     const rawItems = poItemsMap[selectedPoNumber] || currentPo?.items || [];
     if (rawItems && rawItems.length > 0) {
       return rawItems.map((it: any, idx: number) => {
@@ -205,6 +243,24 @@ export function MaterialReceiveMRRPage() {
   // Track location and batch assignments per item
   const [itemLocations, setItemLocations] = useState<Record<string, LocationEntry[]>>({});
   const [itemBatches, setItemBatches] = useState<Record<string, BatchEntry[]>>({});
+
+  // Synchronize when targetReceipt is loaded or changed
+  useEffect(() => {
+    if (targetReceipt) {
+      setReceiveNumber(targetReceipt.receiveNumber);
+      setReceiveDate(targetReceipt.receiveDate);
+      setChallanNo(targetReceipt.challanNo);
+      setChallanDate(targetReceipt.challanDate);
+      setReceivedBy(targetReceipt.receivedBy);
+      setRemarks(targetReceipt.remarks || "");
+      if (targetReceipt.inspectionRemarks) {
+        setInspectionRemarks(targetReceipt.inspectionRemarks);
+      }
+      if (targetReceipt.items && targetReceipt.items.length > 0) {
+        setMrrItems(targetReceipt.items);
+      }
+    }
+  }, [targetReceipt]);
 
   // Active Modals State
   const [activeLocationItemId, setActiveLocationItemId] = useState<string | null>(null);
@@ -514,6 +570,70 @@ export function MaterialReceiveMRRPage() {
       }
     }
 
+    // If editing an existing receipt record (Edit Mode), update the existing record
+    if (targetReceipt) {
+      const updatedMRR: MaterialReceive = {
+        ...targetReceipt,
+        receiveNumber,
+        receiveDate,
+        receiveType: targetReceipt.receiveType || "Purchase Order",
+        receiveSource: targetReceipt.receiveSource || "Against Purchase Order",
+        poNumber: selectedPoNumber,
+        poDate: currentPo?.orderDate || targetReceipt.poDate || "2026-09-15",
+        supplierId: currentPo?.supplierId || targetReceipt.supplierId || "sup-1",
+        supplierName: currentPo?.supplierName || targetReceipt.supplierName || "Default Supplier",
+        supplierCode: currentPo?.supplierCode || targetReceipt.supplierCode || "SUP-VENDOR",
+        department: currentPo?.department || targetReceipt.department || "Central Operations",
+        warehouseStore: selectedStore,
+        receiveLocation: targetReceipt.receiveLocation || "Multiple / Store Defined",
+        challanNo,
+        challanDate,
+        receivedBy,
+        inspectionRequired: true,
+        inspectionStatus: totalRejected > 0 ? "Partially Accepted" : "Passed",
+        inspectionRemarks,
+        items: mrrItems,
+        totalReceivedQty: totalReceived,
+        totalAcceptedQty: totalAccepted,
+        totalRejectedQty: totalRejected,
+        totalAmount,
+        receiveStatus: totalReceived > 0 ? "Full Received" : "Partially Received",
+        remarks,
+      };
+
+      const updatedMRRs = materialReceipts.map((r) =>
+        r.id === targetReceipt.id || r.receiveNumber === targetReceipt.receiveNumber ? updatedMRR : r
+      );
+      setMaterialReceipts(updatedMRRs);
+      setStoredMaterialReceipts(updatedMRRs);
+
+      // Recalculate receive status and quantities for this PO across all its receipts
+      const allPoReceipts = updatedMRRs.filter((r) => r.poNumber === selectedPoNumber);
+      const totalPoReceived = allPoReceipts.reduce((sum, r) => sum + (r.totalReceivedQty || 0), 0);
+
+      const receiveList = getStoredReceiveList();
+      const updatedList = receiveList.map((rec) => {
+        if (rec.poNumber === selectedPoNumber) {
+          const newPrev = totalPoReceived;
+          const newPending = Math.max(0, rec.totalOrderedQty - newPrev);
+          return {
+            ...rec,
+            previouslyReceivedQty: newPrev,
+            pendingQty: newPending,
+            receiveStatus: newPending === 0 ? "Complete" : newPrev > 0 ? "Partial" : "Pending",
+          };
+        }
+        return rec;
+      });
+      setStoredReceiveList(updatedList as any);
+
+      toast.success(
+        `Material Receive "${receiveNumber}" updated successfully! Stock updated with ${totalAccepted} accepted units.`
+      );
+      navigate({ to: "/procurement-material-receive-list" });
+      return;
+    }
+
     const newMRR: MaterialReceive = {
       id: `mrr-${Date.now()}`,
       receiveNumber,
@@ -598,6 +718,16 @@ export function MaterialReceiveMRRPage() {
             </div>
 
             <div className="flex items-center gap-3">
+              {isViewMode && (
+                <span className="text-[11px] font-bold px-3 py-1.5 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center gap-1.5">
+                  <Eye className="size-3.5" /> Read-Only Mode
+                </span>
+              )}
+              {isEditMode && (
+                <span className="text-[11px] font-bold px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center gap-1.5">
+                  <Save className="size-3.5" /> Edit Mode: {receiveNumber}
+                </span>
+              )}
               <button
                 type="button"
                 onClick={handleOpenPreviewReport}
@@ -633,9 +763,10 @@ export function MaterialReceiveMRRPage() {
                 </label>
                 <input
                   type="date"
+                  disabled={isViewMode}
                   value={receiveDate}
                   onChange={(e) => setReceiveDate(e.target.value)}
-                  className="w-full px-3 py-2 font-semibold bg-background border border-border rounded-lg outline-none focus:border-primary"
+                  className="w-full px-3 py-2 font-semibold bg-background border border-border rounded-lg outline-none focus:border-primary disabled:opacity-80 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -697,9 +828,10 @@ export function MaterialReceiveMRRPage() {
                 </label>
                 <input
                   type="text"
+                  disabled={isViewMode}
                   value={challanNo}
                   onChange={(e) => setChallanNo(e.target.value)}
-                  className="w-full px-3 py-2 font-mono font-bold bg-background border border-border rounded-lg outline-none focus:border-primary"
+                  className="w-full px-3 py-2 font-mono font-bold bg-background border border-border rounded-lg outline-none focus:border-primary disabled:opacity-80 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -709,9 +841,10 @@ export function MaterialReceiveMRRPage() {
                 </label>
                 <input
                   type="date"
+                  disabled={isViewMode}
                   value={challanDate}
                   onChange={(e) => setChallanDate(e.target.value)}
-                  className="w-full px-3 py-2 font-semibold bg-background border border-border rounded-lg outline-none focus:border-primary"
+                  className="w-full px-3 py-2 font-semibold bg-background border border-border rounded-lg outline-none focus:border-primary disabled:opacity-80 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -733,10 +866,11 @@ export function MaterialReceiveMRRPage() {
                 </label>
                 <input
                   type="text"
+                  disabled={isViewMode}
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
                   placeholder="Optional delivery notes"
-                  className="w-full px-3 py-2 bg-background border border-border rounded-lg outline-none focus:border-primary text-xs"
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg outline-none focus:border-primary text-xs disabled:opacity-80 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -864,8 +998,20 @@ export function MaterialReceiveMRRPage() {
                             mode={getItemTrackingMode(item.itemCode)}
                             batchCount={itemBatches[item.id]?.length || (item.batchNumber ? 1 : 0)}
                             locationCount={itemLocations[item.id]?.length || (item.location ? 1 : 0)}
-                            onOpenBatch={() => handleOpenBatchModal(item)}
-                            onOpenLocation={() => handleOpenLocationModal(item)}
+                            onOpenBatch={() => {
+                              if (isViewMode) {
+                                toast.info("Batch allocations are read-only in View Mode.");
+                                return;
+                              }
+                              handleOpenBatchModal(item);
+                            }}
+                            onOpenLocation={() => {
+                              if (isViewMode) {
+                                toast.info("Location allocations are read-only in View Mode.");
+                                return;
+                              }
+                              handleOpenLocationModal(item);
+                            }}
                           />
                         </td>
                       </tr>
@@ -897,9 +1043,17 @@ export function MaterialReceiveMRRPage() {
 
             <div className="flex items-center gap-3">
               {isViewMode ? (
-                <span className="px-4 py-2 rounded-xl text-xs font-bold bg-muted text-muted-foreground border border-border">
-                  Viewing Material Receive (Read Only)
-                </span>
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-muted text-muted-foreground border border-border">
+                  <Lock className="size-3.5" /> Read-Only Mode (Viewing Saved Receipt)
+                </div>
+              ) : isEditMode ? (
+                <button
+                  type="button"
+                  onClick={handleSubmitMRR}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-md transition-all cursor-pointer"
+                >
+                  <Save className="size-4" /> Update Material Receive
+                </button>
               ) : (
                 <button
                   type="button"

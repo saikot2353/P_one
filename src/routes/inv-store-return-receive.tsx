@@ -17,12 +17,15 @@ import {
   ChevronDown,
   Info,
   Trash2,
+  Save,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   StoreReturn,
   getStoredStoreReturns,
   postStoreReturnReceive,
+  getStoredStoreReturnReceives,
+  StoreReturnReceive,
 } from "@/lib/inventory-requisition-issue-data";
 import { DEFAULT_WAREHOUSES, getStoredData } from "@/lib/procurement-master-data";
 import { getItemTrackingMode } from "@/lib/item-tracking-utils";
@@ -39,8 +42,14 @@ import {
 } from "@/components/reports/StandardPreviewReportModal";
 
 export const Route = createFileRoute("/inv-store-return-receive")({
-  validateSearch: (search: Record<string, unknown>): { returnId?: string } => ({
+  validateSearch: (search: Record<string, unknown>): {
+    returnId?: string;
+    receiveId?: string;
+    mode?: "view" | "edit";
+  } => ({
     returnId: search.returnId as string | undefined,
+    receiveId: search.receiveId as string | undefined,
+    mode: (search.mode as "view" | "edit" | undefined) || undefined,
   }),
   head: () => ({
     meta: [
@@ -72,14 +81,27 @@ interface ReceiveItemRow {
 }
 
 function StoreReturnReceivePage() {
-  const { returnId: searchReturnId } = Route.useSearch();
+  const { returnId: searchReturnId, receiveId: searchReceiveId, mode: searchMode } = Route.useSearch();
   const navigate = useNavigate();
 
+  const isViewMode = searchMode === "view";
+  const isEditMode = searchMode === "edit";
+  const isReadOnly = isViewMode;
+
   const allReturns = useMemo(() => getStoredStoreReturns(), []);
+  const allReceives = useMemo(() => getStoredStoreReturnReceives(), []);
   const warehouses = getStoredData("proc_warehouses_v2", DEFAULT_WAREHOUSES);
 
-  // Available returns for selection (prioritize Pending Receive)
+  const existingReceiveRecord: StoreReturnReceive | null = useMemo(() => {
+    if (!searchReceiveId) return null;
+    return allReceives.find((r) => r.id === searchReceiveId || r.receiveNumber === searchReceiveId) || null;
+  }, [allReceives, searchReceiveId]);
+
+  // Selected Return ID (prioritize matching existing receive, then searchReturnId, then pending)
   const [selectedReturnId, setSelectedReturnId] = useState<string>(() => {
+    if (existingReceiveRecord?.returnId) {
+      return existingReceiveRecord.returnId;
+    }
     if (searchReturnId && allReturns.some((r) => r.id === searchReturnId || r.returnNumber === searchReturnId)) {
       return searchReturnId;
     }
@@ -92,15 +114,48 @@ function StoreReturnReceivePage() {
   }, [allReturns, selectedReturnId]);
 
   // Form Fields
-  const [receiveDate, setReceiveDate] = useState(() => new Date().toISOString().split("T")[0]);
-  const [receivedBy, setReceivedBy] = useState("Md. Tarek Rahman (Store In-Charge)");
-  const [generalRemarks, setGeneralRemarks] = useState("");
+  const [receiveDate, setReceiveDate] = useState(() => {
+    if (existingReceiveRecord?.receiveDate) return existingReceiveRecord.receiveDate;
+    return new Date().toISOString().split("T")[0];
+  });
+  const [receivedBy, setReceivedBy] = useState(() => {
+    if (existingReceiveRecord?.receivedBy) return existingReceiveRecord.receivedBy;
+    return "Md. Tarek Rahman (Store In-Charge)";
+  });
+  const [generalRemarks, setGeneralRemarks] = useState(() => {
+    if (existingReceiveRecord?.remarks) return existingReceiveRecord.remarks;
+    return "";
+  });
 
   // Items State
   const [items, setItems] = useState<ReceiveItemRow[]>([]);
 
-  // Sync items when activeReturn changes
+  // Sync items when activeReturn changes or existingReceiveRecord is present
   useEffect(() => {
+    if (existingReceiveRecord && existingReceiveRecord.items.length > 0) {
+      const rows: ReceiveItemRow[] = existingReceiveRecord.items.map((it, index) => {
+        const mode = getItemTrackingMode(it.itemCode);
+        return {
+          id: it.id || `ret-item-${index}`,
+          sl: index + 1,
+          itemCode: it.itemCode,
+          itemName: it.itemName,
+          specification: it.specification || "",
+          uom: it.uom,
+          returnedQty: Number(it.returnedQty) || 0,
+          receivedQty: Number(it.receivedQty) || 0,
+          receiveStore: it.receiveStore,
+          condition: it.condition || "Good (Restock)",
+          trackingMode: mode,
+          batchAllocations: it.batchAllocations?.map((b) => ({ batchNumber: b.batchNumber, quantity: b.quantity })) || [],
+          locationAllocations: it.locationAllocations?.map((l) => ({ locationName: l.locationName, quantity: l.quantity })) || [],
+          remarks: it.remarks || "",
+        };
+      });
+      setItems(rows);
+      return;
+    }
+
     if (!activeReturn) {
       setItems([]);
       return;
@@ -138,7 +193,7 @@ function StoreReturnReceivePage() {
     });
 
     setItems(rows);
-  }, [activeReturn, warehouses]);
+  }, [activeReturn, existingReceiveRecord, warehouses]);
 
   // Modals for Tracking
   const [activeBatchItemId, setActiveBatchItemId] = useState<string | null>(null);
@@ -193,7 +248,7 @@ function StoreReturnReceivePage() {
       errs.push("No Return to Store record selected.");
       return errs;
     }
-    if (activeReturn.status === "Received") {
+    if (activeReturn.status === "Received" && !isEditMode && !isViewMode) {
       errs.push(`This return (${activeReturn.returnNumber}) has already been fully received into store.`);
     }
     if (items.length === 0) {
@@ -208,10 +263,11 @@ function StoreReturnReceivePage() {
       }
     }
     return errs;
-  }, [activeReturn, items, totalReceivedQty]);
+  }, [activeReturn, items, totalReceivedQty, isEditMode, isViewMode]);
 
   // Save / Post Receive
   const handleConfirmReceive = () => {
+    if (isReadOnly) return;
     if (validationErrors.length > 0 || !activeReturn) {
       toast.error(validationErrors[0] || "Validation failed");
       return;
@@ -221,26 +277,35 @@ function StoreReturnReceivePage() {
       itemCode: it.itemCode,
       receiveStore: it.receiveStore,
       receivedQty: it.receivedQty,
+      condition: it.condition,
       batchAllocations: it.batchAllocations.length > 0 ? it.batchAllocations : undefined,
       locationAllocations: it.locationAllocations.length > 0 ? it.locationAllocations : undefined,
     }));
 
-    postStoreReturnReceive(activeReturn.id, payloadItems);
+    postStoreReturnReceive(activeReturn.id, payloadItems, {
+      receiveId: existingReceiveRecord?.id,
+      receiveNumber: existingReceiveRecord?.receiveNumber,
+      receiveDate,
+      receivedBy,
+      remarks: generalRemarks,
+    });
 
     toast.success(
-      `Store Return Receive completed! ${totalReceivedQty} units added back to active store inventory.`
+      isEditMode
+        ? `Store Return Receive ${existingReceiveRecord?.receiveNumber || ""} updated successfully!`
+        : `Store Return Receive completed! ${totalReceivedQty} units added back to active store inventory.`
     );
 
     navigate({ to: "/inv-store-return-receive-list" });
   };
 
-  // Preview Note Data
+  // Preview Note Data (CONDITION and REMARKS removed per Requirement 4.1)
   const previewReportData: StandardReportData = useMemo(() => {
     return {
       companyName: "Pakiza Knit Composite Ltd",
       companyAddress: "Gorat, Ashulia, Savar, Dhaka, Bangladesh",
       reportTitle: "STORE RETURN RECEIVE NOTE",
-      reportNumber: `SRR-${activeReturn?.returnNumber || "NEW"}`,
+      reportNumber: existingReceiveRecord?.receiveNumber || `SRR-${activeReturn?.returnNumber || "NEW"}`,
       reportDate: receiveDate,
       statusBadge: "Verified & Received",
       metaFields: [
@@ -259,8 +324,6 @@ function StoreReturnReceivePage() {
         "UOM",
         "RETURNED",
         "RECEIVED",
-        "CONDITION",
-        "REMARKS",
       ],
       tableRows: items.map((it, idx) => [
         String(idx + 1),
@@ -270,8 +333,6 @@ function StoreReturnReceivePage() {
         it.uom,
         String(it.returnedQty),
         String(it.receivedQty),
-        it.condition,
-        it.remarks || "-",
       ]),
       summaryCards: [
         { label: "Total Items", value: String(items.length) },
@@ -287,7 +348,7 @@ function StoreReturnReceivePage() {
         { title: "Store Manager Approval", name: "Operations Head", date: receiveDate },
       ],
     };
-  }, [activeReturn, receiveDate, receivedBy, items, totalReturnedQty, totalReceivedQty]);
+  }, [existingReceiveRecord, activeReturn, receiveDate, receivedBy, items, totalReturnedQty, totalReceivedQty]);
 
   return (
     <div className="min-h-screen flex bg-slate-50 text-foreground">
@@ -311,12 +372,25 @@ function StoreReturnReceivePage() {
                   <h1 className="text-xl font-black text-slate-800 tracking-tight">
                     Store Return Receive
                   </h1>
-                  {activeReturn && (
+                  {existingReceiveRecord && (
                     <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      {existingReceiveRecord.receiveNumber}
+                    </span>
+                  )}
+                  {activeReturn && (
+                    <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                       Against {activeReturn.returnNumber}
                     </span>
                   )}
-                  {activeReturn?.status && (
+                  {isReadOnly ? (
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-300">
+                      Read-Only View
+                    </span>
+                  ) : isEditMode ? (
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                      Edit Mode
+                    </span>
+                  ) : activeReturn?.status ? (
                     <span
                       className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
                         activeReturn.status === "Received"
@@ -328,7 +402,7 @@ function StoreReturnReceivePage() {
                     >
                       {activeReturn.status}
                     </span>
-                  )}
+                  ) : null}
                 </div>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
                   Inspect and verify returned materials from shop floor and restock into inventory
@@ -346,20 +420,36 @@ function StoreReturnReceivePage() {
                 Preview Note
               </button>
 
-              <button
-                type="button"
-                onClick={handleConfirmReceive}
-                disabled={validationErrors.length > 0}
-                className="flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
-              >
-                <CheckCircle2 className="size-4" />
-                Confirm & Receive to Store
-              </button>
+              {isReadOnly ? (
+                <span className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">
+                  Read-Only Mode
+                </span>
+              ) : isEditMode ? (
+                <button
+                  type="button"
+                  onClick={handleConfirmReceive}
+                  disabled={validationErrors.length > 0}
+                  className="flex items-center gap-2 px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  <Save className="size-4" />
+                  Update Store Return Receive
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleConfirmReceive}
+                  disabled={validationErrors.length > 0}
+                  className="flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  <CheckCircle2 className="size-4" />
+                  Confirm & Receive to Store
+                </button>
+              )}
             </div>
           </div>
 
           {/* Validation Banner */}
-          {validationErrors.length > 0 && (
+          {!isReadOnly && validationErrors.length > 0 && (
             <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3">
               <AlertTriangle className="size-5 text-rose-600 shrink-0 mt-0.5" />
               <div>
@@ -390,25 +480,18 @@ function StoreReturnReceivePage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-              {/* Select Return Record */}
+              {/* Select Return Record - Non-editable without dropdown per Requirement 3.1 */}
               <div className="xl:col-span-2">
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                   Select Return Note ID *
                 </label>
-                <div className="relative">
-                  <select
-                    value={selectedReturnId}
-                    onChange={(e) => setSelectedReturnId(e.target.value)}
-                    className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none appearance-none cursor-pointer pr-8"
-                  >
-                    {allReturns.map((ret) => (
-                      <option key={ret.id} value={ret.id}>
-                        {ret.returnNumber} ({ret.status}) — {ret.issuedTo}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+                <input
+                  type="text"
+                  readOnly
+                  disabled
+                  value={activeReturn?.returnNumber || selectedReturnId || ""}
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-100 px-3 text-xs font-bold text-slate-700 outline-none font-mono cursor-not-allowed select-none"
+                />
               </div>
 
               {/* Material Issue ID */}
@@ -484,8 +567,13 @@ function StoreReturnReceivePage() {
                 <input
                   type="date"
                   value={receiveDate}
+                  disabled={isReadOnly}
                   onChange={(e) => setReceiveDate(e.target.value)}
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                  className={`w-full h-9 rounded-lg border border-slate-200 px-3 text-xs font-medium outline-none ${
+                    isReadOnly
+                      ? "bg-slate-100 text-slate-600 cursor-not-allowed"
+                      : "bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  }`}
                 />
               </div>
 
@@ -511,8 +599,13 @@ function StoreReturnReceivePage() {
                   type="text"
                   placeholder="Optional verification remarks..."
                   value={generalRemarks}
+                  disabled={isReadOnly}
                   onChange={(e) => setGeneralRemarks(e.target.value)}
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                  className={`w-full h-9 rounded-lg border border-slate-200 px-3 text-xs font-medium outline-none ${
+                    isReadOnly
+                      ? "bg-slate-100 text-slate-600 cursor-not-allowed"
+                      : "bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  }`}
                 />
               </div>
             </div>
@@ -542,13 +635,13 @@ function StoreReturnReceivePage() {
                       <th className="py-3 px-3 w-24 text-right">Returned Qty</th>
                       <th className="py-3 px-3 w-28 text-right">Received Qty *</th>
                       <th className="py-3 px-3 w-28 text-center">Tracking (B/L)</th>
-                      <th className="py-3 px-3 text-center w-16">Action</th>
+                      {!isReadOnly && <th className="py-3 px-3 text-center w-16">Action</th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {items.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="py-8 text-center text-slate-400">
+                        <td colSpan={isReadOnly ? 8 : 9} className="py-8 text-center text-slate-400">
                           No items loaded. Please select a valid Return to Store record.
                         </td>
                       </tr>
@@ -586,17 +679,21 @@ function StoreReturnReceivePage() {
 
                             {/* Receive Store */}
                             <td className="py-3 px-3">
-                              <select
-                                value={row.receiveStore}
-                                onChange={(e) => handleItemStoreChange(row.id, e.target.value)}
-                                className="w-full h-8 px-2 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                              >
-                                {warehouses.map((w) => (
-                                  <option key={w.id} value={w.name}>
-                                    {w.name}
-                                  </option>
-                                ))}
-                              </select>
+                              {isReadOnly ? (
+                                <span className="font-medium text-slate-700">{row.receiveStore}</span>
+                              ) : (
+                                <select
+                                  value={row.receiveStore}
+                                  onChange={(e) => handleItemStoreChange(row.id, e.target.value)}
+                                  className="w-full h-8 px-2 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                                >
+                                  {warehouses.map((w: any) => (
+                                    <option key={w.id} value={w.name}>
+                                      {w.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
                             </td>
 
                             {/* UOM */}
@@ -613,19 +710,25 @@ function StoreReturnReceivePage() {
 
                             {/* Received Qty (Input) */}
                             <td className="py-3 px-3 text-right">
-                              <input
-                                type="number"
-                                min={0}
-                                max={row.returnedQty}
-                                step="any"
-                                value={row.receivedQty}
-                                onChange={(e) => handleItemQtyChange(row.id, e.target.value)}
-                                className={`w-24 h-8 px-2.5 rounded-lg border text-right font-mono font-bold text-xs focus:ring-2 outline-none transition-colors ${
-                                  isExceeded
-                                    ? "border-rose-400 bg-rose-50 text-rose-700 focus:ring-rose-500/20"
-                                    : "border-slate-200 bg-white text-slate-800 focus:ring-emerald-500/20 focus:border-emerald-500"
-                                }`}
-                              />
+                              {isReadOnly ? (
+                                <span className="font-mono font-bold text-emerald-700 text-xs">
+                                  {row.receivedQty}
+                                </span>
+                              ) : (
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={row.returnedQty}
+                                  step="any"
+                                  value={row.receivedQty}
+                                  onChange={(e) => handleItemQtyChange(row.id, e.target.value)}
+                                  className={`w-24 h-8 px-2.5 rounded-lg border text-right font-mono font-bold text-xs focus:ring-2 outline-none transition-colors ${
+                                    isExceeded
+                                      ? "border-rose-400 bg-rose-50 text-rose-700 focus:ring-rose-500/20"
+                                      : "border-slate-200 bg-white text-slate-800 focus:ring-emerald-500/20 focus:border-emerald-500"
+                                  }`}
+                                />
+                              )}
                             </td>
 
                             {/* Tracking Cell (B or L strictly based on Item Master) */}
@@ -634,25 +737,27 @@ function StoreReturnReceivePage() {
                                 trackingMode={row.trackingMode}
                                 batchCount={row.batchAllocations.length}
                                 locationCount={row.locationAllocations.length}
-                                onOpenBatch={() => setActiveBatchItemId(row.id)}
-                                onOpenLocation={() => setActiveLocationItemId(row.id)}
+                                onOpenBatch={() => !isReadOnly && setActiveBatchItemId(row.id)}
+                                onOpenLocation={() => !isReadOnly && setActiveLocationItemId(row.id)}
                               />
                             </td>
 
-                            {/* Delete Action (Item-level delete without altering original return transaction) */}
-                            <td className="py-3 px-3 text-center">
-                              <button
-                                type="button"
-                                title="Remove item from current receiving operation"
-                                onClick={() => {
-                                  setItems((prev) => prev.filter((it) => it.id !== row.id));
-                                  toast.info(`Removed ${row.itemName} from current receive operation.`);
-                                }}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                              >
-                                <Trash2 className="size-3.5" />
-                              </button>
-                            </td>
+                            {/* Delete Action (Hidden in Read-Only Mode) */}
+                            {!isReadOnly && (
+                              <td className="py-3 px-3 text-center">
+                                <button
+                                  type="button"
+                                  title="Remove item from current receiving operation"
+                                  onClick={() => {
+                                    setItems((prev) => prev.filter((it) => it.id !== row.id));
+                                    toast.info(`Removed ${row.itemName} from current receive operation.`);
+                                  }}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </button>
+                              </td>
+                            )}
                           </tr>
                         );
                       })
@@ -670,7 +775,7 @@ function StoreReturnReceivePage() {
                         <td className="py-3 px-3 text-right font-mono text-emerald-700">
                           {totalReceivedQty}
                         </td>
-                        <td colSpan={2} className="py-3 px-3 text-right text-emerald-800 font-mono text-[11px]">
+                        <td colSpan={isReadOnly ? 1 : 2} className="py-3 px-3 text-right text-emerald-800 font-mono text-[11px]">
                           Total Received: <span className="font-bold">{totalReceivedQty} {items[0]?.uom || "PCS"}</span>
                         </td>
                       </tr>

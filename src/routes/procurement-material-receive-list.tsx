@@ -27,9 +27,11 @@ import { toast } from "sonner";
 import { DEFAULT_WAREHOUSES, DEFAULT_SUPPLIERS } from "@/lib/procurement-master-data";
 import {
   MaterialReceiveListItem,
+  MaterialReceive,
   getStoredReceiveList,
   setStoredReceiveList,
   getStoredPurchaseOrders,
+  getStoredMaterialReceipts,
 } from "@/lib/procurement-order-inventory-data";
 
 export const Route = createFileRoute("/procurement-material-receive-list")({
@@ -89,6 +91,27 @@ export function MaterialReceiveListPage() {
 
   // View Modal State
   const [viewRecord, setViewRecord] = useState<MaterialReceiveListItem | null>(null);
+
+  // State for PO-wise Material Receive Transactions Modal ("D" button)
+  const [selectedPoForReceipts, setSelectedPoForReceipts] = useState<MaterialReceiveListItem | null>(null);
+  const [isReceiptsModalOpen, setIsReceiptsModalOpen] = useState(false);
+  const [materialReceipts, setMaterialReceipts] = useState<MaterialReceive[]>(() =>
+    getStoredMaterialReceipts()
+  );
+
+  // Refresh stored material receipts whenever modal opens
+  useEffect(() => {
+    if (isReceiptsModalOpen) {
+      setMaterialReceipts(getStoredMaterialReceipts());
+    }
+  }, [isReceiptsModalOpen]);
+
+  const poMatchingReceipts = useMemo(() => {
+    if (!selectedPoForReceipts) return [];
+    return materialReceipts.filter(
+      (r) => r.poNumber === selectedPoForReceipts.poNumber
+    );
+  }, [materialReceipts, selectedPoForReceipts]);
 
   // Tab Counts
   const tabCounts = useMemo(() => {
@@ -421,6 +444,7 @@ export function MaterialReceiveListPage() {
                     <th className="py-3 px-3 text-right font-bold">Prev Received</th>
                     <th className="py-3 px-3 text-right font-bold">Pending Qty</th>
                     <th className="py-3 px-3 text-center font-bold">Status</th>
+                    <th className="py-3 px-3 text-center font-bold w-14">View</th>
                     <th className="py-3 px-3 text-center font-bold">Action</th>
                   </tr>
                 </thead>
@@ -476,28 +500,22 @@ export function MaterialReceiveListPage() {
                         </span>
                       </td>
                       <td className="py-3 px-3 text-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedPoForReceipts(row);
+                            setIsReceiptsModalOpen(true);
+                          }}
+                          className="size-7 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white font-black text-xs transition-all shadow-2xs border border-amber-500/30 inline-flex items-center justify-center cursor-pointer active:scale-95"
+                          title={`View Material Receive transactions for ${row.poNumber}`}
+                        >
+                          D
+                        </button>
+                      </td>
+                      <td className="py-3 px-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          {/* View Button */}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              navigate({
-                                to: "/inv-receive-mrr",
-                                search: {
-                                  mode: "view",
-                                  poNumber: row.poNumber,
-                                  warehouse: row.deliveryStore,
-                                } as any,
-                              })
-                            }
-                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
-                            title="View Material Receive"
-                          >
-                            <Eye className="size-3.5" />
-                          </button>
-
                           {/* Receive Button (Only for Pending & Partial records) */}
-                          {row.receiveStatus !== "Complete" && (
+                          {row.receiveStatus !== "Complete" ? (
                             <button
                               type="button"
                               onClick={() => handleInitiateReceive(row)}
@@ -505,6 +523,8 @@ export function MaterialReceiveListPage() {
                             >
                               <Truck className="size-3" /> Receive
                             </button>
+                          ) : (
+                            <span className="text-muted-foreground text-xs font-mono">—</span>
                           )}
                         </div>
                       </td>
@@ -512,7 +532,7 @@ export function MaterialReceiveListPage() {
                   ))}
                   {filteredList.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="py-12 text-center text-muted-foreground">
+                      <td colSpan={13} className="py-12 text-center text-muted-foreground">
                         No orders currently in the &quot;{activeTab}&quot; receiving stage matching the selected store and filters.
                       </td>
                     </tr>
@@ -623,6 +643,166 @@ export function MaterialReceiveListPage() {
                   Proceed to Receive
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Material Receive Transactions Modal (Triggered by "D" button in View Column) */}
+      {isReceiptsModalOpen && selectedPoForReceipts && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-card w-full max-w-2xl rounded-2xl border border-border shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-border pb-3.5">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600">
+                  <FileSpreadsheet className="size-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-foreground">
+                    Material Receive Transactions
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Receipt transactions for Purchase Order{" "}
+                    <span className="font-mono font-bold text-foreground">
+                      {selectedPoForReceipts.poNumber}
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsReceiptsModalOpen(false);
+                  setSelectedPoForReceipts(null);
+                }}
+                className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                title="Close"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Receipts List Table */}
+            {poMatchingReceipts.length > 0 ? (
+              <div className="overflow-x-auto rounded-xl border border-border">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border">
+                      <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
+                      <th className="py-2.5 px-4 font-bold">Receive No</th>
+                      <th className="py-2.5 px-4 font-bold">Receive Date</th>
+                      <th className="py-2.5 px-3 text-center font-bold w-20">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {poMatchingReceipts.map((receipt, rIdx) => (
+                      <tr key={receipt.id || rIdx} className="hover:bg-muted/20 transition-colors">
+                        <td className="py-2.5 px-3 text-center text-muted-foreground font-bold">
+                          {rIdx + 1}
+                        </td>
+                        <td className="py-2.5 px-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsReceiptsModalOpen(false);
+                              navigate({
+                                to: "/inv-receive-mrr",
+                                search: {
+                                  mode: "edit",
+                                  poNumber: selectedPoForReceipts.poNumber,
+                                  receiveNo: receipt.receiveNumber,
+                                  warehouse: receipt.warehouseStore || selectedPoForReceipts.deliveryStore,
+                                } as any,
+                              });
+                            }}
+                            className="font-mono font-bold text-amber-600 hover:text-amber-700 hover:underline inline-flex items-center gap-1 cursor-pointer transition-colors"
+                            title={`Open ${receipt.receiveNumber} in Edit Mode`}
+                          >
+                            <span>{receipt.receiveNumber}</span>
+                            <ChevronRight className="size-3" />
+                          </button>
+                        </td>
+                        <td className="py-2.5 px-4 text-muted-foreground font-medium">
+                          {receipt.receiveDate}
+                        </td>
+                        <td className="py-2.5 px-3 text-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsReceiptsModalOpen(false);
+                              navigate({
+                                to: "/inv-receive-mrr",
+                                search: {
+                                  mode: "view",
+                                  poNumber: selectedPoForReceipts.poNumber,
+                                  receiveNo: receipt.receiveNumber,
+                                  warehouse: receipt.warehouseStore || selectedPoForReceipts.deliveryStore,
+                                } as any,
+                              });
+                            }}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white text-[11px] font-bold transition-all cursor-pointer"
+                            title="View Material Receive (Read-Only Mode)"
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8 px-4 rounded-xl border border-dashed border-border bg-muted/20 space-y-2">
+                <div className="size-10 rounded-full bg-muted flex items-center justify-center mx-auto text-muted-foreground">
+                  <Package className="size-5" />
+                </div>
+                <h4 className="text-xs font-bold text-foreground">
+                  No Material Receive Transactions Found
+                </h4>
+                <p className="text-[11px] text-muted-foreground max-w-md mx-auto">
+                  No Material Receive transactions have been created yet against Purchase Order{" "}
+                  <span className="font-mono font-semibold text-foreground">
+                    {selectedPoForReceipts.poNumber}
+                  </span>
+                  . Transactions will appear here once goods are received.
+                </p>
+                {selectedPoForReceipts.receiveStatus !== "Complete" && (
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const rec = selectedPoForReceipts;
+                        setIsReceiptsModalOpen(false);
+                        handleInitiateReceive(rec);
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs cursor-pointer shadow-xs transition-all"
+                    >
+                      <Truck className="size-3.5" /> Receive Goods Now
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between pt-2 border-t border-border">
+              <span className="text-[11px] text-muted-foreground">
+                Total Receipts Found:{" "}
+                <span className="font-bold text-foreground font-mono">
+                  {poMatchingReceipts.length}
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsReceiptsModalOpen(false);
+                  setSelectedPoForReceipts(null);
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/80 text-foreground transition-colors cursor-pointer"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

@@ -103,8 +103,8 @@ export interface MaterialIssueItem {
 export interface MaterialIssue {
   id: string;
   issueNumber: string; // e.g. "ISS-2026-0001"
-  mrId: string;
-  mrNumber: string;
+  mrId?: string;
+  mrNumber?: string;
   issueDate: string;
   organization: string;
   department: string;
@@ -112,7 +112,7 @@ export interface MaterialIssue {
   employeeId?: string;
   requiredDate?: string;
   warehouseStore: string;
-  issueType: "Issue Regular" | "Issue Special" | "Department Consumption";
+  issueType: "Issue by Requisition" | "Direct Issue" | "Issue Regular" | "Issue Special" | "Department Consumption" | string;
   srnNo?: string;
   totalItems: number;
   totalIssueQty: number;
@@ -447,6 +447,48 @@ export const DEFAULT_MATERIAL_ISSUES: MaterialIssue[] = [
     ],
     remarks: "Partial issue completed per production schedule.",
   },
+  {
+    id: "iss-direct-001",
+    issueNumber: "ISS-2026-0099",
+    mrId: "",
+    mrNumber: "",
+    issueDate: "2026-10-15",
+    organization: "Pakiza Knit Composite Ltd",
+    department: "Maintenance",
+    issuedTo: "Engr. Rafiqul Islam (Senior Maintenance Engineer)",
+    employeeId: "EMP-00188",
+    warehouseStore: "PKCL Central Raw Material Warehouse",
+    issueType: "Direct Issue",
+    srnNo: "SRN-2026-8812",
+    totalItems: 1,
+    totalIssueQty: 50,
+    status: "Posted",
+    previouslyReturnedQty: 0,
+    returnableQty: 50,
+    items: [
+      {
+        id: "isi-dir-1",
+        sl: 1,
+        itemCode: "LUB-SYN-ISO68",
+        itemName: "Industrial Gear Oil ISO VG 68",
+        specification: "Synthetic high performance industrial gear & circulation oil",
+        brand: "Mobil",
+        origin: "Singapore",
+        uom: "LTR",
+        mrRequestedQty: 0,
+        previouslyIssuedQty: 0,
+        remainingIssueQty: 0,
+        availableStock: 250,
+        issueQty: 50,
+        unitPrice: 520,
+        totalPrice: 26000,
+        issueStore: "PKCL Central Raw Material Warehouse",
+        batchAllocations: [{ batchNumber: "BAT-LUB-2026-01", quantity: 50 }],
+        remarks: "Emergency direct issue for lubrication overhaul",
+      },
+    ],
+    remarks: "Direct issue for urgent maintenance without prior requisition.",
+  },
 ];
 
 export const DEFAULT_STORE_RETURNS: StoreReturn[] = [
@@ -523,6 +565,43 @@ export const DEFAULT_STORE_RETURNS: StoreReturn[] = [
       },
     ],
     remarks: "IT hardware returned for warehouse stock receipt.",
+  },
+  {
+    id: "ret-2026-003",
+    returnNumber: "RET-2026-0003",
+    issueId: "iss-2026-001",
+    issueNumber: "ISS-2026-0001",
+    mrId: "mr-2026-001",
+    mrNumber: "MR-2026-0001",
+    returnDate: "2026-10-03",
+    department: "Dyeing & Finishing",
+    issuedTo: "Engr. Kabir Hossain",
+    employeeId: "EMP-00142",
+    warehouseStore: "PKCL Central Raw Material Warehouse",
+    totalItems: 1,
+    totalReturnQty: 100,
+    receivedQty: 40,
+    status: "Partially Received",
+    items: [
+      {
+        id: "sri-3",
+        sl: 1,
+        issueItemId: "isi-1",
+        itemCode: "ITM-YRN-30-1",
+        itemName: "100% Combed Cotton Yarn Ne 30/1",
+        specification: "100% Combed Cotton, Ne 30/1 ring spun, Auto coned",
+        uom: "KG",
+        originallyIssuedQty: 500,
+        previouslyReturnedQty: 50,
+        returnableQty: 450,
+        returnQty: 100,
+        returnStore: "PKCL Central Raw Material Warehouse",
+        returnCondition: "Good (Restock)",
+        batchAllocations: [{ batchNumber: "BAT-YRN-2026-09A", quantity: 40 }],
+        remarks: "Partial return of excess production lots",
+      },
+    ],
+    remarks: "Partial receipt processed. 60 units pending remaining receipt.",
   },
 ];
 
@@ -713,10 +792,123 @@ export function postStoreReturn(storeReturn: StoreReturn): void {
   }
 }
 
+export interface StoreReturnReceiveItem {
+  id: string;
+  sl: number;
+  itemCode: string;
+  itemName: string;
+  specification?: string;
+  uom: string;
+  returnedQty: number;
+  receivedQty: number;
+  receiveStore: string;
+  condition?: string;
+  batchAllocations?: Array<{ batchNumber: string; quantity: number }>;
+  locationAllocations?: Array<{ locationName: string; quantity: number }>;
+  remarks?: string;
+}
+
+export interface StoreReturnReceive {
+  id: string;
+  receiveNumber: string; // e.g. "SRR-2026-0001"
+  returnId: string;
+  returnNumber: string;
+  issueId?: string;
+  issueNumber?: string;
+  mrId?: string;
+  mrNumber?: string;
+  receiveDate: string;
+  receivedBy: string;
+  department?: string;
+  warehouseStore?: string;
+  totalReceivedQty: number;
+  status: "Received" | "Draft";
+  items: StoreReturnReceiveItem[];
+  remarks?: string;
+}
+
+export const DEFAULT_STORE_RETURN_RECEIVES: StoreReturnReceive[] = [
+  {
+    id: "srr-2026-001",
+    receiveNumber: "SRR-2026-0001",
+    returnId: "ret-2026-001",
+    returnNumber: "RET-2026-0001",
+    issueId: "iss-2026-001",
+    issueNumber: "ISS-2026-0001",
+    mrId: "mr-2026-001",
+    mrNumber: "MR-2026-0001",
+    receiveDate: "2026-09-30",
+    receivedBy: "Md. Tarek Rahman (Store In-Charge)",
+    department: "Production (Knitting)",
+    warehouseStore: "PKCL Central Raw Material Warehouse",
+    totalReceivedQty: 50,
+    status: "Received",
+    remarks: "Full receipt verified and restored to central warehouse bin.",
+    items: [
+      {
+        id: "srri-1",
+        sl: 1,
+        itemCode: "ITM-YRN-30-1",
+        itemName: "100% Combed Cotton Yarn Ne 30/1",
+        specification: "100% Combed Cotton, Ne 30/1 ring spun, Auto coned",
+        uom: "KG",
+        returnedQty: 50,
+        receivedQty: 50,
+        receiveStore: "PKCL Central Raw Material Warehouse",
+        condition: "Good (Restock)",
+        batchAllocations: [{ batchNumber: "BAT-YRN-2026-09A", quantity: 50 }],
+        remarks: "Excess unconsumed cones returned after order completion",
+      },
+    ],
+  },
+  {
+    id: "srr-2026-002",
+    receiveNumber: "SRR-2026-0002",
+    returnId: "ret-2026-003",
+    returnNumber: "RET-2026-0003",
+    issueId: "iss-2026-001",
+    issueNumber: "ISS-2026-0001",
+    mrId: "mr-2026-001",
+    mrNumber: "MR-2026-0001",
+    receiveDate: "2026-10-03",
+    receivedBy: "Md. Tarek Rahman (Store In-Charge)",
+    department: "Dyeing & Finishing",
+    warehouseStore: "PKCL Central Raw Material Warehouse",
+    totalReceivedQty: 40,
+    status: "Received",
+    remarks: "Partial batch receipt of 40 KG verified into stock.",
+    items: [
+      {
+        id: "srri-2",
+        sl: 1,
+        itemCode: "ITM-YRN-30-1",
+        itemName: "100% Combed Cotton Yarn Ne 30/1",
+        specification: "100% Combed Cotton, Ne 30/1 ring spun, Auto coned",
+        uom: "KG",
+        returnedQty: 100,
+        receivedQty: 40,
+        receiveStore: "PKCL Central Raw Material Warehouse",
+        condition: "Good (Restock)",
+        batchAllocations: [{ batchNumber: "BAT-YRN-2026-09A", quantity: 40 }],
+        remarks: "Partial return lot accepted",
+      },
+    ],
+  },
+];
+
+export function getStoredStoreReturnReceives(): StoreReturnReceive[] {
+  return getStoredData("cripton_store_return_receives_v2", DEFAULT_STORE_RETURN_RECEIVES);
+}
+
+export function setStoredStoreReturnReceives(receives: StoreReturnReceive[]): void {
+  setStoredData("cripton_store_return_receives_v2", receives);
+}
+
 /**
  * Confirm and post a Store Return Receive transaction:
  * 1. Updates StoreReturn status to "Received" or "Partially Received" with item allocations.
  * 2. Increments inventory stock dynamically for the assigned batches/locations.
+ * 3. Persists StoreReturnReceive transaction history (updating existing in place when edit mode).
  */
 export function postStoreReturnReceive(
   returnId: string,
@@ -724,14 +916,24 @@ export function postStoreReturnReceive(
     itemCode: string;
     receiveStore: string;
     receivedQty: number;
+    condition?: string;
     batchAllocations?: Array<{ batchNumber: string; quantity: number }>;
     locationAllocations?: Array<{ locationName: string; quantity: number }>;
-  }>
-): void {
+  }>,
+  meta?: {
+    receiveId?: string;
+    receiveNumber?: string;
+    receiveDate?: string;
+    receivedBy?: string;
+    remarks?: string;
+  }
+): StoreReturnReceive {
   const currentReturns = getStoredStoreReturns();
+  const matchedReturn = currentReturns.find((r) => r.id === returnId || r.returnNumber === returnId);
+  const totalRec = receivedItems.reduce((acc, it) => acc + (Number(it.receivedQty) || 0), 0);
+
   const updatedReturns = currentReturns.map((ret) => {
     if (ret.id === returnId || ret.returnNumber === returnId) {
-      const totalRec = receivedItems.reduce((acc, it) => acc + (Number(it.receivedQty) || 0), 0);
       const isFull = totalRec >= ret.totalReturnQty;
       const updatedItems = ret.items.map((item) => {
         const match = receivedItems.find((r) => r.itemCode === item.itemCode);
@@ -750,11 +952,64 @@ export function postStoreReturnReceive(
       return {
         ...ret,
         receivedQty: totalRec,
-        status: (isFull ? "Received" : "Partially Received") as any,
+        status: (isFull ? "Received" : totalRec > 0 ? "Partially Received" : "Pending Receive") as any,
         items: updatedItems,
       };
     }
     return ret;
   });
   setStoredStoreReturns(updatedReturns);
+
+  // Save / Update StoreReturnReceive record
+  const allReceives = getStoredStoreReturnReceives();
+  const existingIndex = meta?.receiveId
+    ? allReceives.findIndex((r) => r.id === meta.receiveId || r.receiveNumber === meta.receiveNumber)
+    : -1;
+
+  const receiveRecord: StoreReturnReceive = {
+    id: meta?.receiveId || (existingIndex >= 0 ? allReceives[existingIndex].id : `srr-${Date.now()}`),
+    receiveNumber:
+      meta?.receiveNumber ||
+      (existingIndex >= 0
+        ? allReceives[existingIndex].receiveNumber
+        : `SRR-2026-${String(allReceives.length + 1).padStart(4, "0")}`),
+    returnId: matchedReturn?.id || returnId,
+    returnNumber: matchedReturn?.returnNumber || returnId,
+    issueId: matchedReturn?.issueId,
+    issueNumber: matchedReturn?.issueNumber,
+    mrId: matchedReturn?.mrId,
+    mrNumber: matchedReturn?.mrNumber,
+    receiveDate: meta?.receiveDate || new Date().toISOString().split("T")[0],
+    receivedBy: meta?.receivedBy || "Md. Tarek Rahman (Store In-Charge)",
+    department: matchedReturn?.department,
+    warehouseStore: matchedReturn?.warehouseStore,
+    totalReceivedQty: totalRec,
+    status: "Received",
+    remarks: meta?.remarks || matchedReturn?.remarks,
+    items: receivedItems.map((ri, idx) => {
+      const orig = matchedReturn?.items.find((i) => i.itemCode === ri.itemCode);
+      return {
+        id: orig?.id || `srri-${idx + 1}`,
+        sl: idx + 1,
+        itemCode: ri.itemCode,
+        itemName: orig?.itemName || ri.itemCode,
+        specification: orig?.specification,
+        uom: orig?.uom || "PCS",
+        returnedQty: orig?.returnQty || ri.receivedQty,
+        receivedQty: ri.receivedQty,
+        receiveStore: ri.receiveStore,
+        condition: ri.condition || orig?.returnCondition || "Good (Restock)",
+        batchAllocations: ri.batchAllocations,
+        locationAllocations: ri.locationAllocations,
+      };
+    }),
+  };
+
+  if (existingIndex >= 0) {
+    allReceives[existingIndex] = receiveRecord;
+  } else {
+    allReceives.unshift(receiveRecord);
+  }
+  setStoredStoreReturnReceives(allReceives);
+  return receiveRecord;
 }
