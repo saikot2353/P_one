@@ -63,21 +63,32 @@ function InterCompanyReceiveFormPage() {
   const navigate = useNavigate();
   const searchParams = Route.useSearch();
   const isViewMode = searchParams.mode === "view";
+  const isEditMode = searchParams.mode === "edit";
   const catalogItems = getStoredData<ItemProductMaster[]>("proc_items_v2", DEFAULT_ITEMS);
 
   const transfers = useMemo(() => getStoredInterCompanyTransfers(), []);
   const storedReceives = useMemo(() => getStoredInterCompanyReceives(), []);
 
-  // Find matching existing receive if in view mode or receiveId given
+  // Find matching existing receive if in view/edit mode or receiveId given
   const existingReceive = useMemo(() => {
     if (searchParams.receiveId) {
-      return storedReceives.find((r) => r.receiveId === searchParams.receiveId || r.id === searchParams.receiveId) || null;
+      return (
+        storedReceives.find(
+          (r) => r.receiveId === searchParams.receiveId || r.id === searchParams.receiveId
+        ) || null
+      );
     }
-    if (searchParams.transferId && isViewMode) {
-      return storedReceives.find((r) => r.transferReferenceId === searchParams.transferId || r.transferId === searchParams.transferId) || null;
+    if (searchParams.transferId && (isViewMode || isEditMode)) {
+      return (
+        storedReceives.find(
+          (r) =>
+            r.transferReferenceId === searchParams.transferId ||
+            r.transferId === searchParams.transferId
+        ) || null
+      );
     }
     return null;
-  }, [searchParams.receiveId, searchParams.transferId, isViewMode, storedReceives]);
+  }, [searchParams.receiveId, searchParams.transferId, isViewMode, isEditMode, storedReceives]);
 
   // Eligible transfers (Dispatched or Submitted)
   const eligibleTransfers = useMemo(() => {
@@ -92,12 +103,53 @@ function InterCompanyReceiveFormPage() {
   });
 
   const activeTransfer: InterCompanyTransfer | null = useMemo(() => {
-    return (
-      transfers.find(
-        (t) => t.id === selectedTransferId || t.transferId === selectedTransferId
-      ) || null
+    const found = transfers.find(
+      (t) => t.id === selectedTransferId || t.transferId === selectedTransferId
     );
-  }, [transfers, selectedTransferId]);
+    if (found) return found;
+    if (existingReceive) {
+      return {
+        id: existingReceive.transferId || existingReceive.transferReferenceId,
+        transferId: existingReceive.transferReferenceId || existingReceive.transferId,
+        transferDate: existingReceive.transferDate,
+        dispatchDate: existingReceive.dispatchDate,
+        transferType: "Inter-Company",
+        transferReason: "Stock Balancing",
+        fromCompany: existingReceive.fromCompany,
+        fromStore: existingReceive.fromStore,
+        toCompany: existingReceive.toCompany,
+        toStore: existingReceive.toStore,
+        status: "Dispatched",
+        requestedBy: existingReceive.receivedBy,
+        dispatchedBy: "",
+        receivedBy: existingReceive.receivedBy,
+        remarks: existingReceive.remarks,
+        totalItems: existingReceive.totalItems,
+        totalTransferQty: existingReceive.totalDispatchedQty,
+        totalEstValue: 0,
+        totalTransferValue: 0,
+        updatedAt: existingReceive.createdAt,
+        items: existingReceive.items.map((it) => ({
+          id: it.transferItemId || it.id,
+          sl: it.sl,
+          itemCode: it.itemCode,
+          itemName: it.itemName,
+          specification: it.specification,
+          brand: it.brand,
+          origin: it.origin,
+          uom: it.uom,
+          availableStock: it.dispatchedQty,
+          transferQty: it.dispatchedQty,
+          unitPrice: it.unitPrice,
+          totalValue: it.unitPrice * it.dispatchedQty,
+          batchAllocations: it.batchAllocations,
+          locationAllocations: it.locationAllocations,
+        })),
+        createdAt: existingReceive.createdAt,
+      };
+    }
+    return null;
+  }, [transfers, selectedTransferId, existingReceive]);
 
   // Form Header State
   const [receiveId] = useState<string>(() => {
@@ -311,8 +363,8 @@ function InterCompanyReceiveFormPage() {
     const receiveStatus = isFull ? "Fully Received" : "Partially Received";
 
     const payload: InterCompanyReceive = {
-      id: `ictr-${Date.now()}`,
-      receiveId,
+      id: existingReceive ? existingReceive.id : `ictr-${Date.now()}`,
+      receiveId: existingReceive ? existingReceive.receiveId : receiveId,
       receiveDate,
       transferId: activeTransfer.id,
       transferReferenceId: activeTransfer.transferId,
@@ -331,13 +383,15 @@ function InterCompanyReceiveFormPage() {
       totalVarianceQty: totalVariance,
       status: receiveStatus,
       items: receiveItems,
-      createdAt: new Date().toISOString(),
+      createdAt: existingReceive ? existingReceive.createdAt : new Date().toISOString(),
     };
 
     saveInterCompanyReceive(payload);
 
     toast.success(
-      `Transfer Receive ${receiveId} confirmed! ${totalAccepted} units stocked into ${activeTransfer.toStore}.`
+      existingReceive || isEditMode
+        ? `Transfer Receive ${payload.receiveId} updated successfully!`
+        : `Transfer Receive ${receiveId} confirmed! ${totalAccepted} units stocked into ${activeTransfer.toStore}.`
     );
 
     navigate({ to: "/inv-intercompany-receive-list" });
@@ -454,14 +508,34 @@ function InterCompanyReceiveFormPage() {
               </button>
 
               {isViewMode ? (
-                <button
-                  type="button"
-                  onClick={() => navigate({ to: "/inv-intercompany-receive-list" })}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer"
-                >
-                  <ArrowLeft className="size-3.5" />
-                  Back to List
-                </button>
+                <>
+                  <span className="font-mono text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                    Read-Only Mode
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => navigate({ to: "/inv-intercompany-receive-list" })}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer"
+                  >
+                    <ArrowLeft className="size-3.5" />
+                    Back to List
+                  </button>
+                </>
+              ) : isEditMode ? (
+                <>
+                  <span className="font-mono text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                    Edit Mode
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handlePostReceive}
+                    disabled={validationErrors.length > 0}
+                    className="flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <CheckCircle2 className="size-3.5" />
+                    Update & Save Receive
+                  </button>
+                </>
               ) : (
                 <button
                   type="button"
@@ -511,28 +585,18 @@ function InterCompanyReceiveFormPage() {
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                   Select Transfer ID *
                 </label>
-                <div className="relative">
-                  <select
-                    disabled={isViewMode}
-                    value={selectedTransferId}
-                    onChange={(e) => setSelectedTransferId(e.target.value)}
-                    className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-mono font-bold text-indigo-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none appearance-none pr-8 cursor-pointer disabled:bg-slate-50 disabled:cursor-not-allowed"
-                  >
-                    {eligibleTransfers.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.transferId} ({t.status}) — {t.fromCompany.split(" ")[1]} → {t.toCompany.split(" ")[1]}
-                      </option>
-                    ))}
-                    {activeTransfer && !eligibleTransfers.some((t) => t.id === activeTransfer.id) && (
-                      <option value={activeTransfer.id}>
-                        {activeTransfer.transferId} ({activeTransfer.status}) — {activeTransfer.fromCompany.split(" ")[1]} → {activeTransfer.toCompany.split(" ")[1]}
-                      </option>
-                    )}
-                  </select>
-                  {!isViewMode && (
-                    <ChevronDown className="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  )}
-                </div>
+                <input
+                  type="text"
+                  readOnly
+                  disabled
+                  value={
+                    activeTransfer?.transferId ||
+                    existingReceive?.transferReferenceId ||
+                    selectedTransferId ||
+                    "-"
+                  }
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-100 px-3 text-xs font-mono font-bold text-indigo-700 outline-none cursor-not-allowed select-none"
+                />
               </div>
 
               {/* Transfer Date */}

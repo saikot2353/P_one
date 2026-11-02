@@ -20,6 +20,7 @@ import {
   ShoppingBag,
   Sparkles,
   Trash2,
+  Save,
 } from "lucide-react";
 import {
   MaterialRequisition,
@@ -87,11 +88,11 @@ function InvIssueRegularPage() {
   );
 
   const isViewMode = searchParams.mode === "view";
+  const isEditMode = searchParams.mode === "edit";
   const storedIssues = useMemo(() => getStoredMaterialIssues(), []);
 
-  // If viewing an existing issue record by issueId or mrId
+  // If viewing or editing an existing issue record by issueId or mrId
   const viewingIssueRecord = useMemo(() => {
-    if (!isViewMode) return null;
     if (searchParams.issueId) {
       return (
         storedIssues.find(
@@ -99,7 +100,7 @@ function InvIssueRegularPage() {
         ) || null
       );
     }
-    if (searchParams.mrId) {
+    if (isViewMode && searchParams.mrId) {
       return (
         storedIssues.find(
           (i: MaterialIssue) => i.mrId === searchParams.mrId || i.mrNumber === searchParams.mrId
@@ -410,9 +411,9 @@ function InvIssueRegularPage() {
     }
     if (!activeMR) return;
 
-    const newIssue: MaterialIssue = {
-      id: `iss-${Date.now()}`,
-      issueNumber,
+    const issueToSave: MaterialIssue = {
+      id: viewingIssueRecord?.id || `iss-${Date.now()}`,
+      issueNumber: viewingIssueRecord?.issueNumber || issueNumber,
       mrId: activeMR.id,
       mrNumber: activeMR.mrNumber,
       issueDate,
@@ -429,15 +430,17 @@ function InvIssueRegularPage() {
       status: "Posted",
       items: issueItems.filter((i) => i.issueQty > 0),
       remarks,
-      previouslyReturnedQty: 0,
+      previouslyReturnedQty: viewingIssueRecord?.previouslyReturnedQty || 0,
       returnableQty: totalIssueQuantity,
     };
 
     // Deducts stock, updates MR remaining/issued quantities, saves issue
-    postMaterialIssue(newIssue);
+    postMaterialIssue(issueToSave);
 
     toast.success(
-      `Material Issue ${issueNumber} posted! Stock deducted and balance updated successfully.`
+      isEditMode
+        ? `Material Issue ${issueNumber} updated successfully!`
+        : `Material Issue ${issueNumber} posted! Stock deducted and balance updated successfully.`
     );
     navigate({ to: "/inv-issue-list" });
   };
@@ -539,7 +542,20 @@ function InvIssueRegularPage() {
                 Preview Issue Slip
               </button>
 
-              {!isViewMode && (
+              {isViewMode ? (
+                <span className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">
+                  Read-Only Mode
+                </span>
+              ) : isEditMode ? (
+                <button
+                  type="button"
+                  onClick={handlePostIssue}
+                  className="flex items-center gap-2 px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  <Save className="size-4" />
+                  Update Material Issue
+                </button>
+              ) : (
                 <button
                   type="button"
                   onClick={handlePostIssue}

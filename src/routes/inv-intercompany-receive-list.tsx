@@ -19,6 +19,8 @@ import {
   CheckCircle2,
   Clock,
   AlertTriangle,
+  History,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -60,7 +62,7 @@ function InterCompanyReceiveListPage() {
   const [receiveIdFilter, setReceiveIdFilter] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [toCompanyFilter, setToCompanyFilter] = useState("All");
+  const [fromCompanyFilter, setFromCompanyFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
@@ -70,6 +72,20 @@ function InterCompanyReceiveListPage() {
   // Preview Note State
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
   const [reportTargetReceive, setReportTargetReceive] = useState<InterCompanyReceive | null>(null);
+
+  // State for Transfer Receiving History Modal ("D" button)
+  const [selectedTransferForReceives, setSelectedTransferForReceives] = useState<InterCompanyReceive | null>(null);
+  const [isReceivingHistoryModalOpen, setIsReceivingHistoryModalOpen] = useState(false);
+
+  // Matching receives for selected transfer
+  const transferMatchingReceives = useMemo(() => {
+    if (!selectedTransferForReceives) return [];
+    return receives.filter(
+      (r) =>
+        r.transferReferenceId === selectedTransferForReceives.transferReferenceId ||
+        r.transferId === selectedTransferForReceives.transferId
+    );
+  }, [receives, selectedTransferForReceives]);
 
   // Dedicated View Details Modal State
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -83,7 +99,7 @@ function InterCompanyReceiveListPage() {
       if (activeTab === "full" && r.status !== "Fully Received") return false;
 
       if (statusFilter !== "All" && r.status !== statusFilter) return false;
-      if (toCompanyFilter !== "All" && r.toCompany !== toCompanyFilter) return false;
+      if (fromCompanyFilter !== "All" && r.fromCompany !== fromCompanyFilter) return false;
 
       if (receiveIdFilter.trim() && !r.receiveId.toLowerCase().includes(receiveIdFilter.toLowerCase()))
         return false;
@@ -105,7 +121,7 @@ function InterCompanyReceiveListPage() {
 
       return true;
     });
-  }, [receives, activeTab, statusFilter, toCompanyFilter, receiveIdFilter, fromDate, toDate, searchQuery]);
+  }, [receives, activeTab, statusFilter, fromCompanyFilter, receiveIdFilter, fromDate, toDate, searchQuery]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -286,14 +302,14 @@ function InterCompanyReceiveListPage() {
 
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                      Destination Company
+                      From Company
                     </label>
                     <select
-                      value={toCompanyFilter}
-                      onChange={(e) => setToCompanyFilter(e.target.value)}
-                      className="w-full h-8 px-2.5 rounded-lg border border-slate-200 bg-white text-xs outline-none focus:ring-1 focus:ring-emerald-500"
+                      value={fromCompanyFilter}
+                      onChange={(e) => setFromCompanyFilter(e.target.value)}
+                      className="w-full h-8 px-2.5 rounded-lg border border-slate-200 bg-white text-xs outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
                     >
-                      <option value="All">All Companies</option>
+                      <option value="All">All Source Companies</option>
                       {MASTER_COMPANIES.map((c) => (
                         <option key={c.id} value={c.name}>
                           {c.name}
@@ -361,6 +377,7 @@ function InterCompanyReceiveListPage() {
                     <th className="py-3 px-3 text-right">Received</th>
                     <th className="py-3 px-3 text-right text-emerald-700">Accepted</th>
                     <th className="py-3 px-3 text-right text-rose-600">Short/Damage</th>
+                    <th className="py-3 px-3 text-center font-bold w-14">View</th>
                     <th className="py-3 px-3 text-center">Status</th>
                     <th className="py-3 px-3 text-center sticky right-0 bg-slate-100">Action</th>
                   </tr>
@@ -368,7 +385,7 @@ function InterCompanyReceiveListPage() {
                 <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                   {filteredReceives.length === 0 ? (
                     <tr>
-                      <td colSpan={11} className="py-12 text-center text-slate-400">
+                      <td colSpan={12} className="py-12 text-center text-slate-400">
                         <Inbox className="size-8 mx-auto text-slate-300 stroke-[1.5] mb-2" />
                         <p className="text-xs font-semibold text-slate-600">No transfer receives recorded</p>
                       </td>
@@ -405,6 +422,18 @@ function InterCompanyReceiveListPage() {
                           {r.totalVarianceQty.toLocaleString()}
                         </td>
                         <td className="py-3 px-3 text-center">
+                          <button
+                            onClick={() => {
+                              setSelectedTransferForReceives(r);
+                              setIsReceivingHistoryModalOpen(true);
+                            }}
+                            className="size-7 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 text-emerald-600 hover:text-white font-black text-xs transition-all shadow-2xs border border-emerald-500/30 inline-flex items-center justify-center cursor-pointer active:scale-95"
+                            title={`View Transfer Receiving history for ${r.transferReferenceId}`}
+                          >
+                            D
+                          </button>
+                        </td>
+                        <td className="py-3 px-3 text-center">
                           <span
                             className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getStatusBadge(
                               r.status
@@ -429,23 +458,6 @@ function InterCompanyReceiveListPage() {
                                 Receive
                               </button>
                             )}
-
-                            <button
-                              title="View Transfer Receive Details"
-                              onClick={() => {
-                                navigate({
-                                  to: "/inv-intercompany-receive",
-                                  search: {
-                                    receiveId: r.receiveId,
-                                    transferId: r.transferReferenceId || r.transferId,
-                                    mode: "view",
-                                  },
-                                });
-                              }}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
-                            >
-                              <Eye className="size-3.5" />
-                            </button>
 
                             <button
                               title="Print IC-GRN"
@@ -590,6 +602,111 @@ function InterCompanyReceiveListPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Transfer Receiving History Modal ("D" button) */}
+        {isReceivingHistoryModalOpen && selectedTransferForReceives && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+            <div className="bg-white rounded-2xl border border-slate-200 w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+                    <History className="size-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-slate-800">
+                      Transfer Receiving History
+                    </h2>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs text-slate-500 font-medium">Transfer Ref No:</span>
+                      <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                        {selectedTransferForReceives.transferReferenceId || selectedTransferForReceives.transferId}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsReceivingHistoryModalOpen(false)}
+                  className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              <div className="p-6 overflow-y-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                    <tr>
+                      <th className="py-2.5 px-3 text-center w-10">SL</th>
+                      <th className="py-2.5 px-3 font-bold">TR Receive ID</th>
+                      <th className="py-2.5 px-3">TR Receive Date</th>
+                      <th className="py-2.5 px-3 text-center w-24">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {transferMatchingReceives.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="py-8 text-center text-slate-400">
+                          No receiving records found for this transfer reference.
+                        </td>
+                      </tr>
+                    ) : (
+                      transferMatchingReceives.map((rec, idx) => (
+                        <tr key={rec.id} className="hover:bg-slate-50/70">
+                          <td className="py-2.5 px-3 text-center font-mono text-[10px] text-slate-400">
+                            {idx + 1}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsReceivingHistoryModalOpen(false);
+                                navigate({
+                                  to: "/inv-intercompany-receive",
+                                  search: {
+                                    receiveId: rec.receiveId,
+                                    transferId: rec.transferReferenceId || rec.transferId,
+                                    mode: "edit",
+                                  },
+                                });
+                              }}
+                              className="font-mono font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer text-left"
+                              title="Click to open in Edit Mode"
+                            >
+                              {rec.receiveId}
+                            </button>
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-slate-600">
+                            {rec.receiveDate}
+                          </td>
+                          <td className="py-2.5 px-3 text-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsReceivingHistoryModalOpen(false);
+                                navigate({
+                                  to: "/inv-intercompany-receive",
+                                  search: {
+                                    receiveId: rec.receiveId,
+                                    transferId: rec.transferReferenceId || rec.transferId,
+                                    mode: "view",
+                                  },
+                                });
+                              }}
+                              className="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer"
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

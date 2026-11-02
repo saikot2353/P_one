@@ -1407,6 +1407,12 @@ function InterCompanyTransferFormPage() {
             </div>
           </div>
         )}
+        {/* Preview Challan Modal */}
+        <StandardPreviewReportModal
+          isOpen={previewReportOpen}
+          onClose={() => setPreviewReportOpen(false)}
+          data={previewReportData}
+        />
       </main>
     </div>
   );

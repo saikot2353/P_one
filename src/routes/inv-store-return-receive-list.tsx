@@ -17,10 +17,13 @@ import {
   Package,
   X,
   FileSpreadsheet,
+  History,
 } from "lucide-react";
 import {
   StoreReturn,
   getStoredStoreReturns,
+  getStoredStoreReturnReceives,
+  StoreReturnReceive,
 } from "@/lib/inventory-requisition-issue-data";
 import { DEFAULT_WAREHOUSES, getStoredData } from "@/lib/procurement-master-data";
 import {
@@ -45,10 +48,11 @@ function StoreReturnReceiveListPage() {
   const navigate = useNavigate();
 
   const [returns] = useState<StoreReturn[]>(() => getStoredStoreReturns());
+  const [returnReceives] = useState<StoreReturnReceive[]>(() => getStoredStoreReturnReceives());
   const warehouses = getStoredData("proc_warehouses_v2", DEFAULT_WAREHOUSES);
 
-  // Tabs: "pending" vs "all"
-  const [activeTab, setActiveTab] = useState<"pending" | "all">("pending");
+  // Tabs: "pending" | "partial" | "complete" | "all"
+  const [activeTab, setActiveTab] = useState<"pending" | "partial" | "complete" | "all">("pending");
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,10 +70,38 @@ function StoreReturnReceiveListPage() {
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
   const [reportTargetReturn, setReportTargetReturn] = useState<StoreReturn | null>(null);
 
-  // Pending returns count
+  // State for Return Receiving History Modal ("D" button)
+  const [selectedReturnForModal, setSelectedReturnForModal] = useState<StoreReturn | null>(null);
+  const [isReceivingHistoryModalOpen, setIsReceivingHistoryModalOpen] = useState(false);
+
+  // Matching receiving records for selected return
+  const returnMatchingReceives = useMemo(() => {
+    if (!selectedReturnForModal) return [];
+    return returnReceives.filter(
+      (r) =>
+        r.returnId === selectedReturnForModal.id ||
+        r.returnNumber === selectedReturnForModal.returnNumber
+    );
+  }, [returnReceives, selectedReturnForModal]);
+
+  // Tab counts
   const pendingCount = useMemo(() => {
     return returns.filter(
-      (r) => r.status === "Pending Receive" || r.status === "Partially Received"
+      (r) => r.status === "Pending Receive" || (!r.receivedQty && r.status !== "Received")
+    ).length;
+  }, [returns]);
+
+  const partialCount = useMemo(() => {
+    return returns.filter(
+      (r) =>
+        r.status === "Partially Received" ||
+        ((r.receivedQty || 0) > 0 && (r.receivedQty || 0) < r.totalReturnQty)
+    ).length;
+  }, [returns]);
+
+  const completeCount = useMemo(() => {
+    return returns.filter(
+      (r) => r.status === "Received" || (r.receivedQty || 0) >= r.totalReturnQty
     ).length;
   }, [returns]);
 
@@ -83,11 +115,14 @@ function StoreReturnReceiveListPage() {
   // Filtered Returns
   const filteredReturns = useMemo(() => {
     return returns.filter((ret) => {
-      const isPending = ret.status === "Pending Receive" || ret.status === "Partially Received";
+      const recQty = ret.receivedQty || 0;
+      const isPending = ret.status === "Pending Receive" || (recQty === 0 && ret.status !== "Received");
+      const isPartial = ret.status === "Partially Received" || (recQty > 0 && recQty < ret.totalReturnQty);
+      const isComplete = ret.status === "Received" || recQty >= ret.totalReturnQty;
 
-      if (activeTab === "pending" && !isPending) {
-        return false;
-      }
+      if (activeTab === "pending" && !isPending) return false;
+      if (activeTab === "partial" && !isPartial) return false;
+      if (activeTab === "complete" && !isComplete) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -241,7 +276,7 @@ function StoreReturnReceiveListPage() {
             <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
               <button
                 onClick={() => setActiveTab("pending")}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === "pending"
                     ? "bg-white text-slate-800 shadow-sm"
                     : "text-slate-500 hover:text-slate-800"
@@ -255,14 +290,44 @@ function StoreReturnReceiveListPage() {
                 )}
               </button>
               <button
+                onClick={() => setActiveTab("partial")}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  activeTab === "partial"
+                    ? "bg-white text-slate-800 shadow-sm"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <span>Partial Receive</span>
+                {partialCount > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
+                    {partialCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab("complete")}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  activeTab === "complete"
+                    ? "bg-white text-slate-800 shadow-sm"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <span>Complete Received</span>
+                {completeCount > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">
+                    {completeCount}
+                  </span>
+                )}
+              </button>
+              <button
                 onClick={() => setActiveTab("all")}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === "all"
                     ? "bg-white text-slate-800 shadow-sm"
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                <span>All Return Transactions</span>
+                <span>All</span>
                 <span className="text-[10px] text-slate-400">({returns.length})</span>
               </button>
             </div>
@@ -467,6 +532,7 @@ function StoreReturnReceiveListPage() {
                     <th className="py-3 px-3.5">Return Store</th>
                     <th className="py-3 px-3.5 text-center">Total Items</th>
                     <th className="py-3 px-3.5 text-right font-black">Return Quantity</th>
+                    <th className="py-3 px-3.5 text-center font-bold w-14">View</th>
                     <th className="py-3 px-3.5 text-center">Status</th>
                     <th className="py-3 px-3.5 text-center sticky right-0 bg-slate-50 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.05)]">
                       Action
@@ -476,7 +542,7 @@ function StoreReturnReceiveListPage() {
                 <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                   {filteredReturns.length === 0 ? (
                     <tr>
-                      <td colSpan={11} className="py-12 text-center text-slate-400">
+                      <td colSpan={12} className="py-12 text-center text-slate-400">
                         <div className="flex flex-col items-center justify-center gap-2">
                           <CheckCircle2 className="size-8 text-emerald-300 stroke-[1.5]" />
                           <p className="text-xs font-semibold text-slate-600">
@@ -525,6 +591,20 @@ function StoreReturnReceiveListPage() {
                           </td>
                           <td className="py-3 px-3.5 text-right font-bold text-orange-600 font-mono">
                             {ret.totalReturnQty.toLocaleString()}
+                          </td>
+                          {/* View Column with "D" Button */}
+                          <td className="py-3 px-3.5 text-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedReturnForModal(ret);
+                                setIsReceivingHistoryModalOpen(true);
+                              }}
+                              className="size-7 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 text-emerald-600 hover:text-white font-black text-xs transition-all shadow-2xs border border-emerald-500/30 inline-flex items-center justify-center cursor-pointer active:scale-95"
+                              title={`View Return Receiving transactions for ${ret.returnNumber}`}
+                            >
+                              D
+                            </button>
                           </td>
                           <td className="py-3 px-3.5 text-center">
                             <span
@@ -579,6 +659,138 @@ function StoreReturnReceiveListPage() {
             </div>
           </div>
         </div>
+
+        {/* Return Receiving History Modal (Triggered by "D" button in View Column) */}
+        {isReceivingHistoryModalOpen && selectedReturnForModal && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+            <div className="bg-white w-full max-w-2xl rounded-2xl border border-slate-200 shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200">
+              {/* Modal Header */}
+              <div className="flex items-start justify-between border-b border-slate-100 pb-3.5">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 font-bold">
+                    <History className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-800">
+                      Return Receiving History
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Return ID:{" "}
+                      <span className="font-mono font-bold text-emerald-600">
+                        {selectedReturnForModal.returnNumber}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsReceivingHistoryModalOpen(false);
+                    setSelectedReturnForModal(null);
+                  }}
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  title="Close"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              {/* Receives List Table */}
+              {returnMatchingReceives.length > 0 ? (
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                        <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
+                        <th className="py-2.5 px-4 font-bold">Receive ID</th>
+                        <th className="py-2.5 px-4 font-bold">Receive Date</th>
+                        <th className="py-2.5 px-3 text-center font-bold w-20">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {returnMatchingReceives.map((rec, rIdx) => (
+                        <tr key={rec.id || rIdx} className="hover:bg-slate-50 transition-colors">
+                          <td className="py-2.5 px-3 text-center text-slate-400 font-bold">
+                            {rIdx + 1}
+                          </td>
+                          <td className="py-2.5 px-4">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsReceivingHistoryModalOpen(false);
+                                navigate({
+                                  to: "/inv-store-return-receive",
+                                  search: {
+                                    returnId: selectedReturnForModal.id,
+                                    receiveId: rec.id,
+                                    mode: "edit",
+                                  },
+                                });
+                              }}
+                              className="font-mono font-bold text-emerald-600 hover:text-emerald-700 hover:underline inline-flex items-center gap-1 cursor-pointer transition-colors"
+                              title={`Open ${rec.receiveNumber} in Edit Mode`}
+                            >
+                              <span>{rec.receiveNumber}</span>
+                              <ArrowRight className="size-3" />
+                            </button>
+                          </td>
+                          <td className="py-2.5 px-4 text-slate-600 font-medium font-mono">
+                            {rec.receiveDate}
+                          </td>
+                          <td className="py-2.5 px-3 text-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsReceivingHistoryModalOpen(false);
+                                navigate({
+                                  to: "/inv-store-return-receive",
+                                  search: {
+                                    returnId: selectedReturnForModal.id,
+                                    receiveId: rec.id,
+                                    mode: "view",
+                                  },
+                                });
+                              }}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white text-[11px] font-bold transition-all cursor-pointer"
+                              title="View Store Return Receive (Read-Only Mode)"
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="p-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                  <PackageCheck className="size-8 text-slate-300 mx-auto mb-2 stroke-[1.5]" />
+                  <p className="text-xs font-semibold text-slate-600">
+                    No Store Return Receive transactions found
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    No receiving transactions have been recorded yet for Return Note{" "}
+                    {selectedReturnForModal.returnNumber}.
+                  </p>
+                </div>
+              )}
+
+              {/* Modal Footer */}
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsReceivingHistoryModalOpen(false);
+                    setSelectedReturnForModal(null);
+                  }}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Preview Report Modal */}
         <StandardPreviewReportModal
