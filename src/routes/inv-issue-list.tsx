@@ -20,6 +20,8 @@ import {
   History,
   FileText,
   Eye,
+  Plus,
+  Sparkles,
 } from "lucide-react";
 import {
   MaterialRequisition,
@@ -61,9 +63,6 @@ function MaterialIssueListPage() {
 
   const warehouses = getStoredData("proc_warehouses_v2", DEFAULT_WAREHOUSES);
 
-  // Tabs: "pending" (Approved with pending or partial issue) vs "all" (All approved/issued MRs)
-  const [activeTab, setActiveTab] = useState<"pending" | "all">("pending");
-
   // Filters State
   const [searchQuery, setSearchQuery] = useState("");
   const [mrIdFilter, setMrIdFilter] = useState("");
@@ -78,11 +77,16 @@ function MaterialIssueListPage() {
   // Preview Report & Issue View State
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
   const [reportTargetMR, setReportTargetMR] = useState<MaterialRequisition | null>(null);
+  const [reportTargetDirectIssue, setReportTargetDirectIssue] = useState<MaterialIssue | null>(null);
   const [viewingIssue, setViewingIssue] = useState<MaterialIssue | null>(null);
 
   // State for Requisition-wise Material Issue History Modal ("D" button)
   const [selectedReqForIssues, setSelectedReqForIssues] = useState<MaterialRequisition | null>(null);
   const [isIssueHistoryModalOpen, setIsIssueHistoryModalOpen] = useState(false);
+
+  // State for Direct Issue Details Modal ("D" button on Direct Issue record)
+  const [selectedDirectIssueForDetails, setSelectedDirectIssueForDetails] = useState<MaterialIssue | null>(null);
+  const [isDirectIssueDetailsModalOpen, setIsDirectIssueDetailsModalOpen] = useState(false);
 
   const reqMatchingIssues = useMemo(() => {
     if (!selectedReqForIssues) return [];
@@ -110,8 +114,67 @@ function MaterialIssueListPage() {
   const departments = useMemo(() => {
     const set = new Set<string>();
     requisitions.forEach((r) => r.department && set.add(r.department));
+    issuedRecords.forEach((i) => i.department && set.add(i.department));
     return Array.from(set);
-  }, [requisitions]);
+  }, [requisitions, issuedRecords]);
+
+  // Is Direct Issue filter selected
+  const isDirectIssueFilter = statusFilter === "Direct Issue";
+
+  // Filtered Direct Issue records
+  const directIssueRecords = useMemo(() => {
+    return issuedRecords.filter((iss) => {
+      if (iss.issueType !== "Direct Issue") return false;
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const match =
+          iss.issueNumber.toLowerCase().includes(q) ||
+          iss.department.toLowerCase().includes(q) ||
+          iss.issuedTo.toLowerCase().includes(q) ||
+          iss.warehouseStore.toLowerCase().includes(q) ||
+          iss.items.some(
+            (it) =>
+              it.itemCode.toLowerCase().includes(q) ||
+              it.itemName.toLowerCase().includes(q)
+          );
+        if (!match) return false;
+      }
+
+      if (mrIdFilter.trim() && !iss.issueNumber.toLowerCase().includes(mrIdFilter.toLowerCase())) {
+        return false;
+      }
+      if (fromDate && iss.issueDate < fromDate) {
+        return false;
+      }
+      if (toDate && iss.issueDate > toDate) {
+        return false;
+      }
+      if (departmentFilter !== "All" && iss.department !== departmentFilter) {
+        return false;
+      }
+      if (
+        requestedByFilter.trim() &&
+        !iss.issuedTo.toLowerCase().includes(requestedByFilter.toLowerCase())
+      ) {
+        return false;
+      }
+      if (warehouseFilter !== "All" && iss.warehouseStore !== warehouseFilter) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [
+    issuedRecords,
+    searchQuery,
+    mrIdFilter,
+    fromDate,
+    toDate,
+    departmentFilter,
+    requestedByFilter,
+    warehouseFilter,
+  ]);
 
   // Approved Requisitions eligible for issue
   const eligibleRequisitions = useMemo(() => {
@@ -123,11 +186,6 @@ function MaterialIssueListPage() {
         mr.status === "Fully Issued";
 
       if (!isEligibleStatus) return false;
-
-      // Pending tab: Only shows MRs with remaining issue quantity > 0
-      if (activeTab === "pending") {
-        if (mr.remainingQuantity <= 0) return false;
-      }
 
       // Quick search
       if (searchQuery.trim()) {
@@ -175,7 +233,6 @@ function MaterialIssueListPage() {
     });
   }, [
     requisitions,
-    activeTab,
     searchQuery,
     mrIdFilter,
     fromDate,
@@ -215,6 +272,50 @@ function MaterialIssueListPage() {
 
   // Preview Report Data
   const previewReportData: StandardReportData = useMemo(() => {
+    if (reportTargetDirectIssue) {
+      return {
+        companyName: reportTargetDirectIssue.organization || "Pakiza Knit Composite Ltd",
+        companyAddress: "Gorat, Ashulia, Savar, Dhaka, Bangladesh",
+        reportTitle: "STORE DIRECT MATERIAL ISSUE SLIP",
+        reportNumber: reportTargetDirectIssue.issueNumber,
+        reportDate: reportTargetDirectIssue.issueDate,
+        statusBadge: "Direct Issue",
+        hideLogo: true,
+        metaFields: [
+          { label: "Issue Type", value: "Direct Issue" },
+          { label: "Department", value: reportTargetDirectIssue.department },
+          { label: "Issued To", value: reportTargetDirectIssue.issuedTo },
+          { label: "Warehouse / Store", value: reportTargetDirectIssue.warehouseStore },
+        ],
+        tableHeaders: [
+          "SL",
+          "ITEM CODE",
+          "ITEM DESCRIPTION",
+          "UOM",
+          "ISSUE QTY",
+        ],
+        tableRows: reportTargetDirectIssue.items.map((it, idx) => [
+          String(idx + 1),
+          it.itemCode,
+          it.itemName,
+          it.uom,
+          String(it.issueQty),
+        ]),
+        summaryCards: [
+          { label: "Total Items", value: String(reportTargetDirectIssue.totalItems) },
+          { label: "Total Issue Qty", value: String(reportTargetDirectIssue.totalIssueQty) },
+        ],
+        notes: [
+          "Direct material issue dispatched without material requisition linkage.",
+          "Physical receipt verified and store ledgers updated upon posting.",
+        ],
+        signatures: [
+          { title: "Store Officer", name: "Warehouse Dispatcher", date: reportTargetDirectIssue.issueDate },
+          { title: "Received By", name: reportTargetDirectIssue.issuedTo, date: "-" },
+        ],
+      };
+    }
+
     if (!reportTargetMR) {
       return {
         companyName: "Pakiza Knit Composite Ltd",
@@ -282,7 +383,7 @@ function MaterialIssueListPage() {
         { title: "Received By", name: reportTargetMR.requestedBy, date: "-" },
       ],
     };
-  }, [reportTargetMR]);
+  }, [reportTargetMR, reportTargetDirectIssue]);
 
   return (
     <div className="min-h-screen flex bg-slate-50 text-foreground">
@@ -307,45 +408,15 @@ function MaterialIssueListPage() {
               </div>
             </div>
 
-            {/* View Tabs */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-              <button
-                onClick={() => setActiveTab("pending")}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === "pending"
-                    ? "bg-white text-slate-800 shadow-sm"
-                    : "text-slate-500 hover:text-slate-800"
-                }`}
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <Link
+                to="/inv-issue-regular"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 active:scale-95 transition-all cursor-pointer"
               >
-                <span>Pending / Partial Issue</span>
-                {pendingIssueCount > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white">
-                    {pendingIssueCount}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab("all")}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === "all"
-                    ? "bg-white text-slate-800 shadow-sm"
-                    : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                <span>All Requisitions</span>
-                <span className="text-[10px] text-slate-400">
-                  (
-                  {
-                    requisitions.filter(
-                      (r) =>
-                        r.status === "Approved" ||
-                        r.status === "Partially Issued" ||
-                        r.status === "Fully Issued"
-                    ).length
-                  }
-                  )
-                </span>
-              </button>
+                <Plus className="size-3.5" />
+                New Issue
+              </Link>
             </div>
           </div>
 
@@ -358,7 +429,9 @@ function MaterialIssueListPage() {
                   Store-Wise Filters & Search Criteria
                 </h2>
                 <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-                  {eligibleRequisitions.length} eligible requisitions
+                  {isDirectIssueFilter
+                    ? `${directIssueRecords.length} direct issue records`
+                    : `${eligibleRequisitions.length} eligible requisitions`}
                 </span>
               </div>
               <button
@@ -486,26 +559,30 @@ function MaterialIssueListPage() {
                   <option value="Pending Issue">Pending Issue (0 issued)</option>
                   <option value="Partially Issued">Partially Issued</option>
                   <option value="Fully Issued">Fully Issued</option>
+                  <option value="Direct Issue">Direct Issue</option>
                 </select>
               </div>
             </div>
           </div>
 
-          {/* Table Card (Pending / Requisitions view) */}
+          {/* Table Card (Pending / Requisitions / Direct Issue view) */}
           <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
             <div className="p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100">
               <span className="text-sm font-black text-slate-800">
-                {activeTab === "pending"
-                  ? "Requisitions Pending Material Issue"
-                  : "All Approved Requisitions"}{" "}
-                ({eligibleRequisitions.length})
+                {isDirectIssueFilter
+                  ? `Direct Issue Transactions (${directIssueRecords.length})`
+                  : `Material Requisitions (${eligibleRequisitions.length})`}
               </span>
 
               <div className="relative flex-1 sm:w-72">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search by MR, Dept, Requester..."
+                  placeholder={
+                    isDirectIssueFilter
+                      ? "Search by Issue ID, Dept, Issued To, Store..."
+                      : "Search by MR, Dept, Requester..."
+                  }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full h-9 rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-3 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
@@ -518,23 +595,125 @@ function MaterialIssueListPage() {
                 <thead>
                   <tr className="bg-slate-50/75 border-b border-slate-200/80 text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
                     <th className="py-3 px-3.5 text-center w-12">SL</th>
-                    <th className="py-3 px-3.5">Requisition ID</th>
-                    <th className="py-3 px-3.5">Requisition Date</th>
+                    <th className="py-3 px-3.5">
+                      {isDirectIssueFilter ? "Issue ID" : "Requisition ID"}
+                    </th>
+                    <th className="py-3 px-3.5">
+                      {isDirectIssueFilter ? "Issue Date" : "Requisition Date"}
+                    </th>
                     <th className="py-3 px-3.5">Department</th>
-                    <th className="py-3 px-3.5">Requested By</th>
+                    <th className="py-3 px-3.5">
+                      {isDirectIssueFilter ? "Issued To" : "Requested By"}
+                    </th>
                     <th className="py-3 px-3.5 text-center">Total Items</th>
-                    <th className="py-3 px-3.5 text-right">Requested Qty</th>
-                    <th className="py-3 px-3.5 text-right">Previously Issued</th>
-                    <th className="py-3 px-3.5 text-right font-black">Remaining Issue Qty</th>
-                    <th className="py-3 px-3.5 text-center font-bold w-14">View</th>
-                    <th className="py-3 px-3.5 text-center">Status</th>
+                    {isDirectIssueFilter ? (
+                      <>
+                        <th className="py-3 px-3.5 text-right font-black">Total Issue Qty</th>
+                        <th className="py-3 px-3.5">Issue Store</th>
+                        <th className="py-3 px-3.5 text-center">Status</th>
+                      </>
+                    ) : (
+                      <>
+                        <th className="py-3 px-3.5 text-right">Requested Qty</th>
+                        <th className="py-3 px-3.5 text-right">Previously Issued</th>
+                        <th className="py-3 px-3.5 text-right font-black">Remaining Issue Qty</th>
+                        <th className="py-3 px-3.5 text-center font-bold w-14">View</th>
+                        <th className="py-3 px-3.5 text-center">Status</th>
+                      </>
+                    )}
                     <th className="py-3 px-3.5 text-center sticky right-0 bg-slate-50 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.05)]">
                       Action
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                  {eligibleRequisitions.length === 0 ? (
+                  {isDirectIssueFilter ? (
+                    directIssueRecords.length === 0 ? (
+                      <tr>
+                        <td colSpan={10} className="py-12 text-center text-slate-400">
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <PackageOpen className="size-8 text-indigo-300 stroke-[1.5]" />
+                            <p className="text-xs font-semibold text-slate-600">
+                              No Direct Issue transactions found
+                            </p>
+                            <p className="text-[10px] text-slate-400">
+                              Direct issue transactions created via "New Issue" will appear here.
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      directIssueRecords.map((iss, idx) => (
+                        <tr
+                          key={iss.id}
+                          className="hover:bg-slate-50/70 transition-colors group whitespace-nowrap"
+                        >
+                          <td className="py-3 px-3.5 text-center text-slate-400 font-mono text-[10px]">
+                            {idx + 1}
+                          </td>
+                          <td className="py-3 px-3.5">
+                            <span className="font-bold text-indigo-600 font-mono">
+                              {iss.issueNumber}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3.5 text-slate-600 font-mono">
+                            {iss.issueDate}
+                          </td>
+                          <td className="py-3 px-3.5 font-semibold text-slate-800">
+                            {iss.department || "-"}
+                          </td>
+                          <td className="py-3 px-3.5 text-slate-800">{iss.issuedTo || "-"}</td>
+                          <td className="py-3 px-3.5 text-center font-bold font-mono">
+                            {iss.totalItems}
+                          </td>
+                          <td className="py-3 px-3.5 text-right font-black text-indigo-700 font-mono">
+                            {iss.totalIssueQty.toLocaleString()}
+                          </td>
+                          <td className="py-3 px-3.5 text-slate-600 text-xs">
+                            {iss.warehouseStore}
+                          </td>
+                          <td className="py-3 px-3.5 text-center">
+                            <span className="px-2.5 py-1 rounded-full text-[9.5px] font-bold border bg-purple-50 text-purple-700 border-purple-200">
+                              Direct Issue
+                            </span>
+                          </td>
+
+                          {/* Action Column for Direct Issue: Eye icon button (Edit Mode) + Print button (No View button displayed) */}
+                          <td className="py-3 px-3.5 text-center sticky right-0 bg-white group-hover:bg-slate-50/70 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.05)]">
+                            <div className="flex items-center justify-center gap-1.5">
+                              <button
+                                type="button"
+                                title="Edit Direct Issue"
+                                onClick={() => {
+                                  navigate({
+                                    to: "/inv-issue-regular",
+                                    search: {
+                                      issueId: iss.id,
+                                      mode: "edit",
+                                    },
+                                  });
+                                }}
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer"
+                              >
+                                <Eye className="size-4" />
+                              </button>
+
+                              <button
+                                title="Print Direct Issue Slip"
+                                onClick={() => {
+                                  setReportTargetDirectIssue(iss);
+                                  setPreviewReportOpen(true);
+                                }}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
+                              >
+                                <Printer className="size-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )
+                  ) : eligibleRequisitions.length === 0 ? (
                     <tr>
                       <td colSpan={12} className="py-12 text-center text-slate-400">
                         <div className="flex flex-col items-center justify-center gap-2">
@@ -975,10 +1154,163 @@ function MaterialIssueListPage() {
           </div>
         )}
 
+        {/* Direct Issue Details Modal ("D" button on Direct Issue record) */}
+        {isDirectIssueDetailsModalOpen && selectedDirectIssueForDetails && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+              {/* Modal Header */}
+              <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 font-bold">
+                    <History className="size-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-slate-800 text-base">
+                        Direct Material Issue Details
+                      </h3>
+                      <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        {selectedDirectIssueForDetails.issueNumber}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                        Direct Issue
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Issued to {selectedDirectIssueForDetails.issuedTo} ({selectedDirectIssueForDetails.department}) on {selectedDirectIssueForDetails.issueDate}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsDirectIssueDetailsModalOpen(false);
+                    setSelectedDirectIssueForDetails(null);
+                  }}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              {/* Items Table */}
+              <div className="p-5 overflow-y-auto flex-1 space-y-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase">Issue Date</div>
+                    <div className="font-mono font-bold text-slate-800 text-xs mt-0.5">{selectedDirectIssueForDetails.issueDate}</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase">Department</div>
+                    <div className="font-semibold text-slate-800 text-xs mt-0.5">{selectedDirectIssueForDetails.department}</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase">Issued To</div>
+                    <div className="font-semibold text-slate-800 text-xs mt-0.5">{selectedDirectIssueForDetails.issuedTo}</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase">Warehouse Store</div>
+                    <div className="font-semibold text-slate-800 text-xs mt-0.5 truncate">{selectedDirectIssueForDetails.warehouseStore}</div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-slate-200 overflow-hidden">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 text-[10px] uppercase font-bold tracking-wider">
+                      <tr>
+                        <th className="py-2.5 px-3 w-10 text-center">SL</th>
+                        <th className="py-2.5 px-3">Item Code</th>
+                        <th className="py-2.5 px-3">Item Description</th>
+                        <th className="py-2.5 px-2 text-center w-16">UOM</th>
+                        <th className="py-2.5 px-3 text-right w-28">Issue Qty</th>
+                        <th className="py-2.5 px-3 text-center">Tracking (B/L)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {selectedDirectIssueForDetails.items.map((it, idx) => (
+                        <tr key={it.id || idx} className="hover:bg-slate-50">
+                          <td className="py-2.5 px-3 text-center text-slate-400 font-mono text-[10px]">{idx + 1}</td>
+                          <td className="py-2.5 px-3 font-mono font-bold text-blue-600">{it.itemCode}</td>
+                          <td className="py-2.5 px-3 font-semibold text-slate-800">{it.itemName}</td>
+                          <td className="py-2.5 px-2 text-center font-mono text-slate-600">{it.uom}</td>
+                          <td className="py-2.5 px-3 text-right font-mono font-bold text-indigo-700">{it.issueQty.toLocaleString()}</td>
+                          <td className="py-2.5 px-3 text-center text-[10.5px] font-mono">
+                            {it.batchAllocations && it.batchAllocations.length > 0 ? (
+                              <span className="text-indigo-600 font-bold">
+                                Batch: {it.batchAllocations.map(b => `${b.batchNumber} (${b.quantity})`).join(", ")}
+                              </span>
+                            ) : it.locationAllocations && it.locationAllocations.length > 0 ? (
+                              <span className="text-emerald-600 font-bold">
+                                Loc: {it.locationAllocations.map(l => `${l.locationName} (${l.quantity})`).join(", ")}
+                              </span>
+                            ) : (
+                              "—"
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-50 font-bold border-t border-slate-200 text-slate-800">
+                        <td colSpan={4} className="py-2.5 px-3 text-right text-[10px] uppercase tracking-wider">
+                          Total Issue Quantity:
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono font-black text-indigo-700">
+                          {selectedDirectIssueForDetails.totalIssueQty.toLocaleString()}
+                        </td>
+                        <td></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <span className="text-xs text-slate-500 font-medium">
+                  Direct issuance recorded in stock ledger
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsDirectIssueDetailsModalOpen(false);
+                      navigate({
+                        to: "/inv-issue-regular",
+                        search: {
+                          issueId: selectedDirectIssueForDetails.id,
+                          mode: "view",
+                        },
+                      });
+                    }}
+                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer"
+                  >
+                    Open in Form (Read-Only)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsDirectIssueDetailsModalOpen(false);
+                      setSelectedDirectIssueForDetails(null);
+                    }}
+                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Preview Report Modal */}
         <StandardPreviewReportModal
           isOpen={previewReportOpen}
-          onClose={() => setPreviewReportOpen(false)}
+          onClose={() => {
+            setPreviewReportOpen(false);
+            setReportTargetMR(null);
+            setReportTargetDirectIssue(null);
+          }}
           data={previewReportData}
         />
       </main>
