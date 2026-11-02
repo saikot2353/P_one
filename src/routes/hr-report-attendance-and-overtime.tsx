@@ -31,114 +31,345 @@ export const Route = createFileRoute("/hr-report-attendance-and-overtime")({
 export interface AttendanceOvertimeRecord {
   sl: number;
   id: string;
-  empIdOffc: string;
   name: string;
+  type: string;
   department: string;
+  designation: string;
+  unit: string;
   date: string;
   inTime: string;
   outDate: string;
   outTime: string;
-  overTime: string;
+  otActual: string;
+  otRequest: string;
+  otDiff: string;
+  otRate: string;
+  taka: string;
   status: string;
-  employeeType: string;
-  section: string;
-  unit: string;
+  section?: string;
+  empIdOffc?: string;
 }
 
 const INITIAL_DATA: AttendanceOvertimeRecord[] = [
   {
-    sl: 1,
-    id: "2026061937",
-    empIdOffc: "2026061937",
-    name: "Md. Jahidul Islam",
-    department: "Implementation & Business Analysis",
-    date: "30/09/2026",
-    inTime: "09:05 AM",
-    outDate: "30/09/2026",
-    outTime: "06:15 PM",
-    overTime: "00:00:00",
-    status: "Working",
-    employeeType: "Permanent",
+    sl: 2425,
+    id: "2024049586",
+    name: "Anamul Haque",
+    type: "Worker",
+    department: "Maintenance Utility & Textile",
+    designation: "AC Helper",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "07:39:30",
+    outDate: "01/11/2026",
+    outTime: "20:04:34",
+    otActual: "3.00",
+    otRequest: "0",
+    otDiff: "3.00",
+    otRate: "84.54",
+    taka: "254",
+    status: "Present",
+    section: "Maintenance",
+    empIdOffc: "2024049586",
+  },
+  {
+    sl: 2429,
+    id: "2026062012",
+    name: "Md. Hasan Mahmud",
+    type: "Worker",
+    department: "Maintenance Utility & Textile",
+    designation: "AC Helper",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "07:50:57",
+    outDate: "01/11/2026",
+    outTime: "20:04:12",
+    otActual: "3.00",
+    otRequest: "0",
+    otDiff: "3.00",
+    otRate: "70.83",
+    taka: "212",
+    status: "Present",
+    section: "Maintenance",
+    empIdOffc: "2026062012",
+  },
+  {
+    sl: 8,
+    id: "2015003488",
+    name: "Md. Komol Hossain",
+    type: "Office Executive",
+    department: "Human Resources",
+    designation: "Assistant Manager",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "07:58:06",
+    outDate: "01/11/2026",
+    outTime: "22:31:45",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "300.00",
+    taka: "0",
+    status: "Present",
     section: "HR Team",
-    unit: "PSL",
+    empIdOffc: "2015003488",
+  },
+  {
+    sl: 10,
+    id: "2020021549",
+    name: "Aminur Islam",
+    type: "Office Executive",
+    department: "Human Resources",
+    designation: "Assistant Manager",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "08:03:56",
+    outDate: "01/11/2026",
+    outTime: "22:38:55",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "275.19",
+    taka: "0",
+    status: "Present",
+    section: "HR Team",
+    empIdOffc: "2020021549",
+  },
+  {
+    sl: 205,
+    id: "2018011194",
+    name: "Sobhan Mia",
+    type: "Production Executive",
+    department: "Accessories Store (MCD)",
+    designation: "Assistant Manager",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "07:57:30",
+    outDate: "01/11/2026",
+    outTime: "",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "222.09",
+    taka: "0",
+    status: "Present",
+    section: "Store",
+    empIdOffc: "2018011194",
+  },
+  {
+    sl: 5334,
+    id: "2025057576",
+    name: "Md. Abu Said",
+    type: "Worker",
+    department: "Transport",
+    designation: "Asst. Cook",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "04:58:01",
+    outDate: "01/11/2026",
+    outTime: "19:01:15",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "67.63",
+    taka: "0",
+    status: "Present",
+    section: "Transport",
+    empIdOffc: "2025057576",
+  },
+  {
+    sl: 22,
+    id: "2018011308",
+    name: "Masud Parvej Piyash",
+    type: "Office Executive",
+    department: "Merchandising Supply Chain",
+    designation: "Asst. Manager",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "07:36:38",
+    outDate: "01/11/2026",
+    outTime: "17:06:51",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "299.00",
+    taka: "0",
+    status: "Present",
+    section: "Supply Chain",
+    empIdOffc: "2018011308",
+  },
+  {
+    sl: 209,
+    id: "2015005030",
+    name: "Md. Shah Alam",
+    type: "Production Executive",
+    department: "Chemical Store (MCD)",
+    designation: "Asst. Manager",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "07:56:13",
+    outDate: "01/11/2026",
+    outTime: "17:41:43",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "244.73",
+    taka: "0",
+    status: "Present",
+    section: "Store",
+    empIdOffc: "2015005030",
+  },
+  {
+    sl: 253,
+    id: "2021027717",
+    name: "Md. Rayhan Parves Opu",
+    type: "Production Executive",
+    department: "Production Audit",
+    designation: "Asst. Manager",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "08:01:53",
+    outDate: "01/11/2026",
+    outTime: "17:16:37",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "237.39",
+    taka: "0",
+    status: "Present",
+    section: "Audit",
+    empIdOffc: "2021027717",
+  },
+  {
+    sl: 41,
+    id: "2018011967",
+    name: "Md. Atikur Rahman",
+    type: "Office Staff",
+    department: "Cutting",
+    designation: "Asst. Marker",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "19:49:29",
+    outDate: "02/11/2026",
+    outTime: "08:05:49",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "136.74",
+    taka: "0",
+    status: "Present",
+    section: "Cutting",
+    empIdOffc: "2018011967",
   },
   {
     sl: 2,
-    id: "2025054609",
-    empIdOffc: "2025054609",
-    name: "Md Mahir Shahriyar",
-    department: "Business Innovation",
-    date: "30/09/2026",
-    inTime: "09:20 AM",
-    outDate: "30/09/2026",
-    outTime: "08:00 PM",
-    overTime: "02:00:00",
-    status: "Working",
-    employeeType: "Permanent",
-    section: "Project Resource & Strategy",
-    unit: "PSL",
+    id: "2021023801",
+    name: "Md. Rabiul Hasan",
+    type: "Office Executive",
+    department: "Fire and Safety",
+    designation: "Asst. Officer",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "07:47:29",
+    outDate: "01/11/2026",
+    outTime: "17:11:09",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "195.00",
+    taka: "0",
+    status: "Present",
+    section: "Safety",
+    empIdOffc: "2021023801",
   },
   {
-    sl: 3,
-    id: "2026090511",
-    empIdOffc: "2026090511",
-    name: "Tanvir Ahmed",
-    department: "Accounts & Finance",
-    date: "30/09/2026",
-    inTime: "--:--",
-    outDate: "--/--/----",
-    outTime: "--:--",
-    overTime: "00:00:00",
-    status: "Absent",
-    employeeType: "Probationary",
-    section: "Payroll Audit",
-    unit: "PKG",
-  }
+    sl: 11,
+    id: "2017009298",
+    name: "Md. Golam Mawla",
+    type: "Office Executive",
+    department: "Maintenance RMG",
+    designation: "Asst. Officer",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "07:52:31",
+    outDate: "01/11/2026",
+    outTime: "20:24:57",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "181.23",
+    taka: "0",
+    status: "Present",
+    section: "Maintenance",
+    empIdOffc: "2017009298",
+  },
+  {
+    sl: 210,
+    id: "2020017658",
+    name: "Md. Hafijur Rahman",
+    type: "Production Executive",
+    department: "Chemical Store (MCD)",
+    designation: "Asst. Officer",
+    unit: "N/A",
+    date: "01/11/2026",
+    inTime: "13:55:58",
+    outDate: "01/11/2026",
+    outTime: "22:00:30",
+    otActual: "0.00",
+    otRequest: "0",
+    otDiff: "0.00",
+    otRate: "146.23",
+    taka: "0",
+    status: "Present",
+    section: "Store",
+    empIdOffc: "2020017658",
+  },
 ];
 
 function AttendanceAndOvertimeReportPage() {
-  const [data, setData] = useState<AttendanceOvertimeRecord[]>(INITIAL_DATA);
-  
-  // Form States corresponding to the screenshot
+  const [data] = useState<AttendanceOvertimeRecord[]>(INITIAL_DATA);
+
+  // Form States
   const [employeeType, setEmployeeType] = useState("ALL");
   const [section, setSection] = useState("ALL");
   const [unit, setUnit] = useState("ALL");
-  
-  const [startDate, setStartDate] = useState("2026-09-30");
-  const [endDate, setEndDate] = useState("2026-09-30");
+
+  const [startDate, setStartDate] = useState("2026-11-01");
+  const [endDate, setEndDate] = useState("2026-11-01");
   const [option, setOption] = useState("ALL");
-  
+
   const [outTimeStart, setOutTimeStart] = useState("");
   const [outTimeEnd, setOutTimeEnd] = useState("");
   const [ot, setOt] = useState("ALL");
-  
+
   const [employeeId, setEmployeeId] = useState("");
   const [idType, setIdType] = useState<"System" | "Office">("System");
-  
-  const [status, setStatus] = useState("Working");
-  
+
+  const [status, setStatus] = useState("ALL");
   const [tableSearch, setTableSearch] = useState("");
 
   // Filtered State
   const [filteredData, setFilteredData] = useState<AttendanceOvertimeRecord[]>(INITIAL_DATA);
-  
+
   // PDF Modal State
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<any>({});
+  const [appliedFilters, setAppliedFilters] = useState<any>({
+    initialized: true,
+  });
 
   const handleReset = () => {
     setEmployeeType("ALL");
     setSection("ALL");
     setUnit("ALL");
-    setStartDate("2026-09-30");
-    setEndDate("2026-09-30");
+    setStartDate("2026-11-01");
+    setEndDate("2026-11-01");
     setOption("ALL");
     setOutTimeStart("");
     setOutTimeEnd("");
     setOt("ALL");
     setEmployeeId("");
     setIdType("System");
-    setStatus("Working");
+    setStatus("ALL");
     setTableSearch("");
     setFilteredData(data);
     toast.success("Filters reset successfully!");
@@ -159,19 +390,22 @@ function AttendanceAndOvertimeReportPage() {
       idType,
       status,
     };
-    
+
     const filtered = data.filter((item) => {
-      if (employeeType !== "ALL" && item.employeeType !== employeeType) return false;
-      if (section !== "ALL" && item.section !== section) return false;
+      if (employeeType !== "ALL" && item.type !== employeeType) return false;
+      if (section !== "ALL" && item.section !== section && item.department !== section) return false;
       if (unit !== "ALL" && item.unit !== unit) return false;
       if (status !== "ALL" && item.status !== status) return false;
 
+      if (ot === "With OT" && parseFloat(item.otActual || "0") <= 0) return false;
+      if (ot === "Without OT" && parseFloat(item.otActual || "0") > 0) return false;
+
       if (employeeId.trim() !== "") {
-        const ids = employeeId.split(",").map(id => id.trim());
+        const ids = employeeId.split(",").map((id) => id.trim());
         if (idType === "System") {
           if (!ids.includes(item.id)) return false;
         } else {
-          if (!ids.includes(item.empIdOffc)) return false;
+          if (!ids.includes(item.empIdOffc || item.id)) return false;
         }
       }
 
@@ -180,16 +414,90 @@ function AttendanceAndOvertimeReportPage() {
 
     setFilteredData(filtered);
     setAppliedFilters(currentFilters);
-    
+
     if (filtered.length === 0) {
       toast.error("No records found matching the criteria");
     } else {
-      toast.success("Found " + filtered.length + " records");
+      toast.success(`Found ${filtered.length} records`);
     }
   };
 
+  // Instant table search filter
+  const displayedData = filteredData.filter((item) => {
+    if (!tableSearch.trim()) return true;
+    const query = tableSearch.toLowerCase();
+    return (
+      item.name.toLowerCase().includes(query) ||
+      item.id.toLowerCase().includes(query) ||
+      item.type.toLowerCase().includes(query) ||
+      item.department.toLowerCase().includes(query) ||
+      item.designation.toLowerCase().includes(query) ||
+      item.unit.toLowerCase().includes(query) ||
+      item.date.toLowerCase().includes(query) ||
+      item.status.toLowerCase().includes(query) ||
+      String(item.sl).includes(query)
+    );
+  });
+
   const handleExportExcel = () => {
-    toast.success("Excel report exported successfully!");
+    if (displayedData.length === 0) {
+      toast.error("No records available to export");
+      return;
+    }
+
+    const headers = [
+      "SL",
+      "ID",
+      "Name",
+      "Type",
+      "Department",
+      "Designation",
+      "Unit",
+      "Date",
+      "In Time",
+      "Out Date",
+      "Out Time",
+      "OT Actual",
+      "OT Request",
+      "OT(+/-)",
+      "OT Rate",
+      "OT Amount",
+      "Status",
+    ];
+
+    const rows = displayedData.map((r) => [
+      r.sl,
+      `"${r.id}"`,
+      `"${r.name}"`,
+      `"${r.type}"`,
+      `"${r.department}"`,
+      `"${r.designation}"`,
+      `"${r.unit}"`,
+      `"${r.date}"`,
+      `"${r.inTime}"`,
+      `"${r.outDate}"`,
+      `"${r.outTime}"`,
+      r.otActual,
+      r.otRequest,
+      r.otDiff,
+      r.otRate,
+      r.taka,
+      `"${r.status}"`,
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `attendance_and_overtime_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success("Excel CSV report exported successfully!");
   };
 
   const handlePrint = () => {
@@ -199,28 +507,30 @@ function AttendanceAndOvertimeReportPage() {
     }, 300);
   };
 
-  // PDF Export definitions
+  // PDF Export definitions for all 17 columns
   const pdfColumns: ColumnDef<AttendanceOvertimeRecord>[] = [
-    { header: "SL", accessor: (_, idx) => idx + 1, align: "center", width: "40px" },
+    { header: "SL", accessor: (r) => r.sl, align: "center", width: "40px" },
     { header: "ID", accessor: (r) => r.id, align: "center" },
-    { header: "EmpId (Off.)", accessor: (r) => r.empIdOffc, align: "center" },
     { header: "Name", accessor: (r) => r.name },
+    { header: "Type", accessor: (r) => r.type },
     { header: "Department", accessor: (r) => r.department },
+    { header: "Designation", accessor: (r) => r.designation },
+    { header: "Unit", accessor: (r) => r.unit, align: "center" },
     { header: "Date", accessor: (r) => r.date, align: "center" },
     { header: "In Time", accessor: (r) => r.inTime, align: "center" },
     { header: "Out Date", accessor: (r) => r.outDate, align: "center" },
     { header: "Out Time", accessor: (r) => r.outTime, align: "center" },
-    { header: "Over Time", accessor: (r) => r.overTime, align: "center" },
+    { header: "OT Actual", accessor: (r) => r.otActual, align: "right" },
+    { header: "OT Request", accessor: (r) => r.otRequest, align: "right" },
+    { header: "OT(+/-)", accessor: (r) => r.otDiff, align: "right" },
+    { header: "OT Rate", accessor: (r) => r.otRate, align: "right" },
+    { header: "OT Amount", accessor: (r) => r.taka, align: "right" },
     { header: "Status", accessor: (r) => r.status, align: "center" },
   ];
 
   const handlePdfExport = () => {
-    if (filteredData.length === 0) {
+    if (displayedData.length === 0) {
       toast.error("No data available to export.");
-      return;
-    }
-    if (Object.keys(appliedFilters).length === 0) {
-      toast.error("Please perform a search first before exporting.");
       return;
     }
     setIsPdfModalOpen(true);
@@ -233,7 +543,7 @@ function AttendanceAndOvertimeReportPage() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Topbar />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 max-w-[1700px] mx-auto w-full">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 max-w-[1850px] mx-auto w-full">
           {/* Breadcrumb Navigation */}
           <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
             <Link to="/" className="hover:text-primary transition-colors">
@@ -285,7 +595,6 @@ function AttendanceAndOvertimeReportPage() {
 
             {/* Filter Form Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 text-xs">
-              
               {/* Employee Type */}
               <div className="space-y-1">
                 <label className="font-semibold text-slate-700 dark:text-slate-300 block">
@@ -297,6 +606,10 @@ function AttendanceAndOvertimeReportPage() {
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="ALL">ALL</option>
+                  <option value="Worker">Worker</option>
+                  <option value="Office Executive">Office Executive</option>
+                  <option value="Production Executive">Production Executive</option>
+                  <option value="Office Staff">Office Staff</option>
                   <option value="Permanent">Permanent</option>
                   <option value="Probationary">Probationary</option>
                   <option value="Contractual">Contractual</option>
@@ -314,7 +627,14 @@ function AttendanceAndOvertimeReportPage() {
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="ALL">ALL</option>
+                  <option value="Maintenance">Maintenance</option>
                   <option value="HR Team">HR Team</option>
+                  <option value="Store">Store</option>
+                  <option value="Transport">Transport</option>
+                  <option value="Supply Chain">Supply Chain</option>
+                  <option value="Audit">Audit</option>
+                  <option value="Cutting">Cutting</option>
+                  <option value="Safety">Safety</option>
                   <option value="Project Resource & Strategy">Project Resource & Strategy</option>
                   <option value="Payroll Audit">Payroll Audit</option>
                 </select>
@@ -331,6 +651,7 @@ function AttendanceAndOvertimeReportPage() {
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="ALL">ALL</option>
+                  <option value="N/A">N/A</option>
                   <option value="PSL">PSL</option>
                   <option value="PKG">PKG</option>
                 </select>
@@ -426,7 +747,10 @@ function AttendanceAndOvertimeReportPage() {
               <div className="space-y-1 col-span-1 sm:col-span-2">
                 <div className="flex items-center justify-between mb-1">
                   <label className="font-semibold text-slate-700 dark:text-slate-300 block">
-                    Employee Id <span className="text-[10px] font-normal text-slate-500">(Multi with comma)</span>
+                    Employee Id{" "}
+                    <span className="text-[10px] font-normal text-slate-500">
+                      (Multi with comma)
+                    </span>
                   </label>
                   <div className="flex items-center gap-3 text-[11px] font-bold">
                     <label className="flex items-center gap-1 cursor-pointer">
@@ -457,7 +781,7 @@ function AttendanceAndOvertimeReportPage() {
                   type="text"
                   value={employeeId}
                   onChange={(e) => setEmployeeId(e.target.value)}
-                  placeholder="e.g. 2026061937, 2025054609"
+                  placeholder="e.g. 2024049586, 2026062012"
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>
@@ -473,12 +797,13 @@ function AttendanceAndOvertimeReportPage() {
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="ALL">ALL</option>
+                  <option value="Present">Present</option>
                   <option value="Working">Working</option>
+                  <option value="Absent">Absent</option>
                   <option value="Resigned">Resigned</option>
                   <option value="Suspended">Suspended</option>
                 </select>
               </div>
-
             </div>
 
             {/* Search Trigger Button */}
@@ -544,59 +869,127 @@ function AttendanceAndOvertimeReportPage() {
 
             {/* Data Table */}
             <div className="overflow-x-auto rounded-xl border border-slate-200/80 dark:border-slate-800">
-              <table className="w-full text-[11px] text-left border-collapse min-w-[1200px]">
+              <table className="w-full text-xs text-left border-collapse min-w-[1600px]">
                 <thead>
                   <tr className="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-extrabold border-b border-slate-200 dark:border-slate-700">
-                    <th className="p-2.5 w-12 text-center">SL</th>
-                    <th className="p-2.5">ID</th>
-                    <th className="p-2.5">EmpId (Off.)</th>
-                    <th className="p-2.5 min-w-[160px]">Name</th>
-                    <th className="p-2.5">Department</th>
-                    <th className="p-2.5 text-center">Date</th>
-                    <th className="p-2.5 text-center">In Time</th>
-                    <th className="p-2.5 text-center">Out Date</th>
-                    <th className="p-2.5 text-center">Out Time</th>
-                    <th className="p-2.5 text-center">Over Time</th>
-                    <th className="p-2.5">Status</th>
+                    <th className="p-2.5 w-12 text-center whitespace-nowrap">SL</th>
+                    <th className="p-2.5 whitespace-nowrap">ID</th>
+                    <th className="p-2.5 min-w-[160px] whitespace-nowrap">Name</th>
+                    <th className="p-2.5 whitespace-nowrap">Type</th>
+                    <th className="p-2.5 whitespace-nowrap">Department</th>
+                    <th className="p-2.5 whitespace-nowrap">Designation</th>
+                    <th className="p-2.5 text-center whitespace-nowrap">Unit</th>
+                    <th className="p-2.5 text-center whitespace-nowrap">Date</th>
+                    <th className="p-2.5 text-center whitespace-nowrap">In Time</th>
+                    <th className="p-2.5 text-center whitespace-nowrap">Out Date</th>
+                    <th className="p-2.5 text-center whitespace-nowrap">Out Time</th>
+                    <th className="p-2.5 text-right whitespace-nowrap">OT Actual</th>
+                    <th className="p-2.5 text-right whitespace-nowrap">OT Request</th>
+                    <th className="p-2.5 text-right whitespace-nowrap">OT(+/-)</th>
+                    <th className="p-2.5 text-right whitespace-nowrap">OT Rate</th>
+                    <th className="p-2.5 text-right whitespace-nowrap">OT Amount</th>
+                    <th className="p-2.5 text-center whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
-                  {filteredData.length > 0 ? (
-                    filteredData.map((row, idx) => (
+                  {displayedData.length > 0 ? (
+                    displayedData.map((row) => (
                       <tr
-                        key={row.id}
+                        key={`${row.id}-${row.sl}`}
                         className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
                       >
-                        <td className="p-2.5 text-center font-bold text-slate-500">{idx + 1}</td>
-                        <td className="p-2.5 font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                        {/* 1. SL */}
+                        <td className="p-2.5 text-center font-bold text-slate-500 whitespace-nowrap">
+                          {row.sl}
+                        </td>
+
+                        {/* 2. ID */}
+                        <td className="p-2.5 font-mono font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
                           {row.id}
                         </td>
-                        <td className="p-2.5 font-mono font-bold text-slate-800 dark:text-slate-200">
-                          {row.empIdOffc}
-                        </td>
-                        <td className="p-2.5 font-bold text-slate-900 dark:text-white">
+
+                        {/* 3. Name */}
+                        <td className="p-2.5 font-bold text-slate-900 dark:text-white whitespace-nowrap">
                           {row.name}
                         </td>
-                        <td className="p-2.5 text-slate-800 dark:text-slate-200 font-semibold">
+
+                        {/* 4. Type */}
+                        <td className="p-2.5 text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                          {row.type}
+                        </td>
+
+                        {/* 5. Department */}
+                        <td className="p-2.5 font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap">
                           {row.department}
                         </td>
-                        <td className="p-2.5 text-slate-600 dark:text-slate-400 text-center">{row.date}</td>
-                        <td className="p-2.5 text-emerald-600 dark:text-emerald-400 font-bold text-center">
+
+                        {/* 6. Designation */}
+                        <td className="p-2.5 text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                          {row.designation}
+                        </td>
+
+                        {/* 7. Unit */}
+                        <td className="p-2.5 text-slate-600 dark:text-slate-400 text-center whitespace-nowrap">
+                          {row.unit}
+                        </td>
+
+                        {/* 8. Date */}
+                        <td className="p-2.5 text-slate-600 dark:text-slate-400 text-center whitespace-nowrap">
+                          {row.date}
+                        </td>
+
+                        {/* 9. In Time */}
+                        <td className="p-2.5 text-emerald-600 dark:text-emerald-400 font-bold text-center whitespace-nowrap">
                           {row.inTime}
                         </td>
-                        <td className="p-2.5 text-slate-600 dark:text-slate-400 text-center">{row.outDate}</td>
-                        <td className="p-2.5 text-amber-600 dark:text-amber-500 font-bold text-center">
-                          {row.outTime}
+
+                        {/* 10. Out Date */}
+                        <td className="p-2.5 text-slate-600 dark:text-slate-400 text-center whitespace-nowrap">
+                          {row.outDate}
                         </td>
-                        <td className="p-2.5 text-indigo-600 dark:text-indigo-500 font-bold text-center">
-                          {row.overTime}
+
+                        {/* 11. Out Time */}
+                        <td className="p-2.5 text-amber-600 dark:text-amber-500 font-bold text-center whitespace-nowrap">
+                          {row.outTime || "--:--:--"}
                         </td>
-                        <td className="p-2.5">
-                          <span className={"inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold " + (
-                            row.status === 'Working' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                            row.status === 'Absent' ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' :
-                            'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400'
-                          )}>
+
+                        {/* 12. OT Actual */}
+                        <td className="p-2.5 text-right font-mono font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
+                          {row.otActual}
+                        </td>
+
+                        {/* 13. OT Request */}
+                        <td className="p-2.5 text-right font-mono font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                          {row.otRequest}
+                        </td>
+
+                        {/* 14. OT(+/-) */}
+                        <td className="p-2.5 text-right font-mono font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">
+                          {row.otDiff}
+                        </td>
+
+                        {/* 15. OT Rate */}
+                        <td className="p-2.5 text-right font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                          {row.otRate}
+                        </td>
+
+                        {/* 16. OT Amount */}
+                        <td className="p-2.5 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                          {row.taka}
+                        </td>
+
+                        {/* 17. Status */}
+                        <td className="p-2.5 text-center whitespace-nowrap">
+                          <span
+                            className={
+                              "inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold " +
+                              (row.status === "Present" || row.status === "Working"
+                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                : row.status === "Absent"
+                                  ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
+                                  : "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400")
+                            }
+                          >
                             {row.status}
                           </span>
                         </td>
@@ -604,7 +997,10 @@ function AttendanceAndOvertimeReportPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={11} className="p-12 text-center text-slate-500 dark:text-slate-400 font-medium bg-slate-50/50 dark:bg-slate-800/30">
+                      <td
+                        colSpan={17}
+                        className="p-12 text-center text-slate-500 dark:text-slate-400 font-medium bg-slate-50/50 dark:bg-slate-800/30"
+                      >
                         No data available in table
                       </td>
                     </tr>
@@ -613,7 +1009,7 @@ function AttendanceAndOvertimeReportPage() {
               </table>
             </div>
           </div>
-          
+
           <div className="h-8"></div>
         </main>
       </div>
@@ -623,7 +1019,7 @@ function AttendanceAndOvertimeReportPage() {
         isOpen={isPdfModalOpen}
         onClose={() => setIsPdfModalOpen(false)}
         reportTitle="Attendance & Overtime"
-        data={filteredData}
+        data={displayedData}
         columns={pdfColumns}
         layout="landscape"
       />
