@@ -32,6 +32,7 @@ import {
   setStoredReceiveList,
   getStoredPurchaseOrders,
   getStoredMaterialReceipts,
+  syncReceiveListWithOrders,
 } from "@/lib/procurement-order-inventory-data";
 
 export const Route = createFileRoute("/procurement-material-receive-list")({
@@ -51,15 +52,20 @@ export const Route = createFileRoute("/procurement-material-receive-list")({
 export function MaterialReceiveListPage() {
   const navigate = useNavigate();
   const [receiveRecords, setReceiveRecords] = useState<MaterialReceiveListItem[]>(() =>
-    getStoredReceiveList()
+    syncReceiveListWithOrders()
   );
+
+  useEffect(() => {
+    const list = syncReceiveListWithOrders();
+    setReceiveRecords(list);
+  }, []);
 
   // Filters State
   const [selectedStore, setSelectedStore] = useState<string>("All Stores");
   const [selectedOrganization, setSelectedOrganization] = useState<string>("All Organizations");
   const [selectedDepartment, setSelectedDepartment] = useState<string>("All Departments");
   const [selectedSupplier, setSelectedSupplier] = useState<string>("All Suppliers");
-  const [selectedDocType, setSelectedDocType] = useState<string>("All");
+  const [selectedDocType, setSelectedDocType] = useState<string>("Purchase Order");
   const [poSearch, setPoSearch] = useState<string>("");
   const [orderDateFrom, setOrderDateFrom] = useState<string>("");
   const [orderDateTo, setOrderDateTo] = useState<string>("");
@@ -126,6 +132,13 @@ export function MaterialReceiveListPage() {
     return { pending: p, partial: part, complete: c };
   }, [receiveRecords]);
 
+  // Dynamic Available Stores (Warehouses & Work Locations)
+  const availableStores = useMemo(() => {
+    const warehouseNames = DEFAULT_WAREHOUSES.map((w) => w.storeName);
+    const recordStores = receiveRecords.map((r) => r.deliveryStore).filter(Boolean);
+    return Array.from(new Set([...warehouseNames, ...recordStores]));
+  }, [receiveRecords]);
+
   // Filtered Records
   const filteredList = useMemo(() => {
     return receiveRecords.filter((rec) => {
@@ -178,7 +191,7 @@ export function MaterialReceiveListPage() {
     setSelectedOrganization("All Organizations");
     setSelectedDepartment("All Departments");
     setSelectedSupplier("All Suppliers");
-    setSelectedDocType("All");
+    setSelectedDocType("Purchase Order");
     setPoSearch("");
     setOrderDateFrom("");
     setOrderDateTo("");
@@ -291,9 +304,9 @@ export function MaterialReceiveListPage() {
                   className="w-full px-3 py-2 bg-amber-500/5 border-2 border-amber-500/30 rounded-xl font-bold text-xs text-foreground outline-none focus:border-amber-500 cursor-pointer shadow-xs"
                 >
                   <option value="All Stores">All Delivery Stores / Warehouses</option>
-                  {DEFAULT_WAREHOUSES.map((wh) => (
-                    <option key={wh.id} value={wh.storeName}>
-                      {wh.storeName} ({wh.storeCode})
+                  {availableStores.map((st) => (
+                    <option key={st} value={st}>
+                      {st}
                     </option>
                   ))}
                 </select>
@@ -326,9 +339,8 @@ export function MaterialReceiveListPage() {
                 <select
                   value={selectedDocType}
                   onChange={(e) => setSelectedDocType(e.target.value)}
-                  className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium outline-none"
+                  className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium outline-none cursor-pointer"
                 >
-                  <option value="All">All Document Types</option>
                   <option value="Purchase Order">Purchase Order</option>
                   <option value="Work Order">Work Order</option>
                 </select>
@@ -438,8 +450,17 @@ export function MaterialReceiveListPage() {
                     <th className="py-3 px-3 font-bold">Document Type</th>
                     <th className="py-3 px-3 font-bold">Order Date</th>
                     <th className="py-3 px-3 font-bold">Supplier / Vendor</th>
-                    <th className="py-3 px-3 font-bold">Delivery Store</th>
-                    <th className="py-3 px-3 font-bold">Exp. Delivery</th>
+                    {selectedDocType === "Work Order" ? (
+                      <>
+                        <th className="py-3 px-3 font-bold">Work Location *</th>
+                        <th className="py-3 px-3 font-bold">Area</th>
+                      </>
+                    ) : (
+                      <th className="py-3 px-3 font-bold">Delivery Store</th>
+                    )}
+                    <th className="py-3 px-3 font-bold">
+                      {selectedDocType === "Work Order" ? "Exp. Service" : "Exp. Delivery"}
+                    </th>
                     <th className="py-3 px-3 text-right font-bold">Total Ordered</th>
                     <th className="py-3 px-3 text-right font-bold">Prev Received</th>
                     <th className="py-3 px-3 text-right font-bold">Pending Qty</th>
@@ -471,9 +492,20 @@ export function MaterialReceiveListPage() {
                       <td className="py-3 px-3 font-semibold text-foreground truncate max-w-[180px]">
                         {row.supplierName}
                       </td>
-                      <td className="py-3 px-3 text-muted-foreground truncate max-w-[200px]">
-                        {row.deliveryStore}
-                      </td>
+                      {selectedDocType === "Work Order" ? (
+                        <>
+                          <td className="py-3 px-3 font-medium text-foreground truncate max-w-[200px]">
+                            {row.workLocation || row.deliveryStore}
+                          </td>
+                          <td className="py-3 px-3 text-muted-foreground truncate max-w-[150px]">
+                            {row.area || "—"}
+                          </td>
+                        </>
+                      ) : (
+                        <td className="py-3 px-3 text-muted-foreground truncate max-w-[200px]">
+                          {row.deliveryStore}
+                        </td>
+                      )}
                       <td className="py-3 px-3 text-muted-foreground">
                         {row.expectedDeliveryDate}
                       </td>
@@ -532,7 +564,7 @@ export function MaterialReceiveListPage() {
                   ))}
                   {filteredList.length === 0 && (
                     <tr>
-                      <td colSpan={13} className="py-12 text-center text-muted-foreground">
+                      <td colSpan={selectedDocType === "Work Order" ? 14 : 13} className="py-12 text-center text-muted-foreground">
                         No orders currently in the &quot;{activeTab}&quot; receiving stage matching the selected store and filters.
                       </td>
                     </tr>
@@ -582,7 +614,7 @@ export function MaterialReceiveListPage() {
                 </div>
                 <div>
                   <span className="text-[10px] text-muted-foreground uppercase block font-bold">
-                    Delivery Warehouse
+                    {viewRecord.documentType === "Work Order" ? "Work Location / Store" : "Delivery Warehouse"}
                   </span>
                   <span className="font-semibold text-foreground">{viewRecord.deliveryStore}</span>
                 </div>

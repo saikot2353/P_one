@@ -20,6 +20,7 @@ export interface PurchaseOrderItemReport {
 export interface WorkOrderItemReport {
   serviceCode?: string;
   serviceName: string;
+  csNumber?: string;
   workDescription?: string;
   specification?: string;
   uom: string;
@@ -44,6 +45,8 @@ export interface PurchaseOrderReportData {
   paymentMode?: string;
   deliveryWarehouse?: string;
   workLocation?: string;
+  area?: string;
+  contractPerson?: string;
   prepareBy?: string;
   department?: string;
   currency?: string;
@@ -133,67 +136,123 @@ export function PurchaseOrderReportModal({
               </div>
             </div>
 
-            <div className="text-right text-xs space-y-0.5">
-              <div className="text-sm font-black text-indigo-700 font-mono">{order.orderNumber}</div>
-              <div className="text-slate-600">
-                Order Date: <strong className="text-slate-900">{order.orderDate}</strong>
+            {isPO && (
+              <div className="text-right text-xs space-y-0.5">
+                <div className="text-sm font-black text-indigo-700 font-mono">{order.orderNumber}</div>
+                <div className="text-slate-600">
+                  Order Date: <strong className="text-slate-900">{order.orderDate}</strong>
+                </div>
+                <div className="text-slate-600">
+                  Payment Terms: <strong className="text-slate-900">{order.paymentMode || "Credit"}</strong>
+                </div>
+                <div className="text-slate-600">
+                  Currency: <strong className="text-slate-900">{order.currency || "BDT"}</strong>
+                </div>
               </div>
-              <div className="text-slate-600">
-                Payment Terms: <strong className="text-slate-900">{order.paymentMode || "Credit"}</strong>
-              </div>
-              <div className="text-slate-600">
-                Currency: <strong className="text-slate-900">{order.currency || "BDT"}</strong>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Supplier & Delivery Location Grid */}
-          <div className="grid grid-cols-2 gap-4 border border-slate-200 rounded-xl p-4 bg-slate-50/60 text-xs">
-            <div className="space-y-1.5">
-              <div className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                Vendor / Supplier Information:
+          {isPO ? (
+            <div className="grid grid-cols-2 gap-4 border border-slate-200 rounded-xl p-4 bg-slate-50/60 text-xs">
+              <div className="space-y-1.5">
+                <div className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  Vendor / Supplier Information:
+                </div>
+                <div className="text-sm font-bold text-slate-900">{order.supplierName}</div>
+                {order.supplierAddress && (
+                  <div className="text-slate-600 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>{order.supplierAddress}</span>
+                  </div>
+                )}
+                {order.supplierContact && (
+                  <div className="text-slate-600 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>Contact: {order.supplierContact}</span>
+                  </div>
+                )}
+                {order.supplierMobile && (
+                  <div className="text-slate-600 flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>Mobile: {order.supplierMobile}</span>
+                  </div>
+                )}
               </div>
-              <div className="text-sm font-bold text-slate-900">{order.supplierName}</div>
-              {order.supplierAddress && (
-                <div className="text-slate-600 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>{order.supplierAddress}</span>
-                </div>
-              )}
-              {order.supplierContact && (
-                <div className="text-slate-600 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>Contact: {order.supplierContact}</span>
-                </div>
-              )}
-              {order.supplierMobile && (
-                <div className="text-slate-600 flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>Mobile: {order.supplierMobile}</span>
-                </div>
-              )}
-            </div>
 
-            <div className="space-y-1.5">
-              <div className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                Delivery & Issuance Details:
-              </div>
-              <div>
-                <span className="text-slate-500 font-medium">{isPO ? "Delivery Warehouse:" : "Work Site Location:"} </span>
-                <strong className="text-slate-900">
-                  {isPO ? (order.deliveryWarehouse || "Central Warehouse") : (order.workLocation || "Factory Site")}
-                </strong>
-              </div>
-              <div>
-                <span className="text-slate-500 font-medium">Department: </span>
-                <strong className="text-slate-900">{order.department || "Procurement & Commercial"}</strong>
-              </div>
-              <div>
-                <span className="text-slate-500 font-medium">Prepared By: </span>
-                <strong className="text-slate-900">{order.prepareBy || "Procurement Officer"}</strong>
+              <div className="space-y-1.5">
+                <div className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  Delivery & Issuance Details:
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Delivery Warehouse: </span>
+                  <strong className="text-slate-900">
+                    {order.deliveryWarehouse || "Central Warehouse"}
+                  </strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Department: </span>
+                  <strong className="text-slate-900">{order.department || "Procurement & Commercial"}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Prepared By: </span>
+                  <strong className="text-slate-900">{order.prepareBy || "Procurement Officer"}</strong>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border border-slate-200 rounded-xl p-4 bg-slate-50/60 text-xs">
+              {/* Column 1: Work Order No, Date, Supplier Name */}
+              <div className="space-y-1.5">
+                <div>
+                  <span className="text-slate-500 font-medium">Work Order No: </span>
+                  <strong className="text-slate-900 font-mono">{order.orderNumber}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Date: </span>
+                  <strong className="text-slate-900">{order.orderDate}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Supplier Name: </span>
+                  <strong className="text-slate-900">{order.supplierName}</strong>
+                </div>
+              </div>
+
+              {/* Column 2: Work Location, Area, Contract Person */}
+              <div className="space-y-1.5">
+                <div>
+                  <span className="text-slate-500 font-medium">Work Location: </span>
+                  <strong className="text-slate-900">
+                    {order.workLocation || "Pakiza Knit Composite Ltd"}
+                  </strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Area: </span>
+                  <strong className="text-slate-900">
+                    {order.area || "—"}
+                  </strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Contract Person: </span>
+                  <strong className="text-slate-900">
+                    {order.contractPerson || "—"}
+                  </strong>
+                </div>
+              </div>
+
+              {/* Column 3: Department, Prepared By */}
+              <div className="space-y-1.5">
+                <div>
+                  <span className="text-slate-500 font-medium">Department: </span>
+                  <strong className="text-slate-900">{order.department || "Procurement & Commercial"}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Prepared By: </span>
+                  <strong className="text-slate-900">{order.prepareBy || "Procurement Officer"}</strong>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Line Items Table: Unit Price -> Discount -> VAT -> Tax -> Line Total */}
           <div className="overflow-x-auto border border-slate-300 rounded-lg">

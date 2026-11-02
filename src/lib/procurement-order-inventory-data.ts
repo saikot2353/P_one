@@ -62,6 +62,7 @@ export interface WOServiceItem {
   serviceStartDate: string;
   serviceEndDate: string;
   remarks?: string;
+  csNumber?: string;
 }
 
 export interface OrderAttachment {
@@ -111,9 +112,11 @@ export interface PurchaseOrder {
   contactNumber?: string;
   supplierEmail?: string;
   // Delivery or Service Info
-  deliveryWarehouse: string; // For PO
+  deliveryWarehouse?: string; // For PO
   deliveryDate?: string;
   workLocation?: string; // For WO
+  area?: string; // For WO
+  contractPerson?: string; // For WO
   transportMethod?: string;
   paymentMode?: string;
   poValidDate?: string;
@@ -491,6 +494,7 @@ export const DEFAULT_PURCHASE_ORDERS: PurchaseOrder[] = [
     id: "wo-2026-001",
     orderNumber: "WO-2026-0001",
     documentType: "Work Order",
+    creationMethod: "Purchase Requisition",
     orderDate: "2026-09-23",
     prepareBy: "Tahmid Afsar Shapno",
     department: "Information Technology",
@@ -507,12 +511,15 @@ export const DEFAULT_PURCHASE_ORDERS: PurchaseOrder[] = [
     contactNumber: "01812334455",
     supplierEmail: "arif@bengalinfo.com",
     deliveryWarehouse: "Pakiza Technovation Central IT & Hardware Depot",
-    workLocation: "Annex Building Server Room & 3rd Floor IT Bay",
+    workLocation: "Pakiza Knit Composite Ltd",
+    area: "PAL-Fabric Dyeing",
+    contractPerson: "Tahmid Afsar Shapno (+880 1750-021154)",
     currency: "BDT",
     subtotal: 165000,
     discountTotal: 5000,
     vatTotal: 12000,
-    grandTotal: 172000,
+    taxTotal: 4950,
+    grandTotal: 176950,
     termsAndConditions: "1. Scope of work must be executed strictly following IEEE safety and cabling standards.\n2. Vendor technician must provide testing and OTDR calibration report.\n3. 100% payment upon sign-off by Head of IT.",
     attachments: [],
     orderStatus: "Approved",
@@ -539,6 +546,59 @@ export const DEFAULT_PURCHASE_ORDERS: PurchaseOrder[] = [
       },
     ],
     remarks: "Campus fiber optic cable termination and network rack structured cabling.",
+  },
+  {
+    id: "wo-2026-002",
+    orderNumber: "WO-2026-0002",
+    documentType: "Work Order",
+    creationMethod: "Direct Purchase Order / Work Order",
+    orderDate: "2026-09-29",
+    prepareBy: "Tahmid Afsar Shapno",
+    department: "Engineering & Maintenance",
+    prIds: [],
+    supplierId: "sup-bengal-02",
+    supplierName: "Bengal Information Systems",
+    supplierCode: "SUP-002",
+    contactPerson: "Arif Chowdhury",
+    designation: "Key Accounts Lead",
+    contactNumber: "01812334455",
+    supplierEmail: "arif@bengalinfo.com",
+    workLocation: "Pakiza Knit Composite Ltd",
+    area: "PAL-Fabric Dyeing",
+    contractPerson: "Tahmid Afsar Shapno (+880 1750-021154)",
+    deliveryDate: "2026-10-15",
+    currency: "BDT",
+    exchangeRate: 1.0,
+    paymentMode: "Credit 30 Days",
+    poValidDate: "2026-11-15",
+    subtotal: 185000,
+    discountTotal: 5000,
+    vatTotal: 9000,
+    taxTotal: 3600,
+    grandTotal: 192600,
+    termsAndConditions: "1. Scope of work must be executed strictly following industrial safety standards.\n2. Vendor technician must provide testing and calibration report upon completion.\n3. 100% payment upon sign-off by Maintenance Head.",
+    attachments: [
+      {
+        id: "att-wo-1",
+        documentType: "Work Specification & BOQ",
+        documentName: "Technical Scope of Work - Valve Calibration.pdf",
+        fileName: "Technical_Scope_Valve_Calibration.pdf",
+        fileSize: "1.4 MB",
+      },
+    ],
+    orderStatus: "Submitted",
+    currentApprovalLevel: 1,
+    approvalHistory: [
+      {
+        level: 1,
+        approver: "Tahmid Afsar Shapno",
+        designation: "Engineering Officer",
+        action: "Submitted",
+        dateTime: "2026-09-29 10:15 AM",
+        remarks: "Submitted for authorization: emergency pipeline overhaul and valve calibration.",
+      },
+    ],
+    remarks: "Emergency pipeline overhaul and valve calibration in dyeing plant.",
   },
   {
     id: "po-2026-003",
@@ -791,6 +851,44 @@ export const DEFAULT_WO_ITEMS: Record<string, WOServiceItem[]> = {
       remarks: "Materials provided by client, labor and testing under vendor scope.",
     },
   ],
+  "WO-2026-0002": [
+    {
+      id: "woi-201",
+      sl: 1,
+      serviceName: "High Pressure Steam Line Valve Calibration",
+      serviceCode: "SRV-MNT-01",
+      workDescription: "Calibration, leak testing, and sealing of high-pressure safety steam valves.",
+      specification: "Pressure rating up to 16 bar, certified calibration sticker and certificate.",
+      uom: "Unit",
+      estimatedQuantity: 6,
+      workOrderQuantity: 6,
+      unitRate: 15000,
+      vatRate: 5,
+      taxRate: 2,
+      lineTotal: 90000,
+      serviceStartDate: "2026-10-01",
+      serviceEndDate: "2026-10-05",
+      remarks: "Includes high-temp gaskets and calibration certificates.",
+    },
+    {
+      id: "woi-202",
+      sl: 2,
+      serviceName: "Industrial Dyeing Machine Pipeline Overhaul",
+      serviceCode: "SRV-MNT-02",
+      workDescription: "Disassembly, chemical descaling, and high-temperature gasket replacement for 2 dyeing vessels.",
+      specification: "Food-grade PTFE gaskets, ultrasonic leak testing.",
+      uom: "Job",
+      estimatedQuantity: 2,
+      workOrderQuantity: 2,
+      unitRate: 47500,
+      vatRate: 5,
+      taxRate: 2,
+      lineTotal: 95000,
+      serviceStartDate: "2026-10-02",
+      serviceEndDate: "2026-10-08",
+      remarks: "Includes ultrasonic testing reports.",
+    },
+  ],
 };
 
 // -------------------------------------------------------------
@@ -805,6 +903,8 @@ export interface MaterialReceiveListItem {
   orderDate: string;
   supplierName: string;
   deliveryStore: string;
+  workLocation?: string;
+  area?: string;
   expectedDeliveryDate: string;
   totalOrderedQty: number;
   previouslyReceivedQty: number;
@@ -854,6 +954,22 @@ export const DEFAULT_RECEIVE_LIST: MaterialReceiveListItem[] = [
     previouslyReceivedQty: 50,
     pendingQty: 0,
     receiveStatus: "Complete",
+  },
+  {
+    id: "rec-4",
+    sl: 4,
+    poNumber: "WO-2026-0001",
+    documentType: "Work Order",
+    orderDate: "2026-09-23",
+    supplierName: "Bengal Information Systems",
+    deliveryStore: "Pakiza Technovation Central IT & Hardware Depot",
+    workLocation: "Pakiza Knit Composite Ltd",
+    area: "PAL-Fabric Dyeing",
+    expectedDeliveryDate: "2026-10-02",
+    totalOrderedQty: 69,
+    previouslyReceivedQty: 0,
+    pendingQty: 69,
+    receiveStatus: "Pending",
   },
 ];
 
@@ -1337,8 +1453,113 @@ export function setStoredMaterialReceipts(receipts: MaterialReceive[]): void {
   setStoredData(STORAGE_KEYS.MATERIAL_RECEIPTS, receipts);
 }
 
+export function syncReceiveListWithOrders(): MaterialReceiveListItem[] {
+  const existingList = getStoredData(STORAGE_KEYS.RECEIVE_LIST, DEFAULT_RECEIVE_LIST) as MaterialReceiveListItem[];
+  const allOrders = getStoredPurchaseOrders();
+  const allReceipts = getStoredMaterialReceipts();
+  const poItemsMap = getStoredPoItems();
+  const woItemsMap = getStoredWoItems();
+
+  const approvedOrders = allOrders.filter(
+    (o) => o.orderStatus === "Approved" || o.orderStatus === "Closed"
+  );
+
+  let updatedList = [...existingList];
+
+  approvedOrders.forEach((ord) => {
+    // 1. Calculate total ordered quantity
+    let totalOrderedQty = 0;
+    if (ord.documentType === "Purchase Order") {
+      const items = poItemsMap[ord.orderNumber] || ord.items || [];
+      totalOrderedQty = items.reduce((sum, it) => {
+        const factor = it.conversionFactor && it.conversionFactor > 0 ? it.conversionFactor : 1;
+        return sum + Math.round((it.orderedQuantity || 0) * factor);
+      }, 0);
+    } else {
+      const woItems = woItemsMap[ord.orderNumber] || ord.woItems || [];
+      totalOrderedQty = woItems.reduce((sum, it) => {
+        return sum + (it.workOrderQuantity || it.estimatedQuantity || 0);
+      }, 0);
+    }
+
+    if (totalOrderedQty === 0) {
+      totalOrderedQty = 1;
+    }
+
+    // 2. Calculate previously received quantity from all material receipts against this PO/WO
+    const matchingReceipts = allReceipts.filter((r) => r.poNumber === ord.orderNumber);
+    const previouslyReceivedQty = matchingReceipts.reduce((sum, r) => {
+      if (typeof r.totalReceivedQty === "number") return sum + r.totalReceivedQty;
+      if (r.items && Array.isArray(r.items)) {
+        return sum + r.items.reduce((iSum, i) => iSum + (Number(i.currentReceiveQty) || 0), 0);
+      }
+      return sum;
+    }, 0);
+
+    const pendingQty = Math.max(0, totalOrderedQty - previouslyReceivedQty);
+    const receiveStatus: "Pending" | "Partial" | "Complete" =
+      pendingQty === 0 && previouslyReceivedQty > 0
+        ? "Complete"
+        : previouslyReceivedQty > 0
+        ? "Partial"
+        : "Pending";
+
+    const existingIdx = updatedList.findIndex((r) => r.poNumber === ord.orderNumber);
+    const deliveryStore = ord.deliveryWarehouse || ord.workLocation || "PKCL Central Raw Material Warehouse";
+    const workLocation = ord.workLocation || (ord.documentType === "Work Order" ? "Pakiza Knit Composite Ltd" : undefined);
+    const area = ord.area || (ord.documentType === "Work Order" ? "PAL-Fabric Dyeing" : undefined);
+
+    if (existingIdx >= 0) {
+      const targetOrdered = updatedList[existingIdx].totalOrderedQty || totalOrderedQty;
+      const targetPending = Math.max(0, targetOrdered - previouslyReceivedQty);
+      const targetStatus: "Pending" | "Partial" | "Complete" =
+        targetPending === 0 && previouslyReceivedQty > 0
+          ? "Complete"
+          : previouslyReceivedQty > 0
+          ? "Partial"
+          : "Pending";
+
+      updatedList[existingIdx] = {
+        ...updatedList[existingIdx],
+        documentType: ord.documentType,
+        orderDate: ord.orderDate,
+        supplierName: ord.supplierName,
+        deliveryStore: updatedList[existingIdx].deliveryStore || deliveryStore,
+        workLocation: updatedList[existingIdx].workLocation || workLocation,
+        area: updatedList[existingIdx].area || area,
+        expectedDeliveryDate: ord.deliveryDate || updatedList[existingIdx].expectedDeliveryDate,
+        totalOrderedQty: targetOrdered,
+        previouslyReceivedQty,
+        pendingQty: targetPending,
+        receiveStatus: targetStatus,
+      };
+    } else {
+      updatedList.push({
+        id: `rec-${ord.orderNumber.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
+        sl: updatedList.length + 1,
+        poNumber: ord.orderNumber,
+        documentType: ord.documentType,
+        orderDate: ord.orderDate,
+        supplierName: ord.supplierName,
+        deliveryStore,
+        workLocation,
+        area,
+        expectedDeliveryDate: ord.deliveryDate || ord.orderDate,
+        totalOrderedQty,
+        previouslyReceivedQty,
+        pendingQty,
+        receiveStatus,
+      });
+    }
+  });
+
+  updatedList = updatedList.map((item, idx) => ({ ...item, sl: idx + 1 }));
+  setStoredData(STORAGE_KEYS.RECEIVE_LIST, updatedList);
+  return updatedList;
+}
+
 export function getStoredReceiveList(): MaterialReceiveListItem[] {
-  return getStoredData(STORAGE_KEYS.RECEIVE_LIST, DEFAULT_RECEIVE_LIST);
+  return syncReceiveListWithOrders();
 }
 
 export function setStoredReceiveList(list: MaterialReceiveListItem[]): void {
