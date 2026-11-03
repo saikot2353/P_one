@@ -3442,7 +3442,15 @@ function ZakatAndFinancialAidPage() {
                         </label>
                         <select
                           value={recCadence}
-                          onChange={(e) => setRecCadence(e.target.value as DisbursementCadence)}
+                          onChange={(e) => {
+                            const val = e.target.value as DisbursementCadence;
+                            setRecCadence(val);
+                            if (val === "Annual Lump Sum") {
+                              setRecDurationMonths("1");
+                            } else if (recDurationMonths === "1" || recDurationMonths === "5" || recDurationMonths === "10") {
+                              setRecDurationMonths("12");
+                            }
+                          }}
                           className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
                         >
                           <option value="Monthly">Monthly</option>
@@ -3452,36 +3460,66 @@ function ZakatAndFinancialAidPage() {
                         </select>
                       </div>
 
-                      <div>
-                        <label className="text-xs font-semibold text-slate-700 block mb-1">
-                          Disbursement Day
-                        </label>
-                        <select
-                          value={recDisbursementDay}
-                          onChange={(e) => setRecDisbursementDay(e.target.value)}
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
-                        >
-                          <option value="1">1st of Month</option>
-                          <option value="5">5th of Month</option>
-                          <option value="10">10th of Month</option>
-                          <option value="15">15th of Month</option>
-                        </select>
-                      </div>
+                      {recCadence === "Annual Lump Sum" ? (
+                        <div>
+                          <label className="text-xs font-semibold text-slate-700 block mb-1">
+                            Disbursement Date
+                          </label>
+                          <input
+                            type="date"
+                            value={recStartDate}
+                            onChange={(e) => {
+                              setRecStartDate(e.target.value);
+                              setRecDisbursementDay(e.target.value);
+                            }}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <label className="text-xs font-semibold text-slate-700 block mb-1">
+                            Disbursement Day
+                          </label>
+                          <select
+                            value={recDisbursementDay}
+                            onChange={(e) => setRecDisbursementDay(e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                          >
+                            <option value="1">1st of Month</option>
+                            <option value="5">5th of Month</option>
+                            <option value="10">10th of Month</option>
+                            <option value="15">15th of Month</option>
+                          </select>
+                        </div>
+                      )}
 
                       <div>
                         <label className="text-xs font-semibold text-slate-700 block mb-1">
                           Duration
                         </label>
-                        <select
-                          value={recDurationMonths}
-                          onChange={(e) => setRecDurationMonths(e.target.value)}
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
-                        >
-                          <option value="6">6 Months</option>
-                          <option value="12">12 Months (1 Year)</option>
-                          <option value="24">24 Months (2 Years)</option>
-                          <option value="0">Indefinite</option>
-                        </select>
+                        {recCadence === "Annual Lump Sum" ? (
+                          <select
+                            value={recDurationMonths === "12" ? "1" : recDurationMonths}
+                            onChange={(e) => setRecDurationMonths(e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                          >
+                            <option value="1">1 year</option>
+                            <option value="5">5 year</option>
+                            <option value="10">10 year</option>
+                            <option value="0">Indefinite</option>
+                          </select>
+                        ) : (
+                          <select
+                            value={recDurationMonths === "1" ? "12" : recDurationMonths}
+                            onChange={(e) => setRecDurationMonths(e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                          >
+                            <option value="6">6 Months</option>
+                            <option value="12">12 Months (1 Year)</option>
+                            <option value="24">24 Months (2 Years)</option>
+                            <option value="0">Indefinite</option>
+                          </select>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -3780,14 +3818,23 @@ function ZakatAndFinancialAidPage() {
                     <div>
                       <span className="text-slate-400 text-[11px] block">Duration</span>
                       <span className="font-bold text-slate-800">
-                        {recDurationMonths === "0" ? "Indefinite" : `${recDurationMonths} Mos`}
+                        {recDurationMonths === "0"
+                          ? "Indefinite"
+                          : recCadence === "Annual Lump Sum"
+                            ? `${recDurationMonths === "12" ? "1" : recDurationMonths} Year${recDurationMonths === "1" || recDurationMonths === "12" ? "" : "s"}`
+                            : `${recDurationMonths} Mos`}
                       </span>
                     </div>
 
                     <div>
                       <span className="text-slate-400 text-[11px] block">Total Commitment</span>
                       <span className="font-bold font-mono text-emerald-700 text-sm">
-                        ৳{((parseFloat(recMonthlyAmount) || 0) * (parseInt(recDurationMonths) || 12)).toLocaleString()}
+                        ৳{(
+                          (parseFloat(recMonthlyAmount) || 0) *
+                          (recCadence === "Annual Lump Sum"
+                            ? (recDurationMonths === "0" ? 1 : (parseInt(recDurationMonths === "12" ? "1" : recDurationMonths) || 1))
+                            : (recDurationMonths === "0" ? 1 : (parseInt(recDurationMonths) || 12)))
+                        ).toLocaleString()}
                       </span>
                     </div>
 
@@ -3812,7 +3859,12 @@ function ZakatAndFinancialAidPage() {
                 <div className="text-xs font-semibold text-slate-600">
                   Total Grant:{" "}
                   <span className="font-mono font-bold text-sm text-slate-900 ml-1">
-                    ৳{((parseFloat(recMonthlyAmount) || 0) * (parseInt(recDurationMonths) || 12)).toLocaleString()}
+                    ৳{(
+                      (parseFloat(recMonthlyAmount) || 0) *
+                      (recCadence === "Annual Lump Sum"
+                        ? (recDurationMonths === "0" ? 1 : (parseInt(recDurationMonths === "12" ? "1" : recDurationMonths) || 1))
+                        : (recDurationMonths === "0" ? 1 : (parseInt(recDurationMonths) || 12)))
+                    ).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center gap-2.5">
