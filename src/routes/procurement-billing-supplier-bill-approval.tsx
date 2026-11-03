@@ -379,6 +379,25 @@ export function SupplierBillApprovalPage() {
 
                 <div>
                   <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                    Bill Type
+                  </label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={
+                      selectedBill.billType ||
+                      (selectedBill.poNumber?.startsWith("WO-")
+                        ? "Bill against WO"
+                        : selectedBill.poNumber && selectedBill.poNumber !== "DIRECT-SERVICE"
+                        ? "Bill against PO"
+                        : "Service Bill Entry")
+                    }
+                    className="w-full px-3 py-2 font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-amber-600 truncate"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                     Bill Date
                   </label>
                   <input
@@ -389,17 +408,19 @@ export function SupplierBillApprovalPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-                    Purchase Order / Work Order
-                  </label>
-                  <input
-                    type="text"
-                    readOnly
-                    value={`${selectedBill.poNumber} (${currentPo.orderDate || ""})`}
-                    className="w-full px-3 py-2 font-mono font-semibold bg-muted/50 border border-border rounded-lg cursor-not-allowed"
-                  />
-                </div>
+                {selectedBill.billType !== "Service Bill Entry" && (
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                      Purchase Order / Work Order
+                    </label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={`${selectedBill.poNumber} (${currentPo?.orderDate || selectedBill.poDate || ""})`}
+                      className="w-full px-3 py-2 font-mono font-semibold bg-muted/50 border border-border rounded-lg cursor-not-allowed truncate"
+                    />
+                  </div>
+                )}
 
                 <div>
                   <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
@@ -463,33 +484,37 @@ export function SupplierBillApprovalPage() {
               </div>
 
               {/* MRR Reference Section */}
-              <div className="bg-muted/20 p-4 rounded-xl border border-border space-y-3">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
-                    Linked Material Receive Report (MRR) References
-                  </h3>
-                </div>
+              {selectedBill.billType !== "Service Bill Entry" && (
+                <div className="bg-muted/20 p-4 rounded-xl border border-border space-y-3">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
+                      Linked Material Receive Report (MRR) References
+                    </h3>
+                  </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {(selectedBill.mrrNumbers || []).map((mrrNo) => (
-                    <span
-                      key={mrrNo}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 font-mono font-bold text-xs"
-                    >
-                      {mrrNo}
-                    </span>
-                  ))}
+                  <div className="flex flex-wrap gap-2">
+                    {(selectedBill.mrrNumbers || []).map((mrrNo) => (
+                      <span
+                        key={mrrNo}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 font-mono font-bold text-xs"
+                      >
+                        {mrrNo}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">
+                    PO Reference: <span className="font-bold text-foreground">{selectedBill.poNumber}</span> • Supplier: <span className="font-bold text-foreground">{selectedBill.supplierName}</span>
+                  </div>
                 </div>
-                <div className="text-[11px] text-muted-foreground">
-                  PO Reference: <span className="font-bold text-foreground">{selectedBill.poNumber}</span> • Supplier: <span className="font-bold text-foreground">{selectedBill.supplierName}</span>
-                </div>
-              </div>
+              )}
 
-              {/* Bill Item Details from MRR */}
+              {/* Bill Item Details */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
-                    Bill Item Details (MRR Verified Quantities)
+                    {selectedBill.billType === "Service Bill Entry"
+                      ? "Bill Item Details (Direct Service Items)"
+                      : "Bill Item Details (MRR Verified Quantities)"}
                   </h3>
                 </div>
 
@@ -498,15 +523,25 @@ export function SupplierBillApprovalPage() {
                     <thead>
                       <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border">
                         <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
-                        <th className="py-2.5 px-3 font-bold">Item & Specification</th>
-                        <th className="py-2.5 px-3 font-bold">Brand / Origin</th>
-                        <th className="py-2.5 px-3 w-16 font-bold">UOM</th>
-                        <th className="py-2.5 px-3 text-right font-bold">MRR Rec. Qty</th>
-                        <th className="py-2.5 px-3 text-right font-bold">Prev Billed</th>
-                        <th className="py-2.5 px-3 text-right font-bold w-28 text-amber-600">
-                          Current Bill Qty
+                        <th className="py-2.5 px-3 font-bold">
+                          {selectedBill.billType === "Service Bill Entry" ? "Service Item & Scope" : "Item & Specification"}
                         </th>
-                        <th className="py-2.5 px-3 text-right font-bold">Unit Price (৳)</th>
+                        <th className="py-2.5 px-3 font-bold">
+                          {selectedBill.billType === "Service Bill Entry" ? "Category / Group" : "Brand / Origin"}
+                        </th>
+                        <th className="py-2.5 px-3 w-16 font-bold">UOM</th>
+                        {selectedBill.billType !== "Service Bill Entry" && (
+                          <>
+                            <th className="py-2.5 px-3 text-right font-bold">MRR Rec. Qty</th>
+                            <th className="py-2.5 px-3 text-right font-bold">Prev Billed</th>
+                          </>
+                        )}
+                        <th className="py-2.5 px-3 text-right font-bold w-28 text-amber-600">
+                          {selectedBill.billType === "Service Bill Entry" ? "Bill Qty" : "Current Bill Qty"}
+                        </th>
+                        <th className="py-2.5 px-3 text-right font-bold">
+                          {selectedBill.billType === "Service Bill Entry" ? "Unit Rate (৳)" : "Unit Price (৳)"}
+                        </th>
                         <th className="py-2.5 px-3 text-right font-bold">Discount (৳)</th>
                         <th className="py-2.5 px-3 text-right font-bold">VAT</th>
                         <th className="py-2.5 px-3 text-right font-bold text-amber-600">Tax</th>
@@ -531,12 +566,16 @@ export function SupplierBillApprovalPage() {
                           <td className="py-2.5 px-3 text-muted-foreground font-semibold">
                             {item.uom}
                           </td>
-                          <td className="py-2.5 px-3 text-right font-mono font-bold text-foreground">
-                            {item.mrrReceivedQty}
-                          </td>
-                          <td className="py-2.5 px-3 text-right font-mono text-muted-foreground">
-                            {item.previouslyBilledQty}
-                          </td>
+                          {selectedBill.billType !== "Service Bill Entry" && (
+                            <>
+                              <td className="py-2.5 px-3 text-right font-mono font-bold text-foreground">
+                                {item.mrrReceivedQty}
+                              </td>
+                              <td className="py-2.5 px-3 text-right font-mono text-muted-foreground">
+                                {item.previouslyBilledQty}
+                              </td>
+                            </>
+                          )}
                           <td className="py-2.5 px-3 text-right font-mono font-bold text-amber-600 text-xs">
                             {item.currentBillQty}
                           </td>

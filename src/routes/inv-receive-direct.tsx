@@ -43,7 +43,9 @@ import {
   setStoredMaterialReceipts,
   getStoredDirectMRRs,
   DirectMRRRecord,
+  ItemWarrantyDetail,
 } from "@/lib/procurement-order-inventory-data";
+import { getActiveWarrantyTypes } from "@/lib/warranty-types-data";
 import { getItemTrackingMode } from "@/lib/item-tracking-utils";
 import {
   LocationAllocationModal,
@@ -93,6 +95,7 @@ interface DirectMRRRow {
   acceptedQuantity: number;
   rejectedQuantity: number;
   remarks?: string;
+  warranties?: ItemWarrantyDetail[];
 }
 
 export function DirectMRRPage() {
@@ -214,6 +217,15 @@ export function DirectMRRPage() {
       acceptedQuantity: 2,
       rejectedQuantity: 0,
       remarks: "Replacement unit for Head Office",
+      warranties: [
+        {
+          id: "warr-dm-1",
+          warrantyType: "Standard Manufacturer Warranty",
+          startDate: "2026-09-01",
+          endDate: "2029-08-31",
+          remarks: "3-Year ProSupport Plus on-site next business day warranty",
+        },
+      ],
     },
   ]);
 
@@ -229,6 +241,94 @@ export function DirectMRRPage() {
 
   const handleOpenBatchModal = (item: DirectMRRRow) => {
     setActiveBatchItemId(item.id);
+  };
+
+  // ── Warranty Details State & Handlers ───────────────────────────
+  const [activeWarrantyItemId, setActiveWarrantyItemId] = useState<string | null>(null);
+  const [isAddingWarranty, setIsAddingWarranty] = useState(false);
+  const [warrSearch, setWarrSearch] = useState("");
+  const [warrTypeSelectOpen, setWarrTypeSelectOpen] = useState(false);
+  const [newWarrantyType, setNewWarrantyType] = useState("");
+  const [newWarrantyStartDate, setNewWarrantyStartDate] = useState(new Date().toISOString().slice(0, 10));
+  const [newWarrantyEndDate, setNewWarrantyEndDate] = useState(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().slice(0, 10);
+  });
+  const [newWarrantyRemarks, setNewWarrantyRemarks] = useState("");
+
+  const activeWarrantyItem = useMemo(
+    () => items.find((i) => i.id === activeWarrantyItemId),
+    [items, activeWarrantyItemId]
+  );
+
+  const activeWarrantyTypes = useMemo(() => getActiveWarrantyTypes(), [activeWarrantyItemId]);
+
+  const handleOpenWarrantyModal = (itemId: string) => {
+    setActiveWarrantyItemId(itemId);
+    setIsAddingWarranty(false);
+    setWarrSearch("");
+    setWarrTypeSelectOpen(false);
+    const activeTypes = getActiveWarrantyTypes();
+    setNewWarrantyType(activeTypes[0]?.warrantyType || "Standard Manufacturer Warranty");
+    setNewWarrantyStartDate(mrrDate || new Date().toISOString().slice(0, 10));
+    const d = new Date(mrrDate || Date.now());
+    d.setFullYear(d.getFullYear() + 1);
+    setNewWarrantyEndDate(d.toISOString().slice(0, 10));
+    setNewWarrantyRemarks("");
+  };
+
+  const handleSaveWarrantyEntry = () => {
+    if (!activeWarrantyItemId) return;
+    if (!newWarrantyType.trim()) {
+      toast.error("Please select a Warranty Type.");
+      return;
+    }
+    if (!newWarrantyStartDate || !newWarrantyEndDate) {
+      toast.error("Please specify both Start Date and End Date.");
+      return;
+    }
+
+    const newEntry: ItemWarrantyDetail = {
+      id: `warr-${Date.now()}`,
+      warrantyType: newWarrantyType.trim(),
+      startDate: newWarrantyStartDate,
+      endDate: newWarrantyEndDate,
+      remarks: newWarrantyRemarks.trim(),
+    };
+
+    setItems((prev) =>
+      prev.map((i) => {
+        if (i.id === activeWarrantyItemId) {
+          const currentWarrs = i.warranties || [];
+          return {
+            ...i,
+            warranties: [...currentWarrs, newEntry],
+          };
+        }
+        return i;
+      })
+    );
+
+    setIsAddingWarranty(false);
+    setNewWarrantyRemarks("");
+    toast.success(`Warranty "${newEntry.warrantyType}" added.`);
+  };
+
+  const handleDeleteWarrantyEntry = (warrantyId: string) => {
+    if (!activeWarrantyItemId) return;
+    setItems((prev) =>
+      prev.map((i) => {
+        if (i.id === activeWarrantyItemId) {
+          return {
+            ...i,
+            warranties: (i.warranties || []).filter((w) => w.id !== warrantyId),
+          };
+        }
+        return i;
+      })
+    );
+    toast.info("Warranty entry removed.");
   };
 
   // Filter Catalog Items for Search Modal (Large modal, No price column)
@@ -499,6 +599,7 @@ export function DirectMRRPage() {
         acceptedQty: i.acceptedQuantity,
         rejectedQty: i.rejectedQuantity,
         remarks: i.remarks,
+        warranties: i.warranties,
       })),
     };
 
@@ -739,6 +840,7 @@ export function DirectMRRPage() {
                     <th className="py-2.5 px-3 min-w-[200px] font-bold">Item Description & Spec*</th>
                     <th className="py-2.5 px-3 font-bold w-24">Brand / Origin</th>
                     <th className="py-2.5 px-3 w-16 font-bold text-center">UOM</th>
+                    <th className="py-2.5 px-2 text-center font-bold w-20">Warranty</th>
                     <th className="py-2.5 px-3 text-right font-bold w-24 text-primary">
                       Receive Qty*
                     </th>
@@ -772,6 +874,21 @@ export function DirectMRRPage() {
                         </td>
                         <td className="py-2.5 px-3 text-center font-semibold text-muted-foreground">
                           {item.uom}
+                        </td>
+                        {/* Warranty Column */}
+                        <td className="py-2.5 px-2 text-center">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenWarrantyModal(item.id)}
+                            className={`inline-flex items-center justify-center size-7 rounded-lg text-xs font-black transition-all cursor-pointer border ${
+                              item.warranties && item.warranties.length > 0
+                                ? "bg-amber-500 text-white border-amber-600 shadow-xs hover:bg-amber-600"
+                                : "bg-muted/70 hover:bg-amber-500/10 hover:text-amber-600 hover:border-amber-500/40 text-muted-foreground border-border"
+                            }`}
+                            title={`Warranty Details (${item.warranties?.length || 0} registered)`}
+                          >
+                            W
+                          </button>
                         </td>
                         <td className="py-2.5 px-3 text-right">
                           <input
@@ -853,7 +970,7 @@ export function DirectMRRPage() {
                   })}
                   {items.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="py-8 text-center text-muted-foreground">
+                      <td colSpan={13} className="py-8 text-center text-muted-foreground">
                         No items added yet. Click &quot;Search & Add Item&quot; to begin.
                       </td>
                     </tr>
@@ -1164,6 +1281,297 @@ export function DirectMRRPage() {
         onClose={() => setPreviewReportOpen(false)}
         data={previewReportData}
       />
+
+      {/* ── Warranty Details Modal ─────────────────────────────── */}
+      {activeWarrantyItemId && activeWarrantyItem && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-card w-full max-w-3xl rounded-2xl border border-border shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-border bg-muted/40 flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+                  <ShieldCheck className="size-4 text-amber-500" />
+                  <span>Warranty Details</span>
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Item: <span className="font-bold text-foreground">{activeWarrantyItem.itemName}</span> &bull; Code: <span className="font-mono text-foreground">{activeWarrantyItem.itemCode}</span> &bull; UOM: {activeWarrantyItem.uom}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveWarrantyItemId(null);
+                  setIsAddingWarranty(false);
+                }}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-5 overflow-y-auto">
+              {/* Header bar with Add button */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
+                    Configured Warranties ({(activeWarrantyItem.warranties || []).length})
+                  </h4>
+                  <p className="text-[11px] text-muted-foreground">
+                    Multiple warranty policies and coverage periods can be registered for this item.
+                  </p>
+                </div>
+
+                {!isViewMode && !isAddingWarranty && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddingWarranty(true);
+                      setWarrSearch("");
+                      const activeTypes = getActiveWarrantyTypes();
+                      if (activeTypes[0]) setNewWarrantyType(activeTypes[0].warrantyType);
+                    }}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition-all cursor-pointer"
+                  >
+                    <Plus className="size-3.5" /> Add
+                  </button>
+                )}
+              </div>
+
+              {/* Add Warranty Form with Searchable Warranty Type dropdown */}
+              {isAddingWarranty && (
+                <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-500/5 space-y-4 animate-in fade-in">
+                  <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                    <span className="text-[11px] font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                      <ShieldCheck className="size-3.5 text-amber-500" /> New Warranty Entry
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingWarranty(false)}
+                      className="text-muted-foreground hover:text-foreground text-xs cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    {/* Searchable Warranty Type Dropdown */}
+                    <div className="sm:col-span-2 relative">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                        Warranty Type *
+                      </label>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setWarrTypeSelectOpen((prev) => !prev)}
+                          className="w-full px-3 py-2 bg-background border border-border rounded-xl text-left flex items-center justify-between outline-none focus:border-amber-500 cursor-pointer"
+                        >
+                          <span className={newWarrantyType ? "font-bold text-foreground" : "text-muted-foreground"}>
+                            {newWarrantyType || "Select Active Warranty Type..."}
+                          </span>
+                          <ChevronRight className={`size-3.5 transition-transform ${warrTypeSelectOpen ? "rotate-90" : ""}`} />
+                        </button>
+
+                        {warrTypeSelectOpen && (
+                          <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-card border border-border rounded-xl shadow-xl p-2 space-y-2 animate-in fade-in">
+                            <div className="relative">
+                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
+                              <input
+                                type="text"
+                                placeholder="Search warranty type..."
+                                value={warrSearch}
+                                onChange={(e) => setWarrSearch(e.target.value)}
+                                className="w-full pl-8 pr-2.5 py-1 text-xs bg-muted/40 border border-border rounded-lg outline-none focus:border-amber-500"
+                              />
+                            </div>
+                            <div className="max-h-48 overflow-y-auto divide-y divide-border/50">
+                              {activeWarrantyTypes
+                                .filter((w) =>
+                                  !warrSearch.trim() ||
+                                  w.warrantyType.toLowerCase().includes(warrSearch.toLowerCase()) ||
+                                  w.description.toLowerCase().includes(warrSearch.toLowerCase())
+                                )
+                                .map((w) => (
+                                  <button
+                                    key={w.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setNewWarrantyType(w.warrantyType);
+                                      setWarrTypeSelectOpen(false);
+                                    }}
+                                    className={`w-full text-left p-2 rounded-lg hover:bg-muted/50 transition-colors flex flex-col gap-0.5 cursor-pointer ${
+                                      newWarrantyType === w.warrantyType ? "bg-amber-500/10 font-bold" : ""
+                                    }`}
+                                  >
+                                    <span className="text-xs text-foreground font-semibold flex items-center gap-1.5">
+                                      <ShieldCheck className="size-3 text-amber-500 shrink-0" />
+                                      {w.warrantyType}
+                                    </span>
+                                    {w.description && (
+                                      <span className="text-[10px] text-muted-foreground line-clamp-1">
+                                        {w.description}
+                                      </span>
+                                    )}
+                                  </button>
+                                ))}
+                              {activeWarrantyTypes.filter((w) =>
+                                !warrSearch.trim() ||
+                                w.warrantyType.toLowerCase().includes(warrSearch.toLowerCase())
+                              ).length === 0 && (
+                                <div className="p-3 text-center text-[11px] text-muted-foreground">
+                                  No active warranty types match &quot;{warrSearch}&quot;.
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Warranty Start Date */}
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                        Warranty Start Date *
+                      </label>
+                      <input
+                        type="date"
+                        value={newWarrantyStartDate}
+                        onChange={(e) => setNewWarrantyStartDate(e.target.value)}
+                        className="w-full px-2.5 py-2 bg-background border border-border rounded-xl outline-none focus:border-amber-500 font-medium"
+                      />
+                    </div>
+
+                    {/* Warranty End Date */}
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                        Warranty End Date *
+                      </label>
+                      <input
+                        type="date"
+                        value={newWarrantyEndDate}
+                        onChange={(e) => setNewWarrantyEndDate(e.target.value)}
+                        className="w-full px-2.5 py-2 bg-background border border-border rounded-xl outline-none focus:border-amber-500 font-medium"
+                      />
+                    </div>
+
+                    {/* Remarks */}
+                    <div className="sm:col-span-3">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                        Remarks
+                      </label>
+                      <input
+                        type="text"
+                        value={newWarrantyRemarks}
+                        onChange={(e) => setNewWarrantyRemarks(e.target.value)}
+                        placeholder="e.g. Free parts replacement and quarterly calibration support"
+                        className="w-full px-3 py-2 bg-background border border-border rounded-xl outline-none focus:border-amber-500"
+                      />
+                    </div>
+
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={handleSaveWarrantyEntry}
+                        className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+                      >
+                        <CheckCircle2 className="size-3.5" /> Save Warranty
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Warranties Table */}
+              <div className="rounded-xl border border-border overflow-hidden">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border">
+                      <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
+                      <th className="py-2.5 px-3 font-bold min-w-[200px]">Warranty Type</th>
+                      <th className="py-2.5 px-3 font-bold text-center w-28">Start Date</th>
+                      <th className="py-2.5 px-3 font-bold text-center w-28">End Date</th>
+                      <th className="py-2.5 px-3 font-bold">Remarks</th>
+                      {!isViewMode && (
+                        <th className="py-2.5 px-2 w-12 text-center font-bold">Action</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {activeWarrantyItem.warranties && activeWarrantyItem.warranties.length > 0 ? (
+                      activeWarrantyItem.warranties.map((w, idx) => (
+                        <tr key={w.id || idx} className="hover:bg-muted/30">
+                          <td className="py-2.5 px-3 text-center text-muted-foreground font-bold">
+                            {idx + 1}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <span className="font-bold text-foreground flex items-center gap-1.5">
+                              <ShieldCheck className="size-3.5 text-amber-500 shrink-0" />
+                              {w.warrantyType}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 text-center font-mono text-[11px] text-foreground">
+                            {w.startDate}
+                          </td>
+                          <td className="py-2.5 px-3 text-center font-mono text-[11px] text-foreground">
+                            {w.endDate}
+                          </td>
+                          <td className="py-2.5 px-3 text-muted-foreground text-xs">
+                            {w.remarks || "—"}
+                          </td>
+                          {!isViewMode && (
+                            <td className="py-2.5 px-2 text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteWarrantyEntry(w.id)}
+                                className="p-1 text-muted-foreground hover:text-rose-600 transition-colors cursor-pointer"
+                                title="Remove warranty"
+                              >
+                                <Trash2 className="size-3.5" />
+                              </button>
+                            </td>
+                          )}
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={isViewMode ? 5 : 6} className="py-8 text-center text-muted-foreground text-xs">
+                          <div className="flex flex-col items-center justify-center gap-1.5">
+                            <ShieldCheck className="size-6 text-muted-foreground/30" />
+                            <span>No warranty details registered for this item yet.</span>
+                            {!isViewMode && !isAddingWarranty && (
+                              <button
+                                type="button"
+                                onClick={() => setIsAddingWarranty(true)}
+                                className="text-amber-500 hover:underline font-bold text-xs mt-1"
+                              >
+                                + Click Add to register a warranty
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-3 border-t border-border bg-muted/20 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveWarrantyItemId(null);
+                  setIsAddingWarranty(false);
+                }}
+                className="px-4 py-2 bg-muted text-foreground hover:bg-muted/80 rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -46,8 +46,10 @@ import {
 } from "@/lib/procurement-order-inventory-data";
 import {
   DEFAULT_ITEMS,
+  DEFAULT_SUPPLIERS,
   getStoredData,
   ItemProductMaster,
+  SupplierVendor,
 } from "@/lib/procurement-master-data";
 import {
   StandardPreviewReportModal,
@@ -90,6 +92,27 @@ export function SupplierBillPage() {
   // Mode: "create" | "edit" | "view"
   const [formMode, setFormMode] = useState<"create" | "edit" | "view">("create");
   const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
+
+  // Bill Type: "Bill against PO" | "Bill against WO" | "Service Bill Entry"
+  type BillType = "Bill against PO" | "Bill against WO" | "Service Bill Entry";
+  const [billType, setBillType] = useState<BillType>("Bill against PO");
+
+  // Supplier state for Service Bill Entry
+  const [serviceSupplierId, setServiceSupplierId] = useState<string>("sup-1");
+  const [serviceSupplierName, setServiceSupplierName] = useState<string>(
+    "Apex Textile Chemical & Dyestuffs Ltd"
+  );
+
+  // Service items modal state for Service Bill Entry
+  const [serviceItemModalOpen, setServiceItemModalOpen] = useState(false);
+  const [serviceModalSearch, setServiceModalSearch] = useState("");
+  const [customServiceName, setCustomServiceName] = useState("");
+  const [customServiceSpec, setCustomServiceSpec] = useState("");
+  const [customServiceUom, setCustomServiceUom] = useState("Job");
+  const [customServiceQty, setCustomServiceQty] = useState<number>(1);
+  const [customServiceRate, setCustomServiceRate] = useState<number>(5000);
+  const [customServiceVatRate, setCustomServiceVatRate] = useState<number>(5);
+  const [customServiceTaxRate, setCustomServiceTaxRate] = useState<number>(0);
 
   // Bill Header Form State
   const [billNumber, setBillNumber] = useState(
@@ -170,17 +193,56 @@ export function SupplierBillPage() {
     return purchaseOrders.find((p) => p.orderNumber === selectedPoNumber) || purchaseOrders[0];
   }, [purchaseOrders, selectedPoNumber]);
 
-  // Filtered POs for selection modal (PO/WO Number, Date, Supplier Name, Value)
-  const filteredPurchaseOrders = useMemo(() => {
-    if (!poSearchQuery.trim()) return purchaseOrders;
-    const q = poSearchQuery.toLowerCase();
+  const activeSupplierName = useMemo(() => {
+    if (billType === "Service Bill Entry") {
+      return serviceSupplierName || "Apex Textile Chemical & Dyestuffs Ltd";
+    }
+    return currentPo?.supplierName || "Bengal Information Systems";
+  }, [billType, serviceSupplierName, currentPo]);
+
+  const activeSupplierId = useMemo(() => {
+    if (billType === "Service Bill Entry") {
+      return serviceSupplierId || "sup-1";
+    }
+    return currentPo?.supplierId || "sup-bengal-02";
+  }, [billType, serviceSupplierId, currentPo]);
+
+  // Approved Purchase Orders only (excluding Work Orders)
+  const approvedPurchaseOrders = useMemo(() => {
     return purchaseOrders.filter(
+      (po) =>
+        (po.orderStatus === "Approved" || (po as any).status === "Approved") &&
+        (po.documentType === "Purchase Order" || po.orderNumber.startsWith("PO-"))
+    );
+  }, [purchaseOrders]);
+
+  // Approved Work Orders only (excluding Purchase Orders)
+  const approvedWorkOrders = useMemo(() => {
+    return purchaseOrders.filter(
+      (po) =>
+        (po.orderStatus === "Approved" || (po as any).status === "Approved") &&
+        (po.documentType === "Work Order" || po.orderNumber.startsWith("WO-"))
+    );
+  }, [purchaseOrders]);
+
+  // Orders available for selection based on Bill Type
+  const selectableOrders = useMemo(() => {
+    if (billType === "Bill against PO") return approvedPurchaseOrders;
+    if (billType === "Bill against WO") return approvedWorkOrders;
+    return [];
+  }, [billType, approvedPurchaseOrders, approvedWorkOrders]);
+
+  // Filtered orders for modal table
+  const filteredPurchaseOrders = useMemo(() => {
+    if (!poSearchQuery.trim()) return selectableOrders;
+    const q = poSearchQuery.toLowerCase();
+    return selectableOrders.filter(
       (po) =>
         po.orderNumber.toLowerCase().includes(q) ||
         (po.supplierName && po.supplierName.toLowerCase().includes(q)) ||
         (po.orderDate && po.orderDate.includes(q))
     );
-  }, [purchaseOrders, poSearchQuery]);
+  }, [selectableOrders, poSearchQuery]);
 
   // Filtered MRRs for selection modal (with search, removing PO/Supplier from view)
   const filteredMaterialReceipts = useMemo(() => {
@@ -251,6 +313,18 @@ export function SupplierBillPage() {
     setFormMode(mode);
     setBillNumber(bill.billNumber);
     setBillDate(bill.billDate);
+    const loadedType: BillType =
+      bill.billType ||
+      (bill.poNumber?.startsWith("WO-")
+        ? "Bill against WO"
+        : bill.poNumber && bill.poNumber !== "DIRECT-SERVICE"
+        ? "Bill against PO"
+        : "Service Bill Entry");
+    setBillType(loadedType);
+    if (loadedType === "Service Bill Entry") {
+      setServiceSupplierId(bill.supplierId || "sup-1");
+      setServiceSupplierName(bill.supplierName || "Apex Textile Chemical & Dyestuffs Ltd");
+    }
     setSelectedPoNumber(bill.poNumber);
     setSelectedMrrNumbers(bill.mrrNumbers || []);
     setSupplierBillNo(bill.supplierBillNo);
@@ -279,8 +353,26 @@ export function SupplierBillPage() {
   const handleStartCreateNew = () => {
     setSelectedBillId(null);
     setFormMode("create");
+    setBillType("Bill against PO");
     setBillNumber(`BIL-2026-000${Math.floor(100 + Math.random() * 900)}`);
     setBillDate(new Date().toISOString().slice(0, 10));
+    const firstPo = approvedPurchaseOrders[0];
+    if (firstPo) {
+      setSelectedPoNumber(firstPo.orderNumber);
+      const related = materialReceipts.filter((m) => m.poNumber === firstPo.orderNumber);
+      if (related.length > 0) {
+        const mrrNos = [related[0].receiveNumber];
+        setSelectedMrrNumbers(mrrNos);
+        populateBillItemsFromMrrs(mrrNos, firstPo.orderNumber);
+      } else {
+        setSelectedMrrNumbers([]);
+        setBillItems([]);
+      }
+    } else {
+      setSelectedPoNumber("");
+      setSelectedMrrNumbers([]);
+      setBillItems([]);
+    }
     setSupplierBillNo(`INV-2026-${Math.floor(1000 + Math.random() * 9000)}`);
     setSupplierBillDate(new Date().toISOString().slice(0, 10));
     setRemarks("");
@@ -291,6 +383,166 @@ export function SupplierBillPage() {
     setAdjustment(0);
     setManualDiscount("");
     setManualVatAmount("");
+  };
+
+  // Switch Bill Type handler
+  const handleBillTypeChange = (newType: BillType) => {
+    if (formMode === "view") return;
+    setBillType(newType);
+
+    if (newType === "Bill against PO") {
+      const firstPo = approvedPurchaseOrders[0];
+      if (firstPo) {
+        handleSelectPo(firstPo);
+      } else {
+        setSelectedPoNumber("");
+        setSelectedMrrNumbers([]);
+        setBillItems([]);
+      }
+    } else if (newType === "Bill against WO") {
+      const firstWo = approvedWorkOrders[0];
+      if (firstWo) {
+        handleSelectPo(firstWo);
+      } else {
+        setSelectedPoNumber("");
+        setSelectedMrrNumbers([]);
+        setBillItems([]);
+      }
+    } else if (newType === "Service Bill Entry") {
+      setSelectedPoNumber("");
+      setSelectedMrrNumbers([]);
+      setBillItems([]);
+      toast.info("Switched to Service Bill Entry. Click 'Add Service Item' to add items.");
+    }
+  };
+
+  // Add Catalog Service to Bill
+  const handleAddCatalogService = (srv: ItemProductMaster) => {
+    const qty = 1;
+    const rate = srv.standardPurchasePrice || 5000;
+    const vatRate = 5;
+    const taxRate = 0;
+    const vatAmount = (rate * qty * vatRate) / 100;
+    const taxAmount = (rate * qty * taxRate) / 100;
+    const lineAmount = rate * qty + vatAmount + taxAmount;
+
+    const newItem: SupplierBillItem = {
+      id: `sbi-srv-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      sl: billItems.length + 1,
+      itemCode: srv.itemCode,
+      itemName: srv.itemName,
+      specification: srv.specification || "Service scope per invoice description",
+      brand: srv.subGroupName || "Service Charge",
+      origin: "Local / In-House",
+      uom: srv.purchaseUOM || srv.stockUOM || "Job",
+      mrrReceivedQty: qty,
+      previouslyBilledQty: 0,
+      currentBillQty: qty,
+      unitPrice: rate,
+      discount: 0,
+      vatRate,
+      vatAmount,
+      taxRate,
+      taxAmount,
+      lineAmount,
+    };
+
+    setBillItems((prev) => [...prev, newItem]);
+    toast.success(`Added service item "${srv.itemName}" to bill.`);
+  };
+
+  // Add Custom Service to Bill
+  const handleAddCustomService = () => {
+    if (!customServiceName.trim()) {
+      toast.error("Please enter a Service Name.");
+      return;
+    }
+    const qty = Math.max(1, Number(customServiceQty) || 1);
+    const rate = Math.max(0, Number(customServiceRate) || 0);
+    const vRate = Math.max(0, Number(customServiceVatRate) || 0);
+    const tRate = Math.max(0, Number(customServiceTaxRate) || 0);
+    const vatAmount = (rate * qty * vRate) / 100;
+    const taxAmount = (rate * qty * tRate) / 100;
+    const lineAmount = rate * qty + vatAmount + taxAmount;
+
+    const newItem: SupplierBillItem = {
+      id: `sbi-srv-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      sl: billItems.length + 1,
+      itemCode: `SRV-CUS-${Math.floor(100 + Math.random() * 900)}`,
+      itemName: customServiceName.trim(),
+      specification: customServiceSpec.trim() || "Scope of service & labor work",
+      brand: "Custom Service",
+      origin: "In-House / Contract",
+      uom: customServiceUom || "Job",
+      mrrReceivedQty: qty,
+      previouslyBilledQty: 0,
+      currentBillQty: qty,
+      unitPrice: rate,
+      discount: 0,
+      vatRate: vRate,
+      vatAmount,
+      taxRate: tRate,
+      taxAmount,
+      lineAmount,
+    };
+
+    setBillItems((prev) => [...prev, newItem]);
+    setCustomServiceName("");
+    setCustomServiceSpec("");
+    setCustomServiceRate(5000);
+    setCustomServiceQty(1);
+    setServiceItemModalOpen(false);
+    toast.success(`Added custom service "${newItem.itemName}" to bill.`);
+  };
+
+  // Remove Service Item from Bill
+  const handleRemoveServiceItem = (id: string) => {
+    if (formMode === "view") return;
+    setBillItems((prev) => {
+      const filtered = prev.filter((i) => i.id !== id);
+      return filtered.map((item, idx) => ({ ...item, sl: idx + 1 }));
+    });
+    toast.info("Service item removed from bill.");
+  };
+
+  // Update Service Item Line in Table
+  const handleUpdateServiceItemLine = (
+    id: string,
+    field: "currentBillQty" | "unitPrice" | "discount" | "vatRate" | "taxRate" | "specification",
+    val: any
+  ) => {
+    if (formMode === "view") return;
+    setBillItems((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const qty = field === "currentBillQty" ? Math.max(0, Number(val)) : item.currentBillQty;
+          const price = field === "unitPrice" ? Math.max(0, Number(val)) : item.unitPrice;
+          const disc = field === "discount" ? Math.max(0, Number(val)) : item.discount;
+          const vRate = field === "vatRate" ? Math.max(0, Number(val)) : (item.vatRate ?? 5);
+          const tRate = field === "taxRate" ? Math.max(0, Number(val)) : (item.taxRate ?? 0);
+          const spec = field === "specification" ? String(val) : item.specification;
+
+          const base = qty * price;
+          const afterDisc = Math.max(0, base - disc);
+          const vat = (afterDisc * vRate) / 100;
+          const tax = (afterDisc * tRate) / 100;
+
+          return {
+            ...item,
+            currentBillQty: qty,
+            unitPrice: price,
+            discount: disc,
+            vatRate: vRate,
+            vatAmount: vat,
+            taxRate: tRate,
+            taxAmount: tax,
+            specification: spec,
+            lineAmount: afterDisc + vat + tax,
+          };
+        }
+        return item;
+      })
+    );
   };
 
   // Sync mode with route params if provided
@@ -308,16 +560,17 @@ export function SupplierBillPage() {
   }, [searchParams.action, searchParams.id, bills]);
 
   // Helper to populate items from MRRs with Work Order / PO tax carry-forward
-  const populateBillItemsFromMrrs = (mrrNos: string[]) => {
+  const populateBillItemsFromMrrs = (mrrNos: string[], orderNumberOverride?: string) => {
     const matchedMRRs = materialReceipts.filter((m) => mrrNos.includes(m.receiveNumber));
     const consolidatedItems: SupplierBillItem[] = [];
     let sl = 1;
 
+    const targetPoNum = orderNumberOverride || selectedPoNumber;
     const poItemsMap = getStoredPoItems();
     const woItemsMap = getStoredWoItems();
-    const poOrder = purchaseOrders.find((p) => p.orderNumber === selectedPoNumber);
-    const poItems = poItemsMap[selectedPoNumber] || poOrder?.items || [];
-    const woItems = woItemsMap[selectedPoNumber] || [];
+    const poOrder = purchaseOrders.find((p) => p.orderNumber === targetPoNum);
+    const poItems = poItemsMap[targetPoNum] || poOrder?.items || [];
+    const woItems = woItemsMap[targetPoNum] || [];
 
     matchedMRRs.forEach((mrr) => {
       (mrr.items || []).forEach((item) => {
@@ -378,12 +631,12 @@ export function SupplierBillPage() {
     if (related.length > 0) {
       const mrrNos = [related[0].receiveNumber];
       setSelectedMrrNumbers(mrrNos);
-      populateBillItemsFromMrrs(mrrNos);
+      populateBillItemsFromMrrs(mrrNos, po.orderNumber);
     } else {
       setSelectedMrrNumbers([]);
       setBillItems([]);
     }
-    toast.success(`Selected PO/WO "${po.orderNumber}". Related MRR displayed.`);
+    toast.success(`Selected ${po.documentType === "Work Order" ? "Work Order" : "Purchase Order"} "${po.orderNumber}". Related MRR displayed.`);
   };
 
   // Update Bill Items on MRR Selection
@@ -505,13 +758,20 @@ export function SupplierBillPage() {
       toast.error("Supplier Invoice / Bill No. is required");
       return;
     }
-    if (selectedMrrNumbers.length === 0) {
-      toast.error("At least one MRR must be selected");
-      return;
-    }
-    if (billItems.length === 0) {
-      toast.error("At least one line item is required from MRR");
-      return;
+    if (billType !== "Service Bill Entry") {
+      if (selectedMrrNumbers.length === 0) {
+        toast.error("At least one MRR must be selected");
+        return;
+      }
+      if (billItems.length === 0) {
+        toast.error("At least one line item is required from MRR");
+        return;
+      }
+    } else {
+      if (billItems.length === 0) {
+        toast.error("At least one service item is required to generate a service bill");
+        return;
+      }
     }
     if (otherCharges !== "" && Number(otherCharges) < 0) {
       toast.error("Other Charges cannot be negative. Please enter 0 or a positive value.");
@@ -526,17 +786,23 @@ export function SupplierBillPage() {
       return;
     }
 
+    const effectivePoNumber = billType === "Service Bill Entry" ? "DIRECT-SERVICE" : selectedPoNumber;
+    const effectivePoDate = billType === "Service Bill Entry" ? billDate : currentPo.orderDate;
+    const effectiveSupplierId = activeSupplierId;
+    const effectiveSupplierName = activeSupplierName;
+
     if (formMode === "edit" && selectedBillId) {
       const updated = bills.map((b) =>
         b.id === selectedBillId
           ? {
               ...b,
               billDate,
-              poNumber: selectedPoNumber,
-              poDate: currentPo.orderDate,
-              mrrNumbers: selectedMrrNumbers,
-              supplierId: currentPo.supplierId,
-              supplierName: currentPo.supplierName,
+              billType,
+              poNumber: effectivePoNumber,
+              poDate: effectivePoDate,
+              mrrNumbers: billType === "Service Bill Entry" ? [] : selectedMrrNumbers,
+              supplierId: effectiveSupplierId,
+              supplierName: effectiveSupplierName,
               supplierBillNo,
               supplierBillDate,
               currency,
@@ -561,7 +827,11 @@ export function SupplierBillPage() {
       setStoredSupplierBills(updated);
       setCurrentApprovalStatus(approvalStatus);
       setFormMode("view");
-      toast.success(`Supplier Bill "${billNumber}" updated successfully!`);
+      toast.success(
+        billType === "Service Bill Entry"
+          ? `Service Bill "${billNumber}" updated successfully!`
+          : `Supplier Bill "${billNumber}" updated successfully!`
+      );
       return;
     }
 
@@ -569,11 +839,12 @@ export function SupplierBillPage() {
       id: `bil-${Date.now()}`,
       billNumber,
       billDate,
-      poNumber: selectedPoNumber,
-      poDate: currentPo.orderDate,
-      mrrNumbers: selectedMrrNumbers,
-      supplierId: currentPo.supplierId,
-      supplierName: currentPo.supplierName,
+      billType,
+      poNumber: effectivePoNumber,
+      poDate: effectivePoDate,
+      mrrNumbers: billType === "Service Bill Entry" ? [] : selectedMrrNumbers,
+      supplierId: effectiveSupplierId,
+      supplierName: effectiveSupplierName,
       supplierBillNo,
       supplierBillDate,
       currency,
@@ -621,7 +892,9 @@ export function SupplierBillPage() {
     setCurrentApprovalStatus(approvalStatus);
     setFormMode("view");
     toast.success(
-      `Supplier Bill "${billNumber}" successfully created and saved as ${approvalStatus}!`
+      billType === "Service Bill Entry"
+        ? `Service Bill "${billNumber}" successfully created and saved as ${approvalStatus}!`
+        : `Supplier Bill "${billNumber}" successfully created and saved as ${approvalStatus}!`
     );
   };
 
@@ -629,7 +902,12 @@ export function SupplierBillPage() {
   const billReportData: StandardReportData = useMemo(() => {
     return {
       reportType: "supplier-bill",
-      title: "Supplier Commercial Bill / Invoice Dossier",
+      title:
+        billType === "Service Bill Entry"
+          ? "Supplier Service Bill / Commercial Dossier"
+          : billType === "Bill against WO"
+          ? "Work Order Supplier Commercial Bill Dossier"
+          : "Supplier Commercial Bill / Invoice Dossier",
       documentNumber: billNumber,
       documentNo: billNumber,
       documentDate: billDate,
@@ -637,19 +915,27 @@ export function SupplierBillPage() {
       status: currentApprovalStatus,
       metadata: [
         { label: "Internal Bill No", value: billNumber, highlight: true },
+        { label: "Bill Type", value: billType, highlight: true },
         { label: "Bill Date", value: billDate },
-        { label: "Supplier / Vendor", value: currentPo?.supplierName || "—", highlight: true },
+        { label: "Supplier / Vendor", value: activeSupplierName, highlight: true },
         { label: "Vendor Invoice No", value: supplierBillNo || "—" },
         { label: "Vendor Invoice Date", value: supplierBillDate || "—" },
-        { label: "PO Reference", value: selectedPoNumber },
-        { label: "Linked MRR References", value: selectedMrrNumbers.join(", ") },
+        ...(billType === "Service Bill Entry"
+          ? [{ label: "Billing Method", value: "Direct Service Bill Entry" }]
+          : [
+              {
+                label: billType === "Bill against WO" ? "Work Order Reference" : "PO Reference",
+                value: selectedPoNumber,
+              },
+              { label: "Linked MRR References", value: selectedMrrNumbers.join(", ") },
+            ]),
         { label: "Currency", value: currency },
         { label: "Payment Due Date", value: paymentDueDate },
       ],
       tableHeaders: [
         "SL",
-        "Item Description & Spec",
-        "Brand / Origin",
+        billType === "Service Bill Entry" ? "Service Description & Scope" : "Item Description & Spec",
+        billType === "Service Bill Entry" ? "Category / Group" : "Brand / Origin",
         "UOM",
         "Billed Qty",
         "Unit Price",
@@ -660,14 +946,18 @@ export function SupplierBillPage() {
         idx + 1,
         <div key={idx}>
           <div className="font-bold text-slate-900">{item.itemName}</div>
-          <div className="text-[9.5px] text-slate-500 font-mono">{item.itemCode}</div>
+          <div className="text-[9.5px] text-slate-500 font-mono">
+            {item.itemCode} • {item.specification}
+          </div>
         </div>,
         `${item.brand} / ${item.origin}`,
         item.uom,
         item.currentBillQty,
         `৳ ${item.unitPrice.toLocaleString()}`,
         `৳ ${item.lineAmount.toLocaleString()}`,
-        `MRR Qty: ${item.mrrReceivedQty} (Prev: ${item.previouslyBilledQty})`,
+        billType === "Service Bill Entry"
+          ? `Direct Service Bill`
+          : `MRR Qty: ${item.mrrReceivedQty} (Prev: ${item.previouslyBilledQty})`,
       ]),
       summaryCards: [
         { label: "Subtotal", value: `৳ ${summary.subtotal.toLocaleString()}` },
@@ -834,7 +1124,25 @@ export function SupplierBillPage() {
             </div>
 
             {/* Bill Header Information */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-xs">
+              {/* 1. Bill Type */}
+              <div>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                  Bill Type*
+                </label>
+                <select
+                  disabled={isReadOnly}
+                  value={billType}
+                  onChange={(e) => handleBillTypeChange(e.target.value as BillType)}
+                  className="w-full px-3 py-2 font-bold bg-background border border-amber-500/50 rounded-lg outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-foreground cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+                >
+                  <option value="Bill against PO">Bill against PO</option>
+                  <option value="Bill against WO">Bill against WO</option>
+                  <option value="Service Bill Entry">Service Bill Entry</option>
+                </select>
+              </div>
+
+              {/* 2. Bill Date */}
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                   Bill Date*
@@ -848,44 +1156,82 @@ export function SupplierBillPage() {
                 />
               </div>
 
+              {/* 3. Purchase Order / Work Order* (Hidden when Service Bill Entry) */}
+              {billType !== "Service Bill Entry" && (
+                <div>
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                    {billType === "Bill against PO" ? "Purchase Order *" : "Work Order *"}
+                  </label>
+                  <div className="flex gap-1.5">
+                    <select
+                      disabled={isReadOnly}
+                      value={selectedPoNumber}
+                      onChange={(e) => {
+                        const found = selectableOrders.find((p) => p.orderNumber === e.target.value);
+                        if (found) handleSelectPo(found);
+                      }}
+                      className="w-full px-3 py-2 font-mono font-bold bg-background border border-border rounded-lg outline-none focus:border-amber-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed truncate"
+                    >
+                      <option value="">
+                        Select {billType === "Bill against PO" ? "Purchase Order" : "Work Order"}...
+                      </option>
+                      {selectableOrders.map((po) => (
+                        <option key={po.id} value={po.orderNumber}>
+                          {po.orderNumber} ({po.supplierName})
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      disabled={isReadOnly}
+                      onClick={() => setPoModalOpen(true)}
+                      className="px-2.5 py-2 border border-border rounded-lg text-muted-foreground hover:text-amber-600 hover:bg-muted/50 disabled:opacity-50 cursor-pointer shrink-0"
+                      title={`Search ${billType === "Bill against PO" ? "Purchase Orders" : "Work Orders"}`}
+                    >
+                      <Search className="size-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. Supplier / Vendor* */}
               <div>
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-                  Purchase Order / Work Order*
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
+                  {billType !== "Service Bill Entry" && <Lock className="size-3" />} Supplier / Vendor*
                 </label>
-                <div className="relative">
+                {billType === "Service Bill Entry" ? (
+                  <select
+                    disabled={isReadOnly}
+                    value={serviceSupplierId}
+                    onChange={(e) => {
+                      const sup = DEFAULT_SUPPLIERS.find(
+                        (s) => s.id === e.target.value || s.vendorCode === e.target.value
+                      );
+                      if (sup) {
+                        setServiceSupplierId(sup.id);
+                        setServiceSupplierName(sup.vendorName);
+                      }
+                    }}
+                    className="w-full px-3 py-2 font-bold bg-background border border-border rounded-lg outline-none focus:border-amber-500 text-foreground cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed truncate"
+                  >
+                    {DEFAULT_SUPPLIERS.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.vendorName} ({s.vendorCode})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
                   <input
                     type="text"
                     readOnly
-                    value={selectedPoNumber}
-                    onClick={() => !isReadOnly && setPoModalOpen(true)}
-                    className="w-full px-3 py-2 pr-9 font-mono font-bold bg-background border border-border rounded-lg outline-none focus:border-amber-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
-                    placeholder="Click to select PO/WO..."
+                    disabled
+                    value={activeSupplierName}
+                    className="w-full px-3 py-2 font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-foreground truncate"
                   />
-                  <button
-                    type="button"
-                    disabled={isReadOnly}
-                    onClick={() => setPoModalOpen(true)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-amber-600 disabled:opacity-50 cursor-pointer"
-                    title="Select PO/WO"
-                  >
-                    <Search className="size-4" />
-                  </button>
-                </div>
+                )}
               </div>
 
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
-                  <Lock className="size-3" /> Supplier / Vendor*
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  disabled
-                  value={currentPo.supplierName}
-                  className="w-full px-3 py-2 font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-foreground"
-                />
-              </div>
-
+              {/* 5. Supplier Bill / Invoice No.* */}
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                   Supplier Bill / Invoice No.*
@@ -900,6 +1246,7 @@ export function SupplierBillPage() {
                 />
               </div>
 
+              {/* 6. Supplier Bill Date* */}
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                   Supplier Bill Date*
@@ -913,6 +1260,7 @@ export function SupplierBillPage() {
                 />
               </div>
 
+              {/* 7. Currency* */}
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                   Currency*
@@ -927,145 +1275,378 @@ export function SupplierBillPage() {
               </div>
             </div>
 
-            {/* MRR Reference Section (Multiple MRR Support) */}
-            <div className="bg-muted/20 p-4 rounded-xl border border-border space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
-                    Linked Material Receive Report (MRR) References
-                  </h3>
+            {/* MRR Reference Section (Multiple MRR Support) - Hidden for Service Bill Entry */}
+            {billType !== "Service Bill Entry" && (
+              <div className="bg-muted/20 p-4 rounded-xl border border-border space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
+                      Linked Material Receive Report (MRR) References
+                    </h3>
+                  </div>
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() => setMrrModalOpen(true)}
+                      className="text-xs font-bold text-amber-600 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Search className="size-3" /> Select MRR ({selectedMrrNumbers.length})
+                    </button>
+                  )}
                 </div>
-                {!isReadOnly && (
+
+                <div className="flex flex-wrap gap-2">
+                  {selectedMrrNumbers.map((mrrNo) => (
+                    <span
+                      key={mrrNo}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 font-mono font-bold text-xs"
+                    >
+                      {mrrNo}
+                      {!isReadOnly && (
+                        <button
+                          type="button"
+                          onClick={() => handleToggleMrr(mrrNo)}
+                          className="hover:text-rose-500 cursor-pointer"
+                        >
+                          <X className="size-3" />
+                        </button>
+                      )}
+                    </span>
+                  ))}
+                  {selectedMrrNumbers.length === 0 && (
+                    <span className="text-xs text-muted-foreground italic">
+                      No MRRs linked. Click &quot;Select MRR&quot; to link verified goods receipts.
+                    </span>
+                  )}
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  {billType === "Bill against WO" ? "WO Reference:" : "PO Reference:"}{" "}
+                  <span className="font-bold text-foreground">{selectedPoNumber}</span> • Supplier:{" "}
+                  <span className="font-bold text-foreground">{activeSupplierName}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Bill Item Details Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  {billType === "Service Bill Entry"
+                    ? "Bill Item Details (Service Items)"
+                    : "Bill Item Details (Auto-populated from MRR)"}
+                </h3>
+                {billType === "Service Bill Entry" && !isReadOnly && (
                   <button
                     type="button"
-                    onClick={() => setMrrModalOpen(true)}
-                    className="text-xs font-bold text-amber-600 hover:underline flex items-center gap-1 cursor-pointer"
+                    onClick={() => setServiceItemModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-sm shadow-amber-500/20 transition-all cursor-pointer"
                   >
-                    <Search className="size-3" /> Select MRR ({selectedMrrNumbers.length})
+                    <Plus className="size-3.5" /> Add Service Item
                   </button>
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                {selectedMrrNumbers.map((mrrNo) => (
-                  <span
-                    key={mrrNo}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 font-mono font-bold text-xs"
-                  >
-                    {mrrNo}
-                    {!isReadOnly && (
-                      <button
-                        type="button"
-                        onClick={() => handleToggleMrr(mrrNo)}
-                        className="hover:text-rose-500 cursor-pointer"
-                      >
-                        <X className="size-3" />
-                      </button>
-                    )}
-                  </span>
-                ))}
-              </div>
-              <div className="text-[11px] text-muted-foreground">
-                PO Reference: <span className="font-bold text-foreground">{selectedPoNumber}</span> • Supplier: <span className="font-bold text-foreground">{currentPo.supplierName}</span>
-              </div>
-            </div>
-
-            {/* Bill Item Details from MRR with Quantity Validation */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
-                  Bill Item Details (Auto-populated from MRR)
-                </h3>
-              </div>
-
               <div className="overflow-x-auto rounded-xl border border-border">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border">
-                      <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
-                      <th className="py-2.5 px-3 font-bold">Item & Specification</th>
-                      <th className="py-2.5 px-3 font-bold">Brand / Origin</th>
-                      <th className="py-2.5 px-3 w-16 font-bold">UOM</th>
-                      <th className="py-2.5 px-3 text-right font-bold">MRR Rec. Qty</th>
-                      <th className="py-2.5 px-3 text-right font-bold">Prev Billed</th>
-                      <th className="py-2.5 px-3 text-right font-bold w-28 text-amber-600">
-                        Current Bill Qty*
-                      </th>
-                      <th className="py-2.5 px-3 text-right font-bold">Unit Price (৳)</th>
-                      <th className="py-2.5 px-3 text-right font-bold">Discount (৳)</th>
-                      <th className="py-2.5 px-3 text-right font-bold">VAT</th>
-                      <th className="py-2.5 px-3 text-right font-bold text-amber-600">Tax</th>
-                      <th className="py-2.5 px-3 text-right font-bold">Line Total (৳)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {billItems.map((item, idx) => (
-                      <tr key={item.id} className="hover:bg-muted/20">
-                        <td className="py-2 px-3 text-center text-muted-foreground font-bold">
-                          {idx + 1}
-                        </td>
-                        <td className="py-2 px-3">
-                          <div className="font-bold text-foreground">{item.itemName}</div>
-                          <div className="text-[10px] text-muted-foreground font-mono">
-                            {item.itemCode} • {item.specification}
-                          </div>
-                        </td>
-                        <td className="py-2 px-3 text-muted-foreground">
-                          {item.brand} / {item.origin}
-                        </td>
-                        <td className="py-2 px-3 text-muted-foreground font-semibold">
-                          {item.uom}
-                        </td>
-                        <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
-                          {item.mrrReceivedQty}
-                        </td>
-                        <td className="py-2 px-3 text-right font-mono text-muted-foreground">
-                          {item.previouslyBilledQty}
-                        </td>
-                        <td className="py-2 px-3 text-right">
-                          {isReadOnly ? (
-                            <span className="font-mono font-bold text-amber-600 text-xs">
-                              {item.currentBillQty}
-                            </span>
-                          ) : (
-                            <input
-                              type="number"
-                              min="0"
-                              max={item.mrrReceivedQty - item.previouslyBilledQty}
-                              value={item.currentBillQty}
-                              onChange={(e) =>
-                                handleUpdateItemQty(item.id, Number(e.target.value))
-                              }
-                              className="w-20 text-right font-mono font-bold px-2 py-1 bg-background border border-amber-500/40 rounded focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-xs"
-                            />
-                          )}
-                        </td>
-                        <td className="py-2 px-3 text-right font-mono text-muted-foreground">
-                          ৳ {item.unitPrice.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-3 text-right font-mono text-rose-600">
-                          {item.discount ? `-৳ ${Number(item.discount).toLocaleString()}` : "৳ 0"}
-                        </td>
-                        <td className="py-2 px-3 text-right font-mono text-muted-foreground">
-                          ৳ {item.vatAmount.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-3 text-right font-mono">
-                          <div className="font-bold text-foreground">
-                            ৳ {(item.taxAmount ?? Math.round(((item.currentBillQty * item.unitPrice - item.discount) * (item.taxRate || 0)) / 100)).toLocaleString()}
-                          </div>
-                          {item.taxRate !== undefined && item.taxRate > 0 && (
-                            <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block">
-                              ({item.taxRate}%)
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
-                          ৳ {item.lineAmount.toLocaleString()}
-                        </td>
+                {billType === "Service Bill Entry" ? (
+                  /* Service Items Table */
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border">
+                        <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
+                        <th className="py-2.5 px-3 font-bold min-w-[200px]">Service Item & Scope</th>
+                        <th className="py-2.5 px-3 w-16 font-bold text-center">UOM</th>
+                        <th className="py-2.5 px-3 text-right font-bold w-24 text-amber-600">
+                          Bill Qty*
+                        </th>
+                        <th className="py-2.5 px-3 text-right font-bold w-28 text-amber-600">
+                          Unit Rate (৳)*
+                        </th>
+                        <th className="py-2.5 px-3 text-right font-bold w-24">Discount (৳)</th>
+                        <th className="py-2.5 px-3 text-right font-bold">VAT</th>
+                        <th className="py-2.5 px-3 text-right font-bold text-amber-600">Tax</th>
+                        <th className="py-2.5 px-3 text-right font-bold">Line Total (৳)</th>
+                        {!isReadOnly && (
+                          <th className="py-2.5 px-2 text-center w-12 font-bold">Action</th>
+                        )}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {billItems.map((item, idx) => (
+                        <tr key={item.id} className="hover:bg-muted/20">
+                          <td className="py-2 px-3 text-center text-muted-foreground font-bold">
+                            {idx + 1}
+                          </td>
+                          <td className="py-2 px-3">
+                            <div className="font-bold text-foreground">{item.itemName}</div>
+                            {isReadOnly ? (
+                              <div className="text-[10px] text-muted-foreground font-mono">
+                                {item.itemCode} • {item.specification}
+                              </div>
+                            ) : (
+                              <input
+                                type="text"
+                                value={item.specification}
+                                onChange={(e) =>
+                                  handleUpdateServiceItemLine(item.id, "specification", e.target.value)
+                                }
+                                placeholder="Service description / scope"
+                                className="w-full mt-1 text-[10px] px-2 py-0.5 bg-background border border-border/80 rounded focus:border-amber-500 outline-none"
+                              />
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-center text-muted-foreground font-semibold">
+                            {item.uom}
+                          </td>
+                          <td className="py-2 px-3 text-right">
+                            {isReadOnly ? (
+                              <span className="font-mono font-bold text-amber-600">
+                                {item.currentBillQty}
+                              </span>
+                            ) : (
+                              <input
+                                type="number"
+                                min="1"
+                                value={item.currentBillQty}
+                                onChange={(e) =>
+                                  handleUpdateServiceItemLine(item.id, "currentBillQty", e.target.value)
+                                }
+                                className="w-16 text-right font-mono font-bold px-2 py-1 bg-background border border-amber-500/40 rounded focus:border-amber-500 outline-none text-xs"
+                              />
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-right">
+                            {isReadOnly ? (
+                              <span className="font-mono font-bold">
+                                ৳ {item.unitPrice.toLocaleString()}
+                              </span>
+                            ) : (
+                              <input
+                                type="number"
+                                min="0"
+                                value={item.unitPrice}
+                                onChange={(e) =>
+                                  handleUpdateServiceItemLine(item.id, "unitPrice", e.target.value)
+                                }
+                                className="w-24 text-right font-mono font-bold px-2 py-1 bg-background border border-amber-500/40 rounded focus:border-amber-500 outline-none text-xs"
+                              />
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-right">
+                            {isReadOnly ? (
+                              <span className="font-mono text-rose-600">
+                                {item.discount ? `-৳ ${Number(item.discount).toLocaleString()}` : "৳ 0"}
+                              </span>
+                            ) : (
+                              <input
+                                type="number"
+                                min="0"
+                                value={item.discount || ""}
+                                placeholder="0"
+                                onChange={(e) =>
+                                  handleUpdateServiceItemLine(item.id, "discount", e.target.value)
+                                }
+                                className="w-20 text-right font-mono px-2 py-1 bg-background border border-border rounded focus:border-amber-500 outline-none text-xs text-rose-600"
+                              />
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono">
+                            {isReadOnly ? (
+                              <>
+                                <div className="font-bold text-foreground">৳ {item.vatAmount.toLocaleString()}</div>
+                                <span className="text-[10px] text-muted-foreground font-semibold">({item.vatRate ?? 5}%)</span>
+                              </>
+                            ) : (
+                              <div>
+                                <div className="flex items-center justify-end gap-1">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.5"
+                                    value={item.vatRate ?? 5}
+                                    onChange={(e) =>
+                                      handleUpdateServiceItemLine(item.id, "vatRate", e.target.value)
+                                    }
+                                    className="w-14 text-right font-mono font-semibold px-1.5 py-0.5 bg-background border border-border rounded focus:border-amber-500 outline-none text-xs"
+                                  />
+                                  <span className="text-[11px] text-muted-foreground font-semibold">%</span>
+                                </div>
+                                <div className="text-[11px] font-mono font-bold text-foreground mt-0.5">
+                                  ৳ {item.vatAmount.toLocaleString()}
+                                </div>
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono">
+                            {isReadOnly ? (
+                              <>
+                                <div className="font-bold text-foreground">
+                                  ৳ {(item.taxAmount ?? 0).toLocaleString()}
+                                </div>
+                                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block">
+                                  ({item.taxRate ?? 0}%)
+                                </span>
+                              </>
+                            ) : (
+                              <div>
+                                <div className="flex items-center justify-end gap-1">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.5"
+                                    value={item.taxRate ?? 0}
+                                    onChange={(e) =>
+                                      handleUpdateServiceItemLine(item.id, "taxRate", e.target.value)
+                                    }
+                                    className="w-14 text-right font-mono font-semibold px-1.5 py-0.5 bg-background border border-amber-500/40 rounded focus:border-amber-500 outline-none text-xs"
+                                  />
+                                  <span className="text-[11px] text-muted-foreground font-semibold">%</span>
+                                </div>
+                                <div className="text-[11px] font-mono font-bold text-foreground mt-0.5">
+                                  ৳ {(item.taxAmount ?? 0).toLocaleString()}
+                                </div>
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
+                            ৳ {item.lineAmount.toLocaleString()}
+                          </td>
+                          {!isReadOnly && (
+                            <td className="py-2 px-2 text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveServiceItem(item.id)}
+                                className="p-1 text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer"
+                                title="Remove service item"
+                              >
+                                <Trash2 className="size-3.5" />
+                              </button>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                      {billItems.length === 0 && (
+                        <tr>
+                          <td colSpan={10} className="py-10 text-center text-muted-foreground text-xs">
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <Layers className="size-8 text-muted-foreground/40" />
+                              <span className="font-semibold text-foreground">No service items added to this bill yet.</span>
+                              <p className="text-muted-foreground text-[11px] max-w-sm">
+                                Click &quot;Add Service Item&quot; to pick services from the service catalog or add custom scope entries.
+                              </p>
+                              {!isReadOnly && (
+                                <button
+                                  type="button"
+                                  onClick={() => setServiceItemModalOpen(true)}
+                                  className="mt-2 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-sm shadow-amber-500/20 cursor-pointer"
+                                >
+                                  <Plus className="size-3.5" /> Add Service Item
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                ) : (
+                  /* Original MRR Populated Table */
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border">
+                        <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
+                        <th className="py-2.5 px-3 font-bold">Item & Specification</th>
+                        <th className="py-2.5 px-3 font-bold">Brand / Origin</th>
+                        <th className="py-2.5 px-3 w-16 font-bold">UOM</th>
+                        <th className="py-2.5 px-3 text-right font-bold">MRR Rec. Qty</th>
+                        <th className="py-2.5 px-3 text-right font-bold">Prev Billed</th>
+                        <th className="py-2.5 px-3 text-right font-bold w-28 text-amber-600">
+                          Current Bill Qty*
+                        </th>
+                        <th className="py-2.5 px-3 text-right font-bold">Unit Price (৳)</th>
+                        <th className="py-2.5 px-3 text-right font-bold">Discount (৳)</th>
+                        <th className="py-2.5 px-3 text-right font-bold">VAT</th>
+                        <th className="py-2.5 px-3 text-right font-bold text-amber-600">Tax</th>
+                        <th className="py-2.5 px-3 text-right font-bold">Line Total (৳)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {billItems.map((item, idx) => (
+                        <tr key={item.id} className="hover:bg-muted/20">
+                          <td className="py-2 px-3 text-center text-muted-foreground font-bold">
+                            {idx + 1}
+                          </td>
+                          <td className="py-2 px-3">
+                            <div className="font-bold text-foreground">{item.itemName}</div>
+                            <div className="text-[10px] text-muted-foreground font-mono">
+                              {item.itemCode} • {item.specification}
+                            </div>
+                          </td>
+                          <td className="py-2 px-3 text-muted-foreground">
+                            {item.brand} / {item.origin}
+                          </td>
+                          <td className="py-2 px-3 text-muted-foreground font-semibold">
+                            {item.uom}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
+                            {item.mrrReceivedQty}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                            {item.previouslyBilledQty}
+                          </td>
+                          <td className="py-2 px-3 text-right">
+                            {isReadOnly ? (
+                              <span className="font-mono font-bold text-amber-600 text-xs">
+                                {item.currentBillQty}
+                              </span>
+                            ) : (
+                              <input
+                                type="number"
+                                min="0"
+                                max={item.mrrReceivedQty - item.previouslyBilledQty}
+                                value={item.currentBillQty}
+                                onChange={(e) =>
+                                  handleUpdateItemQty(item.id, Number(e.target.value))
+                                }
+                                className="w-20 text-right font-mono font-bold px-2 py-1 bg-background border border-amber-500/40 rounded focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-xs"
+                              />
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                            ৳ {item.unitPrice.toLocaleString()}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono text-rose-600">
+                            {item.discount ? `-৳ ${Number(item.discount).toLocaleString()}` : "৳ 0"}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                            ৳ {item.vatAmount.toLocaleString()}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono">
+                            <div className="font-bold text-foreground">
+                              ৳ {(item.taxAmount ?? Math.round(((item.currentBillQty * item.unitPrice - item.discount) * (item.taxRate || 0)) / 100)).toLocaleString()}
+                            </div>
+                            {item.taxRate !== undefined && item.taxRate > 0 && (
+                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block">
+                                ({item.taxRate}%)
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
+                            ৳ {item.lineAmount.toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                      {billItems.length === 0 && (
+                        <tr>
+                          <td colSpan={12} className="py-8 text-center text-muted-foreground text-xs">
+                            No items found for the selected MRRs.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
 
@@ -1460,9 +2041,15 @@ export function SupplierBillPage() {
           <div className="bg-card w-full max-w-2xl rounded-2xl border border-border shadow-2xl p-5 space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <h3 className="text-sm font-bold text-foreground">Select Purchase Order / Work Order</h3>
+                <h3 className="text-sm font-bold text-foreground">
+                  {billType === "Bill against WO"
+                    ? "Select Work Order (Approved Only)"
+                    : "Select Purchase Order (Approved Only)"}
+                </h3>
                 <p className="text-xs text-muted-foreground">
-                  Select a PO/WO to bill against. Related MRR records will be displayed below.
+                  {billType === "Bill against WO"
+                    ? "Select an approved Work Order to bill against. Related service MRR records will be displayed below."
+                    : "Select an approved Purchase Order to bill against. Related MRR records will be displayed below."}
                 </p>
               </div>
               <button
@@ -1474,26 +2061,36 @@ export function SupplierBillPage() {
               </button>
             </div>
 
-            {/* Search PO */}
+            {/* Search PO/WO */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
               <input
                 type="text"
                 value={poSearchQuery}
                 onChange={(e) => setPoSearchQuery(e.target.value)}
-                placeholder="Search PO/WO number, date, or supplier..."
+                placeholder={
+                  billType === "Bill against WO"
+                    ? "Search Work Order number, date, or contractor..."
+                    : "Search Purchase Order number, date, or supplier..."
+                }
                 className="w-full pl-9 pr-3 py-2 text-xs bg-background border border-border rounded-xl outline-none focus:border-amber-500"
               />
             </div>
 
-            {/* PO List Table */}
+            {/* PO/WO List Table */}
             <div className="max-h-72 overflow-y-auto border border-border rounded-xl">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-muted/50 border-b border-border text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                    <th className="py-2.5 px-3">PO/WO Number</th>
-                    <th className="py-2.5 px-3">PO/WO Date</th>
-                    <th className="py-2.5 px-3">Supplier Name</th>
+                    <th className="py-2.5 px-3">
+                      {billType === "Bill against WO" ? "WO Number" : "PO Number"}
+                    </th>
+                    <th className="py-2.5 px-3">
+                      {billType === "Bill against WO" ? "WO Date" : "PO Date"}
+                    </th>
+                    <th className="py-2.5 px-3">
+                      {billType === "Bill against WO" ? "Contractor / Vendor" : "Supplier Name"}
+                    </th>
                     <th className="py-2.5 px-3 text-right">Value</th>
                   </tr>
                 </thead>
@@ -1522,7 +2119,7 @@ export function SupplierBillPage() {
                   {filteredPurchaseOrders.length === 0 && (
                     <tr>
                       <td colSpan={4} className="py-6 text-center text-muted-foreground text-xs">
-                        No purchase orders found matching &quot;{poSearchQuery}&quot;
+                        No approved {billType === "Bill against WO" ? "work orders" : "purchase orders"} found matching &quot;{poSearchQuery}&quot;
                       </td>
                     </tr>
                   )}
@@ -1575,7 +2172,7 @@ export function SupplierBillPage() {
               />
             </div>
 
-            {/* MRR List (PO Number and Supplier Name removed as per Req 2.3) */}
+            {/* MRR List */}
             <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
               {filteredMaterialReceipts.map((mrr) => {
                 const isSelected = selectedMrrNumbers.includes(mrr.receiveNumber);
@@ -1597,7 +2194,7 @@ export function SupplierBillPage() {
                         </span>
                       </div>
                       <div className="text-[11px] text-muted-foreground mt-1">
-                        Store: <span className="font-medium text-foreground">{mrr.warehouseStore}</span> • Items: {mrr.items?.length || 0}
+                        Store / Location: <span className="font-medium text-foreground">{mrr.warehouseStore}</span> • Items: {mrr.items?.length || 0}
                       </div>
                     </div>
                     <div className="text-right">
@@ -1623,6 +2220,110 @@ export function SupplierBillPage() {
                 className="px-4 py-2 bg-amber-500 text-white rounded-lg text-xs font-bold cursor-pointer"
               >
                 Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Service Item Modal (Used for Service Bill Entry) */}
+      {serviceItemModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-card w-full max-w-3xl rounded-2xl border border-border shadow-2xl p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Receipt className="size-4 text-amber-500" /> Add Service Item to Bill
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Select service items from the service catalog to include in this bill.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setServiceItemModalOpen(false)}
+                className="text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Service Items Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-foreground uppercase tracking-wider">
+                  Service Items
+                </span>
+                <div className="relative w-64">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={serviceModalSearch}
+                    onChange={(e) => setServiceModalSearch(e.target.value)}
+                    placeholder="Search service items..."
+                    className="w-full pl-8 pr-2.5 py-1 text-xs bg-background border border-border rounded-lg outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+
+              {/* Service Items Table: 2 Data Columns: Service Item Name & UoM */}
+              <div className="max-h-72 overflow-y-auto border border-border rounded-xl">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border sticky top-0 bg-muted/95 backdrop-blur-xs">
+                      <th className="py-2.5 px-3 font-bold">Service Item Name</th>
+                      <th className="py-2.5 px-3 w-28 text-center font-bold">UoM</th>
+                      <th className="py-2.5 px-3 w-24 text-center font-bold">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {availableServiceItems
+                      .filter(
+                        (s) =>
+                          !serviceModalSearch.trim() ||
+                          s.itemName.toLowerCase().includes(serviceModalSearch.toLowerCase()) ||
+                          s.itemCode.toLowerCase().includes(serviceModalSearch.toLowerCase())
+                      )
+                      .map((srv) => (
+                        <tr
+                          key={srv.id}
+                          className="hover:bg-muted/40 transition-colors"
+                        >
+                          <td className="py-2.5 px-3">
+                            <div className="font-bold text-foreground">{srv.itemName}</div>
+                            <div className="text-[10px] text-muted-foreground font-mono">
+                              {srv.itemCode} {srv.specification ? `• ${srv.specification}` : ""}
+                            </div>
+                          </td>
+                          <td className="py-2.5 px-3 text-center text-muted-foreground font-semibold">
+                            {srv.purchaseUOM || "Job"}
+                          </td>
+                          <td className="py-2.5 px-3 text-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleAddCatalogService(srv);
+                                setServiceItemModalOpen(false);
+                              }}
+                              className="px-3 py-1 rounded-lg text-xs font-bold border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 transition-all cursor-pointer inline-flex items-center gap-1"
+                            >
+                              <Plus className="size-3" /> Select
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => setServiceItemModalOpen(false)}
+                className="px-4 py-2 bg-muted text-foreground hover:bg-muted/80 rounded-lg text-xs font-semibold cursor-pointer"
+              >
+                Close
               </button>
             </div>
           </div>
