@@ -60,8 +60,55 @@ import {
   setStoredWoItems,
 } from "@/lib/procurement-order-inventory-data";
 import { PurchaseOrderReportModal, PurchaseOrderReportData } from "@/components/procurement/PurchaseOrderReportModal";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { getEffectiveProcurementConfig } from "@/lib/procurement-config-data";
 import pakizaSoftwareLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
+
+const DEFAULT_COMPANIES = [
+  "Pakiza Knit Composite Ltd",
+  "Pakiza Technovation Limited",
+  "Pakiza Software Limited",
+  "Pakiza Spinning Mills Ltd",
+  "Pakiza Apparels Ltd",
+  "Pakiza Dyeing & Printing Industries Ltd",
+  "Pakiza Cotton Mills Ltd",
+  "Pakiza Woven Composite Ltd",
+];
+
+const DEFAULT_AREAS = [
+  "Head Office",
+  "PAL-Fabric Dyeing",
+  "Central Utility & Generator Area",
+  "Spinning Unit",
+  "Garments Finishing Area",
+  "Cutting Section",
+  "Knitting Production Floor",
+  "Warehouse & Dispatch Deck",
+  "Central IT & Hardware Depot",
+  "Annex Building Server Room & IT Bay",
+  "Savar Sewing Unit",
+  "Savar Finishing Unit",
+  "Tongipara Dyeing Unit",
+  "Ashulia Printing Unit",
+  "Narsingdi Weaving",
+  "Gazipur Texturizing",
+  "Factory Building A",
+  "Finished Goods Export Transit Store",
+];
+
+const DEFAULT_CONTRACT_PERSONS = [
+  { name: "Tahmid Afsar Shapno", mobile: "+880 1750-021154" },
+  { name: "Md. Anik Islam", mobile: "+880 1711-209481" },
+  { name: "Engr. Rafiqul Islam", mobile: "+880 1713-998822" },
+  { name: "Engr. Kabir Hossain", mobile: "+880 1714-332110" },
+  { name: "Sohanur Rahman Sohan", mobile: "+880 1750-021160" },
+  { name: "Easin Mia", mobile: "+880 1712-334455" },
+  { name: "Tanvir Ahmed", mobile: "+880 1718-443322" },
+  { name: "Nazmul Huda", mobile: "+880 1715-776655" },
+  { name: "Rashidul Islam", mobile: "+880 1716-112233" },
+  { name: "Md Johirul Islam", mobile: "+880 1719-012345" },
+  { name: "Rajebul Hasan Rajon", mobile: "+880 1819-223344" },
+];
 
 function getItemPurchaseHistory(item: { itemName: string; unitPrice?: number; uom?: string }) {
   const basePrice = item.unitPrice || 450;
@@ -159,9 +206,75 @@ export function PurchaseOrderWorkOrderPage() {
     return list[0]?.storeName || "PKCL Central Raw Material Warehouse";
   });
   const [deliveryDate, setDeliveryDate] = useState<string>("2026-10-15");
-  const [workLocation, setWorkLocation] = useState<string>(
-    "Annex Building Server Room & 3rd Floor IT Bay"
-  );
+  const [workLocation, setWorkLocation] = useState<string>("Pakiza Knit Composite Ltd");
+  const [workArea, setWorkArea] = useState<string>("PAL-Fabric Dyeing");
+  const [contractPerson, setContractPerson] = useState<string>("Tahmid Afsar Shapno (+880 1750-021154)");
+
+  // Options for Work Order Service fields
+  const companyOptions = useMemo(() => {
+    let orgs: string[] = [];
+    try {
+      if (typeof window !== "undefined") {
+        const raw = localStorage.getItem("hris_organizations");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            orgs = parsed.map((o: any) => o.nameEng || o.name || o.shortName).filter(Boolean);
+          }
+        }
+      }
+    } catch (e) {}
+    const combined = Array.from(new Set([...DEFAULT_COMPANIES, ...orgs]));
+    return combined.map((c) => ({ value: c, label: c }));
+  }, []);
+
+  const areaOptions = useMemo(() => {
+    let areas: string[] = [];
+    try {
+      if (typeof window !== "undefined") {
+        const raw = localStorage.getItem("hris_areas");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            areas = parsed.map((a: any) => a.nameEng || a.name || a.shortName).filter(Boolean);
+          }
+        }
+      }
+    } catch (e) {}
+    const combined = Array.from(new Set([...DEFAULT_AREAS, ...areas]));
+    return combined.map((a) => ({ value: a, label: a }));
+  }, []);
+
+  const contractPersonOptions = useMemo(() => {
+    const list = [...DEFAULT_CONTRACT_PERSONS];
+    try {
+      if (typeof window !== "undefined") {
+        const raw = localStorage.getItem("recruitment_synced_employees");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            parsed.forEach((e: any) => {
+              const name = e.name;
+              const mobile = e.officeMob || e.phone || e.mobile;
+              if (name && mobile && mobile !== "—") {
+                list.push({ name, mobile });
+              }
+            });
+          }
+        }
+      }
+    } catch (e) {}
+    const seen = new Set<string>();
+    const options: { value: string; label: string }[] = [];
+    list.forEach((p) => {
+      const formatted = `${p.name} (${p.mobile})`;
+      if (!seen.has(formatted)) {
+        seen.add(formatted);
+        options.push({ value: formatted, label: formatted });
+      }
+    });
+    return options;
+  }, []);
   const [currency, setCurrency] = useState<string>("BDT");
   const [exchangeRate, setExchangeRate] = useState<number | "">(1.0);
   const [paymentMode, setPaymentMode] = useState<string>("Credit 30 Days");
@@ -357,6 +470,9 @@ export function PurchaseOrderWorkOrderPage() {
           setSupplierId(matched.id);
         }
       }
+      if (activeCSDetails.subjectDescription && !remarks) {
+        setRemarks(activeCSDetails.subjectDescription);
+      }
     }
   }, [creationMethod, activeCSDetails]);
 
@@ -386,7 +502,9 @@ export function PurchaseOrderWorkOrderPage() {
         setSelectedCS(existing.csId || "");
         setSupplierId(existing.supplierId);
         setDeliveryWarehouse(existing.deliveryWarehouse || "");
-        setWorkLocation(existing.workLocation || "");
+        setWorkLocation(existing.workLocation || "Pakiza Knit Composite Ltd");
+        setWorkArea((existing as any).area || "PAL-Fabric Dyeing");
+        setContractPerson((existing as any).contractPerson || "Tahmid Afsar Shapno (+880 1750-021154)");
         setDeliveryDate(existing.deliveryDate || new Date().toISOString().slice(0, 10));
         setCurrency(existing.currency || "BDT");
         setExchangeRate(existing.exchangeRate || 1.0);
@@ -519,6 +637,8 @@ export function PurchaseOrderWorkOrderPage() {
       paymentMode,
       deliveryWarehouse,
       workLocation,
+      area: docType === "Work Order" ? workArea : undefined,
+      contractPerson: docType === "Work Order" ? contractPerson : undefined,
       prepareBy,
       department,
       currency,
@@ -545,6 +665,7 @@ export function PurchaseOrderWorkOrderPage() {
       woItems: woItems.map((w) => ({
         serviceCode: w.serviceCode,
         serviceName: w.serviceName,
+        csNumber: (w as any).csNumber || selectedCS || undefined,
         workDescription: w.workDescription,
         specification: w.specification,
         uom: w.uom,
@@ -566,6 +687,8 @@ export function PurchaseOrderWorkOrderPage() {
     paymentMode,
     deliveryWarehouse,
     workLocation,
+    workArea,
+    contractPerson,
     prepareBy,
     department,
     currency,
@@ -689,7 +812,7 @@ export function PurchaseOrderWorkOrderPage() {
         sl: woItems.length + 1,
         serviceName: catalogItem.itemName,
         serviceCode: catalogItem.itemCode,
-        workDescription: catalogItem.specification || "Standard scope of work",
+        workDescription: remarks || catalogItem.specification || "Standard scope of work",
         specification: catalogItem.specification || "Standard commercial specification",
         uom: defaultUom,
         marketUnit: defaultUom,
@@ -704,7 +827,8 @@ export function PurchaseOrderWorkOrderPage() {
         lineTotal: base + vat + tax,
         serviceStartDate: new Date().toISOString().slice(0, 10),
         serviceEndDate: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
-        remarks: "",
+        remarks: remarks || "",
+        csNumber: selectedCS || undefined,
       };
 
       setWoItems((prev) => [...prev, newWo]);
@@ -842,10 +966,59 @@ export function PurchaseOrderWorkOrderPage() {
       availableApprovedCSs.find((c) => c.csNumber === csNo) ||
       DEFAULT_COMPARATIVE_STATEMENTS.find((c) => c.csNumber === csNo);
     if (!cs) return;
+
+    if (cs.subjectDescription) {
+      setRemarks(cs.subjectDescription);
+    }
+
     const itemsToUse =
       (cs as any).remainingItems && (cs as any).remainingItems.length > 0
         ? (cs as any).remainingItems
         : cs.itemComparison || [];
+
+    if (docType === "Work Order") {
+      const newWoList: WOServiceItem[] = [];
+      let sl = 1;
+      itemsToUse.forEach((it: any) => {
+        const uom = it.unit || it.uom || "Job";
+        const qty = it.requiredQty || 1;
+        const unitPrice = it.lowestUnitPrice || it.estimatedUnitPrice || 1000;
+        const vatRate = 5;
+        const taxRate = 0;
+        const base = qty * unitPrice;
+        const vat = (base * vatRate) / 100;
+        const tax = (base * taxRate) / 100;
+        newWoList.push({
+          id: `woi-cs-${csNo}-${it.itemCode || sl}-${Date.now()}-${sl}`,
+          sl: sl++,
+          serviceName: it.itemName || it.serviceName || "Service Item",
+          serviceCode: it.itemCode || `SRV-${sl}`,
+          workDescription: cs.subjectDescription || it.specification || `Sourced from CS: ${csNo}`,
+          specification: it.specification || cs.subjectDescription || "Standard commercial specification",
+          uom,
+          marketUnit: uom,
+          conversion: `1 ${uom} = 1 ${uom}`,
+          estimatedQuantity: qty,
+          workOrderQuantity: qty,
+          unitRate: unitPrice,
+          vatRate,
+          vatAmount: vat,
+          taxRate,
+          taxAmount: tax,
+          lineTotal: base + vat + tax,
+          serviceStartDate: new Date().toISOString().slice(0, 10),
+          serviceEndDate: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+          remarks: cs.subjectDescription || `Sourced from CS: ${csNo}`,
+          csNumber: csNo,
+        });
+      });
+      if (newWoList.length > 0) {
+        setWoItems(newWoList);
+        toast.success(`Automatically populated ${newWoList.length} service item(s) from CS "${csNo}".`);
+      }
+      return;
+    }
+
     const newItems: POItem[] = [];
     let sl = 1;
     itemsToUse.forEach((it: any) => {
@@ -956,7 +1129,7 @@ export function PurchaseOrderWorkOrderPage() {
       sl: woItems.length + 1,
       serviceName: "Equipment Preventive Overhaul & Maintenance",
       serviceCode: `SRV-ENG-${Math.floor(10 + Math.random() * 90)}`,
-      workDescription: "Comprehensive diagnostic inspection, calibration, and replacement of consumable filters.",
+      workDescription: remarks || "Comprehensive diagnostic inspection, calibration, and replacement of consumable filters.",
       specification: "Strict compliance with OEM technical service manual.",
       uom: "Job",
       marketUnit: "Job",
@@ -969,7 +1142,8 @@ export function PurchaseOrderWorkOrderPage() {
       lineTotal: 36750,
       serviceStartDate: new Date().toISOString().slice(0, 10),
       serviceEndDate: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
-      remarks: "Field engineer sign-off required",
+      remarks: remarks || "Field engineer sign-off required",
+      csNumber: selectedCS || undefined,
     };
     setWoItems((prev) => [...prev, newWo]);
     toast.success("Service / Work line added.");
@@ -1096,6 +1270,8 @@ export function PurchaseOrderWorkOrderPage() {
       deliveryWarehouse,
       deliveryDate,
       workLocation,
+      area: docType === "Work Order" ? workArea : undefined,
+      contractPerson: docType === "Work Order" ? contractPerson : undefined,
       currency,
       exchangeRate: typeof exchangeRate === "number" ? exchangeRate : 1.0,
       paymentMode,
@@ -1388,12 +1564,12 @@ export function PurchaseOrderWorkOrderPage() {
                   )}
                 </div>
 
-                {/* Field 7: Delivery Warehouse / Work Location */}
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">
-                    {docType === "Purchase Order" ? "Delivery Warehouse *" : "Work Location *"}
-                  </label>
-                  {docType === "Purchase Order" ? (
+                {/* Delivery Warehouse (for Purchase Order only) */}
+                {docType === "Purchase Order" && (
+                  <div>
+                    <label className="block text-xs font-bold mb-1 text-foreground">
+                      Delivery Warehouse *
+                    </label>
                     <select
                       disabled={isViewMode}
                       value={deliveryWarehouse}
@@ -1406,21 +1582,64 @@ export function PurchaseOrderWorkOrderPage() {
                         </option>
                       ))}
                     </select>
-                  ) : (
-                    <input
-                      type="text"
-                      disabled={isViewMode}
-                      value={workLocation}
-                      onChange={(e) => setWorkLocation(e.target.value)}
-                      placeholder="e.g. Annex Server Room"
-                      className="w-full h-8.5 px-3 rounded-lg border border-border/80 bg-background text-xs outline-none focus:border-blue-500 disabled:opacity-70"
-                    />
-                  )}
-                </div>
+                  </div>
+                )}
 
-                {/* Field 8: Expected Delivery Date */}
+                {/* Conditional Fields for Work Order (Service): Work Location -> Area -> Contract Person */}
+                {docType === "Work Order" && (
+                  <>
+                    {/* Work Location (Company Name in searchable dropdown) */}
+                    <div>
+                      <label className="block text-xs font-bold mb-1 text-foreground">
+                        Work Location *
+                      </label>
+                      <SearchableSelect
+                        disabled={isViewMode}
+                        value={workLocation}
+                        onChange={setWorkLocation}
+                        options={companyOptions}
+                        placeholder="Select Company..."
+                        className="h-8.5 rounded-lg text-xs font-medium"
+                      />
+                    </div>
+
+                    {/* Area (Searchable dropdown immediately right of Work Location) */}
+                    <div>
+                      <label className="block text-xs font-bold mb-1 text-foreground">
+                        Area
+                      </label>
+                      <SearchableSelect
+                        disabled={isViewMode}
+                        value={workArea}
+                        onChange={setWorkArea}
+                        options={areaOptions}
+                        placeholder="Select Area..."
+                        className="h-8.5 rounded-lg text-xs font-medium"
+                      />
+                    </div>
+
+                    {/* Contract Person (Company employees names & mobile in searchable dropdown immediately right of Area) */}
+                    <div>
+                      <label className="block text-xs font-bold mb-1 text-foreground">
+                        Contract Person
+                      </label>
+                      <SearchableSelect
+                        disabled={isViewMode}
+                        value={contractPerson}
+                        onChange={setContractPerson}
+                        options={contractPersonOptions}
+                        placeholder="Select Contract Person..."
+                        className="h-8.5 rounded-lg text-xs font-medium"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Field 8: Expected Delivery Date / Expected Service Date */}
                 <div>
-                  <label className="block text-xs font-bold mb-1 text-foreground">Expected Delivery Date *</label>
+                  <label className="block text-xs font-bold mb-1 text-foreground">
+                    {docType === "Work Order" ? "Expected Service Date *" : "Expected Delivery Date *"}
+                  </label>
                   <input
                     type="date"
                     disabled={isViewMode}
@@ -1548,8 +1767,8 @@ export function PurchaseOrderWorkOrderPage() {
                   )}
                 </div>
 
-                {/* Field 13: Job Description / Remarks (Full 4-Column Span) */}
-                <div className="sm:col-span-2 lg:col-span-4">
+                {/* Field 13: Job Description / Remarks (Immediately after Comparative Statement) */}
+                <div className={docType === "Work Order" ? "sm:col-span-1 lg:col-span-3" : "sm:col-span-1 lg:col-span-1"}>
                   <label className="block text-xs font-bold mb-1 text-foreground">
                     Job Description / Subject Remarks
                   </label>
@@ -1835,7 +2054,7 @@ export function PurchaseOrderWorkOrderPage() {
                       <tr>
                         <th className="py-2.5 px-3 w-10 text-center">SL</th>
                         <th className="py-2.5 px-3 min-w-[200px]">Service / Work Name</th>
-                        <th className="py-2.5 px-3 min-w-[200px]">Work Description &amp; Scope</th>
+                        <th className="py-2.5 px-3 min-w-[220px]">Specification</th>
                         <th className="py-2.5 px-3 text-center w-20">UOM</th>
                         <th className="py-2.5 px-3 text-right w-24">Work Qty</th>
                         <th className="py-2.5 px-3 text-right min-w-[110px] w-28">Unit Rate (৳)</th>
@@ -1858,9 +2077,11 @@ export function PurchaseOrderWorkOrderPage() {
                               ) : (
                                 <input
                                   type="text"
+                                  readOnly
+                                  disabled
                                   value={item.serviceName}
-                                  onChange={(e) => handleUpdateWoItem(item.id, "serviceName", e.target.value)}
-                                  className="w-full h-7 px-2 bg-background border border-border/80 rounded-md text-xs font-bold outline-none focus:border-blue-500"
+                                  title="Service / Work Name is read-only once selected"
+                                  className="w-full h-7 px-2 bg-muted/50 border border-border/80 rounded-md text-xs font-bold text-foreground cursor-not-allowed outline-none select-none"
                                 />
                               )}
                               <button
@@ -1884,27 +2105,21 @@ export function PurchaseOrderWorkOrderPage() {
                           </td>
                           <td className="py-2 px-3">
                             {isViewMode ? (
-                              <div className="text-muted-foreground">{item.workDescription}</div>
+                              <div className="text-muted-foreground text-xs">{item.workDescription}</div>
                             ) : (
                               <input
                                 type="text"
                                 value={item.workDescription}
                                 onChange={(e) => handleUpdateWoItem(item.id, "workDescription", e.target.value)}
+                                placeholder="Specification"
                                 className="w-full h-7 px-2 bg-background border border-border/80 rounded-md text-xs outline-none focus:border-blue-500"
                               />
                             )}
                           </td>
                           <td className="py-2 px-2 text-center">
-                            {isViewMode ? (
-                              <span className="font-bold">{item.uom}</span>
-                            ) : (
-                              <input
-                                type="text"
-                                value={item.uom}
-                                onChange={(e) => handleUpdateWoItem(item.id, "uom", e.target.value)}
-                                className="w-16 h-7 px-1.5 text-center bg-background border border-border/80 rounded-md text-xs outline-none font-bold focus:border-blue-500"
-                              />
-                            )}
+                            <span className="inline-block font-mono font-bold text-foreground text-xs px-2.5 py-1 bg-muted/40 rounded border border-border/60">
+                              {item.uom}
+                            </span>
                           </td>
                           <td className="py-2 px-2">
                             {isViewMode ? (

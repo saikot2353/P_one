@@ -39,8 +39,10 @@ import {
   setStoredMaterialReceipts,
   getStoredPurchaseOrders,
   getStoredPoItems,
+  getStoredWoItems,
   getStoredReceiveList,
   setStoredReceiveList,
+  syncReceiveListWithOrders,
 } from "@/lib/procurement-order-inventory-data";
 import { getItemTrackingMode } from "@/lib/item-tracking-utils";
 import {
@@ -90,6 +92,7 @@ export function MaterialReceiveMRRPage() {
 
   const purchaseOrders = useMemo(() => getStoredPurchaseOrders(), []);
   const poItemsMap = useMemo(() => getStoredPoItems(), []);
+  const woItemsMap = useMemo(() => getStoredWoItems(), []);
   const [materialReceipts, setMaterialReceipts] = useState<MaterialReceive[]>(() =>
     getStoredMaterialReceipts()
   );
@@ -111,7 +114,7 @@ export function MaterialReceiveMRRPage() {
     return null;
   }, [materialReceipts, searchParams.receiveNo, searchParams.poNumber, isViewMode]);
 
-  // Active PO reference
+  // Active PO/WO reference
   const selectedPoNumber =
     targetReceipt?.poNumber || searchParams.poNumber || "PO-2026-0001";
   const currentPo = useMemo(() => {
@@ -123,7 +126,22 @@ export function MaterialReceiveMRRPage() {
     targetReceipt?.warehouseStore ||
     searchParams.warehouse ||
     currentPo?.deliveryWarehouse ||
+    currentPo?.workLocation ||
     "Pakiza Technovation Central IT & Hardware Depot";
+
+  const isWorkOrder =
+    currentPo?.documentType === "Work Order" ||
+    targetReceipt?.receiveType === "Work Order" ||
+    selectedPoNumber.startsWith("WO-");
+
+  const activeWorkLocation =
+    currentPo?.workLocation ||
+    targetReceipt?.receiveLocation ||
+    "Pakiza Knit Composite Ltd";
+
+  const activeArea =
+    currentPo?.area ||
+    "PAL-Fabric Dyeing";
 
   // 1. Receive Header Information
   const [receiveNumber, setReceiveNumber] = useState(
@@ -151,18 +169,72 @@ export function MaterialReceiveMRRPage() {
   );
 
   // Material Receive Details Items State
-  // Populated using Base/SKU UOM (Order Qty × Conversion Factor) or saved receipt items
+  // Populated using Base/SKU UOM for POs or Work Order services, or saved receipt items
   const [mrrItems, setMrrItems] = useState<MRRItem[]>(() => {
     if (targetReceipt && targetReceipt.items && targetReceipt.items.length > 0) {
       return targetReceipt.items;
     }
+
+    const existingPoReceipts = materialReceipts.filter(
+      (r) => r.poNumber === selectedPoNumber && (!targetReceipt || r.id !== targetReceipt.id)
+    );
+
+    const getPrevReceivedForItem = (code: string) => {
+      return existingPoReceipts.reduce((sum, r) => {
+        const matched = r.items?.find((i) => i.itemCode === code);
+        return sum + (Number(matched?.currentReceiveQty) || Number(matched?.acceptedQty) || 0);
+      }, 0);
+    };
+
+    // If active order is a Work Order (Services)
+    if (currentPo?.documentType === "Work Order") {
+      const rawWo = woItemsMap[selectedPoNumber] || currentPo?.woItems || [];
+      if (rawWo && rawWo.length > 0) {
+        return rawWo.map((it: any, idx: number) => {
+          const orderedQty = it.workOrderQuantity || it.estimatedQuantity || 1;
+          const prevReceived = getPrevReceivedForItem(it.serviceCode);
+          const remaining = Math.max(0, orderedQty - prevReceived);
+          const currentReceive = remaining;
+          const unitRate = it.unitRate || 0;
+
+          return {
+            id: `mrri-${it.id || idx + 1}`,
+            sl: idx + 1,
+            itemCode: it.serviceCode,
+            itemName: it.serviceName,
+            specification: it.specification || it.workDescription || "",
+            brand: "Service / In-House",
+            origin: "Work Order",
+            uom: it.uom,
+            orderedQty,
+            previouslyReceivedQty: prevReceived,
+            currentReceiveQty: currentReceive,
+            remainingQty: Math.max(0, orderedQty - prevReceived - currentReceive),
+            unitPrice: unitRate,
+            lineTotal: currentReceive * unitRate,
+            batchNumber: "",
+            createDate: new Date().toISOString().slice(0, 10),
+            expiryDate: "",
+            location: currentPo?.workLocation || "On-Site Location",
+            acceptedQty: currentReceive,
+            rejectedQty: 0,
+            remarks: it.remarks || "",
+          };
+        });
+      }
+    }
+
+    // Purchase Order Items
     const rawItems = poItemsMap[selectedPoNumber] || currentPo?.items || [];
     if (rawItems && rawItems.length > 0) {
       return rawItems.map((it: any, idx: number) => {
         const factor = it.conversionFactor && it.conversionFactor > 0 ? it.conversionFactor : 1;
         const baseOrderedQty = Math.round((it.orderedQuantity || 1) * factor);
-        const prevReceived = 0;
-        const currentReceive = baseOrderedQty;
+        const prevReceived = getPrevReceivedForItem(it.itemCode);
+        const remaining = Math.max(0, baseOrderedQty - prevReceived);
+        const currentReceive = remaining;
+        const unitPrice = Math.round(it.unitPrice / factor) || it.unitPrice || 0;
+
         return {
           id: `mrri-${it.id || idx + 1}`,
           sl: idx + 1,
@@ -175,9 +247,9 @@ export function MaterialReceiveMRRPage() {
           orderedQty: baseOrderedQty,
           previouslyReceivedQty: prevReceived,
           currentReceiveQty: currentReceive,
-          remainingQty: baseOrderedQty - prevReceived - currentReceive,
-          unitPrice: Math.round(it.unitPrice / factor) || it.unitPrice,
-          lineTotal: currentReceive * (Math.round(it.unitPrice / factor) || it.unitPrice),
+          remainingQty: Math.max(0, baseOrderedQty - prevReceived - currentReceive),
+          unitPrice,
+          lineTotal: currentReceive * unitPrice,
           batchNumber: "BAT-2026-01",
           createDate: new Date().toISOString().slice(0, 10),
           expiryDate: "",
@@ -273,40 +345,61 @@ export function MaterialReceiveMRRPage() {
   const [previewReportData, setPreviewReportData] = useState<StandardReportData | null>(null);
 
   const handleOpenPreviewReport = () => {
+    const isWO = currentPo?.documentType === "Work Order";
     const supplierName = currentPo?.supplierName || "Groz-Beckert KG / Dell Tech";
     const warehouseStore = selectedStore;
+    const workLocation = currentPo?.workLocation || selectedStore;
+    const workArea = currentPo?.area || "PAL-Fabric Dyeing";
     const vehicleNumber = currentPo?.transportMethod || "Covered Van (DHK-METRO-11-2041)";
     const department = currentPo?.department || "Central Inventory & Stores";
 
     const report: StandardReportData = {
       reportType: "mrr",
-      title: "MATERIAL RECEIVE REPORT (MRR)",
+      title: isWO ? "WORK ORDER SERVICE RECEIVE REPORT (MRR)" : "MATERIAL RECEIVE REPORT (MRR)",
       documentNumber: receiveNumber,
       documentDate: receiveDate,
       hideLogo: true,
       metadata: [
         { label: "MRR Number", value: receiveNumber, highlight: true },
         { label: "Receive Date", value: receiveDate },
-        { label: "PO / WO Number", value: `${currentPo?.orderNumber || selectedPoNumber} (${currentPo?.orderDate || "2026-09-15"})` },
-        { label: "Supplier", value: supplierName, highlight: true },
-        { label: "Warehouse / Store", value: warehouseStore },
-        { label: "Challan Number", value: challanNo },
+        {
+          label: isWO ? "Work Order Number" : "PO / WO Number",
+          value: `${currentPo?.orderNumber || selectedPoNumber} (${currentPo?.orderDate || "2026-09-15"})`,
+        },
+        { label: isWO ? "Contractor / Vendor" : "Supplier", value: supplierName, highlight: true },
+        ...(isWO
+          ? [
+              { label: "Work Location", value: workLocation },
+              { label: "Area", value: workArea },
+            ]
+          : [{ label: "Warehouse / Store", value: warehouseStore }]),
+        { label: isWO ? "Challan / Work Certificate" : "Challan Number", value: challanNo },
         { label: "Challan Date", value: challanDate },
         { label: "Received By", value: receivedBy },
       ],
-      tableHeaders: [
-        "SL",
-        "Item Description & Spec",
-        "Brand / Origin",
-        "UOM",
-        "Ordered Qty",
-        "Regular Qty",
-        "FOC Qty",
-        "Total Received",
-        "Accepted",
-        "Rejected",
-        "Payable Value",
-      ],
+      tableHeaders: isWO
+        ? [
+            "SL",
+            "Service Description & Scope",
+            "UOM",
+            "Ordered Qty",
+            "Service Receive Qty",
+            "Total Received",
+            "Payable Value",
+          ]
+        : [
+            "SL",
+            "Item Description & Spec",
+            "Brand / Origin",
+            "UOM",
+            "Ordered Qty",
+            "Regular Qty",
+            "FOC Qty",
+            "Total Received",
+            "Accepted",
+            "Rejected",
+            "Payable Value",
+          ],
       tableRows: mrrItems.map((item, idx) => {
         const foc = Number(item.focQty) || 0;
         const reg = Number(item.currentReceiveQty) || 0;
@@ -315,6 +408,23 @@ export function MaterialReceiveMRRPage() {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         });
+
+        if (isWO) {
+          return [
+            idx + 1,
+            <div>
+              <div className="font-bold">{item.itemName}</div>
+              <div className="text-[9.5px] text-slate-500 font-mono">
+                {item.itemCode} • {item.specification}
+              </div>
+            </div>,
+            item.uom,
+            item.orderedQty,
+            reg,
+            totalLineReceived,
+            `৳ ${payableVal}`,
+          ];
+        }
 
         return [
           idx + 1,
@@ -339,26 +449,39 @@ export function MaterialReceiveMRRPage() {
           `৳ ${payableVal}`,
         ];
       }),
-      summaryCards: [
-        { label: "Regular Received Qty", value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0), 0) },
-        { label: "FOC (Free of Cost) Qty", value: mrrItems.reduce((acc, i) => acc + (Number(i.focQty) || 0), 0) },
-        {
-          label: "Total Physical Received Qty",
-          value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0) + (Number(i.focQty) || 0), 0),
-        },
-        {
-          label: "Payable Value (Excl. FOC)",
-          value: `৳ ${mrrItems
-            .reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0) * (Number(i.unitPrice) || 0), 0)
-            .toLocaleString()}`,
-        },
-      ],
+      summaryCards: isWO
+        ? [
+            {
+              label: "Total Service Received Qty",
+              value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0), 0),
+            },
+            {
+              label: "Total Payable Value",
+              value: `৳ ${mrrItems
+                .reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0) * (Number(i.unitPrice) || 0), 0)
+                .toLocaleString()}`,
+            },
+          ]
+        : [
+            { label: "Regular Received Qty", value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0), 0) },
+            { label: "FOC (Free of Cost) Qty", value: mrrItems.reduce((acc, i) => acc + (Number(i.focQty) || 0), 0) },
+            {
+              label: "Total Physical Received Qty",
+              value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0) + (Number(i.focQty) || 0), 0),
+            },
+            {
+              label: "Payable Value (Excl. FOC)",
+              value: `৳ ${mrrItems
+                .reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0) * (Number(i.unitPrice) || 0), 0)
+                .toLocaleString()}`,
+            },
+          ],
       signatures: [
-        { role: "Store Officer", name: receivedBy, designation: "Received By" },
-        { role: "QA Inspector", name: "Md. Rafiqul Islam", designation: "Inspected & Verified" },
-        { role: "Warehouse In-Charge", name: "Nazmul Huda", designation: "Store In-Charge" },
+        { role: isWO ? "Contract Supervisor" : "Store Officer", name: receivedBy, designation: "Received By" },
+        { role: isWO ? "Site Engineer" : "QA Inspector", name: "Md. Rafiqul Islam", designation: "Inspected & Verified" },
+        { role: isWO ? "Maintenance In-Charge" : "Warehouse In-Charge", name: "Nazmul Huda", designation: isWO ? "Service Sign-Off" : "Store In-Charge" },
       ],
-      notes: remarks || "Goods physically verified and accepted according to purchase order specifications.",
+      notes: remarks || (isWO ? "Service delivery physically inspected and verified according to work order scope." : "Goods physically verified and accepted according to purchase order specifications."),
     };
 
     setPreviewReportData(report);
@@ -576,8 +699,8 @@ export function MaterialReceiveMRRPage() {
         ...targetReceipt,
         receiveNumber,
         receiveDate,
-        receiveType: targetReceipt.receiveType || "Purchase Order",
-        receiveSource: targetReceipt.receiveSource || "Against Purchase Order",
+        receiveType: currentPo?.documentType === "Work Order" ? "Work Order" : "Purchase Order",
+        receiveSource: currentPo?.documentType === "Work Order" ? "Against Work Order" : "Against Purchase Order",
         poNumber: selectedPoNumber,
         poDate: currentPo?.orderDate || targetReceipt.poDate || "2026-09-15",
         supplierId: currentPo?.supplierId || targetReceipt.supplierId || "sup-1",
@@ -585,7 +708,7 @@ export function MaterialReceiveMRRPage() {
         supplierCode: currentPo?.supplierCode || targetReceipt.supplierCode || "SUP-VENDOR",
         department: currentPo?.department || targetReceipt.department || "Central Operations",
         warehouseStore: selectedStore,
-        receiveLocation: targetReceipt.receiveLocation || "Multiple / Store Defined",
+        receiveLocation: currentPo?.workLocation || targetReceipt.receiveLocation || "Multiple / Store Defined",
         challanNo,
         challanDate,
         receivedBy,
@@ -607,28 +730,13 @@ export function MaterialReceiveMRRPage() {
       setMaterialReceipts(updatedMRRs);
       setStoredMaterialReceipts(updatedMRRs);
 
-      // Recalculate receive status and quantities for this PO across all its receipts
-      const allPoReceipts = updatedMRRs.filter((r) => r.poNumber === selectedPoNumber);
-      const totalPoReceived = allPoReceipts.reduce((sum, r) => sum + (r.totalReceivedQty || 0), 0);
-
-      const receiveList = getStoredReceiveList();
-      const updatedList = receiveList.map((rec) => {
-        if (rec.poNumber === selectedPoNumber) {
-          const newPrev = totalPoReceived;
-          const newPending = Math.max(0, rec.totalOrderedQty - newPrev);
-          return {
-            ...rec,
-            previouslyReceivedQty: newPrev,
-            pendingQty: newPending,
-            receiveStatus: newPending === 0 ? "Complete" : newPrev > 0 ? "Partial" : "Pending",
-          };
-        }
-        return rec;
-      });
-      setStoredReceiveList(updatedList as any);
+      // Recalculate receive status and quantities for all orders across all receipts
+      syncReceiveListWithOrders();
 
       toast.success(
-        `Material Receive "${receiveNumber}" updated successfully! Stock updated with ${totalAccepted} accepted units.`
+        isWorkOrder
+          ? `Work Order Service Receive "${receiveNumber}" updated successfully!`
+          : `Material Receive "${receiveNumber}" updated successfully! Stock updated with ${totalAccepted} accepted units.`
       );
       navigate({ to: "/procurement-material-receive-list" });
       return;
@@ -638,8 +746,8 @@ export function MaterialReceiveMRRPage() {
       id: `mrr-${Date.now()}`,
       receiveNumber,
       receiveDate,
-      receiveType: "Purchase Order",
-      receiveSource: "Against Purchase Order",
+      receiveType: currentPo?.documentType === "Work Order" ? "Work Order" : "Purchase Order",
+      receiveSource: currentPo?.documentType === "Work Order" ? "Against Work Order" : "Against Purchase Order",
       poNumber: selectedPoNumber,
       poDate: currentPo?.orderDate || "2026-09-15",
       supplierId: currentPo?.supplierId || "sup-1",
@@ -647,7 +755,7 @@ export function MaterialReceiveMRRPage() {
       supplierCode: currentPo?.supplierCode || "SUP-VENDOR",
       department: currentPo?.department || "Central Operations",
       warehouseStore: selectedStore,
-      receiveLocation: "Multiple / Store Defined",
+      receiveLocation: currentPo?.workLocation || "Multiple / Store Defined",
       challanNo,
       challanDate,
       receivedBy,
@@ -667,25 +775,13 @@ export function MaterialReceiveMRRPage() {
     setMaterialReceipts(updatedMRRs);
     setStoredMaterialReceipts(updatedMRRs);
 
-    // Update Receive List status for this PO
-    const receiveList = getStoredReceiveList();
-    const updatedList = receiveList.map((rec) => {
-      if (rec.poNumber === selectedPoNumber) {
-        const newPrev = rec.previouslyReceivedQty + totalReceived;
-        const newPending = Math.max(0, rec.totalOrderedQty - newPrev);
-        return {
-          ...rec,
-          previouslyReceivedQty: newPrev,
-          pendingQty: newPending,
-          receiveStatus: newPending === 0 ? "Complete" : "Partial",
-        };
-      }
-      return rec;
-    });
-    setStoredReceiveList(updatedList as any);
+    // Update Receive List status for all POs and WOs
+    syncReceiveListWithOrders();
 
     toast.success(
-      `Material Receive Report "${receiveNumber}" submitted! Inventory updated with ${totalAccepted} accepted units.`
+      isWorkOrder
+        ? `Work Order Service Receive Report "${receiveNumber}" submitted successfully!`
+        : `Material Receive Report "${receiveNumber}" submitted! Inventory updated with ${totalAccepted} accepted units.`
     );
     navigate({ to: "/procurement-material-receive-list" });
   };
@@ -809,18 +905,45 @@ export function MaterialReceiveMRRPage() {
                 />
               </div>
 
-              {/* Warehouse / Store* (Auto-populated from selected store, Cannot be changed) */}
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
-                  <Lock className="size-3 text-muted-foreground" /> Warehouse / Store*
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  value={selectedStore}
-                  className="w-full px-3 py-2 font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-foreground truncate"
-                />
-              </div>
+              {/* Warehouse / Store* (For PO) or Work Location * & Area (For Work Order) */}
+              {isWorkOrder ? (
+                <>
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
+                      <Lock className="size-3 text-muted-foreground" /> Work Location *
+                    </label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={activeWorkLocation}
+                      className="w-full px-3 py-2 font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-foreground truncate"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
+                      <Lock className="size-3 text-muted-foreground" /> Area
+                    </label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={activeArea}
+                      className="w-full px-3 py-2 font-semibold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-foreground truncate"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
+                    <Lock className="size-3 text-muted-foreground" /> Warehouse / Store*
+                  </label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={selectedStore}
+                    className="w-full px-3 py-2 font-bold bg-muted/50 border border-border rounded-lg cursor-not-allowed text-foreground truncate"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
@@ -860,7 +983,7 @@ export function MaterialReceiveMRRPage() {
                 />
               </div>
 
-              <div className="lg:col-span-2">
+              <div className={isWorkOrder ? "" : "lg:col-span-2"}>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                   General Remarks
                 </label>
@@ -881,11 +1004,11 @@ export function MaterialReceiveMRRPage() {
             <div className="flex items-center justify-between border-b border-border/50 pb-3">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
-                  Material Receive Details
+                  {isWorkOrder ? "Work Order Service Details" : "Material Receive Details"}
                 </h2>
               </div>
               <span className="text-xs text-muted-foreground">
-                Ordered Qty is shown in Base/SKU UOM
+                {isWorkOrder ? "Ordered Qty is shown in Service UOM" : "Ordered Qty is shown in Base/SKU UOM"}
               </span>
             </div>
 
@@ -894,18 +1017,26 @@ export function MaterialReceiveMRRPage() {
                 <thead>
                   <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border">
                     <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
-                    <th className="py-2.5 px-3 font-bold min-w-[180px]">Item Description & Spec</th>
+                    <th className="py-2.5 px-3 font-bold min-w-[180px]">
+                      {isWorkOrder ? "Service Description & Scope" : "Item Description & Spec"}
+                    </th>
                     <th className="py-2.5 px-3 font-bold w-24">Brand / Origin</th>
-                    <th className="py-2.5 px-3 w-16 font-bold text-center">SKU UOM</th>
+                    <th className="py-2.5 px-3 w-16 font-bold text-center">
+                      {isWorkOrder ? "UOM" : "SKU UOM"}
+                    </th>
                     <th className="py-2.5 px-3 text-right font-bold w-20">Ordered Qty</th>
                     <th className="py-2.5 px-3 text-right font-bold w-20">Prev Rec</th>
                     <th className="py-2.5 px-3 text-right font-bold w-24 text-primary">
-                      Receive Qty*
+                      {isWorkOrder ? "Service Receive Qty *" : "Receive Qty*"}
                     </th>
                     <th className="py-2.5 px-3 text-right font-bold w-20">Remaining</th>
-                    <th className="py-2.5 px-2 text-center font-bold w-24 text-emerald-600">Accepted</th>
-                    <th className="py-2.5 px-2 text-center font-bold w-24 text-rose-600">Rejected</th>
-                    <th className="py-2.5 px-2 text-center font-bold w-24">Tracking (B/L)</th>
+                    {!isWorkOrder && (
+                      <>
+                        <th className="py-2.5 px-2 text-center font-bold w-24 text-emerald-600">Accepted</th>
+                        <th className="py-2.5 px-2 text-center font-bold w-24 text-rose-600">Rejected</th>
+                        <th className="py-2.5 px-2 text-center font-bold w-24">Tracking (B/L)</th>
+                      </>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -962,58 +1093,62 @@ export function MaterialReceiveMRRPage() {
                           )}
                         </td>
 
-                        {/* Item-level Quality Accepted */}
-                        <td className="py-2.5 px-2 text-center">
-                          <input
-                            type="number"
-                            min="0"
-                            disabled={isViewMode}
-                            max={item.currentReceiveQty}
-                            value={item.acceptedQty}
-                            onChange={(e) =>
-                              handleUpdateAcceptedRejected(item.id, "accepted", Number(e.target.value))
-                            }
-                            className="w-16 text-center font-mono font-bold px-1.5 py-1 bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-500/40 text-emerald-700 dark:text-emerald-400 rounded outline-none focus:border-emerald-600 text-xs disabled:opacity-75 disabled:cursor-not-allowed"
-                          />
-                        </td>
+                        {!isWorkOrder && (
+                          <>
+                            {/* Item-level Quality Accepted */}
+                            <td className="py-2.5 px-2 text-center">
+                              <input
+                                type="number"
+                                min="0"
+                                disabled={isViewMode}
+                                max={item.currentReceiveQty}
+                                value={item.acceptedQty}
+                                onChange={(e) =>
+                                  handleUpdateAcceptedRejected(item.id, "accepted", Number(e.target.value))
+                                }
+                                className="w-16 text-center font-mono font-bold px-1.5 py-1 bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-500/40 text-emerald-700 dark:text-emerald-400 rounded outline-none focus:border-emerald-600 text-xs disabled:opacity-75 disabled:cursor-not-allowed"
+                              />
+                            </td>
 
-                        {/* Item-level Quality Rejected */}
-                        <td className="py-2.5 px-2 text-center">
-                          <input
-                            type="number"
-                            min="0"
-                            disabled={isViewMode}
-                            max={item.currentReceiveQty}
-                            value={item.rejectedQty}
-                            onChange={(e) =>
-                              handleUpdateAcceptedRejected(item.id, "rejected", Number(e.target.value))
-                            }
-                            className="w-16 text-center font-mono font-bold px-1.5 py-1 bg-rose-50/50 dark:bg-rose-950/30 border border-rose-500/40 text-rose-700 dark:text-rose-400 rounded outline-none focus:border-rose-600 text-xs disabled:opacity-75 disabled:cursor-not-allowed"
-                          />
-                        </td>
+                            {/* Item-level Quality Rejected */}
+                            <td className="py-2.5 px-2 text-center">
+                              <input
+                                type="number"
+                                min="0"
+                                disabled={isViewMode}
+                                max={item.currentReceiveQty}
+                                value={item.rejectedQty}
+                                onChange={(e) =>
+                                  handleUpdateAcceptedRejected(item.id, "rejected", Number(e.target.value))
+                                }
+                                className="w-16 text-center font-mono font-bold px-1.5 py-1 bg-rose-50/50 dark:bg-rose-950/30 border border-rose-500/40 text-rose-700 dark:text-rose-400 rounded outline-none focus:border-rose-600 text-xs disabled:opacity-75 disabled:cursor-not-allowed"
+                              />
+                            </td>
 
-                        {/* Tracking (B/L) Cell: Shows ONLY B or ONLY L based on item configuration */}
-                        <td className="py-2.5 px-2 text-center">
-                          <ItemTrackingCell
-                            mode={getItemTrackingMode(item.itemCode)}
-                            batchCount={itemBatches[item.id]?.length || (item.batchNumber ? 1 : 0)}
-                            locationCount={itemLocations[item.id]?.length || (item.location ? 1 : 0)}
-                            onOpenBatch={() => {
-                              if (isViewMode) {
-                                toast.info("Batch allocations are read-only in View Mode.");
-                                return;
-                              }
-                              handleOpenBatchModal(item);
-                            }}
-                            onOpenLocation={() => {
-                              if (isViewMode) {
-                                toast.info("Location allocations are read-only in View Mode.");
-                                return;
-                              }
-                              handleOpenLocationModal(item);
-                            }}
-                          />
-                        </td>
+                            {/* Tracking (B/L) Cell: Shows ONLY B or ONLY L based on item configuration */}
+                            <td className="py-2.5 px-2 text-center">
+                              <ItemTrackingCell
+                                mode={getItemTrackingMode(item.itemCode)}
+                                batchCount={itemBatches[item.id]?.length || (item.batchNumber ? 1 : 0)}
+                                locationCount={itemLocations[item.id]?.length || (item.location ? 1 : 0)}
+                                onOpenBatch={() => {
+                                  if (isViewMode) {
+                                    toast.info("Batch allocations are read-only in View Mode.");
+                                    return;
+                                  }
+                                  handleOpenBatchModal(item);
+                                }}
+                                onOpenLocation={() => {
+                                  if (isViewMode) {
+                                    toast.info("Location allocations are read-only in View Mode.");
+                                    return;
+                                  }
+                                  handleOpenLocationModal(item);
+                                }}
+                              />
+                            </td>
+                          </>
+                        )}
                       </tr>
                     );
                   })}
@@ -1023,9 +1158,15 @@ export function MaterialReceiveMRRPage() {
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-3 text-xs bg-muted/20 p-3 rounded-xl border border-border">
               <div className="flex items-center gap-4 font-mono font-bold">
-                <span className="text-emerald-600">Total Accepted: {totalAccepted}</span>
-                <span className="text-rose-600">Total Rejected: {totalRejected}</span>
-                <span className="text-foreground">Total Receive: {totalReceived}</span>
+                {isWorkOrder ? (
+                  <span className="text-foreground">Total Service Receive: {totalReceived}</span>
+                ) : (
+                  <>
+                    <span className="text-emerald-600">Total Accepted: {totalAccepted}</span>
+                    <span className="text-rose-600">Total Rejected: {totalRejected}</span>
+                    <span className="text-foreground">Total Receive: {totalReceived}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -1033,12 +1174,20 @@ export function MaterialReceiveMRRPage() {
           {/* Section 3: Final Submission */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-card border border-border/80 shadow-2xs">
             <div className="space-y-0.5">
-              <span className="text-xs font-bold text-foreground block">
-                Total Received: <span className="text-primary font-mono">{totalReceived} Units</span> | Accepted Stock: <span className="text-emerald-600 font-mono font-bold">{totalAccepted} Units</span> | Total Value: <span className="text-foreground font-mono font-black">৳{totalAmount.toLocaleString()}</span>
-              </span>
-              <p className="text-[11px] text-muted-foreground">
-                Upon submitting, stock in warehouse &ldquo;{selectedStore}&rdquo; will automatically increment.
-              </p>
+              {isWorkOrder ? (
+                <span className="text-xs font-bold text-foreground block">
+                  Total Service Received: <span className="text-primary font-mono">{totalReceived} Units</span> | Total Value: <span className="text-foreground font-mono font-black">৳{totalAmount.toLocaleString()}</span>
+                </span>
+              ) : (
+                <>
+                  <span className="text-xs font-bold text-foreground block">
+                    Total Received: <span className="text-primary font-mono">{totalReceived} Units</span> | Accepted Stock: <span className="text-emerald-600 font-mono font-bold">{totalAccepted} Units</span> | Total Value: <span className="text-foreground font-mono font-black">৳{totalAmount.toLocaleString()}</span>
+                  </span>
+                  <p className="text-[11px] text-muted-foreground">
+                    Upon submitting, stock in warehouse &ldquo;{selectedStore}&rdquo; will automatically increment.
+                  </p>
+                </>
+              )}
             </div>
 
             <div className="flex items-center gap-3">
@@ -1052,7 +1201,7 @@ export function MaterialReceiveMRRPage() {
                   onClick={handleSubmitMRR}
                   className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-md transition-all cursor-pointer"
                 >
-                  <Save className="size-4" /> Update Material Receive
+                  <Save className="size-4" /> {isWorkOrder ? "Update Service Receive" : "Update Material Receive"}
                 </button>
               ) : (
                 <button
@@ -1060,7 +1209,7 @@ export function MaterialReceiveMRRPage() {
                   onClick={handleSubmitMRR}
                   className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all cursor-pointer"
                 >
-                  <CheckCircle2 className="size-4" /> Submit Material Receive
+                  <CheckCircle2 className="size-4" /> {isWorkOrder ? "Submit Service Receive" : "Submit Material Receive"}
                 </button>
               )}
             </div>
