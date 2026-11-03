@@ -86,8 +86,11 @@ export const payrollCompensationNav: NavItem[] = [
         ],
       },
       {
-        label: "Loan",
-        subitems: [{ label: "Loan Management", to: "/loan-application" }],
+        label: "Loan Application",
+        subitems: [
+          { label: "Loan Application", to: "/loan-application" },
+          { label: "Loan List", to: "/loan-list" },
+        ],
       },
       { label: "Deductions", to: "/payroll-deductions" },
       { label: "Tax Update", to: "/employee-tax-pay" },
