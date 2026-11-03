@@ -11,15 +11,15 @@ import {
   FileText,
   Filter,
   Eye,
-  Plus,
-  Coins,
-  CheckCircle2,
-  Clock,
-  XCircle,
   Calendar,
   Building2,
-  ArrowUpDown,
-  RotateCcw
+  RotateCcw,
+  Layers,
+  MapPin,
+  Briefcase,
+  User,
+  ShieldCheck,
+  CheckCircle2
 } from "lucide-react";
 import {
   LoanApplicationDetailsModal,
@@ -41,13 +41,86 @@ export const Route = createFileRoute("/loan-list")({
   component: LoanListPage,
 });
 
+/** Helper to compute accurate loan repayment balance */
+export function calculateLoanBalance(loan: {
+  status: string;
+  approvalStatus?: string;
+  approvedAmount: number;
+  installmentTerm: number;
+  paidMonths?: number;
+  monthlyRate: number;
+  remainingBalance?: number;
+}) {
+  const isApproved =
+    loan.approvalStatus === "Approved" ||
+    loan.status === "Approved" ||
+    loan.status === "Fully Paid" ||
+    loan.status === "Active";
+
+  if (!isApproved || loan.status === "Rejected" || loan.status === "Closed") {
+    return {
+      paidMonths: 0,
+      totalPaid: 0,
+      remainingBalance: 0,
+      displayPaidMonths: "-",
+      displayRemaining: "-",
+    };
+  }
+
+  if (loan.status === "Pending") {
+    return {
+      paidMonths: 0,
+      totalPaid: 0,
+      remainingBalance: 0,
+      displayPaidMonths: "-",
+      displayRemaining: "-",
+    };
+  }
+
+  if (loan.status === "Fully Paid") {
+    const term = loan.installmentTerm || 1;
+    return {
+      paidMonths: term,
+      totalPaid: loan.approvedAmount,
+      remainingBalance: 0,
+      displayPaidMonths: `${term} / ${term} mo`,
+      displayRemaining: "৳0",
+    };
+  }
+
+  // Active Approved Loan Calculation
+  const approvedAmt = loan.approvedAmount || 0;
+  const term = loan.installmentTerm || 1;
+  const monthly = loan.monthlyRate || (term > 0 ? Math.round(approvedAmt / term) : 0);
+  const paidMonths = typeof loan.paidMonths === "number" ? loan.paidMonths : 0;
+  
+  // Total repaid so far
+  const totalPaid = Math.min(approvedAmt, paidMonths * monthly);
+  
+  // Outstanding remaining balance = Approved Amount - Total Paid
+  const remaining = typeof loan.remainingBalance === "number" && loan.remainingBalance >= 0
+    ? loan.remainingBalance
+    : Math.max(0, approvedAmt - totalPaid);
+
+  return {
+    paidMonths,
+    totalPaid,
+    remainingBalance: remaining,
+    displayPaidMonths: `${paidMonths} / ${term} mo`,
+    displayRemaining: `৳${remaining.toLocaleString()}`,
+  };
+}
+
 const INITIAL_LOANS: LoanRecord[] = [
   {
     id: "LN-000002",
     reqNo: "LN-000002",
     applicationDate: "01/09/2026",
     submittedTime: "5:37 PM",
-    status: "Approved",
+    approvalStatus: "Approved",
+    status: "Active",
+    company: "Pakiza Software Limited",
+    area: "PSL -Operation",
     empId: "2024049326",
     empName: "Hanif Uddin",
     designation: "Sr. Executive",
@@ -62,7 +135,9 @@ const INITIAL_LOANS: LoanRecord[] = [
     requestedAmount: 150000,
     approvedAmount: 150000,
     installmentTerm: 15,
+    paidMonths: 3,
     monthlyRate: 10000,
+    remainingBalance: 120000, // 150,000 - (3 * 10,000) = 120,000
     reason: "Marige",
     submitter: {
       name: "Md. Anik Islam",
@@ -92,7 +167,10 @@ const INITIAL_LOANS: LoanRecord[] = [
     reqNo: "LN-000001",
     applicationDate: "15/08/2026",
     submittedTime: "10:15 AM",
-    status: "Approved",
+    approvalStatus: "Approved",
+    status: "Active",
+    company: "Pakiza Knit Composite Ltd.",
+    area: "Knit Dyeing",
     empId: "2018010173",
     empName: "Md. Golam Mowdud",
     designation: "Manager",
@@ -107,7 +185,9 @@ const INITIAL_LOANS: LoanRecord[] = [
     requestedAmount: 50000,
     approvedAmount: 50000,
     installmentTerm: 10,
+    paidMonths: 4,
     monthlyRate: 5000,
+    remainingBalance: 30000, // 50,000 - (4 * 5,000) = 30,000
     reason: "Dear Sir, This loan is required for his wife's Cesarean (Baby Delivery) Surgery purpose.",
     submitter: {
       name: "Md. Golam Mowdud",
@@ -123,7 +203,10 @@ const INITIAL_LOANS: LoanRecord[] = [
     reqNo: "LN-000003",
     applicationDate: "20/08/2026",
     submittedTime: "02:45 PM",
-    status: "Approved",
+    approvalStatus: "Approved",
+    status: "Active",
+    company: "Pakiza Software Limited",
+    area: "PSL -Operation",
     empId: "2021028341",
     empName: "Tanvir Ahmed",
     designation: "Assistant Manager",
@@ -138,7 +221,9 @@ const INITIAL_LOANS: LoanRecord[] = [
     requestedAmount: 80000,
     approvedAmount: 80000,
     installmentTerm: 8,
+    paidMonths: 2,
     monthlyRate: 10000,
+    remainingBalance: 60000, // 80,000 - (2 * 10,000) = 60,000
     reason: "Residential House Renovation and Maintenance Expenses.",
     submitter: {
       name: "Tanvir Ahmed",
@@ -154,7 +239,10 @@ const INITIAL_LOANS: LoanRecord[] = [
     reqNo: "LN-000004",
     applicationDate: "28/08/2026",
     submittedTime: "11:00 AM",
-    status: "Approved",
+    approvalStatus: "Approved",
+    status: "Active",
+    company: "Pakiza Apparels Ltd.",
+    area: "Factory Unit-1",
     empId: "2022039124",
     empName: "Farhana Akter",
     designation: "Senior Merchandiser",
@@ -169,7 +257,9 @@ const INITIAL_LOANS: LoanRecord[] = [
     requestedAmount: 120000,
     approvedAmount: 100000,
     installmentTerm: 10,
+    paidMonths: 3,
     monthlyRate: 10000,
+    remainingBalance: 70000, // 100,000 - (3 * 10,000) = 70,000
     reason: "Child Higher Education University Admission & Semester Fee.",
     submitter: {
       name: "Farhana Akter",
@@ -181,11 +271,86 @@ const INITIAL_LOANS: LoanRecord[] = [
     },
   },
   {
+    id: "LN-000008",
+    reqNo: "LN-000008",
+    applicationDate: "05/01/2026",
+    submittedTime: "11:30 AM",
+    approvalStatus: "Approved",
+    status: "Fully Paid",
+    company: "Pakiza Software Limited",
+    area: "PSL -Operation",
+    empId: "2019012384",
+    empName: "Nazmul Huda",
+    designation: "Senior Executive",
+    department: "Store & Inventory",
+    section: "Central Warehouse",
+    operationalDivision: "PSL -Operation",
+    joinDate: "14/05/2019",
+    basicSalary: 36000,
+    grossSalary: 56000,
+    documents: "",
+    avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    requestedAmount: 60000,
+    approvedAmount: 60000,
+    installmentTerm: 6,
+    paidMonths: 6,
+    monthlyRate: 10000,
+    remainingBalance: 0,
+    reason: "Personal Emergency Expense Loan.",
+    submitter: {
+      name: "Nazmul Huda",
+      empId: "2019012384",
+      designation: "Senior Executive",
+      department: "Store & Inventory",
+      time: "11:30 AM",
+      date: "05/01/2026",
+    },
+  },
+  {
+    id: "LN-000009",
+    reqNo: "LN-000009",
+    applicationDate: "10/02/2026",
+    submittedTime: "02:15 PM",
+    approvalStatus: "Approved",
+    status: "Fully Paid",
+    company: "Pakiza Apparels Ltd.",
+    area: "Factory Unit-1",
+    empId: "2017009412",
+    empName: "Rashedul Islam",
+    designation: "Assistant Manager",
+    department: "Production",
+    section: "Cutting Department",
+    operationalDivision: "Factory Unit-1",
+    joinDate: "10/02/2017",
+    basicSalary: 40000,
+    grossSalary: 62000,
+    documents: "",
+    avatarUrl: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80",
+    requestedAmount: 100000,
+    approvedAmount: 100000,
+    installmentTerm: 10,
+    paidMonths: 10,
+    monthlyRate: 10000,
+    remainingBalance: 0,
+    reason: "Family Medical & Surgical Expenses.",
+    submitter: {
+      name: "Rashedul Islam",
+      empId: "2017009412",
+      designation: "Assistant Manager",
+      department: "Production",
+      time: "02:15 PM",
+      date: "10/02/2026",
+    },
+  },
+  {
     id: "LN-000005",
     reqNo: "LN-000005",
     applicationDate: "05/09/2026",
     submittedTime: "04:10 PM",
+    approvalStatus: "Pending",
     status: "Pending",
+    company: "Pakiza Corporate HQ",
+    area: "Corporate HQ",
     empId: "2023041920",
     empName: "Mahbubur Rahman",
     designation: "Executive",
@@ -200,7 +365,9 @@ const INITIAL_LOANS: LoanRecord[] = [
     requestedAmount: 60000,
     approvedAmount: 0,
     installmentTerm: 6,
+    paidMonths: 0,
     monthlyRate: 10000,
+    remainingBalance: 0,
     reason: "Emergency Medical Treatment for Mother in Dhaka.",
     submitter: {
       name: "Mahbubur Rahman",
@@ -216,7 +383,10 @@ const INITIAL_LOANS: LoanRecord[] = [
     reqNo: "LN-000006",
     applicationDate: "10/09/2026",
     submittedTime: "09:30 AM",
+    approvalStatus: "Pending",
     status: "Pending",
+    company: "Pakiza Knit Composite Ltd.",
+    area: "Knit Dyeing",
     empId: "2020015523",
     empName: "Kamrul Islam",
     designation: "Maintenance Engineer",
@@ -231,7 +401,9 @@ const INITIAL_LOANS: LoanRecord[] = [
     requestedAmount: 45000,
     approvedAmount: 0,
     installmentTerm: 9,
+    paidMonths: 0,
     monthlyRate: 5000,
+    remainingBalance: 0,
     reason: "Emergency Home Repair & Roof Waterproofing.",
     submitter: {
       name: "Kamrul Islam",
@@ -247,7 +419,10 @@ const INITIAL_LOANS: LoanRecord[] = [
     reqNo: "LN-000007",
     applicationDate: "12/09/2026",
     submittedTime: "03:15 PM",
-    status: "Rejected",
+    approvalStatus: "Rejected",
+    status: "Closed",
+    company: "Pakiza Textiles Ltd.",
+    area: "Factory Unit-2",
     empId: "2024050119",
     empName: "Sabbir Hossain",
     designation: "Junior Officer",
@@ -262,7 +437,9 @@ const INITIAL_LOANS: LoanRecord[] = [
     requestedAmount: 40000,
     approvedAmount: 0,
     installmentTerm: 8,
+    paidMonths: 0,
     monthlyRate: 5000,
+    remainingBalance: 0,
     reason: "Motorcycle Purchase Down Payment.",
     submitter: {
       name: "Sabbir Hossain",
@@ -275,6 +452,19 @@ const INITIAL_LOANS: LoanRecord[] = [
   },
 ];
 
+function parseDateStrToDate(dStr: string): Date | null {
+  if (!dStr) return null;
+  const parts = dStr.split(/[-/]/);
+  if (parts.length === 3) {
+    if (parts[0].length === 4) {
+      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    } else {
+      return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+    }
+  }
+  return new Date(dStr);
+}
+
 function LoanListPage() {
   const [loans] = useState<LoanRecord[]>(INITIAL_LOANS);
   const [selectedLoan, setSelectedLoan] = useState<LoanRecord | null>(null);
@@ -285,53 +475,109 @@ function LoanListPage() {
   const [selectedPrintLoan, setSelectedPrintLoan] = useState<LoanPrintData | null>(null);
   const [isAllLoansPrintOpen, setIsAllLoansPrintOpen] = useState(false);
 
-  // Filters
-  const [searchQuery, setSearchQuery] = useState("");
+  // Exact 10 Filters State
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [empIdFilter, setEmpIdFilter] = useState("");
+  const [companyFilter, setCompanyFilter] = useState("ALL");
+  const [areaFilter, setAreaFilter] = useState("ALL");
   const [departmentFilter, setDepartmentFilter] = useState("ALL");
-  const [statusFilter, setStatusFilter] = useState("ALL");
   const [sectionFilter, setSectionFilter] = useState("ALL");
+  const [designationFilter, setDesignationFilter] = useState("ALL");
+  const [approvalStatusFilter, setApprovalStatusFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
-  // Unique lists for dropdowns
+  // Dynamic unique options for dropdowns
+  const companies = useMemo(() => {
+    return Array.from(new Set(loans.map((l) => l.company).filter(Boolean))).sort();
+  }, [loans]);
+
+  const areas = useMemo(() => {
+    return Array.from(new Set(loans.map((l) => l.area || l.operationalDivision).filter(Boolean))).sort();
+  }, [loans]);
+
   const departments = useMemo(() => {
-    return Array.from(new Set(loans.map((l) => l.department))).sort();
+    return Array.from(new Set(loans.map((l) => l.department).filter(Boolean))).sort();
   }, [loans]);
 
   const sections = useMemo(() => {
-    return Array.from(new Set(loans.map((l) => l.section))).sort();
+    return Array.from(new Set(loans.map((l) => l.section).filter(Boolean))).sort();
   }, [loans]);
 
-  // Filtered loans list
+  const designations = useMemo(() => {
+    return Array.from(new Set(loans.map((l) => l.designation).filter(Boolean))).sort();
+  }, [loans]);
+
+  // Filtered loans list according to all 10 criteria
   const filteredLoans = useMemo(() => {
     return loans.filter((item) => {
-      if (departmentFilter !== "ALL" && item.department !== departmentFilter) return false;
-      if (sectionFilter !== "ALL" && item.section !== sectionFilter) return false;
-      if (statusFilter !== "ALL" && item.status !== statusFilter) return false;
+      // 1. From Date (Application Date)
+      if (fromDate) {
+        const from = new Date(fromDate);
+        from.setHours(0, 0, 0, 0);
+        const itemDate = parseDateStrToDate(item.applicationDate);
+        if (itemDate && itemDate < from) return false;
+      }
 
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
+      // 2. To Date (Application Date)
+      if (toDate) {
+        const to = new Date(toDate);
+        to.setHours(23, 59, 59, 999);
+        const itemDate = parseDateStrToDate(item.applicationDate);
+        if (itemDate && itemDate > to) return false;
+      }
+
+      // 3. Employee ID (Partial or Exact match)
+      if (empIdFilter.trim()) {
+        const q = empIdFilter.toLowerCase().trim();
         const matchesEmpId = item.empId.toLowerCase().includes(q);
         const matchesName = item.empName.toLowerCase().includes(q);
-        const matchesReqNo = item.reqNo.toLowerCase().includes(q);
-        const matchesDesignation = item.designation.toLowerCase().includes(q);
-        const matchesDivision = item.operationalDivision.toLowerCase().includes(q);
-        if (!matchesEmpId && !matchesName && !matchesReqNo && !matchesDesignation && !matchesDivision) {
-          return false;
-        }
+        if (!matchesEmpId && !matchesName) return false;
+      }
+
+      // 4. Company
+      if (companyFilter !== "ALL" && item.company !== companyFilter) return false;
+
+      // 5. Area
+      const itemArea = item.area || item.operationalDivision;
+      if (areaFilter !== "ALL" && itemArea !== areaFilter) return false;
+
+      // 6. Department
+      if (departmentFilter !== "ALL" && item.department !== departmentFilter) return false;
+
+      // 7. Section
+      if (sectionFilter !== "ALL" && item.section !== sectionFilter) return false;
+
+      // 8. Designation
+      if (designationFilter !== "ALL" && item.designation !== designationFilter) return false;
+
+      // 9. Approval Status
+      const itemAppStatus = item.approvalStatus || (item.status === "Approved" || item.status === "Fully Paid" ? "Approved" : item.status);
+      if (approvalStatusFilter !== "ALL" && itemAppStatus !== approvalStatusFilter) return false;
+
+      // 10. Status (Active, Fully Paid, Closed, etc.)
+      if (statusFilter !== "ALL") {
+        if (statusFilter === "Active" && item.status !== "Active" && item.status !== "Approved") return false;
+        if (statusFilter === "Fully Paid" && item.status !== "Fully Paid") return false;
+        if (statusFilter === "Closed" && item.status !== "Closed" && item.status !== "Rejected") return false;
+        if (statusFilter === "Pending" && item.status !== "Pending") return false;
       }
 
       return true;
     });
-  }, [loans, departmentFilter, sectionFilter, statusFilter, searchQuery]);
-
-  // Statistics
-  const totalApplications = loans.length;
-  const totalApprovedAmount = useMemo(() => {
-    return loans.filter((l) => l.status === "Approved").reduce((sum, l) => sum + l.approvedAmount, 0);
-  }, [loans]);
-  const pendingCount = loans.filter((l) => l.status === "Pending").length;
-  const totalMonthlyRecoveries = useMemo(() => {
-    return loans.filter((l) => l.status === "Approved").reduce((sum, l) => sum + l.monthlyRate, 0);
-  }, [loans]);
+  }, [
+    loans,
+    fromDate,
+    toDate,
+    empIdFilter,
+    companyFilter,
+    areaFilter,
+    departmentFilter,
+    sectionFilter,
+    designationFilter,
+    approvalStatusFilter,
+    statusFilter,
+  ]);
 
   const handleOpenDetails = (loan: LoanRecord) => {
     setSelectedLoan(loan);
@@ -339,6 +585,7 @@ function LoanListPage() {
   };
 
   const handleOpenPrint = (loan: LoanRecord) => {
+    const calc = calculateLoanBalance(loan);
     const printData: LoanPrintData = {
       id: typeof loan.id === "number" ? loan.id : 101,
       empId: loan.empId,
@@ -348,18 +595,31 @@ function LoanListPage() {
       unit: loan.operationalDivision,
       basicSalary: loan.basicSalary,
       grossSalary: loan.grossSalary,
-      areaName: loan.operationalDivision,
+      areaName: loan.area || loan.operationalDivision,
       joinDate: loan.joinDate,
       expLoanAmount: loan.requestedAmount,
       appLoanAmt: loan.approvedAmount,
       installments: loan.installmentTerm,
       installmentAmt: loan.monthlyRate,
       reason: loan.reason,
-      status: loan.status,
+      status: loan.status === "Fully Paid" ? "Approved" : (loan.approvalStatus || (loan.status as any)),
       applicationDate: loan.applicationDate,
     };
     setSelectedPrintLoan(printData);
     setIsSinglePrintOpen(true);
+  };
+
+  const handleResetFilters = () => {
+    setFromDate("");
+    setToDate("");
+    setEmpIdFilter("");
+    setCompanyFilter("ALL");
+    setAreaFilter("ALL");
+    setDepartmentFilter("ALL");
+    setSectionFilter("ALL");
+    setDesignationFilter("ALL");
+    setApprovalStatusFilter("ALL");
+    setStatusFilter("ALL");
   };
 
   const handleExportCSV = () => {
@@ -367,33 +627,44 @@ function LoanListPage() {
       "Sl",
       "Employee ID",
       "Employee Name",
+      "Company",
+      "Area",
       "Designation",
       "Department",
       "Section",
-      "Operational Division",
       "Requested Amount",
       "Approved Amount",
       "Installment Term",
+      "Paid Months",
       "Monthly Rate",
+      "Remaining Balance",
+      "Approval Status",
       "Status",
       "Application Date",
     ];
 
-    const rows = filteredLoans.map((l, index) => [
-      index + 1,
-      `"${l.empId}"`,
-      `"${l.empName}"`,
-      `"${l.designation}"`,
-      `"${l.department}"`,
-      `"${l.section}"`,
-      `"${l.operationalDivision}"`,
-      l.requestedAmount,
-      l.approvedAmount,
-      `"${l.installmentTerm} Months"`,
-      l.monthlyRate,
-      l.status,
-      l.applicationDate,
-    ]);
+    const rows = filteredLoans.map((l, index) => {
+      const calc = calculateLoanBalance(l);
+      return [
+        index + 1,
+        `"${l.empId}"`,
+        `"${l.empName}"`,
+        `"${l.company || ""}"`,
+        `"${l.area || l.operationalDivision}"`,
+        `"${l.designation}"`,
+        `"${l.department}"`,
+        `"${l.section}"`,
+        l.requestedAmount,
+        l.approvedAmount,
+        `"${l.installmentTerm} Months"`,
+        `"${calc.paidMonths} Months"`,
+        l.monthlyRate,
+        calc.remainingBalance,
+        l.approvalStatus || (l.status === "Approved" || l.status === "Fully Paid" ? "Approved" : l.status),
+        l.status,
+        l.applicationDate,
+      ];
+    });
 
     const csvContent =
       "data:text/csv;charset=utf-8," +
@@ -412,7 +683,7 @@ function LoanListPage() {
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col relative overflow-y-auto">
         <Topbar />
-        <div className="p-4 md:p-6 space-y-6 w-full max-w-[1700px] mx-auto">
+        <div className="p-4 md:p-6 space-y-5 w-full max-w-[1750px] mx-auto">
           
           {/* Breadcrumb Navigation */}
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
@@ -429,128 +700,138 @@ function LoanListPage() {
             <span className="text-slate-700 dark:text-slate-300 font-bold">Loan List</span>
           </div>
 
-          {/* Top Banner Card */}
-          <div className="relative bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs overflow-hidden">
-            <div className="absolute right-0 top-0 w-80 h-80 bg-blue-50/40 dark:bg-blue-900/10 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3" />
-            
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
-              <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
-                  <Coins className="size-3.5" />
-                  Payroll & Loan Management
-                </div>
-                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                  Employee Loan List
-                </h1>
-                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-                  Directory of employee company loan applications, approved sanction amounts, repayment tenures, monthly deduction rates, and detailed amortization profiles.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5">
-                <Link to="/loan-application">
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-10 px-5 rounded-xl transition-all shadow-md shadow-blue-500/10 flex items-center gap-2 text-xs cursor-pointer"
-                  >
-                    <Plus className="size-4" />
-                    APPLY FOR LOAN
-                  </Button>
-                </Link>
-
-                <Button
-                  variant="outline"
-                  onClick={() => setIsAllLoansPrintOpen(true)}
-                  className="h-10 px-4 rounded-xl border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-bold text-xs flex items-center gap-2 shadow-2xs cursor-pointer"
-                  title="Print All Loans Register"
-                >
-                  <Printer className="size-4 text-blue-600" />
-                  <span>Print Loan Register</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Metrics Ribbon */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-              <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-950/40 border border-slate-150 dark:border-slate-800/80">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
-                  Total Applications
-                </span>
-                <span className="text-2xl font-black text-slate-900 dark:text-white font-mono mt-1 block">
-                  {totalApplications}
-                </span>
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  All active & historical loans
-                </span>
-              </div>
-
-              <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-150 dark:border-emerald-900/40">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
-                  Total Approved Sanctions
-                </span>
-                <span className="text-2xl font-black text-emerald-700 dark:text-emerald-300 font-mono mt-1 block">
-                  ৳{totalApprovedAmount.toLocaleString()}
-                </span>
-                <span className="text-[10px] text-emerald-600/80 mt-1 block">
-                  Disbursed company capital
-                </span>
-              </div>
-
-              <div className="p-4 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-150 dark:border-amber-900/40">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 block">
-                  Pending Approvals
-                </span>
-                <span className="text-2xl font-black text-amber-700 dark:text-amber-300 font-mono mt-1 block">
-                  {pendingCount}
-                </span>
-                <span className="text-[10px] text-amber-600/80 mt-1 block">
-                  Awaiting HOD / HR approval
-                </span>
-              </div>
-
-              <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-150 dark:border-blue-900/40">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400 block">
-                  Monthly Recovery Rate
-                </span>
-                <span className="text-2xl font-black text-blue-700 dark:text-blue-300 font-mono mt-1 block">
-                  ৳{totalMonthlyRecoveries.toLocaleString()}
-                </span>
-                <span className="text-[10px] text-blue-600/80 mt-1 block">
-                  Active monthly deductions
-                </span>
-              </div>
+          {/* Clean Page Title Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h1 className="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Loan List
+              </h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Comprehensive directory of employee loan applications, terms, and repayment parameters.
+              </p>
             </div>
           </div>
 
-          {/* Filter Bar */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
-            <div className="flex items-center gap-2 mb-3">
-              <Filter className="size-4 text-blue-600" />
-              <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                Filter & Search Records
-              </h2>
+          {/* ── 10 EXACT FILTER CONTROLS ── */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Filter className="size-4 text-blue-600" />
+                <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                  Filter Records
+                </h2>
+              </div>
+              
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="text-xs font-bold text-slate-500 hover:text-rose-600 flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Reset all filter fields"
+              >
+                <RotateCcw className="size-3.5" />
+                <span>Reset Filters</span>
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Responsive 5-column layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 text-xs">
+              
+              {/* 1. From Date */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 block">Search by Employee ID / Name</label>
+                <label className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <Calendar className="size-3 text-blue-600" />
+                  <span>From Date</span>
+                </label>
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
+              </div>
+
+              {/* 2. To Date */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <Calendar className="size-3 text-blue-600" />
+                  <span>To Date</span>
+                </label>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
+              </div>
+
+              {/* 3. Employee ID */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <User className="size-3 text-slate-400" />
+                  <span>Employee ID</span>
+                </label>
                 <div className="relative">
-                  <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search className="size-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
-                    placeholder="Search ID, name, req no..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="Search by ID or name..."
+                    value={empIdFilter}
+                    onChange={(e) => setEmpIdFilter(e.target.value)}
+                    className="w-full h-9 pl-8 pr-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
               </div>
 
+              {/* 4. Company */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 block">Department</label>
+                <label className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <Building2 className="size-3 text-slate-400" />
+                  <span>Company</span>
+                </label>
+                <select
+                  value={companyFilter}
+                  onChange={(e) => setCompanyFilter(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer truncate"
+                >
+                  <option value="ALL">All Companies</option>
+                  {companies.map((comp) => (
+                    <option key={comp} value={comp}>
+                      {comp}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 5. Area */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <MapPin className="size-3 text-slate-400" />
+                  <span>Area</span>
+                </label>
+                <select
+                  value={areaFilter}
+                  onChange={(e) => setAreaFilter(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer truncate"
+                >
+                  <option value="ALL">All Areas</option>
+                  {areas.map((ar) => (
+                    <option key={ar} value={ar}>
+                      {ar}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 6. Department */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <Building2 className="size-3 text-slate-400" />
+                  <span>Department</span>
+                </label>
                 <select
                   value={departmentFilter}
                   onChange={(e) => setDepartmentFilter(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                  className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer truncate"
                 >
                   <option value="ALL">All Departments</option>
                   {departments.map((dept) => (
@@ -561,12 +842,16 @@ function LoanListPage() {
                 </select>
               </div>
 
+              {/* 7. Section */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 block">Section</label>
+                <label className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <Layers className="size-3 text-slate-400" />
+                  <span>Section</span>
+                </label>
                 <select
                   value={sectionFilter}
                   onChange={(e) => setSectionFilter(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                  className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer truncate"
                 >
                   <option value="ALL">All Sections</option>
                   {sections.map((sec) => (
@@ -577,35 +862,63 @@ function LoanListPage() {
                 </select>
               </div>
 
+              {/* 8. Designation */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 block">Approval Status</label>
-                <div className="flex gap-2">
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="flex-1 h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
-                  >
-                    <option value="ALL">All Status</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Rejected">Rejected</option>
-                  </select>
-
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSearchQuery("");
-                      setDepartmentFilter("ALL");
-                      setSectionFilter("ALL");
-                      setStatusFilter("ALL");
-                    }}
-                    className="h-10 px-3 rounded-xl border-slate-200 text-slate-500 hover:text-slate-800"
-                    title="Reset all filters"
-                  >
-                    <RotateCcw className="size-4" />
-                  </Button>
-                </div>
+                <label className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <Briefcase className="size-3 text-slate-400" />
+                  <span>Designation</span>
+                </label>
+                <select
+                  value={designationFilter}
+                  onChange={(e) => setDesignationFilter(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer truncate"
+                >
+                  <option value="ALL">All Designations</option>
+                  {designations.map((desig) => (
+                    <option key={desig} value={desig}>
+                      {desig}
+                    </option>
+                  ))}
+                </select>
               </div>
+
+              {/* 9. Approval Status */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <ShieldCheck className="size-3 text-slate-400" />
+                  <span>Approval Status</span>
+                </label>
+                <select
+                  value={approvalStatusFilter}
+                  onChange={(e) => setApprovalStatusFilter(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                >
+                  <option value="ALL">All Approval Status</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+
+              {/* 10. Status */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <CheckCircle2 className="size-3 text-slate-400" />
+                  <span>Status</span>
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                >
+                  <option value="ALL">All Status</option>
+                  <option value="Active">Active / Running</option>
+                  <option value="Fully Paid">Fully Paid</option>
+                  <option value="Pending">Pending Review</option>
+                  <option value="Closed">Closed</option>
+                </select>
+              </div>
+
             </div>
           </div>
 
@@ -653,7 +966,7 @@ function LoanListPage() {
               </div>
             </div>
 
-            {/* ── Table with exact required columns ── */}
+            {/* ── Table with all columns ── */}
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left border-collapse whitespace-nowrap">
                 <thead className="text-[11px] uppercase tracking-wider font-extrabold text-slate-500 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-950/60 border-b border-slate-200/80 dark:border-slate-800">
@@ -671,6 +984,9 @@ function LoanListPage() {
                       Employee Name
                     </th>
                     <th className="px-4 py-3.5 border-r border-slate-100 dark:border-slate-800/80">
+                      Company
+                    </th>
+                    <th className="px-4 py-3.5 border-r border-slate-100 dark:border-slate-800/80">
                       Designation
                     </th>
                     <th className="px-4 py-3.5 border-r border-slate-100 dark:border-slate-800/80">
@@ -680,7 +996,7 @@ function LoanListPage() {
                       Section
                     </th>
                     <th className="px-4 py-3.5 border-r border-slate-100 dark:border-slate-800/80">
-                      Operational Division
+                      Area
                     </th>
                     <th className="px-4 py-3.5 border-r border-slate-100 dark:border-slate-800/80 text-right">
                       REQUESTED AMOUNT
@@ -691,8 +1007,17 @@ function LoanListPage() {
                     <th className="px-4 py-3.5 border-r border-slate-100 dark:border-slate-800/80 text-center">
                       INSTALLMENT TERM
                     </th>
+                    <th className="px-4 py-3.5 border-r border-slate-100 dark:border-slate-800/80 text-center text-blue-600 dark:text-blue-400">
+                      PAID MONTHS
+                    </th>
                     <th className="px-4 py-3.5 border-r border-slate-100 dark:border-slate-800/80 text-right">
                       MONTHLY RATE
+                    </th>
+                    <th className="px-4 py-3.5 border-r border-slate-100 dark:border-slate-800/80 text-right text-rose-600 dark:text-rose-400">
+                      REMAINING BALANCE
+                    </th>
+                    <th className="px-4 py-3.5 border-r border-slate-100 dark:border-slate-800/80 text-center">
+                      Approval Status
                     </th>
                     <th className="px-4 py-3.5 text-center">
                       Status
@@ -702,116 +1027,174 @@ function LoanListPage() {
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 bg-white dark:bg-slate-900">
                   {filteredLoans.length === 0 ? (
                     <tr>
-                      <td colSpan={13} className="px-4 py-16 text-center text-slate-400 text-sm font-semibold">
+                      <td colSpan={17} className="px-4 py-16 text-center text-slate-400 text-sm font-semibold">
                         No loan records match selected filters.
                       </td>
                     </tr>
                   ) : (
-                    filteredLoans.map((row, index) => (
-                      <tr
-                        key={row.id}
-                        onClick={() => handleOpenDetails(row)}
-                        className="hover:bg-blue-50/40 dark:hover:bg-blue-950/20 transition-colors cursor-pointer group"
-                      >
-                        {/* Sl */}
-                        <td className="px-3.5 py-3 text-slate-400 text-center border-r border-slate-100 dark:border-slate-800 font-bold">
-                          {index + 1}
-                        </td>
+                    filteredLoans.map((row, index) => {
+                      const appStatus =
+                        row.approvalStatus ||
+                        (row.status === "Approved" || row.status === "Fully Paid" ? "Approved" : row.status);
+                      
+                      // Accurate, dynamic loan balance calculation
+                      const calc = calculateLoanBalance(row);
 
-                        {/* Actions */}
-                        <td
-                          className="px-3.5 py-3 text-center border-r border-slate-100 dark:border-slate-800"
-                          onClick={(e) => e.stopPropagation()}
+                      return (
+                        <tr
+                          key={row.id}
+                          onClick={() => handleOpenDetails(row)}
+                          className="hover:bg-blue-50/40 dark:hover:bg-blue-950/20 transition-colors cursor-pointer group"
                         >
-                          <div className="flex items-center justify-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => handleOpenDetails(row)}
-                              className="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 p-1.5 rounded-lg border border-blue-100 dark:border-blue-900 hover:bg-blue-100 transition-colors cursor-pointer shadow-2xs"
-                              title="View Loan Application Details (Modal)"
-                            >
-                              <Eye className="size-3.5" strokeWidth={2.5} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleOpenPrint(row)}
-                              className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 p-1.5 rounded-lg border border-emerald-100 dark:border-emerald-900 hover:bg-emerald-100 transition-colors cursor-pointer shadow-2xs"
-                              title="Print Official Loan Application Form"
-                            >
-                              <Printer className="size-3.5" strokeWidth={2.5} />
-                            </button>
-                          </div>
-                        </td>
+                          {/* Sl */}
+                          <td className="px-3.5 py-3 text-slate-400 text-center border-r border-slate-100 dark:border-slate-800 font-bold">
+                            {index + 1}
+                          </td>
 
-                        {/* Employee ID */}
-                        <td className="px-4 py-3 font-mono font-bold text-slate-700 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800">
-                          {row.empId}
-                        </td>
-
-                        {/* Employee Name */}
-                        <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100 border-r border-slate-100 dark:border-slate-800 group-hover:text-blue-600 transition-colors">
-                          <div className="flex items-center gap-2">
-                            <span className="size-2 rounded-full bg-blue-500 shrink-0" />
-                            <span>{row.empName}</span>
-                          </div>
-                        </td>
-
-                        {/* Designation */}
-                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800">
-                          {row.designation}
-                        </td>
-
-                        {/* Department */}
-                        <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800">
-                          {row.department}
-                        </td>
-
-                        {/* Section */}
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800">
-                          {row.section}
-                        </td>
-
-                        {/* Operational Division */}
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800">
-                          {row.operationalDivision}
-                        </td>
-
-                        {/* REQUESTED AMOUNT */}
-                        <td className="px-4 py-3 text-right font-mono font-bold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800">
-                          ৳{row.requestedAmount.toLocaleString()}
-                        </td>
-
-                        {/* APPROVED AMOUNT */}
-                        <td className="px-4 py-3 text-right font-mono font-extrabold text-blue-600 dark:text-blue-400 border-r border-slate-100 dark:border-slate-800">
-                          {row.status === "Approved" ? `৳${row.approvedAmount.toLocaleString()}` : "৳0"}
-                        </td>
-
-                        {/* INSTALLMENT TERM */}
-                        <td className="px-4 py-3 text-center font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800">
-                          {row.installmentTerm} Months
-                        </td>
-
-                        {/* MONTHLY RATE */}
-                        <td className="px-4 py-3 text-right font-mono font-bold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800">
-                          ৳{row.monthlyRate.toLocaleString()}<span className="text-[10px] font-normal text-slate-400">/mo</span>
-                        </td>
-
-                        {/* Status */}
-                        <td className="px-4 py-3 text-center">
-                          <span
-                            className={`text-[10px] font-extrabold px-3 py-1 rounded-full border ${
-                              row.status === "Approved"
-                                ? "bg-emerald-50 text-emerald-600 border-emerald-200/60 dark:bg-emerald-950/20 dark:text-emerald-400"
-                                : row.status === "Rejected"
-                                ? "bg-rose-50 text-rose-600 border-rose-200/60 dark:bg-rose-950/20 dark:text-rose-400"
-                                : "bg-amber-50 text-amber-600 border-amber-200/60 dark:bg-amber-950/20 dark:text-amber-400"
-                            }`}
+                          {/* Actions */}
+                          <td
+                            className="px-3.5 py-3 text-center border-r border-slate-100 dark:border-slate-800"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            {row.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
+                            <div className="flex items-center justify-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenDetails(row)}
+                                className="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 p-1.5 rounded-lg border border-blue-100 dark:border-blue-900 hover:bg-blue-100 transition-colors cursor-pointer shadow-2xs"
+                                title="View Loan Application Details (Modal)"
+                              >
+                                <Eye className="size-3.5" strokeWidth={2.5} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenPrint(row)}
+                                className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 p-1.5 rounded-lg border border-emerald-100 dark:border-emerald-900 hover:bg-emerald-100 transition-colors cursor-pointer shadow-2xs"
+                                title="Print Official Loan Application Form"
+                              >
+                                <Printer className="size-3.5" strokeWidth={2.5} />
+                              </button>
+                            </div>
+                          </td>
+
+                          {/* Employee ID */}
+                          <td className="px-4 py-3 font-mono font-bold text-slate-700 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800">
+                            {row.empId}
+                          </td>
+
+                          {/* Employee Name */}
+                          <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100 border-r border-slate-100 dark:border-slate-800 group-hover:text-blue-600 transition-colors">
+                            <div className="flex items-center gap-2">
+                              <span className="size-2 rounded-full bg-blue-500 shrink-0" />
+                              <span>{row.empName}</span>
+                            </div>
+                          </td>
+
+                          {/* Company */}
+                          <td className="px-4 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800">
+                            {row.company || "Pakiza Software Limited"}
+                          </td>
+
+                          {/* Designation */}
+                          <td className="px-4 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800">
+                            {row.designation}
+                          </td>
+
+                          {/* Department */}
+                          <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800">
+                            {row.department}
+                          </td>
+
+                          {/* Section */}
+                          <td className="px-4 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800">
+                            {row.section}
+                          </td>
+
+                          {/* Area */}
+                          <td className="px-4 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800">
+                            {row.area || row.operationalDivision}
+                          </td>
+
+                          {/* REQUESTED AMOUNT */}
+                          <td className="px-4 py-3 text-right font-mono font-bold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800">
+                            ৳{row.requestedAmount.toLocaleString()}
+                          </td>
+
+                          {/* APPROVED AMOUNT */}
+                          <td className="px-4 py-3 text-right font-mono font-extrabold text-blue-600 dark:text-blue-400 border-r border-slate-100 dark:border-slate-800">
+                            {appStatus === "Approved" ? `৳${row.approvedAmount.toLocaleString()}` : "৳0"}
+                          </td>
+
+                          {/* INSTALLMENT TERM */}
+                          <td className="px-4 py-3 text-center font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800">
+                            {row.installmentTerm} Months
+                          </td>
+
+                          {/* PAID MONTHS */}
+                          <td className="px-4 py-3 text-center font-semibold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800">
+                            {appStatus === "Approved" ? (
+                              <span className="inline-flex items-center gap-1 font-bold">
+                                <span className="text-blue-600 dark:text-blue-400">{calc.paidMonths}</span>
+                                <span className="text-slate-400 font-normal">/ {row.installmentTerm} mo</span>
+                              </span>
+                            ) : (
+                              <span className="text-slate-400">-</span>
+                            )}
+                          </td>
+
+                          {/* MONTHLY RATE */}
+                          <td className="px-4 py-3 text-right font-mono font-bold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800">
+                            ৳{row.monthlyRate.toLocaleString()}<span className="text-[10px] font-normal text-slate-400">/mo</span>
+                          </td>
+
+                          {/* REMAINING BALANCE (CALCULATED: APPROVED AMOUNT - TOTAL REPAID) */}
+                          <td className="px-4 py-3 text-right font-mono font-extrabold border-r border-slate-100 dark:border-slate-800">
+                            {appStatus === "Approved" ? (
+                              calc.remainingBalance === 0 || row.status === "Fully Paid" ? (
+                                <span className="text-emerald-600 dark:text-emerald-400">৳0</span>
+                              ) : (
+                                <span className="text-rose-600 dark:text-rose-400">
+                                  ৳{calc.remainingBalance.toLocaleString()}
+                                </span>
+                              )
+                            ) : (
+                              <span className="text-slate-400 font-sans font-normal">-</span>
+                            )}
+                          </td>
+
+                          {/* Approval Status */}
+                          <td className="px-4 py-3 text-center border-r border-slate-100 dark:border-slate-800">
+                            <span
+                              className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
+                                appStatus === "Approved"
+                                  ? "bg-emerald-50 text-emerald-600 border-emerald-200/60 dark:bg-emerald-950/20 dark:text-emerald-400"
+                                  : appStatus === "Rejected"
+                                  ? "bg-rose-50 text-rose-600 border-rose-200/60 dark:bg-rose-950/20 dark:text-rose-400"
+                                  : "bg-amber-50 text-amber-600 border-amber-200/60 dark:bg-amber-950/20 dark:text-amber-400"
+                              }`}
+                            >
+                              {appStatus}
+                            </span>
+                          </td>
+
+                          {/* Status */}
+                          <td className="px-4 py-3 text-center">
+                            <span
+                              className={`text-[10px] font-extrabold px-3 py-1 rounded-full border ${
+                                row.status === "Fully Paid"
+                                  ? "bg-teal-50 text-teal-700 border-teal-200/60 dark:bg-teal-950/20 dark:text-teal-400"
+                                  : row.status === "Active" || row.status === "Approved"
+                                  ? "bg-blue-50 text-blue-700 border-blue-200/60 dark:bg-blue-950/20 dark:text-blue-400"
+                                  : row.status === "Closed" || row.status === "Rejected"
+                                  ? "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400"
+                                  : "bg-amber-50 text-amber-600 border-amber-200/60 dark:bg-amber-950/20 dark:text-amber-400"
+                              }`}
+                            >
+                              {row.status}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -820,7 +1203,7 @@ function LoanListPage() {
             {/* Pagination Footer */}
             <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/40 dark:bg-slate-950/40 text-xs font-bold text-slate-400">
               <div>
-                Showing 1 to {filteredLoans.length} of {filteredLoans.length} records
+                Showing 1 to {filteredLoans.length} of {loans.length} records
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="h-8 px-3 text-xs font-bold" disabled>
@@ -837,7 +1220,7 @@ function LoanListPage() {
           </div>
         </div>
 
-        {/* ── MODAL: LOAN APPLICATION DETAILS (Exact match to Screenshots 2 & 3) ── */}
+        {/* ── MODAL: LOAN APPLICATION DETAILS ── */}
         <LoanApplicationDetailsModal
           isOpen={isDetailsModalOpen}
           onClose={() => setIsDetailsModalOpen(false)}
@@ -847,7 +1230,7 @@ function LoanListPage() {
           }}
         />
 
-        {/* ── SINGLE LOAN PRINT MODAL (PAKIZA OFFICIAL A4 FORMAT) ── */}
+        {/* ── SINGLE LOAN PRINT MODAL ── */}
         <SingleLoanPrintModal
           isOpen={isSinglePrintOpen}
           onClose={() => setIsSinglePrintOpen(false)}
@@ -867,14 +1250,14 @@ function LoanListPage() {
             unit: l.operationalDivision,
             basicSalary: l.basicSalary,
             grossSalary: l.grossSalary,
-            areaName: l.operationalDivision,
+            areaName: l.area || l.operationalDivision,
             joinDate: l.joinDate,
             expLoanAmount: l.requestedAmount,
             appLoanAmt: l.approvedAmount,
             installments: l.installmentTerm,
             installmentAmt: l.monthlyRate,
             reason: l.reason,
-            status: l.status,
+            status: l.status === "Fully Paid" ? "Approved" : (l.approvalStatus || (l.status as any)),
             applicationDate: l.applicationDate,
           }))}
         />
@@ -883,4 +1266,3 @@ function LoanListPage() {
   );
 }
 export default LoanListPage;
-

@@ -24,7 +24,10 @@ export interface LoanRecord {
   reqNo: string;
   applicationDate: string;
   submittedTime: string;
-  status: "Approved" | "Pending" | "Rejected";
+  status: "Approved" | "Pending" | "Rejected" | "Fully Paid" | "Active" | "Closed";
+  approvalStatus?: "Approved" | "Pending" | "Rejected";
+  company?: string;
+  area?: string;
   empId: string;
   empName: string;
   designation: string;
@@ -39,7 +42,9 @@ export interface LoanRecord {
   requestedAmount: number;
   approvedAmount: number;
   installmentTerm: number;
+  paidMonths?: number;
   monthlyRate: number;
+  remainingBalance?: number;
   reason: string;
   submitter: {
     name: string;
@@ -160,6 +165,8 @@ export function LoanApplicationDetailsModal({
                   className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
                     loan.status === "Approved"
                       ? "bg-emerald-50 text-emerald-600 border-emerald-200/60 dark:bg-emerald-950/20 dark:text-emerald-400"
+                      : loan.status === "Fully Paid"
+                      ? "bg-teal-50 text-teal-700 border-teal-200/60 dark:bg-teal-950/20 dark:text-teal-400"
                       : loan.status === "Rejected"
                       ? "bg-rose-50 text-rose-600 border-rose-200/60 dark:bg-rose-950/20 dark:text-rose-400"
                       : "bg-amber-50 text-amber-600 border-amber-200/60 dark:bg-amber-950/20 dark:text-amber-400"
