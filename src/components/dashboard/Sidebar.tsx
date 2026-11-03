@@ -407,7 +407,15 @@ export const nav: NavItem[] = [
       { label: "Employee Allowance", to: "/" },
       { label: "Tax Exemption Rules", to: "/" },
       { label: "Allowance Requisition", to: "/allowance-requisition" },
-      { label: "Festival Allowance Check (HR)", to: "/festival-allowance-check-hr" },
+      {
+        label: "Festival Allowance",
+        subitems: [
+          { label: "Festival Allowance", to: "/festival-allowance" },
+          { label: "Festival Allowance Check (HR)", to: "/festival-allowance-check-hr" },
+          { label: "Festival Allowance Approval", to: "/festival-allowance-approval" },
+          { label: "Festival Allowance Payment Sheet", to: "/festival-allowance-payment-sheet" },
+        ],
+      },
     ],
   },
   {
