@@ -337,14 +337,19 @@ export function checkMaternityEligibility(
   durationParts.push(`${days} ${days === 1 ? "day" : "days"}`);
   const durationFormatted = durationParts.join(", ");
 
-  // Bangladesh Labor Act 2006, Section 46: Minimum 6 months (approx 180 days)
-  const isEligible = totalDays >= 180;
+  // Check eligibility against configured minimum working period
+  const config = getMaternityVerificationConfig();
+  const requiredDays = config.servicePeriodUnit === "MONTHS"
+    ? config.minServicePeriodMonths * 30
+    : config.minServicePeriodDays;
+
+  const isEligible = totalDays >= requiredDays;
 
   let eligibilityMessage = "";
   if (isEligible) {
-    eligibilityMessage = `Eligible for Maternity Leave and Benefit. Employee has completed ${durationFormatted} of continuous service (meets statutory 6 months requirement).`;
+    eligibilityMessage = `Eligible for Maternity Leave and Benefit. Employee has completed ${durationFormatted} of continuous service (meets required ${config.minServicePeriodMonths} months / ${requiredDays} days threshold).`;
   } else {
-    eligibilityMessage = `Not Eligible for Maternity Benefit. Employee has completed only ${durationFormatted} of service. Under Section 46 of Bangladesh Labor Act 2006, an employee must have worked for at least 6 months with the employer immediately preceding expected delivery date.`;
+    eligibilityMessage = `Not Eligible for Maternity Benefit. Employee has completed only ${durationFormatted} of service. Policy requires minimum ${config.minServicePeriodMonths} months (${requiredDays} days) continuous service with employer immediately preceding expected delivery date.`;
   }
 
   return {
@@ -1049,4 +1054,105 @@ export function rejectMaternityByHr(
   currentRequests[index] = target;
   saveMaternityRequests(currentRequests);
   return target;
+}
+
+
+// ============================================================================
+// MATERNITY VERIFICATION SETUP & BUSINESS RULES CONFIGURATION
+// ============================================================================
+
+export interface MaternityVerificationConfig {
+  // 1. Minimum Working Period to Check Employee Eligibility
+  minServicePeriodMonths: number; // default: 6
+  minServicePeriodDays: number; // default: 180
+  servicePeriodUnit: "MONTHS" | "DAYS";
+  includeProbation: boolean;
+  continuityRequirement: "STRICT_CONTINUOUS" | "CUMULATIVE";
+  ineligibilityHandling: "BLOCK" | "ALLOW_WITH_OVERRIDE" | "WARNING_ONLY";
+
+  // 2. Minimum Medical Follow-up Checkup Count
+  minMedicalFollowupCount: number; // default: 2
+  minFollowupIntervalDays: number; // default: 7
+  enforceMinFollowupBeforeFinal: boolean;
+  requireMandatoryVitals: boolean;
+  allowEmergencyOverride: boolean;
+
+  // 3. Leave Count Setup Previous & After Expected Delivery Date (EDD)
+  preDeliveryLeaveDays: number; // default: 56 (8 weeks)
+  postDeliveryLeaveDays: number; // default: 56 (8 weeks)
+  totalLeaveDays: number; // default: 112 (16 weeks)
+  rolloverUnspentPreNatal: boolean;
+  preservePostNatalOnDelay: boolean;
+  maxLivingChildrenForBenefit: number; // default: 2
+  policyPreset: "BLA_2006_STANDARD" | "EXTENDED_180" | "CUSTOM";
+
+  // Metadata
+  updatedAt: string;
+  updatedBy: string;
+}
+
+export const DEFAULT_MATERNITY_VERIFICATION_CONFIG: MaternityVerificationConfig = {
+  minServicePeriodMonths: 6,
+  minServicePeriodDays: 180,
+  servicePeriodUnit: "MONTHS",
+  includeProbation: true,
+  continuityRequirement: "STRICT_CONTINUOUS",
+  ineligibilityHandling: "BLOCK",
+
+  minMedicalFollowupCount: 2,
+  minFollowupIntervalDays: 7,
+  enforceMinFollowupBeforeFinal: true,
+  requireMandatoryVitals: true,
+  allowEmergencyOverride: true,
+
+  preDeliveryLeaveDays: 56,
+  postDeliveryLeaveDays: 56,
+  totalLeaveDays: 112,
+  rolloverUnspentPreNatal: true,
+  preservePostNatalOnDelay: true,
+  maxLivingChildrenForBenefit: 2,
+  policyPreset: "BLA_2006_STANDARD",
+
+  updatedAt: "2026-10-31 10:00:00",
+  updatedBy: "HR Compliance Authority",
+};
+
+const MATERNITY_CONFIG_STORAGE_KEY = "cripton_maternity_verification_config_v1";
+
+export function getMaternityVerificationConfig(): MaternityVerificationConfig {
+  if (typeof window === "undefined") return DEFAULT_MATERNITY_VERIFICATION_CONFIG;
+  try {
+    const raw = localStorage.getItem(MATERNITY_CONFIG_STORAGE_KEY);
+    if (!raw) {
+      localStorage.setItem(MATERNITY_CONFIG_STORAGE_KEY, JSON.stringify(DEFAULT_MATERNITY_VERIFICATION_CONFIG));
+      return DEFAULT_MATERNITY_VERIFICATION_CONFIG;
+    }
+    return { ...DEFAULT_MATERNITY_VERIFICATION_CONFIG, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULT_MATERNITY_VERIFICATION_CONFIG;
+  }
+}
+
+export function saveMaternityVerificationConfig(
+  config: Partial<MaternityVerificationConfig>
+): MaternityVerificationConfig {
+  const current = getMaternityVerificationConfig();
+  const updated: MaternityVerificationConfig = {
+    ...current,
+    ...config,
+    updatedAt: new Date().toISOString().replace("T", " ").substring(0, 19),
+  };
+  if (typeof window !== "undefined") {
+    localStorage.setItem(MATERNITY_CONFIG_STORAGE_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent("maternity-config-updated", { detail: updated }));
+  }
+  return updated;
+}
+
+export function resetMaternityVerificationConfig(): MaternityVerificationConfig {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(MATERNITY_CONFIG_STORAGE_KEY, JSON.stringify(DEFAULT_MATERNITY_VERIFICATION_CONFIG));
+    window.dispatchEvent(new CustomEvent("maternity-config-updated", { detail: DEFAULT_MATERNITY_VERIFICATION_CONFIG }));
+  }
+  return DEFAULT_MATERNITY_VERIFICATION_CONFIG;
 }

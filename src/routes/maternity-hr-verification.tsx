@@ -54,6 +54,17 @@ export const Route = createFileRoute("/maternity-hr-verification")({
   component: MaternityHrVerificationPage,
 });
 
+// Helper to abbreviate service duration into concise single-line label
+function formatServiceShort(str: string): string {
+  if (!str) return "";
+  return str
+    .replace(/years?/gi, "Yrs")
+    .replace(/months?/gi, "Mos")
+    .replace(/days?/gi, "Days")
+    .replace(/,/g, "")
+    .trim();
+}
+
 function MaternityHrVerificationPage() {
   const [requests, setRequests] = useState<MaternityRequest[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -632,14 +643,14 @@ function MaternityHrVerificationPage() {
                 <thead>
                   <tr className="bg-slate-100/70 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
                     <th className="py-3.5 px-3 text-center w-12">SL</th>
-                    <th className="py-3.5 px-4">Case Ref / Sanction</th>
+                    <th className="py-3.5 px-4 whitespace-nowrap">Case Ref / Sanction</th>
                     <th className="py-3.5 px-4">Employee Details</th>
-                    <th className="py-3.5 px-4">Joining Date</th>
-                    <th className="py-3.5 px-4">Service Period</th>
-                    <th className="py-3.5 px-4">Welfare Confirmed EDD</th>
-                    <th className="py-3.5 px-4">Leave Duration (112 Days)</th>
-                    <th className="py-3.5 px-4">Status</th>
-                    <th className="py-3.5 px-4 text-right">Actions</th>
+                    <th className="py-3.5 px-4 whitespace-nowrap">Joining Date</th>
+                    <th className="py-3.5 px-4 whitespace-nowrap">Service Period</th>
+                    <th className="py-3.5 px-4 whitespace-nowrap">Welfare Confirmed EDD</th>
+                    <th className="py-3.5 px-4 whitespace-nowrap">Leave Duration (112 Days)</th>
+                    <th className="py-3.5 px-4 whitespace-nowrap">Status</th>
+                    <th className="py-3.5 px-4 text-right whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -700,60 +711,88 @@ function MaternityHrVerificationPage() {
                           </td>
 
                           {/* 5. Service Period */}
-                          <td className="py-3.5 px-4">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200">
-                              <ShieldCheck className="w-3.5 h-3.5" />
-                              {req.welfareStage1.serviceDurationText ||
-                                checkMaternityEligibility(req.employee.joiningDate).durationFormatted}
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 whitespace-nowrap">
+                              <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0" />
+                              {formatServiceShort(
+                                req.welfareStage1.serviceDurationText ||
+                                  checkMaternityEligibility(req.employee.joiningDate).durationFormatted
+                              )}
                             </span>
                           </td>
 
                           {/* 6. Welfare Confirmed EDD */}
-                          <td className="py-3.5 px-4">
-                            <span className="font-bold text-pink-600 dark:text-pink-400 font-mono">
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <span className="font-bold text-pink-600 dark:text-pink-400 font-mono whitespace-nowrap">
                               {req.medicalStage.expectedDeliveryDate || "N/A"}
                             </span>
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[10px] text-slate-400 whitespace-nowrap">
                               {req.medicalStage.checkupVisits.length} checkups verified
                             </p>
                           </td>
 
                           {/* 7. Leave Duration (112 Days) */}
-                          <td className="py-3.5 px-4">
-                            <p className="font-semibold text-slate-800 dark:text-slate-200">
-                              {req.welfareStage2.expectedLeaveStartDate} to {req.welfareStage2.expectedLeaveEndDate}
-                            </p>
-                            <span className="text-[10px] font-semibold text-emerald-600">
-                              {req.welfareStage2.totalLeaveDays || 112} Days (16 Weeks)
-                            </span>
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            {req.welfareStage2.expectedLeaveStartDate ? (
+                              <div>
+                                <p className="font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap">
+                                  {req.welfareStage2.expectedLeaveStartDate} to {req.welfareStage2.expectedLeaveEndDate}
+                                </p>
+                                <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                                  {req.welfareStage2.totalLeaveDays || 112} Days (16 Wks)
+                                </span>
+                              </div>
+                            ) : (
+                              <div>
+                                <span className="text-slate-400 italic text-[11px] whitespace-nowrap">Pending Schedule</span>
+                                <p className="text-[10px] text-slate-400 whitespace-nowrap">
+                                  {req.welfareStage2.totalLeaveDays || 112} Days (16 Wks)
+                                </p>
+                              </div>
+                            )}
                           </td>
 
                           {/* 8. Status */}
-                          <td className="py-3.5 px-4">
+                          <td className="py-3.5 px-4 whitespace-nowrap">
                             {isPendingHr && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-100 text-purple-900 dark:bg-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 animate-pulse">
-                                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-                                Action Required: Verify &amp; Sign
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-100 text-purple-900 dark:bg-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 animate-pulse whitespace-nowrap">
+                                <Sparkles className="w-3.5 h-3.5 text-purple-600 flex-shrink-0" />
+                                Verify &amp; Sign
                               </span>
                             )}
                             {isApproved && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200">
-                                <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 whitespace-nowrap">
+                                <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
                                 Approved
                               </span>
                             )}
-                            {!isPendingHr && !isApproved && (
-                              <span className="text-slate-400 text-xs">{req.statusLabel}</span>
+                            {!isPendingHr && !isApproved && req.currentStage === "MEDICAL_VERIFIED" && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 whitespace-nowrap">
+                                Ready to Schedule
+                              </span>
+                            )}
+                            {!isPendingHr && !isApproved && req.currentStage === "MEDICAL_FOLLOWUP" && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 whitespace-nowrap">
+                                Med Follow-up
+                              </span>
+                            )}
+                            {!isPendingHr && !isApproved && req.currentStage === "WELFARE_INITIATED" && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800 whitespace-nowrap">
+                                At Medical
+                              </span>
+                            )}
+                            {!isPendingHr && !isApproved && !["MEDICAL_VERIFIED", "MEDICAL_FOLLOWUP", "WELFARE_INITIATED"].includes(req.currentStage) && (
+                              <span className="text-slate-400 text-xs whitespace-nowrap">{req.statusLabel}</span>
                             )}
                           </td>
 
                           {/* 9. Actions */}
-                          <td className="py-3.5 px-4 text-right">
-                            <div className="flex items-center justify-end gap-1.5">
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
                               {isPendingHr && (
                                 <button
                                   onClick={() => openVerifyModal(req)}
-                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 hover:bg-purple-700 text-white shadow-xs flex items-center gap-1 transition cursor-pointer"
+                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 hover:bg-purple-700 text-white shadow-xs flex items-center gap-1 transition cursor-pointer whitespace-nowrap flex-shrink-0"
                                 >
                                   <ShieldCheck className="w-3.5 h-3.5" />
                                   Verify &amp; Approve
@@ -763,7 +802,7 @@ function MaternityHrVerificationPage() {
                               {isApproved && (
                                 <button
                                   onClick={() => openSanctionLetter(req)}
-                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs flex items-center gap-1 transition cursor-pointer"
+                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs flex items-center gap-1 transition cursor-pointer whitespace-nowrap flex-shrink-0"
                                 >
                                   <FileCheck2 className="w-3.5 h-3.5" />
                                   Sanction Order
@@ -772,7 +811,7 @@ function MaternityHrVerificationPage() {
 
                               <button
                                 onClick={() => openVerifyModal(req)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer flex-shrink-0"
                                 title="View Details"
                               >
                                 <Eye className="w-4 h-4" />
