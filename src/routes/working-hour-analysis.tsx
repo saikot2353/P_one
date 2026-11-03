@@ -1288,16 +1288,6 @@ function WorkingHourAnalysisPage() {
                   <>Showing 0 to 0 of 0 entries</>
                 )}
               </div>
-
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setIsReportPdfModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
-                >
-                  <Eye className="size-3.5" />
-                  <span>VIEW (PDF)</span>
-                </button>
-              </div>
             </div>
           </div>
         </main>

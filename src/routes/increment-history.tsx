@@ -64,6 +64,21 @@ const defaultColumns = {
   lastPromotion: true,
 };
 
+const availableYears = [
+  "2014",
+  "2015",
+  "2016",
+  "2017",
+  "2018",
+  "2019",
+  "2020",
+  "2021",
+  "2022",
+  "2023",
+  "2024",
+  "2025",
+];
+
 function IncrementHistoryPage() {
   // Filter States (Matching Unified HR Reports Criteria Style)
   const [company, setCompany] = useState("Pakiza Software Limited");
@@ -74,7 +89,8 @@ function IncrementHistoryPage() {
   const [designation, setDesignation] = useState("ALL");
   const [employeeId, setEmployeeId] = useState("");
   const [status, setStatus] = useState("Working");
-  const [filterYear, setFilterYear] = useState("ALL");
+  const [startYear, setStartYear] = useState("ALL");
+  const [endYear, setEndYear] = useState("ALL");
 
   // Applied Filter Trigger State
   const [appliedFilters, setAppliedFilters] = useState({
@@ -86,17 +102,35 @@ function IncrementHistoryPage() {
     designation: "ALL",
     employeeId: "",
     status: "Working",
-    filterYear: "ALL",
+    startYear: "ALL",
+    endYear: "ALL",
   });
 
   // Table Search, Selection, and Pagination
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRecord, setSelectedRecord] = useState<RawIncrementRecord | null>(null);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
   // Column toggle states
   const [visibleCols, setVisibleCols] = useState(defaultColumns);
   const [isColSelectorOpen, setIsColSelectorOpen] = useState(false);
+
+  // Active year range columns to display
+  const activeYearsList = useMemo(() => {
+    const sYear = appliedFilters.startYear !== "ALL" ? parseInt(appliedFilters.startYear) : null;
+    const eYear = appliedFilters.endYear !== "ALL" ? parseInt(appliedFilters.endYear) : null;
+
+    if (sYear === null && eYear === null) {
+      return availableYears;
+    }
+
+    const minYear = sYear !== null && eYear !== null ? Math.min(sYear, eYear) : (sYear !== null ? sYear : 2014);
+    const maxYear = sYear !== null && eYear !== null ? Math.max(sYear, eYear) : (eYear !== null ? eYear : 2025);
+
+    return availableYears.filter((yrStr) => {
+      const yr = parseInt(yrStr);
+      return yr >= minYear && yr <= maxYear;
+    });
+  }, [appliedFilters.startYear, appliedFilters.endYear]);
 
   // Sorting
   const [sortField, setSortField] = useState<keyof RawIncrementRecord | "">("");
@@ -134,7 +168,8 @@ function IncrementHistoryPage() {
       designation,
       employeeId,
       status,
-      filterYear,
+      startYear,
+      endYear,
     });
     toast.success("Filtering Increment History report...");
   };
@@ -149,7 +184,8 @@ function IncrementHistoryPage() {
     setDesignation("ALL");
     setEmployeeId("");
     setStatus("Working");
-    setFilterYear("ALL");
+    setStartYear("ALL");
+    setEndYear("ALL");
     setSearchQuery("");
     setAppliedFilters({
       company: "Pakiza Software Limited",
@@ -160,7 +196,8 @@ function IncrementHistoryPage() {
       designation: "ALL",
       employeeId: "",
       status: "Working",
-      filterYear: "ALL",
+      startYear: "ALL",
+      endYear: "ALL",
     });
     toast.info("Filter criteria reset to default.");
   };
@@ -221,12 +258,24 @@ function IncrementHistoryPage() {
       list = list.filter((r) => r.empId.toLowerCase().includes(idQ));
     }
 
-    // 5. Year Filter (Check if employee received increment in selected year)
-    if (appliedFilters.filterYear !== "ALL") {
-      const colKey = `inc${appliedFilters.filterYear}` as keyof RawIncrementRecord;
+    // 5. Year Range Filter (Check if employee received increment in selected Start & End year range)
+    const sYear = appliedFilters.startYear !== "ALL" ? parseInt(appliedFilters.startYear) : null;
+    const eYear = appliedFilters.endYear !== "ALL" ? parseInt(appliedFilters.endYear) : null;
+
+    if (sYear !== null || eYear !== null) {
+      const minYear = sYear !== null && eYear !== null ? Math.min(sYear, eYear) : (sYear !== null ? sYear : 2014);
+      const maxYear = sYear !== null && eYear !== null ? Math.max(sYear, eYear) : (eYear !== null ? eYear : 2025);
+
       list = list.filter((r) => {
-        const val = r[colKey] as string;
-        return val && val !== "0" && val !== "0.00" && val !== "0(0)";
+        return availableYears.some((yrStr) => {
+          const yr = parseInt(yrStr);
+          if (yr >= minYear && yr <= maxYear) {
+            const colKey = `inc${yrStr}` as keyof RawIncrementRecord;
+            const val = r[colKey] as string;
+            return Boolean(val && val !== "0" && val !== "0.00" && val !== "0(0)");
+          }
+          return false;
+        });
       });
     }
 
@@ -473,7 +522,7 @@ function IncrementHistoryPage() {
 
             {/* Filter Form Grid */}
             <form onSubmit={handleSearchSubmit}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 text-xs">
                 {/* 1. Company */}
                 <div className="space-y-1">
                   <label className="font-semibold text-slate-700 dark:text-slate-300 block">
@@ -614,23 +663,41 @@ function IncrementHistoryPage() {
                   </select>
                 </div>
 
-                {/* 9. Increment Year Filter */}
+                {/* 9. Start Year */}
                 <div className="space-y-1">
                   <label className="font-semibold text-slate-700 dark:text-slate-300 block">
-                    Increment Year
+                    Start Year
                   </label>
                   <select
-                    value={filterYear}
-                    onChange={(e) => setFilterYear(e.target.value)}
+                    value={startYear}
+                    onChange={(e) => setStartYear(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                   >
-                    <option value="ALL">ALL Years (2014-2025)</option>
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                    <option value="2020">2020</option>
+                    <option value="ALL">ALL (2014)</option>
+                    {availableYears.map((yr) => (
+                      <option key={yr} value={yr}>
+                        {yr}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 10. End Year */}
+                <div className="space-y-1">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300 block">
+                    End Year
+                  </label>
+                  <select
+                    value={endYear}
+                    onChange={(e) => setEndYear(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    <option value="ALL">ALL (2025)</option>
+                    {[...availableYears].reverse().map((yr) => (
+                      <option key={yr} value={yr}>
+                        {yr}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -848,20 +915,7 @@ function IncrementHistoryPage() {
                     )}
 
                     {/* Configurable Years */}
-                    {[
-                      "2014",
-                      "2015",
-                      "2016",
-                      "2017",
-                      "2018",
-                      "2019",
-                      "2020",
-                      "2021",
-                      "2022",
-                      "2023",
-                      "2024",
-                      "2025",
-                    ].map((yr) => {
+                    {activeYearsList.map((yr) => {
                       const colKey = `inc${yr}` as keyof typeof defaultColumns;
                       return (
                         visibleCols[colKey] && (
@@ -903,20 +957,13 @@ function IncrementHistoryPage() {
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                   {filteredRecords.length > 0 ? (
                     filteredRecords.map((row, idx) => {
-                      const isSelected = selectedRecord?.empId === row.empId;
-                      const stickyCellBgClass = isSelected
-                        ? "bg-slate-100 dark:bg-slate-800"
-                        : "bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/60";
+                      const stickyCellBgClass =
+                        "bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/60";
 
                       return (
                         <tr
                           key={row.sl}
-                          onClick={() => setSelectedRecord(row)}
-                          className={`group transition-colors cursor-pointer ${
-                            isSelected
-                              ? "bg-slate-100 dark:bg-slate-800"
-                              : "hover:bg-slate-50/80 dark:hover:bg-slate-800/50"
-                          }`}
+                          className="group transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/50"
                         >
                           {/* Sticky Left SL Cell */}
                           <td
@@ -934,17 +981,7 @@ function IncrementHistoryPage() {
                           <td
                             className={`sticky left-[160px] ${stickyCellBgClass} px-3 py-2.5 font-bold text-slate-900 dark:text-white border-r border-slate-200 dark:border-slate-800 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[180px] min-w-[180px] max-w-[180px] transition-colors`}
                           >
-                            <div className="flex items-center gap-2">
-                              <div className="size-6 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-[9px] font-bold text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center">
-                                {row.empName
-                                  .split(" ")
-                                  .map((s) => s[0])
-                                  .slice(0, 2)
-                                  .join("")
-                                  .toUpperCase()}
-                              </div>
-                              <span className="truncate max-w-[125px]">{row.empName}</span>
-                            </div>
+                            <span className="truncate">{row.empName}</span>
                           </td>
 
                           {/* Configurable Cells */}
@@ -994,20 +1031,7 @@ function IncrementHistoryPage() {
                           )}
 
                           {/* Years values */}
-                          {[
-                            "2014",
-                            "2015",
-                            "2016",
-                            "2017",
-                            "2018",
-                            "2019",
-                            "2020",
-                            "2021",
-                            "2022",
-                            "2023",
-                            "2024",
-                            "2025",
-                          ].map((yr) => {
+                          {activeYearsList.map((yr) => {
                             const colKey = `inc${yr}` as keyof typeof defaultColumns;
                             const rowVal = row[colKey as keyof RawIncrementRecord] as string;
                             return (
@@ -1088,129 +1112,6 @@ function IncrementHistoryPage() {
           </div>
         </main>
       </div>
-
-      {/* Record details Audit Modal */}
-      {selectedRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-slate-900 dark:text-slate-100">
-            <button
-              onClick={() => setSelectedRecord(null)}
-              className="absolute right-4 top-4 p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition cursor-pointer"
-            >
-              <X className="size-5" />
-            </button>
-
-            <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3.5 mb-5">
-              <Sparkles className="size-5 text-indigo-600 dark:text-indigo-400" />
-              <span>Compensation History Breakdown</span>
-            </h3>
-
-            <div className="space-y-4 text-xs font-semibold">
-              {/* Profile card */}
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-indigo-600 text-white grid place-items-center text-xs font-black shadow-sm">
-                  {selectedRecord.empName
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .substring(0, 3)
-                    .toUpperCase()}
-                </div>
-                <div>
-                  <div className="font-extrabold text-slate-900 dark:text-white text-sm">
-                    {selectedRecord.empName}
-                  </div>
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5 font-bold">
-                    <span className="font-mono">{selectedRecord.empId}</span>
-                    <span>•</span>
-                    <span>{selectedRecord.designation}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Salary bands details */}
-              <div className="grid grid-cols-3 gap-3 text-center">
-                <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40">
-                  <div className="text-[8.5px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">
-                    JOINING
-                  </div>
-                  <div className="text-xs font-mono font-bold mt-1 text-slate-800 dark:text-slate-200">
-                    ৳{selectedRecord.salaryJoining.toLocaleString()}
-                  </div>
-                </div>
-                <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40">
-                  <div className="text-[8.5px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">
-                    BASIC
-                  </div>
-                  <div className="text-xs font-mono font-bold mt-1 text-slate-800 dark:text-slate-200">
-                    ৳{selectedRecord.salaryBasic.toLocaleString()}
-                  </div>
-                </div>
-                <div className="p-3 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40">
-                  <div className="text-[8.5px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-bold">
-                    GROSS
-                  </div>
-                  <div className="text-xs font-mono font-black mt-1 text-indigo-600 dark:text-indigo-400">
-                    ৳{selectedRecord.salaryGross.toLocaleString()}
-                  </div>
-                </div>
-              </div>
-
-              {/* Detailed specs */}
-              <div className="border-t border-b border-slate-100 dark:border-slate-800 py-4 space-y-2.5 font-bold text-slate-600 dark:text-slate-400">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Department</span>
-                  <span className="text-slate-900 dark:text-white">{selectedRecord.department}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Section Group</span>
-                  <span className="text-slate-900 dark:text-white">{selectedRecord.section}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Joining Date</span>
-                  <span className="font-mono text-slate-900 dark:text-white">{selectedRecord.joiningDate}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Total Increment Accrued</span>
-                  <span className="text-slate-900 dark:text-white">{renderTotalCell(selectedRecord.total)}</span>
-                </div>
-                {selectedRecord.lastIncDate && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Last Increment Date</span>
-                    <span className="font-mono text-slate-900 dark:text-white">{selectedRecord.lastIncDate}</span>
-                  </div>
-                )}
-                {selectedRecord.lastIncAmount && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Last Increment Amount</span>
-                    <span className="font-mono text-slate-900 dark:text-white">
-                      ৳{parseFloat(selectedRecord.lastIncAmount).toLocaleString()}
-                    </span>
-                  </div>
-                )}
-                {selectedRecord.lastPromotion && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Last Promotion Date</span>
-                    <span className="font-mono text-slate-900 dark:text-white">
-                      {selectedRecord.lastPromotion}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Close Button */}
-              <div className="flex justify-end pt-2">
-                <button
-                  onClick={() => setSelectedRecord(null)}
-                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition cursor-pointer"
-                >
-                  Close Summary
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* PDF View Printable Modal */}
       {isPdfModalOpen && (

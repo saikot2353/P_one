@@ -32,7 +32,8 @@ import {
   UserCheck,
   MapPin,
   TrendingDown,
-  Info
+  Info,
+  Coins
 } from "lucide-react";
 import {
   SingleLoanPrintModal,
@@ -426,6 +427,18 @@ function LoanApplicationPage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-2.5">
+                {/* View Loan List Navigation Button */}
+                <Link to="/loan-list">
+                  <Button
+                    variant="outline"
+                    className="h-11 px-4 rounded-xl border-blue-200 text-blue-800 bg-blue-50/70 hover:bg-blue-100 font-bold text-xs flex items-center gap-2 shadow-xs cursor-pointer transition-all"
+                    title="View Employee Loan List"
+                  >
+                    <Coins className="size-4 text-blue-600" />
+                    <span>Loan List</span>
+                  </Button>
+                </Link>
+
                 {/* Direct Single Loan Print Preview Button */}
                 <Button
                   variant="outline"
