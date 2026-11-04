@@ -50,6 +50,7 @@ import {
   createWelfareMaternityRequest,
   submitWelfareLeaveScheduleToHr,
   checkMaternityEligibility,
+  calculateRejoiningDate,
 } from "@/lib/maternityLeaveStore";
 
 export const Route = createFileRoute("/maternity-welfare-verification")({
@@ -243,18 +244,19 @@ function MaternityWelfareVerificationPage() {
   const [viewModalEdd, setViewModalEdd] = useState("");
   const [viewModalStartDate, setViewModalStartDate] = useState("");
   const [viewModalEndDate, setViewModalEndDate] = useState("");
+  const [viewModalRejoiningDate, setViewModalRejoiningDate] = useState("");
   const [viewModalLeaveAddress, setViewModalLeaveAddress] = useState("");
   const [viewModalRemarks, setViewModalRemarks] = useState("");
   const [isEditingSchedule, setIsEditingSchedule] = useState(false);
 
-  // Helper to calculate 112-day statutory maternity leave from EDD
+  // Helper to calculate 112-day statutory maternity leave and re-joining date from EDD
   const calculateLeavePeriodFromEdd = (eddDateStr: string) => {
-    if (!eddDateStr) return { start: "", end: "", totalDays: 112 };
+    if (!eddDateStr) return { start: "", end: "", rejoiningDate: "", totalDays: 112 };
     try {
       const parts = eddDateStr.split("-").map(Number);
-      if (parts.length !== 3 || parts.some(isNaN)) return { start: "", end: "", totalDays: 112 };
+      if (parts.length !== 3 || parts.some(isNaN)) return { start: "", end: "", rejoiningDate: "", totalDays: 112 };
       const edd = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
-      if (isNaN(edd.getTime())) return { start: "", end: "", totalDays: 112 };
+      if (isNaN(edd.getTime())) return { start: "", end: "", rejoiningDate: "", totalDays: 112 };
 
       // 56 days (8 weeks) prior to EDD
       const start = new Date(edd);
@@ -263,6 +265,10 @@ function MaternityWelfareVerificationPage() {
       // 55 days post EDD (total 112 calendar days)
       const end = new Date(edd);
       end.setDate(edd.getDate() + 55);
+
+      // Re-joining Date: day immediately after leave end date
+      const rejoining = new Date(end);
+      rejoining.setDate(end.getDate() + 1);
 
       const fmt = (d: Date) => {
         const y = d.getFullYear();
@@ -274,10 +280,11 @@ function MaternityWelfareVerificationPage() {
       return {
         start: fmt(start),
         end: fmt(end),
+        rejoiningDate: fmt(rejoining),
         totalDays: 112,
       };
     } catch {
-      return { start: "", end: "", totalDays: 112 };
+      return { start: "", end: "", rejoiningDate: "", totalDays: 112 };
     }
   };
 
@@ -287,9 +294,11 @@ function MaternityWelfareVerificationPage() {
       const calc = calculateLeavePeriodFromEdd(newEdd);
       setViewModalStartDate(calc.start);
       setViewModalEndDate(calc.end);
+      setViewModalRejoiningDate(calc.rejoiningDate);
     } else {
       setViewModalStartDate("");
       setViewModalEndDate("");
+      setViewModalRejoiningDate("");
     }
   };
 
@@ -301,13 +310,18 @@ function MaternityWelfareVerificationPage() {
     if (req.welfareStage2.expectedLeaveStartDate && req.welfareStage2.expectedLeaveEndDate) {
       setViewModalStartDate(req.welfareStage2.expectedLeaveStartDate);
       setViewModalEndDate(req.welfareStage2.expectedLeaveEndDate);
+      setViewModalRejoiningDate(
+        req.welfareStage2.rejoiningDate || calculateRejoiningDate(req.welfareStage2.expectedLeaveEndDate)
+      );
     } else if (edd) {
       const calc = calculateLeavePeriodFromEdd(edd);
       setViewModalStartDate(calc.start);
       setViewModalEndDate(calc.end);
+      setViewModalRejoiningDate(calc.rejoiningDate);
     } else {
       setViewModalStartDate("");
       setViewModalEndDate("");
+      setViewModalRejoiningDate("");
     }
     setViewModalLeaveAddress(req.welfareStage2.leaveAddress || req.employee.presentAddress || "");
     setViewModalRemarks(
@@ -324,9 +338,13 @@ function MaternityWelfareVerificationPage() {
       return;
     }
 
+    const calculatedRejoining =
+      viewModalRejoiningDate || calculateRejoiningDate(viewModalEndDate);
+
     const updated = submitWelfareLeaveScheduleToHr(activeRequest.id, {
       startDate: viewModalStartDate,
       endDate: viewModalEndDate,
+      rejoiningDate: calculatedRejoining,
       totalDays: 112,
       leaveAddress: viewModalLeaveAddress,
       emergencyContact:
@@ -354,6 +372,7 @@ function MaternityWelfareVerificationPage() {
   // Leave Scheduling Form States (Stage 2)
   const [scheduleStartDate, setScheduleStartDate] = useState("");
   const [scheduleEndDate, setScheduleEndDate] = useState("");
+  const [scheduleRejoiningDate, setScheduleRejoiningDate] = useState("");
   const [scheduleTotalDays, setScheduleTotalDays] = useState(112);
   const [emergencyContact, setEmergencyContact] = useState("");
   const [emergencyPhone, setEmergencyPhone] = useState("");
@@ -531,6 +550,7 @@ function MaternityWelfareVerificationPage() {
     submitWelfareLeaveScheduleToHr(activeRequest.id, {
       startDate: scheduleStartDate,
       endDate: scheduleEndDate,
+      rejoiningDate: scheduleRejoiningDate || calculateRejoiningDate(scheduleEndDate),
       totalDays: scheduleTotalDays,
       leaveAddress: leaveAddress,
       emergencyContact: emergencyContact,
@@ -957,13 +977,14 @@ function MaternityWelfareVerificationPage() {
                     <th className="py-3.5 px-4 whitespace-nowrap">Current Stage</th>
                     <th className="py-3.5 px-4 whitespace-nowrap">Medical EDD</th>
                     <th className="py-3.5 px-4 whitespace-nowrap">Scheduled Leave</th>
+                    <th className="py-3.5 px-4 whitespace-nowrap">Re-joining Date</th>
                     <th className="py-3.5 px-4 text-right whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                   {filteredRequests.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="py-12 text-center text-slate-400 dark:text-slate-500">
+                      <td colSpan={11} className="py-12 text-center text-slate-400 dark:text-slate-500">
                         <HeartPulse className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                         No maternity records found for the selected filter.
                       </td>
@@ -1112,6 +1133,22 @@ function MaternityWelfareVerificationPage() {
                               </div>
                             ) : (
                               <span className="text-slate-400 italic">Not scheduled yet</span>
+                            )}
+                          </td>
+
+                          {/* Re-joining Date */}
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            {req.welfareStage2.expectedLeaveStartDate ? (
+                              <div>
+                                <span className="font-bold text-slate-900 dark:text-white font-mono text-xs block">
+                                  {req.welfareStage2.rejoiningDate || calculateRejoiningDate(req.welfareStage2.expectedLeaveEndDate) || "---"}
+                                </span>
+                                <span className="text-[10px] text-purple-600 dark:text-purple-400 font-medium">
+                                  Duty Resumption
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-slate-400 italic text-[11px]">---</span>
                             )}
                           </td>
 
@@ -1783,7 +1820,7 @@ function MaternityWelfareVerificationPage() {
               </div>
 
               {/* Leave Dates Calculation Form */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Expected Leave Start Date *
@@ -1805,11 +1842,32 @@ function MaternityWelfareVerificationPage() {
                   <input
                     type="date"
                     value={scheduleEndDate}
-                    onChange={(e) => setScheduleEndDate(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setScheduleEndDate(val);
+                      if (val) {
+                        setScheduleRejoiningDate(calculateRejoiningDate(val));
+                      }
+                    }}
                     required
                     className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                   />
                   <p className="text-[10px] text-slate-500 mt-1">Suggested: 8 weeks after EDD</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                    <span>Re-joining Date</span>
+                    <span className="text-[10px] text-slate-400 font-normal">View only</span>
+                  </label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={scheduleRejoiningDate}
+                    placeholder="Auto-calculated from end date"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/60 text-slate-800 dark:text-slate-200 font-bold font-mono cursor-not-allowed select-none"
+                  />
+                  <p className="text-[10px] text-purple-600 dark:text-purple-400 font-medium mt-1">Day after leave completion</p>
                 </div>
 
                 <div>
@@ -2338,8 +2396,8 @@ function MaternityWelfareVerificationPage() {
                   if (isScheduleAlreadyGiven && !isEditingSchedule) {
                     return (
                       <div className="space-y-4">
-                        {/* 4-column overview card from screenshot */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 text-xs">
+                        {/* 5-column overview card */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 text-xs">
                           <div>
                             <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
                               EXPECTED DELIVERY DATE
@@ -2366,6 +2424,17 @@ function MaternityWelfareVerificationPage() {
                               {activeRequest.welfareStage2.expectedLeaveEndDate}
                             </span>
                             <span className="text-[10px] text-slate-400">55d post-delivery</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
+                              RE-JOINING DATE
+                            </span>
+                            <span className="font-bold text-purple-700 dark:text-purple-300 block mt-1 text-sm font-mono">
+                              {activeRequest.welfareStage2.rejoiningDate ||
+                                calculateRejoiningDate(activeRequest.welfareStage2.expectedLeaveEndDate) ||
+                                "---"}
+                            </span>
+                            <span className="text-[10px] text-slate-400">Post-leave resumption</span>
                           </div>
                           <div>
                             <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
@@ -2443,7 +2512,7 @@ function MaternityWelfareVerificationPage() {
                         </div>
 
                         {/* Input Fields */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div>
                             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                               Expected Delivery Date (EDD) <span className="text-rose-500">*</span>
@@ -2452,11 +2521,34 @@ function MaternityWelfareVerificationPage() {
                               type="date"
                               value={viewModalEdd}
                               onChange={(e) => handleViewModalEddChange(e.target.value)}
-                              className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-1 focus:ring-slate-400 focus:outline-none transition shadow-2xs"
+                              className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-1 focus:ring-slate-400 focus:outline-none transition shadow-2xs font-mono"
                             />
                             {viewModalStartDate && viewModalEndDate && (
                               <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1.5">
-                                ✓ Auto-calculated Leave: <strong>{viewModalStartDate}</strong> to <strong>{viewModalEndDate}</strong> (112 Days / 16 Wks)
+                                ✓ Auto Leave: <strong>{viewModalStartDate}</strong> to <strong>{viewModalEndDate}</strong> (112 Days / 16 Wks)
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center justify-between">
+                              <span>Re-joining Date</span>
+                              <span className="text-[10px] text-slate-400 font-normal">View only</span>
+                            </label>
+                            <input
+                              type="text"
+                              readOnly
+                              value={viewModalRejoiningDate}
+                              placeholder="Auto-calculated from leave end date"
+                              className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/70 dark:bg-slate-800/60 text-slate-900 dark:text-white font-bold cursor-not-allowed select-none transition shadow-2xs font-mono"
+                            />
+                            {viewModalRejoiningDate ? (
+                              <p className="text-[11px] text-purple-600 dark:text-purple-400 font-medium mt-1.5">
+                                Duty resumption: <strong>{viewModalRejoiningDate}</strong>
+                              </p>
+                            ) : (
+                              <p className="text-[11px] text-slate-400 mt-1.5">
+                                Auto-calculated when EDD is selected
                               </p>
                             )}
                           </div>
@@ -2492,11 +2584,18 @@ function MaternityWelfareVerificationPage() {
                         {/* Calculated Schedule Info */}
                         <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500">
                           {viewModalStartDate && viewModalEndDate ? (
-                            <span className="text-slate-600 dark:text-slate-400">
-                              Calculated Leave Period: <strong className="text-slate-800 dark:text-slate-200">{viewModalStartDate}</strong> to <strong className="text-slate-800 dark:text-slate-200">{viewModalEndDate}</strong> (112 Statutory Days)
-                            </span>
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <span className="text-slate-600 dark:text-slate-400">
+                                Calculated Leave Period: <strong className="text-slate-800 dark:text-slate-200">{viewModalStartDate}</strong> to <strong className="text-slate-800 dark:text-slate-200">{viewModalEndDate}</strong> (112 Statutory Days)
+                              </span>
+                              {viewModalRejoiningDate && (
+                                <span className="text-purple-700 dark:text-purple-400 font-semibold">
+                                  Official Re-joining Date: <strong className="font-mono">{viewModalRejoiningDate}</strong>
+                                </span>
+                              )}
+                            </div>
                           ) : (
-                            <span className="text-slate-400">Please select an Expected Delivery Date to calculate statutory leave period.</span>
+                            <span className="text-slate-400">Please select an Expected Delivery Date to calculate statutory leave period and re-joining date.</span>
                           )}
                         </div>
                       </div>

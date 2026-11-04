@@ -115,6 +115,7 @@ export interface MaternityRequest {
   welfareStage2: {
     expectedLeaveStartDate: string; // YYYY-MM-DD
     expectedLeaveEndDate: string; // YYYY-MM-DD
+    rejoiningDate?: string; // YYYY-MM-DD (day immediately following leave end date)
     totalLeaveDays: number; // 112 days
     leaveAddress: string;
     emergencyContactPerson: string;
@@ -598,6 +599,7 @@ export const INITIAL_MATERNITY_REQUESTS: MaternityRequest[] = [
     welfareStage2: {
       expectedLeaveStartDate: "2026-11-01",
       expectedLeaveEndDate: "2027-02-20",
+      rejoiningDate: "2027-02-21",
       totalLeaveDays: 112,
       leaveAddress: "House 24, Road 4, Sector 10, Uttara, Dhaka",
       emergencyContactPerson: "Md. Aminul Islam (Spouse)",
@@ -958,12 +960,32 @@ export function logMedicalVisitAndProcess(
   return target;
 }
 
+// Helper: Calculate Re-joining date (day after leave end date)
+export function calculateRejoiningDate(endDateStr: string): string {
+  if (!endDateStr) return "";
+  try {
+    const parts = endDateStr.split("-").map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return "";
+    const end = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+    if (isNaN(end.getTime())) return "";
+    const rejoining = new Date(end);
+    rejoining.setDate(end.getDate() + 1);
+    const y = rejoining.getFullYear();
+    const m = String(rejoining.getMonth() + 1).padStart(2, "0");
+    const dayStr = String(rejoining.getDate()).padStart(2, "0");
+    return `${y}-${m}-${dayStr}`;
+  } catch {
+    return "";
+  }
+}
+
 // 3. Welfare Officer sets Expected Leave Start & End Date and submits to HR
 export function submitWelfareLeaveScheduleToHr(
   requestId: string,
   data: {
     startDate: string;
     endDate: string;
+    rejoiningDate?: string;
     totalDays: number;
     leaveAddress: string;
     emergencyContact: string;
@@ -980,6 +1002,7 @@ export function submitWelfareLeaveScheduleToHr(
     ...target.welfareStage2,
     expectedLeaveStartDate: data.startDate,
     expectedLeaveEndDate: data.endDate,
+    rejoiningDate: data.rejoiningDate || (data.endDate ? calculateRejoiningDate(data.endDate) : ""),
     totalLeaveDays: data.totalDays,
     leaveAddress: data.leaveAddress,
     emergencyContactPerson: data.emergencyContact,
