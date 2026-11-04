@@ -179,6 +179,16 @@ export interface MRRItem {
   // FOC fields
   focQty?: number;
   focAllocations?: any[];
+  // Warranty details
+  warranties?: ItemWarrantyDetail[];
+}
+
+export interface ItemWarrantyDetail {
+  id: string;
+  warrantyType: string;
+  startDate: string;
+  endDate: string;
+  remarks?: string;
 }
 
 export interface MaterialReceive {
@@ -246,6 +256,7 @@ export interface SupplierBill {
   id: string;
   billNumber: string; // BIL-2026-000142
   billDate: string;
+  billType?: "Bill against PO" | "Bill against WO" | "Service Bill Entry";
   poNumber: string;
   poDate?: string;
   mrrNumbers: string[]; // Supports multiple MRRs
@@ -476,8 +487,8 @@ export const DEFAULT_PURCHASE_ORDERS: PurchaseOrder[] = [
     grandTotal: 252000,
     termsAndConditions: "1. Total payment will be done after delivery and inspection.\n2. Warranty period: Minimum 24 months from installation.\n3. Goods to be delivered at factory gate.",
     attachments: [],
-    orderStatus: "Pending Approval",
-    currentApprovalLevel: 1,
+    orderStatus: "Approved",
+    currentApprovalLevel: 2,
     approvalHistory: [
       {
         level: 1,
@@ -586,8 +597,8 @@ export const DEFAULT_PURCHASE_ORDERS: PurchaseOrder[] = [
         fileSize: "1.4 MB",
       },
     ],
-    orderStatus: "Submitted",
-    currentApprovalLevel: 1,
+    orderStatus: "Approved",
+    currentApprovalLevel: 2,
     approvalHistory: [
       {
         level: 1,
@@ -1161,6 +1172,7 @@ export const DEFAULT_SUPPLIER_BILLS: SupplierBill[] = [
     id: "bil-2026-001",
     billNumber: "BIL-2026-000142",
     billDate: "2026-09-25",
+    billType: "Bill against PO",
     poNumber: "PO-2026-0001",
     poDate: "2026-09-22",
     mrrNumbers: ["MRR-2026-0001"],
@@ -1243,6 +1255,7 @@ export const DEFAULT_SUPPLIER_BILLS: SupplierBill[] = [
     id: "bil-2026-002",
     billNumber: "BIL-2026-000143",
     billDate: "2026-10-15",
+    billType: "Bill against PO",
     poNumber: "PO-2026-0002",
     poDate: "2026-10-10",
     mrrNumbers: ["MRR-2026-0002"],
@@ -1299,6 +1312,134 @@ export const DEFAULT_SUPPLIER_BILLS: SupplierBill[] = [
         taxRate: 3,
         taxAmount: 3675,
         lineAmount: 132300,
+      },
+    ],
+  },
+  {
+    id: "bil-2026-003",
+    billNumber: "BIL-2026-000144",
+    billDate: "2026-10-18",
+    billType: "Bill against WO",
+    poNumber: "WO-2026-0001",
+    poDate: "2026-09-23",
+    mrrNumbers: ["MRR-2026-0004"],
+    supplierId: "sup-bengal-02",
+    supplierName: "Bengal Information Systems",
+    supplierBillNo: "INV-WO-2026-301",
+    supplierBillDate: "2026-10-17",
+    currency: "BDT",
+    subtotal: 165000,
+    discount: 5000,
+    vat: 12000,
+    tax: 4950,
+    otherCharges: 0,
+    adjustment: 0,
+    netBillAmount: 176950,
+    roundOff: 0,
+    paymentStatus: "Unpaid",
+    paymentDueDate: "2026-11-17",
+    paidAmount: 0,
+    outstandingAmount: 176950,
+    approvalStatus: "Approved",
+    submittedBy: "Tahmid Afsar Shapno",
+    submittedDate: "2026-10-18",
+    approvedBy: "Kamrul Islam",
+    approvedDate: "2026-10-18",
+    approvalRemarks: "Work order service delivery verified and approved.",
+    remarks: "Campus fiber optic cable termination and network rack cabling invoice.",
+    attachments: [],
+    items: [
+      {
+        id: "sbi-301",
+        sl: 1,
+        itemCode: "SRV-IT-FBR-01",
+        itemName: "Fiber Optic Backbone Splicing & OTDR Calibration",
+        specification: "12-core single-mode fiber backbone splicing, testing and certification",
+        brand: "Bengal Networking",
+        origin: "Bangladesh",
+        uom: "Job",
+        mrrReceivedQty: 1,
+        previouslyBilledQty: 0,
+        currentBillQty: 1,
+        unitPrice: 165000,
+        discount: 5000,
+        vatRate: 7.5,
+        vatAmount: 12000,
+        taxRate: 3,
+        taxAmount: 4950,
+        lineAmount: 176950,
+      },
+    ],
+  },
+  {
+    id: "bil-2026-004",
+    billNumber: "BIL-2026-000145",
+    billDate: "2026-10-22",
+    billType: "Service Bill Entry",
+    poNumber: "DIRECT-SERVICE",
+    mrrNumbers: [],
+    supplierId: "sup-1",
+    supplierName: "Apex Textile Chemical & Dyestuffs Ltd",
+    supplierBillNo: "INV-SRV-2026-550",
+    supplierBillDate: "2026-10-21",
+    currency: "BDT",
+    subtotal: 72500,
+    discount: 2500,
+    vat: 3500,
+    tax: 1400,
+    otherCharges: 0,
+    adjustment: 0,
+    netBillAmount: 74900,
+    roundOff: 0,
+    paymentStatus: "Unpaid",
+    paymentDueDate: "2026-11-21",
+    paidAmount: 0,
+    outstandingAmount: 74900,
+    approvalStatus: "Submitted",
+    submittedBy: "Tahmid Afsar Shapno",
+    submittedDate: "2026-10-22",
+    remarks: "Preventive maintenance and chemical lab QA testing services.",
+    attachments: [],
+    items: [
+      {
+        id: "sbi-401",
+        sl: 1,
+        itemCode: "SRV-MAINT-03",
+        itemName: "Machinery Preventive Maintenance & Overhaul",
+        specification: "Comprehensive mechanical diagnostic, calibration, servicing and motor overhaul",
+        brand: "Maintenance & Repair Services",
+        origin: "Local / In-House",
+        uom: "Job",
+        mrrReceivedQty: 1,
+        previouslyBilledQty: 0,
+        currentBillQty: 1,
+        unitPrice: 35000,
+        discount: 1000,
+        vatRate: 5,
+        vatAmount: 1700,
+        taxRate: 2,
+        taxAmount: 680,
+        lineAmount: 36380,
+      },
+      {
+        id: "sbi-402",
+        sl: 2,
+        itemCode: "SRV-QA-04",
+        itemName: "Laboratory QA & Textile Fabric Testing Service",
+        specification: "GSM, shrinkage, colorfastness, and tensile strength laboratory testing batch",
+        brand: "Technical Service",
+        origin: "Local / In-House",
+        uom: "Batch",
+        mrrReceivedQty: 1,
+        previouslyBilledQty: 0,
+        currentBillQty: 1,
+        unitPrice: 37500,
+        discount: 1500,
+        vatRate: 5,
+        vatAmount: 1800,
+        taxRate: 2,
+        taxAmount: 720,
+        lineAmount: 38520,
       },
     ],
   },

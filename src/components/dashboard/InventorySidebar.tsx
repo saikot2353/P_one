@@ -95,6 +95,10 @@ export const nav: NavItem[] = [
         to: "/inventory-configuration",
         search: { tab: "uom" },
       },
+      {
+        label: "Types of Warranty",
+        to: "/inv-warranty-types",
+      },
     ],
   },
   {

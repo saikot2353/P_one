@@ -25,6 +25,9 @@ import {
   ArrowLeft,
   MapPin,
   Layers,
+  Paperclip,
+  Download,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -35,6 +38,7 @@ import {
 import {
   MaterialReceive,
   MRRItem,
+  ItemWarrantyDetail,
   getStoredMaterialReceipts,
   setStoredMaterialReceipts,
   getStoredPurchaseOrders,
@@ -44,6 +48,7 @@ import {
   setStoredReceiveList,
   syncReceiveListWithOrders,
 } from "@/lib/procurement-order-inventory-data";
+import { getActiveWarrantyTypes } from "@/lib/warranty-types-data";
 import { getItemTrackingMode } from "@/lib/item-tracking-utils";
 import {
   LocationAllocationModal,
@@ -674,6 +679,215 @@ export function MaterialReceiveMRRPage() {
     return mrrItems.reduce((sum, i) => sum + i.lineTotal, 0);
   }, [mrrItems]);
 
+  // ── Action: Delete Item from Form ──────────────────────────────
+  const handleDeleteItem = (itemId: string) => {
+    if (isViewMode) {
+      toast.error("Items cannot be deleted in read-only mode.");
+      return;
+    }
+    if (mrrItems.length <= 1) {
+      toast.error("At least one item must remain in the receive list.");
+      return;
+    }
+    setMrrItems((prev) => {
+      const filtered = prev.filter((i) => i.id !== itemId);
+      return filtered.map((it, idx) => ({ ...it, sl: idx + 1 }));
+    });
+    toast.success("Item removed from receive list.");
+  };
+
+  // ── Attachment State & Handlers (PI Entry Pattern) ─────────────
+  const [attachmentModalOpen, setAttachmentModalOpen] = useState(false);
+  const [attachments, setAttachments] = useState<any[]>(() => {
+    if (targetReceipt && (targetReceipt as any).attachments) {
+      return (targetReceipt as any).attachments;
+    }
+    return [
+      {
+        id: "att-mrr-1",
+        fileName: "Vendor_Challan_Signed.pdf",
+        title: "Vendor Delivery Challan",
+        note: "Physical challan signed by gate security and vehicle driver",
+        fileSize: "1.4 MB",
+        uploadedBy: "Tahmid Afsar Shapno - Store Officer",
+        uploadTime: "2026-09-15 11:30",
+      },
+    ];
+  });
+  const [selectedUploadFile, setSelectedUploadFile] = useState<File | null>(null);
+  const [uploadTitle, setUploadTitle] = useState("");
+  const [uploadNote, setUploadNote] = useState("");
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const MAX_SIZE = 3 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      setUploadError(`File size (${(file.size / (1024 * 1024)).toFixed(2)} MB) exceeds maximum allowed limit of 3 MB.`);
+      setSelectedUploadFile(null);
+      e.target.value = "";
+      return;
+    }
+
+    setSelectedUploadFile(file);
+    if (!uploadTitle.trim()) {
+      const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf(".")) || file.name;
+      setUploadTitle(nameWithoutExt);
+    }
+  };
+
+  const handleUploadAttachment = () => {
+    setUploadError(null);
+    if (!selectedUploadFile) {
+      setUploadError("Please select a file to upload.");
+      return;
+    }
+    if (!uploadTitle.trim()) {
+      setUploadError("Attachment Title is required.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const newAtt = {
+        id: `att-${Date.now()}`,
+        fileName: selectedUploadFile.name,
+        title: uploadTitle.trim(),
+        note: uploadNote.trim(),
+        fileSize:
+          selectedUploadFile.size < 1024 * 1024
+            ? `${(selectedUploadFile.size / 1024).toFixed(1)} KB`
+            : `${(selectedUploadFile.size / (1024 * 1024)).toFixed(2)} MB`,
+        uploadedBy: receivedBy,
+        uploadTime: new Date().toISOString().replace("T", " ").substring(0, 16),
+        dataUrl,
+      };
+
+      setAttachments((prev) => [newAtt, ...prev]);
+      setSelectedUploadFile(null);
+      setUploadTitle("");
+      setUploadNote("");
+      toast.success(`Attachment "${newAtt.title}" uploaded successfully.`);
+    };
+    reader.readAsDataURL(selectedUploadFile);
+  };
+
+  const handleDeleteAttachment = (id: string) => {
+    setAttachments((prev) => prev.filter((a) => a.id !== id));
+    toast.info("Attachment removed.");
+  };
+
+  const handleDownloadAttachment = (att: any) => {
+    try {
+      const link = document.createElement("a");
+      if (att.dataUrl && (att.dataUrl.startsWith("data:") || att.dataUrl.startsWith("blob:"))) {
+        link.href = att.dataUrl;
+      } else {
+        const textContent = `CRIPTON Material Receive Document\nMRR: ${receiveNumber}\nFilename: ${att.fileName}\nTitle: ${att.title}\nUploaded By: ${att.uploadedBy}\nUpload Time: ${att.uploadTime}\nNote: ${att.note || "N/A"}`;
+        const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
+        link.href = URL.createObjectURL(blob);
+      }
+      link.download = att.fileName || `${att.title}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch {
+      toast.error("Failed to download attachment.");
+    }
+  };
+
+  // ── Warranty Details State & Handlers ───────────────────────────
+  const [activeWarrantyItemId, setActiveWarrantyItemId] = useState<string | null>(null);
+  const [isAddingWarranty, setIsAddingWarranty] = useState(false);
+  const [warrSearch, setWarrSearch] = useState("");
+  const [warrTypeSelectOpen, setWarrTypeSelectOpen] = useState(false);
+  const [newWarrantyType, setNewWarrantyType] = useState("");
+  const [newWarrantyStartDate, setNewWarrantyStartDate] = useState(new Date().toISOString().slice(0, 10));
+  const [newWarrantyEndDate, setNewWarrantyEndDate] = useState(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().slice(0, 10);
+  });
+  const [newWarrantyRemarks, setNewWarrantyRemarks] = useState("");
+
+  const activeWarrantyItem = useMemo(
+    () => mrrItems.find((i) => i.id === activeWarrantyItemId),
+    [mrrItems, activeWarrantyItemId]
+  );
+
+  const activeWarrantyTypes = useMemo(() => getActiveWarrantyTypes(), [activeWarrantyItemId]);
+
+  const handleOpenWarrantyModal = (itemId: string) => {
+    setActiveWarrantyItemId(itemId);
+    setIsAddingWarranty(false);
+    setWarrSearch("");
+    setWarrTypeSelectOpen(false);
+    const activeTypes = getActiveWarrantyTypes();
+    setNewWarrantyType(activeTypes[0]?.warrantyType || "Standard Manufacturer Warranty");
+    setNewWarrantyStartDate(receiveDate || new Date().toISOString().slice(0, 10));
+    const d = new Date(receiveDate || Date.now());
+    d.setFullYear(d.getFullYear() + 1);
+    setNewWarrantyEndDate(d.toISOString().slice(0, 10));
+    setNewWarrantyRemarks("");
+  };
+
+  const handleSaveWarrantyEntry = () => {
+    if (!activeWarrantyItemId) return;
+    if (!newWarrantyType.trim()) {
+      toast.error("Please select a Warranty Type.");
+      return;
+    }
+    if (!newWarrantyStartDate || !newWarrantyEndDate) {
+      toast.error("Please specify both Start Date and End Date.");
+      return;
+    }
+
+    const newEntry: ItemWarrantyDetail = {
+      id: `warr-${Date.now()}`,
+      warrantyType: newWarrantyType.trim(),
+      startDate: newWarrantyStartDate,
+      endDate: newWarrantyEndDate,
+      remarks: newWarrantyRemarks.trim(),
+    };
+
+    setMrrItems((prev) =>
+      prev.map((i) => {
+        if (i.id === activeWarrantyItemId) {
+          const currentWarrs = i.warranties || [];
+          return {
+            ...i,
+            warranties: [...currentWarrs, newEntry],
+          };
+        }
+        return i;
+      })
+    );
+
+    setIsAddingWarranty(false);
+    setNewWarrantyRemarks("");
+    toast.success(`Warranty "${newEntry.warrantyType}" added.`);
+  };
+
+  const handleDeleteWarrantyEntry = (warrantyId: string) => {
+    if (!activeWarrantyItemId) return;
+    setMrrItems((prev) =>
+      prev.map((i) => {
+        if (i.id === activeWarrantyItemId) {
+          return {
+            ...i,
+            warranties: (i.warranties || []).filter((w) => w.id !== warrantyId),
+          };
+        }
+        return i;
+      })
+    );
+    toast.info("Warranty entry removed.");
+  };
+
   // Submit MRR
   const handleSubmitMRR = () => {
     if (!challanNo.trim()) {
@@ -721,6 +935,7 @@ export function MaterialReceiveMRRPage() {
         totalRejectedQty: totalRejected,
         totalAmount,
         receiveStatus: totalReceived > 0 ? "Full Received" : "Partially Received",
+        attachments,
         remarks,
       };
 
@@ -768,6 +983,7 @@ export function MaterialReceiveMRRPage() {
       totalRejectedQty: totalRejected,
       totalAmount,
       receiveStatus: totalReceived > 0 ? "Full Received" : "Partially Received",
+      attachments,
       remarks,
     };
 
@@ -824,6 +1040,14 @@ export function MaterialReceiveMRRPage() {
                   <Save className="size-3.5" /> Edit Mode: {receiveNumber}
                 </span>
               )}
+              <button
+                type="button"
+                onClick={() => setAttachmentModalOpen(true)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-border text-xs font-semibold hover:bg-muted transition-colors cursor-pointer"
+              >
+                <Paperclip className="size-3.5 text-teal-600" />
+                <span>Attachment ({attachments.length})</span>
+              </button>
               <button
                 type="button"
                 onClick={handleOpenPreviewReport}
@@ -1024,6 +1248,7 @@ export function MaterialReceiveMRRPage() {
                     <th className="py-2.5 px-3 w-16 font-bold text-center">
                       {isWorkOrder ? "UOM" : "SKU UOM"}
                     </th>
+                    <th className="py-2.5 px-2 text-center font-bold w-20">Warranty</th>
                     <th className="py-2.5 px-3 text-right font-bold w-20">Ordered Qty</th>
                     <th className="py-2.5 px-3 text-right font-bold w-20">Prev Rec</th>
                     <th className="py-2.5 px-3 text-right font-bold w-24 text-primary">
@@ -1037,6 +1262,7 @@ export function MaterialReceiveMRRPage() {
                         <th className="py-2.5 px-2 text-center font-bold w-24">Tracking (B/L)</th>
                       </>
                     )}
+                    <th className="py-2.5 px-2 text-center font-bold w-16">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -1062,6 +1288,21 @@ export function MaterialReceiveMRRPage() {
                         {/* Base / SKU UOM */}
                         <td className="py-2.5 px-3 text-center font-bold text-muted-foreground">
                           {item.uom}
+                        </td>
+                        {/* Warranty Column (Available for both PO and Work Order) */}
+                        <td className="py-2.5 px-2 text-center">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenWarrantyModal(item.id)}
+                            className={`inline-flex items-center justify-center size-7 rounded-lg text-xs font-black transition-all cursor-pointer border ${
+                              item.warranties && item.warranties.length > 0
+                                ? "bg-amber-500 text-white border-amber-600 shadow-xs hover:bg-amber-600"
+                                : "bg-muted/70 hover:bg-amber-500/10 hover:text-amber-600 hover:border-amber-500/40 text-muted-foreground border-border"
+                            }`}
+                            title={`Warranty Details (${item.warranties?.length || 0} registered)`}
+                          >
+                            W
+                          </button>
                         </td>
                         {/* Ordered Qty in Base/SKU UOM */}
                         <td className="py-2.5 px-3 text-right font-mono font-bold text-foreground">
@@ -1149,6 +1390,19 @@ export function MaterialReceiveMRRPage() {
                             </td>
                           </>
                         )}
+
+                        {/* Action Column: Absolute last position */}
+                        <td className="py-2.5 px-2 text-center">
+                          <button
+                            type="button"
+                            disabled={isViewMode}
+                            onClick={() => handleDeleteItem(item.id)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                            title="Delete Item"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
+                        </td>
                       </tr>
                     );
                   })}
@@ -1191,6 +1445,14 @@ export function MaterialReceiveMRRPage() {
             </div>
 
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setAttachmentModalOpen(true)}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold hover:bg-muted transition-colors cursor-pointer"
+              >
+                <Paperclip className="size-3.5 text-teal-600" />
+                <span>Attachment ({attachments.length})</span>
+              </button>
               {isViewMode ? (
                 <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-muted text-muted-foreground border border-border">
                   <Lock className="size-3.5" /> Read-Only Mode (Viewing Saved Receipt)
@@ -1302,6 +1564,491 @@ export function MaterialReceiveMRRPage() {
             onClose={() => setPreviewReportOpen(false)}
             data={previewReportData}
           />
+
+          {/* ── Attachment Modal (PI Entry Form Pattern) ───────────── */}
+          {attachmentModalOpen && (
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+              <div className="bg-card w-full max-w-4xl rounded-2xl border border-border shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-150">
+                {/* Modal Header */}
+                <div className="px-6 py-4 border-b border-border bg-muted/40 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+                      <Paperclip className="size-4 text-teal-600" />
+                      <span>Document Storage — Material Receive Attachments</span>
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      MRR: <span className="font-mono font-bold text-foreground">{receiveNumber}</span> &bull; Supplier: <span className="font-semibold text-foreground">{supplierName}</span>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAttachmentModalOpen(false)}
+                    className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+
+                {/* Modal Body */}
+                <div className="p-6 space-y-5 overflow-y-auto">
+                  {/* File Upload Box */}
+                  {!isViewMode && (
+                    <div className="p-4 rounded-xl border border-dashed border-border bg-muted/20 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                          <Upload className="size-3.5 text-teal-600" /> Upload Supporting Document
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          Max file size: 3 MB (PDF, Images, Excel, Scanned Challan)
+                        </span>
+                      </div>
+
+                      {uploadError && (
+                        <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-600 text-xs flex items-center gap-2">
+                          <AlertCircle className="size-4 shrink-0" />
+                          <span>{uploadError}</span>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div>
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                            Select File *
+                          </label>
+                          <input
+                            type="file"
+                            onChange={handleFileChange}
+                            className="w-full text-xs text-muted-foreground file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                            Attachment Title *
+                          </label>
+                          <input
+                            type="text"
+                            value={uploadTitle}
+                            onChange={(e) => setUploadTitle(e.target.value)}
+                            placeholder="e.g. Vendor Challan Signed Copy"
+                            className="w-full px-2.5 py-1.5 bg-background border border-border rounded-lg outline-none focus:border-teal-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                            Note / Remarks
+                          </label>
+                          <input
+                            type="text"
+                            value={uploadNote}
+                            onChange={(e) => setUploadNote(e.target.value)}
+                            placeholder="Optional remarks"
+                            className="w-full px-2.5 py-1.5 bg-background border border-border rounded-lg outline-none focus:border-teal-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={handleUploadAttachment}
+                          className="px-4 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+                        >
+                          <Upload className="size-3.5" /> Upload File
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Attachments Table */}
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-bold text-foreground uppercase tracking-wider block">
+                      Attached Documents ({attachments.length})
+                    </span>
+
+                    <div className="rounded-xl border border-border overflow-hidden">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border">
+                            <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
+                            {!isViewMode && (
+                              <th className="py-2.5 px-2 w-12 text-center font-bold">Remove</th>
+                            )}
+                            <th className="py-2.5 px-3 font-bold">Document Title</th>
+                            <th className="py-2.5 px-3 font-bold">Note</th>
+                            <th className="py-2.5 px-3 font-bold">Uploaded By</th>
+                            <th className="py-2.5 px-3 font-bold text-center w-28">Upload Time</th>
+                            <th className="py-2.5 px-3 font-bold text-right w-20">Size</th>
+                            <th className="py-2.5 px-3 font-bold text-center w-24">Download</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {attachments.length > 0 ? (
+                            attachments.map((att, idx) => (
+                              <tr key={att.id || idx} className="hover:bg-muted/30">
+                                <td className="py-2 px-3 text-center text-muted-foreground font-bold">
+                                  {idx + 1}
+                                </td>
+                                {!isViewMode && (
+                                  <td className="py-2 px-2 text-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteAttachment(att.id)}
+                                      className="p-1 text-muted-foreground hover:text-rose-600 transition-colors cursor-pointer"
+                                      title="Delete attachment"
+                                    >
+                                      <Trash2 className="size-3.5" />
+                                    </button>
+                                  </td>
+                                )}
+                                <td className="py-2 px-3">
+                                  <div className="font-bold text-foreground flex items-center gap-1.5">
+                                    <FileText className="size-3.5 text-teal-600 shrink-0" />
+                                    <span>{att.title}</span>
+                                  </div>
+                                  <div className="text-[10px] text-muted-foreground font-mono">
+                                    {att.fileName}
+                                  </div>
+                                </td>
+                                <td className="py-2 px-3 text-muted-foreground text-xs">
+                                  {att.note || "—"}
+                                </td>
+                                <td className="py-2 px-3 text-muted-foreground">
+                                  {att.uploadedBy}
+                                </td>
+                                <td className="py-2 px-3 text-center text-[11px] font-mono text-muted-foreground">
+                                  {att.uploadTime}
+                                </td>
+                                <td className="py-2 px-3 text-right font-mono text-muted-foreground">
+                                  {att.fileSize}
+                                </td>
+                                <td className="py-2 px-3 text-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDownloadAttachment(att)}
+                                    className="px-2.5 py-1 rounded-md text-[11px] font-bold border border-border bg-card hover:bg-muted transition-colors cursor-pointer inline-flex items-center gap-1 text-primary"
+                                  >
+                                    <Download className="size-3" /> Download
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={isViewMode ? 7 : 8} className="py-8 text-center text-muted-foreground text-xs">
+                                No documents attached to this receipt yet.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="px-6 py-3 border-t border-border bg-muted/20 flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setAttachmentModalOpen(false)}
+                    className="px-4 py-2 bg-muted text-foreground hover:bg-muted/80 rounded-xl text-xs font-semibold cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Warranty Details Modal ─────────────────────────────── */}
+          {activeWarrantyItemId && activeWarrantyItem && (
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+              <div className="bg-card w-full max-w-3xl rounded-2xl border border-border shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-150">
+                {/* Modal Header */}
+                <div className="px-6 py-4 border-b border-border bg-muted/40 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+                      <ShieldCheck className="size-4 text-amber-500" />
+                      <span>Warranty Details</span>
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Item: <span className="font-bold text-foreground">{activeWarrantyItem.itemName}</span> &bull; Code: <span className="font-mono text-foreground">{activeWarrantyItem.itemCode}</span> &bull; UOM: {activeWarrantyItem.uom}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveWarrantyItemId(null);
+                      setIsAddingWarranty(false);
+                    }}
+                    className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+
+                {/* Modal Body */}
+                <div className="p-6 space-y-5 overflow-y-auto">
+                  {/* Header bar with Add button */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
+                        Configured Warranties ({(activeWarrantyItem.warranties || []).length})
+                      </h4>
+                      <p className="text-[11px] text-muted-foreground">
+                        Multiple warranty policies and coverage periods can be registered for this service line item.
+                      </p>
+                    </div>
+
+                    {!isViewMode && !isAddingWarranty && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAddingWarranty(true);
+                          setWarrSearch("");
+                          const activeTypes = getActiveWarrantyTypes();
+                          if (activeTypes[0]) setNewWarrantyType(activeTypes[0].warrantyType);
+                        }}
+                        className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition-all cursor-pointer"
+                      >
+                        <Plus className="size-3.5" /> Add
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Add Warranty Form with Searchable Warranty Type dropdown */}
+                  {isAddingWarranty && (
+                    <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-500/5 space-y-4 animate-in fade-in">
+                      <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                        <span className="text-[11px] font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                          <ShieldCheck className="size-3.5 text-amber-500" /> New Warranty Entry
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setIsAddingWarranty(false)}
+                          className="text-muted-foreground hover:text-foreground text-xs cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                        {/* Searchable Warranty Type Dropdown */}
+                        <div className="sm:col-span-2 relative">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                            Warranty Type *
+                          </label>
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => setWarrTypeSelectOpen((prev) => !prev)}
+                              className="w-full px-3 py-2 bg-background border border-border rounded-xl text-left flex items-center justify-between outline-none focus:border-amber-500 cursor-pointer"
+                            >
+                              <span className={newWarrantyType ? "font-bold text-foreground" : "text-muted-foreground"}>
+                                {newWarrantyType || "Select Active Warranty Type..."}
+                              </span>
+                              <ChevronRight className={`size-3.5 transition-transform ${warrTypeSelectOpen ? "rotate-90" : ""}`} />
+                            </button>
+
+                            {warrTypeSelectOpen && (
+                              <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-card border border-border rounded-xl shadow-xl p-2 space-y-2 animate-in fade-in">
+                                <div className="relative">
+                                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
+                                  <input
+                                    type="text"
+                                    placeholder="Search warranty type..."
+                                    value={warrSearch}
+                                    onChange={(e) => setWarrSearch(e.target.value)}
+                                    className="w-full pl-8 pr-2.5 py-1 text-xs bg-muted/40 border border-border rounded-lg outline-none focus:border-amber-500"
+                                  />
+                                </div>
+                                <div className="max-h-48 overflow-y-auto divide-y divide-border/50">
+                                  {activeWarrantyTypes
+                                    .filter((w) =>
+                                      !warrSearch.trim() ||
+                                      w.warrantyType.toLowerCase().includes(warrSearch.toLowerCase()) ||
+                                      w.description.toLowerCase().includes(warrSearch.toLowerCase())
+                                    )
+                                    .map((w) => (
+                                      <button
+                                        key={w.id}
+                                        type="button"
+                                        onClick={() => {
+                                          setNewWarrantyType(w.warrantyType);
+                                          setWarrTypeSelectOpen(false);
+                                        }}
+                                        className={`w-full text-left p-2 rounded-lg hover:bg-muted/50 transition-colors flex flex-col gap-0.5 cursor-pointer ${
+                                          newWarrantyType === w.warrantyType ? "bg-amber-500/10 font-bold" : ""
+                                        }`}
+                                      >
+                                        <span className="text-xs text-foreground font-semibold flex items-center gap-1.5">
+                                          <ShieldCheck className="size-3 text-amber-500 shrink-0" />
+                                          {w.warrantyType}
+                                        </span>
+                                        {w.description && (
+                                          <span className="text-[10px] text-muted-foreground line-clamp-1">
+                                            {w.description}
+                                          </span>
+                                        )}
+                                      </button>
+                                    ))}
+                                  {activeWarrantyTypes.filter((w) =>
+                                    !warrSearch.trim() ||
+                                    w.warrantyType.toLowerCase().includes(warrSearch.toLowerCase())
+                                  ).length === 0 && (
+                                    <div className="p-3 text-center text-[11px] text-muted-foreground">
+                                      No active warranty types match &quot;{warrSearch}&quot;.
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Warranty Start Date */}
+                        <div>
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                            Warranty Start Date *
+                          </label>
+                          <input
+                            type="date"
+                            value={newWarrantyStartDate}
+                            onChange={(e) => setNewWarrantyStartDate(e.target.value)}
+                            className="w-full px-2.5 py-2 bg-background border border-border rounded-xl outline-none focus:border-amber-500 font-medium"
+                          />
+                        </div>
+
+                        {/* Warranty End Date */}
+                        <div>
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                            Warranty End Date *
+                          </label>
+                          <input
+                            type="date"
+                            value={newWarrantyEndDate}
+                            onChange={(e) => setNewWarrantyEndDate(e.target.value)}
+                            className="w-full px-2.5 py-2 bg-background border border-border rounded-xl outline-none focus:border-amber-500 font-medium"
+                          />
+                        </div>
+
+                        {/* Remarks */}
+                        <div className="sm:col-span-3">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                            Remarks
+                          </label>
+                          <input
+                            type="text"
+                            value={newWarrantyRemarks}
+                            onChange={(e) => setNewWarrantyRemarks(e.target.value)}
+                            placeholder="e.g. Free parts replacement and quarterly calibration support"
+                            className="w-full px-3 py-2 bg-background border border-border rounded-xl outline-none focus:border-amber-500"
+                          />
+                        </div>
+
+                        <div className="flex items-end">
+                          <button
+                            type="button"
+                            onClick={handleSaveWarrantyEntry}
+                            className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+                          >
+                            <CheckCircle2 className="size-3.5" /> Save Warranty
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Warranties Table */}
+                  <div className="rounded-xl border border-border overflow-hidden">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-muted/70 text-muted-foreground text-[10px] uppercase tracking-wider border-b border-border">
+                          <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
+                          <th className="py-2.5 px-3 font-bold min-w-[200px]">Warranty Type</th>
+                          <th className="py-2.5 px-3 font-bold text-center w-28">Start Date</th>
+                          <th className="py-2.5 px-3 font-bold text-center w-28">End Date</th>
+                          <th className="py-2.5 px-3 font-bold">Remarks</th>
+                          {!isViewMode && (
+                            <th className="py-2.5 px-2 w-12 text-center font-bold">Action</th>
+                          )}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {activeWarrantyItem.warranties && activeWarrantyItem.warranties.length > 0 ? (
+                          activeWarrantyItem.warranties.map((w, idx) => (
+                            <tr key={w.id || idx} className="hover:bg-muted/30">
+                              <td className="py-2.5 px-3 text-center text-muted-foreground font-bold">
+                                {idx + 1}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <span className="font-bold text-foreground flex items-center gap-1.5">
+                                  <ShieldCheck className="size-3.5 text-amber-500 shrink-0" />
+                                  {w.warrantyType}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-mono text-[11px] text-foreground">
+                                {w.startDate}
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-mono text-[11px] text-foreground">
+                                {w.endDate}
+                              </td>
+                              <td className="py-2.5 px-3 text-muted-foreground text-xs">
+                                {w.remarks || "—"}
+                              </td>
+                              {!isViewMode && (
+                                <td className="py-2.5 px-2 text-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteWarrantyEntry(w.id)}
+                                    className="p-1 text-muted-foreground hover:text-rose-600 transition-colors cursor-pointer"
+                                    title="Remove warranty"
+                                  >
+                                    <Trash2 className="size-3.5" />
+                                  </button>
+                                </td>
+                              )}
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={isViewMode ? 5 : 6} className="py-8 text-center text-muted-foreground text-xs">
+                              <div className="flex flex-col items-center justify-center gap-1.5">
+                                <ShieldCheck className="size-6 text-muted-foreground/30" />
+                                <span>No warranty details registered for this service item yet.</span>
+                                {!isViewMode && !isAddingWarranty && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsAddingWarranty(true)}
+                                    className="text-amber-500 hover:underline font-bold text-xs mt-1"
+                                  >
+                                    + Click Add to register a warranty
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="px-6 py-3 border-t border-border bg-muted/20 flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveWarrantyItemId(null);
+                      setIsAddingWarranty(false);
+                    }}
+                    className="px-4 py-2 bg-muted text-foreground hover:bg-muted/80 rounded-xl text-xs font-semibold cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>

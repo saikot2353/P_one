@@ -527,8 +527,13 @@ export function SupplierBillListPage() {
                         key={b.id}
                         className="hover:bg-muted/40 transition-colors"
                       >
-                        <td className="py-3 px-3.5 font-mono font-bold text-amber-600">
-                          {b.billNumber}
+                        <td className="py-3 px-3.5">
+                          <div className="font-mono font-bold text-amber-600">{b.billNumber}</div>
+                          {b.billType && (
+                            <span className="text-[9.5px] font-sans font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 inline-block mt-0.5">
+                              {b.billType}
+                            </span>
+                          )}
                         </td>
                         <td className="py-3 px-3 text-muted-foreground whitespace-nowrap">
                           {b.billDate}
@@ -540,7 +545,13 @@ export function SupplierBillListPage() {
                           {b.supplierName}
                         </td>
                         <td className="py-3 px-3 font-mono text-muted-foreground">
-                          {b.poNumber}
+                          {b.billType === "Service Bill Entry" || b.poNumber === "DIRECT-SERVICE" ? (
+                            <span className="text-[10.5px] font-sans px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 font-semibold inline-block">
+                              Direct Service
+                            </span>
+                          ) : (
+                            b.poNumber
+                          )}
                         </td>
                         <td className="py-3 px-3 text-right font-mono font-black text-foreground whitespace-nowrap">
                           ৳ {b.netBillAmount.toLocaleString()}
