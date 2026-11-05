@@ -68,6 +68,7 @@ export interface MedicalCheckupVisit {
 }
 
 export type MaternityStage =
+  | "WELFARE_REGISTERED" // Employee registered at welfare, awaiting intake docs & consultation
   | "WELFARE_INITIATED" // Welfare intake complete, sent to Medical
   | "MEDICAL_FOLLOWUP" // Medical in progress (follow-up scheduled)
   | "MEDICAL_VERIFIED" // Medical checkup complete with EDD, sent back to Welfare
@@ -717,31 +718,22 @@ export const INITIAL_MATERNITY_REQUESTS: MaternityRequest[] = [
     id: "MAT-2026-003",
     employeeId: "2022031902",
     employee: INITIAL_FEMALE_EMPLOYEES[2],
-    currentStage: "WELFARE_INITIATED",
-    statusLabel: "At Medical Verification (Initial Queue)",
+    currentStage: "WELFARE_REGISTERED",
+    statusLabel: "Welfare Registered (Awaiting Intake & Docs)",
     createdAt: "2026-10-26 14:20:00",
     updatedAt: "2026-10-26 14:20:00",
     welfareStage1: {
       intakeDate: "2026-10-26",
       welfareOfficerName: "Sharmin Sultana (Welfare Executive)",
       welfareOfficerId: "WLF-019",
-      informedPregnancyDate: "2026-10-25",
+      informedPregnancyDate: "",
       tentativeTrimester: "1st Trimester (1-12 wks)",
       serviceDurationText: "4 years, 7 months",
       isEligible: true,
       counselingNotes:
-        "Tania Sultana reported pregnancy. Job duration 4+ years (Eligible). Uploaded doctor consultation slip and blood group card. Submitted for initial medical examination.",
-      attachedDocuments: [
-        {
-          id: "DOC-201",
-          name: "Doctor_Initial_Prescription.pdf",
-          type: "Prescription",
-          size: "950 KB",
-          uploadDate: "2026-10-26",
-          status: "Pending",
-        },
-      ],
-      previousHistoryDisplayed: true,
+        "Tania Sultana reported pregnancy. Initial service tenure verified (4+ years - Statutory Eligible). Registered at Welfare. Instructed to bring doctor's consultation report and prescription for full intake and medical verification.",
+      attachedDocuments: [],
+      previousHistoryDisplayed: false,
     },
     medicalStage: {
       assignedDoctor: "Dr. Farzana Yasmin, MBBS, DGO",
@@ -750,7 +742,7 @@ export const INITIAL_MATERNITY_REQUESTS: MaternityRequest[] = [
       isFinalCheckupDone: false,
       expectedDeliveryDate: "",
       clinicalFitness: "Normal Health - Fit to Work",
-      doctorFinalRemarks: "Awaiting first in-person clinical examination.",
+      doctorFinalRemarks: "Awaiting welfare intake completion and document verification.",
       medicalVerifiedAt: null,
     },
     welfareStage2: {
@@ -780,7 +772,7 @@ export const INITIAL_MATERNITY_REQUESTS: MaternityRequest[] = [
 
 ];
 
-const LOCAL_STORAGE_KEY = "cripton_maternity_requests_v4";
+const LOCAL_STORAGE_KEY = "cripton_maternity_requests_v6";
 
 export function getMaternityRequests(): MaternityRequest[] {
   if (typeof window === "undefined") return INITIAL_MATERNITY_REQUESTS;
@@ -816,6 +808,117 @@ export function saveMaternityRequests(requests: MaternityRequest[]): void {
   } catch (err) {
     console.error("Error saving maternity requests", err);
   }
+}
+
+// 0. Welfare Officer registers an employee for the first time (without intake details or documents)
+export function registerWelfareMaternityEmployee(payload: {
+  employee: FemaleEmployee;
+  notes: string;
+}): MaternityRequest {
+  const currentRequests = getMaternityRequests();
+  const nextNum = currentRequests.length + 1;
+  const newId = `MAT-2026-${String(nextNum).padStart(3, "0")}`;
+
+  const eligibility = checkMaternityEligibility(payload.employee.joiningDate);
+  const dailyRate = Number((payload.employee.grossSalary / 26).toFixed(2));
+  const total112Days = Math.round(dailyRate * 112);
+  const installment = Math.round(total112Days / 2);
+
+  const newRequest: MaternityRequest = {
+    id: newId,
+    employeeId: payload.employee.id,
+    employee: payload.employee,
+    currentStage: "WELFARE_REGISTERED",
+    statusLabel: "Welfare Registered (Awaiting Intake & Docs)",
+    createdAt: new Date().toISOString().replace("T", " ").substring(0, 19),
+    updatedAt: new Date().toISOString().replace("T", " ").substring(0, 19),
+    welfareStage1: {
+      intakeDate: new Date().toISOString().substring(0, 10),
+      welfareOfficerName: "Rozina Akter (Welfare Lead)",
+      welfareOfficerId: "WLF-012",
+      informedPregnancyDate: "",
+      tentativeTrimester: "1st Trimester (1-12 wks)",
+      serviceDurationText: eligibility.durationFormatted,
+      isEligible: eligibility.isEligible,
+      counselingNotes:
+        payload.notes.trim() ||
+        "Initial employee pregnancy registration recorded. Awaiting medical documents and consultation details upon next visit.",
+      attachedDocuments: [],
+      previousHistoryDisplayed: payload.employee.previousMaternityLeaves.length > 0,
+    },
+    medicalStage: {
+      assignedDoctor: "Dr. Farzana Yasmin, MBBS, DGO",
+      doctorRegNo: "BMDC-A-45920",
+      checkupVisits: [],
+      isFinalCheckupDone: false,
+      expectedDeliveryDate: "",
+      clinicalFitness: "Normal Health - Fit to Work",
+      doctorFinalRemarks: "Awaiting welfare intake completion and document verification.",
+      medicalVerifiedAt: null,
+    },
+    welfareStage2: {
+      expectedLeaveStartDate: "",
+      expectedLeaveEndDate: "",
+      totalLeaveDays: 112,
+      leaveAddress: payload.employee.presentAddress,
+      emergencyContactPerson: payload.employee.spouseName || "Next of Kin",
+      emergencyPhone: payload.employee.emergencyContact || payload.employee.phone,
+      welfareOfficerRemarks: "",
+      submittedToHrAt: null,
+    },
+    hrStage: {
+      hrReviewerName: null,
+      approvedAt: null,
+      sanctionOrderNo: null,
+      hrRemarks: null,
+      benefitEstimate: {
+        grossMonthlyWage: payload.employee.grossSalary,
+        dailyRate: dailyRate,
+        total112DaysAmount: total112Days,
+        firstInstallment: installment,
+        secondInstallment: installment,
+      },
+    },
+  };
+
+  const updated = [newRequest, ...currentRequests];
+  saveMaternityRequests(updated);
+  return newRequest;
+}
+
+// 0.5. Submit Welfare Intake & Documents for a registered employee, advancing to Medical Verification
+export function submitWelfareIntakeAndDocs(
+  requestId: string,
+  payload: {
+    welfareOfficerName?: string;
+    welfareOfficerId?: string;
+    informedPregnancyDate: string;
+    tentativeTrimester: MaternityRequest["welfareStage1"]["tentativeTrimester"];
+    counselingNotes: string;
+    documents: MaternityDocument[];
+  }
+): MaternityRequest | null {
+  const currentRequests = getMaternityRequests();
+  const index = currentRequests.findIndex((r) => r.id === requestId);
+  if (index === -1) return null;
+
+  const target = { ...currentRequests[index] };
+  target.currentStage = "WELFARE_INITIATED";
+  target.statusLabel = "At Medical Verification (Initial Queue)";
+  target.updatedAt = new Date().toISOString().replace("T", " ").substring(0, 19);
+  target.welfareStage1 = {
+    ...target.welfareStage1,
+    informedPregnancyDate: payload.informedPregnancyDate,
+    tentativeTrimester: payload.tentativeTrimester,
+    counselingNotes: payload.counselingNotes,
+    attachedDocuments: payload.documents,
+    ...(payload.welfareOfficerName ? { welfareOfficerName: payload.welfareOfficerName } : {}),
+    ...(payload.welfareOfficerId ? { welfareOfficerId: payload.welfareOfficerId } : {}),
+  };
+
+  currentRequests[index] = target;
+  saveMaternityRequests(currentRequests);
+  return target;
 }
 
 // 1. Welfare Officer creates and submits new Maternity Intake

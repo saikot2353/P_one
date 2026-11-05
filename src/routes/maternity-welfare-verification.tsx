@@ -48,6 +48,8 @@ import {
   getMaternityRequests,
   saveMaternityRequests,
   createWelfareMaternityRequest,
+  registerWelfareMaternityEmployee,
+  submitWelfareIntakeAndDocs,
   submitWelfareLeaveScheduleToHr,
   checkMaternityEligibility,
   calculateRejoiningDate,
@@ -133,6 +135,7 @@ function MaternityWelfareVerificationPage() {
 
   const stageOptions = [
     { label: "All Stages", value: "ALL" },
+    { label: "Welfare Registered (Pending Docs)", value: "WELFARE_REGISTERED" },
     { label: "Welfare Initiated (At Medical)", value: "WELFARE_INITIATED" },
     { label: "Medical Follow-up Scheduled", value: "MEDICAL_FOLLOWUP" },
     { label: "Medical Verified (Ready to Schedule)", value: "MEDICAL_VERIFIED" },
@@ -183,7 +186,10 @@ function MaternityWelfareVerificationPage() {
   ]);
 
   // Modals
-  const [isNewIntakeOpen, setIsNewIntakeOpen] = useState(false);
+  const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
+  const [registrationNotes, setRegistrationNotes] = useState("");
+  const [isIntakeDocsModalOpen, setIsIntakeDocsModalOpen] = useState(false);
+  const [selectedRegisteredReq, setSelectedRegisteredReq] = useState<MaternityRequest | null>(null);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isViewDossierOpen, setIsViewDossierOpen] = useState(false);
   const [activeRequest, setActiveRequest] = useState<MaternityRequest | null>(null);
@@ -608,17 +614,52 @@ function MaternityWelfareVerificationPage() {
     e.target.value = "";
   };
 
-  // Submit New Intake
-  const handleCreateIntake = (e: React.FormEvent) => {
+  // 1. Initial Registration Handler (First time visit: Employee Info + Eligibility + Notes only)
+  const handleRegisterEmployee = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentSelectedEmp) {
       showToast("❌ Please select a female employee to proceed.");
       return;
     }
-    // Soft warning if ineligible but allow welfare intake recording
-    if (currentEligibility && !currentEligibility.isEligible) {
-      console.warn("Employee has less than 6 months service; proceeding with Welfare record (Eligibility: NO).");
+
+    const created = registerWelfareMaternityEmployee({
+      employee: currentSelectedEmp,
+      notes: registrationNotes,
+    });
+
+    setIsRegistrationModalOpen(false);
+    setSelectedEmpId("");
+    setRegistrationNotes("");
+    showToast(`✅ Employee ${created.employee.name} registered for maternity welfare! Record added to Welfare Verification table.`);
+  };
+
+  // 2. Open Complete Intake & Documents Modal for a registered employee
+  const openIntakeDocsModal = (req: MaternityRequest) => {
+    setSelectedRegisteredReq(req);
+    setInformedDate(req.welfareStage1.informedPregnancyDate || new Date().toISOString().substring(0, 10));
+    setTentativeTrimester(req.welfareStage1.tentativeTrimester || "1st Trimester (1-12 wks)");
+    setCounselingNotes(req.welfareStage1.counselingNotes || "");
+    if (req.welfareStage1.attachedDocuments && req.welfareStage1.attachedDocuments.length > 0) {
+      setDocumentRows(
+        req.welfareStage1.attachedDocuments.map((d) => ({
+          id: d.id,
+          title: d.name,
+          fileName: d.name,
+          fileSize: d.size,
+        }))
+      );
+    } else {
+      setDocumentRows([
+        { id: "doc-1", title: "Pregnancy Medical Certificate", fileName: "", fileSize: "" },
+      ]);
     }
+    setIsIntakeDocsModalOpen(true);
+  };
+
+  // 3. Submit Intake & Documents -> Advances to Medical Verification
+  const handleSubmitIntakeAndDocs = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedRegisteredReq) return;
 
     const finalDocs: MaternityDocument[] = documentRows
       .filter((d) => d.title.trim() || d.fileName.trim())
@@ -649,10 +690,9 @@ function MaternityWelfareVerificationPage() {
 
     const finalNotes =
       counselingNotes.trim() ||
-      "Employee visited the Welfare Department to notify her pregnancy. Service records reviewed. Documents received and counseling completed regarding nutritional and rest precautions.";
+      "Employee visited with medical reports and documentation. Intake and consultation completed. Forwarded to Medical Clinic for verification.";
 
-    const created = createWelfareMaternityRequest({
-      employee: currentSelectedEmp,
+    const updated = submitWelfareIntakeAndDocs(selectedRegisteredReq.id, {
       welfareOfficerName,
       welfareOfficerId,
       informedPregnancyDate: informedDate,
@@ -661,13 +701,15 @@ function MaternityWelfareVerificationPage() {
       documents: finalDocs,
     });
 
-    setIsNewIntakeOpen(false);
-    setSelectedEmpId("");
+    setIsIntakeDocsModalOpen(false);
+    setSelectedRegisteredReq(null);
     setCounselingNotes("");
     setDocumentRows([
       { id: "doc-1", title: "Pregnancy Medical Certificate", fileName: "", fileSize: "" },
     ]);
-    showToast(`✅ Maternity request initiated for ${created.employee.name} and forwarded to Medical Verification!`);
+    if (updated) {
+      showToast(`✅ Intake & documents submitted for ${updated.employee.name}. Request forwarded to Medical Verification!`);
+    }
   };
 
   return (
@@ -712,26 +754,16 @@ function MaternityWelfareVerificationPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Link
-                to="/maternity-medical-verification"
-                className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800 transition flex items-center gap-1.5"
-              >
-                <Stethoscope className="w-4 h-4 text-blue-500" />
-                Medical Verification Queue
-              </Link>
-
               <button
                 onClick={() => {
                   setSelectedEmpId("");
-                  setDocumentRows([
-                    { id: "doc-1", title: "Pregnancy Medical Certificate", fileName: "", fileSize: "" },
-                  ]);
-                  setIsNewIntakeOpen(true);
+                  setRegistrationNotes("");
+                  setIsRegistrationModalOpen(true);
                 }}
-                className="px-4 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white shadow-md shadow-pink-600/20 hover:shadow-lg transition flex items-center gap-2"
+                className="px-4 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white shadow-md shadow-pink-600/20 hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                New Maternity Intake Form
+                Register
               </button>
             </div>
           </div>
@@ -1074,6 +1106,12 @@ function MaternityWelfareVerificationPage() {
 
                           {/* Current Stage */}
                           <td className="py-3.5 px-4 whitespace-nowrap">
+                            {req.currentStage === "WELFARE_REGISTERED" && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-pink-50 text-pink-700 dark:bg-pink-950 dark:text-pink-300 border border-pink-200 dark:border-pink-800 whitespace-nowrap">
+                                <Clock className="w-3 h-3 flex-shrink-0" />
+                                Registered (Pending Docs)
+                              </span>
+                            )}
                             {req.currentStage === "WELFARE_INITIATED" && (
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800 whitespace-nowrap">
                                 <Clock className="w-3 h-3 flex-shrink-0" />
@@ -1155,6 +1193,17 @@ function MaternityWelfareVerificationPage() {
                           {/* Actions */}
                           <td className="py-3.5 px-4 text-right whitespace-nowrap">
                             <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
+                              {req.currentStage === "WELFARE_REGISTERED" && (
+                                <button
+                                  onClick={() => openIntakeDocsModal(req)}
+                                  className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white shadow-xs flex items-center gap-1.5 transition whitespace-nowrap flex-shrink-0 cursor-pointer"
+                                  title="Complete Welfare Intake & Documents"
+                                >
+                                  <FileUp className="w-3.5 h-3.5" />
+                                  Intake &amp; Docs
+                                </button>
+                              )}
+
                               {isReadyToSchedule && (
                                 <button
                                   onClick={() => openScheduleModal(req)}
@@ -1186,9 +1235,9 @@ function MaternityWelfareVerificationPage() {
       </div>
 
       {/* ========================================================================= */}
-      {/* MODAL 1: NEW MATERNITY INTAKE DRAWER / FORM (STAGE 1 - REDESIGNED)        */}
+      {/* MODAL 1: FEMALE EMPLOYEE REGISTRATION (STAGE 1 INITIAL VISIT)             */}
       {/* ========================================================================= */}
-      {isNewIntakeOpen && (
+      {isRegistrationModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-5xl shadow-2xl my-8 overflow-hidden animate-in fade-in zoom-in-95 flex flex-col max-h-[90vh]">
             {/* Modal Header */}
@@ -1199,25 +1248,25 @@ function MaternityWelfareVerificationPage() {
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    New Maternity Intake &amp; Eligibility Verification
+                    Female Employee Maternity Registration
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Welfare Stage 1: Validate continuous service tenure (&ge; 6 months) and record medical documents
+                    Welfare Stage 1: Initial visit registration &amp; continuous service tenure eligibility check (&ge; 6 months)
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => setIsNewIntakeOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                onClick={() => setIsRegistrationModalOpen(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Form Scrollable Area */}
-            <form onSubmit={handleCreateIntake} className="p-6 space-y-5 overflow-y-auto flex-1">
-              {/* SECTION 1: EMPLOYEE SELECTION & ELIGIBILITY */}
+            <form onSubmit={handleRegisterEmployee} className="p-6 space-y-5 overflow-y-auto flex-1">
+              {/* SECTION: EMPLOYEE SELECTION & ELIGIBILITY */}
               <div className="bg-slate-50/60 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3.5">
                 <div className="flex items-center justify-between border-b border-slate-200/70 dark:border-slate-800 pb-2">
                   <div className="flex items-center gap-2">
@@ -1335,9 +1384,8 @@ function MaternityWelfareVerificationPage() {
                 {/* When an employee is selected: Display Particulars & Eligibility */}
                 {currentSelectedEmp && currentEligibility && (
                   <div className="space-y-3 pt-1">
-                    {/* EMPLOYEE DETAILS CARD (MATCHING SPECIFICATION IMAGE) */}
+                    {/* EMPLOYEE DETAILS CARD */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xs">
-                      {/* Section Title Header */}
                       <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/80">
                         <div className="w-5 h-5 rounded-full border border-blue-500/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                           <User className="w-3 h-3" />
@@ -1347,9 +1395,7 @@ function MaternityWelfareVerificationPage() {
                         </h4>
                       </div>
 
-                      {/* Content: Photo + 2-Column Attributes */}
                       <div className="flex flex-row gap-5 items-start">
-                        {/* Avatar / Photo */}
                         <div className="flex-shrink-0">
                           <img
                             src={
@@ -1361,9 +1407,7 @@ function MaternityWelfareVerificationPage() {
                           />
                         </div>
 
-                        {/* Two Columns Grid */}
                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-xs">
-                          {/* Column 1 */}
                           <div className="space-y-2">
                             <div className="flex items-baseline">
                               <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
@@ -1431,7 +1475,6 @@ function MaternityWelfareVerificationPage() {
                             </div>
                           </div>
 
-                          {/* Column 2 */}
                           <div className="space-y-2">
                             <div className="flex items-baseline">
                               <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
@@ -1491,7 +1534,7 @@ function MaternityWelfareVerificationPage() {
                                 Documents:
                               </span>
                               <span className="font-medium text-slate-600 dark:text-slate-400">
-                                Available
+                                Required upon next visit
                               </span>
                             </div>
                           </div>
@@ -1549,11 +1592,331 @@ function MaternityWelfareVerificationPage() {
                 )}
               </div>
 
-              {/* SECTION 2: WELFARE INTAKE DETAILS */}
-              <div className="bg-slate-50/60 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3.5">
+              {/* SECTION: NOTES INPUT FIELD ONLY */}
+              <div className="bg-slate-50/60 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-2">
                 <div className="flex items-center gap-2 border-b border-slate-200/70 dark:border-slate-800 pb-2">
                   <span className="w-5 h-5 rounded-full bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300 flex items-center justify-center text-[11px] font-bold">
                     2
+                  </span>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                    Registration Notes &amp; Observations
+                  </h3>
+                </div>
+                <textarea
+                  rows={3}
+                  value={registrationNotes}
+                  onChange={(e) => setRegistrationNotes(e.target.value)}
+                  placeholder="Record initial visit observations, employee notification notes, and instructions to bring medical reports and documentation upon subsequent visit..."
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-2xs resize-y"
+                />
+              </div>
+
+              {/* Modal Footer / Action Buttons */}
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500">
+                  {!currentSelectedEmp ? (
+                    <span className="text-slate-400">Please select an employee</span>
+                  ) : (
+                    <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Ready to register employee in Welfare list
+                    </span>
+                  )}
+                </span>
+
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsRegistrationModalOpen(false)}
+                    className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={!currentSelectedEmp}
+                    className={`px-5 py-2 text-xs font-semibold rounded-xl text-white shadow-md flex items-center gap-2 transition ${
+                      currentSelectedEmp
+                        ? "bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 shadow-pink-600/25 cursor-pointer"
+                        : "bg-slate-300 dark:bg-slate-700 cursor-not-allowed opacity-60 text-slate-500"
+                    }`}
+                  >
+                    <UserCheck className="w-3.5 h-3.5" />
+                    Register Employee
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 1B: WELFARE INTAKE & DOCUMENTS (STAGE 1 SUBSEQUENT VISIT)           */}
+      {/* ========================================================================= */}
+      {isIntakeDocsModalOpen && selectedRegisteredReq && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-5xl shadow-2xl my-8 overflow-hidden animate-in fade-in zoom-in-95 flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-r from-pink-50/80 via-white to-rose-50/80 dark:from-pink-950/30 dark:via-slate-900 dark:to-rose-950/30 flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-pink-100 text-pink-600 dark:bg-pink-950/60 dark:text-pink-400 flex items-center justify-center shadow-xs">
+                  <FileCheck2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    Welfare Intake &amp; Documents Submission
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Welfare Stage 1 (Step 2): Record medical reports and consultation details for {selectedRegisteredReq.employee.name} ({selectedRegisteredReq.employee.id})
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsIntakeDocsModalOpen(false);
+                  setSelectedRegisteredReq(null);
+                }}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form Scrollable Area */}
+            <form onSubmit={handleSubmitIntakeAndDocs} className="p-6 space-y-5 overflow-y-auto flex-1">
+              {/* EMPLOYEE DETAILS CARD */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xs">
+                <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/80">
+                  <div className="w-5 h-5 rounded-full border border-blue-500/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                    <User className="w-3 h-3" />
+                  </div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                    EMPLOYEE DETAILS
+                  </h4>
+                </div>
+
+                <div className="flex flex-row gap-5 items-start">
+                  <div className="flex-shrink-0">
+                    <img
+                      src={
+                        selectedRegisteredReq.employee.avatar ||
+                        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"
+                      }
+                      alt={selectedRegisteredReq.employee.name}
+                      className="w-20 h-24 sm:w-24 sm:h-28 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shadow-xs bg-slate-100 dark:bg-slate-800"
+                    />
+                  </div>
+
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-xs">
+                    <div className="space-y-2">
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Employee Name:
+                        </span>
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">
+                          {selectedRegisteredReq.employee.name}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Designation:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {selectedRegisteredReq.employee.designation}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Section:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {selectedRegisteredReq.employee.section}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Location:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {selectedRegisteredReq.employee.unit ? `${selectedRegisteredReq.employee.unit} - Operation` : "PSL -Operation"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Contact:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {selectedRegisteredReq.employee.phone}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Service Period:
+                        </span>
+                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                          {selectedRegisteredReq.welfareStage1.serviceDurationText ||
+                            checkMaternityEligibility(selectedRegisteredReq.employee.joiningDate).durationFormatted}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Address:
+                        </span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300 flex-1 leading-snug">
+                          {selectedRegisteredReq.employee.presentAddress ||
+                            selectedRegisteredReq.employee.permanentAddress ||
+                            "Megh Roddur By 1st Choice Real Estate Ltd., 148 West Rayer Bazar West Dhanmondi, Bangladesh"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Employee ID:
+                        </span>
+                        <span className="font-mono font-medium text-slate-800 dark:text-slate-200">
+                          {selectedRegisteredReq.employee.id}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Department:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {selectedRegisteredReq.employee.department}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Date of Joining:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {selectedRegisteredReq.employee.joiningDate.includes("-")
+                            ? selectedRegisteredReq.employee.joiningDate.split("-").reverse().join("/")
+                            : selectedRegisteredReq.employee.joiningDate}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Business Unit:
+                        </span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                          {selectedRegisteredReq.employee.unit || "PSL"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Eligibility:
+                        </span>
+                        <span
+                          className={`font-bold uppercase ${
+                            (selectedRegisteredReq.welfareStage1.isEligible ??
+                              checkMaternityEligibility(selectedRegisteredReq.employee.joiningDate).isEligible)
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-rose-600 dark:text-rose-400"
+                          }`}
+                        >
+                          {(selectedRegisteredReq.welfareStage1.isEligible ??
+                            checkMaternityEligibility(selectedRegisteredReq.employee.joiningDate).isEligible)
+                            ? "YES"
+                            : "NO"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-baseline">
+                        <span className="w-28 sm:w-32 text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+                          Registration Date:
+                        </span>
+                        <span className="font-medium text-slate-600 dark:text-slate-400">
+                          {selectedRegisteredReq.welfareStage1.informedDate || "Recorded"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Initial Registration Notes if any */}
+                {selectedRegisteredReq.welfareStage1.counselingNotes && (
+                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-start gap-2 text-xs">
+                    <span className="font-semibold text-pink-600 dark:text-pink-400 flex-shrink-0">
+                      Initial Registration Note:
+                    </span>
+                    <span className="text-slate-700 dark:text-slate-300 italic">
+                      &quot;{selectedRegisteredReq.welfareStage1.counselingNotes}&quot;
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Previous Maternity Leave History */}
+              {selectedRegisteredReq.employee.previousMaternityLeaves &&
+              selectedRegisteredReq.employee.previousMaternityLeaves.length > 0 ? (
+                <div className="border border-amber-200 dark:border-amber-900/60 rounded-xl overflow-hidden bg-amber-50/20 dark:bg-amber-950/10">
+                  <div className="px-3 py-1.5 bg-amber-100/70 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 text-xs font-bold flex items-center justify-between">
+                    <span>
+                      Previous Maternity History ({selectedRegisteredReq.employee.previousMaternityLeaves.length} Recorded)
+                    </span>
+                    {selectedRegisteredReq.employee.previousMaternityLeaves.length >= 2 && (
+                      <span className="text-[10px] text-amber-700 dark:text-amber-300 font-normal">
+                        Statutory limit: max 2 paid children (Sec 46-3)
+                      </span>
+                    )}
+                  </div>
+                  <table className="w-full text-xs text-left">
+                    <thead className="text-[10px] uppercase text-slate-500 border-b border-amber-200/50">
+                      <tr>
+                        <th className="py-2 px-3">Child</th>
+                        <th className="py-2 px-3">Leave Period</th>
+                        <th className="py-2 px-3">Delivery Date</th>
+                        <th className="py-2 px-3">Days</th>
+                        <th className="py-2 px-3">Benefit</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-amber-200/50 dark:divide-amber-900/40">
+                      {selectedRegisteredReq.employee.previousMaternityLeaves.map((hist, idx) => (
+                        <tr key={hist.id}>
+                          <td className="py-2 px-3 font-semibold text-slate-800 dark:text-slate-200">
+                            Baby #{hist.childNumber || idx + 1}
+                          </td>
+                          <td className="py-2 px-3 text-slate-600 dark:text-slate-400">
+                            {hist.leaveStartDate} to {hist.leaveEndDate}
+                          </td>
+                          <td className="py-2 px-3 text-slate-800 dark:text-slate-200">{hist.deliveryDate}</td>
+                          <td className="py-2 px-3 font-semibold text-emerald-600">{hist.totalDays}d</td>
+                          <td className="py-2 px-3 font-mono font-semibold text-slate-800 dark:text-slate-200">
+                            {hist.benefitDisbursedBdt.toLocaleString()} BDT
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-center text-xs text-slate-500 flex items-center justify-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  First Maternity Application &mdash; No previous maternity leave recorded.
+                </div>
+              )}
+
+              {/* SECTION: WELFARE INTAKE & CONSULTATION DETAILS */}
+              <div className="bg-slate-50/60 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3.5">
+                <div className="flex items-center gap-2 border-b border-slate-200/70 dark:border-slate-800 pb-2">
+                  <span className="w-5 h-5 rounded-full bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300 flex items-center justify-center text-[11px] font-bold">
+                    1
                   </span>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                     Welfare Intake &amp; Consultation Details
@@ -1570,7 +1933,7 @@ function MaternityWelfareVerificationPage() {
                       value={informedDate}
                       onChange={(e) => setInformedDate(e.target.value)}
                       required
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-pink-500"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-pink-500 cursor-pointer"
                     />
                     <p className="text-[10px] text-slate-400 mt-1">Date the employee goes for Medical Verification</p>
                   </div>
@@ -1582,7 +1945,7 @@ function MaternityWelfareVerificationPage() {
                     <select
                       value={tentativeTrimester}
                       onChange={(e: any) => setTentativeTrimester(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-pink-500"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-pink-500 cursor-pointer"
                     >
                       <option value="1st Trimester (1-12 wks)">1st Trimester (1-12 wks)</option>
                       <option value="2nd Trimester (13-26 wks)">2nd Trimester (13-26 wks)</option>
@@ -1599,18 +1962,18 @@ function MaternityWelfareVerificationPage() {
                     rows={2}
                     value={counselingNotes}
                     onChange={(e) => setCounselingNotes(e.target.value)}
-                    placeholder="Write a comments (if required)"
+                    placeholder="Write counseling observations, health precautions advised, or doctor recommendations..."
                     className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-2xs resize-y min-h-[50px]"
                   />
                 </div>
               </div>
 
-              {/* SECTION 3: DOCUMENTS SECTION */}
+              {/* SECTION: DOCUMENTS SECTION */}
               <div className="bg-slate-50/60 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3.5">
                 <div className="flex items-center justify-between border-b border-slate-200/70 dark:border-slate-800 pb-2">
                   <div className="flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300 flex items-center justify-center text-[11px] font-bold">
-                      3
+                      2
                     </span>
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                       Documents Section
@@ -1644,7 +2007,7 @@ function MaternityWelfareVerificationPage() {
                           <button
                             type="button"
                             onClick={() => handleRemoveDocumentRow(doc.id)}
-                            className="text-[11px] text-rose-500 hover:text-rose-600 flex items-center gap-1 transition"
+                            className="text-[11px] text-rose-500 hover:text-rose-600 flex items-center gap-1 transition cursor-pointer"
                             title="Remove this document"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1704,7 +2067,7 @@ function MaternityWelfareVerificationPage() {
                                     prev.map((d) => (d.id === doc.id ? { ...d, fileName: "", fileSize: "" } : d))
                                   )
                                 }
-                                className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                                className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
                                 title="Clear uploaded file"
                               >
                                 <X className="w-3.5 h-3.5" />
@@ -1720,7 +2083,7 @@ function MaternityWelfareVerificationPage() {
                   <button
                     type="button"
                     onClick={handleAddDocumentRow}
-                    className="w-full py-2.5 px-4 rounded-xl border border-dashed border-pink-300 dark:border-pink-800/80 text-pink-600 dark:text-pink-400 hover:bg-pink-50/60 dark:hover:bg-pink-950/20 text-xs font-semibold flex items-center justify-center gap-1.5 transition shadow-2xs"
+                    className="w-full py-2.5 px-4 rounded-xl border border-dashed border-pink-300 dark:border-pink-800/80 text-pink-600 dark:text-pink-400 hover:bg-pink-50/60 dark:hover:bg-pink-950/20 text-xs font-semibold flex items-center justify-center gap-1.5 transition shadow-2xs cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
                     Add Document
@@ -1730,37 +2093,29 @@ function MaternityWelfareVerificationPage() {
 
               {/* Modal Footer / Action Buttons */}
               <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                <span className="text-[11px] text-slate-500">
-                  {!currentSelectedEmp ? (
-                    <span className="text-slate-400">Please select an employee</span>
-                  ) : (
-                    <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      Ready to submit to Medical Verification
-                    </span>
-                  )}
+                <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Ready to submit to Medical Verification
                 </span>
 
                 <div className="flex items-center gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setIsNewIntakeOpen(false)}
-                    className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    onClick={() => {
+                      setIsIntakeDocsModalOpen(false);
+                      setSelectedRegisteredReq(null);
+                    }}
+                    className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                   >
                     Cancel
                   </button>
 
                   <button
                     type="submit"
-                    disabled={!currentSelectedEmp}
-                    className={`px-5 py-2 text-xs font-semibold rounded-xl text-white shadow-md flex items-center gap-2 transition ${
-                      currentSelectedEmp
-                        ? "bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 shadow-pink-600/25 cursor-pointer"
-                        : "bg-slate-300 dark:bg-slate-700 cursor-not-allowed opacity-60 text-slate-500"
-                    }`}
+                    className="px-5 py-2 text-xs font-semibold rounded-xl text-white shadow-md flex items-center gap-2 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 shadow-pink-600/25 cursor-pointer transition"
                   >
                     <Send className="w-3.5 h-3.5" />
-                    Submit for Medical Verification
+                    Submit to Medical Verification
                   </button>
                 </div>
               </div>
@@ -2219,7 +2574,12 @@ function MaternityWelfareVerificationPage() {
                     <span className="text-[10px] text-slate-400 font-medium">Click any document to view preview</span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                  {activeRequest.welfareStage1.attachedDocuments.length === 0 ? (
+                    <div className="p-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-800/30">
+                      No documents uploaded yet. Employee registered for initial visit &mdash; medical reports and documentation will be recorded upon subsequent intake visit.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
                     {activeRequest.welfareStage1.attachedDocuments.map((doc) => (
                       <button
                         key={doc.id}
@@ -2255,6 +2615,7 @@ function MaternityWelfareVerificationPage() {
                       </button>
                     ))}
                   </div>
+                )}
                 </div>
               </div>
 

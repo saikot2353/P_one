@@ -219,6 +219,11 @@ function MaternityMedicalVerificationPage() {
 
   const filteredRequests = useMemo(() => {
     return requests.filter((r) => {
+      // Exclude initial welfare registrations awaiting intake & documents
+      if (r.currentStage === "WELFARE_REGISTERED") {
+        return false;
+      }
+
       // 1. Company filter
       if (filterCompany !== "ALL") {
         const empComp = r.employee.unit || "";
