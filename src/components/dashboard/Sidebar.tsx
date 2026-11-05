@@ -408,7 +408,15 @@ export const nav: NavItem[] = [
       { label: "Employee Allowance", to: "/" },
       { label: "Tax Exemption Rules", to: "/" },
       { label: "Allowance Requisition", to: "/allowance-requisition" },
-      { label: "Festival Allowance Check (HR)", to: "/festival-allowance-check-hr" },
+      {
+        label: "Festival Allowance",
+        subitems: [
+          { label: "Festival Allowance", to: "/festival-allowance" },
+          { label: "Festival Allowance Check (HR)", to: "/festival-allowance-check-hr" },
+          { label: "Festival Allowance Approval", to: "/festival-allowance-approval" },
+          { label: "Festival Allowance Payment Sheet", to: "/festival-allowance-payment-sheet" },
+        ],
+      },
     ],
   },
   {
@@ -423,8 +431,11 @@ export const nav: NavItem[] = [
         ],
       },
       {
-        label: "Loan",
-        subitems: [{ label: "Loan Management", to: "/loan-application" }],
+        label: "Loan Application",
+        subitems: [
+          { label: "Loan Application", to: "/loan-application" },
+          { label: "Loan List", to: "/loan-list" },
+        ],
       },
       { label: "Deductions", to: "/payroll-deductions" },
       { label: "Tax Update", to: "/employee-tax-pay" },

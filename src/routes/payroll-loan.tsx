@@ -29,13 +29,13 @@ function PayrollLoanPage() {
       title: "Loan Application",
       icon: Send,
       desc: "Submit a new employee loan application for personal or business needs.",
-      to: "#",
+      to: "/loan-application",
     },
     {
       title: "Loan Application List",
       icon: List,
       desc: "View the list of all submitted loan applications and their current statuses.",
-      to: "#",
+      to: "/loan-list",
     },
     {
       title: "Approve By HOD",
