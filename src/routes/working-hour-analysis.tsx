@@ -577,17 +577,17 @@ function WorkingHourAnalysisPage() {
       "Shift",
       "Line",
       "Week 01",
-      "Daily Highest Week in 01",
+      "Daily Highest 01",
       "Week 02",
-      "Daily Highest Week in 02",
+      "Daily Highest 02",
       "Week 03",
-      "Daily Highest Week in 03",
+      "Daily Highest 03",
       "Week 04",
-      "Daily Highest Week in 04",
+      "Daily Highest 04",
       "Week 05",
-      "Daily Highest Week in 05",
+      "Daily Highest 05",
       "AVG",
-      "Weekly Highest Working Hours Including OT",
+      "Weekly Highest (Inc. OT)",
     ];
 
     const rows = sortedData.map((r, i) => [
@@ -1062,7 +1062,7 @@ function WorkingHourAnalysisPage() {
                       onClick={() => handleSort("dailyHighest01")}
                       className="p-2.5 text-right cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
                     >
-                      Daily Highest Week in 01
+                      Daily Highest 01
                     </th>
                     <th
                       onClick={() => handleSort("week02")}
@@ -1074,7 +1074,7 @@ function WorkingHourAnalysisPage() {
                       onClick={() => handleSort("dailyHighest02")}
                       className="p-2.5 text-right cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
                     >
-                      Daily Highest Week in 02
+                      Daily Highest 02
                     </th>
                     <th
                       onClick={() => handleSort("week03")}
@@ -1086,7 +1086,7 @@ function WorkingHourAnalysisPage() {
                       onClick={() => handleSort("dailyHighest03")}
                       className="p-2.5 text-right cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
                     >
-                      Daily Highest Week in 03
+                      Daily Highest 03
                     </th>
                     <th
                       onClick={() => handleSort("week04")}
@@ -1098,7 +1098,7 @@ function WorkingHourAnalysisPage() {
                       onClick={() => handleSort("dailyHighest04")}
                       className="p-2.5 text-right cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
                     >
-                      Daily Highest Week in 04
+                      Daily Highest 04
                     </th>
                     <th
                       onClick={() => handleSort("week05")}
@@ -1110,7 +1110,7 @@ function WorkingHourAnalysisPage() {
                       onClick={() => handleSort("dailyHighest05")}
                       className="p-2.5 text-right cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
                     >
-                      Daily Highest Week in 05
+                      Daily Highest 05
                     </th>
                     <th
                       onClick={() => handleSort("avg")}
@@ -1122,7 +1122,7 @@ function WorkingHourAnalysisPage() {
                       onClick={() => handleSort("weeklyHighestIncOT")}
                       className="p-2.5 text-right cursor-pointer hover:bg-slate-200/70 dark:hover:bg-slate-700 transition"
                     >
-                      Weekly Highest Working Hours Including OT
+                      Weekly Highest (Inc. OT)
                     </th>
                   </tr>
                 </thead>

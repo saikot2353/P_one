@@ -770,36 +770,13 @@ function FinancialAidReportPage() {
               </div>
             </div>
 
-            {/* Clean Key Metrics Strip (Without Asset Purchases) */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-border/50 text-xs">
-              <div className="flex flex-wrap items-center gap-3 font-medium text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <span className="size-2 rounded-full bg-emerald-500"></span>
-                  <span>Filtered Cases: <strong className="text-foreground font-bold">{stats.totalRecords}</strong></span>
-                </div>
-                <span className="text-border">|</span>
-                <div>
-                  Average Aid per Case: <strong className="text-foreground font-bold">
-                    ৳{stats.totalRecords > 0 ? Math.round(stats.totalAssigned / stats.totalRecords).toLocaleString() : 0}
-                  </strong>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5 bg-muted/50 px-3 py-1 rounded-lg border border-border/70">
-                  <span className="text-muted-foreground text-[11px] uppercase font-bold">Total Disbursed:</span>
-                  <span className="text-foreground font-mono text-sm font-black">
-                    ৳{stats.totalAssigned.toLocaleString()}
-                  </span>
-                </div>
-                {filterYear !== "ALL" && (
-                  <div className="flex items-center gap-1.5 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20 text-emerald-700 dark:text-emerald-400">
-                    <span className="text-[11px] uppercase font-bold">Remaining Budget:</span>
-                    <span className="font-mono text-sm font-black">
-                      ৳{stats.remainingBudget.toLocaleString()}
-                    </span>
-                  </div>
-                )}
+            {/* Clean Key Metrics Strip */}
+            <div className="flex items-center justify-end pt-2.5 border-t border-border/50 text-xs">
+              <div className="flex items-center gap-1.5 bg-muted/50 px-3 py-1 rounded-lg border border-border/70">
+                <span className="text-muted-foreground text-[11px] uppercase font-bold">Total Disbursed:</span>
+                <span className="text-foreground font-mono text-sm font-black">
+                  ৳{stats.totalAssigned.toLocaleString()}
+                </span>
               </div>
             </div>
           </div>

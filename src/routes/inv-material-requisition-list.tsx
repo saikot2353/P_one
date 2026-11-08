@@ -38,8 +38,18 @@ import {
   StandardReportData,
 } from "@/components/reports/StandardPreviewReportModal";
 import { DEFAULT_WAREHOUSES, getStoredData } from "@/lib/procurement-master-data";
+import { MaterialRequisitionViewModal } from "@/components/inventory/MaterialRequisitionViewModal";
+
+interface MRListSearch {
+  action?: "view";
+  id?: string;
+}
 
 export const Route = createFileRoute("/inv-material-requisition-list")({
+  validateSearch: (search: Record<string, unknown>): MRListSearch => ({
+    action: search.action as any,
+    id: search.id as string | undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Material Requisition List — Inventory ERP" },
@@ -50,6 +60,7 @@ export const Route = createFileRoute("/inv-material-requisition-list")({
 });
 
 function MaterialRequisitionListPage() {
+  const searchParams = Route.useSearch();
   const navigate = useNavigate();
   const [requisitions, setRequisitions] = useState<MaterialRequisition[]>(() =>
     getStoredMaterialRequisitions()
@@ -58,6 +69,23 @@ function MaterialRequisitionListPage() {
   useEffect(() => {
     setStoredMaterialRequisitions(requisitions);
   }, [requisitions]);
+
+  // View Modal State
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedMRForView, setSelectedMRForView] = useState<MaterialRequisition | null>(null);
+
+  // Auto-open modal if accessed via query params ?action=view&id=...
+  useEffect(() => {
+    if (searchParams.id) {
+      const match = requisitions.find(
+        (r) => r.id === searchParams.id || r.mrNumber.toLowerCase() === searchParams.id?.toLowerCase()
+      );
+      if (match) {
+        setSelectedMRForView(match);
+        setViewModalOpen(true);
+      }
+    }
+  }, [searchParams.id, searchParams.action, requisitions]);
 
   // Master Warehouses
   const warehouses = getStoredData("proc_warehouses_v2", DEFAULT_WAREHOUSES);
@@ -554,9 +582,17 @@ function MaterialRequisitionListPage() {
                             {idx + 1}
                           </td>
                           <td className="py-3 px-3.5">
-                            <span className="font-bold text-blue-600 font-mono">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedMRForView(mr);
+                                setViewModalOpen(true);
+                              }}
+                              className="font-bold text-blue-600 hover:text-blue-800 hover:underline font-mono text-left cursor-pointer transition-colors"
+                              title="Click to view requisition details"
+                            >
                               {mr.mrNumber}
-                            </span>
+                            </button>
                           </td>
                           <td className="py-3 px-3.5 text-slate-600 font-mono">
                             {mr.requisitionDate}
@@ -592,16 +628,14 @@ function MaterialRequisitionListPage() {
                           {/* Condition-based Actions */}
                           <td className="py-3 px-3.5 text-center sticky right-0 bg-white group-hover:bg-slate-50/70 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.05)]">
                             <div className="flex items-center justify-center gap-1">
-                              {/* View Action (Always Available) */}
+                              {/* View Action (Opens Modal) */}
                               <button
                                 title="View Requisition"
-                                onClick={() =>
-                                  navigate({
-                                    to: "/inv-material-requisition",
-                                    search: { action: "view", id: mr.id },
-                                  })
-                                }
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                onClick={() => {
+                                  setSelectedMRForView(mr);
+                                  setViewModalOpen(true);
+                                }}
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
                               >
                                 <Eye className="size-3.5" />
                               </button>
@@ -715,6 +749,22 @@ function MaterialRequisitionListPage() {
           isOpen={previewReportOpen}
           onClose={() => setPreviewReportOpen(false)}
           data={previewReportData}
+        />
+
+        {/* Material Requisition In-Page View Modal */}
+        <MaterialRequisitionViewModal
+          open={viewModalOpen}
+          onOpenChange={(isOpen) => {
+            setViewModalOpen(isOpen);
+            if (!isOpen) {
+              setSelectedMRForView(null);
+            }
+          }}
+          requisition={selectedMRForView}
+          onPrint={(target) => {
+            setReportTarget(target);
+            setPreviewReportOpen(true);
+          }}
         />
       </main>
     </div>

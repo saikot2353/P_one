@@ -53,6 +53,7 @@ import {
   HelpCircle,
   Shield,
 } from "lucide-react";
+import { CADENCE_CONFIG, calculateInstallmentCount } from "./zakat-list";
 
 export const Route = createFileRoute("/zakat-and-financial-aid")({
   head: () => ({
@@ -292,6 +293,7 @@ export interface UnifiedAidRecord {
 
   isRecurring?: boolean;
   recurringScheduleId?: string;
+  cadence?: DisbursementCadence;
   installmentNumber?: number;
   installmentTotal?: number;
 
@@ -950,67 +952,237 @@ const INITIAL_UNIFIED_RECORDS: UnifiedAidRecord[] = [
     batchRecipientInfo: "Recipient 3 of 3",
     batchDriveTitle: "Sreepur Community Hardship Drive",
   },
-];
 
-const INITIAL_RECURRING_SCHEDULES: UnifiedRecurringSchedule[] = [
+  // ========================================================
+  // RECURRING DEMO RECORDS - ZAKAT (MONTHLY, QUARTERLY, BI-ANNUAL, ANNUAL)
+  // ========================================================
   {
-    id: "REC-ZK-2026-01",
+    id: "ZK-REC-2026-M01",
     fundType: "Zakat",
-    title: "Monthly Quran Madrasa Orphan Student Food & Tuition Stipend",
+    budgetYear: 2026,
+    assignedDate: "2026-07-10",
+    distributionDeadline: "2026-07-20",
+    amount: 12000,
+    isRecurring: true,
+    recurringScheduleId: "REC-ZK-2026-01",
+    cadence: "Monthly",
+    installmentNumber: 7,
+    installmentTotal: 12,
+    disbursementChannel: "Direct Employee",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Medical Treatment",
+    purposeSpecificDescription: "Monthly Dialysis & Medicine Grant (Installment #7 of 12)",
+    employeeId: "2020004510",
+    employeeName: "Abdur Rashid",
+    employeeDept: "Logistics",
+    employeeDesignation: "Forklift Operator",
+    beneficiaryName: "Abdur Rashid (Staff Self)",
+    beneficiaryPhone: "01722-113355",
+    beneficiaryAddress: "Tongi, Gazipur",
+    asnafCategory: "Al-Masakin",
+    justificationDetails: "Monthly corporate Zakat medical stipend for recurring hemodialysis and erythropoietin injections.",
+    agencyStatus: "Verified",
+  },
+  {
+    id: "ZK-REC-2026-Q01",
+    fundType: "Zakat",
+    budgetYear: 2026,
+    assignedDate: "2026-06-15",
+    distributionDeadline: "2026-06-25",
+    amount: 35000,
+    isRecurring: true,
+    recurringScheduleId: "REC-ZK-2026-02",
+    cadence: "Quarterly",
+    installmentNumber: 2,
+    installmentTotal: 4,
     disbursementChannel: "Via Employee Agent",
     disbursementMode: "Cash Grant",
     purposeCategory: "Mosque/Madrasa",
-    purposeDescription: "Monthly food grain, oil, and textbook allowance for 10 resident orphan students.",
-    cadence: "Monthly",
+    purposeSpecificDescription: "Quarterly Quran Madrasa Resident Orphan Food & Tuition Grant (Installment #2 of 4)",
     employeeId: "2018001090",
     employeeName: "Anisur Rahman",
     employeeDept: "Admin & Compliance",
     beneficiaryName: "Darul Uloom Hussainia Madrasa & Yateemkhana",
     beneficiaryPhone: "01711-998877",
+    beneficiaryAddress: "Valuka, Mymensingh",
     asnafCategory: "Fi Sabilillah",
-    monthlyAmount: 20000,
-    disbursementDayOfMonth: 1,
-    startDate: "2026-01-01",
-    totalPlannedMonths: 12,
-    status: "Active",
-    installmentsGenerated: 7,
-    totalAmountDisbursed: 140000,
-    lastGeneratedDate: "2026-07-01",
-    nextDueDate: "2026-08-01",
-    createdAt: "2025-12-20",
-    notes: "Continuous recurring support committed for 2026 academic calendar.",
+    justificationDetails: "Quarterly stipend covering food rations, books, and Islamic boarding care for 10 resident orphan students.",
+    agencyStatus: "Verified",
   },
   {
-    id: "REC-FA-2026-01",
+    id: "ZK-REC-2026-B01",
+    fundType: "Zakat",
+    budgetYear: 2026,
+    assignedDate: "2026-05-20",
+    distributionDeadline: "2026-05-30",
+    amount: 50000,
+    isRecurring: true,
+    recurringScheduleId: "REC-ZK-2026-03",
+    cadence: "Bi-Annual",
+    installmentNumber: 1,
+    installmentTotal: 2,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    purposeCategory: "Vehicle",
+    assetDetails: {
+      assetType: "Battery Electric Auto-Van / Easy Bike",
+      assetName: "Cargo Auto-Van with Motor & Battery Pack",
+      assetQuantity: "1 Unit",
+      vendorOrMarket: "Gazipur City Auto Market",
+    },
+    purposeSpecificDescription: "Bi-Annual Livelihood Vehicle Grant (Installment #1 of 2)",
+    employeeId: "2019003881",
+    employeeName: "Mizanur Rahman",
+    employeeDept: "Quality Assurance",
+    employeeDesignation: "Sr. QA Inspector",
+    beneficiaryName: "Nurul Islam (Disabled Village Artisan)",
+    beneficiaryPhone: "01933-776655",
+    beneficiaryAddress: "Bhaluka, Mymensingh",
+    asnafCategory: "Al-Fuqara",
+    justificationDetails: "Bi-annual sustainable livelihood vehicle procurement for disabled village artisan to transport and market goods.",
+    agencyStatus: "Distributed",
+  },
+  {
+    id: "ZK-REC-2026-A01",
+    fundType: "Zakat",
+    budgetYear: 2026,
+    assignedDate: "2026-04-10",
+    distributionDeadline: "2026-04-20",
+    amount: 120000,
+    isRecurring: true,
+    recurringScheduleId: "REC-ZK-2026-04",
+    cadence: "Annual Lump Sum",
+    installmentNumber: 1,
+    installmentTotal: 1,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Business Setup",
+    purposeSpecificDescription: "Annual Destitute Family Self-Reliance & Asset Rehabilitation (Installment #1 of 1)",
+    employeeId: "2018001090",
+    employeeName: "Anisur Rahman",
+    employeeDept: "Admin & Compliance",
+    beneficiaryName: "Kulsum Bibi & Family",
+    beneficiaryPhone: "01755-667788",
+    beneficiaryAddress: "Fulbaria, Mymensingh",
+    asnafCategory: "Al-Masakin",
+    justificationDetails: "Annual corporate Zakat grant providing micro-poultry farm setup and grocery kiosk startup capital for destitute widow's household.",
+    agencyStatus: "Verified",
+  },
+
+  // ========================================================
+  // RECURRING DEMO RECORDS - FINANCIAL AID (MONTHLY, QUARTERLY, BI-ANNUAL, ANNUAL)
+  // ========================================================
+  {
+    id: "FA-REC-2026-M01",
     fundType: "Financial Aid",
-    title: "Monthly Deceased Operator Family Subsidy",
+    budgetYear: 2026,
+    assignedDate: "2026-07-05",
+    distributionDeadline: "2026-07-15",
+    amount: 15000,
+    isRecurring: true,
+    recurringScheduleId: "REC-FA-2026-01",
+    cadence: "Monthly",
+    installmentNumber: 6,
+    installmentTotal: 24,
     disbursementChannel: "Via Employee Agent",
     disbursementMode: "Cash Grant",
     purposeCategory: "Others",
     otherPurposeDetails: "Family Hardship Living Allowance",
-    purposeDescription: "Living stipend for the widow and school-going children of deceased sewing operator late Rafiqul Islam.",
-    cadence: "Monthly",
+    purposeSpecificDescription: "Monthly Deceased Operator Family Welfare Subsidy (Installment #6 of 24)",
     employeeId: "2020002130",
     employeeName: "Farid Hossain",
     employeeDept: "Medical & Welfare",
     beneficiaryName: "Hasna Hena (Widow of late Rafiqul Islam)",
     beneficiaryPhone: "01819-334455",
     beneficiaryAddress: "Sreepur, Gazipur",
-    // No Asnaf for Financial Aid!
-    monthlyAmount: 15000,
-    disbursementDayOfMonth: 5,
-    startDate: "2026-02-01",
-    totalPlannedMonths: 24,
-    status: "Active",
-    installmentsGenerated: 6,
-    totalAmountDisbursed: 90000,
-    lastGeneratedDate: "2026-07-05",
-    nextDueDate: "2026-08-05",
-    createdAt: "2026-01-25",
-    notes: "Approved 2-year welfare commitment following tragic road accident.",
+    justificationDetails: "Continuous monthly welfare grant for widow and school-going dependents of deceased worker late Rafiqul Islam.",
+    agencyStatus: "Verified",
   },
   {
-    id: "REC-ZK-2026-02",
+    id: "FA-REC-2026-Q01",
+    fundType: "Financial Aid",
+    budgetYear: 2026,
+    assignedDate: "2026-06-25",
+    distributionDeadline: "2026-07-05",
+    amount: 25000,
+    isRecurring: true,
+    recurringScheduleId: "REC-FA-2026-02",
+    cadence: "Quarterly",
+    installmentNumber: 2,
+    installmentTotal: 4,
+    disbursementChannel: "Direct Employee",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Others",
+    otherPurposeDetails: "Staff Dependent Higher Education",
+    purposeSpecificDescription: "Quarterly Higher Secondary Tuition & Books Co-Pay (Installment #2 of 4)",
+    employeeId: "2023043021",
+    employeeName: "Jalal Uddin",
+    employeeDept: "Maintenance",
+    employeeDesignation: "Sr. Technician",
+    beneficiaryName: "Tanvir Ahmed (Son of Jalal Uddin)",
+    beneficiaryPhone: "01711-223399",
+    beneficiaryAddress: "Sreepur, Gazipur",
+    justificationDetails: "Quarterly scholarship supporting university entrance and polytechnic tuition for technician's merit student son.",
+    agencyStatus: "Verified",
+  },
+  {
+    id: "FA-REC-2026-B01",
+    fundType: "Financial Aid",
+    budgetYear: 2026,
+    assignedDate: "2026-05-15",
+    distributionDeadline: "2026-05-25",
+    amount: 40000,
+    isRecurring: true,
+    recurringScheduleId: "REC-FA-2026-03",
+    cadence: "Bi-Annual",
+    installmentNumber: 1,
+    installmentTotal: 2,
+    disbursementChannel: "Direct Employee",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Medical Treatment",
+    purposeSpecificDescription: "Bi-Annual Chronic Chemotherapy Co-Payment Grant (Installment #1 of 2)",
+    employeeId: "2023046001",
+    employeeName: "Morium Begum",
+    employeeDept: "Finishing (Line-02)",
+    employeeDesignation: "Line Ironer",
+    beneficiaryName: "Morium Begum (Staff Self)",
+    beneficiaryPhone: "01822-445588",
+    beneficiaryAddress: "Gazipur Sadar",
+    justificationDetails: "Bi-annual oncology financial assistance subsidizing specialized targeted therapy medication.",
+    agencyStatus: "Distributed",
+  },
+  {
+    id: "FA-REC-2026-A01",
+    fundType: "Financial Aid",
+    budgetYear: 2026,
+    assignedDate: "2026-03-30",
+    distributionDeadline: "2026-04-10",
+    amount: 80000,
+    isRecurring: true,
+    recurringScheduleId: "REC-FA-2026-04",
+    cadence: "Annual Lump Sum",
+    installmentNumber: 1,
+    installmentTotal: 1,
+    disbursementChannel: "Direct Employee",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Others",
+    otherPurposeDetails: "River Erosion Disaster Relief",
+    purposeSpecificDescription: "Annual River Erosion Homestead Relocation Grant (Installment #1 of 1)",
+    employeeId: "2019003881",
+    employeeName: "Monirul Haque",
+    employeeDept: "Quality Assurance",
+    employeeDesignation: "Sr. QA Inspector",
+    beneficiaryName: "Monirul Haque (Staff Self)",
+    beneficiaryPhone: "01933-778844",
+    beneficiaryAddress: "Sirajganj Sadar",
+    justificationDetails: "Annual hardship relief grant assisting employee in purchasing high-ground homestead land following riverbank erosion.",
+    agencyStatus: "Verified",
+  },
+];
+
+const INITIAL_RECURRING_SCHEDULES: UnifiedRecurringSchedule[] = [
+  {
+    id: "REC-ZK-2026-01",
     fundType: "Zakat",
     title: "Permanent Dialysis Kidney Patient Monthly Medicine Grant",
     disbursementChannel: "Direct Employee",
@@ -1028,15 +1200,220 @@ const INITIAL_RECURRING_SCHEDULES: UnifiedRecurringSchedule[] = [
     asnafCategory: "Al-Masakin",
     monthlyAmount: 12000,
     disbursementDayOfMonth: 10,
-    startDate: "2026-03-01",
+    startDate: "2026-01-10",
     totalPlannedMonths: 12,
     status: "Active",
-    installmentsGenerated: 5,
-    totalAmountDisbursed: 60000,
+    installmentsGenerated: 7,
+    totalAmountDisbursed: 84000,
     lastGeneratedDate: "2026-07-10",
     nextDueDate: "2026-08-10",
-    createdAt: "2026-02-22",
+    createdAt: "2025-12-28",
     notes: "Requires quarterly nephrologist prescription review.",
+  },
+  {
+    id: "REC-ZK-2026-02",
+    fundType: "Zakat",
+    title: "Quarterly Quran Madrasa Resident Orphan Food & Tuition Grant",
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Mosque/Madrasa",
+    purposeDescription: "Quarterly food grain, oil, and textbook allowance for resident orphan students.",
+    cadence: "Quarterly",
+    employeeId: "2018001090",
+    employeeName: "Anisur Rahman",
+    employeeDept: "Admin & Compliance",
+    beneficiaryName: "Darul Uloom Hussainia Madrasa & Yateemkhana",
+    beneficiaryPhone: "01711-998877",
+    beneficiaryAddress: "Valuka, Mymensingh",
+    asnafCategory: "Fi Sabilillah",
+    monthlyAmount: 35000,
+    disbursementDayOfMonth: 15,
+    startDate: "2026-01-15",
+    totalPlannedMonths: 12,
+    status: "Active",
+    installmentsGenerated: 2,
+    totalAmountDisbursed: 70000,
+    lastGeneratedDate: "2026-06-15",
+    nextDueDate: "2026-09-15",
+    createdAt: "2025-12-20",
+    notes: "Continuous quarterly welfare support committed for academic calendar.",
+  },
+  {
+    id: "REC-ZK-2026-03",
+    fundType: "Zakat",
+    title: "Bi-Annual Disabled Village Artisan Subsistence & Tool Grant",
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    purposeCategory: "Vehicle",
+    assetDetails: {
+      assetType: "Battery Electric Auto-Van / Easy Bike",
+      assetName: "Cargo Auto-Van with Motor & Battery Pack",
+      assetQuantity: "1 Unit",
+    },
+    purposeDescription: "Bi-annual sustainable equipment and van grant for disabled artisan.",
+    cadence: "Bi-Annual",
+    employeeId: "2019003881",
+    employeeName: "Mizanur Rahman",
+    employeeDept: "Quality Assurance",
+    employeeDesignation: "Sr. QA Inspector",
+    beneficiaryName: "Nurul Islam (Disabled Village Artisan)",
+    beneficiaryPhone: "01933-776655",
+    beneficiaryAddress: "Bhaluka, Mymensingh",
+    asnafCategory: "Al-Fuqara",
+    monthlyAmount: 50000,
+    disbursementDayOfMonth: 20,
+    startDate: "2026-01-20",
+    totalPlannedMonths: 12,
+    status: "Active",
+    installmentsGenerated: 1,
+    totalAmountDisbursed: 50000,
+    lastGeneratedDate: "2026-05-20",
+    nextDueDate: "2026-11-20",
+    createdAt: "2026-01-05",
+    notes: "Bi-annual installments for disabled artisan livelihood.",
+  },
+  {
+    id: "REC-ZK-2026-04",
+    fundType: "Zakat",
+    title: "Annual Destitute Family Self-Reliance & Asset Rehabilitation Grant",
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Business Setup",
+    purposeDescription: "Annual capital grant for micro-poultry farm and homestead kiosk setup.",
+    cadence: "Annual Lump Sum",
+    employeeId: "2018001090",
+    employeeName: "Anisur Rahman",
+    employeeDept: "Admin & Compliance",
+    beneficiaryName: "Kulsum Bibi & Family",
+    beneficiaryPhone: "01755-667788",
+    beneficiaryAddress: "Fulbaria, Mymensingh",
+    asnafCategory: "Al-Masakin",
+    monthlyAmount: 120000,
+    disbursementDayOfMonth: 10,
+    startDate: "2026-04-10",
+    totalPlannedMonths: 12,
+    status: "Completed",
+    installmentsGenerated: 1,
+    totalAmountDisbursed: 120000,
+    lastGeneratedDate: "2026-04-10",
+    nextDueDate: "2027-04-10",
+    createdAt: "2026-03-25",
+    notes: "Single annual grant for full-year family rehabilitation.",
+  },
+
+  {
+    id: "REC-FA-2026-01",
+    fundType: "Financial Aid",
+    title: "Monthly Deceased Operator Family Subsidy",
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Others",
+    otherPurposeDetails: "Family Hardship Living Allowance",
+    purposeDescription: "Living stipend for the widow and school-going children of deceased sewing operator late Rafiqul Islam.",
+    cadence: "Monthly",
+    employeeId: "2020002130",
+    employeeName: "Farid Hossain",
+    employeeDept: "Medical & Welfare",
+    beneficiaryName: "Hasna Hena (Widow of late Rafiqul Islam)",
+    beneficiaryPhone: "01819-334455",
+    beneficiaryAddress: "Sreepur, Gazipur",
+    monthlyAmount: 15000,
+    disbursementDayOfMonth: 5,
+    startDate: "2026-02-01",
+    totalPlannedMonths: 24,
+    status: "Active",
+    installmentsGenerated: 6,
+    totalAmountDisbursed: 90000,
+    lastGeneratedDate: "2026-07-05",
+    nextDueDate: "2026-08-05",
+    createdAt: "2026-01-25",
+    notes: "Approved 2-year welfare commitment following tragic road accident.",
+  },
+  {
+    id: "REC-FA-2026-02",
+    fundType: "Financial Aid",
+    title: "Quarterly Higher Secondary Tuition & Books Co-Pay Grant",
+    disbursementChannel: "Direct Employee",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Others",
+    otherPurposeDetails: "Staff Dependent Education",
+    purposeDescription: "Quarterly tuition and academic co-payment for technician's son.",
+    cadence: "Quarterly",
+    employeeId: "2023043021",
+    employeeName: "Jalal Uddin",
+    employeeDept: "Maintenance",
+    employeeDesignation: "Sr. Technician",
+    beneficiaryName: "Tanvir Ahmed (Son of Jalal Uddin)",
+    beneficiaryPhone: "01711-223399",
+    beneficiaryAddress: "Sreepur, Gazipur",
+    monthlyAmount: 25000,
+    disbursementDayOfMonth: 25,
+    startDate: "2026-01-25",
+    totalPlannedMonths: 12,
+    status: "Active",
+    installmentsGenerated: 2,
+    totalAmountDisbursed: 50000,
+    lastGeneratedDate: "2026-06-25",
+    nextDueDate: "2026-09-25",
+    createdAt: "2026-01-10",
+    notes: "Quarterly academic support through 2026.",
+  },
+  {
+    id: "REC-FA-2026-03",
+    fundType: "Financial Aid",
+    title: "Bi-Annual Chronic Chemotherapy Co-Payment Grant",
+    disbursementChannel: "Direct Employee",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Medical Treatment",
+    purposeDescription: "Bi-annual oncology financial assistance for line ironer staff.",
+    cadence: "Bi-Annual",
+    employeeId: "2023046001",
+    employeeName: "Morium Begum",
+    employeeDept: "Finishing (Line-02)",
+    employeeDesignation: "Line Ironer",
+    beneficiaryName: "Morium Begum (Staff Self)",
+    beneficiaryPhone: "01822-445588",
+    beneficiaryAddress: "Gazipur Sadar",
+    monthlyAmount: 40000,
+    disbursementDayOfMonth: 15,
+    startDate: "2026-01-15",
+    totalPlannedMonths: 12,
+    status: "Active",
+    installmentsGenerated: 1,
+    totalAmountDisbursed: 40000,
+    lastGeneratedDate: "2026-05-15",
+    nextDueDate: "2026-11-15",
+    createdAt: "2026-01-05",
+    notes: "Bi-annual oncology grant support.",
+  },
+  {
+    id: "REC-FA-2026-04",
+    fundType: "Financial Aid",
+    title: "Annual River Erosion Homestead Relocation & Disaster Grant",
+    disbursementChannel: "Direct Employee",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Others",
+    otherPurposeDetails: "River Erosion Relief",
+    purposeDescription: "Annual single grant assisting employee family relocation.",
+    cadence: "Annual Lump Sum",
+    employeeId: "2019003881",
+    employeeName: "Monirul Haque",
+    employeeDept: "Quality Assurance",
+    employeeDesignation: "Sr. QA Inspector",
+    beneficiaryName: "Monirul Haque (Staff Self)",
+    beneficiaryPhone: "01933-778844",
+    beneficiaryAddress: "Sirajganj Sadar",
+    monthlyAmount: 80000,
+    disbursementDayOfMonth: 30,
+    startDate: "2026-03-30",
+    totalPlannedMonths: 12,
+    status: "Completed",
+    installmentsGenerated: 1,
+    totalAmountDisbursed: 80000,
+    lastGeneratedDate: "2026-03-30",
+    nextDueDate: "2027-03-30",
+    createdAt: "2026-03-15",
+    notes: "Single annual grant for homestead reconstruction.",
   },
 ];
 
@@ -1065,13 +1442,12 @@ function ZakatAndFinancialAidPage() {
   // Records state
   const [records, setRecords] = useState<UnifiedAidRecord[]>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("cripton_unified_aid_records");
+      const saved = localStorage.getItem("cripton_unified_aid_records_v4");
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          const hasMultiBen = Array.isArray(parsed) && parsed.some((r: any) => r.batchRecipientInfo || r.justificationDetails?.includes("recipients"));
-          if (Array.isArray(parsed) && parsed.length >= 15 && hasMultiBen) {
-            return parsed.filter((r: any) => r.disbursementChannel !== "Direct External");
+          if (Array.isArray(parsed) && parsed.length >= 10) {
+            return parsed;
           }
         } catch (e) {}
       }
@@ -1082,10 +1458,13 @@ function ZakatAndFinancialAidPage() {
   // Recurring schedules state
   const [recurringSchedules, setRecurringSchedules] = useState<UnifiedRecurringSchedule[]>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("cripton_unified_recurring_schedules");
+      const saved = localStorage.getItem("cripton_unified_recurring_schedules_v4");
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length >= 8) {
+            return parsed;
+          }
         } catch (e) {}
       }
     }
@@ -1094,12 +1473,15 @@ function ZakatAndFinancialAidPage() {
 
   // Synchronize with localStorage
   useEffect(() => {
-    localStorage.setItem("cripton_unified_aid_records", JSON.stringify(records));
+    localStorage.setItem("cripton_unified_aid_records_v4", JSON.stringify(records));
   }, [records]);
 
   useEffect(() => {
-    localStorage.setItem("cripton_unified_recurring_schedules", JSON.stringify(recurringSchedules));
+    localStorage.setItem("cripton_unified_recurring_schedules_v4", JSON.stringify(recurringSchedules));
   }, [recurringSchedules]);
+
+  // Tabs State: All, Zakat Regular, Zakat Recurring, Financial Aid Regular, Financial Aid Recurring
+  const [activeTab, setActiveTab] = useState<"ALL" | "ZAKAT_REGULAR" | "ZAKAT_RECURRING" | "FA_REGULAR" | "FA_RECURRING">("ALL");
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState("");
@@ -1466,12 +1848,38 @@ function ZakatAndFinancialAidPage() {
     };
   }, [records, recurringSchedules, selectedBudgetYear]);
 
+  // Tab Live Counts
+  const tabCounts = useMemo(() => {
+    const yearRecords = records.filter(
+      (r) => !selectedBudgetYear || r.budgetYear === selectedBudgetYear || r.assignedDate.startsWith(selectedBudgetYear.toString())
+    );
+    return {
+      all: yearRecords.length,
+      zakatRegular: yearRecords.filter((r) => r.fundType === "Zakat" && !r.isRecurring).length,
+      zakatRecurring: yearRecords.filter((r) => r.fundType === "Zakat" && r.isRecurring).length,
+      faRegular: yearRecords.filter((r) => r.fundType === "Financial Aid" && !r.isRecurring).length,
+      faRecurring: yearRecords.filter((r) => r.fundType === "Financial Aid" && r.isRecurring).length,
+    };
+  }, [records, selectedBudgetYear]);
+
   // Filtered records for table
   const filteredRecords = useMemo(() => {
     return records.filter((r) => {
       if (r.budgetYear && r.budgetYear !== selectedBudgetYear && !r.assignedDate.startsWith(selectedBudgetYear.toString())) {
         return false;
       }
+
+      // Tab Filtering
+      if (activeTab === "ZAKAT_REGULAR") {
+        if (r.fundType !== "Zakat" || r.isRecurring) return false;
+      } else if (activeTab === "ZAKAT_RECURRING") {
+        if (r.fundType !== "Zakat" || !r.isRecurring) return false;
+      } else if (activeTab === "FA_REGULAR") {
+        if (r.fundType !== "Financial Aid" || r.isRecurring) return false;
+      } else if (activeTab === "FA_RECURRING") {
+        if (r.fundType !== "Financial Aid" || !r.isRecurring) return false;
+      }
+
       if (filterFundType !== "ALL" && r.fundType !== filterFundType) return false;
       if (filterChannel !== "ALL" && r.disbursementChannel !== filterChannel) return false;
       if (filterMode !== "ALL" && r.disbursementMode !== filterMode) return false;
@@ -1493,6 +1901,7 @@ function ZakatAndFinancialAidPage() {
           (r.assetDetails?.assetName && r.assetDetails.assetName.toLowerCase().includes(q)) ||
           (r.purposeSpecificDescription && r.purposeSpecificDescription.toLowerCase().includes(q)) ||
           (r.otherPurposeDetails && r.otherPurposeDetails.toLowerCase().includes(q)) ||
+          (r.cadence && r.cadence.toLowerCase().includes(q)) ||
           r.purposeCategory.toLowerCase().includes(q)
         );
       }
@@ -1501,6 +1910,7 @@ function ZakatAndFinancialAidPage() {
   }, [
     records,
     selectedBudgetYear,
+    activeTab,
     filterFundType,
     filterChannel,
     filterMode,
@@ -1783,6 +2193,9 @@ function ZakatAndFinancialAidPage() {
         : (recBeneficiaryName.trim() || "Beneficiary");
 
     const prefix = recFundType === "Zakat" ? "REC-ZK" : "REC-FA";
+    const startDay = (recStartDate ? parseInt(recStartDate.split("-")[2], 10) : undefined) || parseInt(recDisbursementDay) || 1;
+    const plannedInstallments = calculateInstallmentCount(recCadence, recDurationMonths);
+
     const newSchedule: UnifiedRecurringSchedule = {
       id: `${prefix}-${selectedBudgetYear}-${String(recurringSchedules.length + 1).padStart(2, "0")}`,
       fundType: recFundType,
@@ -1804,7 +2217,7 @@ function ZakatAndFinancialAidPage() {
       // Only Zakat gets Asnaf Category
       asnafCategory: recFundType === "Zakat" ? recAsnaf : undefined,
       monthlyAmount: parseFloat(recMonthlyAmount),
-      disbursementDayOfMonth: 1,
+      disbursementDayOfMonth: startDay,
       startDate: recStartDate,
       totalPlannedMonths: parseInt(recDurationMonths, 10) || 12,
       status: "Active",
@@ -1827,8 +2240,9 @@ function ZakatAndFinancialAidPage() {
       amount: parseFloat(recMonthlyAmount),
       isRecurring: true,
       recurringScheduleId: newSchedule.id,
+      cadence: recCadence,
       installmentNumber: 1,
-      installmentTotal: parseInt(recDurationMonths, 10) || 12,
+      installmentTotal: plannedInstallments,
       disbursementChannel: recChannel,
       disbursementMode: recMode,
       purposeCategory: recPurposeCategory,
@@ -2099,49 +2513,102 @@ function ZakatAndFinancialAidPage() {
 
           {/* 5. Comprehensive Filter Console */}
           <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs space-y-3">
-            {/* Fund Type Quick Pills */}
+            {/* Primary Category & Recurring Sub-Tabs */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl">
+              <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-slate-700/60">
                 <button
                   type="button"
-                  onClick={() => setFilterFundType("ALL")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                    filterFundType === "ALL"
+                  onClick={() => setActiveTab("ALL")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    activeTab === "ALL"
                       ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs"
                       : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
-                  All Funds ({records.length})
+                  <span>All Disbursements</span>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                    activeTab === "ALL" ? "bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200" : "bg-slate-200/70 text-slate-600"
+                  }`}>
+                    {tabCounts.all}
+                  </span>
                 </button>
+
                 <button
                   type="button"
-                  onClick={() => setFilterFundType("Zakat")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
-                    filterFundType === "Zakat"
+                  onClick={() => setActiveTab("ZAKAT_REGULAR")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    activeTab === "ZAKAT_REGULAR"
                       ? "bg-emerald-600 text-white shadow-xs"
-                      : "text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                      : "text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/30"
                   }`}
                 >
                   <ShieldCheck className="size-3.5" />
-                  <span>Zakat Only ({records.filter((r) => r.fundType === "Zakat").length})</span>
+                  <span>Zakat Regular</span>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                    activeTab === "ZAKAT_REGULAR" ? "bg-emerald-700 text-emerald-100" : "bg-emerald-100 text-emerald-800"
+                  }`}>
+                    {tabCounts.zakatRegular}
+                  </span>
                 </button>
+
                 <button
                   type="button"
-                  onClick={() => setFilterFundType("Financial Aid")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
-                    filterFundType === "Financial Aid"
+                  onClick={() => setActiveTab("ZAKAT_RECURRING")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    activeTab === "ZAKAT_RECURRING"
+                      ? "bg-teal-600 text-white shadow-xs"
+                      : "text-teal-700 dark:text-teal-400 hover:bg-teal-50/70 dark:hover:bg-teal-950/30"
+                  }`}
+                >
+                  <Repeat className="size-3.5" />
+                  <span>Zakat Recurring</span>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                    activeTab === "ZAKAT_RECURRING" ? "bg-teal-700 text-teal-100" : "bg-teal-100 text-teal-800"
+                  }`}>
+                    {tabCounts.zakatRecurring}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("FA_REGULAR")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    activeTab === "FA_REGULAR"
                       ? "bg-blue-600 text-white shadow-xs"
-                      : "text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30"
+                      : "text-blue-700 dark:text-blue-400 hover:bg-blue-50/70 dark:hover:bg-blue-950/30"
                   }`}
                 >
                   <Banknote className="size-3.5" />
-                  <span>Financial Aid Only ({records.filter((r) => r.fundType === "Financial Aid").length})</span>
+                  <span>Financial Aid Regular</span>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                    activeTab === "FA_REGULAR" ? "bg-blue-700 text-blue-100" : "bg-blue-100 text-blue-800"
+                  }`}>
+                    {tabCounts.faRegular}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("FA_RECURRING")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    activeTab === "FA_RECURRING"
+                      ? "bg-indigo-600 text-white shadow-xs"
+                      : "text-indigo-700 dark:text-indigo-400 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/30"
+                  }`}
+                >
+                  <CalendarClock className="size-3.5" />
+                  <span>Financial Aid Recurring</span>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                    activeTab === "FA_RECURRING" ? "bg-indigo-700 text-indigo-100" : "bg-indigo-100 text-indigo-800"
+                  }`}>
+                    {tabCounts.faRecurring}
+                  </span>
                 </button>
               </div>
 
-              {/* Recurring Schedules Tab Link */}
+              {/* Matching Count */}
               <div className="text-xs font-semibold text-slate-500 flex items-center gap-2">
-                <span>Showing {filteredRecords.length} matching disbursements</span>
+                <span>Showing <strong className="text-slate-900 dark:text-slate-100">{filteredRecords.length}</strong> matching disbursements</span>
               </div>
             </div>
 
@@ -2258,9 +2725,13 @@ function ZakatAndFinancialAidPage() {
                               >
                                 {r.fundType}
                               </span>
-                              {r.isRecurring && (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">
-                                  Recurring
+                              {r.isRecurring ? (
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200 dark:bg-teal-950/60 dark:text-teal-300 dark:border-teal-800">
+                                  {r.cadence === "Annual Lump Sum" ? "Annual" : (r.cadence || "Recurring")} #{r.installmentNumber || 1}{r.installmentTotal ? `/${r.installmentTotal}` : ""}
+                                </span>
+                              ) : (
+                                <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
+                                  Regular
                                 </span>
                               )}
                             </div>
@@ -3438,11 +3909,19 @@ function ZakatAndFinancialAidPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
                         <label className="text-xs font-semibold text-slate-700 block mb-1">
-                          Cadence
+                          Cadence <span className="text-red-500">*</span>
                         </label>
                         <select
                           value={recCadence}
-                          onChange={(e) => setRecCadence(e.target.value as DisbursementCadence)}
+                          onChange={(e) => {
+                            const val = e.target.value as DisbursementCadence;
+                            setRecCadence(val);
+                            if (val === "Annual Lump Sum") {
+                              setRecDurationMonths("1");
+                            } else if (recDurationMonths === "1" || recDurationMonths === "5" || recDurationMonths === "10") {
+                              setRecDurationMonths("12");
+                            }
+                          }}
                           className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
                         >
                           <option value="Monthly">Monthly</option>
@@ -3452,36 +3931,66 @@ function ZakatAndFinancialAidPage() {
                         </select>
                       </div>
 
-                      <div>
-                        <label className="text-xs font-semibold text-slate-700 block mb-1">
-                          Disbursement Day
-                        </label>
-                        <select
-                          value={recDisbursementDay}
-                          onChange={(e) => setRecDisbursementDay(e.target.value)}
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
-                        >
-                          <option value="1">1st of Month</option>
-                          <option value="5">5th of Month</option>
-                          <option value="10">10th of Month</option>
-                          <option value="15">15th of Month</option>
-                        </select>
-                      </div>
+                      {recCadence === "Annual Lump Sum" ? (
+                        <div>
+                          <label className="text-xs font-semibold text-slate-700 block mb-1">
+                            Disbursement Date
+                          </label>
+                          <input
+                            type="date"
+                            value={recStartDate}
+                            onChange={(e) => {
+                              setRecStartDate(e.target.value);
+                              setRecDisbursementDay(e.target.value);
+                            }}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <label className="text-xs font-semibold text-slate-700 block mb-1">
+                            Disbursement Day
+                          </label>
+                          <select
+                            value={recDisbursementDay}
+                            onChange={(e) => setRecDisbursementDay(e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                          >
+                            <option value="1">1st of Month</option>
+                            <option value="5">5th of Month</option>
+                            <option value="10">10th of Month</option>
+                            <option value="15">15th of Month</option>
+                          </select>
+                        </div>
+                      )}
 
                       <div>
                         <label className="text-xs font-semibold text-slate-700 block mb-1">
                           Duration
                         </label>
-                        <select
-                          value={recDurationMonths}
-                          onChange={(e) => setRecDurationMonths(e.target.value)}
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
-                        >
-                          <option value="6">6 Months</option>
-                          <option value="12">12 Months (1 Year)</option>
-                          <option value="24">24 Months (2 Years)</option>
-                          <option value="0">Indefinite</option>
-                        </select>
+                        {recCadence === "Annual Lump Sum" ? (
+                          <select
+                            value={recDurationMonths === "12" ? "1" : recDurationMonths}
+                            onChange={(e) => setRecDurationMonths(e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                          >
+                            <option value="1">1 year</option>
+                            <option value="5">5 year</option>
+                            <option value="10">10 year</option>
+                            <option value="0">Indefinite</option>
+                          </select>
+                        ) : (
+                          <select
+                            value={recDurationMonths === "1" ? "12" : recDurationMonths}
+                            onChange={(e) => setRecDurationMonths(e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
+                          >
+                            <option value="6">6 Months</option>
+                            <option value="12">12 Months (1 Year)</option>
+                            <option value="24">24 Months (2 Years)</option>
+                            <option value="0">Indefinite</option>
+                          </select>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -3595,14 +4104,14 @@ function ZakatAndFinancialAidPage() {
                     </div>
                   )}
 
-                  {/* Monthly Amount with Clean Inline Presets */}
+                  {/* Amount with Clean Dynamic Cadence Presets */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-slate-700">
-                        Monthly Amount (৳) <span className="text-red-500">*</span>
+                        {CADENCE_CONFIG[recCadence]?.amountLabel || "Monthly Amount (৳)"} <span className="text-red-500">*</span>
                       </label>
                       <div className="flex items-center gap-1">
-                        {[3000, 5000, 10000, 15000, 20000].map((amt) => (
+                        {(CADENCE_CONFIG[recCadence]?.presets || CADENCE_CONFIG.Monthly.presets).map((amt) => (
                           <button
                             type="button"
                             key={amt}
@@ -3625,7 +4134,7 @@ function ZakatAndFinancialAidPage() {
                         required
                         value={recMonthlyAmount}
                         onChange={(e) => setRecMonthlyAmount(e.target.value)}
-                        placeholder="Enter monthly amount (e.g. 10000)"
+                        placeholder={CADENCE_CONFIG[recCadence]?.amountPlaceholder || "Enter amount (e.g. 10000)"}
                         className="w-full h-9.5 pl-8 pr-3 rounded-lg border border-slate-300 bg-white text-sm font-bold font-mono text-slate-900 outline-none focus:border-emerald-600 transition-all"
                       />
                     </div>
@@ -3762,57 +4271,82 @@ function ZakatAndFinancialAidPage() {
                 </div>
 
                 {/* SUMMARY STATS BAR */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
-                  <div className="flex items-center gap-1.5 font-bold text-slate-700">
-                    <Sparkles className="size-4 text-emerald-600" />
-                    <span>Summary</span>
-                  </div>
+                {(() => {
+                  const installments = calculateInstallmentCount(recCadence, recDurationMonths);
+                  const installmentAmt = parseFloat(recMonthlyAmount) || 0;
+                  const totalCommitmentAmt = installmentAmt * installments;
+                  const isIndefinite = recDurationMonths === "0";
+                  return (
+                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                      <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                        <Sparkles className="size-4 text-emerald-600" />
+                        <span>Summary</span>
+                      </div>
 
-                  <div className="flex flex-wrap items-center gap-5">
-                    <div>
-                      <span className="text-slate-400 text-[11px] block">Rate</span>
-                      <span className="font-bold font-mono text-slate-800">
-                        ৳{(parseFloat(recMonthlyAmount) || 0).toLocaleString()}
-                        {recSettlementType === "Periodic Installments" ? "/mo" : ""}
-                      </span>
-                    </div>
+                      <div className="flex flex-wrap items-center gap-5">
+                        <div>
+                          <span className="text-slate-400 text-[11px] block">Rate / Cadence</span>
+                          <span className="font-bold font-mono text-slate-800">
+                            ৳{installmentAmt.toLocaleString()}
+                            <span className="font-sans font-normal text-slate-500 text-[11px]">
+                              {" "}
+                              {CADENCE_CONFIG[recCadence]?.rateSuffix || "/ mo"}
+                            </span>
+                          </span>
+                        </div>
 
-                    <div>
-                      <span className="text-slate-400 text-[11px] block">Duration</span>
-                      <span className="font-bold text-slate-800">
-                        {recDurationMonths === "0" ? "Indefinite" : `${recDurationMonths} Mos`}
-                      </span>
-                    </div>
+                        <div>
+                          <span className="text-slate-400 text-[11px] block">Duration</span>
+                          <span className="font-bold text-slate-800">
+                            {recDurationMonths === "0"
+                              ? "Indefinite"
+                              : recCadence === "Annual Lump Sum"
+                                ? `${recDurationMonths === "12" ? "1" : recDurationMonths} Year${recDurationMonths === "1" || recDurationMonths === "12" ? "" : "s"}`
+                                : `${recDurationMonths} Mos`}
+                          </span>
+                        </div>
 
-                    <div>
-                      <span className="text-slate-400 text-[11px] block">Total Commitment</span>
-                      <span className="font-bold font-mono text-emerald-700 text-sm">
-                        ৳{((parseFloat(recMonthlyAmount) || 0) * (parseInt(recDurationMonths) || 12)).toLocaleString()}
-                      </span>
-                    </div>
+                        <div>
+                          <span className="text-slate-400 text-[11px] block">Total Commitment</span>
+                          <span className="font-bold font-mono text-emerald-700 text-sm">
+                            ৳{(
+                              (parseFloat(recMonthlyAmount) || 0) *
+                              (recCadence === "Annual Lump Sum"
+                                ? (recDurationMonths === "0" ? 1 : (parseInt(recDurationMonths === "12" ? "1" : recDurationMonths) || 1))
+                                : (recDurationMonths === "0" ? 1 : (parseInt(recDurationMonths) || 12)))
+                            ).toLocaleString()}
+                          </span>
+                        </div>
 
-                    <div>
-                      <span className="text-slate-400 text-[11px] block">Remaining Pool</span>
-                      <span className="font-bold font-mono text-slate-800">
-                        ৳{Math.max(
-                          0,
-                          (325000 - stats.totalCombinedAmount) -
-                          (recSettlementType === "1-Year Full Advance"
-                            ? (parseFloat(recMonthlyAmount) || 0) * (parseInt(recDurationMonths) || 12)
-                            : 0)
-                        ).toLocaleString()}
-                      </span>
+                        <div>
+                          <span className="text-slate-400 text-[11px] block">Remaining Pool</span>
+                          <span className="font-bold font-mono text-slate-800">
+                            ৳{Math.max(
+                              0,
+                              (325000 - stats.totalCombinedAmount) -
+                              (recSettlementType === "1-Year Full Advance"
+                                ? totalCommitmentAmt
+                                : 0)
+                            ).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  );
+                })()}
               </div>
 
               {/* Modal Footer */}
               <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-slate-50">
                 <div className="text-xs font-semibold text-slate-600">
-                  Total Grant:{" "}
+                  {recDurationMonths === "0" ? "Est. Annual Grant:" : "Total Grant:"}{" "}
                   <span className="font-mono font-bold text-sm text-slate-900 ml-1">
-                    ৳{((parseFloat(recMonthlyAmount) || 0) * (parseInt(recDurationMonths) || 12)).toLocaleString()}
+                    ৳{(
+                      (parseFloat(recMonthlyAmount) || 0) *
+                      (recCadence === "Annual Lump Sum"
+                        ? (recDurationMonths === "0" ? 1 : (parseInt(recDurationMonths === "12" ? "1" : recDurationMonths) || 1))
+                        : (recDurationMonths === "0" ? 1 : (parseInt(recDurationMonths) || 12)))
+                    ).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center gap-2.5">

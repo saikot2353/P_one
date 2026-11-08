@@ -38,6 +38,7 @@ import {
   getMaternityRequests,
   approveMaternityByHr,
   rejectMaternityByHr,
+  calculateRejoiningDate,
 } from "@/lib/maternityLeaveStore";
 
 export const Route = createFileRoute("/maternity-hr-verification")({
@@ -738,9 +739,14 @@ function MaternityHrVerificationPage() {
                                 <p className="font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap">
                                   {req.welfareStage2.expectedLeaveStartDate} to {req.welfareStage2.expectedLeaveEndDate}
                                 </p>
-                                <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
-                                  {req.welfareStage2.totalLeaveDays || 112} Days (16 Wks)
-                                </span>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                                    {req.welfareStage2.totalLeaveDays || 112}d
+                                  </span>
+                                  <span className="text-[10px] text-purple-600 dark:text-purple-400 font-medium">
+                                    &bull; Re-join: <strong>{req.welfareStage2.rejoiningDate || calculateRejoiningDate(req.welfareStage2.expectedLeaveEndDate)}</strong>
+                                  </span>
+                                </div>
                               </div>
                             ) : (
                               <div>
@@ -1261,8 +1267,8 @@ function MaternityHrVerificationPage() {
                   </h4>
                 </div>
 
-                {/* 4-column overview card */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 text-xs">
+                {/* 5-column overview card */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 text-xs">
                   <div>
                     <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
                       EXPECTED DELIVERY DATE
@@ -1289,6 +1295,17 @@ function MaternityHrVerificationPage() {
                       {activeRequest.welfareStage2.expectedLeaveEndDate || "2027-02-20"}
                     </span>
                     <span className="text-[10px] text-slate-400">55d post-delivery</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
+                      RE-JOINING DATE
+                    </span>
+                    <span className="font-bold text-purple-700 dark:text-purple-300 block mt-1 text-sm font-mono">
+                      {activeRequest.welfareStage2.rejoiningDate ||
+                        calculateRejoiningDate(activeRequest.welfareStage2.expectedLeaveEndDate) ||
+                        "2027-02-21"}
+                    </span>
+                    <span className="text-[10px] text-slate-400">Duty Resumption</span>
                   </div>
                   <div>
                     <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">

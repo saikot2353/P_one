@@ -335,6 +335,102 @@ export type RecurringScheduleStatus = "Active" | "Paused" | "Completed" | "Cance
 export type DisbursementCadence = "Monthly" | "Quarterly" | "Bi-Annual" | "Annual Lump Sum";
 export type DisbursementSettlementType = "Periodic Installments" | "1-Year Full Advance";
 
+export const CADENCE_CONFIG: Record<
+  DisbursementCadence,
+  {
+    label: string;
+    amountLabel: string;
+    amountPlaceholder: string;
+    rateSuffix: string;
+    periodUnit: string;
+    presets: number[];
+    durationOptions: { value: string; label: string }[];
+    defaultDuration: string;
+    monthsPerPeriod: number;
+  }
+> = {
+  Monthly: {
+    label: "Monthly",
+    amountLabel: "Monthly Amount (৳)",
+    amountPlaceholder: "Enter monthly amount (e.g. 10000)",
+    rateSuffix: "/ mo",
+    periodUnit: "Month",
+    presets: [3000, 5000, 10000, 15000, 20000],
+    durationOptions: [
+      { value: "3", label: "3 Months (3 Installments)" },
+      { value: "6", label: "6 Months (6 Installments)" },
+      { value: "12", label: "12 Months / 1 Year (12 Installments)" },
+      { value: "24", label: "24 Months / 2 Years (24 Installments)" },
+      { value: "0", label: "Indefinite (Ongoing)" },
+    ],
+    defaultDuration: "12",
+    monthsPerPeriod: 1,
+  },
+  Quarterly: {
+    label: "Quarterly",
+    amountLabel: "Quarterly Amount (৳)",
+    amountPlaceholder: "Enter quarterly amount (e.g. 25000)",
+    rateSuffix: "/ qtr",
+    periodUnit: "Quarter",
+    presets: [10000, 15000, 25000, 30000, 50000],
+    durationOptions: [
+      { value: "6", label: "6 Months (2 Quarters)" },
+      { value: "12", label: "12 Months / 1 Year (4 Quarters)" },
+      { value: "24", label: "24 Months / 2 Years (8 Quarters)" },
+      { value: "36", label: "36 Months / 3 Years (12 Quarters)" },
+      { value: "0", label: "Indefinite (Ongoing)" },
+    ],
+    defaultDuration: "12",
+    monthsPerPeriod: 3,
+  },
+  "Bi-Annual": {
+    label: "Bi-Annual",
+    amountLabel: "Bi-Annual Amount (৳)",
+    amountPlaceholder: "Enter bi-annual amount (e.g. 50000)",
+    rateSuffix: "/ half-yr",
+    periodUnit: "Half-Year",
+    presets: [20000, 30000, 50000, 60000, 100000],
+    durationOptions: [
+      { value: "6", label: "6 Months (1 Installment)" },
+      { value: "12", label: "12 Months / 1 Year (2 Installments)" },
+      { value: "24", label: "24 Months / 2 Years (4 Installments)" },
+      { value: "36", label: "36 Months / 3 Years (6 Installments)" },
+      { value: "0", label: "Indefinite (Ongoing)" },
+    ],
+    defaultDuration: "12",
+    monthsPerPeriod: 6,
+  },
+  "Annual Lump Sum": {
+    label: "Annual",
+    amountLabel: "Annual Amount (৳)",
+    amountPlaceholder: "Enter annual amount (e.g. 100000)",
+    rateSuffix: "/ yr",
+    periodUnit: "Year",
+    presets: [30000, 50000, 60000, 100000, 120000],
+    durationOptions: [
+      { value: "12", label: "12 Months / 1 Year (1 Installment)" },
+      { value: "24", label: "24 Months / 2 Years (2 Installments)" },
+      { value: "36", label: "36 Months / 3 Years (3 Installments)" },
+      { value: "60", label: "60 Months / 5 Years (5 Installments)" },
+      { value: "0", label: "Indefinite (Ongoing)" },
+    ],
+    defaultDuration: "12",
+    monthsPerPeriod: 12,
+  },
+};
+
+export const calculateInstallmentCount = (
+  cadence: DisbursementCadence = "Monthly",
+  totalMonthsStr: string | number = "12"
+): number => {
+  const months = typeof totalMonthsStr === "number" ? totalMonthsStr : parseInt(totalMonthsStr, 10) || 0;
+  const cfg = CADENCE_CONFIG[cadence] || CADENCE_CONFIG.Monthly;
+  if (months === 0) {
+    return Math.max(1, Math.round(12 / cfg.monthsPerPeriod));
+  }
+  return Math.max(1, Math.round(months / cfg.monthsPerPeriod));
+};
+
 export interface RecurringZakatSchedule {
   id: string; // e.g. "REC-ZK-2026-01"
   title: string;
@@ -403,6 +499,7 @@ export interface ZakatRecord {
   // Recurring linkage & Advance Settlement
   isRecurring?: boolean;
   recurringScheduleId?: string;
+  cadence?: DisbursementCadence;
   installmentNumber?: number;
   installmentTotal?: number;
   isAdvanceLumpSum?: boolean;
@@ -877,6 +974,7 @@ export const defaultZakatRecords: ZakatRecord[] = [
     amount: 120000,
     isRecurring: true,
     recurringScheduleId: "REC-ZK-2026-03",
+    cadence: "Annual Lump Sum",
     installmentNumber: 1,
     installmentTotal: 1,
     isAdvanceLumpSum: true,
@@ -913,6 +1011,63 @@ export const defaultZakatRecords: ZakatRecord[] = [
         uploadedAt: "2026-10-01",
       },
     ],
+  },
+  {
+    id: "ZK-2026-12",
+    budgetYear: 2026,
+    assignedDate: "2026-06-15",
+    distributionDeadline: "2026-06-25",
+    amount: 35000,
+    isRecurring: true,
+    recurringScheduleId: "REC-ZK-2026-04",
+    cadence: "Quarterly",
+    installmentNumber: 2,
+    installmentTotal: 4,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    purposeCategory: "Mosque/Madrasa",
+    purposeSpecificDescription: "Quarterly Resident Orphan Education & Nutrition Grant (Installment #2 of 4)",
+    employeeId: "2018001090",
+    employeeName: "Anisur Rahman",
+    employeeDept: "Admin & Compliance",
+    beneficiaryName: "Darul Uloom Hussainia Madrasa & Yateemkhana",
+    beneficiaryPhone: "01711-998877",
+    beneficiaryAddress: "Valuka, Mymensingh",
+    asnafCategory: "Fi Sabilillah",
+    justificationDetails: "Quarterly food grain, oil, and textbook allowance supporting 10 resident orphan students.",
+    agencyStatus: "Verified",
+  },
+  {
+    id: "ZK-2026-13",
+    budgetYear: 2026,
+    assignedDate: "2026-05-20",
+    distributionDeadline: "2026-05-30",
+    amount: 50000,
+    isRecurring: true,
+    recurringScheduleId: "REC-ZK-2026-05",
+    cadence: "Bi-Annual",
+    installmentNumber: 1,
+    installmentTotal: 2,
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    purposeCategory: "Vehicle",
+    assetDetails: {
+      assetType: "Battery Electric Auto-Van / Easy Bike",
+      assetName: "Cargo Auto-Van with Motor & Battery Pack",
+      assetQuantity: "1 Unit",
+      vendorOrMarket: "Gazipur City Auto Market",
+    },
+    purposeSpecificDescription: "Bi-Annual Livelihood Vehicle Grant (Installment #1 of 2)",
+    employeeId: "2019003881",
+    employeeName: "Mizanur Rahman",
+    employeeDept: "Quality Assurance",
+    employeeDesignation: "Sr. QA Inspector",
+    beneficiaryName: "Nurul Islam (Disabled Village Artisan)",
+    beneficiaryPhone: "01933-776655",
+    beneficiaryAddress: "Bhaluka, Mymensingh",
+    asnafCategory: "Al-Fuqara",
+    justificationDetails: "Bi-annual sustainable equipment and electric van grant for disabled artisan to transport and market handmade wares.",
+    agencyStatus: "Distributed",
   },
 ];
 
@@ -1047,6 +1202,72 @@ export const defaultRecurringSchedules: RecurringZakatSchedule[] = [
       },
     ],
   },
+  {
+    id: "REC-ZK-2026-04",
+    title: "Quarterly Quran Madrasa Resident Orphan Food & Tuition Grant",
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Cash Grant",
+    cadence: "Quarterly",
+    settlementType: "Periodic Installments",
+    disbursementMethod: "Bank Transfer",
+    paymentDetails: "Islami Bank A/C: 2050-7711-440",
+    employeeName: "Anisur Rahman",
+    employeeId: "2018001090",
+    employeeDept: "Admin & Compliance",
+    beneficiaryName: "Darul Uloom Hussainia Madrasa & Yateemkhana",
+    beneficiaryPhone: "01711-998877",
+    beneficiaryAddress: "Valuka, Mymensingh",
+    purposeCategory: "Mosque/Madrasa",
+    purposeDescription: "Quarterly food grain, oil, and textbook allowance for resident orphan students.",
+    asnafCategory: "Fi Sabilillah",
+    monthlyAmount: 35000,
+    disbursementDayOfMonth: 15,
+    startDate: "2026-01-15",
+    totalPlannedMonths: 12,
+    status: "Active",
+    installmentsGenerated: 2,
+    totalAmountDisbursed: 70000,
+    lastGeneratedDate: "2026-06-15",
+    nextDueDate: "2026-09-15",
+    createdAt: "2025-12-20",
+    notes: "Continuous quarterly welfare support committed for academic calendar.",
+  },
+  {
+    id: "REC-ZK-2026-05",
+    title: "Bi-Annual Disabled Village Artisan Subsistence & Tool Grant",
+    disbursementChannel: "Via Employee Agent",
+    disbursementMode: "Asset Purchased",
+    assetDetails: {
+      assetType: "Battery Electric Auto-Van / Easy Bike",
+      assetName: "Cargo Auto-Van with Motor & Battery Pack",
+      assetQuantity: "1 Unit",
+    },
+    cadence: "Bi-Annual",
+    settlementType: "Periodic Installments",
+    disbursementMethod: "In-Kind Delivery",
+    paymentDetails: "Market Delivery Chalan #GZ-8819",
+    employeeId: "2019003881",
+    employeeName: "Mizanur Rahman",
+    employeeDept: "Quality Assurance",
+    employeeDesignation: "Sr. QA Inspector",
+    beneficiaryName: "Nurul Islam (Disabled Village Artisan)",
+    beneficiaryPhone: "01933-776655",
+    beneficiaryAddress: "Bhaluka, Mymensingh",
+    purposeCategory: "Vehicle",
+    purposeDescription: "Bi-annual sustainable equipment and electric cargo van grant for disabled artisan.",
+    asnafCategory: "Al-Fuqara",
+    monthlyAmount: 50000,
+    disbursementDayOfMonth: 20,
+    startDate: "2026-01-20",
+    totalPlannedMonths: 12,
+    status: "Active",
+    installmentsGenerated: 1,
+    totalAmountDisbursed: 50000,
+    lastGeneratedDate: "2026-05-20",
+    nextDueDate: "2026-11-20",
+    createdAt: "2026-01-05",
+    notes: "Bi-annual installments for disabled artisan livelihood.",
+  },
 ];
 
 export const INITIAL_RECURRING_SCHEDULES = defaultRecurringSchedules;
@@ -1134,6 +1355,7 @@ function normalizeRecords(raw: any[]): ZakatRecord[] {
       amount: typeof r.amount === "number" ? r.amount : 10000,
       isRecurring: !!r.isRecurring,
       recurringScheduleId: r.recurringScheduleId,
+      cadence: r.cadence || defaultZakatRecords.find((d) => d.id === r.id)?.cadence,
       installmentNumber: r.installmentNumber,
       installmentTotal: r.installmentTotal,
       isAdvanceLumpSum: !!r.isAdvanceLumpSum || defaultZakatRecords.find((d) => d.id === r.id)?.isAdvanceLumpSum,
@@ -1291,6 +1513,9 @@ function ZakatManagementPage() {
       if (!alreadyHasThisMonth) {
         const nextInstallmentNum = schedule.installmentsGenerated + 1;
         const newRecordId = `ZK-${today.getFullYear()}-REC-${schedule.id.slice(-2)}-${today.toLocaleString("en-US", { month: "short" }).toUpperCase()}`;
+        const totalPlannedInstallments = schedule.totalPlannedMonths
+          ? calculateInstallmentCount(schedule.cadence || "Monthly", schedule.totalPlannedMonths)
+          : 12;
 
         const newRec: ZakatRecord = {
           id: newRecordId,
@@ -1300,8 +1525,9 @@ function ZakatManagementPage() {
           amount: schedule.monthlyAmount,
           isRecurring: true,
           recurringScheduleId: schedule.id,
+          cadence: schedule.cadence,
           installmentNumber: nextInstallmentNum,
-          installmentTotal: schedule.totalPlannedMonths || 12,
+          installmentTotal: totalPlannedInstallments,
           disbursementChannel: schedule.disbursementChannel,
           disbursementMode: schedule.disbursementMode,
           assetDetails: schedule.assetDetails,
@@ -1320,7 +1546,7 @@ function ZakatManagementPage() {
           institutionRepresentative: schedule.institutionRepresentative,
           institutionContactPhone: schedule.institutionContactPhone,
           asnafCategory: schedule.asnafCategory,
-          justificationDetails: `Automated recurring monthly Zakat allowance for ${schedule.title}.`,
+          justificationDetails: `Automated recurring ${schedule.cadence || "Monthly"} Zakat allowance for ${schedule.title}.`,
           agencyStatus: "Assigned",
           attachments: schedule.attachments,
         };
@@ -1328,8 +1554,13 @@ function ZakatManagementPage() {
         newRecordsToAppend.push(newRec);
         generatedCount++;
 
-        const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, schedule.disbursementDayOfMonth);
-        const nextDueDateStr = nextMonth.toISOString().slice(0, 10);
+        let monthsToAdd = 1;
+        if (schedule.cadence === "Quarterly") monthsToAdd = 3;
+        else if (schedule.cadence === "Bi-Annual") monthsToAdd = 6;
+        else if (schedule.cadence === "Annual Lump Sum") monthsToAdd = 12;
+
+        const nextPeriod = new Date(today.getFullYear(), today.getMonth() + monthsToAdd, schedule.disbursementDayOfMonth || 1);
+        const nextDueDateStr = nextPeriod.toISOString().slice(0, 10);
 
         return {
           ...schedule,
@@ -1338,7 +1569,7 @@ function ZakatManagementPage() {
           lastGeneratedDate: todayStr,
           nextDueDate: nextDueDateStr,
           status:
-            schedule.totalPlannedMonths && nextInstallmentNum >= schedule.totalPlannedMonths
+            schedule.totalPlannedMonths && nextInstallmentNum >= totalPlannedInstallments
               ? ("Completed" as RecurringScheduleStatus)
               : schedule.status,
         };
@@ -2270,7 +2501,7 @@ function ZakatManagementPage() {
   const handleSaveRecurringSchedule = (e: React.FormEvent) => {
     e.preventDefault();
     if (!recTitle.trim() || !recMonthlyAmount || parseFloat(recMonthlyAmount) <= 0) {
-      alert("Please provide a title and valid monthly amount.");
+      alert("Please provide a title and valid amount.");
       return;
     }
 
@@ -2282,8 +2513,10 @@ function ZakatManagementPage() {
 
     const isAdvance = recSettlementType === "1-Year Full Advance";
     const plannedMonths = isAdvance ? (parseInt(recTotalMonths) || 12) : (parseInt(recTotalMonths) || undefined);
-    const totalAdvanceAmt = isAdvance ? monthlyAmt * (plannedMonths || 12) : 0;
+    const plannedInstallments = calculateInstallmentCount(recCadence, recTotalMonths);
+    const totalAdvanceAmt = isAdvance ? monthlyAmt * plannedInstallments : 0;
     const scheduleId = `REC-ZK-${selectedBudgetYear}-${String(recurringSchedules.length + 1).padStart(2, "0")}`;
+    const startDay = (recStartDate ? parseInt(recStartDate.split("-")[2], 10) : undefined) || parseInt(recDisbursementDay) || 1;
 
     const newSchedule: RecurringZakatSchedule = {
       id: scheduleId,
@@ -2308,7 +2541,7 @@ function ZakatManagementPage() {
       beneficiaryAddress: recBeneficiaryAddress || undefined,
       purposeCategory: recPurposeCategory,
       otherPurposeDetails: recPurposeCategory === "Others" ? recOtherPurpose : undefined,
-      purposeDescription: recPurposeDesc || `${recPurposeCategory} ${isAdvance ? "Full 1-Year Advance Stipend" : "regular monthly stipend"}`,
+      purposeDescription: recPurposeDesc || `${recPurposeCategory} ${isAdvance ? "Full Advance Stipend" : `${recCadence} recurring stipend`}`,
       asnafCategory: recAsnaf,
       monthlyAmount: monthlyAmt,
       cadence: recCadence,
@@ -2316,16 +2549,16 @@ function ZakatManagementPage() {
       isUpfrontFullYearPaid: isAdvance,
       disbursementMethod: recPaymentMethod,
       paymentDetails: recPaymentAccount || undefined,
-      disbursementDayOfMonth: parseInt(recDisbursementDay) || 1,
+      disbursementDayOfMonth: startDay,
       startDate: recStartDate,
       totalPlannedMonths: plannedMonths,
       status: isAdvance ? "Completed" : "Active",
-      installmentsGenerated: isAdvance ? (plannedMonths || 12) : 0,
+      installmentsGenerated: isAdvance ? plannedInstallments : 0,
       totalAmountDisbursed: isAdvance ? totalAdvanceAmt : 0,
       nextDueDate: isAdvance ? "Fully Settled Upfront" : recStartDate,
       createdAt: new Date().toISOString().slice(0, 10),
       notes: isAdvance
-        ? `1-Year Full Advance Upfront Disbursement (৳${totalAdvanceAmt.toLocaleString()} covering ${plannedMonths || 12} consecutive months). ${recNotes}`
+        ? `Advance Upfront Disbursement (৳${totalAdvanceAmt.toLocaleString()} covering ${plannedInstallments} installments over ${plannedMonths || 12} months). ${recNotes}`
         : recNotes,
       attachments: recAttachments.length > 0 ? recAttachments : undefined,
     };
@@ -2342,23 +2575,24 @@ function ZakatManagementPage() {
         amount: totalAdvanceAmt,
         isRecurring: true,
         recurringScheduleId: scheduleId,
+        cadence: recCadence,
         installmentNumber: 1,
         installmentTotal: 1,
         isAdvanceLumpSum: true,
-        advancePeriodCovered: `Full 1-Year Advance (${plannedMonths || 12} Months Upfront: ${recStartDate} to +12 Months)`,
+        advancePeriodCovered: `Full Advance (${plannedInstallments} installments: ${recStartDate} to +${plannedMonths || 12} Months)`,
         disbursementChannel: recChannel,
         disbursementMode: recMode,
         assetDetails: newSchedule.assetDetails,
         purposeCategory: recPurposeCategory,
         otherPurposeDetails: recPurposeCategory === "Others" ? recOtherPurpose : undefined,
-        purposeSpecificDescription: `Full 1-Year Advance Stipend (${plannedMonths || 12} Months Upfront): ${recTitle}`,
+        purposeSpecificDescription: `Full Advance Stipend (${plannedMonths || 12} Months Upfront): ${recTitle}`,
         employeeId: newSchedule.employeeId,
         employeeName: newSchedule.employeeName,
         beneficiaryName: resolvedBeneficiary || "Beneficiary",
         beneficiaryPhone: recBeneficiaryPhone,
         beneficiaryAddress: recBeneficiaryAddress || undefined,
         asnafCategory: recAsnaf,
-        justificationDetails: `Full 1-Year upfront advance Zakat stipend for ${recTitle}. Total ৳${totalAdvanceAmt.toLocaleString()} covering ${plannedMonths || 12} months at ৳${monthlyAmt.toLocaleString()}/mo via ${recPaymentMethod} ${recPaymentAccount ? `(${recPaymentAccount})` : ""}.`,
+        justificationDetails: `Full upfront advance Zakat stipend for ${recTitle}. Total ৳${totalAdvanceAmt.toLocaleString()} covering ${plannedInstallments} ${recCadence} installment(s) at ৳${monthlyAmt.toLocaleString()} via ${recPaymentMethod} ${recPaymentAccount ? `(${recPaymentAccount})` : ""}.`,
         agencyStatus: "Distributed",
         attachments: recAttachments.length > 0 ? recAttachments : undefined,
       };
@@ -2991,8 +3225,13 @@ function ZakatManagementPage() {
                               <div className="font-mono font-bold text-slate-900">{row.id}</div>
                               <div className="text-[11px] text-slate-500 mt-0.5">{row.assignedDate}</div>
                               {row.isRecurring ? (
-                                <div className="text-[10px] text-blue-700 font-medium mt-0.5">
-                                  Recurring #{row.installmentNumber || 1}
+                                <div className="flex items-center gap-1 mt-0.5">
+                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                    {row.cadence === "Annual Lump Sum" ? "Annual" : (row.cadence || "Recurring")}
+                                  </span>
+                                  <span className="text-[10px] text-slate-500 font-medium">
+                                    #{row.installmentNumber || 1}{row.installmentTotal ? `/${row.installmentTotal}` : ""}
+                                  </span>
                                 </div>
                               ) : (
                                 <div className="text-[10px] text-slate-400 mt-0.5">One-Time</div>
@@ -3259,10 +3498,15 @@ function ZakatManagementPage() {
                         <div className="text-right shrink-0">
                           <div className="text-base font-black text-emerald-700 font-mono">
                             ৳ {schedule.monthlyAmount.toLocaleString()}
-                            <span className="text-[10px] text-slate-400 font-sans font-medium"> / mo</span>
+                            <span className="text-[10px] text-slate-400 font-sans font-medium">
+                              {" "}
+                              {CADENCE_CONFIG[schedule.cadence || "Monthly"]?.rateSuffix || "/ mo"}
+                            </span>
                           </div>
                           <span className="text-[9px] text-slate-400">
-                            {isUpfrontPaid ? "Full Advance Settled" : `Day #${schedule.disbursementDayOfMonth} of month`}
+                            {isUpfrontPaid
+                              ? "Full Advance Settled"
+                              : `Disburses: Day #${schedule.disbursementDayOfMonth || 1} • ${schedule.cadence || "Monthly"}`}
                           </span>
                         </div>
                       </div>
@@ -3303,37 +3547,46 @@ function ZakatManagementPage() {
                       </div>
 
                       {/* Progress */}
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-[10px] font-bold">
-                          <span className="text-slate-500">
-                            {isUpfrontPaid
-                              ? `12 of 12 Months Settled Upfront in Full`
-                              : `Generated: ${schedule.installmentsGenerated} of ${schedule.totalPlannedMonths || "∞"} months`}
-                          </span>
-                          <span className="text-emerald-700 font-mono font-bold">
-                            Disbursed: ৳ {schedule.totalAmountDisbursed.toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                          <div
-                            className="h-full bg-emerald-500 rounded-full transition-all duration-300"
-                            style={{
-                              width: `${isUpfrontPaid
-                                  ? 100
-                                  : schedule.totalPlannedMonths
-                                    ? Math.min(100, (schedule.installmentsGenerated / schedule.totalPlannedMonths) * 100)
-                                    : 50
-                                }%`,
-                            }}
-                          ></div>
-                        </div>
-                        <div className="flex justify-between text-[9px] text-slate-400">
-                          <span>Start: {schedule.startDate}</span>
-                          <span>
-                            {isUpfrontPaid ? "1-Year Advance Settlement" : `Next Due: ${schedule.nextDueDate}`}
-                          </span>
-                        </div>
-                      </div>
+                      {(() => {
+                        const totalPlannedInst = schedule.totalPlannedMonths
+                          ? calculateInstallmentCount(schedule.cadence || "Monthly", schedule.totalPlannedMonths)
+                          : 0;
+                        const pct = isUpfrontPaid
+                          ? 100
+                          : totalPlannedInst > 0
+                            ? Math.min(100, (schedule.installmentsGenerated / totalPlannedInst) * 100)
+                            : 50;
+                        return (
+                          <div className="space-y-1.5">
+                            <div className="flex justify-between text-[10px] font-bold">
+                              <span className="text-slate-500">
+                                {isUpfrontPaid
+                                  ? `Settled Upfront in Full (${totalPlannedInst || 1} inst.)`
+                                  : `Generated: ${schedule.installmentsGenerated} of ${
+                                      totalPlannedInst > 0
+                                        ? `${totalPlannedInst} installments (${schedule.totalPlannedMonths} mo)`
+                                        : "∞"
+                                    }`}
+                              </span>
+                              <span className="text-emerald-700 font-mono font-bold">
+                                Disbursed: ৳ {schedule.totalAmountDisbursed.toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                              <div
+                                className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
+                            <div className="flex justify-between text-[9px] text-slate-400">
+                              <span>Start: {schedule.startDate}</span>
+                              <span>
+                                {isUpfrontPaid ? "Advance Settlement Completed" : `Next Due: ${schedule.nextDueDate}`}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })()}
 
                       {/* Schedule Actions */}
                       <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
@@ -4586,11 +4839,19 @@ function ZakatManagementPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
                         <label className="text-xs font-semibold text-slate-700 block mb-1">
-                          Cadence
+                          Cadence <span className="text-red-500">*</span>
                         </label>
                         <select
                           value={recCadence}
-                          onChange={(e) => setRecCadence(e.target.value as DisbursementCadence)}
+                          onChange={(e) => {
+                            const nextCadence = e.target.value as DisbursementCadence;
+                            setRecCadence(nextCadence);
+                            const cfg = CADENCE_CONFIG[nextCadence] || CADENCE_CONFIG.Monthly;
+                            const validValues = cfg.durationOptions.map((opt) => opt.value);
+                            if (!validValues.includes(recTotalMonths)) {
+                              setRecTotalMonths(cfg.defaultDuration);
+                            }
+                          }}
                           className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
                         >
                           <option value="Monthly">Monthly</option>
@@ -4602,33 +4863,42 @@ function ZakatManagementPage() {
 
                       <div>
                         <label className="text-xs font-semibold text-slate-700 block mb-1">
-                          Disbursement Day
+                          Disbursement Date <span className="text-red-500">*</span>
                         </label>
-                        <select
-                          value={recDisbursementDay}
-                          onChange={(e) => setRecDisbursementDay(e.target.value)}
-                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
-                        >
-                          <option value="1">1st of Month</option>
-                          <option value="5">5th of Month</option>
-                          <option value="10">10th of Month</option>
-                          <option value="15">15th of Month</option>
-                        </select>
+                        <input
+                          type="date"
+                          required
+                          value={recStartDate}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setRecStartDate(val);
+                            if (val) {
+                              const parts = val.split("-");
+                              const d = parts.length === 3 ? parseInt(parts[2], 10) : new Date(val).getDate();
+                              if (!isNaN(d)) setRecDisbursementDay(d.toString());
+                            }
+                          }}
+                          className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600"
+                        />
+                        <span className="text-[10px] text-slate-500 mt-0.5 block font-medium">
+                          Day #{recDisbursementDay || 1} • Repeats {CADENCE_CONFIG[recCadence]?.label.toLowerCase() || "monthly"}
+                        </span>
                       </div>
 
                       <div>
                         <label className="text-xs font-semibold text-slate-700 block mb-1">
-                          Duration
+                          Duration ({CADENCE_CONFIG[recCadence]?.periodUnit}s)
                         </label>
                         <select
                           value={recTotalMonths}
                           onChange={(e) => setRecTotalMonths(e.target.value)}
                           className="w-full h-9 px-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 outline-none focus:border-emerald-600 cursor-pointer"
                         >
-                          <option value="6">6 Months</option>
-                          <option value="12">12 Months (1 Year)</option>
-                          <option value="24">24 Months (2 Years)</option>
-                          <option value="0">Indefinite</option>
+                          {(CADENCE_CONFIG[recCadence]?.durationOptions || CADENCE_CONFIG.Monthly.durationOptions).map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
@@ -4744,14 +5014,14 @@ function ZakatManagementPage() {
                     </div>
                   )}
 
-                  {/* Monthly Amount with Clean Inline Presets */}
+                  {/* Amount with Clean Dynamic Cadence Presets */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-slate-700">
-                        Monthly Amount (৳) <span className="text-red-500">*</span>
+                        {CADENCE_CONFIG[recCadence]?.amountLabel || "Monthly Amount (৳)"} <span className="text-red-500">*</span>
                       </label>
                       <div className="flex items-center gap-1">
-                        {[3000, 5000, 10000, 15000, 20000].map((amt) => (
+                        {(CADENCE_CONFIG[recCadence]?.presets || CADENCE_CONFIG.Monthly.presets).map((amt) => (
                           <button
                             type="button"
                             key={amt}
@@ -4773,7 +5043,7 @@ function ZakatManagementPage() {
                         required
                         value={recMonthlyAmount}
                         onChange={(e) => setRecMonthlyAmount(e.target.value)}
-                        placeholder="Enter monthly amount (e.g. 10000)"
+                        placeholder={CADENCE_CONFIG[recCadence]?.amountPlaceholder || "Enter amount (e.g. 10000)"}
                         className="w-full h-9.5 pl-8 pr-3 rounded-lg border border-slate-300 bg-white text-sm font-bold font-mono text-slate-900 outline-none focus:border-emerald-600 transition-all"
                       />
                     </div>
@@ -4894,57 +5164,79 @@ function ZakatManagementPage() {
                 </div>
 
                 {/* SUMMARY STATS BAR */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
-                  <div className="flex items-center gap-1.5 font-bold text-slate-700">
-                    <Sparkles className="size-4 text-emerald-600" />
-                    <span>Summary</span>
-                  </div>
+                {(() => {
+                  const installments = calculateInstallmentCount(recCadence, recTotalMonths);
+                  const installmentAmt = parseFloat(recMonthlyAmount) || 0;
+                  const totalCommitmentAmt = installmentAmt * installments;
+                  const isIndefinite = recTotalMonths === "0";
+                  return (
+                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                      <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                        <Sparkles className="size-4 text-emerald-600" />
+                        <span>Summary</span>
+                      </div>
 
-                  <div className="flex flex-wrap items-center gap-5">
-                    <div>
-                      <span className="text-slate-400 text-[11px] block">Rate</span>
-                      <span className="font-bold font-mono text-slate-800">
-                        ৳{(parseFloat(recMonthlyAmount) || 0).toLocaleString()}
-                        {recSettlementType === "Periodic Installments" ? "/mo" : ""}
-                      </span>
-                    </div>
+                      <div className="flex flex-wrap items-center gap-5">
+                        <div>
+                          <span className="text-slate-400 text-[11px] block">Rate / Cadence</span>
+                          <span className="font-bold font-mono text-slate-800">
+                            ৳{installmentAmt.toLocaleString()}
+                            <span className="font-sans font-normal text-slate-500 text-[11px]">
+                              {" "}
+                              {CADENCE_CONFIG[recCadence]?.rateSuffix || "/ mo"}
+                            </span>
+                          </span>
+                        </div>
 
-                    <div>
-                      <span className="text-slate-400 text-[11px] block">Duration</span>
-                      <span className="font-bold text-slate-800">
-                        {recTotalMonths === "0" ? "Indefinite" : `${recTotalMonths} Mos`}
-                      </span>
-                    </div>
+                        <div>
+                          <span className="text-slate-400 text-[11px] block">Duration</span>
+                          <span className="font-bold text-slate-800">
+                            {isIndefinite ? "Indefinite" : `${recTotalMonths} Mos`}
+                            <span className="font-sans font-normal text-slate-500 text-[11px] ml-1">
+                              ({installments} {installments === 1 ? "inst." : "installments"})
+                            </span>
+                          </span>
+                        </div>
 
-                    <div>
-                      <span className="text-slate-400 text-[11px] block">Total Commitment</span>
-                      <span className="font-bold font-mono text-emerald-700 text-sm">
-                        ৳{((parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)).toLocaleString()}
-                      </span>
-                    </div>
+                        <div>
+                          <span className="text-slate-400 text-[11px] block">
+                            {isIndefinite ? "Est. Annual Commitment" : "Total Commitment"}
+                          </span>
+                          <span className="font-bold font-mono text-emerald-700 text-sm">
+                            ৳{totalCommitmentAmt.toLocaleString()}
+                          </span>
+                        </div>
 
-                    <div>
-                      <span className="text-slate-400 text-[11px] block">Remaining Pool</span>
-                      <span className="font-bold font-mono text-slate-800">
-                        ৳{Math.max(
-                          0,
-                          stats.remainingBudget -
-                          (recSettlementType === "1-Year Full Advance"
-                            ? (parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)
-                            : 0)
-                        ).toLocaleString()}
-                      </span>
+                        <div>
+                          <span className="text-slate-400 text-[11px] block">Remaining Pool</span>
+                          <span className="font-bold font-mono text-slate-800">
+                            ৳{Math.max(
+                              0,
+                              stats.remainingBudget -
+                              (recSettlementType === "1-Year Full Advance"
+                                ? totalCommitmentAmt
+                                : 0)
+                            ).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  );
+                })()}
               </div>
 
               {/* Modal Footer */}
               <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-slate-50">
                 <div className="text-xs font-semibold text-slate-600">
-                  Total Grant:{" "}
+                  {recTotalMonths === "0" ? "Est. Annual Grant:" : "Total Grant:"}{" "}
                   <span className="font-mono font-bold text-sm text-slate-900 ml-1">
-                    ৳{((parseFloat(recMonthlyAmount) || 0) * (parseInt(recTotalMonths) || 12)).toLocaleString()}
+                    ৳{(
+                      (parseFloat(recMonthlyAmount) || 0) *
+                      calculateInstallmentCount(recCadence, recTotalMonths)
+                    ).toLocaleString()}
+                  </span>
+                  <span className="text-slate-400 text-[11px] ml-1.5 font-normal">
+                    ({calculateInstallmentCount(recCadence, recTotalMonths)} × ৳{(parseFloat(recMonthlyAmount) || 0).toLocaleString()})
                   </span>
                 </div>
                 <div className="flex items-center gap-2.5">
