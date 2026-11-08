@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Settings,
+  Database,
   FileSpreadsheet,
   Calculator,
   ShoppingCart,
@@ -41,6 +42,7 @@ interface MMNavSubItem {
   label: string;
   to: string;
   badge?: string;
+  subitems?: { label: string; to: string }[];
 }
 
 interface MMNavGroup {
@@ -76,6 +78,21 @@ const navGroups: MMNavGroup[] = [
     to: "/mm-policy-config",
   },
   {
+    key: "merchandisingMasterData",
+    title: "Merchandising Master Data",
+    icon: Database,
+    to: "/mm-master-fabric-composition",
+    subitems: [
+      { label: "Fabric Composition", to: "/mm-master-fabric-composition" },
+      { label: "Fabric Type", to: "/mm-master-fabric-type" },
+      { label: "Spinning Type", to: "/mm-master-spinning-type" },
+      { label: "Yarn Count", to: "/mm-master-yarn-count" },
+      { label: "Dyeing Rate", to: "/mm-master-dyeing-rate" },
+      { label: "Knitting Process Rate", to: "/mm-master-knitting-rate" },
+      { label: "Yarn Rate", to: "/mm-master-yarn-rate" },
+    ],
+  },
+  {
     key: "marketingPlanning",
     title: "Marketing Planning & Performance",
     icon: Target,
@@ -103,6 +120,8 @@ const navGroups: MMNavGroup[] = [
     subitems: [
       { label: "Pre-Costing Register", to: "/mm-pre-costing" },
       { label: "Pre Costing Entry", to: "/mm-pre-costing?tab=create" },
+      { label: "Pre Costing Register (Knit)", to: "/mm-pre-costing-knit" },
+      { label: "Pre Costing Entry (Knit)", to: "/mm-pre-costing-knit?tab=create" },
       { label: "Amendment & Comparison", to: "/mm-pre-costing?tab=compare" },
       { label: "Fabric Consumption (CAD)", to: "/mm-fabric-consumption-cad" },
       { label: "Fabric Consumption Register (Mer)", to: "/mm-fabric-consumption-register" },
@@ -261,7 +280,17 @@ export function MarketingMerchandisingLayout({
   const navigate = useNavigate();
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(getInitialOpenGroups);
+  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({
+    "Merchandising Master Data": true,
+  });
   const [searchQuery, setSearchQuery] = useState("");
+
+  const toggleSubmenu = (label: string) => {
+    setOpenSubmenus((prev) => ({
+      ...prev,
+      [label]: !prev[label],
+    }));
+  };
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("cripton_theme") as "light" | "dark" | null;
@@ -419,7 +448,16 @@ export function MarketingMerchandisingLayout({
               const hasSub = Boolean(group.subitems && group.subitems.length > 0);
               const hasActiveChild = Boolean(
                 group.subitems &&
-                  group.subitems.some((sub) => activePath.startsWith(sub.to.split("?")[0]))
+                  group.subitems.some(
+                    (sub) =>
+                      activePath.startsWith(sub.to.split("?")[0]) ||
+                      Boolean(
+                        sub.subitems &&
+                          sub.subitems.some((nested) =>
+                            activePath.startsWith(nested.to.split("?")[0])
+                          )
+                      )
+                  )
               );
               const isGroupOpen = openGroups[group.key] ?? hasActiveChild;
               const isActive = activePath.startsWith(group.to || "###") || hasActiveChild;
@@ -485,6 +523,56 @@ export function MarketingMerchandisingLayout({
                   {hasSub && isGroupOpen && (
                     <div className="ml-4 pl-3 border-l border-slate-200 dark:border-slate-800 py-0.5 space-y-0.5">
                       {group.subitems!.map((sub, sIdx) => {
+                        const hasNested = Boolean(sub.subitems && sub.subitems.length > 0);
+                        if (hasNested) {
+                          const isNestedActive = sub.subitems!.some((nested) =>
+                            activePath.startsWith(nested.to.split("?")[0])
+                          );
+                          const isSubmenuOpen = openSubmenus[sub.label] ?? isNestedActive;
+
+                          return (
+                            <div key={sIdx} className="space-y-0.5 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => toggleSubmenu(sub.label)}
+                                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-[11px] font-bold transition-colors cursor-pointer ${
+                                  isNestedActive
+                                    ? "text-teal-700 dark:text-teal-300 bg-teal-50/70 dark:bg-teal-950/50"
+                                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                }`}
+                              >
+                                <span className="truncate">{sub.label}</span>
+                                {isSubmenuOpen ? (
+                                  <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
+                                ) : (
+                                  <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />
+                                )}
+                              </button>
+
+                              {isSubmenuOpen && (
+                                <div className="ml-3 pl-2.5 border-l border-teal-200/60 dark:border-teal-800/60 space-y-0.5 py-0.5">
+                                  {sub.subitems!.map((nested, nIdx) => {
+                                    const isChildActive = activePath === nested.to;
+                                    return (
+                                      <Link
+                                        key={nIdx}
+                                        to={nested.to}
+                                        className={`block px-2 py-1 rounded-md text-[10.5px] transition-colors ${
+                                          isChildActive
+                                            ? "bg-teal-600 text-white font-bold shadow-xs"
+                                            : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-800/40"
+                                        }`}
+                                      >
+                                        {nested.label}
+                                      </Link>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        }
+
                         const isSubActive = activePath === sub.to;
                         return (
                           <Link

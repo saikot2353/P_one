@@ -549,6 +549,10 @@ export function SupplierBillListPage() {
                             <span className="text-[10.5px] font-sans px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 font-semibold inline-block">
                               Direct Service
                             </span>
+                          ) : b.billType === "Bill against Receive" || b.poNumber === "DIRECT-RECEIVE" ? (
+                            <span className="text-[10.5px] font-sans px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 font-semibold inline-block">
+                              Direct Receive
+                            </span>
                           ) : (
                             b.poNumber
                           )}

@@ -256,7 +256,7 @@ export interface SupplierBill {
   id: string;
   billNumber: string; // BIL-2026-000142
   billDate: string;
-  billType?: "Bill against PO" | "Bill against WO" | "Service Bill Entry";
+  billType?: "Bill against PO" | "Bill against WO" | "Service Bill Entry" | "Bill against Receive";
   poNumber: string;
   poDate?: string;
   mrrNumbers: string[]; // Supports multiple MRRs

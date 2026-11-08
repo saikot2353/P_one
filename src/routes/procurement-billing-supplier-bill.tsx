@@ -43,6 +43,8 @@ import {
   getStoredPurchaseOrders,
   getStoredPoItems,
   getStoredWoItems,
+  getStoredDirectMRRs,
+  DirectMRRRecord,
 } from "@/lib/procurement-order-inventory-data";
 import {
   DEFAULT_ITEMS,
@@ -93,8 +95,8 @@ export function SupplierBillPage() {
   const [formMode, setFormMode] = useState<"create" | "edit" | "view">("create");
   const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
 
-  // Bill Type: "Bill against PO" | "Bill against WO" | "Service Bill Entry"
-  type BillType = "Bill against PO" | "Bill against WO" | "Service Bill Entry";
+  // Bill Type: "Bill against PO" | "Bill against WO" | "Service Bill Entry" | "Bill against Receive"
+  type BillType = "Bill against PO" | "Bill against WO" | "Service Bill Entry" | "Bill against Receive";
   const [billType, setBillType] = useState<BillType>("Bill against PO");
 
   // Supplier state for Service Bill Entry
@@ -102,6 +104,14 @@ export function SupplierBillPage() {
   const [serviceSupplierName, setServiceSupplierName] = useState<string>(
     "Apex Textile Chemical & Dyestuffs Ltd"
   );
+
+  // Supplier state for Bill against Receive
+  const [receiveSupplierId, setReceiveSupplierId] = useState<string>("sup-bengal-02");
+  const [receiveSupplierName, setReceiveSupplierName] = useState<string>(
+    "Bengal Information Systems"
+  );
+  const [supplierModalOpen, setSupplierModalOpen] = useState(false);
+  const [supplierSearchQuery, setSupplierSearchQuery] = useState("");
 
   // Service items modal state for Service Bill Entry
   const [serviceItemModalOpen, setServiceItemModalOpen] = useState(false);
@@ -193,19 +203,77 @@ export function SupplierBillPage() {
     return purchaseOrders.find((p) => p.orderNumber === selectedPoNumber) || purchaseOrders[0];
   }, [purchaseOrders, selectedPoNumber]);
 
+  // Stored Direct MRRs
+  const directMrrs = useMemo(() => getStoredDirectMRRs(), []);
+
+  // Merged supplier list including suppliers with direct MRRs
+  const allSuppliers = useMemo(() => {
+    const map = new Map<string, { id: string; vendorName: string; vendorCode: string }>();
+    DEFAULT_SUPPLIERS.forEach((s) => {
+      map.set(s.id, { id: s.id, vendorName: s.vendorName, vendorCode: s.vendorCode });
+    });
+    directMrrs.forEach((d) => {
+      if (d.supplierId && !map.has(d.supplierId)) {
+        map.set(d.supplierId, {
+          id: d.supplierId,
+          vendorName: d.supplierName || d.supplier || "Unknown Supplier",
+          vendorCode: d.supplierCode || d.supplierId,
+        });
+      }
+    });
+    return Array.from(map.values());
+  }, [directMrrs]);
+
   const activeSupplierName = useMemo(() => {
     if (billType === "Service Bill Entry") {
       return serviceSupplierName || "Apex Textile Chemical & Dyestuffs Ltd";
     }
+    if (billType === "Bill against Receive") {
+      return receiveSupplierName || "Bengal Information Systems";
+    }
     return currentPo?.supplierName || "Bengal Information Systems";
-  }, [billType, serviceSupplierName, currentPo]);
+  }, [billType, serviceSupplierName, receiveSupplierName, currentPo]);
 
   const activeSupplierId = useMemo(() => {
     if (billType === "Service Bill Entry") {
       return serviceSupplierId || "sup-1";
     }
+    if (billType === "Bill against Receive") {
+      return receiveSupplierId || "sup-bengal-02";
+    }
     return currentPo?.supplierId || "sup-bengal-02";
-  }, [billType, serviceSupplierId, currentPo]);
+  }, [billType, serviceSupplierId, receiveSupplierId, currentPo]);
+
+  // Direct Receive MRRs belonging to the selected supplier
+  const supplierDirectMrrs = useMemo(() => {
+    if (billType !== "Bill against Receive") return [];
+    return directMrrs.filter((d) => {
+      const matchesSupplierId =
+        d.supplierId &&
+        (d.supplierId === receiveSupplierId || d.supplierCode === receiveSupplierId);
+      const matchesSupplierName =
+        (d.supplierName &&
+          receiveSupplierName &&
+          d.supplierName.toLowerCase() === receiveSupplierName.toLowerCase()) ||
+        (d.supplier &&
+          receiveSupplierName &&
+          d.supplier.toLowerCase() === receiveSupplierName.toLowerCase());
+      return Boolean(matchesSupplierId || matchesSupplierName);
+    });
+  }, [billType, directMrrs, receiveSupplierId, receiveSupplierName]);
+
+  const filteredDirectMaterialReceipts = useMemo(() => {
+    if (!mrrSearchQuery.trim()) return supplierDirectMrrs;
+    const q = mrrSearchQuery.toLowerCase();
+    return supplierDirectMrrs.filter(
+      (m) =>
+        m.mrrNumber.toLowerCase().includes(q) ||
+        (m.challanNo && m.challanNo.toLowerCase().includes(q)) ||
+        (m.storeName && m.storeName.toLowerCase().includes(q)) ||
+        (m.warehouseStore && m.warehouseStore.toLowerCase().includes(q)) ||
+        (m.mrrDate && m.mrrDate.includes(q))
+    );
+  }, [supplierDirectMrrs, mrrSearchQuery]);
 
   // Approved Purchase Orders only (excluding Work Orders)
   const approvedPurchaseOrders = useMemo(() => {
@@ -315,7 +383,9 @@ export function SupplierBillPage() {
     setBillDate(bill.billDate);
     const loadedType: BillType =
       bill.billType ||
-      (bill.poNumber?.startsWith("WO-")
+      (bill.poNumber === "DIRECT-RECEIVE"
+        ? "Bill against Receive"
+        : bill.poNumber?.startsWith("WO-")
         ? "Bill against WO"
         : bill.poNumber && bill.poNumber !== "DIRECT-SERVICE"
         ? "Bill against PO"
@@ -324,6 +394,9 @@ export function SupplierBillPage() {
     if (loadedType === "Service Bill Entry") {
       setServiceSupplierId(bill.supplierId || "sup-1");
       setServiceSupplierName(bill.supplierName || "Apex Textile Chemical & Dyestuffs Ltd");
+    } else if (loadedType === "Bill against Receive") {
+      setReceiveSupplierId(bill.supplierId || "sup-bengal-02");
+      setReceiveSupplierName(bill.supplierName || "Bengal Information Systems");
     }
     setSelectedPoNumber(bill.poNumber);
     setSelectedMrrNumbers(bill.mrrNumbers || []);
@@ -408,6 +481,39 @@ export function SupplierBillPage() {
         setSelectedMrrNumbers([]);
         setBillItems([]);
       }
+    } else if (newType === "Bill against Receive") {
+      setSelectedPoNumber("");
+      const supplierWithDirectMrr =
+        allSuppliers.find((s) =>
+          directMrrs.some(
+            (d) =>
+              d.supplierId === s.id ||
+              (d.supplierName && d.supplierName.toLowerCase() === s.vendorName.toLowerCase())
+          )
+        ) || allSuppliers[0];
+
+      if (supplierWithDirectMrr) {
+        setReceiveSupplierId(supplierWithDirectMrr.id);
+        setReceiveSupplierName(supplierWithDirectMrr.vendorName);
+        const related = directMrrs.filter(
+          (d) =>
+            d.supplierId === supplierWithDirectMrr.id ||
+            (d.supplierName &&
+              d.supplierName.toLowerCase() === supplierWithDirectMrr.vendorName.toLowerCase())
+        );
+        if (related.length > 0) {
+          const mrrNos = related.map((m) => m.mrrNumber);
+          setSelectedMrrNumbers(mrrNos);
+          populateBillItemsFromDirectMrrs(mrrNos);
+        } else {
+          setSelectedMrrNumbers([]);
+          setBillItems([]);
+        }
+      } else {
+        setSelectedMrrNumbers([]);
+        setBillItems([]);
+      }
+      toast.success("Switched to Bill against Receive. Direct Receive MRRs displayed.");
     } else if (newType === "Service Bill Entry") {
       setSelectedPoNumber("");
       setSelectedMrrNumbers([]);
@@ -658,6 +764,147 @@ export function SupplierBillPage() {
     toast.success(`Updated MRR references (${nextMrrs.join(", ")})`);
   };
 
+  // Helper to populate items from Direct Receive MRRs
+  const populateBillItemsFromDirectMrrs = (mrrNos: string[]) => {
+    const matchedDirectMRRs = directMrrs.filter((m) => mrrNos.includes(m.mrrNumber));
+    const consolidatedItems: SupplierBillItem[] = [];
+    let sl = 1;
+
+    matchedDirectMRRs.forEach((mrr) => {
+      (mrr.items || []).forEach((item) => {
+        const received =
+          item.acceptedQuantity ??
+          (item as any).receiveQuantity ??
+          (item as any).receivedQuantity ??
+          1;
+        const unitPrice = item.unitPrice || 0;
+        const lineBase = received * unitPrice;
+        const vatRate = 5;
+        const taxRate = 0;
+        const lineVat = (lineBase * vatRate) / 100;
+        const lineTax = (lineBase * taxRate) / 100;
+
+        consolidatedItems.push({
+          id: `sbi-dmrr-${mrr.mrrNumber}-${item.itemCode || sl}-${Date.now()}-${sl}`,
+          sl: sl++,
+          itemCode: item.itemCode,
+          itemName: item.itemName,
+          specification: item.specification || "Direct received goods",
+          brand: item.brand || "—",
+          origin: item.origin || "—",
+          uom: item.uom || "PCS",
+          mrrReceivedQty: received,
+          previouslyBilledQty: 0,
+          currentBillQty: received,
+          unitPrice: unitPrice,
+          discount: 0,
+          vatRate,
+          vatAmount: lineVat,
+          taxRate,
+          taxAmount: lineTax,
+          lineAmount: lineBase + lineVat + lineTax,
+        });
+      });
+    });
+
+    setBillItems(consolidatedItems);
+  };
+
+  // Toggle Direct MRR Selection
+  const handleToggleDirectMrr = (mrrNo: string) => {
+    if (formMode === "view") return;
+
+    let nextMrrs: string[];
+    if (selectedMrrNumbers.includes(mrrNo)) {
+      nextMrrs = selectedMrrNumbers.filter((m) => m !== mrrNo);
+    } else {
+      nextMrrs = [...selectedMrrNumbers, mrrNo];
+    }
+    setSelectedMrrNumbers(nextMrrs);
+    populateBillItemsFromDirectMrrs(nextMrrs);
+    if (nextMrrs.length > 0) {
+      toast.success(`Updated Direct MRR references (${nextMrrs.join(", ")})`);
+    } else {
+      toast.info("Cleared Direct MRR references");
+    }
+  };
+
+  // Select Supplier for Direct Receive
+  const handleSelectReceiveSupplier = (supId: string, supName: string) => {
+    setReceiveSupplierId(supId);
+    setReceiveSupplierName(supName);
+    setSupplierModalOpen(false);
+
+    // Find direct MRRs for this supplier
+    const matchingDirectMrrs = directMrrs.filter((d) => {
+      const matchesId = d.supplierId === supId || d.supplierCode === supId;
+      const matchesName =
+        (d.supplierName && d.supplierName.toLowerCase() === supName.toLowerCase()) ||
+        (d.supplier && d.supplier.toLowerCase() === supName.toLowerCase());
+      return Boolean(matchesId || matchesName);
+    });
+
+    if (matchingDirectMrrs.length > 0) {
+      // Auto-select all Direct MRRs for this supplier
+      const firstMrrNos = matchingDirectMrrs.map((m) => m.mrrNumber);
+      setSelectedMrrNumbers(firstMrrNos);
+      populateBillItemsFromDirectMrrs(firstMrrNos);
+      toast.success(
+        `Selected supplier "${supName}". Loaded ${matchingDirectMrrs.length} Direct MRR(s).`
+      );
+    } else {
+      setSelectedMrrNumbers([]);
+      setBillItems([]);
+      toast.info(`Selected supplier "${supName}". No Direct MRR records found for this supplier.`);
+    }
+  };
+
+  const handleUpdateItemDiscount = (id: string, newDiscount: number) => {
+    if (formMode === "view") return;
+    setBillItems((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const disc = Math.max(0, Number(newDiscount) || 0);
+          const base = item.currentBillQty * item.unitPrice;
+          const afterDisc = Math.max(0, base - disc);
+          const vRate = item.vatRate ?? 5;
+          const tRate = item.taxRate ?? 0;
+          const vat = (afterDisc * vRate) / 100;
+          const tax = (afterDisc * tRate) / 100;
+          return {
+            ...item,
+            discount: disc,
+            vatAmount: vat,
+            taxAmount: tax,
+            lineAmount: afterDisc + vat + tax,
+          };
+        }
+        return item;
+      })
+    );
+  };
+
+  const handleUpdateItemVatRate = (id: string, newVatRate: number) => {
+    if (formMode === "view") return;
+    setBillItems((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const vRate = Math.max(0, Number(newVatRate) || 0);
+          const base = item.currentBillQty * item.unitPrice;
+          const afterDisc = Math.max(0, base - item.discount);
+          const vat = (afterDisc * vRate) / 100;
+          return {
+            ...item,
+            vatRate: vRate,
+            vatAmount: vat,
+            lineAmount: afterDisc + vat + (item.taxAmount ?? 0),
+          };
+        }
+        return item;
+      })
+    );
+  };
+
   // Item Update with Strict Validation: Current Bill Qty <= MRR Received Qty - Previously Billed Qty
   const handleUpdateItemQty = (id: string, newQty: number) => {
     if (formMode === "view") return;
@@ -760,7 +1007,11 @@ export function SupplierBillPage() {
     }
     if (billType !== "Service Bill Entry") {
       if (selectedMrrNumbers.length === 0) {
-        toast.error("At least one MRR must be selected");
+        toast.error(
+          billType === "Bill against Receive"
+            ? "At least one Direct Receive MRR must be selected"
+            : "At least one MRR must be selected"
+        );
         return;
       }
       if (billItems.length === 0) {
@@ -786,8 +1037,16 @@ export function SupplierBillPage() {
       return;
     }
 
-    const effectivePoNumber = billType === "Service Bill Entry" ? "DIRECT-SERVICE" : selectedPoNumber;
-    const effectivePoDate = billType === "Service Bill Entry" ? billDate : currentPo.orderDate;
+    const effectivePoNumber =
+      billType === "Service Bill Entry"
+        ? "DIRECT-SERVICE"
+        : billType === "Bill against Receive"
+        ? "DIRECT-RECEIVE"
+        : selectedPoNumber;
+    const effectivePoDate =
+      billType === "Service Bill Entry" || billType === "Bill against Receive"
+        ? billDate
+        : currentPo.orderDate;
     const effectiveSupplierId = activeSupplierId;
     const effectiveSupplierName = activeSupplierName;
 
@@ -907,6 +1166,8 @@ export function SupplierBillPage() {
           ? "Supplier Service Bill / Commercial Dossier"
           : billType === "Bill against WO"
           ? "Work Order Supplier Commercial Bill Dossier"
+          : billType === "Bill against Receive"
+          ? "Direct Receive Supplier Bill / Commercial Dossier"
           : "Supplier Commercial Bill / Invoice Dossier",
       documentNumber: billNumber,
       documentNo: billNumber,
@@ -922,6 +1183,11 @@ export function SupplierBillPage() {
         { label: "Vendor Invoice Date", value: supplierBillDate || "—" },
         ...(billType === "Service Bill Entry"
           ? [{ label: "Billing Method", value: "Direct Service Bill Entry" }]
+          : billType === "Bill against Receive"
+          ? [
+              { label: "Billing Method", value: "Bill against Direct Receive" },
+              { label: "Linked Direct MRR References", value: selectedMrrNumbers.join(", ") },
+            ]
           : [
               {
                 label: billType === "Bill against WO" ? "Work Order Reference" : "PO Reference",
@@ -1138,6 +1404,7 @@ export function SupplierBillPage() {
                 >
                   <option value="Bill against PO">Bill against PO</option>
                   <option value="Bill against WO">Bill against WO</option>
+                  <option value="Bill against Receive">Bill against Receive</option>
                   <option value="Service Bill Entry">Service Bill Entry</option>
                 </select>
               </div>
@@ -1156,8 +1423,8 @@ export function SupplierBillPage() {
                 />
               </div>
 
-              {/* 3. Purchase Order / Work Order* (Hidden when Service Bill Entry) */}
-              {billType !== "Service Bill Entry" && (
+              {/* 3. Purchase Order / Work Order* (Hidden when Service Bill Entry or Bill against Receive) */}
+              {billType !== "Service Bill Entry" && billType !== "Bill against Receive" && (
                 <div>
                   <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
                     {billType === "Bill against PO" ? "Purchase Order *" : "Work Order *"}
@@ -1197,14 +1464,14 @@ export function SupplierBillPage() {
               {/* 4. Supplier / Vendor* */}
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
-                  {billType !== "Service Bill Entry" && <Lock className="size-3" />} Supplier / Vendor*
+                  {billType !== "Service Bill Entry" && billType !== "Bill against Receive" && <Lock className="size-3" />} Supplier / Vendor*
                 </label>
                 {billType === "Service Bill Entry" ? (
                   <select
                     disabled={isReadOnly}
                     value={serviceSupplierId}
                     onChange={(e) => {
-                      const sup = DEFAULT_SUPPLIERS.find(
+                      const sup = allSuppliers.find(
                         (s) => s.id === e.target.value || s.vendorCode === e.target.value
                       );
                       if (sup) {
@@ -1214,12 +1481,51 @@ export function SupplierBillPage() {
                     }}
                     className="w-full px-3 py-2 font-bold bg-background border border-border rounded-lg outline-none focus:border-amber-500 text-foreground cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed truncate"
                   >
-                    {DEFAULT_SUPPLIERS.map((s) => (
+                    {allSuppliers.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.vendorName} ({s.vendorCode})
                       </option>
                     ))}
                   </select>
+                ) : billType === "Bill against Receive" ? (
+                  <div className="flex gap-1.5">
+                    <select
+                      disabled={isReadOnly}
+                      value={receiveSupplierId}
+                      onChange={(e) => {
+                        const sup = allSuppliers.find(
+                          (s) => s.id === e.target.value || s.vendorCode === e.target.value
+                        );
+                        if (sup) {
+                          handleSelectReceiveSupplier(sup.id, sup.vendorName);
+                        }
+                      }}
+                      className="w-full px-3 py-2 font-bold bg-background border border-amber-500/50 rounded-lg outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-foreground cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed truncate"
+                    >
+                      <option value="">Select Supplier...</option>
+                      {allSuppliers.map((s) => {
+                        const count = directMrrs.filter(
+                          (d) =>
+                            d.supplierId === s.id ||
+                            (d.supplierName && d.supplierName.toLowerCase() === s.vendorName.toLowerCase())
+                        ).length;
+                        return (
+                          <option key={s.id} value={s.id}>
+                            {s.vendorName} {count > 0 ? `(${count} Direct MRR${count > 1 ? "s" : ""})` : ""}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <button
+                      type="button"
+                      disabled={isReadOnly}
+                      onClick={() => setSupplierModalOpen(true)}
+                      className="px-2.5 py-2 border border-border rounded-lg text-muted-foreground hover:text-amber-600 hover:bg-muted/50 disabled:opacity-50 cursor-pointer shrink-0"
+                      title="Search Suppliers with Direct MRRs"
+                    >
+                      <Search className="size-3.5" />
+                    </button>
+                  </div>
                 ) : (
                   <input
                     type="text"
@@ -1281,8 +1587,15 @@ export function SupplierBillPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
-                      Linked Material Receive Report (MRR) References
+                      {billType === "Bill against Receive"
+                        ? "Linked Direct Receive MRR References"
+                        : "Linked Material Receive Report (MRR) References"}
                     </h3>
+                    {billType === "Bill against Receive" && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 font-bold border border-amber-500/20">
+                        Supplier: {activeSupplierName} ({supplierDirectMrrs.length} Direct MRR{supplierDirectMrrs.length !== 1 ? "s" : ""} Available)
+                      </span>
+                    )}
                   </div>
                   {!isReadOnly && (
                     <button
@@ -1305,7 +1618,13 @@ export function SupplierBillPage() {
                       {!isReadOnly && (
                         <button
                           type="button"
-                          onClick={() => handleToggleMrr(mrrNo)}
+                          onClick={() => {
+                            if (billType === "Bill against Receive") {
+                              handleToggleDirectMrr(mrrNo);
+                            } else {
+                              handleToggleMrr(mrrNo);
+                            }
+                          }}
                           className="hover:text-rose-500 cursor-pointer"
                         >
                           <X className="size-3" />
@@ -1315,14 +1634,25 @@ export function SupplierBillPage() {
                   ))}
                   {selectedMrrNumbers.length === 0 && (
                     <span className="text-xs text-muted-foreground italic">
-                      No MRRs linked. Click &quot;Select MRR&quot; to link verified goods receipts.
+                      {billType === "Bill against Receive"
+                        ? `No Direct MRRs linked for "${activeSupplierName}". Click "Select MRR" to select from available direct receipts.`
+                        : 'No MRRs linked. Click "Select MRR" to link verified goods receipts.'}
                     </span>
                   )}
                 </div>
                 <div className="text-[11px] text-muted-foreground">
-                  {billType === "Bill against WO" ? "WO Reference:" : "PO Reference:"}{" "}
-                  <span className="font-bold text-foreground">{selectedPoNumber}</span> • Supplier:{" "}
-                  <span className="font-bold text-foreground">{activeSupplierName}</span>
+                  {billType === "Bill against Receive" ? (
+                    <>
+                      Billing Source: <span className="font-bold text-emerald-600">Direct Receive (No PO)</span> • Supplier:{" "}
+                      <span className="font-bold text-foreground">{activeSupplierName}</span>
+                    </>
+                  ) : (
+                    <>
+                      {billType === "Bill against WO" ? "WO Reference:" : "PO Reference:"}{" "}
+                      <span className="font-bold text-foreground">{selectedPoNumber}</span> • Supplier:{" "}
+                      <span className="font-bold text-foreground">{activeSupplierName}</span>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -1616,20 +1946,82 @@ export function SupplierBillPage() {
                           <td className="py-2 px-3 text-right font-mono text-muted-foreground">
                             ৳ {item.unitPrice.toLocaleString()}
                           </td>
-                          <td className="py-2 px-3 text-right font-mono text-rose-600">
-                            {item.discount ? `-৳ ${Number(item.discount).toLocaleString()}` : "৳ 0"}
-                          </td>
-                          <td className="py-2 px-3 text-right font-mono text-muted-foreground">
-                            ৳ {item.vatAmount.toLocaleString()}
+                          <td className="py-2 px-3 text-right">
+                            {isReadOnly ? (
+                              <span className="font-mono text-rose-600 text-xs">
+                                {item.discount ? `-৳ ${Number(item.discount).toLocaleString()}` : "৳ 0"}
+                              </span>
+                            ) : (
+                              <input
+                                type="number"
+                                min="0"
+                                value={item.discount || ""}
+                                placeholder="0"
+                                onChange={(e) =>
+                                  handleUpdateItemDiscount(item.id, Number(e.target.value))
+                                }
+                                className="w-20 text-right font-mono px-2 py-1 bg-background border border-border rounded focus:border-amber-500 outline-none text-xs text-rose-600"
+                              />
+                            )}
                           </td>
                           <td className="py-2 px-3 text-right font-mono">
-                            <div className="font-bold text-foreground">
-                              ৳ {(item.taxAmount ?? Math.round(((item.currentBillQty * item.unitPrice - item.discount) * (item.taxRate || 0)) / 100)).toLocaleString()}
-                            </div>
-                            {item.taxRate !== undefined && item.taxRate > 0 && (
-                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block">
-                                ({item.taxRate}%)
-                              </span>
+                            {isReadOnly ? (
+                              <>
+                                <div className="font-bold text-foreground">৳ {item.vatAmount.toLocaleString()}</div>
+                                <span className="text-[10px] text-muted-foreground font-semibold">({item.vatRate ?? 5}%)</span>
+                              </>
+                            ) : (
+                              <div>
+                                <div className="flex items-center justify-end gap-1">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.5"
+                                    value={item.vatRate ?? 5}
+                                    onChange={(e) =>
+                                      handleUpdateItemVatRate(item.id, Number(e.target.value))
+                                    }
+                                    className="w-14 text-right font-mono font-semibold px-1.5 py-0.5 bg-background border border-border rounded focus:border-amber-500 outline-none text-xs"
+                                  />
+                                  <span className="text-[11px] text-muted-foreground font-semibold">%</span>
+                                </div>
+                                <div className="text-[11px] font-mono font-bold text-foreground mt-0.5">
+                                  ৳ {item.vatAmount.toLocaleString()}
+                                </div>
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono">
+                            {isReadOnly ? (
+                              <>
+                                <div className="font-bold text-foreground">
+                                  ৳ {(item.taxAmount ?? 0).toLocaleString()}
+                                </div>
+                                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block">
+                                  ({item.taxRate ?? 0}%)
+                                </span>
+                              </>
+                            ) : (
+                              <div>
+                                <div className="flex items-center justify-end gap-1">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.5"
+                                    value={item.taxRate ?? 0}
+                                    onChange={(e) =>
+                                      handleUpdateItemTaxRate(item.id, Number(e.target.value))
+                                    }
+                                    className="w-14 text-right font-mono font-semibold px-1.5 py-0.5 bg-background border border-amber-500/40 rounded focus:border-amber-500 outline-none text-xs"
+                                  />
+                                  <span className="text-[11px] text-muted-foreground font-semibold">%</span>
+                                </div>
+                                <div className="text-[11px] font-mono font-bold text-foreground mt-0.5">
+                                  ৳ {(item.taxAmount ?? 0).toLocaleString()}
+                                </div>
+                              </div>
                             )}
                           </td>
                           <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
@@ -2146,9 +2538,15 @@ export function SupplierBillPage() {
           <div className="bg-card w-full max-w-2xl rounded-2xl border border-border shadow-2xl p-5 space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <h3 className="text-sm font-bold text-foreground">Select MRR for Supplier Billing</h3>
+                <h3 className="text-sm font-bold text-foreground">
+                  {billType === "Bill against Receive"
+                    ? "Select Direct Receive MRR References"
+                    : "Select MRR for Supplier Billing"}
+                </h3>
                 <p className="text-xs text-muted-foreground">
-                  Pick verified MRR references to bill against received goods.
+                  {billType === "Bill against Receive"
+                    ? `Pick verified Direct Receive MRR records for "${activeSupplierName}" to bill against received goods.`
+                    : "Pick verified MRR references to bill against received goods."}
                 </p>
               </div>
               <button
@@ -2167,46 +2565,140 @@ export function SupplierBillPage() {
                 type="text"
                 value={mrrSearchQuery}
                 onChange={(e) => setMrrSearchQuery(e.target.value)}
-                placeholder="Search MRR number, challan, or warehouse/store..."
+                placeholder={
+                  billType === "Bill against Receive"
+                    ? "Search Direct MRR number, challan, or store..."
+                    : "Search MRR number, challan, or warehouse/store..."
+                }
                 className="w-full pl-9 pr-3 py-2 text-xs bg-background border border-border rounded-xl outline-none focus:border-amber-500"
               />
             </div>
 
             {/* MRR List */}
             <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-              {filteredMaterialReceipts.map((mrr) => {
-                const isSelected = selectedMrrNumbers.includes(mrr.receiveNumber);
-                return (
-                  <div
-                    key={mrr.id}
-                    onClick={() => handleToggleMrr(mrr.receiveNumber)}
-                    className={`flex items-center justify-between p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-                      isSelected
-                        ? "bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400"
-                        : "bg-muted/20 border-border hover:bg-muted/50"
-                    }`}
-                  >
-                    <div>
-                      <div className="font-mono font-bold text-foreground flex items-center gap-2">
-                        <span>{mrr.receiveNumber}</span>
-                        <span className="text-[10px] font-sans font-normal px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                          Challan: {mrr.challanNo}
+              {billType === "Bill against Receive" ? (
+                /* Direct MRR List for Selected Supplier */
+                filteredDirectMaterialReceipts.map((mrr) => {
+                  const isSelected = selectedMrrNumbers.includes(mrr.mrrNumber);
+                  const totalQty = (mrr.items || []).reduce(
+                    (s, it) =>
+                      s +
+                      (it.acceptedQuantity ??
+                        (it as any).receiveQuantity ??
+                        (it as any).receivedQuantity ??
+                        0),
+                    0
+                  );
+                  const totalAmt =
+                    mrr.totalAmount ||
+                    (mrr.items || []).reduce(
+                      (s, it) =>
+                        s +
+                        it.unitPrice *
+                          (it.acceptedQuantity ??
+                            (it as any).receiveQuantity ??
+                            (it as any).receivedQuantity ??
+                            1),
+                      0
+                    );
+
+                  return (
+                    <div
+                      key={mrr.id}
+                      onClick={() => handleToggleDirectMrr(mrr.mrrNumber)}
+                      className={`flex items-center justify-between p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                        isSelected
+                          ? "bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400"
+                          : "bg-muted/20 border-border hover:bg-muted/50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          readOnly
+                          className="size-4 accent-amber-500 rounded cursor-pointer"
+                        />
+                        <div>
+                          <div className="font-mono font-bold text-foreground flex items-center gap-2">
+                            <span>{mrr.mrrNumber}</span>
+                            <span className="text-[10px] font-sans font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                              Direct Receive
+                            </span>
+                            {mrr.challanNo && (
+                              <span className="text-[10px] font-sans font-normal px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                                Challan: {mrr.challanNo}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground mt-1">
+                            Store: <span className="font-medium text-foreground">{mrr.storeName || mrr.warehouseStore}</span> • Items: {mrr.items?.length || 0} ({totalQty} units)
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-mono font-bold block text-foreground">
+                          ৳ {totalAmt.toLocaleString()}
                         </span>
-                      </div>
-                      <div className="text-[11px] text-muted-foreground mt-1">
-                        Store / Location: <span className="font-medium text-foreground">{mrr.warehouseStore}</span> • Items: {mrr.items?.length || 0}
+                        <span className="text-[10px] text-muted-foreground">{mrr.mrrDate}</span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <span className="font-mono font-bold block">
-                        ৳ {mrr.totalAmount.toLocaleString()}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">{mrr.receiveDate}</span>
+                  );
+                })
+              ) : (
+                /* Regular MRR List */
+                filteredMaterialReceipts.map((mrr) => {
+                  const isSelected = selectedMrrNumbers.includes(mrr.receiveNumber);
+                  return (
+                    <div
+                      key={mrr.id}
+                      onClick={() => handleToggleMrr(mrr.receiveNumber)}
+                      className={`flex items-center justify-between p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                        isSelected
+                          ? "bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400"
+                          : "bg-muted/20 border-border hover:bg-muted/50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          readOnly
+                          className="size-4 accent-amber-500 rounded cursor-pointer"
+                        />
+                        <div>
+                          <div className="font-mono font-bold text-foreground flex items-center gap-2">
+                            <span>{mrr.receiveNumber}</span>
+                            <span className="text-[10px] font-sans font-normal px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                              Challan: {mrr.challanNo}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-muted-foreground mt-1">
+                            Store / Location: <span className="font-medium text-foreground">{mrr.warehouseStore}</span> • Items: {mrr.items?.length || 0}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-mono font-bold block">
+                          ৳ {mrr.totalAmount.toLocaleString()}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">{mrr.receiveDate}</span>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-              {filteredMaterialReceipts.length === 0 && (
+                  );
+                })
+              )}
+
+              {billType === "Bill against Receive" && filteredDirectMaterialReceipts.length === 0 && (
+                <div className="py-8 text-center text-muted-foreground text-xs space-y-1">
+                  <div className="font-bold text-foreground">No Direct Receive MRR records found</div>
+                  <p className="text-[11px]">
+                    No Direct MRRs exist for supplier &quot;{activeSupplierName}&quot;. Please select another supplier or create a direct receive first.
+                  </p>
+                </div>
+              )}
+
+              {billType !== "Bill against Receive" && filteredMaterialReceipts.length === 0 && (
                 <div className="py-6 text-center text-muted-foreground text-xs">
                   No MRR records found.
                 </div>
@@ -2219,7 +2711,110 @@ export function SupplierBillPage() {
                 onClick={() => setMrrModalOpen(false)}
                 className="px-4 py-2 bg-amber-500 text-white rounded-lg text-xs font-bold cursor-pointer"
               >
-                Done
+                Done ({selectedMrrNumbers.length} Selected)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Supplier Selection Modal for Direct Receive */}
+      {supplierModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-card w-full max-w-2xl rounded-2xl border border-border shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Building2 className="size-4 text-amber-500" /> Select Supplier for Direct Receive
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Search and select a supplier to load their associated Direct Receive MRR records.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSupplierModalOpen(false)}
+                className="text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+              <input
+                type="text"
+                value={supplierSearchQuery}
+                onChange={(e) => setSupplierSearchQuery(e.target.value)}
+                placeholder="Search supplier by name or code..."
+                className="w-full pl-9 pr-3 py-2 text-xs bg-background border border-border rounded-xl outline-none focus:border-amber-500"
+                autoFocus
+              />
+            </div>
+
+            <div className="max-h-72 overflow-y-auto border border-border rounded-xl divide-y divide-border">
+              {allSuppliers
+                .filter((s) => {
+                  const q = supplierSearchQuery.toLowerCase().trim();
+                  if (!q) return true;
+                  return (
+                    s.vendorName.toLowerCase().includes(q) ||
+                    s.vendorCode.toLowerCase().includes(q)
+                  );
+                })
+                .map((s) => {
+                  const supplierDirectMrrsList = directMrrs.filter(
+                    (d) =>
+                      d.supplierId === s.id ||
+                      (d.supplierName && d.supplierName.toLowerCase() === s.vendorName.toLowerCase())
+                  );
+                  const isSelected = s.id === receiveSupplierId;
+
+                  return (
+                    <div
+                      key={s.id}
+                      onClick={() => handleSelectReceiveSupplier(s.id, s.vendorName)}
+                      className={`p-3 flex items-center justify-between gap-3 text-xs cursor-pointer hover:bg-muted/50 transition-colors ${
+                        isSelected ? "bg-amber-500/10" : ""
+                      }`}
+                    >
+                      <div>
+                        <div className="font-bold text-foreground flex items-center gap-2">
+                          <span>{s.vendorName}</span>
+                          <span className="font-mono text-[10px] text-muted-foreground">({s.vendorCode})</span>
+                        </div>
+                        <div className="text-[11px] text-muted-foreground mt-0.5">
+                          {supplierDirectMrrsList.length > 0 ? (
+                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                              ● {supplierDirectMrrsList.length} Direct MRR record(s) available
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">0 Direct MRRs</span>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectReceiveSupplier(s.id, s.vendorName);
+                        }}
+                        className="px-3 py-1 rounded-lg text-xs font-bold border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 cursor-pointer"
+                      >
+                        Select
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setSupplierModalOpen(false)}
+                className="px-4 py-2 bg-muted text-foreground hover:bg-muted/80 rounded-lg text-xs font-semibold cursor-pointer"
+              >
+                Cancel
               </button>
             </div>
           </div>
