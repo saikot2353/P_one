@@ -10,11 +10,6 @@ import {
   Search,
   RotateCcw,
   UserX,
-  CheckCircle2,
-  XCircle,
-  Calendar,
-  Users,
-  Building2,
   FileDown,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -72,19 +67,21 @@ const SAMPLE_ABSENTEEISM_DATA: AbsenteeismRecord[] = [
 const YEARS = ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018", "2017", "2016"];
 
 const MONTHS = [
-  { val: "01", label: "01 — January" },
-  { val: "02", label: "02 — February" },
-  { val: "03", label: "03 — March" },
-  { val: "04", label: "04 — April" },
-  { val: "05", label: "05 — May" },
-  { val: "06", label: "06 — June" },
-  { val: "07", label: "07 — July" },
-  { val: "08", label: "08 — August" },
-  { val: "09", label: "09 — September" },
-  { val: "10", label: "10 — October" },
-  { val: "11", label: "11 — November" },
-  { val: "12", label: "12 — December" },
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
+
+const STATUS_OPTIONS = ["Working", "ALL", "Resigned", "Separated", "Suspended"];
 
 const EMPLOYEE_TYPES = [
   "ALL",
@@ -135,8 +132,8 @@ function AbsenteeismSummaryReportPage() {
   const [empIdInput, setEmpIdInput] = useState("");
   const [idType, setIdType] = useState<"System" | "Office">("System");
   const [selectedYear, setSelectedYear] = useState("2026");
-  const [startMonth, setStartMonth] = useState("08");
-  const [endMonth, setEndMonth] = useState("09");
+  const [startMonth, setStartMonth] = useState("August");
+  const [endMonth, setEndMonth] = useState("September");
   const [status, setStatus] = useState("Working");
   const [employeeType, setEmployeeType] = useState("ALL");
   const [section, setSection] = useState("ALL");
@@ -165,6 +162,7 @@ function AbsenteeismSummaryReportPage() {
       if (selectedYear && item.year !== selectedYear) return false;
       if (employeeType !== "ALL" && item.employeeType !== employeeType) return false;
       if (section !== "ALL" && item.section !== section) return false;
+      if (designation !== "ALL" && item.designation !== designation) return false;
       if (unit !== "ALL" && item.unit !== unit) return false;
       if (line !== "ALL" && item.line !== line) return false;
       if (status !== "ALL" && item.status !== status) return false;
@@ -187,29 +185,14 @@ function AbsenteeismSummaryReportPage() {
 
       return true;
     });
-  }, [selectedYear, employeeType, section, unit, line, status, empIdInput, idType, tableSearch]);
-
-  // Aggregate stats
-  const totals = useMemo(() => {
-    return filteredData.reduce(
-      (acc, curr) => {
-        acc.workingDay += curr.workingDay;
-        acc.present += curr.present;
-        acc.absent += curr.absent;
-        acc.holiday += curr.holiday;
-        acc.leave += curr.leave;
-        return acc;
-      },
-      { workingDay: 0, present: 0, absent: 0, holiday: 0, leave: 0 }
-    );
-  }, [filteredData]);
+  }, [selectedYear, employeeType, section, designation, unit, line, status, empIdInput, idType, tableSearch]);
 
   const handleReset = () => {
     setEmpIdInput("");
     setIdType("System");
     setSelectedYear("2026");
-    setStartMonth("08");
-    setEndMonth("09");
+    setStartMonth("August");
+    setEndMonth("September");
     setStatus("Working");
     setEmployeeType("ALL");
     setSection("ALL");
@@ -262,7 +245,7 @@ function AbsenteeismSummaryReportPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `Absenteeism_Summary_Report_${selectedYear}_Months_${startMonth}-${endMonth}.csv`);
+    link.setAttribute("download", `Absenteeism_Summary_Report_${selectedYear}_${startMonth}-${endMonth}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -339,59 +322,6 @@ function AbsenteeismSummaryReportPage() {
             </div>
           </div>
 
-          {/* Metric KPI Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Employees</span>
-                <Users className="size-4 text-indigo-500" />
-              </div>
-              <div className="text-xl font-extrabold text-slate-900 dark:text-white mt-1">
-                {filteredData.length}
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-wider">Working Days</span>
-                <Calendar className="size-4 text-indigo-500" />
-              </div>
-              <div className="text-xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1">
-                {totals.workingDay} <span className="text-xs font-normal text-slate-400">days</span>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Total Present</span>
-                <CheckCircle2 className="size-4 text-emerald-500" />
-              </div>
-              <div className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">
-                {totals.present} <span className="text-xs font-normal text-slate-400">days</span>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Total Absent</span>
-                <XCircle className="size-4 text-rose-500" />
-              </div>
-              <div className="text-xl font-extrabold text-rose-600 dark:text-rose-400 mt-1">
-                {totals.absent} <span className="text-xs font-normal text-slate-400">days</span>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-2xs col-span-2 sm:col-span-1">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-purple-600 uppercase tracking-wider">Total Leave</span>
-                <Building2 className="size-4 text-purple-500" />
-              </div>
-              <div className="text-xl font-extrabold text-purple-600 dark:text-purple-400 mt-1">
-                {totals.leave} <span className="text-xs font-normal text-slate-400">days</span>
-              </div>
-            </div>
-          </div>
-
           {/* Form Filter Panel */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -401,67 +331,64 @@ function AbsenteeismSummaryReportPage() {
               </div>
               <button
                 onClick={handleReset}
-                className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-semibold cursor-pointer"
+                className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-semibold cursor-pointer transition-colors"
               >
                 <RotateCcw className="size-3.5" />
                 <span>Reset All</span>
               </button>
             </div>
 
-            {/* Row 1: Employee ID, ID Type Radio, Year, Start Month, End Month */}
+            {/* Filter Grid - 5 Columns Perfectly Aligned Across Both Rows */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 text-xs">
-              {/* Employee ID */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  Employee Id <span className="text-rose-500">*</span>
-                </label>
+              {/* 1. Employee ID + System/Office Radio */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between h-5">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Employee Id <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                    <label className="flex items-center gap-1 cursor-pointer hover:text-sky-600 transition-colors">
+                      <input
+                        type="radio"
+                        name="idType"
+                        checked={idType === "System"}
+                        onChange={() => setIdType("System")}
+                        className="text-sky-600 focus:ring-sky-500 size-3"
+                      />
+                      <span>System</span>
+                    </label>
+                    <label className="flex items-center gap-1 cursor-pointer hover:text-sky-600 transition-colors">
+                      <input
+                        type="radio"
+                        name="idType"
+                        checked={idType === "Office"}
+                        onChange={() => setIdType("Office")}
+                        className="text-sky-600 focus:ring-sky-500 size-3"
+                      />
+                      <span>Office</span>
+                    </label>
+                  </div>
+                </div>
                 <input
                   type="text"
                   value={empIdInput}
                   onChange={(e) => setEmpIdInput(e.target.value)}
                   placeholder="Use Comma as Separator"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full h-9 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
                 />
               </div>
 
-              {/* System / Office Radio */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  ID Type
-                </label>
-                <div className="flex items-center gap-4 mt-2 font-semibold">
-                  <label className="flex items-center gap-1.5 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="idType"
-                      checked={idType === "System"}
-                      onChange={() => setIdType("System")}
-                      className="text-sky-600 focus:ring-sky-500"
-                    />
-                    <span>System</span>
-                  </label>
-                  <label className="flex items-center gap-1.5 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="idType"
-                      checked={idType === "Office"}
-                      onChange={() => setIdType("Office")}
-                      className="text-sky-600 focus:ring-sky-500"
-                    />
-                    <span>Office</span>
+              {/* 2. Year */}
+              <div className="space-y-1">
+                <div className="flex items-center h-5">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Year <span className="text-rose-500">*</span>
                   </label>
                 </div>
-              </div>
-
-              {/* Year */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  Year <span className="text-rose-500">*</span>
-                </label>
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full h-9 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
                 >
                   {YEARS.map((y) => (
                     <option key={y} value={y}>
@@ -471,66 +398,77 @@ function AbsenteeismSummaryReportPage() {
                 </select>
               </div>
 
-              {/* Start Month */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  Start Month <span className="text-rose-500">*</span>
-                </label>
+              {/* 3. Start Month */}
+              <div className="space-y-1">
+                <div className="flex items-center h-5">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Start Month <span className="text-rose-500">*</span>
+                  </label>
+                </div>
                 <select
                   value={startMonth}
                   onChange={(e) => setStartMonth(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full h-9 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
                 >
                   {MONTHS.map((m) => (
-                    <option key={m.val} value={m.val}>
-                      {m.label}
+                    <option key={m} value={m}>
+                      {m}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* End Month */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  End Month <span className="text-rose-500">*</span>
-                </label>
+              {/* 4. End Month */}
+              <div className="space-y-1">
+                <div className="flex items-center h-5">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    End Month <span className="text-rose-500">*</span>
+                  </label>
+                </div>
                 <select
                   value={endMonth}
                   onChange={(e) => setEndMonth(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full h-9 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
                 >
                   {MONTHS.map((m) => (
-                    <option key={m.val} value={m.val}>
-                      {m.label}
+                    <option key={m} value={m}>
+                      {m}
                     </option>
                   ))}
                 </select>
               </div>
-            </div>
 
-            {/* Row 2: Status Tag, Employee Type, Section, Designation, Unit, Line */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5 text-xs">
-              {/* Status */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  Status
-                </label>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold">
-                  <span className="bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 px-2 py-0.5 rounded-md text-[11px] flex items-center gap-1">
-                    Working <span className="cursor-pointer font-extrabold hover:text-rose-600">×</span>
-                  </span>
+              {/* 5. Status */}
+              <div className="space-y-1">
+                <div className="flex items-center h-5">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Status
+                  </label>
                 </div>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-full h-9 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
+                >
+                  {STATUS_OPTIONS.map((st) => (
+                    <option key={st} value={st}>
+                      {st}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Employee Type */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  Employee Type
-                </label>
+              {/* 6. Employee Type */}
+              <div className="space-y-1">
+                <div className="flex items-center h-5">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Employee Type
+                  </label>
+                </div>
                 <select
                   value={employeeType}
                   onChange={(e) => setEmployeeType(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full h-9 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
                 >
                   {EMPLOYEE_TYPES.map((t) => (
                     <option key={t} value={t}>
@@ -540,15 +478,17 @@ function AbsenteeismSummaryReportPage() {
                 </select>
               </div>
 
-              {/* Section */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  Section
-                </label>
+              {/* 7. Section */}
+              <div className="space-y-1">
+                <div className="flex items-center h-5">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Section
+                  </label>
+                </div>
                 <select
                   value={section}
                   onChange={(e) => setSection(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 uppercase"
+                  className="w-full h-9 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-xs uppercase"
                 >
                   {SECTIONS.map((s) => (
                     <option key={s} value={s}>
@@ -558,15 +498,17 @@ function AbsenteeismSummaryReportPage() {
                 </select>
               </div>
 
-              {/* Designation */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  Designation
-                </label>
+              {/* 8. Designation */}
+              <div className="space-y-1">
+                <div className="flex items-center h-5">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Designation
+                  </label>
+                </div>
                 <select
                   value={designation}
                   onChange={(e) => setDesignation(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full h-9 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
                 >
                   <option value="ALL">ALL</option>
                   <option value="Manager">Manager</option>
@@ -579,15 +521,17 @@ function AbsenteeismSummaryReportPage() {
                 </select>
               </div>
 
-              {/* Unit */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  Unit
-                </label>
+              {/* 9. Unit */}
+              <div className="space-y-1">
+                <div className="flex items-center h-5">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Unit
+                  </label>
+                </div>
                 <select
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full h-9 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
                 >
                   {UNITS.map((u) => (
                     <option key={u} value={u}>
@@ -597,15 +541,17 @@ function AbsenteeismSummaryReportPage() {
                 </select>
               </div>
 
-              {/* Line */}
-              <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                  Line
-                </label>
+              {/* 10. Line */}
+              <div className="space-y-1">
+                <div className="flex items-center h-5">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Line
+                  </label>
+                </div>
                 <select
                   value={line}
                   onChange={(e) => setLine(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full h-9 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
                 >
                   {LINES.map((l) => (
                     <option key={l} value={l}>
@@ -620,7 +566,7 @@ function AbsenteeismSummaryReportPage() {
             <div className="pt-2 flex justify-start">
               <button
                 onClick={() => toast.success(`Search generated for ${selectedYear} (${startMonth} to ${endMonth})`)}
-                className="flex items-center gap-2 px-6 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                className="flex items-center gap-2 px-6 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-xs active:scale-95"
               >
                 <Search className="size-3.5" />
                 <span>SEARCH</span>
@@ -772,7 +718,7 @@ function AbsenteeismSummaryReportPage() {
         onClose={() => setIsPdfModalOpen(false)}
         reportTitle="Absenteeism Summary Report"
         companyName="Pakiza Knit Composite Ltd"
-        dateRange={`Year: ${selectedYear} (${startMonth}/${selectedYear} - ${endMonth}/${selectedYear})`}
+        dateRange={`Year: ${selectedYear} (${startMonth} - ${endMonth})`}
         columns={pdfColumns}
         data={filteredData}
       />
