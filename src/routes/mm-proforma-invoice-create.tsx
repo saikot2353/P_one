@@ -178,6 +178,7 @@ function MMProformaInvoiceCreatePage() {
   // Local state for all Bookings from localStorage / MMRepository
   const [fabricBookings, setFabricBookings] = useState<MMFabricBooking[]>([]);
   const [accBookings, setAccBookings] = useState<MMAccessoriesBooking[]>([]);
+  const [blockBookings, setBlockBookings] = useState<MMAccessoriesBooking[]>([]);
   const [allPis, setAllPis] = useState<MMProformaInvoice[]>([]);
   const [selectedCandidateBookingIds, setSelectedCandidateBookingIds] = useState<string[]>([]);
 
@@ -294,7 +295,8 @@ function MMProformaInvoiceCreatePage() {
 
     const loadedAccBookings = MMRepository.getAccessoriesBookings();
     const loadedManualBookings = MMRepository.getManualBookings();
-    setAccBookings([...loadedAccBookings, ...loadedManualBookings]);
+    setAccBookings(loadedAccBookings);
+    setBlockBookings(loadedManualBookings);
 
     const loadedPis = MMRepository.getPIs();
     setAllPis(loadedPis);
@@ -302,7 +304,7 @@ function MMProformaInvoiceCreatePage() {
 
   // Initialize or Load Existing PI / Source Booking
   useEffect(() => {
-    if (fabricBookings.length === 0 && accBookings.length === 0) return;
+    if (fabricBookings.length === 0 && accBookings.length === 0 && blockBookings.length === 0) return;
 
     // Case 1: Loading an existing PI by piId or id
     if (effectivePiId) {
@@ -319,7 +321,7 @@ function MMProformaInvoiceCreatePage() {
       }
     }
 
-    // Case 2: Opening from one or more source Bookings (Accessories or Fabric)
+    // Case 2: Opening from one or more source Bookings (Block Booking, Accessories, or Fabric)
     const effectiveBookingIds = (bookingIds || bookingId || "")
       .split(",")
       .map((s) => s.trim())
@@ -327,12 +329,34 @@ function MMProformaInvoiceCreatePage() {
 
     if (effectiveBookingIds.length > 0) {
       const firstId = effectiveBookingIds[0];
+      const isBlockBooking =
+        searchItem === "Block Booking" ||
+        searchItem?.toLowerCase() === "block booking" ||
+        searchItem?.toLowerCase() === "yarn" ||
+        searchSource?.toLowerCase() === "block-booking" ||
+        searchSource?.toLowerCase() === "manual-booking" ||
+        firstId.startsWith("byb-") ||
+        firstId.startsWith("mb-") ||
+        blockBookings.some((bb) => effectiveBookingIds.includes(bb.id) || effectiveBookingIds.includes(bb.bookingNo));
+
+      if (isBlockBooking) {
+        const repoBlocks = MMRepository.getManualBookings();
+        const selectedList = repoBlocks.filter(
+          (b) => effectiveBookingIds.includes(b.id) || effectiveBookingIds.includes(b.bookingNo)
+        );
+        if (selectedList.length === 0) {
+          setValidationError(`Source Block Booking(s) "${effectiveBookingIds.join(", ")}" not found in persisted Block Yarn Bookings.`);
+          return;
+        }
+
+        initializeNewPiFromBlockBooking(selectedList[0]);
+        return;
+      }
+
       const isAccessories =
         searchSource?.toLowerCase() === "accessories" ||
-        searchSource?.toLowerCase() === "manual-booking" ||
         searchItem?.toLowerCase() === "accessories" ||
         firstId.startsWith("acc-") ||
-        firstId.startsWith("mb-") ||
         accBookings.some((ab) => effectiveBookingIds.includes(ab.id) || effectiveBookingIds.includes(ab.bookingNo));
 
       if (isAccessories) {
@@ -373,12 +397,18 @@ function MMProformaInvoiceCreatePage() {
 
     // Case 3: Brand new blank PI
     if (!currentId) {
-      initializeBlankPi(searchItem === "Accessories" ? "Accessories" : "Fabric");
+      initializeBlankPi(
+        searchItem === "Block Booking"
+          ? "Block Booking"
+          : searchItem === "Accessories"
+          ? "Accessories"
+          : "Fabric"
+      );
     }
-  }, [bookingId, bookingIds, effectivePiId, fabricBookings, accBookings, searchSource, searchItem]);
+  }, [bookingId, bookingIds, effectivePiId, fabricBookings, accBookings, blockBookings, searchSource, searchItem]);
 
   // Helper to initialize blank PI
-  const initializeBlankPi = (defaultCategory: "Fabric" | "Accessories" = "Fabric") => {
+  const initializeBlankPi = (defaultCategory: "Fabric" | "Accessories" | "Block Booking" = "Fabric") => {
     const nextEntry = MMRepository.generateNextPIEntryNo();
     const nextPiNo = MMRepository.generateNextPINumber();
     const newId = `pi-${Date.now()}`;
@@ -492,6 +522,25 @@ function MMProformaInvoiceCreatePage() {
       minute: "2-digit",
     });
 
+    // Enforce: One Block Yarn / Accessories Booking can have only one PI
+    const allExistingPis = MMRepository.getPIs();
+    const existingPi = allExistingPis.find(
+      (p) =>
+        (p.activeBookingId === booking.id ||
+          p.activeBookingId === booking.bookingNo ||
+          p.allocatedBookings?.some(
+            (ab) => ab.bookingId === booking.id || ab.bookingNo === booking.bookingNo
+          )) ||
+        (booking.piReference && (p.piNo === booking.piReference || p.id === booking.piReference))
+    );
+    if (existingPi) {
+      toast.info(
+        `Block Yarn Booking ${booking.bookingNo} is already linked to PI ${existingPi.piNo}. Loading existing record.`
+      );
+      populateFormFromPI(existingPi);
+      return;
+    }
+
     setCurrentId(newId);
     setEntryNo(nextEntry);
     setEntryDate(nowStr);
@@ -551,6 +600,97 @@ function MMProformaInvoiceCreatePage() {
         user: "System",
         timestamp: nowStr,
         message: `Proforma Invoice draft initiated from Accessories Booking ${booking.bookingNo}.`,
+      },
+    ]);
+  };
+
+  // Helper to initialize new PI from a source Block Yarn Booking
+  const initializeNewPiFromBlockBooking = (booking: MMAccessoriesBooking) => {
+    const nextEntry = MMRepository.generateNextPIEntryNo();
+    const nextPiNo = MMRepository.generateNextPINumber(booking.supplierName);
+    const newId = `pi-${Date.now()}`;
+    const nowStr = new Date().toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    // Enforce: One Block Yarn Booking can have only one PI
+    const allExistingPis = MMRepository.getPIs();
+    const existingPi = allExistingPis.find(
+      (p) =>
+        p.id !== currentId &&
+        ((p.activeBookingId === booking.id ||
+          p.activeBookingId === booking.bookingNo ||
+          p.allocatedBookings?.some(
+            (ab) => ab.bookingId === booking.id || ab.bookingNo === booking.bookingNo
+          )) ||
+        (booking.piReference && (p.piNo === booking.piReference || p.id === booking.piReference)))
+    );
+    if (existingPi) {
+      toast.info(
+        `Block Yarn Booking ${booking.bookingNo} is already linked to PI ${existingPi.piNo}. Loading existing record.`
+      );
+      populateFormFromPI(existingPi);
+      return;
+    }
+
+    setCurrentId(newId);
+    setEntryNo(nextEntry);
+    setEntryDate(nowStr);
+    setPiNumber(nextPiNo);
+    setSource("Nominated");
+    setItemCategory("Block Booking");
+    setSupplierName(booking.supplierName || "Square Textiles Ltd");
+    setMerchant("Tanvir Ahmed - Key Account Manager");
+    setStatus("Draft");
+    setBusinessUnit(booking.bookingUnit || "Unit 2 - Garments");
+    setDeliveryTerms(booking.delPlace || booking.deliveryPlace || "Factory Mill Store (Gazipur)");
+    setDeliveryMode(
+      booking.delMode === "Sea" || booking.delMode === "Air" || booking.delMode === "Road"
+        ? (booking.delMode as any)
+        : booking.deliveryMode === "Sea" || booking.deliveryMode === "Air" || booking.deliveryMode === "Road"
+        ? (booking.deliveryMode as any)
+        : "Road"
+    );
+    setDeliveryPlace(booking.delPlace || booking.deliveryPlace || "Factory Mill Store (Gazipur)");
+    setPaymentTerms(booking.payMode || booking.paymentTerms || "At Sight LC");
+    setBdtRate(booking.convRate && booking.convRate > 1 ? booking.convRate : 121.5);
+    setUsdRate(1.0);
+    setBblcNo(booking.piReference || "");
+    setNotes(`Proforma Invoice created from Block Yarn Booking ${booking.bookingNo}.`);
+
+    const attached: MMPIAllocatedBooking = {
+      bookingId: booking.id,
+      bookingNo: booking.bookingNo,
+      bookingType: "Block Booking",
+      orderNo: "",
+      styleNo: "",
+      allocatedAmount: booking.totalBookedAmount || 0,
+      bookingDesc: booking.bookingDesc || `Block Yarn Booking ${booking.bookingNo}`,
+      bookingDate: booking.bookingDate || new Date().toISOString().split("T")[0],
+      deliveryMode: (booking.delMode || booking.deliveryMode || "Road") as any,
+      deliveryDate: booking.deliveryDate || "",
+      affectedGarmentQty: 0,
+      buyerName: "",
+      season: "",
+    };
+
+    setAttachedBookings([attached]);
+    setActiveBookingId(booking.id);
+
+    // Populate items from Block Booking
+    const items = extractItemsFromBlockBooking(booking, 121.5);
+    setPiItems(items);
+    setAdditionalChargesList([]);
+    setComments([
+      {
+        id: `cmt-${Date.now()}`,
+        user: "System",
+        timestamp: nowStr,
+        message: `Proforma Invoice draft initiated from Block Yarn Booking ${booking.bookingNo}.`,
       },
     ]);
   };
@@ -845,6 +985,95 @@ function MMProformaInvoiceCreatePage() {
     return [];
   };
 
+  // Helper to extract PI Items from a Block Yarn Booking preserving real data relationships
+  const extractItemsFromBlockBooking = (
+    booking: MMAccessoriesBooking,
+    rateBdt: number = 121.5
+  ): MMPIItem[] => {
+    const result: MMPIItem[] = [];
+
+    if (booking.items && booking.items.length > 0) {
+      booking.items.forEach((item, idx) => {
+        const itemAny = item as any;
+        const bookedQtyKg = Number(item.bookedQty) || Number(itemAny.requiredQty) || 0;
+        const marketQtyTon =
+          itemAny.marketQty !== undefined && itemAny.marketQty !== null
+            ? Number(itemAny.marketQty)
+            : bookedQtyKg > 0
+            ? Number((bookedQtyKg / 1000).toFixed(3))
+            : 0;
+        const marketUnit = itemAny.marketUnit || "TON (Metric Ton)";
+        const rate = Number(item.bookedRate) || Number(itemAny.rate) || 0;
+        const amountUsd = Number(item.totalAmount) || Number(itemAny.total) || Number((bookedQtyKg * rate).toFixed(2));
+
+        result.push({
+          piItemId: `PII-${booking.id}-${item.bookingItemId || itemAny.id || idx + 1}`,
+          bookingId: booking.id,
+          bookingItemId: item.bookingItemId || itemAny.id || `BYBI-${idx + 1}`,
+          sourceBookingNo: booking.bookingNo,
+          buyerName: "",
+          season: "",
+          jobId: "",
+          styleNo: "",
+          fabricCode: "",
+          affectedGmtQty: 0,
+          qtyDz: 0,
+          itemCategory: "Block Booking",
+          itemDescription: item.itemDescription || itemAny.itemName || "100% Combed Cotton Yarn",
+          specification: item.specification || item.sizeOrDimension || "",
+          color: item.color || "Raw White / Greige",
+          dzConsump: 0,
+          unit: item.unit || "KG",
+          quantity: bookedQtyKg,
+          marketQty: marketQtyTon,
+          marketUnit: marketUnit,
+          unitPrice: rate,
+          totalAmount: amountUsd,
+          amountBdt: Number((amountUsd * rateBdt).toFixed(2)),
+        } as any);
+      });
+      return result;
+    }
+
+    if (booking.lines && booking.lines.length > 0) {
+      booking.lines.forEach((line, lIdx) => {
+        const bookedQtyKg = Number(line.bookAmt) || 0;
+        const marketQtyTon = Number((bookedQtyKg / 1000).toFixed(3));
+        const rate = Number(line.rate) || 0;
+        const amountUsd = Number((bookedQtyKg * rate).toFixed(2));
+
+        result.push({
+          piItemId: `PII-${booking.id}-${line.id || lIdx + 1}`,
+          bookingId: booking.id,
+          bookingItemId: line.id || `BYBL-${lIdx + 1}`,
+          sourceBookingNo: booking.bookingNo,
+          buyerName: "",
+          season: "",
+          jobId: "",
+          styleNo: "",
+          fabricCode: "",
+          affectedGmtQty: 0,
+          qtyDz: 0,
+          itemCategory: "Block Booking",
+          itemDescription: line.accessoryItem || line.description || "Yarn Item",
+          specification: line.description || "",
+          color: "",
+          dzConsump: 0,
+          unit: "KG",
+          quantity: bookedQtyKg,
+          marketQty: marketQtyTon,
+          marketUnit: "TON (Metric Ton)",
+          unitPrice: rate,
+          totalAmount: amountUsd,
+          amountBdt: Number((amountUsd * rateBdt).toFixed(2)),
+        } as any);
+      });
+      return result;
+    }
+
+    return [];
+  };
+
   // Retrieve Season from related Order Entry or authoritative source record
   const resolveSeasonForJob = (jobId: string, styleNo: string, orderNo?: string): string => {
     try {
@@ -1081,6 +1310,7 @@ function MMProformaInvoiceCreatePage() {
 
   // Section 2.2 & 2.3: Aggregate booking items across colors
   const consolidatedBookingItems = useMemo(() => {
+    const isBlock = itemCategory === "Block Booking";
     const map = new Map<
       string,
       {
@@ -1094,6 +1324,8 @@ function MMProformaInvoiceCreatePage() {
         fabricCode: string;
         itemDescription: string;
         quantity: number;
+        marketQty: number;
+        marketUnit: string;
         unit: string;
         unitPrice: number;
         totalAmount: number;
@@ -1103,20 +1335,33 @@ function MMProformaInvoiceCreatePage() {
     >();
 
     for (const item of piItems) {
-      // Grouping key ensuring:
-      // 1. Same booking, job, season, style, fabric item, unit, and unit rate are merged across colors
-      // 2. Different fabric items, jobs, units, or rates are kept distinct
-      const groupKey = [
-        item.sourceBookingNo || item.bookingId,
-        item.buyerName || "",
-        item.jobId || "",
-        item.season || "",
-        item.styleNo || "",
-        item.fabricCode || "",
-        item.itemDescription || "",
-        item.unit || "Kg",
-        Number(item.unitPrice || 0).toFixed(4),
-      ].join("___");
+      const itemIsBlock = isBlock || item.itemCategory === "Block Booking";
+      const itemAny = item as any;
+      const groupKey = itemIsBlock
+        ? [
+            item.sourceBookingNo || item.bookingId,
+            item.itemDescription || "",
+            Number(item.unitPrice || 0).toFixed(4),
+          ].join("___")
+        : [
+            item.sourceBookingNo || item.bookingId,
+            item.buyerName || "",
+            item.jobId || "",
+            item.season || "",
+            item.styleNo || "",
+            item.fabricCode || "",
+            item.itemDescription || "",
+            item.unit || "Kg",
+            Number(item.unitPrice || 0).toFixed(4),
+          ].join("___");
+
+      const itemMarketQty =
+        itemAny.marketQty !== undefined && itemAny.marketQty !== null
+          ? Number(itemAny.marketQty)
+          : item.quantity > 0
+          ? Number((item.quantity / 1000).toFixed(3))
+          : 0;
+      const itemMarketUnit = itemAny.marketUnit || "TON (Metric Ton)";
 
       const existing = map.get(groupKey);
       if (!existing) {
@@ -1124,14 +1369,22 @@ function MMProformaInvoiceCreatePage() {
           key: groupKey,
           sourceBookingNo: item.sourceBookingNo || "",
           bookingId: item.bookingId || "",
-          buyerName: item.buyerName || "H&M Europe",
-          jobId: item.jobId || "JOB-2026-0001",
-          season: item.season || "Spring/Summer 2026",
-          styleNo: item.styleNo || "HM-KT-8841",
+          buyerName: item.buyerName || (itemIsBlock ? "" : "H&M Europe"),
+          jobId: item.jobId || (itemIsBlock ? "" : "JOB-2026-0001"),
+          season: item.season || (itemIsBlock ? "" : "Spring/Summer 2026"),
+          styleNo: item.styleNo || (itemIsBlock ? "" : "HM-KT-8841"),
           fabricCode: item.fabricCode || "",
-          itemDescription: item.itemDescription || "100% Cotton Knitted Fabric",
+          itemDescription:
+            item.itemDescription ||
+            (itemIsBlock
+              ? "100% Combed Cotton Yarn"
+              : itemCategory === "Accessories"
+              ? "Accessory Item"
+              : "100% Cotton Knitted Fabric"),
           quantity: item.quantity || 0,
-          unit: item.unit || "Kg",
+          marketQty: itemMarketQty,
+          marketUnit: itemMarketUnit,
+          unit: item.unit || (itemIsBlock ? "KG" : itemCategory === "Accessories" ? "Pcs" : "Kg"),
           unitPrice: item.unitPrice || 0,
           totalAmount: item.totalAmount || 0,
           amountBdt: item.amountBdt || 0,
@@ -1139,6 +1392,7 @@ function MMProformaInvoiceCreatePage() {
         });
       } else {
         existing.quantity += item.quantity || 0;
+        existing.marketQty += itemMarketQty;
         existing.totalAmount = Number((existing.quantity * existing.unitPrice).toFixed(2));
         existing.amountBdt = Number((existing.totalAmount * bdtRate).toFixed(2));
         if (item.color && !existing.colors.includes(item.color)) {
@@ -1148,7 +1402,7 @@ function MMProformaInvoiceCreatePage() {
     }
 
     return Array.from(map.values());
-  }, [piItems, bdtRate]);
+  }, [piItems, bdtRate, itemCategory]);
 
   // --------------------------------------------------------------------------
   // Section 1.3: PI Preview Report Filtering & Calculations
@@ -1197,6 +1451,30 @@ function MMProformaInvoiceCreatePage() {
   const handlePopulateBookingItems = (bookingIdToPopulate: string) => {
     setActiveBookingId(bookingIdToPopulate);
     setValidationError(null);
+
+    if (itemCategory === "Block Booking") {
+      const booking = blockBookings.find(
+        (b) => b.id === bookingIdToPopulate || b.bookingNo === bookingIdToPopulate
+      );
+      if (!booking) return;
+
+      const extracted = extractItemsFromBlockBooking(booking, bdtRate);
+      if (extracted.length === 0) {
+        setValidationError(`No yarn items found in Block Yarn Booking "${booking.bookingNo}".`);
+        return;
+      }
+
+      setPiItems((prev) => {
+        const alreadyHas = prev.some(
+          (it) => it.bookingId === booking.id || it.sourceBookingNo === booking.bookingNo
+        );
+        if (alreadyHas) return prev;
+        return [...prev, ...extracted];
+      });
+
+      setPopulatedBookingIds((prev) => (prev.includes(booking.id) ? prev : [...prev, booking.id]));
+      return;
+    }
 
     if (itemCategory === "Accessories") {
       const booking = accBookings.find(
@@ -1292,6 +1570,25 @@ function MMProformaInvoiceCreatePage() {
       return;
     }
 
+    // Check 1b: One Block Yarn Booking can have only one PI
+    const allPis = MMRepository.getPIs();
+    const existingOtherPi = allPis.find(
+      (p) =>
+        p.id !== currentId &&
+        (p.activeBookingId === candidate.id ||
+          p.activeBookingId === candidate.bookingNo ||
+          p.allocatedBookings?.some(
+            (ab) => ab.bookingId === candidate.id || ab.bookingNo === candidate.bookingNo
+          ) ||
+          (candidate.piReference && (p.piNo === candidate.piReference || p.id === candidate.piReference)))
+    );
+    if (existingOtherPi) {
+      setValidationError(
+        `Block Yarn Booking ${candidate.bookingNo} is already linked to PI ${existingOtherPi.piNo}. Only one PI can be created per Block Yarn Booking.`
+      );
+      return;
+    }
+
     // Check 2: Same-Supplier Validation (Strict Requirement)
     if (supplierName && supplierName.trim().toLowerCase() !== candidate.supplierName.trim().toLowerCase()) {
       setValidationError("All bookings added to a single Proforma Invoice must belong to the same supplier.");
@@ -1344,6 +1641,83 @@ function MMProformaInvoiceCreatePage() {
     setTimeout(() => setSuccessMessage(null), 3500);
   };
 
+  // Add Additional Block Booking with Strict Same-Supplier Validation
+  const handleAddBlockBookingToPi = (candidate: MMAccessoriesBooking) => {
+    setValidationError(null);
+
+    // Check 1: Already attached?
+    const alreadyAttached = attachedBookings.some(
+      (b) => b.bookingId === candidate.id || b.bookingNo === candidate.bookingNo
+    );
+    if (alreadyAttached) {
+      setValidationError("This booking has already been added to the current Proforma Invoice.");
+      return;
+    }
+
+    // Check 1b: One Block Yarn Booking can have only one PI
+    const allPis = MMRepository.getPIs();
+    const existingOtherPi = allPis.find(
+      (p) =>
+        p.id !== currentId &&
+        (p.activeBookingId === candidate.id ||
+          p.activeBookingId === candidate.bookingNo ||
+          p.allocatedBookings?.some(
+            (ab) => ab.bookingId === candidate.id || ab.bookingNo === candidate.bookingNo
+          ) ||
+          (candidate.piReference && (p.piNo === candidate.piReference || p.id === candidate.piReference)))
+    );
+    if (existingOtherPi) {
+      setValidationError(
+        `Block Yarn Booking ${candidate.bookingNo} is already linked to PI ${existingOtherPi.piNo}. Only one PI can be created per Block Yarn Booking.`
+      );
+      return;
+    }
+
+    // Check 2: Same-Supplier Validation
+    if (supplierName && supplierName.trim().toLowerCase() !== candidate.supplierName.trim().toLowerCase()) {
+      setValidationError("All bookings added to a single Proforma Invoice must belong to the same supplier.");
+      return;
+    }
+
+    // If PI doesn't have a supplier yet, lock to this supplier
+    if (!supplierName) {
+      setSupplierName(candidate.supplierName);
+    }
+
+    const newAttachedBooking: MMPIAllocatedBooking = {
+      bookingId: candidate.id,
+      bookingNo: candidate.bookingNo,
+      bookingType: "Block Booking",
+      orderNo: "",
+      styleNo: "",
+      allocatedAmount: candidate.totalBookedAmount || 0,
+      bookingDesc: candidate.bookingDesc || `Block Yarn Booking ${candidate.bookingNo}`,
+      bookingDate: candidate.bookingDate || new Date().toISOString().split("T")[0],
+      deliveryMode: (candidate.delMode || candidate.deliveryMode || "Road") as any,
+      deliveryDate: candidate.deliveryDate || "",
+      affectedGarmentQty: 0,
+      buyerName: "",
+      season: "",
+    };
+
+    setAttachedBookings((prev) => [...prev, newAttachedBooking]);
+    setActiveBookingId(candidate.id);
+
+    const newItems = extractItemsFromBlockBooking(candidate, bdtRate);
+    setPiItems((prev) => {
+      const existingFromThisBooking = prev.some(
+        (it) => it.bookingId === candidate.id || it.sourceBookingNo === candidate.bookingNo
+      );
+      if (existingFromThisBooking) return prev;
+      return [...prev, ...newItems];
+    });
+
+    setPopulatedBookingIds((prev) => (prev.includes(candidate.id) ? prev : [...prev, candidate.id]));
+    setShowAddBookingModal(false);
+    setSuccessMessage(`Successfully attached Block Yarn Booking ${candidate.bookingNo} and automatically populated its booking details.`);
+    setTimeout(() => setSuccessMessage(null), 3500);
+  };
+
   // Add Additional Accessories Booking with Strict Same-Supplier Validation
   const handleAddAccessoriesBookingToPi = (candidate: MMAccessoriesBooking) => {
     setValidationError(null);
@@ -1354,6 +1728,25 @@ function MMProformaInvoiceCreatePage() {
     );
     if (alreadyAttached) {
       setValidationError("This booking has already been added to the current Proforma Invoice.");
+      return;
+    }
+
+    // Check 1b: One Block Yarn Booking can have only one PI
+    const allPis = MMRepository.getPIs();
+    const existingOtherPi = allPis.find(
+      (p) =>
+        p.id !== currentId &&
+        (p.activeBookingId === candidate.id ||
+          p.activeBookingId === candidate.bookingNo ||
+          p.allocatedBookings?.some(
+            (ab) => ab.bookingId === candidate.id || ab.bookingNo === candidate.bookingNo
+          ) ||
+          (candidate.piReference && (p.piNo === candidate.piReference || p.id === candidate.piReference)))
+    );
+    if (existingOtherPi) {
+      setValidationError(
+        `Block Yarn Booking ${candidate.bookingNo} is already linked to PI ${existingOtherPi.piNo}. Only one PI can be created per Block Yarn Booking.`
+      );
       return;
     }
 
@@ -1411,14 +1804,108 @@ function MMProformaInvoiceCreatePage() {
     if (candidateIds.length === 0) return;
     setValidationError(null);
 
+    if (itemCategory === "Block Booking") {
+      const candidates = blockBookings.filter((b) => candidateIds.includes(b.id));
+      if (candidates.length === 0) return;
+
+      const firstSupplier = supplierName || candidates[0].supplierName;
+      const allPis = MMRepository.getPIs();
+      for (const c of candidates) {
+        if (firstSupplier && c.supplierName && c.supplierName.trim().toLowerCase() !== firstSupplier.trim().toLowerCase()) {
+          setValidationError("All selected bookings must belong to the same supplier.");
+          return;
+        }
+        const hasOtherPi = allPis.some(
+          (p) =>
+            p.id !== currentId &&
+            (p.activeBookingId === c.id ||
+              p.activeBookingId === c.bookingNo ||
+              p.allocatedBookings?.some(
+                (ab) => ab.bookingId === c.id || ab.bookingNo === c.bookingNo
+              ) ||
+              (c.piReference && (p.piNo === c.piReference || p.id === c.piReference)))
+        );
+        if (hasOtherPi) {
+          setValidationError(`Block Yarn Booking ${c.bookingNo} is already linked to another PI. Only one PI can be created per Block Yarn Booking.`);
+          return;
+        }
+      }
+
+      if (!supplierName && firstSupplier) {
+        setSupplierName(firstSupplier);
+      }
+
+      const newAttached: MMPIAllocatedBooking[] = [];
+      const newItemsToAdd: MMPIItem[] = [];
+      const newPopulatedIds: string[] = [];
+
+      for (const candidate of candidates) {
+        if (attachedBookings.some((ab) => ab.bookingId === candidate.id || ab.bookingNo === candidate.bookingNo)) {
+          continue;
+        }
+
+        newAttached.push({
+          bookingId: candidate.id,
+          bookingNo: candidate.bookingNo,
+          bookingType: "Block Booking",
+          orderNo: "",
+          styleNo: "",
+          allocatedAmount: candidate.totalBookedAmount || 0,
+          bookingDesc: candidate.bookingDesc || `Block Yarn Booking ${candidate.bookingNo}`,
+          bookingDate: candidate.bookingDate || new Date().toISOString().split("T")[0],
+          deliveryMode: (candidate.delMode || candidate.deliveryMode || "Road") as any,
+          deliveryDate: candidate.deliveryDate || "",
+          affectedGarmentQty: 0,
+          buyerName: "",
+          season: "",
+        });
+
+        const extracted = extractItemsFromBlockBooking(candidate, bdtRate);
+        newItemsToAdd.push(...extracted);
+        newPopulatedIds.push(candidate.id);
+      }
+
+      if (newAttached.length === 0) {
+        setValidationError("All selected bookings are already attached to this Proforma Invoice.");
+        return;
+      }
+
+      setAttachedBookings((prev) => [...prev, ...newAttached]);
+      setPiItems((prev) => {
+        const existingKeys = new Set(prev.map((it) => `${it.bookingId}_${it.piItemId}`));
+        const filteredNew = newItemsToAdd.filter((it) => !existingKeys.has(`${it.bookingId}_${it.piItemId}`));
+        return [...prev, ...filteredNew];
+      });
+      setPopulatedBookingIds((prev) => [...new Set([...prev, ...newPopulatedIds])]);
+      setSelectedCandidateBookingIds([]);
+      setShowAddBookingModal(false);
+      toast.success(`Successfully attached ${newAttached.length} Block Yarn Booking(s).`);
+      return;
+    }
+
     if (itemCategory === "Accessories") {
       const candidates = accBookings.filter((b) => candidateIds.includes(b.id));
       if (candidates.length === 0) return;
 
       const firstSupplier = supplierName || candidates[0].supplierName;
+      const allPis = MMRepository.getPIs();
       for (const c of candidates) {
         if (firstSupplier && c.supplierName && c.supplierName.trim().toLowerCase() !== firstSupplier.trim().toLowerCase()) {
           setValidationError("All selected bookings must belong to the same supplier.");
+          return;
+        }
+        const hasOtherPi = allPis.some(
+          (p) =>
+            p.id !== currentId &&
+            (p.activeBookingId === c.id ||
+              p.activeBookingId === c.bookingNo ||
+              p.allocatedBookings?.some(
+                (ab) => ab.bookingId === c.id || ab.bookingNo === c.bookingNo
+              ) ||
+              (c.piReference && (p.piNo === c.piReference || p.id === c.piReference)))
+        );
+        if (hasOtherPi) {
+          setValidationError(`Block Yarn Booking ${c.bookingNo} is already linked to another PI. Only one PI can be created per Block Yarn Booking.`);
           return;
         }
       }
@@ -1480,9 +1967,24 @@ function MMProformaInvoiceCreatePage() {
       if (candidates.length === 0) return;
 
       const firstSupplier = supplierName || candidates[0].supplierName;
+      const allPis = MMRepository.getPIs();
       for (const c of candidates) {
         if (firstSupplier && c.supplierName && c.supplierName.trim().toLowerCase() !== firstSupplier.trim().toLowerCase()) {
           setValidationError("All selected bookings must belong to the same supplier.");
+          return;
+        }
+        const hasOtherPi = allPis.some(
+          (p) =>
+            p.id !== currentId &&
+            (p.activeBookingId === c.id ||
+              p.activeBookingId === c.bookingNo ||
+              p.allocatedBookings?.some(
+                (ab) => ab.bookingId === c.id || ab.bookingNo === c.bookingNo
+              ) ||
+              (c.piReference && (p.piNo === c.piReference || p.id === c.piReference)))
+        );
+        if (hasOtherPi) {
+          setValidationError(`Block Yarn Booking ${c.bookingNo} is already linked to another PI. Only one PI can be created per Block Yarn Booking.`);
           return;
         }
       }
@@ -1827,7 +2329,9 @@ function MMProformaInvoiceCreatePage() {
     // Section 3.3: Supplier Consistency Validation
     const mismatch = attachedBookings.some((b) => {
       const original =
-        itemCategory === "Accessories"
+        itemCategory === "Block Booking"
+          ? blockBookings.find((bb) => bb.id === b.bookingId || bb.bookingNo === b.bookingNo)
+          : itemCategory === "Accessories"
           ? accBookings.find((ab) => ab.id === b.bookingId || ab.bookingNo === b.bookingNo)
           : fabricBookings.find((fb) => fb.id === b.bookingId || fb.bookingNo === b.bookingNo);
       return original && original.supplierName.trim().toLowerCase() !== supplierName.trim().toLowerCase();
@@ -1943,7 +2447,9 @@ function MMProformaInvoiceCreatePage() {
     // 3. Confirm that all selected bookings belong to the same supplier
     const mismatch = attachedBookings.some((b) => {
       const original =
-        itemCategory === "Accessories"
+        itemCategory === "Block Booking"
+          ? blockBookings.find((bb) => bb.id === b.bookingId || bb.bookingNo === b.bookingNo)
+          : itemCategory === "Accessories"
           ? accBookings.find((ab) => ab.id === b.bookingId || ab.bookingNo === b.bookingNo)
           : fabricBookings.find((fb) => fb.id === b.bookingId || fb.bookingNo === b.bookingNo);
       return original && original.supplierName.trim().toLowerCase() !== supplierName.trim().toLowerCase();
@@ -2101,12 +2607,28 @@ function MMProformaInvoiceCreatePage() {
 
   return (
     <MarketingMerchandisingLayout
-      activePath={itemCategory === "Accessories" ? "/mm-accessories-booking" : "/mm-fabric-booking"}
+      activePath={
+        itemCategory === "Block Booking"
+          ? "/mm-manual-booking-register"
+          : itemCategory === "Accessories"
+          ? "/mm-accessories-booking"
+          : "/mm-fabric-booking"
+      }
       breadcrumbs={[
         { label: "Marketing & Merchandising" },
         {
-          label: itemCategory === "Accessories" ? "Accessories Booking" : "Fabric Booking",
-          to: itemCategory === "Accessories" ? "/mm-accessories-booking" : "/mm-fabric-booking",
+          label:
+            itemCategory === "Block Booking"
+              ? "Block Yarn Booking"
+              : itemCategory === "Accessories"
+              ? "Accessories Booking"
+              : "Fabric Booking",
+          to:
+            itemCategory === "Block Booking"
+              ? "/mm-manual-booking-register"
+              : itemCategory === "Accessories"
+              ? "/mm-accessories-booking"
+              : "/mm-fabric-booking",
         },
         { label: "Proforma Invoice Entry Form" },
       ]}
@@ -2298,7 +2820,9 @@ function MMProformaInvoiceCreatePage() {
                     readOnly
                     disabled
                     placeholder={
-                      itemCategory === "Accessories"
+                      itemCategory === "Block Booking"
+                        ? "Populated from selected Block Yarn Booking"
+                        : itemCategory === "Accessories"
                         ? "Populated from selected Accessories Booking"
                         : "Populated from selected Fabric Booking"
                     }
@@ -2343,6 +2867,7 @@ function MMProformaInvoiceCreatePage() {
                   >
                     <option value="Fabric">Fabric</option>
                     <option value="Accessories">Accessories</option>
+                    <option value="Block Booking">Block Booking</option>
                   </select>
                 </div>
 
@@ -2535,12 +3060,24 @@ function MMProformaInvoiceCreatePage() {
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 font-bold uppercase text-[10px]">
                   <th className="py-2.5 px-3">Booking No</th>
-                  <th className="py-2.5 px-3">Buyer</th>
-                  <th className="py-2.5 px-3">Job ID</th>
-                  <th className="py-2.5 px-3">Season</th>
-                  <th className="py-2.5 px-3">Style</th>
-                  <th className="py-2.5 px-3">{itemCategory === "Accessories" ? "Item Description" : "Fabric Description"}</th>
-                  <th className="py-2.5 px-3 text-right">Quantity</th>
+                  {itemCategory !== "Block Booking" && (
+                    <>
+                      <th className="py-2.5 px-3">Buyer</th>
+                      <th className="py-2.5 px-3">Job ID</th>
+                      <th className="py-2.5 px-3">Season</th>
+                      <th className="py-2.5 px-3">Style</th>
+                    </>
+                  )}
+                  <th className="py-2.5 px-3">
+                    {itemCategory === "Block Booking"
+                      ? "Yarn Item Description"
+                      : itemCategory === "Accessories"
+                      ? "Item Description"
+                      : "Fabric Description"}
+                  </th>
+                  <th className="py-2.5 px-3 text-right">
+                    {itemCategory === "Block Booking" ? "Market Qty" : "Quantity"}
+                  </th>
                   <th className="py-2.5 px-3">Unit</th>
                   <th className="py-2.5 px-3 text-right">Unit Rate</th>
                   <th className="py-2.5 px-3 text-right">Amount ($)</th>
@@ -2549,7 +3086,7 @@ function MMProformaInvoiceCreatePage() {
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {consolidatedBookingItems.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="py-8 text-center text-slate-400 text-xs">
+                    <td colSpan={itemCategory === "Block Booking" ? 6 : 10} className="py-8 text-center text-slate-400 text-xs">
                       {attachedBookings.length === 0
                         ? `Attach an eligible ${itemCategory} booking above to automatically populate booking details.`
                         : "No booking details available."}
@@ -2561,25 +3098,40 @@ function MMProformaInvoiceCreatePage() {
                       <td className="py-2.5 px-3 font-mono font-bold text-teal-700 dark:text-teal-400">
                         {item.sourceBookingNo}
                       </td>
-                      <td className="py-2.5 px-3 font-semibold text-slate-800 dark:text-slate-200">
-                        {item.buyerName || "H&M Europe"}
-                      </td>
-                      <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
-                        {item.jobId || "JOB-2026-0001"}
-                      </td>
-                      <td className="py-2.5 px-3 font-medium text-indigo-700 dark:text-indigo-400">
-                        {item.season || "Spring/Summer 2026"}
-                      </td>
-                      <td className="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-200">
-                        {item.styleNo || "HM-KT-8841"}
-                      </td>
+                      {itemCategory !== "Block Booking" && (
+                        <>
+                          <td className="py-2.5 px-3 font-semibold text-slate-800 dark:text-slate-200">
+                            {item.buyerName || "H&M Europe"}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
+                            {item.jobId || "JOB-2026-0001"}
+                          </td>
+                          <td className="py-2.5 px-3 font-medium text-indigo-700 dark:text-indigo-400">
+                            {item.season || "Spring/Summer 2026"}
+                          </td>
+                          <td className="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-200">
+                            {item.styleNo || "HM-KT-8841"}
+                          </td>
+                        </>
+                      )}
                       <td className="py-2.5 px-3 text-slate-800 dark:text-slate-200">
-                        {item.itemDescription || (itemCategory === "Accessories" ? "Accessory Item" : "100% Cotton Knitted Fabric")}
+                        {item.itemDescription ||
+                          (itemCategory === "Block Booking"
+                            ? "100% Cotton Yarn"
+                            : itemCategory === "Accessories"
+                            ? "Accessory Item"
+                            : "100% Cotton Knitted Fabric")}
                       </td>
                       <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
-                        {item.quantity.toLocaleString()}
+                        {itemCategory === "Block Booking"
+                          ? (item.marketQty || 0).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 3 })
+                          : item.quantity.toLocaleString()}
                       </td>
-                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-400">{item.unit || (itemCategory === "Accessories" ? "Pcs" : "Kg")}</td>
+                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-400">
+                        {itemCategory === "Block Booking"
+                          ? item.marketUnit || "TON (Metric Ton)"
+                          : item.unit || (itemCategory === "Accessories" ? "Pcs" : "Kg")}
+                      </td>
                       <td className="py-2.5 px-3 text-right font-mono text-slate-800 dark:text-slate-200">
                         ${item.unitPrice.toFixed(2)}
                       </td>
@@ -2904,7 +3456,12 @@ function MMProformaInvoiceCreatePage() {
             <div className="p-4 overflow-y-auto space-y-2 flex-1">
               {(() => {
                 // Filter only eligible bookings belonging to current PI's supplier and active itemCategory
-                const rawCandidates: any[] = itemCategory === "Accessories" ? accBookings : fabricBookings;
+                const rawCandidates: any[] =
+                  itemCategory === "Block Booking"
+                    ? blockBookings
+                    : itemCategory === "Accessories"
+                    ? accBookings
+                    : fabricBookings;
 
                 const eligible = rawCandidates.filter((b) => {
                   // Rule 1: Filter by exact supplier name if PI has supplier locked
@@ -2923,11 +3480,15 @@ function MMProformaInvoiceCreatePage() {
                     const q = bookingSearchQuery.toLowerCase();
                     const matchNo = b.bookingNo?.toLowerCase().includes(q);
                     const matchSupplier = b.supplierName?.toLowerCase().includes(q);
-                    const matchStyle = itemCategory === "Accessories"
-                      ? b.items?.some((i: any) => i.style?.toLowerCase().includes(q) || i.accessoryName?.toLowerCase().includes(q)) ||
-                        b.lines?.some((l: any) => l.style?.toLowerCase().includes(q) || l.itemGroup?.toLowerCase().includes(q) || l.description?.toLowerCase().includes(q))
-                      : b.items?.some((i: any) => i.styleNo?.toLowerCase().includes(q)) ||
-                        b.lines?.some((l: any) => l.jobId?.toLowerCase().includes(q) || l.styleNo?.toLowerCase().includes(q));
+                    const matchStyle =
+                      itemCategory === "Block Booking"
+                        ? b.items?.some((i: any) => i.yarnCount?.toLowerCase().includes(q) || i.itemDescription?.toLowerCase().includes(q)) ||
+                          b.lines?.some((l: any) => l.itemGroup?.toLowerCase().includes(q) || l.description?.toLowerCase().includes(q))
+                        : itemCategory === "Accessories"
+                        ? b.items?.some((i: any) => i.style?.toLowerCase().includes(q) || i.accessoryName?.toLowerCase().includes(q)) ||
+                          b.lines?.some((l: any) => l.style?.toLowerCase().includes(q) || l.itemGroup?.toLowerCase().includes(q) || l.description?.toLowerCase().includes(q))
+                        : b.items?.some((i: any) => i.styleNo?.toLowerCase().includes(q)) ||
+                          b.lines?.some((l: any) => l.jobId?.toLowerCase().includes(q) || l.styleNo?.toLowerCase().includes(q));
                     if (!matchNo && !matchSupplier && !matchStyle) return false;
                   }
 
@@ -3062,7 +3623,9 @@ function MMProformaInvoiceCreatePage() {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  if (itemCategory === "Accessories") {
+                                  if (itemCategory === "Block Booking") {
+                                    handleAddBlockBookingToPi(b as MMAccessoriesBooking);
+                                  } else if (itemCategory === "Accessories") {
                                     handleAddAccessoriesBookingToPi(b as MMAccessoriesBooking);
                                   } else {
                                     handleAddBookingToPi(b as MMFabricBooking);
@@ -3354,7 +3917,7 @@ function MMProformaInvoiceCreatePage() {
                 <div className="flex flex-wrap gap-2">
                   {attachedBookings.map((b) => (
                     <span key={b.bookingId} className="px-2.5 py-1 bg-slate-100 rounded border text-slate-700 font-mono">
-                      {b.bookingNo} ({b.styleNo}) — ${b.allocatedAmount.toLocaleString()}
+                      {b.bookingNo} {b.styleNo ? `(${b.styleNo})` : ""} — ${b.allocatedAmount.toLocaleString()}
                     </span>
                   ))}
                 </div>
@@ -3366,9 +3929,11 @@ function MMProformaInvoiceCreatePage() {
                 <table className="w-full text-left text-xs border border-slate-200">
                   <thead className="bg-slate-100 text-slate-700 font-bold">
                     <tr>
-                      <th className="p-2 border-b">Job ID</th>
+                      {itemCategory !== "Block Booking" && <th className="p-2 border-b">Job ID</th>}
                       <th className="p-2 border-b">Description</th>
-                      <th className="p-2 border-b text-right">Quantity</th>
+                      <th className="p-2 border-b text-right">
+                        {itemCategory === "Block Booking" ? "Market Qty" : "Quantity"}
+                      </th>
                       <th className="p-2 border-b text-right">Unit Rate</th>
                       <th className="p-2 border-b text-right">Amount ($)</th>
                     </tr>
@@ -3376,17 +3941,19 @@ function MMProformaInvoiceCreatePage() {
                   <tbody>
                     {previewBookingItems.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="py-6 text-center text-slate-400 text-xs font-sans">
+                        <td colSpan={itemCategory === "Block Booking" ? 4 : 5} className="py-6 text-center text-slate-400 text-xs font-sans">
                           No booking items linked to this Proforma Invoice.
                         </td>
                       </tr>
                     ) : (
                       previewBookingItems.map((item) => (
                         <tr key={item.piItemId} className="border-b">
-                          <td className="p-2 font-mono">{item.jobId}</td>
+                          {itemCategory !== "Block Booking" && <td className="p-2 font-mono">{item.jobId}</td>}
                           <td className="p-2">{item.itemDescription}</td>
                           <td className="p-2 text-right font-mono">
-                            {item.quantity.toLocaleString()} {item.unit}
+                            {itemCategory === "Block Booking"
+                              ? `${((item as any).marketQty ?? (item.quantity / 1000)).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 3 })} ${(item as any).marketUnit || "TON (Metric Ton)"}`
+                              : `${item.quantity.toLocaleString()} ${item.unit}`}
                           </td>
                           <td className="p-2 text-right font-mono">${item.unitPrice.toFixed(2)}</td>
                           <td className="p-2 text-right font-mono font-bold">${item.totalAmount.toLocaleString()}</td>
@@ -3527,7 +4094,9 @@ function MMProformaInvoiceCreatePage() {
                         <div>
                           <div className="font-mono font-bold text-teal-600">{b.bookingNo}</div>
                           <div className="text-[11px] text-slate-500">
-                            {b.styleNo} — Garments: {(b.affectedGarmentQty || 0).toLocaleString()} pcs
+                            {itemCategory === "Block Booking"
+                              ? "Advance Mill Yarn Reservation"
+                              : `${b.styleNo} — Garments: ${(b.affectedGarmentQty || 0).toLocaleString()} pcs`}
                           </div>
                         </div>
                         <div className="text-right">

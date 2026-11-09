@@ -57,9 +57,9 @@ interface MMNavGroup {
 
 interface MarketingMerchandisingLayoutProps {
   children: React.ReactNode;
-  activePath: string;
-  breadcrumbs: BreadcrumbItem[];
-  title: string;
+  activePath?: string;
+  breadcrumbs?: BreadcrumbItem[];
+  title?: string;
   subtitle?: string;
   actions?: React.ReactNode;
 }
@@ -160,7 +160,8 @@ const navGroups: MMNavGroup[] = [
       { label: "Accessories Booking Approval", to: "/mm-accessories-booking-approval" },
       { label: "Fabric Booking Register", to: "/mm-fabric-booking-register" },
       { label: "Accessories Booking Register", to: "/mm-accessories-booking-register" },
-      { label: "Manual Booking Registes (Acc)", to: "/mm-manual-booking-register" },
+      { label: "Block Yarn Booking", to: "/mm-manual-booking-register" },
+      { label: "Block Yarn Status", to: "/mm-block-yarn-status" },
     ],
   },
   {
@@ -271,12 +272,13 @@ const getInitialOpenGroups = (): Record<string, boolean> => {
 
 export function MarketingMerchandisingLayout({
   children,
-  activePath,
-  breadcrumbs,
-  title,
+  activePath = "",
+  breadcrumbs = [],
+  title = "",
   subtitle,
   actions,
 }: MarketingMerchandisingLayoutProps) {
+  const currentActivePath = activePath || (typeof window !== "undefined" ? window.location.pathname : "");
   const navigate = useNavigate();
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(getInitialOpenGroups);
@@ -450,17 +452,17 @@ export function MarketingMerchandisingLayout({
                 group.subitems &&
                   group.subitems.some(
                     (sub) =>
-                      activePath.startsWith(sub.to.split("?")[0]) ||
+                      currentActivePath.startsWith(sub.to.split("?")[0]) ||
                       Boolean(
                         sub.subitems &&
                           sub.subitems.some((nested) =>
-                            activePath.startsWith(nested.to.split("?")[0])
+                            currentActivePath.startsWith(nested.to.split("?")[0])
                           )
                       )
                   )
               );
               const isGroupOpen = openGroups[group.key] ?? hasActiveChild;
-              const isActive = activePath.startsWith(group.to || "###") || hasActiveChild;
+              const isActive = currentActivePath.startsWith(group.to || "###") || hasActiveChild;
 
               return (
                 <div key={group.key} className="space-y-0.5">
@@ -526,7 +528,7 @@ export function MarketingMerchandisingLayout({
                         const hasNested = Boolean(sub.subitems && sub.subitems.length > 0);
                         if (hasNested) {
                           const isNestedActive = sub.subitems!.some((nested) =>
-                            activePath.startsWith(nested.to.split("?")[0])
+                            currentActivePath.startsWith(nested.to.split("?")[0])
                           );
                           const isSubmenuOpen = openSubmenus[sub.label] ?? isNestedActive;
 
@@ -552,7 +554,7 @@ export function MarketingMerchandisingLayout({
                               {isSubmenuOpen && (
                                 <div className="ml-3 pl-2.5 border-l border-teal-200/60 dark:border-teal-800/60 space-y-0.5 py-0.5">
                                   {sub.subitems!.map((nested, nIdx) => {
-                                    const isChildActive = activePath === nested.to;
+                                    const isChildActive = currentActivePath === nested.to;
                                     return (
                                       <Link
                                         key={nIdx}
@@ -573,7 +575,7 @@ export function MarketingMerchandisingLayout({
                           );
                         }
 
-                        const isSubActive = activePath === sub.to;
+                        const isSubActive = currentActivePath === sub.to;
                         return (
                           <Link
                             key={sIdx}

@@ -6,9 +6,8 @@ import {
   MMRepository,
   MMAccessoriesBooking,
   MMAccessoriesBookingLine,
-  MMAccessoriesMasterItem,
-  INITIAL_MM_ACCESSORIES_MASTER,
 } from "../lib/marketing-merchandising-data";
+import { MMMasterDataRepository } from "../lib/merchandising-master-data";
 import { DEFAULT_UOMS, UOM } from "../lib/procurement-master-data";
 import {
   Package,
@@ -41,6 +40,309 @@ export const MANUAL_BOOKING_ATTACHMENTS_STORAGE_KEY =
 export type MMAccessoriesBookingAttachmentRecord = MMAttachmentRecord;
 
 export type AccessoriesBookingType = "Block Booking";
+
+export interface MMYarnMasterItem {
+  id: string;
+  itemCode: string;
+  itemName: string;
+  category: "Yarn";
+  unit: string;
+  marketUnit: string;
+  conversionFactor: number;
+  defaultRate: number;
+}
+
+export const INITIAL_YARN_MASTER_ITEMS: MMYarnMasterItem[] = [
+  {
+    id: "yarn-001",
+    itemCode: "YRN-COT-30C",
+    itemName: "100% Combed Cotton Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.45,
+  },
+  {
+    id: "yarn-002",
+    itemCode: "YRN-COT-26C",
+    itemName: "100% Combed Cotton Yarn Ne 26/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.35,
+  },
+  {
+    id: "yarn-003",
+    itemCode: "YRN-COT-20C",
+    itemName: "100% Combed Cotton Yarn Ne 20/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.2,
+  },
+  {
+    id: "yarn-004",
+    itemCode: "YRN-COT-24C",
+    itemName: "100% Combed Cotton Yarn Ne 24/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.25,
+  },
+  {
+    id: "yarn-005",
+    itemCode: "YRN-COT-34C",
+    itemName: "100% Combed Compact Cotton Yarn Ne 34/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.65,
+  },
+  {
+    id: "yarn-006",
+    itemCode: "YRN-COT-40C",
+    itemName: "100% Combed Compact Cotton Yarn Ne 40/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.85,
+  },
+  {
+    id: "yarn-007",
+    itemCode: "YRN-COT-16K",
+    itemName: "100% Carded Cotton Yarn Ne 16/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 2.95,
+  },
+  {
+    id: "yarn-008",
+    itemCode: "YRN-COT-20K",
+    itemName: "100% Carded Cotton Yarn Ne 20/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.05,
+  },
+  {
+    id: "yarn-009",
+    itemCode: "YRN-COT-26K",
+    itemName: "100% Carded Cotton Yarn Ne 26/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.15,
+  },
+  {
+    id: "yarn-010",
+    itemCode: "YRN-COT-30K",
+    itemName: "100% Carded Cotton Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.25,
+  },
+  {
+    id: "yarn-011",
+    itemCode: "YRN-CVC-20",
+    itemName: "60% Cotton 40% Polyester (CVC) Yarn Ne 20/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 2.85,
+  },
+  {
+    id: "yarn-012",
+    itemCode: "YRN-CVC-26",
+    itemName: "60% Cotton 40% Polyester (CVC) Yarn Ne 26/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 2.95,
+  },
+  {
+    id: "yarn-013",
+    itemCode: "YRN-CVC-30",
+    itemName: "60% Cotton 40% Polyester (CVC) Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.1,
+  },
+  {
+    id: "yarn-014",
+    itemCode: "YRN-TC-30",
+    itemName: "65% Polyester 35% Cotton (TC) Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 2.75,
+  },
+  {
+    id: "yarn-015",
+    itemCode: "YRN-SLUB-20",
+    itemName: "100% Cotton Slub Yarn Ne 20/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.4,
+  },
+  {
+    id: "yarn-016",
+    itemCode: "YRN-SLUB-26",
+    itemName: "100% Cotton Slub Yarn Ne 26/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.5,
+  },
+  {
+    id: "yarn-017",
+    itemCode: "YRN-SLUB-30",
+    itemName: "100% Cotton Slub Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.6,
+  },
+  {
+    id: "yarn-018",
+    itemCode: "YRN-MEL-30",
+    itemName: "100% Cotton Grey Melange Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.75,
+  },
+  {
+    id: "yarn-019",
+    itemCode: "YRN-MEL-26",
+    itemName: "100% Cotton Charcoal Melange Yarn Ne 26/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.9,
+  },
+  {
+    id: "yarn-020",
+    itemCode: "YRN-SPN-30",
+    itemName: "95% Cotton 5% Spandex (Elastane) Lycra Core Spun Yarn Ne 30/1 + 40D",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 4.6,
+  },
+  {
+    id: "yarn-021",
+    itemCode: "YRN-SPN-40",
+    itemName: "95% Cotton 5% Spandex (Elastane) Lycra Core Spun Yarn Ne 40/1 + 30D",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 4.85,
+  },
+  {
+    id: "yarn-022",
+    itemCode: "YRN-ORG-30",
+    itemName: "100% Organic Cotton Yarn Ne 30/1 (GOTS Certified)",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 4.1,
+  },
+  {
+    id: "yarn-023",
+    itemCode: "YRN-BCI-30",
+    itemName: "100% BCI Cotton Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.65,
+  },
+  {
+    id: "yarn-024",
+    itemCode: "YRN-REG-30",
+    itemName: "100% Regenagri Cotton Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 4.2,
+  },
+  {
+    id: "yarn-025",
+    itemCode: "YRN-GRS-20",
+    itemName: "100% GRS Recycled Cotton Yarn Ne 20/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 3.15,
+  },
+  {
+    id: "yarn-026",
+    itemCode: "YRN-MOD-30",
+    itemName: "100% Modal / Viscose Rayon Spun Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 4.45,
+  },
+  {
+    id: "yarn-027",
+    itemCode: "YRN-POLY-30",
+    itemName: "100% Polyester Spun Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 2.3,
+  },
+  {
+    id: "yarn-028",
+    itemCode: "YRN-BAM-30",
+    itemName: "100% Bamboo Viscose Yarn Ne 30/1",
+    category: "Yarn",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    defaultRate: 4.35,
+  },
+];
+
+export const YARN_UOM_OPTIONS = [
+  { uomCode: "KG", uomName: "Kilogram" },
+  { uomCode: "TON (Metric Ton)", uomName: "Metric Ton" },
+  { uomCode: "LBS", uomName: "Pounds" },
+  { uomCode: "BAG", uomName: "Bag (50 KG)" },
+  { uomCode: "CONE", uomName: "Cone" },
+  { uomCode: "BALES", uomName: "Bales" },
+];
 
 export interface ManualBookingItemRow {
   id: string;
@@ -97,11 +399,11 @@ export const Route = createFileRoute("/mm-manual-booking")({
   }),
   head: () => ({
     meta: [
-      { title: "Manual Booking — Marketing & Merchandising | CriptonHRIS" },
+      { title: "Block Yarn Booking — Marketing & Merchandising | CriptonHRIS" },
       {
         name: "description",
         content:
-          "Enterprise Manual Booking form replicating ERP interface with customizable items, searchable accessory library, and independent Market Unit conversion.",
+          "Enterprise Block Yarn Booking form with customizable yarn items, yarn library, and KG to TON Unit Relation conversion.",
       },
     ],
   }),
@@ -138,31 +440,31 @@ function generateNextBookingNumber(persistedBookings: MMAccessoriesBooking[]): s
 const DEFAULT_BOOKING_ITEMS: ManualBookingItemRow[] = [
   {
     id: "mbi-1",
-    itemId: "acc-m-001",
-    itemCode: "ACC-BTN-01",
-    itemName: "18L 4-Hole Pearl Button (11.5mm)",
-    unit: "Pcs",
-    marketUnit: "Pcs",
-    conversionFactor: 1,
+    itemId: "yarn-001",
+    itemCode: "YRN-COT-30C",
+    itemName: "100% Combed Cotton Yarn Ne 30/1",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
     bookQty: 5000,
-    marketQty: 5000,
+    marketQty: 5.0,
     storeRcvdQty: 0,
-    rate: 0.015,
-    total: 75.0,
+    rate: 3.45,
+    total: 17250.0,
   },
   {
     id: "mbi-2",
-    itemId: "acc-m-004",
-    itemCode: "ACC-THD-01",
-    itemName: "Astra 40/2 Spun Poly Sewing Thread",
-    unit: "Cone",
-    marketUnit: "Cone",
-    conversionFactor: 1,
-    bookQty: 120,
-    marketQty: 120,
+    itemId: "yarn-002",
+    itemCode: "YRN-COT-26C",
+    itemName: "100% Combed Cotton Yarn Ne 26/1",
+    unit: "KG",
+    marketUnit: "TON (Metric Ton)",
+    conversionFactor: 1000,
+    bookQty: 2500,
+    marketQty: 2.5,
     storeRcvdQty: 0,
-    rate: 1.85,
-    total: 222.0,
+    rate: 3.35,
+    total: 8375.0,
   },
 ];
 
@@ -173,7 +475,7 @@ function MMManualBookingPage() {
 
   // Master Data & Persisted Lists
   const [allBookings, setAllBookings] = useState<MMAccessoriesBooking[]>([]);
-  const [accessoriesMaster, setAccessoriesMaster] = useState<MMAccessoriesMasterItem[]>([]);
+  const [yarnMasterList, setYarnMasterList] = useState<MMYarnMasterItem[]>(INITIAL_YARN_MASTER_ITEMS);
   const [uomsList, setUomsList] = useState<UOM[]>([]);
 
   // Active Booking Form State
@@ -225,10 +527,10 @@ function MMManualBookingPage() {
 
   // Additional Information
   const [note, setNote] = useState<string>(
-    "Block booking for seasonal bulk order. Accessories must match approved standard specs."
+    "Block booking for seasonal bulk order. Yarn must match approved count, composition, and standard spinning specs."
   );
   const [termsAndConditions, setTermsAndConditions] = useState<string>(
-    "1. Quality testing standard: Oeko-Tex Standard 100 Class I.\n2. Quantity tolerance: Max +/- 2% acceptable.\n3. Delivery F.O.R. Pakiza Composite Garments Unit.\n4. Defective or off-shade items subject to replacement within 48 hours."
+    "1. Quality testing standard: Uster Statistics 5% benchmark.\n2. Quantity tolerance: Max +/- 2% acceptable.\n3. Delivery F.O.R. Pakiza Composite Spinning & Knitting Unit.\n4. Defective or off-count yarn lot subject to replacement within 48 hours."
   );
   const [piReference, setPiReference] = useState<string>("Not Linked");
 
@@ -243,8 +545,8 @@ function MMManualBookingPage() {
     rowId: "",
     marketUnit: "",
     consumptionUnit: "",
-    factor: 1,
-    factorInput: "1",
+    factor: 1000,
+    factorInput: "1000",
     previousMarketUnit: "",
   });
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
@@ -261,9 +563,33 @@ function MMManualBookingPage() {
     const loadedBookings = MMRepository.getManualBookings();
     setAllBookings(loadedBookings);
 
-    // Load Accessory items from master data repository
-    const masterItems = MMRepository.getAccessoriesMaster();
-    setAccessoriesMaster(masterItems.length > 0 ? masterItems : INITIAL_MM_ACCESSORIES_MASTER);
+    // Merge Yarn Master list with any yarn counts from merchandising master data
+    try {
+      const yarnCounts = MMMasterDataRepository.getYarnCounts();
+      if (yarnCounts && yarnCounts.length > 0) {
+        const extraItems: MMYarnMasterItem[] = [];
+        yarnCounts.forEach((yc, idx) => {
+          const exists = INITIAL_YARN_MASTER_ITEMS.some((it) => it.itemName.includes(yc.yarnCount));
+          if (!exists) {
+            extraItems.push({
+              id: `yarn-c-${yc.id}`,
+              itemCode: yc.code || `YRN-CNT-${idx + 1}`,
+              itemName: `100% Cotton Yarn Ne ${yc.yarnCount}`,
+              category: "Yarn",
+              unit: "KG",
+              marketUnit: "TON (Metric Ton)",
+              conversionFactor: 1000,
+              defaultRate: 3.45,
+            });
+          }
+        });
+        if (extraItems.length > 0) {
+          setYarnMasterList([...INITIAL_YARN_MASTER_ITEMS, ...extraItems]);
+        }
+      }
+    } catch (e) {
+      console.error("Error loading yarn counts:", e);
+    }
 
     // Load UOM master
     let storedUoms: UOM[] = DEFAULT_UOMS;
@@ -315,14 +641,15 @@ function MMManualBookingPage() {
     // Restore item rows
     if (b.items && b.items.length > 0) {
       const restored: ManualBookingItemRow[] = b.items.map((it: any, idx) => {
-        const factor = it.conversionFactor && it.conversionFactor > 0 ? it.conversionFactor : 1;
+        const rUnit = it.unit || "KG";
+        const mUnit = it.marketUnit || "TON (Metric Ton)";
+        const defaultFactor = (rUnit === "KG" && (mUnit === "TON (Metric Ton)" || mUnit === "TON")) ? 1000 : 1;
+        const factor = it.conversionFactor && it.conversionFactor > 0 ? it.conversionFactor : defaultFactor;
         const bQty = Number(it.bookedQty ?? it.bookQty ?? 0);
         const mQty =
           it.marketQty != null
             ? Number(it.marketQty)
-            : Number((bQty / factor).toFixed(2));
-        const rUnit = it.unit || "Pcs";
-        const mUnit = it.marketUnit || rUnit;
+            : Number((bQty / factor).toFixed(4));
         const rate = Number(it.bookedRate ?? it.rate ?? 0);
         const total =
           it.totalAmount != null
@@ -332,7 +659,7 @@ function MMManualBookingPage() {
           id: it.bookingItemId || it.id || `mbi-${idx}`,
           itemId: it.preCostItemId || it.itemId || "",
           itemCode: it.itemCode || it.codeSpecPo || "",
-          itemName: it.accessoryName || it.itemDescription || it.itemName || "Accessory Item",
+          itemName: it.accessoryName || it.itemDescription || it.itemName || "Yarn Item",
           unit: rUnit,
           marketUnit: mUnit,
           conversionFactor: factor,
@@ -349,19 +676,22 @@ function MMManualBookingPage() {
       b.lines.forEach((l, lIdx) => {
         if (l.sizeWiseDetails && l.sizeWiseDetails.length > 0) {
           l.sizeWiseDetails.forEach((d, dIdx) => {
-            const factor = d.conversionFactor && d.conversionFactor > 0 ? d.conversionFactor : 1;
+            const rUnit = d.unit || l.unit || "KG";
+            const mUnit = d.marketUnit || "TON (Metric Ton)";
+            const defaultFactor = (rUnit === "KG" && (mUnit === "TON (Metric Ton)" || mUnit === "TON")) ? 1000 : 1;
+            const factor = d.conversionFactor && d.conversionFactor > 0 ? d.conversionFactor : defaultFactor;
             const bQty = Number(d.bookQty || 0);
             const mQty =
               d.marketQty != null
                 ? Number(d.marketQty)
-                : Number((bQty / factor).toFixed(2));
+                : Number((bQty / factor).toFixed(4));
             restored.push({
               id: d.id || `mbi-${lIdx}-${dIdx}`,
               itemId: "",
               itemCode: d.codeSpecPo || "",
-              itemName: d.itemName || l.accessoryItem || "Accessory Item",
-              unit: d.unit || l.unit || "Pcs",
-              marketUnit: d.marketUnit || d.unit || l.unit || "Pcs",
+              itemName: d.itemName || l.accessoryItem || "Yarn Item",
+              unit: rUnit,
+              marketUnit: mUnit,
               conversionFactor: factor,
               bookQty: bQty,
               marketQty: mQty,
@@ -371,16 +701,20 @@ function MMManualBookingPage() {
             });
           });
         } else {
+          const rUnit = l.unit || "KG";
+          const mUnit = "TON (Metric Ton)";
+          const factor = (rUnit === "KG" && (mUnit === "TON (Metric Ton)" || mUnit === "TON")) ? 1000 : 1;
+          const bQty = Number(l.bookAmt || l.requiredQty || 0);
           restored.push({
             id: l.id || `mbi-${lIdx}`,
             itemId: l.estimationItemId || "",
             itemCode: "",
-            itemName: l.accessoryItem || "Accessory Item",
-            unit: l.unit || "Pcs",
-            marketUnit: l.unit || "Pcs",
-            conversionFactor: 1,
-            bookQty: Number(l.bookAmt || l.requiredQty || 0),
-            marketQty: Number(l.bookAmt || l.requiredQty || 0),
+            itemName: l.accessoryItem || "Yarn Item",
+            unit: rUnit,
+            marketUnit: mUnit,
+            conversionFactor: factor,
+            bookQty: bQty,
+            marketQty: Number((bQty / factor).toFixed(4)),
             storeRcvdQty: 0,
             rate: Number(l.rate || 0),
             total: Number(l.bookAmt || 0),
@@ -389,20 +723,19 @@ function MMManualBookingPage() {
       });
       setItems(restored.length > 0 ? restored : DEFAULT_BOOKING_ITEMS);
     }
-    toast.success(`Loaded Manual Booking ${b.bookingNo}`);
+    toast.success(`Loaded Block Yarn Booking ${b.bookingNo}`);
   };
 
-  // Filter accessory items for search picker
-  const filteredAccessoryItems = useMemo(() => {
-    if (!itemSearchQuery.trim()) return accessoriesMaster;
+  // Filter yarn items for search picker
+  const filteredYarnItems = useMemo(() => {
+    if (!itemSearchQuery.trim()) return yarnMasterList;
     const q = itemSearchQuery.toLowerCase().trim();
-    return accessoriesMaster.filter(
+    return yarnMasterList.filter(
       (it) =>
         it.itemName.toLowerCase().includes(q) ||
-        (it.itemCode && it.itemCode.toLowerCase().includes(q)) ||
-        (it.category && it.category.toLowerCase().includes(q))
+        (it.itemCode && it.itemCode.toLowerCase().includes(q))
     );
-  }, [accessoriesMaster, itemSearchQuery]);
+  }, [yarnMasterList, itemSearchQuery]);
 
   // Totals for detailed grid
   const totals = useMemo(() => {
@@ -420,7 +753,7 @@ function MMManualBookingPage() {
 
     return {
       bookQty: Number(bookQty.toFixed(2)),
-      marketQty: Number(marketQty.toFixed(2)),
+      marketQty: Number(marketQty.toFixed(4)),
       storeRcvdQty: Number(storeRcvdQty.toFixed(2)),
       totalAmount: Number(totalAmount.toFixed(2)),
     };
@@ -428,24 +761,25 @@ function MMManualBookingPage() {
 
   // Row Management
   const handleAddRow = () => {
-    const firstItem = accessoriesMaster[0];
-    const defaultUnit = firstItem?.unit || "Pcs";
+    const firstItem = yarnMasterList[0] || INITIAL_YARN_MASTER_ITEMS[0];
+    const defaultUnit = "KG";
+    const defaultMarketUnit = "TON (Metric Ton)";
     const newRow: ManualBookingItemRow = {
       id: `mbi-${Date.now()}-${items.length}`,
-      itemId: firstItem?.id || "",
-      itemCode: firstItem?.itemCode || "",
-      itemName: firstItem?.itemName || "Select Accessory Item",
+      itemId: firstItem?.id || "yarn-001",
+      itemCode: firstItem?.itemCode || "YRN-COT-30C",
+      itemName: firstItem?.itemName || "100% Combed Cotton Yarn Ne 30/1",
       unit: defaultUnit,
-      marketUnit: defaultUnit,
-      conversionFactor: 1,
+      marketUnit: defaultMarketUnit,
+      conversionFactor: 1000,
       bookQty: 0,
       marketQty: 0,
       storeRcvdQty: 0,
-      rate: firstItem?.defaultRate || 0,
+      rate: firstItem?.defaultRate || 3.45,
       total: 0,
     };
     setItems((prev) => [...prev, newRow]);
-    toast.success("New item row added.");
+    toast.success("New yarn booking row added.");
   };
 
   const handleDeleteRow = (rowId: string) => {
@@ -457,14 +791,15 @@ function MMManualBookingPage() {
     toast.info("Item row removed.");
   };
 
-  const handleSelectItem = (rowId: string, item: MMAccessoriesMasterItem) => {
-    const primaryUnit = item.unit || "Pcs";
+  const handleSelectItem = (rowId: string, item: MMYarnMasterItem) => {
+    const primaryUnit = item.unit || "KG";
+    const marketUnit = item.marketUnit || "TON (Metric Ton)";
+    const factor = item.conversionFactor || 1000;
     setItems((prev) =>
       prev.map((r) => {
         if (r.id !== rowId) return r;
-        const rate = item.defaultRate || r.rate || 0;
-        const factor = 1;
-        const marketQty = Number((r.bookQty / factor).toFixed(2));
+        const rate = item.defaultRate || r.rate || 3.45;
+        const marketQty = Number((r.bookQty / factor).toFixed(4));
         const total = Number((r.bookQty * rate).toFixed(2));
         return {
           ...r,
@@ -472,7 +807,7 @@ function MMManualBookingPage() {
           itemCode: item.itemCode,
           itemName: item.itemName,
           unit: primaryUnit,
-          marketUnit: primaryUnit,
+          marketUnit: marketUnit,
           conversionFactor: factor,
           marketQty,
           rate,
@@ -482,7 +817,7 @@ function MMManualBookingPage() {
     );
     setItemPickerRowId(null);
     setItemSearchQuery("");
-    toast.success(`Selected item "${item.itemName}"`);
+    toast.success(`Selected yarn item "${item.itemName}"`);
   };
 
   // Unit and Market Unit change handlers
@@ -502,6 +837,24 @@ function MMManualBookingPage() {
           };
         })
       );
+    } else if (
+      (newUnit === "KG" && (row.marketUnit === "TON (Metric Ton)" || row.marketUnit === "TON")) ||
+      ((newUnit === "TON (Metric Ton)" || newUnit === "TON") && row.marketUnit === "KG")
+    ) {
+      const factor = newUnit === "KG" ? 1000 : 0.001;
+      setItems((prev) =>
+        prev.map((r) => {
+          if (r.id !== rowId) return r;
+          const marketQty = Number((r.bookQty / factor).toFixed(4));
+          return {
+            ...r,
+            unit: newUnit,
+            conversionFactor: factor,
+            marketQty,
+          };
+        })
+      );
+      toast.success(`Unit relation: 1 ${row.marketUnit} = ${factor} ${newUnit}`);
     } else {
       setConversionModal({
         isOpen: true,
@@ -539,6 +892,24 @@ function MMManualBookingPage() {
         })
       );
       toast.info(`Market Unit set to ${newMarketUnit} (1 : 1 relation)`);
+    } else if (
+      (row.unit === "KG" && (newMarketUnit === "TON (Metric Ton)" || newMarketUnit === "TON")) ||
+      ((row.unit === "TON (Metric Ton)" || row.unit === "TON") && newMarketUnit === "KG")
+    ) {
+      const factor = row.unit === "KG" ? 1000 : 0.001;
+      setItems((prev) =>
+        prev.map((r) => {
+          if (r.id !== rowId) return r;
+          const marketQty = Number((r.bookQty / factor).toFixed(4));
+          return {
+            ...r,
+            marketUnit: newMarketUnit,
+            conversionFactor: factor,
+            marketQty,
+          };
+        })
+      );
+      toast.success(`Unit relation: 1 ${newMarketUnit} = ${factor} ${row.unit}`);
     } else {
       // Units differ — trigger Unit Relation Dialog
       setConversionModal({
@@ -563,7 +934,7 @@ function MMManualBookingPage() {
       marketUnit: row.marketUnit,
       consumptionUnit: row.unit,
       factor: row.conversionFactor,
-      factorInput: String(row.conversionFactor || 1),
+      factorInput: String(row.conversionFactor || 1000),
       previousMarketUnit: row.marketUnit,
     });
   };
@@ -579,7 +950,7 @@ function MMManualBookingPage() {
     setItems((prev) =>
       prev.map((r) => {
         if (r.id !== conversionModal.rowId) return r;
-        const calculatedMarketQty = Number((r.bookQty / factorNum).toFixed(2));
+        const calculatedMarketQty = Number((r.bookQty / factorNum).toFixed(4));
         return {
           ...r,
           marketUnit: conversionModal.marketUnit,
@@ -597,7 +968,7 @@ function MMManualBookingPage() {
       rowId: "",
       marketUnit: "",
       consumptionUnit: "",
-      factor: 1,
+      factor: 1000,
       factorInput: "",
       previousMarketUnit: "",
     });
@@ -621,7 +992,7 @@ function MMManualBookingPage() {
       rowId: "",
       marketUnit: "",
       consumptionUnit: "",
-      factor: 1,
+      factor: 1000,
       factorInput: "",
       previousMarketUnit: "",
     });
@@ -634,13 +1005,31 @@ function MMManualBookingPage() {
     setItems((prev) =>
       prev.map((r) => {
         if (r.id !== rowId) return r;
-        const factor = r.conversionFactor > 0 ? r.conversionFactor : 1;
-        const marketQty = Number((num / factor).toFixed(2));
+        const factor = r.conversionFactor > 0 ? r.conversionFactor : 1000;
+        const marketQty = Number((num / factor).toFixed(4));
         const total = Number((num * (r.rate || 0)).toFixed(2));
         return {
           ...r,
           bookQty: num,
           marketQty,
+          total,
+        };
+      })
+    );
+  };
+
+  const handleMarketQtyChange = (rowId: string, val: string) => {
+    const num = parseFloat(val) || 0;
+    setItems((prev) =>
+      prev.map((r) => {
+        if (r.id !== rowId) return r;
+        const factor = r.conversionFactor > 0 ? r.conversionFactor : 1000;
+        const bookQty = Number((num * factor).toFixed(2));
+        const total = Number((bookQty * (r.rate || 0)).toFixed(2));
+        return {
+          ...r,
+          bookQty,
+          marketQty: num,
           total,
         };
       })
@@ -677,8 +1066,8 @@ function MMManualBookingPage() {
       prev.map((r) => {
         if (r.id !== rowId) return r;
         const rounded = Math.ceil(r.bookQty);
-        const factor = r.conversionFactor > 0 ? r.conversionFactor : 1;
-        const marketQty = Number((rounded / factor).toFixed(2));
+        const factor = r.conversionFactor > 0 ? r.conversionFactor : 1000;
+        const marketQty = Number((rounded / factor).toFixed(4));
         const total = Number((rounded * (r.rate || 0)).toFixed(2));
         return {
           ...r,
@@ -716,12 +1105,12 @@ function MMManualBookingPage() {
         id: `line-${Date.now()}`,
         ourRef: ourRef || "JOB-2026-0001",
         style: "STYLE-2026",
-        grpType: "TRIMS",
-        accessoryItem: items[0]?.itemName || "Manual Block Booking Accessories",
-        description: "Manual Block Booking Accessories",
+        grpType: "YARN",
+        accessoryItem: items[0]?.itemName || "Block Yarn Booking",
+        description: "Block Yarn Booking",
         bookAmt: totals.totalAmount,
         budgetValue: totals.totalAmount,
-        unit: items[0]?.unit || "Pcs",
+        unit: items[0]?.unit || "KG",
         sizeWiseDetails: items.map((r) => ({
           id: r.id,
           lineId: `line-${Date.now()}`,
@@ -980,25 +1369,25 @@ function MMManualBookingPage() {
 
     if (!savedBooking) {
       toast.error(
-        "Validation Notice: Please save or submit this Manual Booking before creating a Proforma Invoice."
+        "Validation Notice: Please save or submit this Block Yarn Booking before creating a Proforma Invoice."
       );
       return;
     }
 
     if (!savedBooking.items?.length && !items.length) {
-      toast.error("Validation Notice: Manual Booking must contain items to create a PI.");
+      toast.error("Validation Notice: Block Yarn Booking must contain items to create a PI.");
       return;
     }
 
-    toast.info(`Opening Proforma Invoice Entry for Manual Booking ${savedBooking.bookingNo}...`);
+    toast.info(`Opening Proforma Invoice Entry for Block Yarn Booking ${savedBooking.bookingNo}...`);
 
     navigate({
       to: "/mm-proforma-invoice-create",
       search: {
         bookingId: savedBooking.id,
         bookingNo: savedBooking.bookingNo,
-        source: "manual-booking",
-        item: "Accessories",
+        source: "block-booking",
+        item: "Block Booking",
       } as any,
     });
   };
@@ -1010,12 +1399,12 @@ function MMManualBookingPage() {
   return (
     <MarketingMerchandisingLayout
       activePath="/mm-manual-booking"
-      title="Manual Booking"
+      title="Block Yarn Booking"
       breadcrumbs={[
         { label: "Marketing & Merchandising", to: "/mm-dashboard" },
         { label: "Booking Information" },
-        { label: "Manual Booking Registes (Acc)", to: "/mm-manual-booking-register" },
-        { label: "Manual Booking Form" },
+        { label: "Block Yarn Booking", to: "/mm-manual-booking-register" },
+        { label: "Block Yarn Booking" },
       ]}
       actions={
         <div className="flex items-center gap-2">
@@ -1048,7 +1437,7 @@ function MMManualBookingPage() {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-teal-600"></span>
                 <span className="font-black text-slate-800 dark:text-slate-100 uppercase tracking-wide text-xs">
-                  Manual Booking
+                  Block Booking
                 </span>
                 <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-teal-100 dark:bg-teal-950/70 text-teal-800 dark:text-teal-300 font-bold border border-teal-200 dark:border-teal-800">
                   {bookingNo}
@@ -1266,16 +1655,15 @@ function MMManualBookingPage() {
           </div>
 
           {/* ================================================================ */}
-          {/* 3. DETAILED SIZE-WISE BOOKING GRID                                */}
-          {/* Removed: Job ID, Color, Size, GMT Qty, Req Qty, Wastage %, Desc  */}
-          {/* Added: Searchable Item Name, Market Unit, Unit Relation Modal     */}
+          {/* 3. YARN BOOKING DETAILS                                          */}
+          {/* Searchable Yarn Item Name, KG / TON conversion, bidirectional    */}
           {/* ================================================================ */}
           <div className="p-3 bg-white dark:bg-slate-900 space-y-2">
             <div className="flex items-center justify-between pb-1 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-teal-600"></span>
                 <span className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide text-[11px]">
-                  Detailed Size-wise Booking Grid
+                  Yarn Booking Details
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 font-mono text-slate-600 dark:text-slate-400">
                   {items.length} item{items.length !== 1 ? "s" : ""}
@@ -1300,29 +1688,29 @@ function MMManualBookingPage() {
                     <th className="py-2 px-2.5 text-center border-r border-slate-300 dark:border-slate-700 w-10">
                       #
                     </th>
-                    <th className="py-2 px-3 border-r border-slate-300 dark:border-slate-700 min-w-[260px]">
+                    <th className="py-2 px-3 border-r border-slate-300 dark:border-slate-700 min-w-[280px]">
                       Item Name
                     </th>
                     <th className="py-2 px-2.5 text-center border-r border-slate-300 dark:border-slate-700 w-28">
                       Unit
                     </th>
-                    <th className="py-2 px-2.5 text-center border-r border-slate-300 dark:border-slate-700 w-32 bg-teal-50/50 dark:bg-teal-950/20 text-teal-800 dark:text-teal-300">
+                    <th className="py-2 px-2.5 text-center border-r border-slate-300 dark:border-slate-700 w-36 bg-teal-50/50 dark:bg-teal-950/20 text-teal-800 dark:text-teal-300">
                       Market Unit
                     </th>
-                    <th className="py-2 px-2.5 text-center border-r border-slate-300 dark:border-slate-700 w-36">
+                    <th className="py-2 px-2.5 text-center border-r border-slate-300 dark:border-slate-700 w-40">
                       Unit Relation / Factor
                     </th>
-                    <th className="py-2 px-2.5 text-right border-r border-slate-300 dark:border-slate-700 font-extrabold text-teal-700 dark:text-teal-400 w-28">
-                      Book Qty
+                    <th className="py-2 px-2.5 text-right border-r border-slate-300 dark:border-slate-700 font-extrabold text-teal-700 dark:text-teal-400 w-32">
+                      Quantity (KG)
                     </th>
-                    <th className="py-2 px-2.5 text-right border-r border-slate-300 dark:border-slate-700 font-bold text-slate-800 dark:text-slate-200 w-28">
-                      Market Qty
+                    <th className="py-2 px-2.5 text-right border-r border-slate-300 dark:border-slate-700 font-bold text-slate-800 dark:text-slate-200 w-32">
+                      Market Qty (TON)
                     </th>
                     <th className="py-2 px-2.5 text-right border-r border-slate-300 dark:border-slate-700 w-24">
                       Store Rcvd
                     </th>
                     <th className="py-2 px-2 text-right border-r border-slate-300 dark:border-slate-700 w-24">
-                      Rate ($)
+                      Rate ($/KG)
                     </th>
                     <th className="py-2 px-2.5 text-right font-bold text-emerald-700 dark:text-emerald-400 w-28">
                       Total ($)
@@ -1338,10 +1726,10 @@ function MMManualBookingPage() {
                       <td colSpan={11} className="py-10 text-center text-slate-400 font-sans">
                         <Package className="w-8 h-8 mx-auto mb-1.5 text-slate-300 dark:text-slate-600" />
                         <p className="font-semibold text-slate-600 dark:text-slate-400">
-                          No booking items added yet.
+                          No yarn booking items added yet.
                         </p>
                         <p className="text-[11px] text-slate-400 mt-1">
-                          Click "Add Item Row" to add your first accessory line.
+                          Click "Add Item Row" to add your first yarn line.
                         </p>
                       </td>
                     </tr>
@@ -1368,11 +1756,11 @@ function MMManualBookingPage() {
                                 setItemSearchQuery("");
                               }}
                               className="w-full text-left px-2 py-1 rounded bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 border border-slate-300 dark:border-slate-700 flex items-center justify-between gap-2 transition cursor-pointer group"
-                              title="Click to select accessory item from master list"
+                              title="Click to select yarn item from yarn library"
                             >
                               <div className="truncate">
                                 <span className="font-semibold text-slate-900 dark:text-white">
-                                  {r.itemName || "Select Accessory Item..."}
+                                  {r.itemName || "Select Yarn Item..."}
                                 </span>
                                 {r.itemCode && (
                                   <span className="ml-1.5 font-mono text-[10px] text-teal-600 dark:text-teal-400 font-medium">
@@ -1384,22 +1772,22 @@ function MMManualBookingPage() {
                             </button>
                           </td>
 
-                          {/* 3. Unit (Consumption Unit) */}
+                          {/* 3. Unit (Default KG) */}
                           <td className="py-1.5 px-2 border-r border-slate-200 dark:border-slate-800 text-center">
                             <select
                               value={r.unit}
                               onChange={(e) => handleUnitChange(r.id, e.target.value)}
                               className="w-full px-1.5 py-1 text-center font-mono font-bold text-xs rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-1 focus:ring-teal-500 focus:outline-none"
                             >
-                              {uomsList.map((u) => (
-                                <option key={u.id} value={u.uomCode}>
+                              {YARN_UOM_OPTIONS.map((u) => (
+                                <option key={u.uomCode} value={u.uomCode}>
                                   {u.uomCode}
                                 </option>
                               ))}
                             </select>
                           </td>
 
-                          {/* 4. Market Unit (Beside Unit, Searchable selection) */}
+                          {/* 4. Market Unit (Default TON (Metric Ton)) */}
                           <td className="py-1.5 px-2 border-r border-slate-200 dark:border-slate-800 text-center bg-teal-50/30 dark:bg-teal-950/10">
                             <select
                               value={r.marketUnit}
@@ -1407,15 +1795,15 @@ function MMManualBookingPage() {
                               className="w-full px-1.5 py-1 text-center font-mono font-bold text-xs rounded border border-teal-400 dark:border-teal-700 bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-300 focus:ring-1 focus:ring-teal-500 focus:outline-none"
                               title="Select Market Unit (conversion dialog opens if different from Unit)"
                             >
-                              {uomsList.map((u) => (
-                                <option key={u.id} value={u.uomCode}>
-                                  {u.uomCode} ({u.uomName})
+                              {YARN_UOM_OPTIONS.map((u) => (
+                                <option key={u.uomCode} value={u.uomCode}>
+                                  {u.uomName ? `${u.uomCode} (${u.uomName})` : u.uomCode}
                                 </option>
                               ))}
                             </select>
                           </td>
 
-                          {/* 5. Unit Relation / Factor */}
+                          {/* 5. Unit Relation / Factor (Default 1,000 for TON to KG) */}
                           <td className="py-1.5 px-2.5 border-r border-slate-200 dark:border-slate-800 text-center">
                             {isConverted ? (
                               <button
@@ -1426,7 +1814,7 @@ function MMManualBookingPage() {
                               >
                                 <Scale className="w-3 h-3 text-teal-600 shrink-0" />
                                 <span>
-                                  1 {r.marketUnit} = {r.conversionFactor} {r.unit}
+                                  1 {r.marketUnit.includes("TON") ? "TON" : r.marketUnit} = {r.conversionFactor.toLocaleString()} {r.unit}
                                 </span>
                               </button>
                             ) : (
@@ -1439,7 +1827,7 @@ function MMManualBookingPage() {
                             )}
                           </td>
 
-                          {/* 6. Book Qty (with R> Round Up button) */}
+                          {/* 6. Quantity (KG) (with R> Round Up button) */}
                           <td className="py-1.5 px-2 text-right border-r border-slate-200 dark:border-slate-800 font-bold text-teal-700 dark:text-teal-400">
                             <div className="flex items-center justify-end gap-1">
                               <input
@@ -1448,7 +1836,11 @@ function MMManualBookingPage() {
                                 value={r.bookQty}
                                 onChange={(e) => handleBookQtyChange(r.id, e.target.value)}
                                 className="w-20 px-1 py-0.5 text-right rounded border border-transparent hover:border-teal-400 bg-transparent focus:bg-white dark:focus:bg-slate-900 font-bold text-teal-700 dark:text-teal-400"
+                                title="Quantity (KG) — Market Quantity (TON) = Quantity (KG) ÷ 1,000"
                               />
+                              <span className="text-[10px] text-teal-600 dark:text-teal-400 font-sans shrink-0">
+                                {r.unit}
+                              </span>
                               <button
                                 type="button"
                                 onClick={() => handleRoundUpBookQty(r.id)}
@@ -1460,17 +1852,21 @@ function MMManualBookingPage() {
                             </div>
                           </td>
 
-                          {/* 7. Market Qty (Calculated automatically from Factor) */}
-                          <td className="py-1.5 px-2.5 text-right border-r border-slate-200 dark:border-slate-800 font-mono font-bold text-slate-800 dark:text-slate-200">
-                            <span>
-                              {(r.marketQty || 0).toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                            </span>
-                            <span className="text-[10px] text-slate-400 ml-1 font-sans">
-                              {r.marketUnit}
-                            </span>
+                          {/* 7. Market Qty (TON) (Editable bidirectional conversion) */}
+                          <td className="py-1.5 px-2 text-right border-r border-slate-200 dark:border-slate-800 font-mono font-bold text-slate-800 dark:text-slate-200">
+                            <div className="flex items-center justify-end gap-1">
+                              <input
+                                type="number"
+                                step="any"
+                                value={r.marketQty}
+                                onChange={(e) => handleMarketQtyChange(r.id, e.target.value)}
+                                className="w-20 px-1 py-0.5 text-right rounded border border-transparent hover:border-teal-400 bg-transparent focus:bg-white dark:focus:bg-slate-900 font-bold text-slate-800 dark:text-slate-200"
+                                title="Market Quantity (TON) — Quantity (KG) = Market Quantity (TON) × 1,000"
+                              />
+                              <span className="text-[10px] text-slate-400 font-sans shrink-0">
+                                {r.marketUnit.includes("TON") ? "TON" : r.marketUnit}
+                              </span>
+                            </div>
                           </td>
 
                           {/* 8. Store Rcvd Qty (Non-editable) */}
@@ -1536,13 +1932,15 @@ function MMManualBookingPage() {
                       {totals.bookQty.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      })}
+                      })}{" "}
+                      KG
                     </td>
                     <td className="py-2 px-2.5 text-right text-slate-800 dark:text-slate-200">
                       {totals.marketQty.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
+                        minimumFractionDigits: 4,
+                        maximumFractionDigits: 4,
+                      })}{" "}
+                      TON
                     </td>
                     <td className="py-2 px-2.5 text-right text-slate-500">
                       {totals.storeRcvdQty.toLocaleString(undefined, {
@@ -1575,7 +1973,7 @@ function MMManualBookingPage() {
                 type="button"
                 onClick={() => setShowAttachmentModal(true)}
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-all shadow-xs cursor-pointer"
-                title="Document Storage — Manual Booking Attachments"
+                title="Document Storage — Block Yarn Booking Attachments"
               >
                 <Paperclip className="w-3.5 h-3.5 text-teal-600" />
                 <span>Attachment ({attachments.length})</span>
@@ -1597,7 +1995,7 @@ function MMManualBookingPage() {
                 type="button"
                 onClick={handleCreatePI}
                 className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all border border-slate-300 dark:border-slate-750 shadow-xs cursor-pointer"
-                title="Create Proforma Invoice from this Manual Booking"
+                title="Create Proforma Invoice from this Block Yarn Booking"
               >
                 <FileText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Proforma Invoice Create</span>
@@ -1632,7 +2030,7 @@ function MMManualBookingPage() {
                     disabled={isSaving || isSubmitting}
                     onClick={handleSaveBooking}
                     className="px-5 py-2 rounded-xl font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-100 shadow-xs flex items-center gap-1.5 text-xs transition-colors disabled:opacity-50 cursor-pointer"
-                    title="Save current Manual Booking as draft"
+                    title="Save current Block Yarn Booking as draft"
                   >
                     <Save className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                     <span>{isSaving ? "Saving..." : "Save"}</span>
@@ -1642,7 +2040,7 @@ function MMManualBookingPage() {
                     disabled={isSubmitting || isSaving}
                     onClick={handleSubmitBooking}
                     className="px-6 py-2 rounded-xl font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-sm flex items-center gap-1.5 text-xs transition-colors disabled:opacity-50 cursor-pointer"
-                    title="Validate and Submit Manual Booking"
+                    title="Validate and Submit Block Yarn Booking"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>{isSubmitting ? "Submitting..." : "Submit for Approval"}</span>
@@ -1654,7 +2052,7 @@ function MMManualBookingPage() {
         </div>
 
         {/* ================================================================== */}
-        {/* MODAL 1: SEARCHABLE ACCESSORY ITEM PICKER                          */}
+        {/* MODAL 1: SEARCHABLE YARN ITEM PICKER                               */}
         {/* ================================================================== */}
         {itemPickerRowId && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
@@ -1663,7 +2061,7 @@ function MMManualBookingPage() {
               <div className="bg-slate-800 text-white px-4 py-3 border-b border-slate-700 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Package className="w-4 h-4 text-teal-400" />
-                  <span className="font-bold text-sm">Select Accessory Item</span>
+                  <span className="font-bold text-sm">Select Yarn Item</span>
                 </div>
                 <button
                   type="button"
@@ -1684,7 +2082,7 @@ function MMManualBookingPage() {
                   <input
                     type="text"
                     autoFocus
-                    placeholder="Search accessory items by name, code, category..."
+                    placeholder="Search yarn items by count, composition, code, type..."
                     value={itemSearchQuery}
                     onChange={(e) => setItemSearchQuery(e.target.value)}
                     className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:outline-none"
@@ -1692,25 +2090,25 @@ function MMManualBookingPage() {
                 </div>
               </div>
 
-              {/* Item Table (Exactly 3 columns: Item Code | Item Name | UoM) */}
+              {/* Item Table (Item Code | Yarn Item Name | Unit) */}
               <div className="flex-1 overflow-y-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold sticky top-0 border-b border-slate-200 dark:border-slate-700 z-10">
                     <tr>
                       <th className="py-2 px-3 border-r border-slate-200 dark:border-slate-700 w-36">Item Code</th>
-                      <th className="py-2 px-3 border-r border-slate-200 dark:border-slate-700">Item Name</th>
-                      <th className="py-2 px-3 text-center w-28">UoM</th>
+                      <th className="py-2 px-3 border-r border-slate-200 dark:border-slate-700">Yarn Item Name</th>
+                      <th className="py-2 px-3 text-center w-28">Unit</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {filteredAccessoryItems.length === 0 ? (
+                    {filteredYarnItems.length === 0 ? (
                       <tr>
                         <td colSpan={3} className="p-8 text-center text-slate-400">
-                          No matching accessory items found.
+                          No matching yarn items found.
                         </td>
                       </tr>
                     ) : (
-                      filteredAccessoryItems.map((item) => (
+                      filteredYarnItems.map((item) => (
                         <tr
                           key={item.id}
                           onClick={() => handleSelectItem(itemPickerRowId, item)}
@@ -1722,8 +2120,8 @@ function MMManualBookingPage() {
                           <td className="py-2 px-3 font-semibold text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-800">
                             {item.itemName}
                           </td>
-                          <td className="py-2 px-3 text-center font-mono font-medium text-slate-700 dark:text-slate-300">
-                            {item.unit || "Pcs"}
+                          <td className="py-2 px-3 text-center font-mono font-bold text-teal-700 dark:text-teal-300">
+                            {item.unit || "KG"}
                           </td>
                         </tr>
                       ))
@@ -1734,7 +2132,7 @@ function MMManualBookingPage() {
 
               {/* Footer */}
               <div className="p-3 bg-slate-100 dark:bg-slate-850 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px] text-slate-500">
-                <span>Total Items: {filteredAccessoryItems.length}</span>
+                <span>Total Yarn Items: {filteredYarnItems.length}</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -1839,8 +2237,8 @@ function MMManualBookingPage() {
                     <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
                     <span>
                       <strong>Formula:</strong> 1 {conversionModal.marketUnit} ={" "}
-                      {conversionModal.factorInput} {conversionModal.consumptionUnit}. (Market Qty =
-                      Book Qty ÷ {conversionModal.factorInput})
+                      {Number(conversionModal.factorInput).toLocaleString()} {conversionModal.consumptionUnit}. (Market Quantity (TON) =
+                      Quantity (KG) ÷ {Number(conversionModal.factorInput).toLocaleString()} | Quantity (KG) = Market Quantity (TON) × {Number(conversionModal.factorInput).toLocaleString()})
                     </span>
                   </div>
                 ) : (
@@ -1918,7 +2316,7 @@ function MMManualBookingPage() {
                 <div className="flex items-center gap-2">
                   <Printer className="w-4 h-4 text-teal-400" />
                   <span className="font-bold text-sm">
-                    Print Preview — Manual Booking Sheet ({bookingNo})
+                    Print Preview — Block Yarn Booking Sheet ({bookingNo})
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -1948,13 +2346,13 @@ function MMManualBookingPage() {
                     Pakiza Knit Composite Ltd.
                   </h1>
                   <p className="text-xs text-slate-600 font-medium">
-                    Central Merchandising &amp; Accessories Procurement Division
+                    Central Merchandising &amp; Yarn Procurement Division
                   </p>
                   <p className="text-[11px] text-slate-500">
                     Plot # 12-14, Gorai Industrial Area, Mirzapur, Tangail, Bangladesh
                   </p>
                   <div className="mt-2 inline-block bg-slate-100 border border-slate-300 px-4 py-1 rounded text-xs font-bold uppercase tracking-wide">
-                    Manual Booking Order Sheet
+                    Block Yarn Booking Order Sheet
                   </div>
                 </div>
 
@@ -1994,16 +2392,17 @@ function MMManualBookingPage() {
                 {/* Items Table */}
                 <div className="space-y-1">
                   <span className="font-bold text-xs uppercase tracking-wide text-slate-700">
-                    Manual Booking Items
+                    Block Yarn Booking Items
                   </span>
                   <table className="w-full border-collapse border border-slate-300 text-xs">
                     <thead className="bg-slate-100 font-bold text-slate-800">
                       <tr>
                         <th className="border border-slate-300 p-1.5 text-center w-8">#</th>
-                        <th className="border border-slate-300 p-1.5 text-left">Item Name</th>
-                        <th className="border border-slate-300 p-1.5 text-center">UoM</th>
-                        <th className="border border-slate-300 p-1.5 text-right">Booking QTY</th>
-                        <th className="border border-slate-300 p-1.5 text-right">Rate ($)</th>
+                        <th className="border border-slate-300 p-1.5 text-left">Yarn Item Name</th>
+                        <th className="border border-slate-300 p-1.5 text-center">Unit</th>
+                        <th className="border border-slate-300 p-1.5 text-right">Quantity (KG)</th>
+                        <th className="border border-slate-300 p-1.5 text-right">Market Qty (TON)</th>
+                        <th className="border border-slate-300 p-1.5 text-right">Rate ($/KG)</th>
                         <th className="border border-slate-300 p-1.5 text-right">Total ($)</th>
                       </tr>
                     </thead>
@@ -2022,10 +2421,16 @@ function MMManualBookingPage() {
                             )}
                           </td>
                           <td className="border border-slate-300 p-1.5 text-center font-semibold text-teal-700">
-                            {it.marketUnit}
+                            {it.unit}
                           </td>
                           <td className="border border-slate-300 p-1.5 text-right font-mono font-bold text-teal-700">
-                            {(it.marketQty || 0).toLocaleString()}
+                            {(it.bookQty || 0).toLocaleString()}
+                          </td>
+                          <td className="border border-slate-300 p-1.5 text-right font-mono font-bold text-slate-800">
+                            {(it.marketQty || 0).toLocaleString(undefined, {
+                              minimumFractionDigits: 4,
+                              maximumFractionDigits: 4,
+                            })}
                           </td>
                           <td className="border border-slate-300 p-1.5 text-right font-mono">
                             ${(it.rate || 0).toFixed(4)}
@@ -2042,7 +2447,14 @@ function MMManualBookingPage() {
                           Total Summary:
                         </td>
                         <td className="border border-slate-300 p-1.5 text-right font-mono font-extrabold text-teal-800">
-                          {totals.marketQty.toLocaleString()}
+                          {totals.bookQty.toLocaleString()} KG
+                        </td>
+                        <td className="border border-slate-300 p-1.5 text-right font-mono font-extrabold text-slate-800">
+                          {totals.marketQty.toLocaleString(undefined, {
+                            minimumFractionDigits: 4,
+                            maximumFractionDigits: 4,
+                          })}{" "}
+                          TON
                         </td>
                         <td className="border border-slate-300 p-1.5"></td>
                         <td className="border border-slate-300 p-1.5 text-right font-mono text-emerald-800 font-extrabold">
@@ -2076,7 +2488,7 @@ function MMManualBookingPage() {
             onClose={() => setShowAttachmentModal(false)}
             bookingNo={bookingNo}
             supplierName={supplierName}
-            bookingTypeLabel="Manual Booking"
+            bookingTypeLabel="Block Yarn Booking"
             attachments={attachments}
             onAddAttachment={(rec) => setAttachments((prev) => [...prev, rec])}
             onDeleteAttachment={(id) => setAttachments((prev) => prev.filter((a) => a.id !== id))}

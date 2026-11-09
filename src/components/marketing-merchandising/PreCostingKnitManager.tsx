@@ -6,7 +6,7 @@ import {
   Send, RotateCcw, AlertTriangle, Layers, Trash2, ArrowRight,
   Upload, Paperclip, File, Image as ImageIcon, Info, ExternalLink,
   Scissors, DollarSign, Percent, Sparkles, Disc, RefreshCw, Hash,
-  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight
+  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Tag, BookmarkCheck, Link2
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -22,6 +22,7 @@ import {
   MMFabricMasterItem,
   MMAccessoriesMasterItem,
   ApprovalStatus,
+  MMYarnBookingTagRecord,
 } from "../../lib/marketing-merchandising-data";
 import {
   MMMasterDataRepository,
@@ -37,7 +38,8 @@ import { PreCostingKnitReport } from "./PreCostingKnitReport";
 
 export interface PreCostingKnitManagerProps {
   initialTab?: "register" | "create" | "compare" | "report";
-  onTabChange?: (tab: "register" | "create" | "compare" | "report") => void;
+  initialRecordId?: string;
+  onTabChange?: (tab: "register" | "create" | "compare" | "report", recordId?: string) => void;
 }
 export type PreCostingManagerProps = PreCostingKnitManagerProps;
 
@@ -89,6 +91,7 @@ export interface KnitYarnDetailRow {
   yarnCost: number;
   brand: string;
   vendor?: string;
+  bookingTag?: MMYarnBookingTagRecord;
 }
 
 export interface KnitFabricCostItemRow {
@@ -469,11 +472,15 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
   };
 
   const consumptionUnit: "PCS" | "DZ" = r.consumptionUnit || "DZ";
-  let knitFabricItems: KnitFabricCostItemRow[] = Array.isArray(r.knitFabricItems) ? r.knitFabricItems : [];
-  let accessoriesItems: PreCostingItemRow[] = Array.isArray(r.accessoriesItems) ? r.accessoriesItems : [];
-  let otherCostItems: KnitOtherCostRow[] = Array.isArray(r.otherCostItems) ? r.otherCostItems : [];
+  const hasExplicitFabric = Array.isArray(r.knitFabricItems);
+  const hasExplicitAcc = Array.isArray(r.accessoriesItems);
+  const hasExplicitOthers = Array.isArray(r.otherCostItems);
 
-  if (knitFabricItems.length === 0 && accessoriesItems.length === 0 && Array.isArray(r.items) && r.items.length > 0) {
+  let knitFabricItems: KnitFabricCostItemRow[] = hasExplicitFabric ? r.knitFabricItems : [];
+  let accessoriesItems: PreCostingItemRow[] = hasExplicitAcc ? r.accessoriesItems : [];
+  let otherCostItems: KnitOtherCostRow[] = hasExplicitOthers ? r.otherCostItems : [];
+
+  if (!hasExplicitFabric && !hasExplicitAcc && Array.isArray(r.items) && r.items.length > 0) {
     const rawItems: PreCostingItemRow[] = r.items;
     const fabRows = rawItems.filter((it) => FABRIC_HEADS.includes(it.head) || it.head === "Fabric" || it.head === "Yarn");
     const accRows = rawItems.filter((it) => ACCESSORIES_HEADS.includes(it.head) || it.head === "Accessories");
@@ -538,7 +545,7 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
     }
   }
 
-  if (knitFabricItems.length === 0) {
+  if (!hasExplicitFabric && knitFabricItems.length === 0) {
     knitFabricItems = [
       computeKnitFabricRow({
         id: "kfi-def-1",
@@ -573,7 +580,7 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
     ];
   }
 
-  if (accessoriesItems.length === 0) {
+  if (!hasExplicitAcc && accessoriesItems.length === 0) {
     accessoriesItems = [
       {
         id: "acc-def-1",
@@ -596,7 +603,7 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
     ];
   }
 
-  if (otherCostItems.length === 0) {
+  if (!hasExplicitOthers && otherCostItems.length === 0) {
     otherCostItems = [
       computeOtherCostRow(
         {
@@ -613,6 +620,17 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
         totalPoVal,
       ),
     ];
+  }
+
+  // Hydrate yarn booking tags on every yarn detail row
+  if (Array.isArray(knitFabricItems)) {
+    knitFabricItems = knitFabricItems.map((f) => ({
+      ...f,
+      yarnDetails: (f.yarnDetails || []).map((y) => ({
+        ...y,
+        bookingTag: y.bookingTag || MMRepository.getYarnBookingTagByRowId(y.id),
+      })),
+    }));
   }
 
   const items = syncAllCostingItems(knitFabricItems, accessoriesItems, otherCostItems);
@@ -864,11 +882,19 @@ function createVersionSnapshot(r: PreCostingRecord): MMPreCostVersionSnapshot {
       surplusPcs,
       smvCost,
     },
-  };
+    fabricEntry: r.fabricEntry,
+    knitFabricItems: r.knitFabricItems,
+    accessoriesItems: r.accessoriesItems,
+    otherCostItems: r.otherCostItems,
+  } as any;
 }
 
 // ── Main Pre Costing (Knit) Component ────────────────────────────
-export function PreCostingKnitManager({ initialTab = "create", onTabChange }: PreCostingKnitManagerProps) {
+export function PreCostingKnitManager({
+  initialTab = "create",
+  initialRecordId,
+  onTabChange,
+}: PreCostingKnitManagerProps) {
   const [records, setRecords] = useState<PreCostingRecord[]>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -877,36 +903,31 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
             return parsed.map((r) => {
-              const poRows = Array.isArray(r.poRows) ? r.poRows : [];
-              const items = Array.isArray(r.items) ? r.items : [];
-              const normalized: PreCostingRecord = {
-                ...r,
-                preCostId: r.preCostId || "JOB-KT-2026-0001",
-                preCostNo: r.preCostNo || "KT-26920",
-                buyer: r.buyer || "H&M Hennes & Mauritz",
-                style: r.style || "HM-KT-8841",
-                merchandiser: r.merchandiser || "Tanvir Ahmed",
-                status: r.status || "Draft",
-                version: r.version || 1,
-                poRows,
-                items,
-                attachments: Array.isArray(r.attachments) ? r.attachments : [],
-                versions: Array.isArray(r.versions) && r.versions.length > 0 ? r.versions : [],
-                auditHistory: Array.isArray(r.auditHistory) ? r.auditHistory : [],
-              };
-              if (normalized.versions.length === 0) {
-                normalized.versions = [createVersionSnapshot(normalized)];
+              const poVal = (r.poRows || []).reduce(
+                (acc: number, p: any) => acc + (Number(p.value) || 0),
+                0
+              );
+              const structured = ensureKnitCostingStructure(r, poVal);
+              if (!structured.versions || structured.versions.length === 0) {
+                structured.versions = [createVersionSnapshot(structured)];
               }
-              return normalized;
+              return structured;
             });
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Failed to load pre-costings from localStorage", e);
+      }
     }
     // Initialize version snapshot for initial record
     const base = INITIAL_RECORDS.map((r) => {
-      const snap = createVersionSnapshot(r);
-      return { ...r, versions: [snap] };
+      const poVal = (r.poRows || []).reduce(
+        (acc: number, p: any) => acc + (Number(p.value) || 0),
+        0
+      );
+      const structured = ensureKnitCostingStructure(r, poVal);
+      const snap = createVersionSnapshot(structured);
+      return { ...structured, versions: [snap] };
     });
     return base;
   });
@@ -915,7 +936,9 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
   useEffect(() => {
     try {
       localStorage.setItem("cripton_pre_costings_knit_master_v1", JSON.stringify(records));
-    } catch (e) {}
+    } catch (e) {
+      console.error("Failed to persist pre-costings to localStorage", e);
+    }
   }, [records]);
 
   // View state: list | form | history | compare | report
@@ -968,11 +991,23 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
     }
   }, [view, compareRecord, records]);
 
-  // Synchronize view with initialTab changes
+  // Synchronize view with initialTab and initialRecordId changes
   useEffect(() => {
     if (initialTab === "create") {
       setView("form");
-      setFormMode("create");
+      if (initialRecordId) {
+        const found = records.find((r) => r.id === initialRecordId || r.preCostId === initialRecordId);
+        if (found) {
+          const poVal = (found.poRows || []).reduce((acc, p) => acc + (Number(p.value) || 0), 0);
+          setFormData(ensureKnitCostingStructure(found, poVal));
+          setFormMode("edit");
+          try {
+            localStorage.setItem("cripton_pre_costings_knit_active_id_v1", found.id);
+          } catch {}
+        } else {
+          setFormMode("create");
+        }
+      }
     } else if (initialTab === "compare") {
       setView("compare");
     } else if (initialTab === "report") {
@@ -980,7 +1015,7 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
     } else if (initialTab === "register") {
       setView("list");
     }
-  }, [initialTab]);
+  }, [initialTab, initialRecordId, records]);
 
   // Master Data sources from MMRepository
   const [seasonsMaster] = useState<MMSeasonMasterItem[]>(() => MMRepository.getSeasons());
@@ -1014,6 +1049,25 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
     rows: [],
     head: "",
     item: "",
+  });
+
+  // Booking Tag Modal State
+  const [bookingTagModal, setBookingTagModal] = useState<{
+    isOpen: boolean;
+    yarnRowIndex: number | null;
+    yarnRowId: string;
+    finalQtyKg: number;
+    yarnItemName: string;
+    selectedBookingNo: string;
+    selectedYarnItemId: string;
+  }>({
+    isOpen: false,
+    yarnRowIndex: null,
+    yarnRowId: "",
+    finalQtyKg: 0,
+    yarnItemName: "",
+    selectedBookingNo: "",
+    selectedYarnItemId: "",
   });
 
   // Fabric Entry Specifications Modal State
@@ -1180,10 +1234,14 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
       setView("list");
       onTabChange?.("register");
     } else if (tabKey === "create") {
-      setFormData(createNewFormData());
+      const newRec = createNewFormData();
+      setFormData(newRec);
       setFormMode("create");
       setView("form");
-      onTabChange?.("create");
+      try {
+        localStorage.setItem("cripton_pre_costings_knit_active_id_v1", newRec.id);
+      } catch {}
+      onTabChange?.("create", newRec.id);
     } else if (tabKey === "compare") {
       if (!compareRecord && records.length > 0) {
         setCompareRecord(records[0]);
@@ -1193,8 +1251,69 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
     }
   };
 
-  // ── Form State ─────────────────────────────────────────────────
-  const [formData, setFormData] = useState<PreCostingRecord>(() => createNewFormData());
+  // ── Form State (Restores saved record or active draft on mount/refresh) ─────
+  const [formData, setFormData] = useState<PreCostingRecord>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("cripton_pre_costings_knit_master_v1");
+        const list: PreCostingRecord[] = stored ? JSON.parse(stored) : [];
+        if (Array.isArray(list) && list.length > 0) {
+          // 1. Explicit ID in search params or prop
+          const urlParams = new URLSearchParams(window.location.search);
+          const targetId = initialRecordId || urlParams.get("id");
+          if (targetId) {
+            const found = list.find((r) => r.id === targetId || r.preCostId === targetId);
+            if (found) {
+              const poVal = (found.poRows || []).reduce(
+                (acc, p) => acc + (Number(p.value) || 0),
+                0
+              );
+              return ensureKnitCostingStructure(found, poVal);
+            }
+          }
+
+          // 2. Active editing draft ID in localStorage
+          const activeId = localStorage.getItem("cripton_pre_costings_knit_active_id_v1");
+          if (activeId && initialTab === "create") {
+            const found = list.find((r) => r.id === activeId);
+            if (found) {
+              const poVal = (found.poRows || []).reduce(
+                (acc, p) => acc + (Number(p.value) || 0),
+                0
+              );
+              return ensureKnitCostingStructure(found, poVal);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to restore initial formData from localStorage:", e);
+      }
+    }
+    return createNewFormData();
+  });
+
+  // Automatically persist formData to records & localStorage whenever formData changes in form view
+  useEffect(() => {
+    if (view !== "form") return;
+    if (!formData || !formData.id) return;
+
+    setRecords((prev) => {
+      const idx = prev.findIndex((r) => r.id === formData.id);
+      if (idx >= 0) {
+        const existing = prev[idx];
+        if (existing === formData) return prev;
+        const copy = [...prev];
+        copy[idx] = { ...formData };
+        return copy;
+      } else {
+        return [{ ...formData }, ...prev];
+      }
+    });
+
+    try {
+      localStorage.setItem("cripton_pre_costings_knit_active_id_v1", formData.id);
+    } catch {}
+  }, [formData, view]);
 
   // Calculate Consolidated Order Qty & Total PO Value
   const consolidatedOrderQty = useMemo(() => {
@@ -1640,6 +1759,7 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
           const comp = y.yarnComposition || formData.fabricEntry?.fabricComposition || "100% Combed Cotton";
           const col = y.colorType || "Solid";
           const g = y.grade === "Grade B" ? "B" : y.grade === "B" ? "B" : "A";
+          const savedTag = y.bookingTag || MMRepository.getYarnBookingTagByRowId(y.id);
           return {
             ...y,
             grade: g,
@@ -1648,6 +1768,7 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
             colorType: col,
             yarnItem: y.yarnItem || [c, comp, col].filter(Boolean).join(" "),
             brand: y.brand || suppliersMaster[0]?.name || "Square Textiles Ltd",
+            bookingTag: savedTag,
           };
         })
       : [
@@ -1739,6 +1860,10 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
 
   const handleRemoveYarnModalRow = (idx: number) => {
     setYarnModal((prev) => {
+      const rowToRemove = prev.rows[idx];
+      if (rowToRemove?.id) {
+        MMRepository.removeYarnBookingTag(rowToRemove.id);
+      }
       const filtered = prev.rows.filter((_, i) => i !== idx);
       const reindexed = filtered.map((r, i) => ({ ...r, sl: i + 1 }));
       return { ...prev, rows: reindexed };
@@ -1768,6 +1893,299 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
 
     setYarnModal((prev) => ({ ...prev, isOpen: false, rowIndex: null }));
     toast.success("Yarn details saved and fabric costing updated.");
+  };
+
+  // ── Booking Tag Modal Handlers & Dynamic Balance Calculations ──
+  const handleOpenBookingTagModal = (yIdx: number, yRow: KnitYarnDetailRow) => {
+    const existingTag = yRow.bookingTag || MMRepository.getYarnBookingTagByRowId(yRow.id);
+    const finalQty = Number(yRow.finalQtyKg) || 0;
+
+    let initBookingNo = existingTag?.blockBookingNo || "";
+    let initYarnItemId = existingTag?.yarnItemId || "";
+
+    const allBookings = MMRepository.getManualBookings();
+
+    // If not tagged yet, find first available booking that has yarn items with available balance
+    if (!initBookingNo && allBookings.length > 0) {
+      const firstValidBooking = allBookings.find((b) =>
+        (b.items || []).some((it) => {
+          const bal = MMRepository.getAvailableYarnBookingBalance(
+            b.bookingNo,
+            it.bookingItemId,
+            it.itemDescription,
+            yRow.id
+          );
+          return bal.availableKg > 0;
+        })
+      );
+      if (firstValidBooking) {
+        initBookingNo = firstValidBooking.bookingNo;
+        const validItem = (firstValidBooking.items || []).find((it) => {
+          const bal = MMRepository.getAvailableYarnBookingBalance(
+            firstValidBooking.bookingNo,
+            it.bookingItemId,
+            it.itemDescription,
+            yRow.id
+          );
+          return bal.availableKg > 0;
+        });
+        if (validItem) {
+          initYarnItemId = validItem.bookingItemId || (validItem as any).id || "";
+        }
+      }
+    }
+
+    setBookingTagModal({
+      isOpen: true,
+      yarnRowIndex: yIdx,
+      yarnRowId: yRow.id,
+      finalQtyKg: finalQty,
+      yarnItemName: yRow.yarnItem || "",
+      selectedBookingNo: initBookingNo,
+      selectedYarnItemId: initYarnItemId,
+    });
+  };
+
+  const activeBooking = useMemo(() => {
+    if (!bookingTagModal.selectedBookingNo) return null;
+    const allBookings = MMRepository.getManualBookings();
+    return (
+      allBookings.find(
+        (b) =>
+          b.bookingNo === bookingTagModal.selectedBookingNo ||
+          b.id === bookingTagModal.selectedBookingNo
+      ) || null
+    );
+  }, [bookingTagModal.selectedBookingNo]);
+
+  const activeYarnItem = useMemo(() => {
+    if (!activeBooking || !activeBooking.items) return null;
+    return (
+      activeBooking.items.find(
+        (it) =>
+          it.bookingItemId === bookingTagModal.selectedYarnItemId ||
+          (it as any).id === bookingTagModal.selectedYarnItemId
+      ) || null
+    );
+  }, [activeBooking, bookingTagModal.selectedYarnItemId]);
+
+  const tagBalanceInfo = useMemo(() => {
+    if (!bookingTagModal.selectedBookingNo || !bookingTagModal.selectedYarnItemId) {
+      return { totalBookedKg: 0, consumedKg: 0, availableKg: 0, remainingKg: 0, isShortage: false };
+    }
+    const bal = MMRepository.getAvailableYarnBookingBalance(
+      bookingTagModal.selectedBookingNo,
+      bookingTagModal.selectedYarnItemId,
+      activeYarnItem?.itemDescription,
+      bookingTagModal.yarnRowId
+    );
+    const tagQty = Number(bookingTagModal.finalQtyKg) || 0;
+    const remainingKg = Number((bal.availableKg - tagQty).toFixed(2));
+    const isShortage = tagQty > bal.availableKg;
+
+    return {
+      totalBookedKg: bal.totalBookedKg,
+      consumedKg: bal.consumedKg,
+      availableKg: bal.availableKg,
+      remainingKg,
+      isShortage,
+    };
+  }, [
+    bookingTagModal.selectedBookingNo,
+    bookingTagModal.selectedYarnItemId,
+    bookingTagModal.yarnRowId,
+    bookingTagModal.finalQtyKg,
+    activeYarnItem,
+  ]);
+
+  const blockBookingDropdownOptions = useMemo(() => {
+    const allBookings = MMRepository.getManualBookings();
+    return allBookings
+      .filter((b) => {
+        if (b.bookingNo === bookingTagModal.selectedBookingNo) return true;
+        return (b.items || []).some((it) => {
+          const bal = MMRepository.getAvailableYarnBookingBalance(
+            b.bookingNo,
+            it.bookingItemId,
+            it.itemDescription,
+            bookingTagModal.yarnRowId
+          );
+          return bal.availableKg > 0;
+        });
+      })
+      .map((b) => {
+        const totalAvail = (b.items || []).reduce((sum, it) => {
+          const bal = MMRepository.getAvailableYarnBookingBalance(
+            b.bookingNo,
+            it.bookingItemId,
+            it.itemDescription,
+            bookingTagModal.yarnRowId
+          );
+          return sum + bal.availableKg;
+        }, 0);
+        return {
+          value: b.bookingNo,
+          label: `${b.bookingNo} — ${b.supplierName || "Mill"} (Available: ${totalAvail.toLocaleString()} KG)`,
+        };
+      });
+  }, [bookingTagModal.yarnRowId, bookingTagModal.selectedBookingNo]);
+
+  const yarnItemDropdownOptions = useMemo(() => {
+    if (!activeBooking || !activeBooking.items) return [];
+    return activeBooking.items.map((it) => {
+      const bal = MMRepository.getAvailableYarnBookingBalance(
+        activeBooking.bookingNo,
+        it.bookingItemId,
+        it.itemDescription,
+        bookingTagModal.yarnRowId
+      );
+      const idVal = it.bookingItemId || (it as any).id || it.itemDescription;
+      return {
+        value: idVal,
+        label: `${it.itemDescription} (Available: ${bal.availableKg.toLocaleString()} KG / Booked: ${bal.totalBookedKg.toLocaleString()} KG)`,
+      };
+    });
+  }, [activeBooking, bookingTagModal.yarnRowId]);
+
+  const handleSelectBookingNo = (bNo: string) => {
+    const allBookings = MMRepository.getManualBookings();
+    const b = allBookings.find((x) => x.bookingNo === bNo || x.id === bNo);
+    let nextItemId = "";
+    if (b && b.items && b.items.length > 0) {
+      const itemWithBal = b.items.find((it) => {
+        const bal = MMRepository.getAvailableYarnBookingBalance(
+          b.bookingNo,
+          it.bookingItemId,
+          it.itemDescription,
+          bookingTagModal.yarnRowId
+        );
+        return bal.availableKg > 0;
+      });
+      nextItemId = (itemWithBal || b.items[0]).bookingItemId || ((itemWithBal || b.items[0]) as any).id || "";
+    }
+    setBookingTagModal((prev) => ({
+      ...prev,
+      selectedBookingNo: bNo,
+      selectedYarnItemId: nextItemId,
+    }));
+  };
+
+  const handleSaveBookingTagModal = () => {
+    if (!bookingTagModal.selectedBookingNo || !bookingTagModal.selectedYarnItemId) {
+      toast.error("Please select a Block Booking No. and Yarn Item.");
+      return;
+    }
+    if (tagBalanceInfo.isShortage) {
+      toast.error("Tag QTY exceeds available booking balance.");
+      return;
+    }
+    if (bookingTagModal.yarnRowIndex === null) return;
+
+    const preCostId =
+      formData.preCostId ||
+      (formData as any).header?.preCostId ||
+      formData.id ||
+      "pre-cost";
+
+    const tagRecord: MMYarnBookingTagRecord = {
+      id: `ytag-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      preCostId: preCostId,
+      yarnRowId: bookingTagModal.yarnRowId,
+      blockBookingNo: bookingTagModal.selectedBookingNo,
+      blockBookingId: activeBooking?.id || bookingTagModal.selectedBookingNo,
+      yarnItemId: bookingTagModal.selectedYarnItemId,
+      yarnItemName: activeYarnItem?.itemDescription || "",
+      supplierName: activeBooking?.supplierName || "",
+      tagQtyKg: bookingTagModal.finalQtyKg,
+      availableBalanceAtTag: tagBalanceInfo.availableKg,
+      remainingBalanceAtTag: tagBalanceInfo.remainingKg,
+      taggedAt: new Date().toISOString(),
+    };
+
+    MMRepository.saveYarnBookingTag(tagRecord);
+
+    setYarnModal((prev) => {
+      const copy = [...prev.rows];
+      if (bookingTagModal.yarnRowIndex !== null && copy[bookingTagModal.yarnRowIndex]) {
+        copy[bookingTagModal.yarnRowIndex] = {
+          ...copy[bookingTagModal.yarnRowIndex],
+          bookingTag: tagRecord,
+        };
+      }
+      return { ...prev, rows: copy };
+    });
+
+    // Also immediately update formData.knitFabricItems so the tag is persisted in the record
+    if (yarnModal.rowIndex !== null) {
+      const fIdx = yarnModal.rowIndex;
+      setFormData((prev) => {
+        const copyFabric = [...(prev.knitFabricItems || [])];
+        if (!copyFabric[fIdx]) return prev;
+        const copyYarn = [...(copyFabric[fIdx].yarnDetails || [])];
+        if (bookingTagModal.yarnRowIndex !== null && copyYarn[bookingTagModal.yarnRowIndex]) {
+          copyYarn[bookingTagModal.yarnRowIndex] = {
+            ...copyYarn[bookingTagModal.yarnRowIndex],
+            bookingTag: tagRecord,
+          };
+          copyFabric[fIdx] = {
+            ...copyFabric[fIdx],
+            yarnDetails: copyYarn,
+          };
+        }
+        return {
+          ...prev,
+          knitFabricItems: copyFabric,
+        };
+      });
+    }
+
+    toast.success(
+      `Yarn row tagged to Block Booking ${tagRecord.blockBookingNo} (${tagRecord.tagQtyKg.toLocaleString()} KG).`
+    );
+    setBookingTagModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const handleRemoveBookingTagModal = () => {
+    if (bookingTagModal.yarnRowId) {
+      MMRepository.removeYarnBookingTag(bookingTagModal.yarnRowId);
+    }
+    setYarnModal((prev) => {
+      const copy = [...prev.rows];
+      if (bookingTagModal.yarnRowIndex !== null && copy[bookingTagModal.yarnRowIndex]) {
+        copy[bookingTagModal.yarnRowIndex] = {
+          ...copy[bookingTagModal.yarnRowIndex],
+          bookingTag: undefined,
+        };
+      }
+      return { ...prev, rows: copy };
+    });
+
+    // Also immediately update formData.knitFabricItems
+    if (yarnModal.rowIndex !== null) {
+      const fIdx = yarnModal.rowIndex;
+      setFormData((prev) => {
+        const copyFabric = [...(prev.knitFabricItems || [])];
+        if (!copyFabric[fIdx]) return prev;
+        const copyYarn = [...(copyFabric[fIdx].yarnDetails || [])];
+        if (bookingTagModal.yarnRowIndex !== null && copyYarn[bookingTagModal.yarnRowIndex]) {
+          copyYarn[bookingTagModal.yarnRowIndex] = {
+            ...copyYarn[bookingTagModal.yarnRowIndex],
+            bookingTag: undefined,
+          };
+          copyFabric[fIdx] = {
+            ...copyFabric[fIdx],
+            yarnDetails: copyYarn,
+          };
+        }
+        return {
+          ...prev,
+          knitFabricItems: copyFabric,
+        };
+      });
+    }
+
+    toast.success("Booking tag removed. Balance released back to block booking.");
+    setBookingTagModal((prev) => ({ ...prev, isOpen: false }));
   };
 
   // ── Accessories Cost Handlers ──────────────────────────────────
@@ -2255,37 +2673,55 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
       return [updatedRecord, ...prev];
     });
 
+    // Synchronous immediate LocalStorage persistence
+    try {
+      const currentStored = localStorage.getItem("cripton_pre_costings_knit_master_v1");
+      const list: PreCostingRecord[] = currentStored ? JSON.parse(currentStored) : [];
+      const idx = list.findIndex((r) => r.id === updatedRecord.id);
+      if (idx >= 0) {
+        list[idx] = updatedRecord;
+      } else {
+        list.unshift(updatedRecord);
+      }
+      localStorage.setItem("cripton_pre_costings_knit_master_v1", JSON.stringify(list));
+      localStorage.setItem("cripton_pre_costings_knit_active_id_v1", updatedRecord.id);
+    } catch (e) {
+      console.error("Failed to save draft to localStorage:", e);
+    }
+
     toast.success(`Pre Costing (Knit) ${updatedRecord.preCostId} saved as Draft.`);
     setView("list");
+    onTabChange?.("register");
   };
 
   // 2. Submit for Approval
-  const handleSubmitForApproval = () => {
-    if (!validateForm()) return;
+  const handleSubmitForApproval = (recordToSubmit?: PreCostingRecord) => {
+    const target = recordToSubmit || formData;
+    if (!recordToSubmit && !validateForm()) return;
 
     const currentSnapshot = createVersionSnapshot({
-      ...formData,
+      ...target,
       status: "Pending Approval",
       submittedBy: "Tanvir Ahmed (Merchandiser)",
       submittedDate: new Date().toISOString().replace("T", " ").substring(0, 16),
     });
 
     const updatedRecord: PreCostingRecord = {
-      ...formData,
+      ...target,
       status: "Pending Approval",
       isCurrentActive: false,
       submittedBy: "Tanvir Ahmed (Merchandiser)",
       submittedDate: new Date().toISOString().replace("T", " ").substring(0, 16),
       versions: [
-        ...(formData.versions || []).filter((v) => v.versionNumber !== formData.version),
+        ...(target.versions || []).filter((v) => v.versionNumber !== target.version),
         currentSnapshot,
       ],
       auditHistory: [
-        ...(formData.auditHistory || []),
+        ...(target.auditHistory || []),
         {
-          versionNumber: formData.version,
-          createdBy: formData.createdBy,
-          createdDate: formData.createdDate,
+          versionNumber: target.version,
+          createdBy: target.createdBy,
+          createdDate: target.createdDate,
           submittedBy: "Tanvir Ahmed (Merchandiser)",
           submittedDate: new Date().toISOString().replace("T", " ").substring(0, 16),
           status: "Pending Approval",
@@ -2303,8 +2739,25 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
       return [updatedRecord, ...prev];
     });
 
+    // Synchronous immediate LocalStorage persistence
+    try {
+      const currentStored = localStorage.getItem("cripton_pre_costings_knit_master_v1");
+      const list: PreCostingRecord[] = currentStored ? JSON.parse(currentStored) : [];
+      const idx = list.findIndex((r) => r.id === updatedRecord.id);
+      if (idx >= 0) {
+        list[idx] = updatedRecord;
+      } else {
+        list.unshift(updatedRecord);
+      }
+      localStorage.setItem("cripton_pre_costings_knit_master_v1", JSON.stringify(list));
+      localStorage.setItem("cripton_pre_costings_knit_active_id_v1", updatedRecord.id);
+    } catch (e) {
+      console.error("Failed to submit to localStorage:", e);
+    }
+
     toast.success(`Pre Costing (Knit) ${updatedRecord.preCostId} v${updatedRecord.version} submitted for approval.`);
     setView("list");
+    onTabChange?.("register");
   };
 
   // 3. Approve Record
@@ -2483,6 +2936,10 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
     setFormData(amendedRecord);
     setFormMode("edit");
     setView("form");
+    try {
+      localStorage.setItem("cripton_pre_costings_knit_active_id_v1", amendedRecord.id);
+    } catch {}
+    onTabChange?.("create", amendedRecord.id);
     toast.success(`Amendment Version v${newVersionNumber} initiated! Modify fields and submit for approval.`);
   };
 
@@ -2494,6 +2951,10 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
     setFormData({ ...structured, attachments: atts });
     setFormMode("edit");
     setView("form");
+    try {
+      localStorage.setItem("cripton_pre_costings_knit_active_id_v1", rec.id);
+    } catch {}
+    onTabChange?.("create", rec.id);
   };
 
   // Open Read-Only View -> Opens Complete Pre-Cost Sheet Report per specification
@@ -2503,7 +2964,7 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
     const structured = ensureKnitCostingStructure(rec, poVal);
     setActiveRecord({ ...structured, attachments: atts });
     setView("report");
-    onTabChange?.("report");
+    onTabChange?.("report", rec.id);
   };
 
   // Open Report View
@@ -2602,9 +3063,14 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    setFormData(createNewFormData());
+                    const newRec = createNewFormData();
+                    setFormData(newRec);
                     setFormMode("create");
                     setView("form");
+                    try {
+                      localStorage.setItem("cripton_pre_costings_knit_active_id_v1", newRec.id);
+                    } catch {}
+                    onTabChange?.("create", newRec.id);
                   }}
                   className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-xs cursor-pointer transition"
                 >
@@ -2860,7 +3326,7 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
                                   <button
                                     onClick={() => {
                                       setFormData(r);
-                                      handleSubmitForApproval();
+                                      handleSubmitForApproval(r);
                                     }}
                                     className="px-2 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold border border-indigo-200 cursor-pointer flex items-center gap-1"
                                     title="Submit for Approval"
@@ -5292,13 +5758,14 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
                               <th className="py-2.5 px-2 text-right w-24 min-w-[90px]">Rate ($/kg) *</th>
                               <th className="py-2.5 px-2.5 text-right w-28 min-w-[100px]">Yarn Cost ($)</th>
                               <th className="py-2.5 px-2.5 w-56 min-w-[180px]">Vendor *</th>
+                              <th className="py-2.5 px-2.5 text-center w-28 min-w-[100px]">Booking Tag</th>
                               {formMode !== "view" && <th className="py-2.5 px-2 text-center w-12">Action</th>}
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {yarnModal.rows.length === 0 ? (
                               <tr>
-                                <td colSpan={formMode !== "view" ? 12 : 11} className="py-8 text-center text-slate-400">
+                                <td colSpan={formMode !== "view" ? 13 : 12} className="py-8 text-center text-slate-400">
                                   No yarn details entered. Click "Add Yarn Row" to define yarn components.
                                 </td>
                               </tr>
@@ -5423,7 +5890,34 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
                                     />
                                   </td>
 
-                                  {/* 12. Action */}
+                                  {/* 12. Booking Tag Column */}
+                                  <td className="py-2 px-2 text-center w-28 min-w-[100px]">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenBookingTagModal(yIdx, yRow)}
+                                      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer ${
+                                        yRow.bookingTag
+                                          ? "bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-700 ring-2 ring-emerald-300 dark:ring-emerald-900"
+                                          : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600"
+                                      }`}
+                                      title={
+                                        yRow.bookingTag
+                                          ? `Tagged: ${yRow.bookingTag.blockBookingNo} (${Number(yRow.bookingTag.tagQtyKg).toLocaleString()} KG) — Click to view/edit tag`
+                                          : "Click to Tag yarn against Block Yarn Booking"
+                                      }
+                                    >
+                                      <span className="font-black text-xs">B</span>
+                                      {yRow.bookingTag ? (
+                                        <span className="text-[9.5px] font-mono bg-emerald-800/50 px-1 py-0.5 rounded leading-none">
+                                          ✓ Tagged
+                                        </span>
+                                      ) : (
+                                        <span className="text-[9px] text-slate-400 font-normal">Tag</span>
+                                      )}
+                                    </button>
+                                  </td>
+
+                                  {/* 13. Action */}
                                   {formMode !== "view" && (
                                     <td className="py-2 px-2 text-center">
                                       <button
@@ -5457,7 +5951,7 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
                               <td className="py-3 px-2.5 text-right font-mono text-amber-700 dark:text-amber-300 text-sm">
                                 ${totalCostVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </td>
-                              <td colSpan={formMode !== "view" ? 2 : 1} />
+                              <td colSpan={formMode !== "view" ? 3 : 2} />
                             </tr>
                           </tfoot>
                         </table>
@@ -5491,6 +5985,199 @@ export function PreCostingKnitManager({ initialTab = "create", onTabChange }: Pr
                   </>
                 );
               })()}
+            </div>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════════════════════
+            MODAL: BOOKING TAG MODAL (TAG YARN TO BLOCK YARN BOOKING)
+           ════════════════════════════════════════════════════════════ */}
+        {bookingTagModal.isOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-amber-50/60 dark:bg-amber-950/30 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Tag className="size-4 text-amber-600" />
+                    <span>Tag Yarn to Block Yarn Booking</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Component: <span className="font-semibold text-slate-800 dark:text-slate-200">{bookingTagModal.yarnItemName || "Yarn Breakdown Item"}</span>
+                    {" • "}
+                    Tag Qty: <span className="font-mono font-bold text-amber-700 dark:text-amber-400">{bookingTagModal.finalQtyKg.toLocaleString()} KG</span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setBookingTagModal((prev) => ({ ...prev, isOpen: false }))}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 space-y-4 overflow-y-auto max-h-[75vh]">
+                {/* 1. Block Booking No. Dropdown */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Block Booking No. <span className="text-rose-500">*</span>
+                  </label>
+                  <SearchableSelect
+                    options={blockBookingDropdownOptions}
+                    value={bookingTagModal.selectedBookingNo}
+                    onChange={handleSelectBookingNo}
+                    placeholder="Search and select Block Yarn Booking..."
+                    disabled={formMode === "view"}
+                    className="w-full text-xs font-semibold"
+                  />
+                  <p className="text-[11px] text-slate-400">
+                    Showing active Block Yarn Bookings with available balances.
+                  </p>
+                </div>
+
+                {/* 2. Yarn Item Dropdown */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Yarn Item <span className="text-rose-500">*</span>
+                  </label>
+                  <SearchableSelect
+                    options={yarnItemDropdownOptions}
+                    value={bookingTagModal.selectedYarnItemId}
+                    onChange={(val) => setBookingTagModal((prev) => ({ ...prev, selectedYarnItemId: val }))}
+                    placeholder={
+                      !bookingTagModal.selectedBookingNo
+                        ? "Select a Block Booking No. first..."
+                        : yarnItemDropdownOptions.length === 0
+                        ? "No yarn items found in this booking"
+                        : "Select Yarn Item in Booking..."
+                    }
+                    disabled={formMode === "view" || !bookingTagModal.selectedBookingNo}
+                    className="w-full text-xs font-semibold"
+                  />
+                  <p className="text-[11px] text-slate-400">
+                    Items sourced directly from selected Block Yarn Booking {bookingTagModal.selectedBookingNo || ""}.
+                  </p>
+                </div>
+
+                {/* 3. Real-Time Balance Cards (Available Balance, Tag QTY, Remaining Balance) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                  {/* Available Balance */}
+                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40">
+                    <span className="text-[10.5px] uppercase font-bold text-slate-500 block mb-1">
+                      Available Balance
+                    </span>
+                    <div className="text-base font-mono font-black text-slate-900 dark:text-white">
+                      {tagBalanceInfo.availableKg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
+                      <span className="text-xs font-sans font-bold text-slate-500">KG</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 block mt-1">
+                      {tagBalanceInfo.totalBookedKg > 0 ? (
+                        <>
+                          Booked: {(tagBalanceInfo.totalBookedKg / 1000).toFixed(2)} TON ({tagBalanceInfo.totalBookedKg.toLocaleString()} KG)
+                        </>
+                      ) : (
+                        "Select a yarn item"
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Tag QTY */}
+                  <div className="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/20">
+                    <span className="text-[10.5px] uppercase font-bold text-amber-700 dark:text-amber-400 block mb-1">
+                      Tag QTY
+                    </span>
+                    <div className="text-base font-mono font-black text-amber-800 dark:text-amber-300">
+                      {Number(bookingTagModal.finalQtyKg).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
+                      <span className="text-xs font-sans font-bold text-amber-600 dark:text-amber-400">KG</span>
+                    </div>
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 block mt-1">
+                      Auto-populated from Final Qty (Kg)
+                    </span>
+                  </div>
+
+                  {/* Remaining Balance */}
+                  <div
+                    className={`p-3.5 rounded-xl border ${
+                      tagBalanceInfo.isShortage
+                        ? "border-rose-300 dark:border-rose-900 bg-rose-50/80 dark:bg-rose-950/30 text-rose-800 dark:text-rose-300"
+                        : "border-emerald-300 dark:border-emerald-900 bg-emerald-50/80 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300"
+                    }`}
+                  >
+                    <span className="text-[10.5px] uppercase font-bold block mb-1">
+                      Remaining Balance
+                    </span>
+                    <div className="text-base font-mono font-black">
+                      {tagBalanceInfo.remainingKg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
+                      <span className="text-xs font-sans font-bold">KG</span>
+                    </div>
+                    <span className="text-[10px] block mt-1 opacity-80">
+                      {tagBalanceInfo.isShortage ? "⚠️ Insufficient Balance" : "✓ Available Balance - Tag QTY"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Validation Warnings / Confirmation Messages */}
+                {tagBalanceInfo.isShortage && (
+                  <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-800 flex items-start gap-2.5 text-rose-700 dark:text-rose-300 text-xs animate-in fade-in">
+                    <AlertCircle className="size-4 shrink-0 mt-0.5 text-rose-600" />
+                    <div>
+                      <span className="font-bold">Insufficient Booking Balance:</span> The Tag QTY ({bookingTagModal.finalQtyKg.toLocaleString()} KG) exceeds the available balance ({tagBalanceInfo.availableKg.toLocaleString()} KG) by {(bookingTagModal.finalQtyKg - tagBalanceInfo.availableKg).toLocaleString()} KG. Tagging cannot be saved against this yarn item.
+                    </div>
+                  </div>
+                )}
+
+                {!tagBalanceInfo.isShortage && bookingTagModal.selectedBookingNo && bookingTagModal.selectedYarnItemId && (
+                  <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 flex items-center gap-2.5 text-emerald-700 dark:text-emerald-300 text-xs animate-in fade-in">
+                    <CheckCircle className="size-4 shrink-0 text-emerald-600" />
+                    <div>
+                      <span className="font-bold">Booking Balance Verified:</span> {tagBalanceInfo.remainingKg.toLocaleString()} KG will remain available in Block Booking {bookingTagModal.selectedBookingNo} after confirming this tag.
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between">
+                <div>
+                  {bookingTagModal.yarnRowIndex !== null &&
+                    yarnModal.rows[bookingTagModal.yarnRowIndex]?.bookingTag &&
+                    formMode !== "view" && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveBookingTagModal}
+                        className="px-3.5 py-2 rounded-xl border border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                      >
+                        <Trash2 className="size-3.5" /> Remove Tag & Release Balance
+                      </button>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBookingTagModal((prev) => ({ ...prev, isOpen: false }))}
+                    className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  {formMode !== "view" && (
+                    <button
+                      type="button"
+                      disabled={
+                        !bookingTagModal.selectedBookingNo ||
+                        !bookingTagModal.selectedYarnItemId ||
+                        tagBalanceInfo.isShortage
+                      }
+                      onClick={handleSaveBookingTagModal}
+                      className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5 transition-all"
+                    >
+                      <Check className="size-3.5" /> Confirm & Save Tag
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}

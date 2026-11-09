@@ -1422,6 +1422,47 @@ export type MMManualBookingItem = MMAccessoriesBookingItem;
 export type MMManualBookingAllocation = MMAccessoriesBookingAllocation;
 export type MMManualBookingSizeDetail = MMAccessoriesBookingSizeDetail;
 
+export interface MMYarnBookingTagRecord {
+  id: string;
+  preCostId?: string;
+  yarnRowId: string;
+  blockBookingId?: string;
+  blockBookingNo: string;
+  yarnItemId: string;
+  yarnItemName: string;
+  supplierName?: string;
+  tagQtyKg: number;
+  availableBalanceAtTag?: number;
+  remainingBalanceAtTag?: number;
+  taggedAt: string;
+}
+
+export interface MMBlockYarnStatusRecord {
+  id: string;
+  bookingId: string;
+  bookingItemId: string;
+  buyer: string; // Column A: Buyer
+  blockNo: string; // Column B: Block No
+  season: string; // Column C: Season
+  job: string; // Column D: Job
+  yarnCount: string; // Column E: Yarn Count
+  yarnComposition?: string;
+  yarnItem: string;
+  qty: number; // Column F: Qty (KG)
+  marketQtyTon?: number; // Qty (TON)
+  useQty: number; // Column G: Use Qty (KG)
+  balance: number; // Column H: Balance (KG) = Qty - Use Qty
+  price: number; // Column I: Price ($/KG)
+  bookingDate: string; // Column J: Booking Date
+  receivedQty: number; // Column K: Received Qty (KG) (initially = Qty)
+  documentsStatus: string; // Column L: Documents Status (LC Number)
+  actualPrice: number; // Column M: Actual Price ($/KG)
+  piNo: string; // Column N: PI No
+  piId?: string;
+  supplierName: string;
+  tags?: MMYarnBookingTagRecord[];
+}
+
 // ----------------------------------------------------------------------------
 // 8. PI (Proforma Invoice) Management Model
 // ----------------------------------------------------------------------------
@@ -4756,6 +4797,87 @@ export const INITIAL_MM_PROFORMA_INVOICES: MMProformaInvoice[] = [
     notes: "Draft Proforma Invoice for accessories trimming package.",
     attachments: [],
   },
+  {
+    id: "pi-byb-001",
+    piNo: "PI-SQ-2026-0881",
+    entryNo: "ENT-PI-BYB-001",
+    piDate: "2026-10-18",
+    entryDate: "2026-10-18",
+    supplierName: "Square Textiles Ltd",
+    businessUnit: "Unit 2 - Garments",
+    currency: "USD",
+    conversionRate: 1.0,
+    paymentTerms: "At Sight LC",
+    deliveryTerms: "FOB Savar",
+    deliveryMode: "Road",
+    lcNumber: "BBLC-2026-0819",
+    lcReferenceNo: "BBLC-2026-0819",
+    status: "Approved",
+    approvedBy: "Head of Merchandising (Rashidul Islam)",
+    approvalDate: "2026-10-20",
+    submittedBy: "Senior Merchandiser (Tanvir Ahmed)",
+    submittedDate: "2026-10-18",
+    createdBy: "Senior Merchandiser (Tanvir Ahmed)",
+    createdDate: "2026-10-18",
+    version: 1,
+    allocatedBookings: [
+      {
+        bookingId: "byb-2026-0001",
+        bookingNo: "BYB-2026-0001",
+        bookingType: "Accessories",
+        orderNo: "JOB-2026-0001",
+        styleNo: "HM-KT-8841",
+        allocatedAmount: 203500,
+        bookingDesc: "Advance Block Yarn Booking - Q4 2026",
+        bookingDate: "2026-10-15",
+        deliveryMode: "Road",
+        deliveryDate: "2026-11-30",
+        affectedGarmentQty: 60000,
+        buyerName: "H&M Europe",
+        season: "Spring/Summer 2026",
+      },
+    ],
+    items: [
+      {
+        piItemId: "PII-BYB-001",
+        bookingItemId: "byb-item-001",
+        sourceBookingNo: "BYB-2026-0001",
+        itemDescription: "100% Combed Cotton Yarn Ne 30/1",
+        specification: "Combed Ring Spun Auto Coned",
+        unit: "Kg",
+        quantity: 25000,
+        unitPrice: 3.45,
+        totalAmount: 86250,
+      },
+      {
+        piItemId: "PII-BYB-002",
+        bookingItemId: "byb-item-002",
+        sourceBookingNo: "BYB-2026-0001",
+        itemDescription: "100% Combed Cotton Yarn Ne 26/1",
+        specification: "Combed Ring Spun Auto Coned",
+        unit: "Kg",
+        quantity: 20000,
+        unitPrice: 3.35,
+        totalAmount: 67000,
+      },
+      {
+        piItemId: "PII-BYB-003",
+        bookingItemId: "byb-item-003",
+        sourceBookingNo: "BYB-2026-0001",
+        itemDescription: "100% Combed Cotton Yarn Ne 20/1",
+        specification: "Combed Ring Spun Auto Coned",
+        unit: "Kg",
+        quantity: 15000,
+        unitPrice: 3.20,
+        totalAmount: 48000,
+      },
+    ],
+    additionalCharges: 0,
+    totalPiValue: 203500,
+    activeBookingId: "byb-2026-0001",
+    notes: "Confirmed Irrevocable At Sight Back-to-Back LC against Block Yarn Booking BYB-2026-0001.",
+    attachments: [],
+  },
 ];
 
 export const INITIAL_MM_AUDIT_LOGS: MMAuditLogEntry[] = [
@@ -4910,6 +5032,314 @@ export interface MMProductionFileRecord {
 }
 
 // ============================================================================
+// Initial Master Data for Block Yarn Bookings (Advance Allocation Pool)
+// ============================================================================
+export const INITIAL_MM_BLOCK_YARN_BOOKINGS: MMAccessoriesBooking[] = [
+  {
+    id: "byb-2026-0001",
+    bookingNo: "BYB-2026-0001",
+    ourRef: "JOB-2026-0001",
+    bookingDate: "2026-10-15",
+    deliveryDate: "2026-11-30",
+    supplierId: "sup-001",
+    supplierName: "Square Textiles Ltd",
+    bookingDesc: "Advance Block Yarn Booking - Q4 2026",
+    payMode: "At Sight LC",
+    deliveryMode: "By Covered Van",
+    deliveryPlace: "Factory Mill Store (Gazipur)",
+    bookType: "Block Yarn Booking",
+    currency: "USD",
+    conversionRate: 1.0,
+    paymentTerms: "At Sight LC",
+    status: "Approved",
+    piReference: "PI-SQ-2026-0881",
+    totalBookedQty: 60000,
+    totalBookedAmount: 203500,
+    totalPreCostAmount: 203500,
+    totalSavingAmount: 0,
+    overallSavingPct: 0,
+    createdBy: "Senior Merchandiser (Tanvir Ahmed)",
+    createdDate: "2026-10-15",
+    items: [
+      {
+        bookingItemId: "byb-item-001",
+        estimationItemId: "yarn-001",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "yarn-001",
+        itemDescription: "100% Combed Cotton Yarn Ne 30/1",
+        specification: "Combed Ring Spun Auto Coned",
+        sizeOrDimension: "Ne 30/1",
+        color: "Raw White / Greige",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 25,
+        requiredQty: 25000,
+        bookedQty: 25000,
+        bookedRate: 3.45,
+        totalAmount: 86250,
+        preCostRate: 3.45,
+        preCostAmount: 86250,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+      {
+        bookingItemId: "byb-item-002",
+        estimationItemId: "yarn-002",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "yarn-002",
+        itemDescription: "100% Combed Cotton Yarn Ne 26/1",
+        specification: "Combed Ring Spun Auto Coned",
+        sizeOrDimension: "Ne 26/1",
+        color: "Raw White / Greige",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 20,
+        requiredQty: 20000,
+        bookedQty: 20000,
+        bookedRate: 3.35,
+        totalAmount: 67000,
+        preCostRate: 3.35,
+        preCostAmount: 67000,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+      {
+        bookingItemId: "byb-item-003",
+        estimationItemId: "yarn-003",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "yarn-003",
+        itemDescription: "100% Combed Cotton Yarn Ne 20/1",
+        specification: "Combed Ring Spun Auto Coned",
+        sizeOrDimension: "Ne 20/1",
+        color: "Raw White / Greige",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 15,
+        requiredQty: 15000,
+        bookedQty: 15000,
+        bookedRate: 3.20,
+        totalAmount: 48000,
+        preCostRate: 3.20,
+        preCostAmount: 48000,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+    ],
+    createdAt: "2026-10-15T09:00:00.000Z",
+    updatedAt: "2026-10-15T09:00:00.000Z",
+  },
+  {
+    id: "byb-2026-0002",
+    bookingNo: "BYB-2026-0002",
+    bookingDate: "2026-10-18",
+    deliveryDate: "2026-12-15",
+    supplierId: "sup-002",
+    supplierName: "Badsha Textiles Ltd",
+    bookingDesc: "Carded & Slub Cotton Block Yarn Booking",
+    payMode: "60 Days Deferred LC",
+    deliveryMode: "By Covered Van",
+    deliveryPlace: "Factory Mill Store (Gazipur)",
+    bookType: "Block Yarn Booking",
+    currency: "USD",
+    conversionRate: 1.0,
+    paymentTerms: "60 Days Deferred LC",
+    status: "Approved",
+    totalBookedQty: 50000,
+    totalBookedAmount: 164200,
+    totalPreCostAmount: 164200,
+    totalSavingAmount: 0,
+    overallSavingPct: 0,
+    createdBy: "Senior Merchandiser (Tanvir Ahmed)",
+    createdDate: "2026-10-18",
+    items: [
+      {
+        bookingItemId: "byb-item-004",
+        estimationItemId: "yarn-009",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "yarn-009",
+        itemDescription: "100% Carded Cotton Yarn Ne 26/1",
+        specification: "Carded Ring Spun Auto Coned",
+        sizeOrDimension: "Ne 26/1",
+        color: "Raw White / Greige",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 18,
+        requiredQty: 18000,
+        bookedQty: 18000,
+        bookedRate: 3.15,
+        totalAmount: 56700,
+        preCostRate: 3.15,
+        preCostAmount: 56700,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+      {
+        bookingItemId: "byb-item-005",
+        estimationItemId: "yarn-010",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "yarn-010",
+        itemDescription: "100% Carded Cotton Yarn Ne 30/1",
+        specification: "Carded Ring Spun Auto Coned",
+        sizeOrDimension: "Ne 30/1",
+        color: "Raw White / Greige",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 22,
+        requiredQty: 22000,
+        bookedQty: 22000,
+        bookedRate: 3.25,
+        totalAmount: 71500,
+        preCostRate: 3.25,
+        preCostAmount: 71500,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+      {
+        bookingItemId: "byb-item-006",
+        estimationItemId: "yarn-017",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "yarn-017",
+        itemDescription: "100% Cotton Slub Yarn Ne 30/1",
+        specification: "Cotton Slub Effect Ne 30/1",
+        sizeOrDimension: "Ne 30/1",
+        color: "Raw White / Greige",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 10,
+        requiredQty: 10000,
+        bookedQty: 10000,
+        bookedRate: 3.60,
+        totalAmount: 36000,
+        preCostRate: 3.60,
+        preCostAmount: 36000,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+    ],
+    createdAt: "2026-10-18T10:30:00.000Z",
+    updatedAt: "2026-10-18T10:30:00.000Z",
+  },
+  {
+    id: "byb-2026-0003",
+    bookingNo: "BYB-2026-0003",
+    bookingDate: "2026-10-22",
+    deliveryDate: "2026-12-30",
+    supplierId: "sup-003",
+    supplierName: "Pahartali Textile & Hosiery Mills",
+    bookingDesc: "CVC & Grey Melange Block Yarn Booking",
+    payMode: "90 Days Usance LC",
+    deliveryMode: "By Covered Van",
+    deliveryPlace: "Factory Mill Store (Gazipur)",
+    bookType: "Block Yarn Booking",
+    currency: "USD",
+    conversionRate: 1.0,
+    paymentTerms: "90 Days Usance LC",
+    status: "Approved",
+    totalBookedQty: 26000,
+    totalBookedAmount: 87900,
+    totalPreCostAmount: 87900,
+    totalSavingAmount: 0,
+    overallSavingPct: 0,
+    createdBy: "Senior Merchandiser (Tanvir Ahmed)",
+    createdDate: "2026-10-22",
+    items: [
+      {
+        bookingItemId: "byb-item-007",
+        estimationItemId: "yarn-012",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "yarn-012",
+        itemDescription: "60% Cotton 40% Polyester (CVC) Yarn Ne 26/1",
+        specification: "CVC Blend 60/40 Auto Coned",
+        sizeOrDimension: "Ne 26/1",
+        color: "Raw White / Greige",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 12,
+        requiredQty: 12000,
+        bookedQty: 12000,
+        bookedRate: 2.95,
+        totalAmount: 35400,
+        preCostRate: 2.95,
+        preCostAmount: 35400,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+      {
+        bookingItemId: "byb-item-008",
+        estimationItemId: "yarn-018",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "yarn-018",
+        itemDescription: "100% Cotton Grey Melange Yarn Ne 30/1",
+        specification: "10% Grey Melange Heather",
+        sizeOrDimension: "Ne 30/1",
+        color: "Grey Melange",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 14,
+        requiredQty: 14000,
+        bookedQty: 14000,
+        bookedRate: 3.75,
+        totalAmount: 52500,
+        preCostRate: 3.75,
+        preCostAmount: 52500,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+    ],
+    createdAt: "2026-10-22T11:15:00.000Z",
+    updatedAt: "2026-10-22T11:15:00.000Z",
+  },
+];
+
+// ============================================================================
 // LocalStorage Persistence Service & Repository
 // ============================================================================
 
@@ -4938,6 +5368,8 @@ const STORAGE_KEYS = {
   ORDER_ENTRY_UI_STATE: "cripton_mm_order_entry_ui_state_v1",
   ORDER_ENTRY_DRAFT: "cripton_mm_order_entry_draft_v1",
   MANUAL_BOOKINGS: "cripton_mm_manual_bookings_v1",
+  YARN_BOOKING_TAGS: "cripton_mm_yarn_booking_tags_v1",
+  BLOCK_YARN_STATUS: "cripton_mm_block_yarn_status_v1",
 };
 
 export class MMRepository {
@@ -5260,9 +5692,269 @@ export class MMRepository {
     this.set(STORAGE_KEYS.ACCESSORIES_BOOKINGS, list);
   }
 
-  // 7.1 Manual Bookings (Dedicated Independent Storage)
+  // 7.1 Manual Bookings / Block Yarn Bookings (Dedicated Independent Storage)
   static getManualBookings(): MMAccessoriesBooking[] {
-    return this.get<MMAccessoriesBooking[]>(STORAGE_KEYS.MANUAL_BOOKINGS, []);
+    const list = this.get<MMAccessoriesBooking[]>(STORAGE_KEYS.MANUAL_BOOKINGS, []);
+    if (!list || list.length === 0) {
+      this.set(STORAGE_KEYS.MANUAL_BOOKINGS, INITIAL_MM_BLOCK_YARN_BOOKINGS);
+      return INITIAL_MM_BLOCK_YARN_BOOKINGS;
+    }
+    return list;
+  }
+
+  // 7.2 Yarn Booking Tags Persistence & Real-time Balance Tracking
+  static getYarnBookingTags(): MMYarnBookingTagRecord[] {
+    return this.get<MMYarnBookingTagRecord[]>(STORAGE_KEYS.YARN_BOOKING_TAGS, []);
+  }
+
+  static getYarnBookingTagByRowId(yarnRowId: string): MMYarnBookingTagRecord | undefined {
+    const tags = this.getYarnBookingTags();
+    return tags.find((t) => t.yarnRowId === yarnRowId);
+  }
+
+  static saveYarnBookingTag(tag: MMYarnBookingTagRecord): void {
+    const tags = this.getYarnBookingTags();
+    const idx = tags.findIndex((t) => t.yarnRowId === tag.yarnRowId || t.id === tag.id);
+    if (idx >= 0) {
+      tags[idx] = tag;
+    } else {
+      tags.push(tag);
+    }
+    this.set(STORAGE_KEYS.YARN_BOOKING_TAGS, tags);
+  }
+
+  static removeYarnBookingTag(yarnRowId: string): void {
+    const tags = this.getYarnBookingTags();
+    const filtered = tags.filter((t) => t.yarnRowId !== yarnRowId && t.id !== yarnRowId);
+    this.set(STORAGE_KEYS.YARN_BOOKING_TAGS, filtered);
+  }
+
+  static getAvailableYarnBookingBalance(
+    bookingNo: string,
+    yarnItemId: string,
+    yarnItemName?: string,
+    currentYarnRowId?: string
+  ): { totalBookedKg: number; consumedKg: number; availableKg: number } {
+    const bookings = this.getManualBookings();
+    const booking = bookings.find((b) => b.bookingNo === bookingNo || b.id === bookingNo);
+    if (!booking || !booking.items || booking.items.length === 0) {
+      return { totalBookedKg: 0, consumedKg: 0, availableKg: 0 };
+    }
+
+    const item = booking.items.find(
+      (it) =>
+        it.bookingItemId === yarnItemId ||
+        (it as any).id === yarnItemId ||
+        (yarnItemName && it.itemDescription === yarnItemName)
+    );
+    if (!item) {
+      return { totalBookedKg: 0, consumedKg: 0, availableKg: 0 };
+    }
+
+    // Determine booked quantity in KG (handling TON -> KG conversion: 1 TON = 1,000 KG)
+    let totalBookedKg = 0;
+    const isMarketTon =
+      (item.marketUnit && item.marketUnit.toUpperCase().includes("TON")) ||
+      item.conversionFactor === 1000;
+    if (isMarketTon && item.marketQty && item.marketQty > 0) {
+      totalBookedKg = Number(item.marketQty) * 1000;
+    } else if (item.unit && item.unit.toUpperCase().includes("TON")) {
+      totalBookedKg = (Number(item.bookedQty) || Number(item.requiredQty) || 0) * 1000;
+    } else {
+      totalBookedKg = Number(item.bookedQty) || Number(item.requiredQty) || 0;
+    }
+
+    // Sum up tagged quantities by OTHER yarn rows (excluding current row so edit balance is accurate)
+    const tags = this.getYarnBookingTags();
+    const consumedKg = tags
+      .filter(
+        (t) =>
+          (t.blockBookingNo === booking.bookingNo || t.blockBookingId === booking.id) &&
+          (t.yarnItemId === item.bookingItemId ||
+            t.yarnItemId === (item as any).id ||
+            t.yarnItemName === item.itemDescription) &&
+          (!currentYarnRowId || t.yarnRowId !== currentYarnRowId)
+      )
+      .reduce((sum, t) => sum + (Number(t.tagQtyKg) || 0), 0);
+
+    const availableKg = Math.max(0, Number((totalBookedKg - consumedKg).toFixed(2)));
+    return {
+      totalBookedKg: Number(totalBookedKg.toFixed(2)),
+      consumedKg: Number(consumedKg.toFixed(2)),
+      availableKg,
+    };
+  }
+
+  // 7.3 Block Yarn Status Synchronization & Real-time Tracking
+  static getBlockYarnStatusRecords(): MMBlockYarnStatusRecord[] {
+    try {
+      const rawBookings = this.getManualBookings();
+      const bookings = Array.isArray(rawBookings) ? rawBookings : [];
+
+      const rawPis = this.getPIs();
+      const pis = Array.isArray(rawPis) ? rawPis : [];
+
+      const rawTags = this.getYarnBookingTags();
+      const tags = Array.isArray(rawTags) ? rawTags : [];
+
+      // Cross-reference pre-costings to extract Buyer, Season, Job if tagged
+      let preCostings: any[] = [];
+      if (typeof window !== "undefined") {
+        try {
+          const stored = localStorage.getItem("cripton_pre_costings_knit_master_v1");
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) preCostings = parsed;
+          }
+        } catch (e) {}
+      }
+
+      // Check if any existing overrides/adjustments were saved
+      const rawExisting = this.get<MMBlockYarnStatusRecord[]>(STORAGE_KEYS.BLOCK_YARN_STATUS, []);
+      const existingRecords = Array.isArray(rawExisting) ? rawExisting : [];
+      const existingMap = new Map<string, MMBlockYarnStatusRecord>();
+      existingRecords.forEach((r) => {
+        if (r && r.id) existingMap.set(r.id, r);
+      });
+
+      const records: MMBlockYarnStatusRecord[] = [];
+
+      bookings.forEach((booking) => {
+        if (!booking) return;
+
+        // Find associated PI
+        const linkedPi = pis.find(
+          (pi) =>
+            pi &&
+            (pi.activeBookingId === booking.id ||
+              pi.activeBookingId === booking.bookingNo ||
+              (Array.isArray(pi.allocatedBookings) &&
+                pi.allocatedBookings.some(
+                  (ab) => ab && (ab.bookingId === booking.id || ab.bookingNo === booking.bookingNo)
+                )) ||
+              (booking.piReference && (pi.piNo === booking.piReference || pi.id === booking.piReference)))
+        );
+
+        const piNo = linkedPi?.piNo || booking.piReference || "-";
+        let documentsStatus = "Pending PI / LC";
+        if (linkedPi) {
+          documentsStatus = linkedPi.lcNumber || linkedPi.lcReferenceNo || "LC Under Process";
+        }
+
+        const items = Array.isArray(booking.items) ? booking.items : [];
+        items.forEach((item, itemIdx) => {
+          if (!item) return;
+          const rowId = `bys-${booking.id}-${item.bookingItemId || itemIdx}`;
+          const existing = existingMap.get(rowId);
+
+          // Qty in KG (TON -> KG conversion: 1 TON = 1,000 KG)
+          let qtyKg = 0;
+          const isMarketTon =
+            (item.marketUnit &&
+              typeof item.marketUnit === "string" &&
+              item.marketUnit.toUpperCase().includes("TON")) ||
+            item.conversionFactor === 1000;
+          if (isMarketTon && item.marketQty && item.marketQty > 0) {
+            qtyKg = Number(item.marketQty) * 1000;
+          } else if (item.unit && typeof item.unit === "string" && item.unit.toUpperCase().includes("TON")) {
+            qtyKg = (Number(item.bookedQty) || Number(item.requiredQty) || 0) * 1000;
+          } else {
+            qtyKg = Number(item.bookedQty) || Number(item.requiredQty) || 0;
+          }
+
+          // Matching tags from Pre Costing
+          const matchingTags = tags.filter(
+            (t) =>
+              t &&
+              (t.blockBookingNo === booking.bookingNo || t.blockBookingId === booking.id) &&
+              (t.yarnItemId === item.bookingItemId ||
+                t.yarnItemId === (item as any).id ||
+                t.yarnItemName === item.itemDescription)
+          );
+
+          const useQty = matchingTags.reduce((sum, t) => sum + (Number(t?.tagQtyKg) || 0), 0);
+          const balance = Math.max(0, Number((qtyKg - useQty).toFixed(2)));
+
+          // Received Qty initially equal to Qty (or preserve saved manual override)
+          const receivedQty = existing?.receivedQty !== undefined ? Number(existing.receivedQty) || 0 : qtyKg;
+
+          const price = Number(item.bookedRate) || Number(item.unitPrice) || 0;
+          const actualPrice = existing?.actualPrice !== undefined ? Number(existing.actualPrice) || 0 : price;
+
+          // Buyer, Season, Job extraction
+          let buyer = booking.buyerName || "H&M Europe";
+          let season = booking.season || "Spring/Summer 2026";
+          let job = booking.ourRef || booking.orderNo || "JOB-2026-0001";
+
+          if (matchingTags.length > 0) {
+            for (const tag of matchingTags) {
+              const pc = preCostings.find(
+                (p) =>
+                  p &&
+                  (p.id === tag.preCostId || p.preCostId === tag.preCostId || p.preCostNo === tag.preCostId)
+              );
+              if (pc) {
+                if (pc.buyer) buyer = pc.buyer;
+                if (pc.season) season = pc.season;
+                if (pc.preCostId || pc.preCostNo || pc.style) job = pc.preCostId || pc.style;
+                break;
+              }
+            }
+          }
+
+          // Yarn Count extraction
+          let yarnCount = item.sizeOrDimension || "";
+          if (!yarnCount) {
+            const desc = `${item.itemDescription || ""} ${item.specification || ""}`;
+            const countMatch = desc.match(/Ne\s*[\d/]+|\b\d{1,3}\/\d{1,2}\b/i);
+            yarnCount = countMatch ? countMatch[0].toUpperCase() : item.itemDescription || "Ne 30/1";
+          }
+
+          records.push({
+            id: rowId,
+            bookingId: booking.id || `booking-${itemIdx}`,
+            bookingItemId: item.bookingItemId || `item-${itemIdx}`,
+            buyer: buyer || "H&M Europe",
+            blockNo: booking.bookingNo || "BYB-2026-0001",
+            season: season || "Spring/Summer 2026",
+            job: job || "JOB-2026-0001",
+            yarnCount: yarnCount || "Ne 30/1",
+            yarnComposition: item.specification || "",
+            yarnItem: item.itemDescription || "100% Combed Cotton Yarn",
+            qty: Number(qtyKg) || 0,
+            marketQtyTon: item.marketQty,
+            useQty: Number(Number(useQty).toFixed(2)) || 0,
+            balance: Number(Number(balance).toFixed(2)) || 0,
+            price: Number(price) || 0,
+            bookingDate: booking.bookingDate || "",
+            receivedQty: Number(receivedQty) || 0,
+            documentsStatus: documentsStatus || "Pending PI / LC",
+            actualPrice: Number(actualPrice) || 0,
+            piNo: piNo || "-",
+            piId: linkedPi?.id,
+            supplierName: booking.supplierName || (item as any).supplierName || "Square Textiles Ltd",
+            tags: matchingTags,
+          });
+        });
+      });
+
+      this.set(STORAGE_KEYS.BLOCK_YARN_STATUS, records);
+      return records;
+    } catch (error) {
+      console.error("Error in getBlockYarnStatusRecords:", error);
+      return [];
+    }
+  }
+
+  static saveBlockYarnStatusRecord(record: MMBlockYarnStatusRecord): void {
+    const list = this.get<MMBlockYarnStatusRecord[]>(STORAGE_KEYS.BLOCK_YARN_STATUS, []);
+    const idx = list.findIndex((r) => r.id === record.id);
+    if (idx >= 0) {
+      list[idx] = record;
+    } else {
+      list.push(record);
+    }
+    this.set(STORAGE_KEYS.BLOCK_YARN_STATUS, list);
   }
 
   static getManualBookingById(id: string): MMAccessoriesBooking | undefined {

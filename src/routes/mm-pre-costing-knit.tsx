@@ -66,10 +66,16 @@ function MMPreCostingKnitPage() {
     >
       <PreCostingKnitManager
         initialTab={activeTab}
-        onTabChange={(newTab) => {
+        initialRecordId={searchParams.id}
+        onTabChange={(newTab, recId) => {
           navigate({
             to: "/mm-pre-costing-knit",
-            search: newTab === "register" ? {} : { tab: newTab },
+            search:
+              newTab === "register"
+                ? {}
+                : recId
+                ? { tab: newTab, id: recId }
+                : { tab: newTab },
           });
         }}
       />

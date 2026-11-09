@@ -751,9 +751,17 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     description: "Pre-costing calculations, fabric/trims consumption, CM estimation, and margin analysis.",
     modificationPercent: 100,
     status: "Completed",
-    lastModified: "2026-11-08",
-    totalRevisions: 9,
+    lastModified: "2026-11-09",
+    totalRevisions: 11,
     changeHistory: [
+      {
+        id: "chg-" + Date.now(),
+        date: "2026-11-09 16:35",
+        type: "Bug Fix",
+        description:
+          "Fixed Pre Costing Entry (Knit) Local Storage persistence and state restoration: Resolved undefined preCostId reference error in booking tag modal; implemented automatic continuous local storage persistence for in-progress form edits (Fabric Cost, Accessories Cost, Others Cost, Yarn Breakdown, Booking Tags); enhanced ensureKnitCostingStructure to protect customized section arrays and hydrate yarn booking tags; added active record tracking (cripton_pre_costings_knit_active_id_v1) and initialRecordId URL synchronization to seamlessly restore full form state across page refreshes and browser reopening without data loss or duplicate records.",
+        percentDelta: 0,
+      },
       {
         id: "chg-1761371400000",
         date: "2026-10-25 11:50",
@@ -816,6 +824,13 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
         type: "Feature",
         description: "Implemented Pre Costing Register (Knit) & Complete Pre-Cost Sheet Report: Added Pre Costing Register (Knit) under Style Pre-Costing menu showing records created through Pre Costing Entry (Knit) with quick search, buyer & status filters, date range filters, pagination (page size, first/prev/next/last controls), and View action. Integrated complete Pre-Cost Sheet Report modeled after PKCL demo reference featuring two-column structured layout: Left column with Header Style & Order Info (Buyer, Job ID, Style, Order Confirm Date, Season, Revision No, SMV, CM/Dz, PL-Knitting/Dyeing/GMT, reason for revision), PO-wise Order Summary, Fabrication & Process Cost breakdown (Qty, Knit, Dye, Fin, Total), 10-category Detailed Cost Sheet (Yarn, Knitting Process, Dyeing Process, Dyeing Finishing Process, Embellishment, Sewing Accessories, Finishing Accessories, General Accessories, Relevant Cost, CMT Cost) with exact subtotals and grand total, and Approval History timeline; Right column with Order & Cost Summary Card (Total Order Qty, FOB Value, Total Cost, Cost per Pc, Surplus/Profit-Loss Value and %), DZ-Based Cost Breakdown / Cost Sharing (Rate/Dz, Share %, Value $), Back-to-Back LC Details (Item, Material $, % FOB, % MAT), Dynamic Key Takeaways summary bullets, and formal signature blocks; added print-friendly styling and PDF export option.",
         percentDelta: 5,
+      },
+      {
+        id: "chg-1762620000000",
+        date: "2026-11-08 22:40",
+        type: "Feature",
+        description: "Implemented Yarn Booking Tagging against Block Yarn Bookings in Pre Costing Entry (Knit): Added 'Booking Tag' column with 'B' button immediately right of 'Vendor *' in the Yarn Breakdown modal table. Built interactive Booking Tag modal featuring searchable Block Booking No. dropdown (filtered to bookings with available balance), searchable Yarn Item dropdown, real-time Available Balance card in KG (with TON to KG conversion: 1 TON = 1,000 KG and subtraction of existing tags across records), auto-populated Tag QTY from row's Final Qty (Kg), dynamic Remaining Balance calculation (Available Balance - Tag QTY), and strict validation blocking confirmation if Tag QTY exceeds Available Balance. Integrated persistent browser storage under 'cripton_mm_yarn_booking_tags_v1' maintaining relationships across Pre Costing, yarn row, block booking, and yarn item with support for tag removal/balance release.",
+        percentDelta: 0,
       },
     ],
   },
@@ -926,11 +941,60 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     searchParams: { tab: "yarnCalc" },
     category: "Materials & Sourcing",
     description: "Yarn requirement calculation, count breakdown, color allocation, and mill booking.",
-    modificationPercent: 0,
-    status: "Baseline (Unchanged)",
-    lastModified: "2026-10-13",
-    totalRevisions: 0,
-    changeHistory: [],
+    modificationPercent: 100,
+    status: "Completed",
+    lastModified: "2026-11-09",
+    totalRevisions: 6,
+    changeHistory: [
+      {
+        id: "chg-" + Date.now(),
+        date: "2026-11-09 09:35",
+        type: "Feature",
+        description:
+          "Proforma Invoice Entry Block Booking Integration (/mm-proforma-invoice-create): Added 'Block Booking' option to Item Type dropdown; automatically selects Block Booking and populates Advance Mill yarn items when navigating from Block Yarn Booking. Updated Booking Details section to conditionally hide Buyer, Job ID, Season, and Style strictly for Block Booking PI, and displayed Market Qty (TON) instead of Consumption Qty. Updated Candidate Booking Modal to filter Block Yarn Bookings and preview modal to cleanly display Block Booking PI specifications without Job ID and showing Market Qty.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794263795000",
+        date: "2026-11-09 07:35",
+        type: "UI Enhancement",
+        description:
+          "Block Yarn Status register UI & layout overhaul (/mm-block-yarn-status): Expanded container to full content width (w-full) removing cramped max-w-7xl constraints and duplicate inner headers; integrated action buttons into MarketingMerchandisingLayout header; removed alphabetical prefixes (A, B, C, ... N) from column headers showing clean field labels; enforced generous column min-widths with whitespace-nowrap and right-aligned font-mono numbers; added subtle alternating row backgrounds and clean borders; aligned totals footer across all 16 columns and polished Summary View.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794263750000",
+        date: "2026-11-09 07:02",
+        type: "Bug Fix",
+        description:
+          "Resolved 'Cannot read properties of undefined (reading startsWith)' error: Made activePath optional with safe fallback in MarketingMerchandisingLayoutProps and defaulted currentActivePath from window.location.pathname, safeguarding all startsWith checks across navigation groups and subitems. Explicitly passed activePath='/mm-block-yarn-status' in mm-block-yarn-status.tsx.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794263690000",
+        date: "2026-11-09 06:45",
+        type: "Bug Fix",
+        description:
+          "Fixed runtime error in Block Yarn Status register (/mm-block-yarn-status): Added defensive null/undefined checks across all data fields and numeric computations, sanitized search string checks, made repository sync resilient to corrupted localStorage entries, and wrapped the page in an Error Boundary with direct auto-recovery and reload.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794263590000",
+        date: "2026-11-09 06:30",
+        type: "Feature",
+        description:
+          "Developed Block Yarn Status module under Marketing & Merchandising → Booking Information → Block Yarn Status (/mm-block-yarn-status) based on Block Yarn Status 2026 reference. Built Main Register with Columns A-N (Buyer, Block No, Season, Job, Yarn Count, Qty, Use Qty, Balance = Qty - Use Qty, Price, Booking Date, Received Qty, Documents Status LC, Actual Price, PI No), search & filters, pagination, CSV export, and View modal with Pre Costing tag breakdown. Implemented Summary View with 4 groupings (By Buyer, By Block No., By Season, By Yarn Count) and Grand Totals. Integrated real-time synchronization from Block Yarn Bookings, Pre Costing Knit tags, and PIs with duplicate-PI prevention.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794263445000",
+        date: "2026-11-08 21:30",
+        type: "Feature",
+        description:
+          "Block Yarn Booking updates: Renamed sidebar menu to 'Block Yarn Booking', register title to 'Block Yarn Booking Register' (cleared subtitle & updated action button to 'Create Block Booking'), form header to 'Block Booking', grid heading to 'Yarn Booking Details'. Replaced accessories picker with yarn-only item library. Enforced default Unit (KG), Market Unit (TON (Metric Ton)), default Unit Relation 1,000, and bidirectional conversion calculations (1 TON = 1,000 KG).",
+        percentDelta: 100,
+      },
+    ],
   },
 
   // ──────────────────────────────────────────────────────────────────────────
