@@ -32,8 +32,18 @@ import {
   StandardReportData,
 } from "@/components/reports/StandardPreviewReportModal";
 import { DEFAULT_WAREHOUSES, getStoredData } from "@/lib/procurement-master-data";
+import { MaterialRequisitionViewModal } from "@/components/inventory/MaterialRequisitionViewModal";
+
+interface MRApprovalSearch {
+  action?: "approve" | "view";
+  id?: string;
+}
 
 export const Route = createFileRoute("/inv-material-requisition-approval-list")({
+  validateSearch: (search: Record<string, unknown>): MRApprovalSearch => ({
+    action: search.action as any,
+    id: search.id as string | undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Material Requisition Approval — Inventory ERP" },
@@ -47,6 +57,7 @@ export const Route = createFileRoute("/inv-material-requisition-approval-list")(
 });
 
 function MaterialRequisitionApprovalListPage() {
+  const searchParams = Route.useSearch();
   const navigate = useNavigate();
   const [requisitions, setRequisitions] = useState<MaterialRequisition[]>(() =>
     getStoredMaterialRequisitions()
@@ -55,6 +66,25 @@ function MaterialRequisitionApprovalListPage() {
   useEffect(() => {
     setStoredMaterialRequisitions(requisitions);
   }, [requisitions]);
+
+  // Process / View Modal State
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedMRForProcess, setSelectedMRForProcess] = useState<MaterialRequisition | null>(null);
+  const [isApprovalMode, setIsApprovalMode] = useState(false);
+
+  // Auto-open modal if navigated to with search query ?id=...
+  useEffect(() => {
+    if (searchParams.id) {
+      const match = requisitions.find(
+        (r) => r.id === searchParams.id || r.mrNumber.toLowerCase() === searchParams.id?.toLowerCase()
+      );
+      if (match) {
+        setSelectedMRForProcess(match);
+        setIsApprovalMode(match.status === "Submitted");
+        setViewModalOpen(true);
+      }
+    }
+  }, [searchParams.id, searchParams.action, requisitions]);
 
   const warehouses = getStoredData("proc_warehouses_v2", DEFAULT_WAREHOUSES);
 
@@ -180,6 +210,8 @@ function MaterialRequisitionApprovalListPage() {
     });
     setRequisitions(updated);
     toast.success(`Requisition ${mr.mrNumber} approved successfully!`);
+    setViewModalOpen(false);
+    setSelectedMRForProcess(null);
   };
 
   const handleConfirmModalAction = () => {
@@ -224,6 +256,8 @@ function MaterialRequisitionApprovalListPage() {
     setTargetMR(null);
     setModalAction(null);
     setModalComment("");
+    setViewModalOpen(false);
+    setSelectedMRForProcess(null);
   };
 
   // Preview Report Data
@@ -568,9 +602,17 @@ function MaterialRequisitionApprovalListPage() {
                             {idx + 1}
                           </td>
                           <td className="py-3 px-3.5">
-                            <span className="font-bold text-blue-600 font-mono">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedMRForProcess(mr);
+                                setIsApprovalMode(isPending);
+                                setViewModalOpen(true);
+                              }}
+                              className="font-bold text-blue-600 hover:text-blue-800 hover:underline font-mono text-left cursor-pointer transition-colors"
+                            >
                               {mr.mrNumber}
-                            </span>
+                            </button>
                           </td>
                           <td className="py-3 px-3.5 font-semibold text-slate-800">
                             {mr.requestedBy}
@@ -603,13 +645,12 @@ function MaterialRequisitionApprovalListPage() {
                             <div className="flex items-center justify-center gap-1.5">
                               {/* View / Open in Approval Form */}
                               <button
-                                title="Open Approval Form"
-                                onClick={() =>
-                                  navigate({
-                                    to: "/inv-material-requisition",
-                                    search: { action: isPending ? "approve" : "view", id: mr.id },
-                                  })
-                                }
+                                title={isPending ? "Process Approval" : "View Requisition"}
+                                onClick={() => {
+                                  setSelectedMRForProcess(mr);
+                                  setIsApprovalMode(isPending);
+                                  setViewModalOpen(true);
+                                }}
                                 className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-[10px] font-bold transition-colors"
                               >
                                 <Eye className="size-3" />
@@ -678,7 +719,7 @@ function MaterialRequisitionApprovalListPage() {
 
         {/* Comment Modal for Reject / Return */}
         {modalAction && targetMR && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-150">
             <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
               <h3 className="text-base font-bold text-slate-800">
                 {modalAction === "Reject" ? "Reject Requisition" : "Return for Correction"}:{" "}
@@ -727,6 +768,32 @@ function MaterialRequisitionApprovalListPage() {
             </div>
           </div>
         )}
+
+        {/* Material Requisition View & Process Modal */}
+        <MaterialRequisitionViewModal
+          open={viewModalOpen}
+          onOpenChange={(open) => {
+            setViewModalOpen(open);
+            if (!open) setSelectedMRForProcess(null);
+          }}
+          requisition={selectedMRForProcess}
+          isApprovalMode={isApprovalMode}
+          onApprove={handleApprove}
+          onReject={(mr) => {
+            setTargetMR(mr);
+            setModalAction("Reject");
+            setModalComment("");
+          }}
+          onReturn={(mr) => {
+            setTargetMR(mr);
+            setModalAction("Return");
+            setModalComment("");
+          }}
+          onPrint={(target) => {
+            setReportTarget(target);
+            setPreviewReportOpen(true);
+          }}
+        />
 
         {/* Preview Report Modal */}
         <StandardPreviewReportModal
