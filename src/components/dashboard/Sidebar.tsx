@@ -227,6 +227,9 @@ export const nav: NavItem[] = [
       { label: "Leave Approve", to: "/leave-approve" },
       { label: "Earn Leave Process (Year)", to: "/earn-leave-process", search: { type: "year" } },
       { label: "Earn Leave Process (Month)", to: "/earn-leave-process", search: { type: "month" } },
+      { label: "Earn Leave Check (HRD)", to: "/earn-leave-check-hrd" },
+      { label: "Earn Leave Check (Audit)", to: "/earn-leave-check-audit" },
+      { label: "Earn Leave Check (Plant Head)", to: "/earn-leave-check-plant-head" },
       { label: "Earn Leave Submit & List", to: "/earn-leave-workflow" },
     ],
   },
@@ -491,6 +494,7 @@ export const nav: NavItem[] = [
         to: "/payroll-reports",
         subitems: [
           { label: "Monthly Salary Details", to: "/monthly-salary-details" },
+          { label: "Monthly Salary Payable", to: "/monthly-salary-payable" },
           { label: "Monthly Lefty Salary Sheet", to: "/monthly-lefty-salary-sheet" },
           { label: "Employee Salary History", to: "/employee-salary-history" },
           { label: "Monthly Advance Salary Sheet", to: "/monthly-advance-salary-sheet" },
