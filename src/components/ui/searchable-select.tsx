@@ -1,23 +1,15 @@
 import * as React from "react";
-import { Check, ChevronDown, Search } from "lucide-react";
+import { Check, ChevronDown, Search, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-interface Option {
+export interface Option {
   value: string;
   label: string;
 }
 
-interface SearchableSelectProps {
+export interface SearchableSelectProps {
   options: Option[];
   value: string;
   onChange: (value: string) => void;
@@ -30,7 +22,7 @@ interface SearchableSelectProps {
 }
 
 export function SearchableSelect({
-  options,
+  options = [],
   value,
   onChange,
   placeholder = "Select...",
@@ -42,10 +34,91 @@ export function SearchableSelect({
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
+  const [highlightedIndex, setHighlightedIndex] = React.useState<number>(-1);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find((option) => option.value === value);
+  const selectedOption = React.useMemo(() => {
+    return (options || []).find((opt) => opt.value === value || opt.label === value);
+  }, [options, value]);
+
+  const filteredOptions = React.useMemo(() => {
+    const safeOptions = Array.isArray(options) ? options : [];
+    const q = searchValue.trim().toLowerCase();
+    if (!q) return safeOptions;
+    return safeOptions.filter(
+      (opt) =>
+        (opt.label || "").toLowerCase().includes(q) ||
+        (opt.value || "").toLowerCase().includes(q)
+    );
+  }, [options, searchValue]);
+
+  React.useEffect(() => {
+    if (open) {
+      setSearchValue("");
+      setHighlightedIndex(-1);
+      const t = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(t);
+    }
+  }, [open]);
+
+  React.useEffect(() => {
+    if (highlightedIndex >= 0 && listRef.current) {
+      const el = listRef.current.children[highlightedIndex] as HTMLElement;
+      if (el && typeof el.scrollIntoView === "function") {
+        el.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [highlightedIndex]);
+
+  const handleSelect = React.useCallback(
+    (val: string) => {
+      onChange(val);
+      setOpen(false);
+      setSearchValue("");
+    },
+    [onChange]
+  );
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) =>
+        prev < filteredOptions.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) =>
+        prev > 0 ? prev - 1 : filteredOptions.length - 1
+      );
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
+        handleSelect(filteredOptions[highlightedIndex].value);
+      } else if (allowCustom && searchValue.trim()) {
+        handleSelect(searchValue.trim());
+      } else if (filteredOptions.length === 1) {
+        handleSelect(filteredOptions[0].value);
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setOpen(false);
+    }
+  };
+
   const isUnderline = variant === "underline";
   const shouldShowSearchIcon = showSearchIconInTrigger ?? !isUnderline;
+
+  const showCustomOption =
+    allowCustom &&
+    searchValue.trim() !== "" &&
+    !(options || []).some(
+      (o) =>
+        (o.label || "").toLowerCase() === searchValue.trim().toLowerCase() ||
+        (o.value || "").toLowerCase() === searchValue.trim().toLowerCase()
+    );
 
   return (
     <Popover open={disabled ? false : open} onOpenChange={disabled ? undefined : setOpen}>
@@ -59,76 +132,110 @@ export function SearchableSelect({
             isUnderline
               ? "flex w-full items-center justify-between h-8 py-1 px-0 bg-transparent border-0 border-b border-slate-300 focus:border-blue-500 rounded-none outline-none text-sm text-slate-800 cursor-pointer text-left shadow-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               : "flex w-full items-center justify-between h-10 px-3 rounded-xl bg-background border border-border/80 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-sm transition-all text-foreground cursor-pointer hover:border-primary/50 text-left disabled:opacity-50 disabled:cursor-not-allowed",
-            className,
+            className
           )}
         >
           <span className="flex items-center gap-2 truncate min-w-0 flex-1 pr-2">
             {shouldShowSearchIcon && (
               <Search className="size-3.5 text-muted-foreground/60 shrink-0" />
             )}
-            <span className={cn("truncate", !selectedOption && !value && "text-slate-400 font-normal")}>
+            <span
+              className={cn(
+                "truncate",
+                !selectedOption && !value && "text-slate-400 font-normal"
+              )}
+            >
               {selectedOption ? selectedOption.label : value || placeholder}
             </span>
           </span>
-          <ChevronDown className="h-4 w-4 shrink-0 opacity-60 text-slate-500" />
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 shrink-0 opacity-60 text-slate-500 transition-transform duration-150",
+              open && "rotate-180"
+            )}
+          />
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0 shadow-lg border-border/50 rounded-xl overflow-hidden z-[100]"
+        className="w-[var(--radix-popover-trigger-width)] min-w-[280px] p-0 shadow-xl border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] bg-white dark:bg-slate-900"
         align="start"
       >
-        <Command>
-          <CommandInput
-            placeholder="Search product..."
-            className="h-9 text-xs"
+        <div className="flex items-center border-b border-slate-200 dark:border-slate-800 px-3 py-2 bg-slate-50/50 dark:bg-slate-900/50">
+          <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-50 text-slate-500" />
+          <input
+            ref={inputRef}
+            type="text"
             value={searchValue}
-            onValueChange={setSearchValue}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+              setHighlightedIndex(0);
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="Search..."
+            className="flex h-7 w-full rounded-md bg-transparent text-xs outline-none placeholder:text-muted-foreground text-slate-900 dark:text-white"
           />
-          <CommandList className="max-h-[220px]">
-            <CommandEmpty className="py-2.5 px-3 text-xs text-muted-foreground">
-              {allowCustom && searchValue.trim() ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onChange(searchValue.trim());
-                    setOpen(false);
-                    setSearchValue("");
-                  }}
-                  className="w-full text-left font-semibold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1.5 cursor-pointer"
+          {searchValue && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchValue("");
+                inputRef.current?.focus();
+              }}
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded cursor-pointer"
+            >
+              <X className="size-3" />
+            </button>
+          )}
+        </div>
+
+        <div
+          ref={listRef}
+          className="max-h-[220px] overflow-y-auto p-1 text-xs space-y-0.5 divide-y divide-transparent"
+        >
+          {showCustomOption && (
+            <button
+              type="button"
+              onClick={() => handleSelect(searchValue.trim())}
+              className="w-full text-left font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 px-2.5 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/40 flex items-center gap-1.5 cursor-pointer text-xs"
+            >
+              <span>+ Use &ldquo;{searchValue.trim()}&rdquo;</span>
+            </button>
+          )}
+
+          {filteredOptions.length === 0 && !showCustomOption ? (
+            <div className="py-4 text-center text-xs text-muted-foreground text-slate-400">
+              No results found.
+            </div>
+          ) : (
+            filteredOptions.map((option, idx) => {
+              const isSelected = value === option.value;
+              const isHighlighted = idx === highlightedIndex;
+              return (
+                <div
+                  key={option.value || idx}
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => handleSelect(option.value)}
+                  onMouseEnter={() => setHighlightedIndex(idx)}
+                  className={cn(
+                    "flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs transition-colors select-none",
+                    isSelected && "bg-primary/10 text-primary font-semibold",
+                    isHighlighted && !isSelected && "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white",
+                    !isSelected && !isHighlighted && "text-slate-700 dark:text-slate-300"
+                  )}
                 >
-                  <span>+ Use &ldquo;{searchValue.trim()}&rdquo;</span>
-                </button>
-              ) : (
-                <span>No results found.</span>
-              )}
-            </CommandEmpty>
-            <CommandGroup className="p-1">
-              {options.map((option) => (
-                <CommandItem
-                  key={option.value}
-                  value={option.label}
-                  onSelect={(currentValue) => {
-                    const selected = options.find((o) => o.label.toLowerCase() === currentValue.toLowerCase());
-                    if (selected) {
-                      onChange(selected.value);
-                      setOpen(false);
-                      setSearchValue("");
-                    }
-                  }}
-                  className="text-xs rounded-lg cursor-pointer data-[selected=true]:bg-primary/10 data-[selected=true]:text-primary my-0.5"
-                >
+                  <span className="truncate pr-2">{option.label}</span>
                   <Check
                     className={cn(
-                      "mr-2 h-3.5 w-3.5 text-primary",
-                      value === option.value ? "opacity-100" : "opacity-0",
+                      "size-3.5 shrink-0 text-primary",
+                      isSelected ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {option.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
+                </div>
+              );
+            })
+          )}
+        </div>
       </PopoverContent>
     </Popover>
   );

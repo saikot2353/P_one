@@ -61,11 +61,13 @@ export function MaterialReceiveListPage() {
   }, []);
 
   // Filters State
+  const [selectedDocType, setSelectedDocType] = useState<string>("Purchase Order");
   const [selectedStore, setSelectedStore] = useState<string>("All Stores");
+  const [selectedWorkLocation, setSelectedWorkLocation] = useState<string>("All Locations");
+  const [selectedArea, setSelectedArea] = useState<string>("All Areas");
   const [selectedOrganization, setSelectedOrganization] = useState<string>("All Organizations");
   const [selectedDepartment, setSelectedDepartment] = useState<string>("All Departments");
   const [selectedSupplier, setSelectedSupplier] = useState<string>("All Suppliers");
-  const [selectedDocType, setSelectedDocType] = useState<string>("Purchase Order");
   const [poSearch, setPoSearch] = useState<string>("");
   const [orderDateFrom, setOrderDateFrom] = useState<string>("");
   const [orderDateTo, setOrderDateTo] = useState<string>("");
@@ -132,11 +134,41 @@ export function MaterialReceiveListPage() {
     return { pending: p, partial: part, complete: c };
   }, [receiveRecords]);
 
-  // Dynamic Available Stores (Warehouses & Work Locations)
+  // Dynamic Available Stores (for Purchase Order)
   const availableStores = useMemo(() => {
     const warehouseNames = DEFAULT_WAREHOUSES.map((w) => w.storeName);
     const recordStores = receiveRecords.map((r) => r.deliveryStore).filter(Boolean);
     return Array.from(new Set([...warehouseNames, ...recordStores]));
+  }, [receiveRecords]);
+
+  // Dynamic Available Work Locations (for Work Order)
+  const availableWorkLocations = useMemo(() => {
+    const defaultLocs = [
+      "Pakiza Knit Composite Ltd",
+      "Pakiza Apparels Ltd",
+      "Pakiza Woven Fashion Ltd",
+      "Cripton Textile Mills Ltd",
+    ];
+    const fromRecords = receiveRecords
+      .map((r) => r.workLocation)
+      .filter(Boolean) as string[];
+    return Array.from(new Set([...defaultLocs, ...fromRecords]));
+  }, [receiveRecords]);
+
+  // Dynamic Available Areas (for Work Order)
+  const availableAreas = useMemo(() => {
+    const defaultAreas = [
+      "PAL-Fabric Dyeing",
+      "Main Production Unit",
+      "Central Warehouse Area",
+      "Power House Bay 1",
+      "Spinning Floor #2",
+      "Garments Sewing Unit",
+    ];
+    const fromRecords = receiveRecords
+      .map((r) => r.area)
+      .filter(Boolean) as string[];
+    return Array.from(new Set([...defaultAreas, ...fromRecords]));
   }, [receiveRecords]);
 
   // Filtered Records
@@ -145,9 +177,32 @@ export function MaterialReceiveListPage() {
       // Primary Tab Filter
       if (rec.receiveStatus !== activeTab) return false;
 
-      // Primary Store Filter
-      if (selectedStore !== "All Stores" && rec.deliveryStore !== selectedStore) {
+      // Doc Type Filter
+      if (selectedDocType !== "All" && rec.documentType !== selectedDocType) {
         return false;
+      }
+
+      // Store Filter (only applied for Purchase Order when not All Stores)
+      if (selectedDocType === "Purchase Order") {
+        if (selectedStore !== "All Stores" && rec.deliveryStore !== selectedStore) {
+          return false;
+        }
+      }
+
+      // Work Location & Area Filter (only applied for Work Order)
+      if (selectedDocType === "Work Order") {
+        if (
+          selectedWorkLocation !== "All Locations" &&
+          rec.workLocation !== selectedWorkLocation
+        ) {
+          return false;
+        }
+        if (
+          selectedArea !== "All Areas" &&
+          rec.area !== selectedArea
+        ) {
+          return false;
+        }
       }
 
       // Supplier Filter
@@ -155,12 +210,7 @@ export function MaterialReceiveListPage() {
         return false;
       }
 
-      // Doc Type Filter
-      if (selectedDocType !== "All" && rec.documentType !== selectedDocType) {
-        return false;
-      }
-
-      // PO No Search
+      // PO / WO No Search
       if (poSearch && !rec.poNumber.toLowerCase().includes(poSearch.toLowerCase())) {
         return false;
       }
@@ -176,9 +226,11 @@ export function MaterialReceiveListPage() {
   }, [
     receiveRecords,
     activeTab,
-    selectedStore,
-    selectedSupplier,
     selectedDocType,
+    selectedStore,
+    selectedWorkLocation,
+    selectedArea,
+    selectedSupplier,
     poSearch,
     orderDateFrom,
     orderDateTo,
@@ -187,11 +239,13 @@ export function MaterialReceiveListPage() {
   ]);
 
   const handleResetFilters = () => {
+    setSelectedDocType("Purchase Order");
     setSelectedStore("All Stores");
+    setSelectedWorkLocation("All Locations");
+    setSelectedArea("All Areas");
     setSelectedOrganization("All Organizations");
     setSelectedDepartment("All Departments");
     setSelectedSupplier("All Suppliers");
-    setSelectedDocType("Purchase Order");
     setPoSearch("");
     setOrderDateFrom("");
     setOrderDateTo("");
@@ -293,24 +347,82 @@ export function MaterialReceiveListPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
-              {/* Delivery Store (PRIMARY FILTER) */}
+              {/* 1. Document Type (First Position - Far Left) */}
               <div>
-                <label className="text-[11px] font-bold text-amber-600 uppercase tracking-wider block mb-1">
-                  Delivery Store *
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                  Document Type
                 </label>
                 <select
-                  value={selectedStore}
-                  onChange={(e) => setSelectedStore(e.target.value)}
-                  className="w-full px-3 py-2 bg-amber-500/5 border-2 border-amber-500/30 rounded-xl font-bold text-xs text-foreground outline-none focus:border-amber-500 cursor-pointer shadow-xs"
+                  value={selectedDocType}
+                  onChange={(e) => setSelectedDocType(e.target.value)}
+                  className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium outline-none cursor-pointer"
                 >
-                  <option value="All Stores">All Delivery Stores / Warehouses</option>
-                  {availableStores.map((st) => (
-                    <option key={st} value={st}>
-                      {st}
-                    </option>
-                  ))}
+                  <option value="Purchase Order">Purchase Order</option>
+                  <option value="Work Order">Work Order</option>
                 </select>
               </div>
+
+              {/* 2. Conditional: When Purchase Order -> Delivery Store (Immediately Right of Document Type) */}
+              {selectedDocType === "Purchase Order" && (
+                <div>
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                    Delivery Store
+                  </label>
+                  <select
+                    value={selectedStore}
+                    onChange={(e) => setSelectedStore(e.target.value)}
+                    className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium text-xs text-foreground outline-none focus:border-primary cursor-pointer shadow-2xs"
+                  >
+                    <option value="All Stores">All Delivery Stores / Warehouses</option>
+                    {availableStores.map((st) => (
+                      <option key={st} value={st}>
+                        {st}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* 2. Conditional: When Work Order -> Work Location & Area (Immediately Right of Document Type) */}
+              {selectedDocType === "Work Order" && (
+                <>
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                      Work Location
+                    </label>
+                    <select
+                      value={selectedWorkLocation}
+                      onChange={(e) => setSelectedWorkLocation(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium text-xs text-foreground outline-none focus:border-primary cursor-pointer shadow-2xs"
+                    >
+                      <option value="All Locations">All Work Locations</option>
+                      {availableWorkLocations.map((loc) => (
+                        <option key={loc} value={loc}>
+                          {loc}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                      Area
+                    </label>
+                    <select
+                      value={selectedArea}
+                      onChange={(e) => setSelectedArea(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium text-xs text-foreground outline-none focus:border-primary cursor-pointer shadow-2xs"
+                    >
+                      <option value="All Areas">All Areas</option>
+                      {availableAreas.map((ar) => (
+                        <option key={ar} value={ar}>
+                          {ar}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
 
               {/* Supplier / Vendor */}
               <div>
@@ -328,21 +440,6 @@ export function MaterialReceiveListPage() {
                       {s.vendorName}
                     </option>
                   ))}
-                </select>
-              </div>
-
-              {/* Document Type */}
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-                  Document Type
-                </label>
-                <select
-                  value={selectedDocType}
-                  onChange={(e) => setSelectedDocType(e.target.value)}
-                  className="w-full px-3 py-2 bg-background border border-border rounded-xl font-medium outline-none cursor-pointer"
-                >
-                  <option value="Purchase Order">Purchase Order</option>
-                  <option value="Work Order">Work Order</option>
                 </select>
               </div>
 

@@ -28,12 +28,12 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   ChevronsLeft,
   ChevronsRight,
   X,
   Sparkles,
-  PieChart,
-  Table as TableIcon,
   Tag,
   RotateCcw,
 } from "lucide-react";
@@ -46,31 +46,49 @@ export const Route = createFileRoute("/mm-block-yarn-status")({
       {
         name: "description",
         content:
-          "Real-time Block Yarn Status register, consumption tracking, and multi-dimensional summary based on Block Yarn Status 2026.",
+          "Real-time Block Yarn Status register and consumption tracking based on Block Yarn Status 2026.",
       },
     ],
   }),
   component: MMBlockYarnStatusPage,
 });
 
-type TabMode = "register" | "summary";
-type SummaryGrouping = "buyer" | "blockNo" | "season" | "yarnCount";
+export interface BlockYarnTransactionRow {
+  id: string;
+  sl: number;
+  buyer: string;
+  season: string;
+  job: string;
+  useQty: number;
+  balance: number;
+  price?: number;
+  blockQty?: number;
+  tag?: MMYarnBookingTagRecord;
+}
 
-interface SummaryRow {
-  groupName: string;
-  totalQty: number;
+export interface BlockYarnGroup {
+  id: string;
+  blockNo: string;
+  yarnName: string;
+  yarnNames: string[];
+  qty: number;
+  price: number;
+  bookingDate: string;
+  receivedQty: number;
+  documentsStatus: string;
+  actualPrice: number;
+  piNo: string;
+  piId?: string;
+  supplierName: string;
+  rawRecord: MMBlockYarnStatusRecord;
+  rows: BlockYarnTransactionRow[];
   totalUseQty: number;
-  balanceStockQty: number;
-  kdAdjustBalance: number;
-  receivedPaymentQty: number;
-  utilizationPct: number;
-  recordCount: number;
+  finalBalance: number;
+  transactionCount: number;
 }
 
 function MMBlockYarnStatusPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<TabMode>("register");
-  const [summaryGrouping, setSummaryGrouping] = useState<SummaryGrouping>("buyer");
   const [records, setRecords] = useState<MMBlockYarnStatusRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -78,7 +96,7 @@ function MMBlockYarnStatusPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [buyerFilter, setBuyerFilter] = useState("All");
   const [seasonFilter, setSeasonFilter] = useState("All");
-  const [yarnCountFilter, setYarnCountFilter] = useState("All");
+  const [yarnNameFilter, setYarnNameFilter] = useState("All");
   const [blockNoFilter, setBlockNoFilter] = useState("All");
   const [documentsStatusFilter, setDocumentsStatusFilter] = useState("All");
 
@@ -105,76 +123,304 @@ function MMBlockYarnStatusPage() {
 
   useEffect(() => {
     loadData();
+
+    // Listen to local storage changes from Pre Costing or Bookings in real-time
+    const handleStorageChange = (e: StorageEvent) => {
+      if (
+        !e.key ||
+        e.key.includes("cripton_mm_yarn_booking_tags_v1") ||
+        e.key.includes("cripton_pre_costings_knit_master_v1") ||
+        e.key.includes("cripton_mm_manual_bookings_v1") ||
+        e.key.includes("cripton_mm_pi_v1")
+      ) {
+        loadData();
+      }
+    };
+
+    // Re-sync on window focus when navigating back from Pre Costing
+    const handleFocus = () => {
+      loadData();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
+
+  // 1. Group records by unique combination of (Block Booking No. + Yarn Name)
+  const allGroups = useMemo<BlockYarnGroup[]>(() => {
+    const list = Array.isArray(records) ? records : [];
+    const groupMap = new Map<string, BlockYarnGroup>();
+
+    list.forEach((r) => {
+      if (!r) return;
+      const blockNo = r.blockNo || "—";
+      const yarnName = r.yarnName || r.yarnItem || r.yarnCount || "Yarn Item";
+      // Grouping Key strictly uses combination of Block Booking No. + Yarn Name
+      const groupKey = `${blockNo}___${yarnName}`;
+
+      if (!groupMap.has(groupKey)) {
+        const validTags = Array.isArray(r.tags)
+          ? r.tags.filter((t) => t && Number(t.tagQtyKg) > 0)
+          : [];
+
+        let rows: BlockYarnTransactionRow[] = [];
+        let runningBal = Number(r.qty) || 0;
+
+        if (validTags.length === 0) {
+          // If a booking has not been tagged yet, display 1 row with Buyer="—", Season="—", Job="—", Use Qty=0, and Balance=Total Booking Qty
+          rows = [
+            {
+              id: `${groupKey}-untagged`,
+              sl: 1,
+              buyer: "—",
+              season: "—",
+              job: "—",
+              useQty: 0,
+              balance: runningBal,
+              price: Number(r.price) || 0,
+              blockQty: Number(r.qty) || 0,
+            },
+          ];
+        } else {
+          // Sequential running balance calculation within this group:
+          // Row 1: Balance = Qty - UseQty_1
+          // Row 2: Balance = Balance_1 - UseQty_2
+          // Row i: Balance = Balance_{i-1} - UseQty_i
+          rows = validTags.map((t, idx) => {
+            const useQty = Number(t.tagQtyKg) || 0;
+            runningBal = Math.max(0, Number((runningBal - useQty).toFixed(2)));
+            return {
+              id: t.id || `${groupKey}-t-${idx}`,
+              sl: idx + 1,
+              buyer: t.buyer && t.buyer !== "—" ? t.buyer : "—",
+              season: t.season && t.season !== "—" ? t.season : "—",
+              job: t.job && t.job !== "—" ? t.job : (t.preCostId || "—"),
+              useQty,
+              balance: runningBal,
+              price: Number(t.price) || Number(r.price) || 0,
+              blockQty: Number(r.qty) || 0,
+              tag: t,
+            };
+          });
+        }
+
+        const totalUseQty = rows.reduce((sum, row) => sum + row.useQty, 0);
+        const finalBalance = rows[rows.length - 1].balance;
+
+        groupMap.set(groupKey, {
+          id: groupKey,
+          blockNo,
+          yarnName,
+          yarnNames: [yarnName],
+          qty: Number(r.qty) || 0,
+          price: Number(r.price) || 0,
+          bookingDate: r.bookingDate || "",
+          receivedQty: Number(r.receivedQty) || 0,
+          documentsStatus: r.documentsStatus || "Pending LC",
+          actualPrice: Number(r.actualPrice) || 0,
+          piNo: r.piNo || "—",
+          piId: r.piId,
+          supplierName: r.supplierName || "Square Textiles Ltd",
+          rawRecord: r,
+          rows,
+          totalUseQty: Number(totalUseQty.toFixed(2)),
+          finalBalance: Number(finalBalance.toFixed(2)),
+          transactionCount: validTags.length,
+        });
+      } else {
+        // Same Block No + Same Yarn Name: append any distinct tags
+        const existingGroup = groupMap.get(groupKey)!;
+        if (Array.isArray(r.tags) && r.tags.length > 0) {
+          const extraTags = r.tags.filter(
+            (t) => t && Number(t.tagQtyKg) > 0 && !existingGroup.rows.some((row) => row.id === t.id)
+          );
+          if (extraTags.length > 0) {
+            if (existingGroup.rows.length === 1 && existingGroup.rows[0].buyer === "—") {
+              existingGroup.rows = [];
+            }
+            let runningBal =
+              existingGroup.rows.length > 0
+                ? existingGroup.rows[existingGroup.rows.length - 1].balance
+                : existingGroup.qty;
+
+            extraTags.forEach((t) => {
+              const useQty = Number(t.tagQtyKg) || 0;
+              runningBal = Math.max(0, Number((runningBal - useQty).toFixed(2)));
+              existingGroup.rows.push({
+                id: t.id || `${groupKey}-t-${existingGroup.rows.length}`,
+                sl: existingGroup.rows.length + 1,
+                buyer: t.buyer && t.buyer !== "—" ? t.buyer : "—",
+                season: t.season && t.season !== "—" ? t.season : "—",
+                job: t.job && t.job !== "—" ? t.job : (t.preCostId || "—"),
+                useQty,
+                balance: runningBal,
+                price: Number(t.price) || 0,
+                blockQty: existingGroup.qty,
+                tag: t,
+              });
+            });
+
+            existingGroup.transactionCount += extraTags.length;
+            existingGroup.totalUseQty = Number(
+              existingGroup.rows.reduce((sum, row) => sum + row.useQty, 0).toFixed(2)
+            );
+            existingGroup.finalBalance = Number(
+              Math.max(0, existingGroup.qty - existingGroup.totalUseQty).toFixed(2)
+            );
+          }
+        }
+      }
+    });
+
+    return Array.from(groupMap.values());
+  }, [records]);
 
   // Filter options derived dynamically from data
   const filterOptions = useMemo(() => {
-    const list = Array.isArray(records) ? records : [];
-    const buyers = Array.from(new Set(list.map((r) => r?.buyer).filter(Boolean))).sort();
-    const seasons = Array.from(new Set(list.map((r) => r?.season).filter(Boolean))).sort();
-    const counts = Array.from(new Set(list.map((r) => r?.yarnCount).filter(Boolean))).sort();
-    const blocks = Array.from(new Set(list.map((r) => r?.blockNo).filter(Boolean))).sort();
-    return { buyers, seasons, counts, blocks };
-  }, [records]);
+    const buyersSet = new Set<string>();
+    const seasonsSet = new Set<string>();
+    const yarnNamesSet = new Set<string>();
+    const blocksSet = new Set<string>();
 
-  // Filtered Records for Register Table
-  const filteredRecords = useMemo(() => {
-    const list = Array.isArray(records) ? records : [];
-    return list.filter((r) => {
-      if (!r) return false;
-
-      // Global Search
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matches =
-          (r.buyer || "").toLowerCase().includes(q) ||
-          (r.blockNo || "").toLowerCase().includes(q) ||
-          (r.season || "").toLowerCase().includes(q) ||
-          (r.job || "").toLowerCase().includes(q) ||
-          (r.yarnCount || "").toLowerCase().includes(q) ||
-          (r.yarnItem || "").toLowerCase().includes(q) ||
-          (r.piNo || "").toLowerCase().includes(q) ||
-          (r.documentsStatus || "").toLowerCase().includes(q) ||
-          (r.supplierName || "").toLowerCase().includes(q);
-        if (!matches) return false;
-      }
-
-      // Dropdown filters
-      if (buyerFilter !== "All" && r.buyer !== buyerFilter) return false;
-      if (seasonFilter !== "All" && r.season !== seasonFilter) return false;
-      if (yarnCountFilter !== "All" && r.yarnCount !== yarnCountFilter) return false;
-      if (blockNoFilter !== "All" && r.blockNo !== blockNoFilter) return false;
-      if (documentsStatusFilter !== "All") {
-        const docStatus = r.documentsStatus || "";
-        if (documentsStatusFilter === "WithLC") {
-          if (!docStatus || docStatus.includes("Pending") || docStatus === "-") return false;
-        } else if (documentsStatusFilter === "Pending") {
-          if (docStatus && !docStatus.includes("Pending") && docStatus !== "-") return false;
-        }
-      }
-
-      return true;
+    allGroups.forEach((g) => {
+      if (g.blockNo && g.blockNo !== "—") blocksSet.add(g.blockNo);
+      if (g.yarnName && g.yarnName !== "—") yarnNamesSet.add(g.yarnName);
+      g.rows.forEach((r) => {
+        if (r.buyer && r.buyer !== "—") buyersSet.add(r.buyer);
+        if (r.season && r.season !== "—") seasonsSet.add(r.season);
+      });
     });
+
+    return {
+      buyers: Array.from(buyersSet).sort(),
+      seasons: Array.from(seasonsSet).sort(),
+      yarnNames: Array.from(yarnNamesSet).sort(),
+      counts: Array.from(yarnNamesSet).sort(),
+      blocks: Array.from(blocksSet).sort(),
+    };
+  }, [allGroups]);
+
+  // Filtered Groups for Register Table
+  const filteredGroups = useMemo<BlockYarnGroup[]>(() => {
+    return allGroups
+      .map((g) => {
+        let matchingRows = g.rows;
+        if (buyerFilter !== "All") {
+          matchingRows = matchingRows.filter((r) => r.buyer === buyerFilter);
+        }
+        if (seasonFilter !== "All") {
+          matchingRows = matchingRows.filter((r) => r.season === seasonFilter);
+        }
+
+        if ((buyerFilter !== "All" || seasonFilter !== "All") && matchingRows.length === 0) {
+          return null;
+        }
+
+        if (yarnNameFilter !== "All" && g.yarnName !== yarnNameFilter) {
+          return null;
+        }
+
+        if (blockNoFilter !== "All" && g.blockNo !== blockNoFilter) {
+          return null;
+        }
+
+        if (documentsStatusFilter !== "All") {
+          const docStatus = g.documentsStatus || "";
+          if (documentsStatusFilter === "WithLC") {
+            if (!docStatus || docStatus.includes("Pending") || docStatus === "-") return null;
+          } else if (documentsStatusFilter === "Pending") {
+            if (docStatus && !docStatus.includes("Pending") && docStatus !== "-") return null;
+          }
+        }
+
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          const matchGroup =
+            (g.blockNo || "").toLowerCase().includes(q) ||
+            (g.yarnName || "").toLowerCase().includes(q) ||
+            (g.piNo || "").toLowerCase().includes(q) ||
+            (g.documentsStatus || "").toLowerCase().includes(q) ||
+            (g.supplierName || "").toLowerCase().includes(q);
+
+          const matchRows = matchingRows.some(
+            (r) =>
+              (r.buyer || "").toLowerCase().includes(q) ||
+              (r.season || "").toLowerCase().includes(q) ||
+              (r.job || "").toLowerCase().includes(q)
+          );
+
+          if (!matchGroup && !matchRows) return null;
+        }
+
+        return {
+          ...g,
+          rows: matchingRows,
+        };
+      })
+      .filter((g): g is BlockYarnGroup => g !== null);
   }, [
-    records,
+    allGroups,
     searchQuery,
     buyerFilter,
     seasonFilter,
-    yarnCountFilter,
+    yarnNameFilter,
     blockNoFilter,
     documentsStatusFilter,
   ]);
 
-  // Totals for filtered records
+  // Expandable group state (combination of Block No + Yarn Name) - collapsed by default
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  };
+
+  const allExpanded =
+    filteredGroups.length > 0 && filteredGroups.every((g) => expandedGroups.has(g.id));
+
+  const toggleAllExpanded = () => {
+    if (allExpanded) {
+      setExpandedGroups(new Set());
+    } else {
+      setExpandedGroups(new Set(filteredGroups.map((g) => g.id)));
+    }
+  };
+
+  // Backward compatibility alias
+  const filteredRecords = filteredGroups;
+
+  // Totals for filtered groups (Counting each booking quantity once per group)
   const totals = useMemo(() => {
-    const list = Array.isArray(filteredRecords) ? filteredRecords : [];
-    const totalQty = list.reduce((sum, r) => sum + (Number(r?.qty) || 0), 0);
-    const totalUseQty = list.reduce((sum, r) => sum + (Number(r?.useQty) || 0), 0);
-    const totalBalance = list.reduce((sum, r) => sum + (Number(r?.balance) || 0), 0);
-    const totalReceivedQty = list.reduce((sum, r) => sum + (Number(r?.receivedQty) || 0), 0);
+    const list = Array.isArray(filteredGroups) ? filteredGroups : [];
+    let totalQty = 0;
+    let totalUseQty = 0;
+    let totalBalance = 0;
+    let totalReceivedQty = 0;
+    const pricedRows: number[] = [];
+
+    list.forEach((g) => {
+      totalQty += Number(g.qty) || 0;
+      totalUseQty += g.rows.reduce((sum, r) => sum + (Number(r.useQty) || 0), 0);
+      totalBalance += Number(g.finalBalance) || 0;
+      totalReceivedQty += Number(g.receivedQty) || 0;
+      if (Number(g.price) > 0) pricedRows.push(Number(g.price));
+    });
+
     const avgPrice =
-      list.length > 0
-        ? list.reduce((sum, r) => sum + (Number(r?.price) || 0), 0) / list.length
+      pricedRows.length > 0
+        ? pricedRows.reduce((sum, p) => sum + p, 0) / pricedRows.length
         : 0;
     const utilizationPct = totalQty > 0 ? (totalUseQty / totalQty) * 100 : 0;
 
@@ -186,213 +432,98 @@ function MMBlockYarnStatusPage() {
       avgPrice: Number(avgPrice.toFixed(2)) || 0,
       utilizationPct: Number(utilizationPct.toFixed(1)) || 0,
     };
-  }, [filteredRecords]);
+  }, [filteredGroups]);
 
-  // Paginated records
-  const paginatedRecords = useMemo(() => {
-    const list = Array.isArray(filteredRecords) ? filteredRecords : [];
+  // Total transaction rows across all filtered groups
+  const totalTransactionRows = useMemo(() => {
+    return filteredGroups.reduce((sum, g) => sum + g.rows.length, 0);
+  }, [filteredGroups]);
+
+  // Cumulative starting index of transactions for each group
+  const groupStartIndices = useMemo(() => {
+    const indices: number[] = [];
+    let running = 0;
+    filteredGroups.forEach((g) => {
+      indices.push(running);
+      running += g.rows.length;
+    });
+    return indices;
+  }, [filteredGroups]);
+
+  // Paginated groups
+  const paginatedGroups = useMemo(() => {
+    const list = Array.isArray(filteredGroups) ? filteredGroups : [];
     const startIndex = (currentPage - 1) * pageSize;
     return list.slice(startIndex, startIndex + pageSize);
-  }, [filteredRecords, currentPage, pageSize]);
+  }, [filteredGroups, currentPage, pageSize]);
 
-  const totalPages = Math.ceil(filteredRecords.length / pageSize) || 1;
-
-  // --------------------------------------------------------------------------
-  // Summary Calculations (Worksheet: "Summary")
-  // 4 Group summaries: By Buyer, By Block No., By Season, By Yarn Count
-  // --------------------------------------------------------------------------
-  const summaryTables = useMemo(() => {
-    const buildSummary = (keyExtractor: (r: MMBlockYarnStatusRecord) => string): SummaryRow[] => {
-      const map = new Map<string, { totalQty: number; totalUseQty: number; receivedQty: number; count: number }>();
-      const list = Array.isArray(records) ? records : [];
-
-      list.forEach((r) => {
-        if (!r) return;
-        const groupKey = keyExtractor(r) || "Unassigned";
-        const curr = map.get(groupKey) || { totalQty: 0, totalUseQty: 0, receivedQty: 0, count: 0 };
-        curr.totalQty += Number(r.qty) || 0;
-        curr.totalUseQty += Number(r.useQty) || 0;
-        curr.receivedQty += Number(r.receivedQty) || 0;
-        curr.count += 1;
-        map.set(groupKey, curr);
-      });
-
-      const rows: SummaryRow[] = [];
-      map.forEach((val, groupName) => {
-        const balanceStockQty = Number((val.totalQty - val.totalUseQty).toFixed(2)) || 0;
-        const kdAdjustBalance = balanceStockQty;
-        const utilizationPct = val.totalQty > 0 ? Number(((val.totalUseQty / val.totalQty) * 100).toFixed(1)) || 0 : 0;
-        rows.push({
-          groupName,
-          totalQty: Number(val.totalQty.toFixed(2)) || 0,
-          totalUseQty: Number(val.totalUseQty.toFixed(2)) || 0,
-          balanceStockQty,
-          kdAdjustBalance,
-          receivedPaymentQty: Number(val.receivedQty.toFixed(2)) || 0,
-          utilizationPct,
-          recordCount: val.count,
-        });
-      });
-
-      return rows.sort((a, b) => b.totalQty - a.totalQty);
-    };
-
-    const byBuyer = buildSummary((r) => r?.buyer || "Unassigned");
-    const byBlockNo = buildSummary((r) => r?.blockNo || "Unassigned");
-    const bySeason = buildSummary((r) => r?.season || "Unassigned");
-    const byYarnCount = buildSummary((r) => r?.yarnCount || "Unassigned");
-
-    const computeGrandTotal = (rows: SummaryRow[]): SummaryRow => {
-      const safeRows = Array.isArray(rows) ? rows : [];
-      const totalQty = safeRows.reduce((sum, r) => sum + (Number(r?.totalQty) || 0), 0);
-      const totalUseQty = safeRows.reduce((sum, r) => sum + (Number(r?.totalUseQty) || 0), 0);
-      const balanceStockQty = safeRows.reduce((sum, r) => sum + (Number(r?.balanceStockQty) || 0), 0);
-      const kdAdjustBalance = safeRows.reduce((sum, r) => sum + (Number(r?.kdAdjustBalance) || 0), 0);
-      const receivedPaymentQty = safeRows.reduce((sum, r) => sum + (Number(r?.receivedPaymentQty) || 0), 0);
-      const utilizationPct = totalQty > 0 ? Number(((totalUseQty / totalQty) * 100).toFixed(1)) || 0 : 0;
-      const recordCount = safeRows.reduce((sum, r) => sum + (Number(r?.recordCount) || 0), 0);
-
-      return {
-        groupName: "Grand Total",
-        totalQty: Number(totalQty.toFixed(2)) || 0,
-        totalUseQty: Number(totalUseQty.toFixed(2)) || 0,
-        balanceStockQty: Number(balanceStockQty.toFixed(2)) || 0,
-        kdAdjustBalance: Number(kdAdjustBalance.toFixed(2)) || 0,
-        receivedPaymentQty: Number(receivedPaymentQty.toFixed(2)) || 0,
-        utilizationPct,
-        recordCount,
-      };
-    };
-
-    return {
-      buyer: { rows: byBuyer, grandTotal: computeGrandTotal(byBuyer) },
-      blockNo: { rows: byBlockNo, grandTotal: computeGrandTotal(byBlockNo) },
-      season: { rows: bySeason, grandTotal: computeGrandTotal(bySeason) },
-      yarnCount: { rows: byYarnCount, grandTotal: computeGrandTotal(byYarnCount) },
-    };
-  }, [records]);
-
-  // Safe reference to active summary table
-  const activeSummaryData = useMemo(() => {
-    return (
-      summaryTables[summaryGrouping] || {
-        rows: [],
-        grandTotal: {
-          groupName: "Grand Total",
-          totalQty: 0,
-          totalUseQty: 0,
-          balanceStockQty: 0,
-          kdAdjustBalance: 0,
-          receivedPaymentQty: 0,
-          utilizationPct: 0,
-          recordCount: 0,
-        },
-      }
-    );
-  }, [summaryTables, summaryGrouping]);
+  const totalPages = Math.ceil(filteredGroups.length / pageSize) || 1;
 
   // Export to CSV
   const handleExportCSV = () => {
-    if (activeTab === "register") {
-      const headers = [
-        "Buyer",
-        "Block No",
-        "Season",
-        "Job",
-        "Yarn Count",
-        "Qty (KG)",
-        "Use Qty (KG)",
-        "Balance (KG)",
-        "Price ($/KG)",
-        "Booking Date",
-        "Received Qty (KG)",
-        "Documents Status (LC)",
-        "Actual Price ($/KG)",
-        "PI No",
-        "Supplier",
-      ];
-      const rows = filteredRecords.map((r) => [
-        `"${r?.buyer || ""}"`,
-        `"${r?.blockNo || ""}"`,
-        `"${r?.season || ""}"`,
-        `"${r?.job || ""}"`,
-        `"${r?.yarnCount || ""}"`,
-        Number(r?.qty) || 0,
-        Number(r?.useQty) || 0,
-        Number(r?.balance) || 0,
-        Number(r?.price) || 0,
-        `"${r?.bookingDate || ""}"`,
-        Number(r?.receivedQty) || 0,
-        `"${r?.documentsStatus || ""}"`,
-        Number(r?.actualPrice) || 0,
-        `"${r?.piNo || ""}"`,
-        `"${r?.supplierName || ""}"`,
-      ]);
-      const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Block_Yarn_Status_Register_${new Date().toISOString().split("T")[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast.success("Main Register exported successfully as CSV");
-    } else {
-      const activeSummary = activeSummaryData;
-      const groupHeader =
-        summaryGrouping === "buyer"
-          ? "Buyer"
-          : summaryGrouping === "blockNo"
-          ? "Block No"
-          : summaryGrouping === "season"
-          ? "Season"
-          : "Yarn Count";
-      const headers = [
-        groupHeader,
-        "Total Qty (KG)",
-        "Total Use Qty (KG)",
-        "Balance / Stock Qty (KG)",
-        "KD Adjust Balance (KG)",
-        "Received / Payment Qty (KG)",
-        "Utilization %",
-      ];
-      const rows = [
-        ...activeSummary.rows.map((r) => [
-          `"${r.groupName}"`,
-          r.totalQty,
-          r.totalUseQty,
-          r.balanceStockQty,
-          r.kdAdjustBalance,
-          r.receivedPaymentQty,
-          `${r.utilizationPct}%`,
-        ]),
-        [
-          `"${activeSummary.grandTotal.groupName}"`,
-          activeSummary.grandTotal.totalQty,
-          activeSummary.grandTotal.totalUseQty,
-          activeSummary.grandTotal.balanceStockQty,
-          activeSummary.grandTotal.kdAdjustBalance,
-          activeSummary.grandTotal.receivedPaymentQty,
-          `${activeSummary.grandTotal.utilizationPct}%`,
-        ],
-      ];
-      const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Block_Yarn_Summary_By_${groupHeader}_${new Date().toISOString().split("T")[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast.success(`Summary by ${groupHeader} exported successfully as CSV`);
-    }
+    const headers = [
+      "SL.",
+      "Buyer",
+      "Season",
+      "Job",
+      "Block Qty (KG)",
+      "Use Qty (KG)",
+      "Balance (KG)",
+      "Price ($/KG)",
+      "Booking Date",
+      "Received Qty (KG)",
+      "Documents Status",
+      "Actual Price ($/KG)",
+      "PI No",
+      "Block No",
+      "Yarn Name",
+      "Supplier",
+    ];
+    const rows: (string | number)[][] = [];
+    let globalSl = 1;
+
+    filteredGroups.forEach((g) => {
+      g.rows.forEach((r) => {
+        rows.push([
+          globalSl++,
+          `"${r.buyer || ""}"`,
+          `"${r.season || ""}"`,
+          `"${r.job || ""}"`,
+          Number(g.qty) || 0,
+          Number(r.useQty) || 0,
+          Number(r.balance) || 0,
+          r.price && Number(r.price) > 0
+            ? Number(r.price)
+            : Number(g.price) > 0
+            ? Number(g.price)
+            : "",
+          `"${g.bookingDate || ""}"`,
+          Number(g.receivedQty) || 0,
+          `"${g.documentsStatus || ""}"`,
+          Number(g.actualPrice) > 0 ? Number(g.actualPrice) : "",
+          `"${g.piNo || ""}"`,
+          `"${g.blockNo || ""}"`,
+          `"${g.yarnName || ""}"`,
+          `"${g.supplierName || ""}"`,
+        ]);
+      });
+    });
+    const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Block_Yarn_Status_Register_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Main Register exported successfully as CSV");
   };
 
   return (
     <MarketingMerchandisingLayout
       activePath="/mm-block-yarn-status"
       title="Block Yarn Status"
-      subtitle="2026 Live Synchronized Register & Multi-Dimensional Summary"
+      subtitle="2026 Live Synchronized Register & Consumption Tracking"
       breadcrumbs={[
         { label: "Booking Information" },
         { label: "Block Yarn Status" },
@@ -519,46 +650,11 @@ function MMBlockYarnStatusPage() {
           </div>
         </div>
 
-        {/* Tab Selection: Main Register vs Summary View */}
-        <div className="flex items-center justify-between border-b pb-3">
-          <div className="inline-flex p-1 bg-muted rounded-xl gap-1">
-            <button
-              onClick={() => setActiveTab("register")}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === "register"
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <TableIcon className="w-3.5 h-3.5" />
-              Main Register (Worksheet: Block Yarn Status)
-              <span className="ml-1 text-[10px] px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-bold">
-                {filteredRecords.length}
-              </span>
-            </button>
-            <button
-              onClick={() => setActiveTab("summary")}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === "summary"
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <PieChart className="w-3.5 h-3.5" />
-              Summary View (Worksheet: Summary)
-              <span className="ml-1 text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold">
-                4 Groupings
-              </span>
-            </button>
-          </div>
-        </div>
-
         {/* ================================================================== */}
-        {/* TAB 1: MAIN REGISTER VIEW (Worksheet: Block Yarn Status)           */}
+        {/* MAIN REGISTER VIEW (Worksheet: Block Yarn Status)                  */}
         {/* ================================================================== */}
-        {activeTab === "register" && (
-          <div className="space-y-4">
-            {/* Filter Toolbar */}
+        <div className="space-y-4">
+          {/* Filter Toolbar */}
             <div className="bg-card border border-border rounded-xl p-4 shadow-sm space-y-3">
               <div className="flex flex-col md:flex-row items-center gap-3">
                 <div className="relative flex-1 w-full">
@@ -618,17 +714,17 @@ function MMBlockYarnStatusPage() {
                     ))}
                   </select>
 
-                  {/* Yarn Count Filter */}
+                  {/* Yarn Name Filter */}
                   <select
-                    value={yarnCountFilter}
+                    value={yarnNameFilter}
                     onChange={(e) => {
-                      setYarnCountFilter(e.target.value);
+                      setYarnNameFilter(e.target.value);
                       setCurrentPage(1);
                     }}
                     className="px-2.5 py-2 text-xs rounded-lg border border-input bg-background text-foreground"
                   >
-                    <option value="All">All Yarn Counts ({filterOptions.counts.length})</option>
-                    {filterOptions.counts.map((c) => (
+                    <option value="All">All Yarn Names ({filterOptions.yarnNames.length})</option>
+                    {filterOptions.yarnNames.map((c) => (
                       <option key={c} value={c}>
                         {c}
                       </option>
@@ -669,7 +765,7 @@ function MMBlockYarnStatusPage() {
                   {(searchQuery ||
                     buyerFilter !== "All" ||
                     seasonFilter !== "All" ||
-                    yarnCountFilter !== "All" ||
+                    yarnNameFilter !== "All" ||
                     blockNoFilter !== "All" ||
                     documentsStatusFilter !== "All") && (
                     <button
@@ -677,7 +773,7 @@ function MMBlockYarnStatusPage() {
                         setSearchQuery("");
                         setBuyerFilter("All");
                         setSeasonFilter("All");
-                        setYarnCountFilter("All");
+                        setYarnNameFilter("All");
                         setBlockNoFilter("All");
                         setDocumentsStatusFilter("All");
                         setCurrentPage(1);
@@ -687,6 +783,24 @@ function MMBlockYarnStatusPage() {
                       Clear Filters
                     </button>
                   )}
+
+                  <button
+                    onClick={toggleAllExpanded}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border border-teal-300 dark:border-teal-700 bg-teal-50/80 hover:bg-teal-100 dark:bg-teal-950/60 dark:hover:bg-teal-900/60 text-teal-800 dark:text-teal-200 transition-colors shadow-xs ml-auto sm:ml-0"
+                    title={allExpanded ? "Collapse all yarn groups" : "Expand all yarn groups"}
+                  >
+                    {allExpanded ? (
+                      <>
+                        <ChevronDown className="w-3.5 h-3.5 text-teal-600" />
+                        <span>Collapse All</span>
+                      </>
+                    ) : (
+                      <>
+                        <ChevronRight className="w-3.5 h-3.5 text-teal-600" />
+                        <span>Expand All</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
@@ -697,177 +811,365 @@ function MMBlockYarnStatusPage() {
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="bg-slate-100/90 dark:bg-slate-900/90 border-b border-border text-[11px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider select-none">
-                      <th className="py-3.5 px-3 w-12 text-center whitespace-nowrap">Sl.</th>
-                      <th className="py-3.5 px-3.5 min-w-[170px] whitespace-nowrap">Buyer</th>
-                      <th className="py-3.5 px-3.5 min-w-[150px] whitespace-nowrap">Block No</th>
-                      <th className="py-3.5 px-3.5 min-w-[160px] whitespace-nowrap">Season</th>
-                      <th className="py-3.5 px-3.5 min-w-[130px] whitespace-nowrap">Job</th>
-                      <th className="py-3.5 px-3.5 min-w-[130px] whitespace-nowrap">Yarn Count</th>
-                      <th className="py-3.5 px-3.5 min-w-[120px] text-right whitespace-nowrap">Qty (kg)</th>
-                      <th className="py-3.5 px-3.5 min-w-[120px] text-right whitespace-nowrap">Use Qty (kg)</th>
-                      <th className="py-3.5 px-3.5 min-w-[130px] text-right whitespace-nowrap">Balance (kg)</th>
-                      <th className="py-3.5 px-3.5 min-w-[110px] text-right whitespace-nowrap">Price ($/kg)</th>
-                      <th className="py-3.5 px-3.5 min-w-[120px] whitespace-nowrap">Booking Date</th>
-                      <th className="py-3.5 px-3.5 min-w-[140px] text-right whitespace-nowrap">Received Qty (kg)</th>
-                      <th className="py-3.5 px-3.5 min-w-[170px] whitespace-nowrap">Documents Status</th>
-                      <th className="py-3.5 px-3.5 min-w-[130px] text-right whitespace-nowrap">Actual Price ($/kg)</th>
-                      <th className="py-3.5 px-3.5 min-w-[150px] whitespace-nowrap">PI No</th>
-                      <th className="py-3.5 px-3 w-16 text-center whitespace-nowrap">Action</th>
+                      <th className="py-3 px-3 w-12 text-center whitespace-nowrap">SL.</th>
+                      <th className="py-3 px-3.5 min-w-[170px] whitespace-nowrap">Buyer</th>
+                      <th className="py-3 px-3.5 min-w-[150px] whitespace-nowrap">Season</th>
+                      <th className="py-3 px-3.5 min-w-[140px] whitespace-nowrap">Job</th>
+                      <th className="py-3 px-3.5 min-w-[130px] text-center whitespace-nowrap">Block Qty (KG)</th>
+                      <th className="py-3 px-3.5 min-w-[120px] text-right whitespace-nowrap">Use Qty (KG)</th>
+                      <th className="py-3 px-3.5 min-w-[130px] text-right whitespace-nowrap">Balance (KG)</th>
+                      <th className="py-3 px-3.5 min-w-[110px] text-center whitespace-nowrap">Price ($/KG)</th>
+                      <th className="py-3 px-3.5 min-w-[120px] text-center whitespace-nowrap">Booking Date</th>
+                      <th className="py-3 px-3.5 min-w-[140px] text-center whitespace-nowrap">Received Qty (KG)</th>
+                      <th className="py-3 px-3.5 min-w-[170px] text-center whitespace-nowrap">Documents Status</th>
+                      <th className="py-3 px-3.5 min-w-[130px] text-center whitespace-nowrap">Actual Price ($/KG)</th>
+                      <th className="py-3 px-3.5 min-w-[140px] text-center whitespace-nowrap">PI No</th>
+                      <th className="py-3 px-3 w-16 text-center whitespace-nowrap">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border font-normal">
-                    {paginatedRecords.length === 0 ? (
+                    {paginatedGroups.length === 0 ? (
                       <tr>
-                        <td colSpan={16} className="text-center py-16 text-muted-foreground">
+                        <td colSpan={14} className="text-center py-16 text-muted-foreground">
                           <Layers className="w-10 h-10 mx-auto mb-2 opacity-30 text-teal-600" />
                           <div className="font-semibold text-foreground text-sm">No Block Yarn Status records found</div>
-                          <p className="text-xs mt-1">
-                            Try adjusting your search criteria or create a new Block Yarn Booking.
+                          <p className="text-xs mt-1 max-w-md mx-auto text-slate-500 dark:text-slate-400">
+                            No Block Yarn Booking items match your search or filter criteria. Create a Block Yarn Booking or adjust your filters.
                           </p>
+                          <div className="mt-4 flex items-center justify-center gap-3">
+                            <Link
+                              to="/mm-pre-costing-knit"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 hover:bg-teal-700 text-white transition-colors shadow-sm"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              <span>Open Pre Costing Entry (Knit)</span>
+                            </Link>
+                            <Link
+                              to="/mm-manual-booking"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-border bg-card hover:bg-muted text-foreground transition-colors shadow-sm"
+                            >
+                              <span>View Block Yarn Bookings</span>
+                            </Link>
+                          </div>
                         </td>
                       </tr>
                     ) : (
-                      paginatedRecords.map((r, idx) => {
-                        const qtyNum = Number(r?.qty) || 0;
-                        const useQtyNum = Number(r?.useQty) || 0;
-                        const balanceNum = Number(r?.balance) || 0;
-                        const isFullyUtilized = balanceNum <= 0 && qtyNum > 0;
-                        const isPartiallyUtilized = useQtyNum > 0 && balanceNum > 0;
+                      paginatedGroups.map((group, groupIdx) => {
+                        const globalGroupIdx = (currentPage - 1) * pageSize + groupIdx;
+                        const groupStartSl = groupStartIndices[globalGroupIdx] ?? 0;
+                        const isExpanded = expandedGroups.has(group.id);
 
                         return (
-                          <tr
-                            key={r?.id || idx}
-                            className="even:bg-slate-50/60 dark:even:bg-slate-900/40 hover:bg-teal-50/60 dark:hover:bg-teal-950/30 transition-colors group cursor-pointer"
-                            onClick={() => setViewRecord(r)}
-                          >
-                            <td className="py-3 px-3 text-center text-muted-foreground text-[11px] whitespace-nowrap font-mono">
-                              {(currentPage - 1) * pageSize + idx + 1}
-                            </td>
+                          <React.Fragment key={`group-${group.id}`}>
+                            {/* Expandable Group Header - Compact Single-line Left-aligned */}
+                            <tr
+                              className="bg-teal-50/70 hover:bg-teal-100/70 dark:bg-teal-950/40 dark:hover:bg-teal-900/40 border-y-2 border-teal-200/90 dark:border-teal-800/90 transition-colors select-none cursor-pointer"
+                              onClick={() => toggleGroup(group.id)}
+                            >
+                              <td colSpan={14} className="py-2 px-3">
+                                <div className="flex items-center gap-2.5 whitespace-nowrap overflow-x-auto text-xs">
+                                  {/* 1. Expand/Collapse Icon */}
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleGroup(group.id);
+                                    }}
+                                    className="p-1 rounded-md hover:bg-teal-200/60 dark:hover:bg-teal-800/60 text-teal-800 dark:text-teal-200 transition-colors shrink-0"
+                                    title={isExpanded ? "Collapse Yarn Group" : "Expand Yarn Group"}
+                                  >
+                                    {isExpanded ? (
+                                      <ChevronDown className="w-4 h-4 text-teal-700 dark:text-teal-300" />
+                                    ) : (
+                                      <ChevronRight className="w-4 h-4 text-teal-700 dark:text-teal-300" />
+                                    )}
+                                  </button>
 
-                            {/* Buyer */}
-                            <td className="py-3 px-3.5 font-semibold text-foreground whitespace-nowrap" title={r?.buyer || ""}>
-                              {r?.buyer || "—"}
-                            </td>
+                                  {/* 2. Block Booking No. */}
+                                  <span className="font-mono font-bold text-sm text-teal-950 dark:text-teal-100 flex items-center gap-1.5 shrink-0">
+                                    <Package className="w-4 h-4 text-teal-600 shrink-0" />
+                                    {group.blockNo}
+                                  </span>
 
-                            {/* Block No */}
-                            <td className="py-3 px-3.5 font-mono font-medium text-teal-700 dark:text-teal-300 whitespace-nowrap">
-                              <span className="px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 font-semibold">
-                                {r?.blockNo || "—"}
-                              </span>
-                            </td>
+                                  {/* 3. Transaction Count */}
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-teal-100 text-teal-800 dark:bg-teal-900/70 dark:text-teal-300 border border-teal-300/70 dark:border-teal-700/70 shadow-2xs shrink-0">
+                                    {group.transactionCount === 0
+                                      ? "0 Transactions"
+                                      : `${group.transactionCount} ${
+                                          group.transactionCount === 1 ? "Transaction" : "Transactions"
+                                        }`}
+                                  </span>
 
-                            {/* Season */}
-                            <td className="py-3 px-3.5 text-slate-600 dark:text-slate-300 whitespace-nowrap" title={r?.season || ""}>
-                              {r?.season || "—"}
-                            </td>
+                                  {/* 4. Yarn Name */}
+                                  <div className="flex items-center gap-1.5 shrink-0">
+                                    <Tag className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                                    <span className="text-[11px] text-muted-foreground font-medium shrink-0">
+                                      Yarn Name:
+                                    </span>
+                                    <span
+                                      className="text-xs font-bold text-teal-950 dark:text-teal-100 bg-white/80 dark:bg-card/60 px-2 py-0.5 rounded border border-teal-200/70 dark:border-teal-800/70 shadow-2xs"
+                                      title={group.yarnName}
+                                    >
+                                      {group.yarnName || "—"}
+                                    </span>
+                                  </div>
 
-                            {/* Job */}
-                            <td className="py-3 px-3.5 font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                              {r?.job || "—"}
-                            </td>
+                                  {/* 5-8. Four Summary Cards immediately after Yarn Name, compact & left-aligned */}
+                                  <div className="flex items-center gap-2 bg-card/90 dark:bg-slate-900/90 px-2.5 py-1 rounded-lg border border-teal-200/80 dark:border-teal-800/80 shadow-2xs shrink-0">
+                                    {/* 5. Block Qty */}
+                                    <div className="flex items-center gap-1 px-1">
+                                      <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+                                        Block Qty:
+                                      </span>
+                                      <span className="text-xs font-mono font-bold text-slate-900 dark:text-slate-100">
+                                        {group.qty.toLocaleString()}{" "}
+                                        <span className="text-[10px] font-sans font-normal text-muted-foreground">
+                                          KG
+                                        </span>
+                                      </span>
+                                    </div>
 
-                            {/* Yarn Count */}
-                            <td className="py-3 px-3.5 font-semibold text-foreground whitespace-nowrap">
-                              <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[11px] font-mono border border-slate-200 dark:border-slate-700">
-                                {r?.yarnCount || "—"}
-                              </span>
-                            </td>
+                                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
 
-                            {/* Qty (kg) */}
-                            <td className="py-3 px-3.5 text-right font-mono font-semibold text-slate-900 dark:text-slate-100 whitespace-nowrap">
-                              {qtyNum.toLocaleString()}
-                            </td>
+                                    {/* 6. Use Qty */}
+                                    <div className="flex items-center gap-1 px-1">
+                                      <span className="text-[10px] uppercase font-bold text-amber-700 dark:text-amber-400 tracking-wider">
+                                        Use Qty:
+                                      </span>
+                                      <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
+                                        {group.totalUseQty.toLocaleString()}{" "}
+                                        <span className="text-[10px] font-sans font-normal text-muted-foreground">
+                                          KG
+                                        </span>
+                                      </span>
+                                    </div>
 
-                            {/* Use Qty (kg) */}
-                            <td className="py-3 px-3.5 text-right font-mono font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">
-                              {useQtyNum.toLocaleString()}
-                            </td>
+                                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
 
-                            {/* Balance (kg) */}
-                            <td className="py-3 px-3.5 text-right font-mono font-bold whitespace-nowrap">
-                              <span
-                                className={`px-2 py-0.5 rounded border inline-block ${
-                                  isFullyUtilized
-                                    ? "bg-slate-100 text-slate-500 border-slate-200 line-through dark:bg-slate-800 dark:border-slate-700"
-                                    : isPartiallyUtilized
-                                    ? "bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800"
-                                    : "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
-                                }`}
-                              >
-                                {balanceNum.toLocaleString()}
-                              </span>
-                            </td>
+                                    {/* 7. Balance */}
+                                    <div className="flex items-center gap-1 px-1">
+                                      <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">
+                                        Balance:
+                                      </span>
+                                      <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                        {group.finalBalance.toLocaleString()}{" "}
+                                        <span className="text-[10px] font-sans font-normal text-muted-foreground">
+                                          KG
+                                        </span>
+                                      </span>
+                                    </div>
 
-                            {/* Price ($/kg) */}
-                            <td className="py-3 px-3.5 text-right font-mono text-slate-600 dark:text-slate-300 whitespace-nowrap">
-                              ${(Number(r?.price) || 0).toFixed(2)}
-                            </td>
+                                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
 
-                            {/* Booking Date */}
-                            <td className="py-3 px-3.5 text-slate-600 dark:text-slate-300 whitespace-nowrap">
-                              {r?.bookingDate || "—"}
-                            </td>
+                                    {/* 8. Received Qty */}
+                                    <div className="flex items-center gap-1 px-1">
+                                      <span className="text-[10px] uppercase font-bold text-teal-700 dark:text-teal-400 tracking-wider">
+                                        Received Qty:
+                                      </span>
+                                      <span className="text-xs font-mono font-bold text-teal-700 dark:text-teal-300">
+                                        {group.receivedQty.toLocaleString()}{" "}
+                                        <span className="text-[10px] font-sans font-normal text-muted-foreground">
+                                          KG
+                                        </span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
 
-                            {/* Received Qty (kg) */}
-                            <td className="py-3 px-3.5 text-right font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                              {(Number(r?.receivedQty) || 0).toLocaleString()}
-                            </td>
+                            {/* Expanded Transaction Records */}
+                            {isExpanded &&
+                              group.rows.map((row, rowIdx) => {
+                                const rowSl = groupStartSl + rowIdx + 1;
+                                const isFullyUtilized = row.balance <= 0 && group.qty > 0;
+                                const isPartiallyUtilized = row.useQty > 0 && row.balance > 0;
+                                const isLastRow = rowIdx === group.rows.length - 1;
+                                const isFirstRow = rowIdx === 0;
+                                const rowCount = group.rows.length;
 
-                            {/* Documents Status */}
-                            <td className="py-3 px-3.5 whitespace-nowrap">
-                              {r?.documentsStatus && !r.documentsStatus.includes("Pending") && r.documentsStatus !== "-" ? (
-                                <span className="inline-flex items-center gap-1.5 text-[11px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 font-medium border border-blue-200 dark:border-blue-800">
-                                  <CheckCircle2 className="w-3 h-3 text-blue-600" />
-                                  {r.documentsStatus}
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                                  <Clock className="w-3 h-3 text-amber-500" />
-                                  Pending LC
-                                </span>
-                              )}
-                            </td>
+                                return (
+                                  <tr
+                                    key={row.id}
+                                    className={`transition-colors cursor-pointer group hover:bg-teal-50/40 dark:hover:bg-teal-950/20 bg-card ${
+                                      isLastRow
+                                        ? "border-b-2 border-slate-300 dark:border-slate-700"
+                                        : "border-b border-border/40"
+                                    }`}
+                                    onClick={() => setViewRecord(group.rawRecord)}
+                                  >
+                                    {/* 1. SL. (Transaction-wise) */}
+                                    <td className="py-2.5 px-3 text-center text-muted-foreground text-[11px] whitespace-nowrap font-mono">
+                                      <span className="font-semibold text-slate-700 dark:text-slate-300">
+                                        {rowSl}
+                                      </span>
+                                      {group.rows.length > 1 && (
+                                        <span className="block text-[9px] text-teal-600 dark:text-teal-400 font-medium">
+                                          {`T-${rowIdx + 1}`}
+                                        </span>
+                                      )}
+                                    </td>
 
-                            {/* Actual Price ($/kg) */}
-                            <td className="py-3 px-3.5 text-right font-mono text-slate-600 dark:text-slate-300 whitespace-nowrap">
-                              ${(Number(r?.actualPrice) || 0).toFixed(2)}
-                            </td>
+                                    {/* 2. Buyer (Transaction-wise) */}
+                                    <td
+                                      className="py-2.5 px-3.5 font-semibold text-foreground whitespace-nowrap"
+                                      title={row.buyer}
+                                    >
+                                      {row.buyer !== "—" ? (
+                                        <span className="text-slate-900 dark:text-slate-100">{row.buyer}</span>
+                                      ) : (
+                                        <span className="text-muted-foreground">—</span>
+                                      )}
+                                    </td>
 
-                            {/* PI No */}
-                            <td className="py-3 px-3.5 font-mono font-medium text-foreground whitespace-nowrap">
-                              {r?.piNo && r.piNo !== "-" ? (
-                                <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-teal-700 dark:text-teal-300 border border-slate-200 dark:border-slate-700">
-                                  {r.piNo}
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground text-[11px]">—</span>
-                              )}
-                            </td>
+                                    {/* 3. Season (Transaction-wise) */}
+                                    <td
+                                      className="py-2.5 px-3.5 text-slate-600 dark:text-slate-300 whitespace-nowrap"
+                                      title={row.season}
+                                    >
+                                      {row.season}
+                                    </td>
 
-                            {/* Action: View */}
-                            <td className="py-3 px-3 text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                onClick={() => setViewRecord(r)}
-                                className="p-1.5 rounded-lg hover:bg-slate-200/80 dark:hover:bg-slate-800 text-slate-500 hover:text-teal-600 transition-colors"
-                                title="View Complete Status Details"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                            </td>
-                          </tr>
+                                    {/* 4. Job (Transaction-wise) */}
+                                    <td className="py-2.5 px-3.5 font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                      {row.job}
+                                    </td>
+
+                                    {/* 5. Block Qty (KG) (Vertically Merged #1) */}
+                                    {isFirstRow && (
+                                      <td
+                                        rowSpan={rowCount}
+                                        className="py-2.5 px-3.5 text-center align-middle font-mono font-semibold text-slate-900 dark:text-slate-100 whitespace-nowrap bg-muted/20 dark:bg-slate-900/30 border-x border-border/40"
+                                      >
+                                        {group.qty.toLocaleString()}
+                                      </td>
+                                    )}
+
+                                    {/* 6. Use Qty (KG) (Transaction-wise) */}
+                                    <td className="py-2.5 px-3.5 text-right font-mono font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">
+                                      {row.useQty > 0 ? row.useQty.toLocaleString() : "0"}
+                                    </td>
+
+                                    {/* 7. Balance (KG) (Transaction-wise) */}
+                                    <td className="py-2.5 px-3.5 text-right font-mono font-bold whitespace-nowrap">
+                                      <span
+                                        className={`px-2 py-0.5 rounded border inline-block ${
+                                          isFullyUtilized
+                                            ? "bg-slate-100 text-slate-500 border-slate-200 line-through dark:bg-slate-800 dark:border-slate-700"
+                                            : isPartiallyUtilized
+                                            ? "bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+                                            : "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
+                                        }`}
+                                      >
+                                        {row.balance.toLocaleString()}
+                                      </span>
+                                    </td>
+
+                                    {/* 8-14. Vertically Merged Booking-level Columns (Rendered once on first row) */}
+                                    {isFirstRow && (
+                                      <>
+                                        {/* 8. Price ($/KG) (Vertically Merged #2) */}
+                                        <td
+                                          rowSpan={rowCount}
+                                          className="py-2.5 px-3.5 text-center align-middle font-mono text-slate-600 dark:text-slate-300 whitespace-nowrap bg-muted/20 dark:bg-slate-900/30 border-x border-border/40"
+                                        >
+                                          {group.price > 0 ? `$${group.price.toFixed(2)}` : "—"}
+                                        </td>
+
+                                        {/* 9. Booking Date (Vertically Merged #3) */}
+                                        <td
+                                          rowSpan={rowCount}
+                                          className="py-2.5 px-3.5 text-center align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap bg-muted/20 dark:bg-slate-900/30 border-x border-border/40"
+                                        >
+                                          {group.bookingDate || "—"}
+                                        </td>
+
+                                        {/* 10. Received Qty (KG) (Vertically Merged #4) */}
+                                        <td
+                                          rowSpan={rowCount}
+                                          className="py-2.5 px-3.5 text-center align-middle font-mono font-semibold text-teal-700 dark:text-teal-300 whitespace-nowrap bg-muted/20 dark:bg-slate-900/30 border-x border-border/40"
+                                        >
+                                          {group.receivedQty.toLocaleString()}
+                                        </td>
+
+                                        {/* 11. Documents Status (Vertically Merged #5) */}
+                                        <td
+                                          rowSpan={rowCount}
+                                          className="py-2.5 px-3.5 text-center align-middle whitespace-nowrap bg-muted/20 dark:bg-slate-900/30 border-x border-border/40"
+                                        >
+                                          {group.documentsStatus &&
+                                          !group.documentsStatus.includes("Pending") &&
+                                          group.documentsStatus !== "-" ? (
+                                            <span className="inline-flex items-center gap-1.5 text-[11px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 font-medium border border-blue-200 dark:border-blue-800">
+                                              <CheckCircle2 className="w-3 h-3 text-blue-600" />
+                                              {group.documentsStatus}
+                                            </span>
+                                          ) : (
+                                            <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                                              <Clock className="w-3 h-3 text-amber-500" />
+                                              Pending LC
+                                            </span>
+                                          )}
+                                        </td>
+
+                                        {/* 12. Actual Price ($/KG) (Vertically Merged #6) */}
+                                        <td
+                                          rowSpan={rowCount}
+                                          className="py-2.5 px-3.5 text-center align-middle font-mono text-slate-600 dark:text-slate-300 whitespace-nowrap bg-muted/20 dark:bg-slate-900/30 border-x border-border/40"
+                                        >
+                                          {group.actualPrice > 0 ? `$${group.actualPrice.toFixed(2)}` : "—"}
+                                        </td>
+
+                                        {/* 13. PI No (Vertically Merged #7) */}
+                                        <td
+                                          rowSpan={rowCount}
+                                          className="py-2.5 px-3.5 text-center align-middle font-mono font-medium text-foreground whitespace-nowrap bg-muted/20 dark:bg-slate-900/30 border-x border-border/40"
+                                        >
+                                          {group.piNo && group.piNo !== "-" ? (
+                                            <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-teal-700 dark:text-teal-300 border border-slate-200 dark:border-slate-700">
+                                              {group.piNo}
+                                            </span>
+                                          ) : (
+                                            <span className="text-muted-foreground text-[11px]">—</span>
+                                          )}
+                                        </td>
+
+                                        {/* 14. Action (Vertically Merged) */}
+                                        <td
+                                          rowSpan={rowCount}
+                                          className="py-2.5 px-3 text-center align-middle whitespace-nowrap bg-muted/20 dark:bg-slate-900/30 border-l border-border/40"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <button
+                                            onClick={() => setViewRecord(group.rawRecord)}
+                                            className="p-1.5 rounded-lg hover:bg-slate-200/80 dark:hover:bg-slate-800 text-slate-500 hover:text-teal-600 transition-colors"
+                                            title="View Complete Status Details"
+                                          >
+                                            <Eye className="w-4 h-4" />
+                                          </button>
+                                        </td>
+                                      </>
+                                    )}
+                                  </tr>
+                                );
+                              })}
+                          </React.Fragment>
                         );
                       })
                     )}
                   </tbody>
 
                   {/* Table Footer with Totals */}
-                  {filteredRecords.length > 0 && (
+                  {filteredGroups.length > 0 && (
                     <tfoot>
                       <tr className="bg-slate-100/90 dark:bg-slate-900/90 border-t-2 border-slate-300 dark:border-slate-700 font-bold text-xs whitespace-nowrap">
-                        <td colSpan={6} className="py-3.5 px-3.5 text-right uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                          Total ({filteredRecords.length} records):
+                        <td
+                          colSpan={4}
+                          className="py-3.5 px-3.5 text-right uppercase tracking-wider text-slate-600 dark:text-slate-400"
+                        >
+                          Total ({filteredGroups.length} yarn groups, {totalTransactionRows} transactions):
                         </td>
-                        <td className="py-3.5 px-3.5 text-right font-mono text-slate-900 dark:text-white font-extrabold">
+                        <td className="py-3.5 px-3.5 text-center font-mono text-slate-900 dark:text-white font-extrabold">
                           {(Number(totals.totalQty) || 0).toLocaleString()}
                         </td>
                         <td className="py-3.5 px-3.5 text-right font-mono text-amber-600 dark:text-amber-400 font-extrabold">
@@ -876,11 +1178,11 @@ function MMBlockYarnStatusPage() {
                         <td className="py-3.5 px-3.5 text-right font-mono text-emerald-600 dark:text-emerald-400 font-extrabold">
                           {(Number(totals.totalBalance) || 0).toLocaleString()}
                         </td>
-                        <td className="py-3.5 px-3.5 text-right font-mono text-slate-600 dark:text-slate-300 font-semibold">
-                          ${(Number(totals.avgPrice) || 0).toFixed(2)}
+                        <td className="py-3.5 px-3.5 text-center font-mono text-slate-600 dark:text-slate-300 font-semibold">
+                          {Number(totals.avgPrice) > 0 ? `$${(Number(totals.avgPrice) || 0).toFixed(2)}` : "—"}
                         </td>
-                        <td className="py-3.5 px-3.5"></td>
-                        <td className="py-3.5 px-3.5 text-right font-mono text-slate-900 dark:text-white font-extrabold">
+                        <td className="py-3.5 px-3.5 text-center"></td>
+                        <td className="py-3.5 px-3.5 text-center font-mono text-teal-700 dark:text-teal-300 font-extrabold">
                           {(Number(totals.totalReceivedQty) || 0).toLocaleString()}
                         </td>
                         <td colSpan={4} className="py-3.5 px-3.5"></td>
@@ -910,8 +1212,8 @@ function MMBlockYarnStatusPage() {
                   <span>per page</span>
                   <span className="mx-2 text-border">|</span>
                   <span>
-                    Showing {filteredRecords.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} to{" "}
-                    {Math.min(currentPage * pageSize, filteredRecords.length)} of {filteredRecords.length} entries
+                    Showing {filteredGroups.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} to{" "}
+                    {Math.min(currentPage * pageSize, filteredGroups.length)} of {filteredGroups.length} yarn groups ({totalTransactionRows} total transaction rows)
                   </span>
                 </div>
 
@@ -955,221 +1257,6 @@ function MMBlockYarnStatusPage() {
               </div>
             </div>
           </div>
-        )}
-
-        {/* ================================================================== */}
-        {/* TAB 2: SUMMARY VIEW (Worksheet: Summary)                           */}
-        {/* 4 Groupings: By Buyer, By Block No., By Season, By Yarn Count      */}
-        {/* ================================================================== */}
-        {activeTab === "summary" && (
-          <div className="space-y-4">
-            {/* Sub-group Navigation Tabs */}
-            <div className="flex items-center justify-between flex-wrap gap-3 bg-card border border-border rounded-xl p-3 shadow-sm">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-semibold text-muted-foreground mr-2">
-                  Group Summary By:
-                </span>
-                <button
-                  onClick={() => setSummaryGrouping("buyer")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    summaryGrouping === "buyer"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  1. By Buyer ({summaryTables.buyer.rows.length})
-                </button>
-                <button
-                  onClick={() => setSummaryGrouping("blockNo")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    summaryGrouping === "blockNo"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  2. By Block No. ({summaryTables.blockNo.rows.length})
-                </button>
-                <button
-                  onClick={() => setSummaryGrouping("season")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    summaryGrouping === "season"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  3. By Season ({summaryTables.season.rows.length})
-                </button>
-                <button
-                  onClick={() => setSummaryGrouping("yarnCount")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    summaryGrouping === "yarnCount"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  4. By Yarn Count ({summaryTables.yarnCount.rows.length})
-                </button>
-              </div>
-
-              <div className="text-xs text-muted-foreground">
-                Formula: <span className="font-mono text-foreground font-semibold">Balance = Total Qty - Total Use Qty</span>
-              </div>
-            </div>
-
-            {/* Active Summary Table */}
-            {(() => {
-              const currentSummary = activeSummaryData;
-              const groupLabel =
-                summaryGrouping === "buyer"
-                  ? "Buyer Name"
-                  : summaryGrouping === "blockNo"
-                  ? "Block Booking No."
-                  : summaryGrouping === "season"
-                  ? "Season Name"
-                  : "Yarn Count Specification";
-
-              return (
-                <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-                  <div className="p-4 border-b bg-muted/40 flex items-center justify-between">
-                    <div>
-                      <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                        <span>Worksheet: Summary — Grouped by {groupLabel}</span>
-                      </h2>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Aggregation of booked quantity, consumed/tagged yarn, remaining balance, and utilization rate.
-                      </p>
-                    </div>
-                    <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-semibold font-mono">
-                      {currentSummary.rows.length} Groups
-                    </span>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs border-collapse">
-                      <thead>
-                        <tr className="bg-slate-100/90 dark:bg-slate-900/90 border-b border-border text-[11px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">
-                          <th className="py-3.5 px-4 w-12 text-center">Sl.</th>
-                          <th className="py-3.5 px-4 min-w-[200px]">{groupLabel}</th>
-                          <th className="py-3.5 px-4 text-center min-w-[110px]">Allocations</th>
-                          <th className="py-3.5 px-4 text-right min-w-[130px]">Total Qty (kg)</th>
-                          <th className="py-3.5 px-4 text-right min-w-[130px]">Total Use Qty (kg)</th>
-                          <th className="py-3.5 px-4 text-right min-w-[150px]">Balance / Stock Qty (kg)</th>
-                          <th className="py-3.5 px-4 text-right min-w-[150px]">KD Adjust Balance (kg)</th>
-                          <th className="py-3.5 px-4 text-right min-w-[160px]">Received / Payment Qty (kg)</th>
-                          <th className="py-3.5 px-4 text-center w-52">Utilization %</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {currentSummary.rows.map((row, idx) => (
-                          <tr key={row.groupName || idx} className="even:bg-slate-50/60 dark:even:bg-slate-900/40 hover:bg-teal-50/60 dark:hover:bg-teal-950/30 transition-colors whitespace-nowrap">
-                            <td className="py-3 px-4 text-center text-muted-foreground font-mono text-[11px]">
-                              {idx + 1}
-                            </td>
-                            <td className="py-3 px-4 font-bold text-foreground">
-                              {summaryGrouping === "blockNo" ? (
-                                <span className="font-mono text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800">
-                                  {row.groupName}
-                                </span>
-                              ) : summaryGrouping === "yarnCount" ? (
-                                <span className="font-mono text-foreground px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                  {row.groupName}
-                                </span>
-                              ) : (
-                                row.groupName
-                              )}
-                            </td>
-                            <td className="py-3 px-4 text-center text-muted-foreground font-mono">
-                              {row.recordCount}
-                            </td>
-                            <td className="py-3 px-4 text-right font-mono font-medium text-foreground">
-                              {(Number(row.totalQty) || 0).toLocaleString()}
-                            </td>
-                            <td className="py-3 px-4 text-right font-mono font-semibold text-amber-600 dark:text-amber-400">
-                              {(Number(row.totalUseQty) || 0).toLocaleString()}
-                            </td>
-                            <td className="py-3 px-4 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                              {(Number(row.balanceStockQty) || 0).toLocaleString()}
-                            </td>
-                            <td className="py-3 px-4 text-right font-mono text-muted-foreground">
-                              {(Number(row.kdAdjustBalance) || 0).toLocaleString()}
-                            </td>
-                            <td className="py-3 px-4 text-right font-mono text-muted-foreground">
-                              {(Number(row.receivedPaymentQty) || 0).toLocaleString()}
-                            </td>
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-2">
-                                <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
-                                  <div
-                                    className={`h-2 rounded-full transition-all ${
-                                      row.utilizationPct > 80
-                                        ? "bg-emerald-500"
-                                        : row.utilizationPct > 40
-                                        ? "bg-amber-500"
-                                        : "bg-teal-600"
-                                    }`}
-                                    style={{ width: `${Math.min(100, Math.max(0, row.utilizationPct))}%` }}
-                                  />
-                                </div>
-                                <span className="text-xs font-mono font-semibold w-12 text-right">
-                                  {row.utilizationPct}%
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-
-                      {/* Grand Total Row at Bottom */}
-                      <tfoot>
-                        <tr className="bg-slate-100/95 dark:bg-slate-900/95 border-t-2 border-slate-300 dark:border-slate-700 font-extrabold text-xs whitespace-nowrap">
-                          <td colSpan={2} className="py-3.5 px-4 text-left uppercase tracking-wider text-teal-800 dark:text-teal-300">
-                            Grand Total ({currentSummary.grandTotal.groupName})
-                          </td>
-                          <td className="py-3.5 px-4 text-center text-teal-800 dark:text-teal-300 font-mono">
-                            {currentSummary.grandTotal.recordCount} items
-                          </td>
-                          <td className="py-3.5 px-4 text-right font-mono text-foreground font-black text-sm">
-                            {(Number(currentSummary.grandTotal.totalQty) || 0).toLocaleString()}
-                          </td>
-                          <td className="py-3.5 px-4 text-right font-mono text-amber-600 dark:text-amber-400 font-black text-sm">
-                            {(Number(currentSummary.grandTotal.totalUseQty) || 0).toLocaleString()}
-                          </td>
-                          <td className="py-3.5 px-4 text-right font-mono text-emerald-600 dark:text-emerald-400 font-black text-sm">
-                            {(Number(currentSummary.grandTotal.balanceStockQty) || 0).toLocaleString()}
-                          </td>
-                          <td className="py-3.5 px-4 text-right font-mono text-muted-foreground">
-                            {(Number(currentSummary.grandTotal.kdAdjustBalance) || 0).toLocaleString()}
-                          </td>
-                          <td className="py-3.5 px-4 text-right font-mono text-foreground font-black text-sm">
-                            {(Number(currentSummary.grandTotal.receivedPaymentQty) || 0).toLocaleString()}
-                          </td>
-                          <td className="py-3.5 px-4">
-                            <div className="flex items-center gap-2">
-                              <div className="flex-1 bg-muted rounded-full h-2.5 overflow-hidden">
-                                <div
-                                  className="bg-teal-600 h-2.5 rounded-full transition-all"
-                                  style={{
-                                    width: `${Math.min(
-                                      100,
-                                      Math.max(0, currentSummary.grandTotal.utilizationPct)
-                                    )}%`,
-                                  }}
-                                />
-                              </div>
-                              <span className="text-xs font-mono font-black text-teal-700 dark:text-teal-300 w-12 text-right">
-                                {currentSummary.grandTotal.utilizationPct}%
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        )}
 
         {/* ================================================================== */}
         {/* RECORD DETAIL MODAL (Worksheet Row Inspection)                     */}
@@ -1191,8 +1278,8 @@ function MMBlockYarnStatusPage() {
                       </span>
                     </h2>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Buyer: <span className="font-semibold text-foreground">{viewRecord.buyer || "-"}</span> • Yarn:{" "}
-                      <span className="font-semibold text-foreground">{viewRecord.yarnCount || "-"}</span>
+                      Buyer: <span className="font-semibold text-foreground">{viewRecord.buyer || "-"}</span> • Yarn Name:{" "}
+                      <span className="font-semibold text-foreground">{viewRecord.yarnName || viewRecord.yarnItem || viewRecord.yarnCount || "-"}</span>
                     </p>
                   </div>
                 </div>
@@ -1234,12 +1321,12 @@ function MMBlockYarnStatusPage() {
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
                     <div>
-                      <span className="text-muted-foreground text-[11px]">Yarn Count:</span>
-                      <div className="font-bold text-foreground font-mono mt-0.5">{viewRecord.yarnCount || "Ne 30/1"}</div>
+                      <span className="text-muted-foreground text-[11px]">Yarn Name:</span>
+                      <div className="font-bold text-foreground font-medium mt-0.5">{viewRecord.yarnName || viewRecord.yarnItem || viewRecord.yarnCount || "100% Combed Cotton Yarn"}</div>
                     </div>
                     <div>
-                      <span className="text-muted-foreground text-[11px]">Item Description:</span>
-                      <div className="font-medium text-foreground mt-0.5">{viewRecord.yarnItem || "100% Combed Cotton Yarn"}</div>
+                      <span className="text-muted-foreground text-[11px]">Specification:</span>
+                      <div className="font-medium text-foreground mt-0.5">{viewRecord.yarnComposition || "Combed Ring Spun Auto Coned"}</div>
                     </div>
                     <div>
                       <span className="text-muted-foreground text-[11px]">Supplier / Mill:</span>

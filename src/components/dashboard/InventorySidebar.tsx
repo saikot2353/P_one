@@ -318,6 +318,10 @@ export const nav: NavItem[] = [
     icon: BarChart3,
     subitems: [
       {
+        label: "Warranty Register",
+        to: "/inv-report-warranty-register",
+      },
+      {
         label: "Stock Balance Register",
         to: "/inv-report-stock-balance",
       },

@@ -1425,6 +1425,7 @@ export type MMManualBookingSizeDetail = MMAccessoriesBookingSizeDetail;
 export interface MMYarnBookingTagRecord {
   id: string;
   preCostId?: string;
+  preCostMasterId?: string;
   yarnRowId: string;
   blockBookingId?: string;
   blockBookingNo: string;
@@ -1435,25 +1436,34 @@ export interface MMYarnBookingTagRecord {
   availableBalanceAtTag?: number;
   remainingBalanceAtTag?: number;
   taggedAt: string;
+  buyer?: string;
+  season?: string;
+  job?: string;
+  yarnCount?: string;
+  price?: number;
 }
 
 export interface MMBlockYarnStatusRecord {
   id: string;
+  tagId?: string;
+  yarnRowId?: string;
+  preCostId?: string;
   bookingId: string;
   bookingItemId: string;
-  buyer: string; // Column A: Buyer
-  blockNo: string; // Column B: Block No
-  season: string; // Column C: Season
-  job: string; // Column D: Job
-  yarnCount: string; // Column E: Yarn Count
+  buyer: string; // Column A: Buyer (from Pre Costing Entry Knit)
+  blockNo: string; // Column B: Block No (from Block Yarn Booking)
+  season: string; // Column C: Season (from Pre Costing Entry Knit)
+  job: string; // Column D: Job (from Pre Costing Entry Knit)
+  yarnName: string; // Column E: Yarn Name (from Block Yarn Booking Item Name)
+  yarnCount?: string; // Kept for backwards compatibility
   yarnComposition?: string;
   yarnItem: string;
   qty: number; // Column F: Qty (KG)
   marketQtyTon?: number; // Qty (TON)
-  useQty: number; // Column G: Use Qty (KG)
+  useQty: number; // Column G: Use Qty (KG) (from Pre Costing Yarn Tag)
   balance: number; // Column H: Balance (KG) = Qty - Use Qty
-  price: number; // Column I: Price ($/KG)
-  bookingDate: string; // Column J: Booking Date
+  price: number; // Column I: Price ($/KG) (from Pre Costing Yarn Breakdown)
+  bookingDate: string; // Column J: Booking Date (from Block Yarn Booking)
   receivedQty: number; // Column K: Received Qty (KG) (initially = Qty)
   documentsStatus: string; // Column L: Documents Status (LC Number)
   actualPrice: number; // Column M: Actual Price ($/KG)
@@ -1461,6 +1471,7 @@ export interface MMBlockYarnStatusRecord {
   piId?: string;
   supplierName: string;
   tags?: MMYarnBookingTagRecord[];
+  totalItemBookedQty?: number;
 }
 
 // ----------------------------------------------------------------------------
@@ -5709,24 +5720,113 @@ export class MMRepository {
 
   static getYarnBookingTagByRowId(yarnRowId: string): MMYarnBookingTagRecord | undefined {
     const tags = this.getYarnBookingTags();
-    return tags.find((t) => t.yarnRowId === yarnRowId);
+    return tags.find((t) => t.yarnRowId === yarnRowId || t.id === yarnRowId);
   }
 
   static saveYarnBookingTag(tag: MMYarnBookingTagRecord): void {
     const tags = this.getYarnBookingTags();
-    const idx = tags.findIndex((t) => t.yarnRowId === tag.yarnRowId || t.id === tag.id);
+    const tagPreCost = tag.preCostId || tag.preCostMasterId || "";
+    const idx = tags.findIndex(
+      (t) =>
+        (tag.id && t.id === tag.id) ||
+        (tag.yarnRowId && t.yarnRowId === tag.yarnRowId) ||
+        (tagPreCost && tag.yarnRowId && (t.preCostId === tagPreCost || t.preCostMasterId === tagPreCost) && t.yarnRowId === tag.yarnRowId)
+    );
     if (idx >= 0) {
-      tags[idx] = tag;
+      tags[idx] = { ...tag };
     } else {
-      tags.push(tag);
+      tags.push({ ...tag });
     }
     this.set(STORAGE_KEYS.YARN_BOOKING_TAGS, tags);
   }
 
-  static removeYarnBookingTag(yarnRowId: string): void {
+  static removeYarnBookingTag(yarnRowId: string, preCostId?: string): void {
     const tags = this.getYarnBookingTags();
-    const filtered = tags.filter((t) => t.yarnRowId !== yarnRowId && t.id !== yarnRowId);
+    const filtered = tags.filter((t) => {
+      if (t.id === yarnRowId || t.yarnRowId === yarnRowId) {
+        if (!preCostId) return false;
+        if (t.preCostId === preCostId || t.preCostMasterId === preCostId) return false;
+      }
+      return true;
+    });
     this.set(STORAGE_KEYS.YARN_BOOKING_TAGS, filtered);
+  }
+
+  // Unified active yarn booking tag transactions (Ledger + saved Pre Costings)
+  static getAllActiveYarnBookingTags(): MMYarnBookingTagRecord[] {
+    const rawTags = this.getYarnBookingTags();
+    const tagsMap = new Map<string, MMYarnBookingTagRecord>();
+
+    // 1. Add all saved tag records from the dedicated transaction ledger
+    if (Array.isArray(rawTags)) {
+      rawTags.forEach((t) => {
+        if (t && (t.blockBookingNo || t.blockBookingId) && Number(t.tagQtyKg) > 0) {
+          const key = t.id || `${t.preCostId || t.preCostMasterId || "pc"}-${t.yarnRowId}`;
+          tagsMap.set(key, { ...t });
+        }
+      });
+    }
+
+    // 2. Cross-reference saved pre-costings from Local Storage
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("cripton_pre_costings_knit_master_v1");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            parsed.forEach((pc: any) => {
+              if (!pc || !Array.isArray(pc.knitFabricItems)) return;
+              const preCostId = pc.preCostId || pc.ourRef || pc.id;
+              pc.knitFabricItems.forEach((kfi: any) => {
+                if (!kfi || !Array.isArray(kfi.yarnDetails)) return;
+                kfi.yarnDetails.forEach((yd: any) => {
+                  const tag = yd.bookingTag;
+                  if (tag && (tag.blockBookingNo || tag.blockBookingId) && Number(yd.finalQtyKg || tag.tagQtyKg) > 0) {
+                    const key = tag.id || `${preCostId}-${yd.id || tag.yarnRowId}`;
+                    const existing = tagsMap.get(key);
+                    if (existing) {
+                      // Preserve existing selected booking & yarn item from transaction ledger, update pre-cost metadata
+                      tagsMap.set(key, {
+                        ...existing,
+                        buyer: pc.buyer || existing.buyer,
+                        season: pc.season || existing.season,
+                        job: preCostId || existing.job,
+                        yarnCount: yd.yarnCount || existing.yarnCount,
+                        price: Number(yd.ratePerKg) !== undefined ? Number(yd.ratePerKg) : existing.price || 0,
+                        tagQtyKg: Number(yd.finalQtyKg) || existing.tagQtyKg,
+                      });
+                    } else {
+                      tagsMap.set(key, {
+                        id: tag.id || `ytag-${preCostId}-${yd.id || Date.now()}`,
+                        preCostId,
+                        preCostMasterId: pc.id,
+                        yarnRowId: yd.id || tag.yarnRowId,
+                        blockBookingNo: tag.blockBookingNo,
+                        blockBookingId: tag.blockBookingId || tag.blockBookingNo,
+                        yarnItemId: tag.yarnItemId,
+                        yarnItemName: tag.yarnItemName || "",
+                        supplierName: tag.supplierName || "",
+                        tagQtyKg: Number(yd.finalQtyKg) || Number(tag.tagQtyKg) || 0,
+                        availableBalanceAtTag: tag.availableBalanceAtTag,
+                        remainingBalanceAtTag: tag.remainingBalanceAtTag,
+                        taggedAt: tag.taggedAt || new Date().toISOString(),
+                        buyer: pc.buyer || tag.buyer,
+                        season: pc.season || tag.season,
+                        job: preCostId || tag.job,
+                        yarnCount: yd.yarnCount || tag.yarnCount,
+                        price: Number(yd.ratePerKg) !== undefined ? Number(yd.ratePerKg) : Number(tag.price) || 0,
+                      });
+                    }
+                  }
+                });
+              });
+            });
+          }
+        }
+      } catch (e) {}
+    }
+
+    return Array.from(tagsMap.values());
   }
 
   static getAvailableYarnBookingBalance(
@@ -5765,16 +5865,30 @@ export class MMRepository {
     }
 
     // Sum up tagged quantities by OTHER yarn rows (excluding current row so edit balance is accurate)
-    const tags = this.getYarnBookingTags();
+    const tags = this.getAllActiveYarnBookingTags();
     const consumedKg = tags
-      .filter(
-        (t) =>
-          (t.blockBookingNo === booking.bookingNo || t.blockBookingId === booking.id) &&
-          (t.yarnItemId === item.bookingItemId ||
-            t.yarnItemId === (item as any).id ||
-            t.yarnItemName === item.itemDescription) &&
-          (!currentYarnRowId || t.yarnRowId !== currentYarnRowId)
-      )
+      .filter((t) => {
+        if (!t || Number(t.tagQtyKg) <= 0) return false;
+        const bookingMatch =
+          t.blockBookingNo === booking.bookingNo ||
+          t.blockBookingId === booking.id ||
+          t.blockBookingNo === booking.id ||
+          t.blockBookingId === booking.bookingNo;
+        if (!bookingMatch) return false;
+
+        const itemMatch =
+          t.yarnItemId === item.bookingItemId ||
+          (item as any).id === t.yarnItemId ||
+          t.yarnItemName === item.itemDescription ||
+          t.yarnItemId === item.itemDescription ||
+          (!t.yarnItemId && booking.items?.length === 1);
+        if (!itemMatch) return false;
+
+        if (currentYarnRowId && (t.yarnRowId === currentYarnRowId || t.id === currentYarnRowId)) {
+          return false;
+        }
+        return true;
+      })
       .reduce((sum, t) => sum + (Number(t.tagQtyKg) || 0), 0);
 
     const availableKg = Math.max(0, Number((totalBookedKg - consumedKg).toFixed(2)));
@@ -5794,22 +5908,9 @@ export class MMRepository {
       const rawPis = this.getPIs();
       const pis = Array.isArray(rawPis) ? rawPis : [];
 
-      const rawTags = this.getYarnBookingTags();
-      const tags = Array.isArray(rawTags) ? rawTags : [];
+      const tagsList = this.getAllActiveYarnBookingTags();
 
-      // Cross-reference pre-costings to extract Buyer, Season, Job if tagged
-      let preCostings: any[] = [];
-      if (typeof window !== "undefined") {
-        try {
-          const stored = localStorage.getItem("cripton_pre_costings_knit_master_v1");
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed)) preCostings = parsed;
-          }
-        } catch (e) {}
-      }
-
-      // Check if any existing overrides/adjustments were saved
+      // Read any manual overrides (e.g. receivedQty or actualPrice adjustments)
       const rawExisting = this.get<MMBlockYarnStatusRecord[]>(STORAGE_KEYS.BLOCK_YARN_STATUS, []);
       const existingRecords = Array.isArray(rawExisting) ? rawExisting : [];
       const existingMap = new Map<string, MMBlockYarnStatusRecord>();
@@ -5819,6 +5920,7 @@ export class MMRepository {
 
       const records: MMBlockYarnStatusRecord[] = [];
 
+      // Every saved Block Yarn Booking is the initial source of records
       bookings.forEach((booking) => {
         if (!booking) return;
 
@@ -5839,15 +5941,33 @@ export class MMRepository {
         let documentsStatus = "Pending PI / LC";
         if (linkedPi) {
           documentsStatus = linkedPi.lcNumber || linkedPi.lcReferenceNo || "LC Under Process";
+        } else if (booking.paymentTerms) {
+          documentsStatus = booking.paymentTerms;
         }
 
-        const items = Array.isArray(booking.items) ? booking.items : [];
+        const items =
+          Array.isArray(booking.items) && booking.items.length > 0
+            ? booking.items
+            : [
+                {
+                  bookingItemId: "item-0",
+                  itemDescription: booking.bookingDesc || "Yarn Item",
+                  bookedQty: booking.totalBookedQty || 0,
+                  bookedRate: 0,
+                  unit: "KG",
+                  marketUnit: "TON (Metric Ton)",
+                  marketQty: (booking.totalBookedQty || 0) / 1000,
+                  specification: "",
+                  sizeOrDimension: "",
+                } as any,
+              ];
+
         items.forEach((item, itemIdx) => {
           if (!item) return;
-          const rowId = `bys-${booking.id}-${item.bookingItemId || itemIdx}`;
+          const rowId = `bys-${booking.id || booking.bookingNo}-${item.bookingItemId || itemIdx}`;
           const existing = existingMap.get(rowId);
 
-          // Qty in KG (TON -> KG conversion: 1 TON = 1,000 KG)
+          // Total Booked Qty in KG from Block Yarn Booking (1 TON = 1,000 KG)
           let qtyKg = 0;
           const isMarketTon =
             (item.marketUnit &&
@@ -5856,84 +5976,114 @@ export class MMRepository {
             item.conversionFactor === 1000;
           if (isMarketTon && item.marketQty && item.marketQty > 0) {
             qtyKg = Number(item.marketQty) * 1000;
-          } else if (item.unit && typeof item.unit === "string" && item.unit.toUpperCase().includes("TON")) {
+          } else if (
+            item.unit &&
+            typeof item.unit === "string" &&
+            item.unit.toUpperCase().includes("TON")
+          ) {
             qtyKg = (Number(item.bookedQty) || Number(item.requiredQty) || 0) * 1000;
           } else {
             qtyKg = Number(item.bookedQty) || Number(item.requiredQty) || 0;
           }
 
-          // Matching tags from Pre Costing
-          const matchingTags = tags.filter(
-            (t) =>
-              t &&
-              (t.blockBookingNo === booking.bookingNo || t.blockBookingId === booking.id) &&
-              (t.yarnItemId === item.bookingItemId ||
-                t.yarnItemId === (item as any).id ||
-                t.yarnItemName === item.itemDescription)
-          );
+          // Matching tags from Pre Costing for this specific Block Booking + Item
+          const matchingTags = tagsList.filter((t) => {
+            if (!t || Number(t.tagQtyKg) <= 0) return false;
+            const bookingMatch =
+              t.blockBookingNo === booking.bookingNo ||
+              t.blockBookingId === booking.id ||
+              t.blockBookingNo === booking.id ||
+              t.blockBookingId === booking.bookingNo;
+            if (!bookingMatch) return false;
 
-          const useQty = matchingTags.reduce((sum, t) => sum + (Number(t?.tagQtyKg) || 0), 0);
+            const itemMatch =
+              t.yarnItemId === item.bookingItemId ||
+              (item as any).id === t.yarnItemId ||
+              t.yarnItemName === item.itemDescription ||
+              t.yarnItemId === item.itemDescription ||
+              (!t.yarnItemId && items.length === 1);
+            return itemMatch;
+          });
+
+          // Aggregate Use Qty from all matching tags
+          const useQty = matchingTags.reduce((sum, t) => sum + (Number(t.tagQtyKg) || 0), 0);
           const balance = Math.max(0, Number((qtyKg - useQty).toFixed(2)));
 
-          // Received Qty initially equal to Qty (or preserve saved manual override)
-          const receivedQty = existing?.receivedQty !== undefined ? Number(existing.receivedQty) || 0 : qtyKg;
+          // Actual Price from booking item or manual override
+          const actualPrice =
+            existing?.actualPrice !== undefined
+              ? Number(existing.actualPrice) || 0
+              : Number(item.bookedRate) || Number(item.unitPrice) || 0;
 
-          const price = Number(item.bookedRate) || Number(item.unitPrice) || 0;
-          const actualPrice = existing?.actualPrice !== undefined ? Number(existing.actualPrice) || 0 : price;
+          // Received Qty initially equal to Qty (or manual override)
+          const receivedQty =
+            existing?.receivedQty !== undefined ? Number(existing.receivedQty) || 0 : qtyKg;
 
-          // Buyer, Season, Job extraction
-          let buyer = booking.buyerName || "H&M Europe";
-          let season = booking.season || "Spring/Summer 2026";
-          let job = booking.ourRef || booking.orderNo || "JOB-2026-0001";
+          // Fields sourced strictly from Pre Costing Entry (Knit)
+          // Default to "—" / 0 until tagged in Pre Costing Entry
+          let buyer = "—";
+          let season = "—";
+          let job = "—";
+          let price = 0;
+
+          // Yarn Name is sourced directly from the Item Name of the Block Yarn Booking
+          const rawYarnName =
+            item.itemDescription ||
+            (item as any).itemName ||
+            (item as any).accessoryName ||
+            item.sizeOrDimension ||
+            "Yarn Item";
 
           if (matchingTags.length > 0) {
-            for (const tag of matchingTags) {
-              const pc = preCostings.find(
-                (p) =>
-                  p &&
-                  (p.id === tag.preCostId || p.preCostId === tag.preCostId || p.preCostNo === tag.preCostId)
-              );
-              if (pc) {
-                if (pc.buyer) buyer = pc.buyer;
-                if (pc.season) season = pc.season;
-                if (pc.preCostId || pc.preCostNo || pc.style) job = pc.preCostId || pc.style;
-                break;
-              }
-            }
-          }
+            const buyers = new Set<string>();
+            const seasons = new Set<string>();
+            const jobs = new Set<string>();
+            const prices: number[] = [];
 
-          // Yarn Count extraction
-          let yarnCount = item.sizeOrDimension || "";
-          if (!yarnCount) {
-            const desc = `${item.itemDescription || ""} ${item.specification || ""}`;
-            const countMatch = desc.match(/Ne\s*[\d/]+|\b\d{1,3}\/\d{1,2}\b/i);
-            yarnCount = countMatch ? countMatch[0].toUpperCase() : item.itemDescription || "Ne 30/1";
+            matchingTags.forEach((t) => {
+              if (t.buyer && t.buyer !== "—") buyers.add(t.buyer);
+              if (t.season && t.season !== "—") seasons.add(t.season);
+              if (t.job && t.job !== "—") jobs.add(t.job);
+              else if (t.preCostId && t.preCostId !== "—") jobs.add(t.preCostId);
+              if (t.price !== undefined && Number(t.price) > 0) {
+                prices.push(Number(t.price));
+              }
+            });
+
+            if (buyers.size > 0) buyer = Array.from(buyers).join(", ");
+            if (seasons.size > 0) season = Array.from(seasons).join(", ");
+            if (jobs.size > 0) job = Array.from(jobs).join(", ");
+            if (prices.length > 0) {
+              price = Number((prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2));
+            }
           }
 
           records.push({
             id: rowId,
             bookingId: booking.id || `booking-${itemIdx}`,
             bookingItemId: item.bookingItemId || `item-${itemIdx}`,
-            buyer: buyer || "H&M Europe",
-            blockNo: booking.bookingNo || "BYB-2026-0001",
-            season: season || "Spring/Summer 2026",
-            job: job || "JOB-2026-0001",
-            yarnCount: yarnCount || "Ne 30/1",
+            buyer,
+            blockNo: booking.bookingNo || "—",
+            season,
+            job,
+            yarnName: rawYarnName,
+            yarnCount: rawYarnName, // Kept for backwards compatibility
             yarnComposition: item.specification || "",
-            yarnItem: item.itemDescription || "100% Combed Cotton Yarn",
-            qty: Number(qtyKg) || 0,
-            marketQtyTon: item.marketQty,
-            useQty: Number(Number(useQty).toFixed(2)) || 0,
-            balance: Number(Number(balance).toFixed(2)) || 0,
-            price: Number(price) || 0,
+            yarnItem: rawYarnName,
+            qty: Number(qtyKg.toFixed(2)),
+            marketQtyTon: isMarketTon ? Number((qtyKg / 1000).toFixed(2)) : undefined,
+            useQty: Number(useQty.toFixed(2)),
+            balance: Number(balance.toFixed(2)),
+            price: Number(price.toFixed(2)),
             bookingDate: booking.bookingDate || "",
-            receivedQty: Number(receivedQty) || 0,
-            documentsStatus: documentsStatus || "Pending PI / LC",
-            actualPrice: Number(actualPrice) || 0,
-            piNo: piNo || "-",
+            receivedQty: Number(receivedQty.toFixed(2)),
+            documentsStatus,
+            actualPrice: Number(actualPrice.toFixed(2)),
+            piNo,
             piId: linkedPi?.id,
             supplierName: booking.supplierName || (item as any).supplierName || "Square Textiles Ltd",
             tags: matchingTags,
+            totalItemBookedQty: qtyKg,
           });
         });
       });

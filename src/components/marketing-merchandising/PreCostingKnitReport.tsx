@@ -23,6 +23,7 @@ import {
   PreCostingItemRow,
   KnitOtherCostRow,
 } from "./PreCostingKnitManager";
+import { MMRepository } from "../../lib/marketing-merchandising-data";
 
 interface PreCostingKnitReportProps {
   record: PreCostingRecord | null;
@@ -74,29 +75,112 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
   const totalDyeingCost = fabricItems.reduce((s, f) => s + (Number(f.dyeingCost) || 0), 0);
   const totalFinishingCost = 0; // Standard knit composite includes finishing in dyeing rate
 
-  // Accessories
-  const accessoriesItems: PreCostingItemRow[] = Array.isArray(record.accessoriesItems)
-    ? record.accessoriesItems
-    : [];
+  // Accessories Normalization & Extraction
+  const rawAccessories: PreCostingItemRow[] =
+    Array.isArray(record.accessoriesItems) && record.accessoriesItems.length > 0
+      ? record.accessoriesItems
+      : Array.isArray(record.items)
+      ? record.items.filter(
+          (it) =>
+            it.head === "Sewing Trims" ||
+            it.head === "Finishing Trims" ||
+            it.head === "Accessories" ||
+            it.head === "Trims" ||
+            it.head?.toLowerCase().includes("trim") ||
+            it.head?.toLowerCase().includes("access")
+        )
+      : [];
+
+  const accessoriesItems = rawAccessories;
   const totalAccessoriesCost = accessoriesItems.reduce((s, a) => s + (Number(a.amount) || 0), 0);
 
-  // Group Accessories
-  const isFinishingAcc = (item: PreCostingItemRow) => {
-    const text = `${item.head} ${item.item} ${item.description}`.toLowerCase();
-    return (
-      text.includes("poly") ||
-      text.includes("carton") ||
-      text.includes("hang tag") ||
-      text.includes("price") ||
-      text.includes("tissue") ||
-      text.includes("sticker") ||
-      text.includes("hanger")
-    );
+  // Accurate Accessories Categorization (Finishing vs Sewing)
+  const isFinishingAccessory = (item: PreCostingItemRow): boolean => {
+    const head = (item.head || "").trim().toLowerCase();
+    const cat = ((item as any).category || "").trim().toLowerCase();
+    const desc = (item.description || "").toLowerCase();
+    const itemName = (item.item || "").toLowerCase();
+    const fullText = `${head} ${itemName} ${desc}`;
+
+    // 1. Explicit Head check (Form dropdown: "Finishing Trims" vs "Sewing Trims")
+    if (head.includes("finish")) return true;
+    if (head.includes("sew")) return false;
+
+    // 2. Explicit Category check (if defined on object)
+    if (cat.includes("finish")) return true;
+    if (cat.includes("sew")) return false;
+
+    // 3. Description prefix check (Form master auto-fill: "Finishing Trims - ...")
+    if (desc.startsWith("finishing") || desc.includes("finishing trim") || desc.includes("finishing access")) return true;
+    if (desc.startsWith("sewing") || desc.includes("sewing trim") || desc.includes("sewing access")) return false;
+
+    // 4. Master library lookup
+    try {
+      const masterList = MMRepository.getAccessoriesMaster();
+      const foundInMaster = masterList.find(
+        (m) =>
+          m.itemName.toLowerCase() === itemName ||
+          (item.codeNo && m.itemCode.toLowerCase() === item.codeNo.toLowerCase())
+      );
+      if (foundInMaster) {
+        if (foundInMaster.category === "Finishing Trims") return true;
+        if (foundInMaster.category === "Sewing Trims") return false;
+      }
+    } catch {
+      // ignore
+    }
+
+    // 5. Keyword analysis:
+    // Check sewing triggers first to prevent "poly" in "poly core sewing thread" from triggering finishing!
+    const isSewingKeyword =
+      fullText.includes("sewing thread") ||
+      fullText.includes("spun poly") ||
+      fullText.includes("core spun") ||
+      fullText.includes("thread") ||
+      fullText.includes("button") ||
+      fullText.includes("zipper") ||
+      fullText.includes("interlining") ||
+      fullText.includes("elastic") ||
+      fullText.includes("twill tape") ||
+      fullText.includes("drawcord") ||
+      fullText.includes("eyelet") ||
+      fullText.includes("rivet") ||
+      fullText.includes("velcro");
+
+    if (isSewingKeyword) return false;
+
+    // Finishing packaging & labeling triggers
+    const isFinishingKeyword =
+      fullText.includes("poly") ||
+      fullText.includes("carton") ||
+      fullText.includes("hang tag") ||
+      fullText.includes("hangtag") ||
+      fullText.includes("price") ||
+      fullText.includes("barcode") ||
+      fullText.includes("tissue") ||
+      fullText.includes("sticker") ||
+      fullText.includes("hanger") ||
+      fullText.includes("label") ||
+      fullText.includes("tagless") ||
+      fullText.includes("silica") ||
+      fullText.includes("desiccant") ||
+      fullText.includes("gum tape") ||
+      fullText.includes("scotch tape") ||
+      fullText.includes("collar stay") ||
+      fullText.includes("butterfly") ||
+      fullText.includes("backboard") ||
+      fullText.includes("blister");
+
+    if (isFinishingKeyword) return true;
+
+    // Default fallback: if not identified as finishing, treat as sewing
+    return false;
   };
-  const sewingAcc = accessoriesItems.filter((a) => !isFinishingAcc(a));
-  const finishingAcc = accessoriesItems.filter((a) => isFinishingAcc(a));
-  const sewingAccCost = sewingAcc.reduce((s, a) => s + (Number(a.amount) || 0), 0);
+
+  const finishingAcc = accessoriesItems.filter((a) => isFinishingAccessory(a));
+  const sewingAcc = accessoriesItems.filter((a) => !isFinishingAccessory(a));
   const finishingAccCost = finishingAcc.reduce((s, a) => s + (Number(a.amount) || 0), 0);
+  const sewingAccCost = sewingAcc.reduce((s, a) => s + (Number(a.amount) || 0), 0);
 
   // Others
   const otherCostItems: KnitOtherCostRow[] = Array.isArray(record.otherCostItems)
@@ -104,8 +188,14 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
     : [];
   const totalOthersCost = otherCostItems.reduce((s, o) => s + (Number(o.amount) || 0), 0);
 
+  // Embellishments
+  const embellishmentItems: any[] = Array.isArray((record as any).embellishmentItems)
+    ? (record as any).embellishmentItems
+    : [];
+  const totalEmbellishmentCost = embellishmentItems.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+
   // Grand Totals (Reconciled with Entry Form)
-  const grandTotalCost = totalFabricCost + totalAccessoriesCost + totalOthersCost;
+  const grandTotalCost = totalFabricCost + totalAccessoriesCost + totalEmbellishmentCost + totalOthersCost;
   const costPerPc = totalOrderQtyPcs > 0 ? grandTotalCost / totalOrderQtyPcs : 0;
   const costPerDz = costPerPc * 12;
   const profitOrLoss = totalOrderValue - grandTotalCost;
@@ -119,57 +209,132 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
   const plGmt = firstFabric.rmgProcessLossPct ?? 4;
   const smv = record.smv ?? 4.25;
   const cpm = record.cpm ?? 0.065;
-  const eff = (record.efficiencyPct ?? 65) / 100;
+  const efficiencyVal =
+    record.efficiencyPct !== undefined && record.efficiencyPct !== null
+      ? Number(record.efficiencyPct)
+      : 65;
+  const eff = efficiencyVal / 100;
   const cmPerPc = Number(((smv * cpm) / (eff || 0.65)).toFixed(4));
-  const cmPerDz = Number((cmPerPc * 12).toFixed(2));
+  const cmPerDz =
+    (record as any).cmDz !== undefined && (record as any).cmDz !== null && (record as any).cmDz !== ""
+      ? Number((record as any).cmDz)
+      : Number((cmPerPc * 12).toFixed(2));
 
   // Consumption Unit
   const consumptionUnit = record.consumptionUnit || "DZ";
 
-  // Cost Sharing (DZ-Based)
-  const costSharingHeads = [
+  // Cost Breakdown / Cost Sharing (DZ-Based)
+  const cmTotalValue = totalOrderQtyDz > 0 ? Number((cmPerDz * totalOrderQtyDz).toFixed(2)) : 0;
+  const costSharingItemsRaw = [
     {
       name: "Fabrication & Yarn",
+      rateDz: totalOrderQtyDz > 0 ? totalFabricCost / totalOrderQtyDz : 0,
       value: totalFabricCost,
       color: "bg-indigo-500",
     },
     {
       name: "Trims & Accessories",
+      rateDz: totalOrderQtyDz > 0 ? totalAccessoriesCost / totalOrderQtyDz : 0,
       value: totalAccessoriesCost,
       color: "bg-teal-500",
     },
     {
-      name: "Commercial, Freight & Testing",
+      name: "Embellishment (Print/Embroidery/Wash)",
+      rateDz: totalOrderQtyDz > 0 ? totalEmbellishmentCost / totalOrderQtyDz : 0,
+      value: totalEmbellishmentCost,
+      color: "bg-purple-500",
+    },
+    {
+      name: "Others Cost",
+      rateDz: totalOrderQtyDz > 0 ? totalOthersCost / totalOrderQtyDz : 0,
       value: totalOthersCost,
       color: "bg-amber-500",
     },
-  ].map((item) => {
-    const rateDz = totalOrderQtyDz > 0 ? item.value / totalOrderQtyDz : 0;
-    const sharePct = grandTotalCost > 0 ? (item.value / grandTotalCost) * 100 : 0;
+    {
+      name: "CM (DZ)",
+      rateDz: cmPerDz,
+      value: cmTotalValue,
+      color: "bg-indigo-600",
+    },
+  ];
+
+  const costSharingTotalValue = costSharingItemsRaw.reduce((sum, it) => sum + it.value, 0);
+  const costSharingTotalRateDz = totalOrderQtyDz > 0 ? costSharingTotalValue / totalOrderQtyDz : 0;
+
+  const costSharingHeads = costSharingItemsRaw.map((item) => {
+    const sharePct = costSharingTotalValue > 0 ? (item.value / costSharingTotalValue) * 100 : 0;
     return {
       particulars: item.name,
-      rateDz,
+      rateDz: item.rateDz,
       sharePct,
       value: item.value,
       color: item.color,
     };
   });
 
-  // Back-to-Back LC Details
-  const b2bItems = [
-    { item: "Yarn (Local / Import B2B)", material: totalYarnCost },
-    { item: "Fabric Processing (Knitting & Dyeing)", material: totalKnittingCost + totalDyeingCost },
-    { item: "Accessories & Trims (Local / Import)", material: totalAccessoriesCost },
-    { item: "Commercial, Freight & Testing", material: totalOthersCost },
-  ].map((it) => {
-    const pctFob = totalOrderValue > 0 ? (it.material / totalOrderValue) * 100 : 0;
-    const pctMat = grandTotalCost > 0 ? (it.material / grandTotalCost) * 100 : 0;
+  // Embellishment categories for Back-to-Back LC Details
+  const embCats = ["Print", "Embroidery", "GMT Wash"] as const;
+  const embellishmentB2B = embCats.map((cat) => {
+    const matching = embellishmentItems.filter((e) => {
+      const h = (e.costHead || "").toLowerCase();
+      if (cat === "GMT Wash") return h.includes("wash");
+      if (cat === "Embroidery") return h.includes("embroid");
+      return h.includes("print");
+    });
+    const material = matching.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+    const source = matching.length > 0 ? (matching[0].source || "In-house") : "In-house";
+    const isSubContract = source.toLowerCase().includes("sub");
+    const pctMat = isSubContract ? 100 : 40;
+    const pctFob = totalOrderValue > 0 ? (material / totalOrderValue) * 100 : 0;
     return {
-      ...it,
+      item: cat,
+      source: matching.length > 0 ? source : undefined,
+      material,
       pctFob,
       pctMat,
     };
   });
+
+  // Back-to-Back LC Details
+  const b2bItems = [
+    {
+      item: "Yarn (Local / Import B2B)",
+      source: undefined,
+      material: totalYarnCost,
+      pctFob: totalOrderValue > 0 ? (totalYarnCost / totalOrderValue) * 100 : 0,
+      pctMat: 100,
+    },
+    {
+      item: "Fabric Processing (Knitting & Dyeing)",
+      source: undefined,
+      material: totalKnittingCost + totalDyeingCost,
+      pctFob: totalOrderValue > 0 ? ((totalKnittingCost + totalDyeingCost) / totalOrderValue) * 100 : 0,
+      pctMat: 40,
+    },
+    {
+      item: "Sewing Trims",
+      source: undefined,
+      material: sewingAccCost,
+      pctFob: totalOrderValue > 0 ? (sewingAccCost / totalOrderValue) * 100 : 0,
+      pctMat: 100,
+    },
+    {
+      item: "Accessories & Trims (Local / Import)",
+      source: undefined,
+      material: finishingAccCost > 0 ? finishingAccCost : Math.max(0, totalAccessoriesCost - sewingAccCost),
+      pctFob:
+        totalOrderValue > 0
+          ? ((finishingAccCost > 0 ? finishingAccCost : Math.max(0, totalAccessoriesCost - sewingAccCost)) /
+              totalOrderValue) *
+            100
+          : 0,
+      pctMat: 100,
+    },
+    ...embellishmentB2B,
+  ];
+
+  const totalB2BMaterial = b2bItems.reduce((acc, it) => acc + it.material, 0);
+  const totalB2BPctFob = totalOrderValue > 0 ? (totalB2BMaterial / totalOrderValue) * 100 : 0;
 
   const handlePrint = () => {
     window.print();
@@ -319,10 +484,14 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                   <span className="font-mono font-bold text-slate-800 block">{smv} min</span>
                 </div>
                 <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Efficiency (%)</span>
+                  <span className="font-mono font-bold text-slate-800 block">{efficiencyVal}%</span>
+                </div>
+
+                <div>
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">CM / Dz</span>
                   <span className="font-mono font-black text-indigo-700 block">${cmPerDz.toFixed(2)}</span>
                 </div>
-
                 <div>
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">PL-Knitting</span>
                   <span className="font-mono font-bold text-slate-800 block">{plKnitting}%</span>
@@ -335,7 +504,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">PL-GMT</span>
                   <span className="font-mono font-bold text-slate-800 block">{plGmt}%</span>
                 </div>
-                <div>
+                <div className="col-span-2 sm:col-span-4">
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Reason for Revision</span>
                   <span className="text-[11px] text-slate-700 italic block truncate" title={record.amendmentReason || "Initial Pre-Costing Creation"}>
                     {record.amendmentReason || "Initial Pre-Costing Creation"}
@@ -659,64 +828,16 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                       </td>
                     </tr>
 
-                    {/* 4. Category: Sewing Accessories */}
+                    {/* 4. Category: Finishing Accessories */}
                     <tr className="bg-slate-50/90 font-black text-slate-800 text-[11px] border-t border-slate-300">
                       <td colSpan={6} className="py-1.5 px-3 uppercase text-indigo-800 tracking-wider">
-                        4. Sewing Accessories
-                      </td>
-                    </tr>
-                    {sewingAcc.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="py-1.5 px-3 text-slate-400 italic text-center">
-                          No sewing trims entered.
-                        </td>
-                      </tr>
-                    ) : (
-                      sewingAcc.map((item, idx) => (
-                        <tr key={`sew-${idx}`} className="hover:bg-slate-50 text-[11.5px]">
-                          <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
-                            {item.head}
-                          </td>
-                          <td className="py-1.5 px-3">
-                            <span className="font-semibold text-slate-900 block">{item.item}</span>
-                            <span className="text-[10px] text-slate-500">
-                              {item.description || item.supplier} • {item.nStatus}
-                            </span>
-                          </td>
-                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                            {item.consumption}
-                          </td>
-                          <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
-                            {(Number(item.finalQty) || 0).toLocaleString()} {item.unit || "pcs"}
-                          </td>
-                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                            ${(Number(item.rate) || 0).toFixed(3)}
-                          </td>
-                          <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
-                            ${(Number(item.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                    <tr className="bg-indigo-50/50 font-bold text-indigo-900 text-xs">
-                      <td colSpan={5} className="py-1.5 px-3 text-right uppercase text-[10px]">
-                        Sub Total — Sewing Accessories:
-                      </td>
-                      <td className="py-1.5 px-3 text-right font-mono font-black text-indigo-900">
-                        ${sewingAccCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </td>
-                    </tr>
-
-                    {/* 5. Category: Finishing Accessories */}
-                    <tr className="bg-slate-50/90 font-black text-slate-800 text-[11px] border-t border-slate-300">
-                      <td colSpan={6} className="py-1.5 px-3 uppercase text-indigo-800 tracking-wider">
-                        5. Finishing Accessories
+                        4. Finishing Accessories
                       </td>
                     </tr>
                     {finishingAcc.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="py-1.5 px-3 text-slate-400 italic text-center">
-                          No finishing trims entered.
+                          No finishing accessories entered.
                         </td>
                       </tr>
                     ) : (
@@ -755,23 +876,119 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                       </td>
                     </tr>
 
-                    {/* 6. Category: Relevant Cost / Commercial & Freight */}
+                    {/* 5. Category: Sewing Accessories */}
                     <tr className="bg-slate-50/90 font-black text-slate-800 text-[11px] border-t border-slate-300">
                       <td colSpan={6} className="py-1.5 px-3 uppercase text-indigo-800 tracking-wider">
-                        6. Commercial, Freight & Testing
+                        5. Sewing Accessories
+                      </td>
+                    </tr>
+                    {sewingAcc.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-1.5 px-3 text-slate-400 italic text-center">
+                          No sewing accessories entered.
+                        </td>
+                      </tr>
+                    ) : (
+                      sewingAcc.map((item, idx) => (
+                        <tr key={`sew-${idx}`} className="hover:bg-slate-50 text-[11.5px]">
+                          <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
+                            {item.head}
+                          </td>
+                          <td className="py-1.5 px-3">
+                            <span className="font-semibold text-slate-900 block">{item.item}</span>
+                            <span className="text-[10px] text-slate-500">
+                              {item.description || item.supplier} • {item.nStatus}
+                            </span>
+                          </td>
+                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                            {item.consumption}
+                          </td>
+                          <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
+                            {(Number(item.finalQty) || 0).toLocaleString()} {item.unit || "pcs"}
+                          </td>
+                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                            ${(Number(item.rate) || 0).toFixed(3)}
+                          </td>
+                          <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
+                            ${(Number(item.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                    <tr className="bg-indigo-50/50 font-bold text-indigo-900 text-xs">
+                      <td colSpan={5} className="py-1.5 px-3 text-right uppercase text-[10px]">
+                        Sub Total — Sewing Accessories:
+                      </td>
+                      <td className="py-1.5 px-3 text-right font-mono font-black text-indigo-900">
+                        ${sewingAccCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                    </tr>
+
+                    {/* 6. Category: Embellishment Cost */}
+                    <tr className="bg-slate-50/90 font-black text-slate-800 text-[11px] border-t border-slate-300">
+                      <td colSpan={6} className="py-1.5 px-3 uppercase text-indigo-800 tracking-wider">
+                        6. Embellishment (Print, Embroidery & Wash)
+                      </td>
+                    </tr>
+                    {embellishmentItems.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-1.5 px-3 text-slate-400 italic text-center">
+                          No embellishment items entered.
+                        </td>
+                      </tr>
+                    ) : (
+                      embellishmentItems.map((e, idx) => (
+                        <tr key={`emb-${idx}`} className="hover:bg-slate-50 text-[11.5px]">
+                          <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
+                            {e.costHead || "Embellishment"}
+                          </td>
+                          <td className="py-1.5 px-3 font-semibold text-slate-900">
+                            {e.description || e.costHead}
+                            <span className="text-[10px] text-slate-500 block">
+                              Source: {e.source || "In-house"}
+                            </span>
+                          </td>
+                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                            {(Number(e.qtyInDz) || 0).toLocaleString()} dz
+                          </td>
+                          <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
+                            {(Number(e.gmtQty) || 0).toLocaleString()} pcs
+                          </td>
+                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                            ${(Number(e.unitRateDz) || 0).toFixed(3)}/dz
+                          </td>
+                          <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
+                            ${(Number(e.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                    <tr className="bg-indigo-50/50 font-bold text-indigo-900 text-xs">
+                      <td colSpan={5} className="py-1.5 px-3 text-right uppercase text-[10px]">
+                        Sub Total — Embellishments:
+                      </td>
+                      <td className="py-1.5 px-3 text-right font-mono font-black text-indigo-900">
+                        ${totalEmbellishmentCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                    </tr>
+
+                    {/* 7. Category: Others Cost */}
+                    <tr className="bg-slate-50/90 font-black text-slate-800 text-[11px] border-t border-slate-300">
+                      <td colSpan={6} className="py-1.5 px-3 uppercase text-indigo-800 tracking-wider">
+                        7. Others Cost
                       </td>
                     </tr>
                     {otherCostItems.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="py-1.5 px-3 text-slate-400 italic text-center">
-                          No commercial or other cost heads entered.
+                          No others cost heads entered.
                         </td>
                       </tr>
                     ) : (
                       otherCostItems.map((o, idx) => (
                         <tr key={`oth-${idx}`} className="hover:bg-slate-50 text-[11.5px]">
                           <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
-                            {o.costHead || o.head || "Commercial"}
+                            {o.costHead || o.head || "Others"}
                           </td>
                           <td className="py-1.5 px-3 font-semibold text-slate-900">
                             {o.description}
@@ -793,7 +1010,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                     )}
                     <tr className="bg-indigo-50/50 font-bold text-indigo-900 text-xs">
                       <td colSpan={5} className="py-1.5 px-3 text-right uppercase text-[10px]">
-                        Sub Total — Commercial & Freight:
+                        Sub Total — Others Cost:
                       </td>
                       <td className="py-1.5 px-3 text-right font-mono font-black text-indigo-900">
                         ${totalOthersCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -1034,13 +1251,13 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                     <tr className="bg-slate-100 font-black border-t-2 border-slate-300 text-xs">
                       <td className="py-2 px-2 uppercase text-[10px]">Grand Total:</td>
                       <td className="py-2 px-2 text-right font-mono text-indigo-700">
-                        ${costPerDz.toFixed(2)}
+                        ${costSharingTotalRateDz.toFixed(2)}
                       </td>
                       <td className="py-2 px-2 text-right font-mono text-indigo-700">
                         100.0%
                       </td>
                       <td className="py-2 px-2 text-right font-mono text-indigo-700">
-                        ${grandTotalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ${costSharingTotalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                     </tr>
                   </tfoot>
@@ -1074,6 +1291,11 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                       <tr key={idx} className="hover:bg-slate-50">
                         <td className="py-1.5 px-2 font-semibold text-slate-800">
                           {b.item}
+                          {b.source && (
+                            <span className="ml-1.5 text-[9.5px] font-normal text-slate-500">
+                              ({b.source})
+                            </span>
+                          )}
                         </td>
                         <td className="py-1.5 px-2 text-right font-mono font-bold text-slate-900">
                           ${b.material.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -1081,8 +1303,8 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                         <td className="py-1.5 px-2 text-right font-mono text-indigo-700">
                           {b.pctFob.toFixed(1)}%
                         </td>
-                        <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                          {b.pctMat.toFixed(1)}%
+                        <td className="py-1.5 px-2 text-right font-mono font-bold text-slate-700">
+                          {b.pctMat}%
                         </td>
                       </tr>
                     ))}
@@ -1091,13 +1313,13 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                     <tr className="bg-slate-100 font-black border-t-2 border-slate-300 text-xs">
                       <td className="py-2 px-2 uppercase text-[10px]">Total Material:</td>
                       <td className="py-2 px-2 text-right font-mono text-indigo-700">
-                        ${grandTotalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ${totalB2BMaterial.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td className="py-2 px-2 text-right font-mono text-indigo-700">
-                        {totalOrderValue > 0 ? ((grandTotalCost / totalOrderValue) * 100).toFixed(1) : 0}%
+                        {totalB2BPctFob.toFixed(1)}%
                       </td>
                       <td className="py-2 px-2 text-right font-mono text-indigo-700">
-                        100.0%
+                        —
                       </td>
                     </tr>
                   </tfoot>

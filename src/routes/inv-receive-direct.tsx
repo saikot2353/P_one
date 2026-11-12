@@ -111,7 +111,7 @@ export function DirectMRRPage() {
   const directMRRs = useMemo(() => getStoredDirectMRRs(), []);
   const loadedDirectMRR = useMemo(() => {
     if (!searchParams.id) return null;
-    return directMRRs.find((r) => r.id === searchParams.id || r.directMrrNumber === searchParams.id) || null;
+    return directMRRs.find((r) => r.id === searchParams.id || r.directMrrNumber === searchParams.id || r.mrrNumber === searchParams.id) || null;
   }, [directMRRs, searchParams.id]);
 
   // 1. Receive Header Information

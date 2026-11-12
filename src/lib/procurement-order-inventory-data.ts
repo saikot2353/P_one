@@ -1037,6 +1037,24 @@ export const DEFAULT_MATERIAL_RECEIPTS: MaterialReceive[] = [
         acceptedQty: 50,
         rejectedQty: 0,
         remarks: "Full lot verified and stored in Rack C",
+        warranties: [
+          {
+            id: "warr-spn-01",
+            warrantyType: "Standard Manufacturer Warranty",
+            startDate: "2026-09-18",
+            endDate: "2027-09-17",
+            remarks: "Precision ceramic bearing defects liability and runout tolerance guarantee (12 Months).",
+          },
+        ],
+      },
+    ],
+    attachments: [
+      {
+        name: "CeramTec_Guide_Roller_OEM_Warranty.pdf",
+        fileName: "CeramTec_Guide_Roller_OEM_Warranty.pdf",
+        fileSize: "1.4 MB",
+        uploadedBy: "Tahmid Afsar Shapno",
+        uploadTime: "2026-09-18 10:15",
       },
     ],
   },
@@ -1067,6 +1085,15 @@ export const DEFAULT_MATERIAL_RECEIPTS: MaterialReceive[] = [
     totalAmount: 492000,
     receiveStatus: "Partially Received",
     remarks: "First delivery lot: 5 Dell Laptops + 1 HP MFP Printer.",
+    attachments: [
+      {
+        name: "Dell_Latitude_ProSupport_Agreement.pdf",
+        fileName: "Dell_Latitude_ProSupport_Agreement.pdf",
+        fileSize: "3.2 MB",
+        uploadedBy: "Tahmid Afsar Shapno",
+        uploadTime: "2026-09-24 14:00",
+      },
+    ],
     items: [
       {
         id: "mrri-1",
@@ -1088,6 +1115,22 @@ export const DEFAULT_MATERIAL_RECEIPTS: MaterialReceive[] = [
         acceptedQty: 5,
         rejectedQty: 0,
         remarks: "5 units delivered with OEM box seals intact.",
+        warranties: [
+          {
+            id: "warr-del-01",
+            warrantyType: "Standard Manufacturer Warranty",
+            startDate: "2026-09-24",
+            endDate: "2029-09-23",
+            remarks: "Dell ProSupport Plus 3-Year comprehensive hardware & battery warranty.",
+          },
+          {
+            id: "warr-del-02",
+            warrantyType: "Extended Service Warranty",
+            startDate: "2029-09-24",
+            endDate: "2030-09-23",
+            remarks: "Annual motherboard and display replacement SLA extension.",
+          },
+        ],
       },
       {
         id: "mrri-2",
@@ -1109,6 +1152,155 @@ export const DEFAULT_MATERIAL_RECEIPTS: MaterialReceive[] = [
         acceptedQty: 1,
         rejectedQty: 0,
         remarks: "1 unit delivered for IT floor test.",
+        warranties: [
+          {
+            id: "warr-hp-01",
+            warrantyType: "Replacement Warranty",
+            startDate: "2026-09-24",
+            endDate: "2027-09-23",
+            remarks: "1-to-1 immediate hardware replacement for printer laser engine or scanner board failure.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "mrr-2026-0002",
+    receiveNumber: "MRR-2026-0002",
+    receiveDate: "2026-10-05",
+    receiveType: "Work Order",
+    receiveSource: "Against Work Order",
+    poNumber: "WO-2026-0001",
+    poDate: "2026-09-28",
+    supplierId: "sup-engpac-04",
+    supplierName: "Energypac Power Generation Ltd.",
+    supplierCode: "SUP-ENGPAC-04",
+    department: "Maintenance & Engineering",
+    warehouseStore: "Engineering & Mechanical Store",
+    company: "Pakiza Knit Composite Ltd",
+    receiveLocation: "Power House Bay 1",
+    challanNo: "CH-ENG-5512",
+    challanDate: "2026-10-05",
+    vehicleNumber: "Dhaka Metro-GA-33-4411",
+    receivedBy: "Nazmul Huda",
+    inspectionRequired: true,
+    inspectionStatus: "Passed",
+    inspectionRemarks: "Overhaul service performed satisfactorily and load test verified under 80% generator load.",
+    totalReceivedQty: 1,
+    totalAcceptedQty: 1,
+    totalRejectedQty: 0,
+    totalAmount: 350000,
+    receiveStatus: "Full Received",
+    remarks: "Work Order service completed for Perkins 500 kVA Generator.",
+    attachments: [
+      {
+        name: "Perkins_Generator_Overhaul_Warranty_Cert.pdf",
+        fileName: "Perkins_Generator_Overhaul_Warranty_Cert.pdf",
+        fileSize: "2.1 MB",
+        uploadedBy: "Nazmul Huda",
+        uploadTime: "2026-10-05 16:30",
+      },
+    ],
+    items: [
+      {
+        id: "mrri-wo-1",
+        sl: 1,
+        itemCode: "SRV-GEN-500KVA",
+        itemName: "Perkins 500 kVA Diesel Generator Overhaul & Calibration Service",
+        specification: "Cylinder head overhaul, AVR recalibration, injector pump timing",
+        brand: "Perkins",
+        origin: "United Kingdom",
+        uom: "JOB",
+        orderedQty: 1,
+        previouslyReceivedQty: 0,
+        currentReceiveQty: 1,
+        remainingQty: 0,
+        unitPrice: 350000,
+        lineTotal: 350000,
+        batchNumber: "BAT-WO-2026-10",
+        location: "Power House Bay 1",
+        acceptedQty: 1,
+        rejectedQty: 0,
+        remarks: "On-site generator overhaul work order service receive",
+        warranties: [
+          {
+            id: "warr-wo-01",
+            warrantyType: "On-site Labor & Maintenance Warranty",
+            startDate: "2026-10-05",
+            endDate: "2026-11-28", // Expiring Soon (<30 days from Nov 12!)
+            remarks: "Service warranty covering generator technician on-site labor and AVR voltage regulation without callout charges.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "mrr-2026-0003",
+    receiveNumber: "MRR-2026-0003",
+    receiveDate: "2025-10-10",
+    receiveType: "Purchase Order",
+    receiveSource: "Against Purchase Order",
+    poNumber: "PO-2025-0450",
+    poDate: "2025-10-01",
+    supplierId: "sup-tex-09",
+    supplierName: "Texline Engineering & Agencies",
+    supplierCode: "SUP-TEX-09",
+    department: "Dyeing & Finishing",
+    warehouseStore: "Dyeing Chemical Store",
+    company: "Pakiza Knit Composite Ltd",
+    receiveLocation: "Laboratory Block 2",
+    challanNo: "CH-TEX-9912",
+    challanDate: "2025-10-10",
+    vehicleNumber: "Dhaka Metro-CHA-12-8877",
+    receivedBy: "Easin Mia",
+    inspectionRequired: true,
+    inspectionStatus: "Passed",
+    inspectionRemarks: "Infrared dye testing apparatus verified against calibration baseline.",
+    totalReceivedQty: 1,
+    totalAcceptedQty: 1,
+    totalRejectedQty: 0,
+    totalAmount: 850000,
+    receiveStatus: "Full Received",
+    remarks: "Received and installed in QA Lab.",
+    attachments: [
+      {
+        name: "Mathis_Labomat_Warranty_Protocol.docx",
+        fileName: "Mathis_Labomat_Warranty_Protocol.docx",
+        fileSize: "850 KB",
+        uploadedBy: "Easin Mia",
+        uploadTime: "2025-10-10 11:00",
+      },
+    ],
+    items: [
+      {
+        id: "mrri-tex-1",
+        sl: 1,
+        itemCode: "ITM-LAB-0022",
+        itemName: "Mathis Labomat High Temperature Dyeing Machine",
+        specification: "Model BFA-12, Infrared heating, 12 beaker capacity, touch Univision",
+        brand: "Mathis AG",
+        origin: "Switzerland",
+        uom: "SET",
+        orderedQty: 1,
+        previouslyReceivedQty: 0,
+        currentReceiveQty: 1,
+        remainingQty: 0,
+        unitPrice: 850000,
+        lineTotal: 850000,
+        batchNumber: "BAT-LAB-2025-10",
+        location: "Laboratory Block 2",
+        acceptedQty: 1,
+        rejectedQty: 0,
+        remarks: "12-month manufacturer defect warranty elapsed.",
+        warranties: [
+          {
+            id: "warr-exp-01",
+            warrantyType: "Defects Liability Warranty",
+            startDate: "2025-10-10",
+            endDate: "2026-10-09", // Expired
+            remarks: "12-month defect liability period elapsed. Maintenance AMC renewal proposal under review.",
+          },
+        ],
       },
     ],
   },
@@ -1587,7 +1779,31 @@ export function setStoredWoItems(items: Record<string, WOServiceItem[]>): void {
 }
 
 export function getStoredMaterialReceipts(): MaterialReceive[] {
-  return getStoredData(STORAGE_KEYS.MATERIAL_RECEIPTS, DEFAULT_MATERIAL_RECEIPTS);
+  const receipts = getStoredData(STORAGE_KEYS.MATERIAL_RECEIPTS, DEFAULT_MATERIAL_RECEIPTS);
+  let hasMod = false;
+  DEFAULT_MATERIAL_RECEIPTS.forEach((defRec) => {
+    const existing = receipts.find((r) => r.receiveNumber === defRec.receiveNumber);
+    if (!existing) {
+      receipts.push(defRec);
+      hasMod = true;
+    } else {
+      defRec.items.forEach((defItem) => {
+        const existItem = existing.items?.find((i) => i.itemCode === defItem.itemCode);
+        if (existItem && (!existItem.warranties || existItem.warranties.length === 0) && defItem.warranties && defItem.warranties.length > 0) {
+          existItem.warranties = defItem.warranties;
+          hasMod = true;
+        }
+      });
+      if ((!existing.attachments || existing.attachments.length === 0) && defRec.attachments && defRec.attachments.length > 0) {
+        existing.attachments = defRec.attachments;
+        hasMod = true;
+      }
+    }
+  });
+  if (hasMod) {
+    setStoredMaterialReceipts(receipts);
+  }
+  return receipts;
 }
 
 export function setStoredMaterialReceipts(receipts: MaterialReceive[]): void {
@@ -1835,6 +2051,24 @@ export const DEFAULT_DIRECT_MRRS: DirectMRRRecord[] = [
         acceptedQuantity: 2,
         rejectedQuantity: 0,
         remarks: "Replacement unit for Head Office",
+        warranties: [
+          {
+            id: "warr-dm-1",
+            warrantyType: "Standard Manufacturer Warranty",
+            startDate: "2026-09-01",
+            endDate: "2029-08-31",
+            remarks: "3-Year ProSupport Plus on-site next business day warranty with accidental damage protection.",
+          },
+        ],
+      },
+    ],
+    attachments: [
+      {
+        name: "Dell_Latitude_Direct_Receipt_Warranty.pdf",
+        fileName: "Dell_Latitude_Direct_Receipt_Warranty.pdf",
+        fileSize: "2.8 MB",
+        uploadedBy: "Tahmid Afsar Shapno",
+        uploadTime: "2026-09-24 16:00",
       },
     ],
   },
@@ -1858,6 +2092,15 @@ export const DEFAULT_DIRECT_MRRS: DirectMRRRecord[] = [
     status: "Approved",
     createdBy: "Nazmul Huda",
     createdDate: "2026-09-26",
+    attachments: [
+      {
+        name: "Schneider_MCB_Test_Report_Warranty.pdf",
+        fileName: "Schneider_MCB_Test_Report_Warranty.pdf",
+        fileSize: "1.1 MB",
+        uploadedBy: "Nazmul Huda",
+        uploadTime: "2026-09-26 12:45",
+      },
+    ],
     items: [
       {
         id: "dm-3",
@@ -1876,13 +2119,46 @@ export const DEFAULT_DIRECT_MRRS: DirectMRRRecord[] = [
         acceptedQuantity: 20,
         rejectedQuantity: 0,
         remarks: "Direct emergency delivery",
+        warranties: [
+          {
+            id: "warr-dm-2",
+            warrantyType: "Replacement Warranty",
+            startDate: "2026-09-26",
+            endDate: "2026-11-25", // Expiring Soon (<30 days from Nov 12!)
+            remarks: "Emergency replacement warranty covering coil trips and short circuit rating.",
+          },
+        ],
       },
     ],
   },
 ];
 
 export function getStoredDirectMRRs(): DirectMRRRecord[] {
-  return getStoredData("cripton_direct_mrrs_v1", DEFAULT_DIRECT_MRRS);
+  const directList = getStoredData("cripton_direct_mrrs_v1", DEFAULT_DIRECT_MRRS);
+  let hasMod = false;
+  DEFAULT_DIRECT_MRRS.forEach((defDir) => {
+    const existing = directList.find((d) => d.mrrNumber === defDir.mrrNumber);
+    if (!existing) {
+      directList.push(defDir);
+      hasMod = true;
+    } else {
+      defDir.items?.forEach((defItem: any) => {
+        const existItem = existing.items?.find((i: any) => i.itemCode === defItem.itemCode);
+        if (existItem && (!existItem.warranties || existItem.warranties.length === 0) && defItem.warranties && defItem.warranties.length > 0) {
+          existItem.warranties = defItem.warranties;
+          hasMod = true;
+        }
+      });
+      if ((!existing.attachments || existing.attachments.length === 0) && (defDir as any).attachments && (defDir as any).attachments.length > 0) {
+        (existing as any).attachments = (defDir as any).attachments;
+        hasMod = true;
+      }
+    }
+  });
+  if (hasMod) {
+    setStoredDirectMRRs(directList);
+  }
+  return directList;
 }
 
 export function setStoredDirectMRRs(records: DirectMRRRecord[]): void {
