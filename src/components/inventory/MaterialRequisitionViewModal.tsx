@@ -12,6 +12,9 @@ import {
   FileText,
   Printer,
   Hourglass,
+  RotateCcw,
+  XCircle,
+  CheckCircle2,
 } from "lucide-react";
 import {
   MaterialRequisition,
@@ -23,6 +26,10 @@ export interface MaterialRequisitionViewModalProps {
   onOpenChange: (open: boolean) => void;
   requisition: MaterialRequisition | null;
   onPrint?: (requisition: MaterialRequisition) => void;
+  isApprovalMode?: boolean;
+  onApprove?: (requisition: MaterialRequisition) => void;
+  onReject?: (requisition: MaterialRequisition) => void;
+  onReturn?: (requisition: MaterialRequisition) => void;
 }
 
 export function MaterialRequisitionViewModal({
@@ -30,6 +37,10 @@ export function MaterialRequisitionViewModal({
   onOpenChange,
   requisition,
   onPrint,
+  isApprovalMode,
+  onApprove,
+  onReject,
+  onReturn,
 }: MaterialRequisitionViewModalProps) {
   if (!requisition) return null;
 
@@ -632,13 +643,52 @@ export function MaterialRequisitionViewModal({
             )}
           </div>
 
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="h-8.5 px-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer"
-          >
-            Close
-          </button>
+          <div className="flex items-center gap-2.5">
+            {isApprovalMode && (
+              <>
+                {onReturn && (
+                  <button
+                    type="button"
+                    onClick={() => onReturn(req)}
+                    className="h-8.5 px-3.5 bg-orange-50 hover:bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300 dark:hover:bg-orange-900/50 border border-orange-200 dark:border-orange-800 rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
+                    Return for Correction
+                  </button>
+                )}
+
+                {onReject && (
+                  <button
+                    type="button"
+                    onClick={() => onReject(req)}
+                    className="h-8.5 px-3.5 bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800 rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                    Reject
+                  </button>
+                )}
+
+                {onApprove && (
+                  <button
+                    type="button"
+                    onClick={() => onApprove(req)}
+                    className="h-8.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                    Approval Request
+                  </button>
+                )}
+              </>
+            )}
+
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="h-8.5 px-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
