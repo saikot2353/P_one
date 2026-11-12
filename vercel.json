@@ -1,5 +1,5 @@
 {
-  "framework": null,
+  "framework": "tanstack-start",
   "installCommand": "npm ci --prefer-offline --no-audit",
   "buildCommand": "NODE_OPTIONS=\"--max-old-space-size=6144\" npm run build"
 }
