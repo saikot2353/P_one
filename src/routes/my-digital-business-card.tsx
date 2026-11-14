@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { DigitalBusinessCardSidebar } from "@/components/dashboard/DigitalBusinessCardSidebar";
 import {
@@ -15,18 +15,22 @@ import {
   Mail,
   MapPin,
   Building2,
-  MessageCircle,
   ExternalLink,
   ShieldCheck,
   ShieldAlert,
   BarChart3,
   Calendar,
-  Lock,
   Sparkles,
   Download,
-  AlertCircle,
-  HelpCircle,
-  RefreshCw,
+  Upload,
+  Image as ImageIcon,
+  Trash2,
+  Wand2,
+  Plus,
+  ChevronDown,
+  RotateCcw,
+  CheckCircle2,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -39,11 +43,20 @@ import {
   getCardAnalytics,
   downloadVCard,
   resolvePublicCard,
+  saveStoredUploadedPhoto,
+  getStoredUploadedPhoto,
+  removeStoredUploadedPhoto,
+  removeImageBackground,
+  saveEmployeeSocialLinks,
+  getEmployeeSocialLinks,
   DigitalBusinessCard,
   CardAnalyticsRecord,
 } from "@/lib/digital-business-card-service";
-import { QRCodeRenderer } from "@/components/digital-business-card/QRCodeRenderer";
-import { SocialMediaIcon } from "@/components/social-media/SocialMediaUtils";
+import {
+  SocialMediaLink,
+  SUPPORTED_PLATFORMS,
+  SocialMediaIcon,
+} from "@/components/social-media/SocialMediaUtils";
 import { employeesData } from "@/routes/personnel-list";
 
 export const Route = createFileRoute("/my-digital-business-card")({
@@ -62,7 +75,7 @@ export const Route = createFileRoute("/my-digital-business-card")({
 
 function MyDigitalBusinessCardPage() {
   const [activeTab, setActiveTab] = useState<
-    "overview" | "visibility" | "whatsapp" | "share" | "analytics"
+    "overview" | "visibility" | "analytics"
   >("overview");
 
   // Determine current employee identity from session
@@ -76,6 +89,16 @@ function MyDigitalBusinessCardPage() {
   const [analytics, setAnalytics] = useState<CardAnalyticsRecord | null>(null);
   const [copied, setCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Digital Business Card Uploaded Photo states
+  const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
+  const [rawUploadedPhoto, setRawUploadedPhoto] = useState<string | null>(null);
+  const [isRemovingBg, setIsRemovingBg] = useState(false);
+  const [autoRemoveBg, setAutoRemoveBg] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Configured Social Media Profiles
+  const [socialLinks, setSocialLinks] = useState<SocialMediaLink[]>([]);
 
   // Form states
   const [visibility, setVisibility] = useState({
@@ -117,14 +140,134 @@ function MyDigitalBusinessCardPage() {
       setCard(existing);
       setVisibility(existing.publicVisibility);
       setWhatsappNumber(existing.whatsappNumber || "");
-      setOfficeAddress(existing.officeAddress || "Pakiza Corporate Tower, 12 Green Road, Dhaka");
+      setOfficeAddress(existing.officeAddress || "House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka, Bangladesh");
       setAnalytics(getCardAnalytics(existing.publicToken));
     } else {
       setCard(null);
     }
+
+    // Load custom uploaded photo from browser storage
+    const customPhoto = getStoredUploadedPhoto(empId);
+    setUploadedPhoto(customPhoto);
+
+    // Load social media links from browser storage or master data
+    const links = getEmployeeSocialLinks(empId);
+    setSocialLinks(links);
   };
 
   const hrisEmp = getHrisEmployee(currentEmpId) || employeesData[0];
+
+  // Photo Upload Handler with Automatic Background Removal
+  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload a valid image file (.png, .jpg, .jpeg, .webp)");
+      return;
+    }
+
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("Image file size should be less than 8MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const rawDataUrl = event.target?.result as string;
+      setRawUploadedPhoto(rawDataUrl);
+
+      if (autoRemoveBg) {
+        setIsRemovingBg(true);
+        toast.info("Analyzing image and removing background automatically...");
+        try {
+          const bgRemovedUrl = await removeImageBackground(rawDataUrl);
+          setUploadedPhoto(bgRemovedUrl);
+          saveStoredUploadedPhoto(currentEmpId, bgRemovedUrl);
+          toast.success("Background removed & photo saved to Digital Business Card!");
+        } catch (err) {
+          console.error(err);
+          setUploadedPhoto(rawDataUrl);
+          saveStoredUploadedPhoto(currentEmpId, rawDataUrl);
+          toast.success("Photo saved to Digital Business Card!");
+        } finally {
+          setIsRemovingBg(false);
+        }
+      } else {
+        setUploadedPhoto(rawDataUrl);
+        saveStoredUploadedPhoto(currentEmpId, rawDataUrl);
+        toast.success("Photo saved to Digital Business Card!");
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleReapplyBgRemoval = async () => {
+    if (!rawUploadedPhoto && !uploadedPhoto) return;
+    const base = rawUploadedPhoto || uploadedPhoto!;
+    setIsRemovingBg(true);
+    try {
+      const processed = await removeImageBackground(base);
+      setUploadedPhoto(processed);
+      saveStoredUploadedPhoto(currentEmpId, processed);
+      toast.success("Background removal applied and saved!");
+    } catch {
+      toast.error("Failed to remove background.");
+    } finally {
+      setIsRemovingBg(false);
+    }
+  };
+
+  const handleRestoreOriginal = () => {
+    if (rawUploadedPhoto) {
+      setUploadedPhoto(rawUploadedPhoto);
+      saveStoredUploadedPhoto(currentEmpId, rawUploadedPhoto);
+      toast.info("Restored original uploaded photo.");
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setUploadedPhoto(null);
+    setRawUploadedPhoto(null);
+    removeStoredUploadedPhoto(currentEmpId);
+    toast.info("Uploaded photo removed. Public card now uses the default portrait.");
+  };
+
+  // Social Media Link Handlers
+  const handleAddSocialLink = () => {
+    const newLink: SocialMediaLink = {
+      id: `s-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      platform: "LinkedIn",
+      url: "",
+    };
+    const updated = [...socialLinks, newLink];
+    setSocialLinks(updated);
+    saveEmployeeSocialLinks(currentEmpId, updated);
+  };
+
+  const handleUpdateSocialLink = (
+    id: string,
+    field: "platform" | "customPlatform" | "url",
+    value: string,
+  ) => {
+    const updated = socialLinks.map((item) =>
+      item.id === id ? { ...item, [field]: value } : item,
+    );
+    setSocialLinks(updated);
+    saveEmployeeSocialLinks(currentEmpId, updated);
+  };
+
+  const handleRemoveSocialLink = (id: string) => {
+    const updated = socialLinks.filter((item) => item.id !== id);
+    setSocialLinks(updated);
+    saveEmployeeSocialLinks(currentEmpId, updated);
+    toast.success("Social profile removed");
+  };
+
+  const handleSaveSocialLinks = () => {
+    saveEmployeeSocialLinks(currentEmpId, socialLinks);
+    toast.success("Social media profiles saved to browser storage!");
+  };
 
   const handleCreateCard = () => {
     const newCard = createCard(currentEmpId, {
@@ -407,7 +550,7 @@ function MyDigitalBusinessCardPage() {
                   }`}
                 >
                   <CreditCard className="size-3.5" />
-                  <span>Card Preview & Details</span>
+                  <span>Card Details Info</span>
                 </button>
 
                 <button
@@ -425,32 +568,6 @@ function MyDigitalBusinessCardPage() {
 
                 <button
                   type="button"
-                  onClick={() => setActiveTab("whatsapp")}
-                  className={`h-10 px-4 text-xs font-bold border-b-2 flex items-center gap-2 transition shrink-0 cursor-pointer ${
-                    activeTab === "whatsapp"
-                      ? "border-primary text-primary"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <MessageCircle className="size-3.5" />
-                  <span>WhatsApp Setup</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("share")}
-                  className={`h-10 px-4 text-xs font-bold border-b-2 flex items-center gap-2 transition shrink-0 cursor-pointer ${
-                    activeTab === "share"
-                      ? "border-primary text-primary"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Share2 className="size-3.5" />
-                  <span>Share & QR Code</span>
-                </button>
-
-                <button
-                  type="button"
                   onClick={() => setActiveTab("analytics")}
                   className={`h-10 px-4 text-xs font-bold border-b-2 flex items-center gap-2 transition shrink-0 cursor-pointer ${
                     activeTab === "analytics"
@@ -459,78 +576,167 @@ function MyDigitalBusinessCardPage() {
                   }`}
                 >
                   <BarChart3 className="size-3.5" />
-                  <span>Analytics</span>
+                  <span>Card Analytics</span>
                 </button>
               </div>
 
-              {/* Tab 1: Overview */}
+              {/* Tab 1: Card Details Info */}
               {activeTab === "overview" && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Left Column: QR Code & Permanent URL */}
-                  <div className="bg-card border border-border rounded-2xl p-6 flex flex-col items-center text-center space-y-4 shadow-2xs">
-                    <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                      <QrCode className="size-4 text-indigo-500" />
-                      Permanent Scannable QR Code
-                    </h4>
-                    <p className="text-[11px] text-muted-foreground">
-                      Scannable from any mobile camera. Directs to your permanent verified public
-                      URL.
-                    </p>
+                <div className="space-y-6">
+                  {/* Digital Business Card Image Upload Section */}
+                  <div className="bg-card border border-border rounded-2xl p-6 shadow-2xs space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/50">
+                      <div>
+                        <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                          <ImageIcon className="size-4 text-primary" />
+                          <span>Digital Business Card Photo</span>
+                        </h4>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Upload your portrait photo for the verified public Digital Business Card.
+                        </p>
+                      </div>
 
-                    <QRCodeRenderer value={publicUrl} size={180} />
-
-                    <div className="w-full space-y-1.5 pt-2 text-left">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                        Permanent Public URL
-                      </label>
-                      <div className="flex items-center gap-1.5 bg-muted/40 border border-border rounded-xl p-2">
-                        <input
-                          type="text"
-                          readOnly
-                          value={publicUrl}
-                          className="bg-transparent text-xs font-mono text-foreground flex-1 outline-none truncate"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleCopyUrl}
-                          className="p-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs transition"
-                          title="Copy Link"
-                        >
-                          {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                        </button>
+                      {/* Upload Instruction Banner */}
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-medium">
+                        <Info className="size-3.5 shrink-0" />
+                        <span>Please upload a professional photo with the person's shoulders clearly visible.</span>
                       </div>
                     </div>
 
-                    <div className="w-full flex gap-2 pt-2">
-                      <button
-                        type="button"
-                        onClick={handleShare}
-                        className="flex-1 h-9 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 transition flex items-center justify-center gap-1.5"
-                      >
-                        <Share2 className="size-3.5" />
-                        <span>Share Card</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleDownloadTestVcf}
-                        className="h-9 px-3 rounded-xl border border-border hover:bg-muted text-xs font-bold transition flex items-center gap-1"
-                        title="Download VCF"
-                      >
-                        <Download className="size-3.5" />
-                        <span>VCF</span>
-                      </button>
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                      {/* Photo Preview Column (Checkerboard background to preview transparency) */}
+                      <div className="md:col-span-4 flex flex-col items-center">
+                        <div
+                          className="relative w-48 h-56 rounded-2xl border-2 border-dashed border-border flex items-center justify-center overflow-hidden shadow-inner group"
+                          style={{
+                            backgroundImage:
+                              "repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 50% / 16px 16px",
+                          }}
+                        >
+                          {uploadedPhoto ? (
+                            <img
+                              src={uploadedPhoto}
+                              alt="Business Card Photo"
+                              className="size-full object-contain select-none"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center text-center p-4 text-muted-foreground space-y-2">
+                              <div className="size-12 rounded-2xl bg-muted/80 flex items-center justify-center">
+                                <Upload className="size-6 text-muted-foreground" />
+                              </div>
+                              <span className="text-xs font-semibold">No custom photo uploaded</span>
+                              <span className="text-[10px] text-muted-foreground/80">
+                                Card uses default Pakiza portrait
+                              </span>
+                            </div>
+                          )}
+
+                          {isRemovingBg && (
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex flex-col items-center justify-center text-white p-3 text-center space-y-2 z-20">
+                              <Wand2 className="size-6 animate-spin text-indigo-400" />
+                              <span className="text-xs font-bold">Removing background...</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {uploadedPhoto && (
+                          <div className="mt-2 flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                            <CheckCircle2 className="size-3.5" />
+                            <span>Saved in browser storage & live on card</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Upload Controls & Settings */}
+                      <div className="md:col-span-8 space-y-4">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/jpg"
+                          onChange={handleImageFileChange}
+                          className="hidden"
+                        />
+
+                        <div className="p-4 rounded-xl border border-border/80 bg-muted/20 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-0.5">
+                              <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                                <Wand2 className="size-3.5 text-indigo-500" />
+                                <span>Automatic Background Removal</span>
+                              </label>
+                              <p className="text-[11px] text-muted-foreground">
+                                Automatically isolates the person from the background upon upload for the corporate royal-blue card.
+                              </p>
+                            </div>
+                            <input
+                              type="checkbox"
+                              checked={autoRemoveBg}
+                              onChange={(e) => setAutoRemoveBg(e.target.checked)}
+                              className="size-4 text-primary rounded cursor-pointer"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap items-center gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="h-10 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-sm hover:bg-primary/90 transition flex items-center gap-2 cursor-pointer"
+                          >
+                            <Upload className="size-4" />
+                            <span>{uploadedPhoto ? "Upload Different Photo" : "Upload Photo"}</span>
+                          </button>
+
+                          {uploadedPhoto && (
+                            <>
+                              <button
+                                type="button"
+                                disabled={isRemovingBg}
+                                onClick={handleReapplyBgRemoval}
+                                className="h-10 px-3.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                                title="Re-run background removal algorithm"
+                              >
+                                <Wand2 className="size-3.5" />
+                                <span>Re-apply Bg Removal</span>
+                              </button>
+
+                              {rawUploadedPhoto && (
+                                <button
+                                  type="button"
+                                  onClick={handleRestoreOriginal}
+                                  className="h-10 px-3 rounded-xl border border-border hover:bg-muted text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
+                                  title="Restore original image before background removal"
+                                >
+                                  <RotateCcw className="size-3.5" />
+                                  <span>Original</span>
+                                </button>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={handleRemovePhoto}
+                                className="h-10 px-3.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ml-auto"
+                              >
+                                <Trash2 className="size-3.5" />
+                                <span>Remove Photo</span>
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Right Column: HRIS Employee Data Summary */}
-                  <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6 space-y-6 shadow-2xs">
-                    <div className="flex items-center justify-between pb-3 border-b border-border/50">
+                  {/* Official HRIS Master Data in a Single Row with Five Columns */}
+                  <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-2xs">
+                    <div className="flex items-center justify-between pb-2 border-b border-border/50">
                       <div>
                         <h4 className="text-sm font-bold text-foreground">
-                          Official HRIS Master Data (Read-Only)
+                          Official HRIS Master Data
                         </h4>
                         <p className="text-xs text-muted-foreground">
-                          Official corporate details synced from the Employee Master Data.
+                          Official corporate credentials synced from Employee Master Data.
                         </p>
                       </div>
                       <Link
@@ -543,146 +749,201 @@ function MyDigitalBusinessCardPage() {
                       </Link>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
+                    {/* Single Row with 5 Columns */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 text-xs">
+                      {/* Column 1: Employee Name */}
+                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40 min-w-0">
                         <span className="text-[10px] font-bold uppercase text-muted-foreground">
                           Employee Name
                         </span>
-                        <div className="font-bold text-foreground">{hrisEmp.name}</div>
+                        <div className="font-bold text-foreground truncate" title={hrisEmp.name}>
+                          {hrisEmp.name}
+                        </div>
                       </div>
 
-                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
+                      {/* Column 2: Designation */}
+                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40 min-w-0">
                         <span className="text-[10px] font-bold uppercase text-muted-foreground">
                           Designation
                         </span>
-                        <div className="font-bold text-foreground">{hrisEmp.title || (hrisEmp as any).designation}</div>
+                        <div
+                          className="font-bold text-foreground truncate"
+                          title={hrisEmp.title || (hrisEmp as any).designation}
+                        >
+                          {hrisEmp.title || (hrisEmp as any).designation}
+                        </div>
                       </div>
 
-                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
+                      {/* Column 3: Company */}
+                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40 min-w-0">
                         <span className="text-[10px] font-bold uppercase text-muted-foreground">
                           Company
                         </span>
-                        <div className="font-bold text-foreground">
+                        <div
+                          className="font-bold text-foreground truncate"
+                          title={hrisEmp.unit || (hrisEmp as any).company || "Pakiza Software Limited"}
+                        >
                           {hrisEmp.unit || (hrisEmp as any).company || "Pakiza Software Limited"}
                         </div>
                       </div>
 
-                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
+                      {/* Column 4: Official Email */}
+                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40 min-w-0">
                         <span className="text-[10px] font-bold uppercase text-muted-foreground">
                           Official Email
                         </span>
-                        <div className="font-bold text-foreground">{hrisEmp.email || "rakib@pakizaknit.com"}</div>
-                      </div>
-
-                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
-                          Mobile
-                        </span>
-                        <div className="font-bold text-foreground font-mono">
-                          {(hrisEmp as any).mobile || hrisEmp.officeMob || "+88 01777 777344"}
-                        </div>
-                      </div>
-
-                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
-                          Website
-                        </span>
-                        <div className="font-bold text-foreground">
-                          <a
-                            href={String((hrisEmp as any).website || "www.pakizasoftware.com").startsWith("http") ? String((hrisEmp as any).website) : `http://${(hrisEmp as any).website || "www.pakizasoftware.com"}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline font-semibold"
-                          >
-                            {(hrisEmp as any).website || "www.pakizasoftware.com"}
-                          </a>
-                        </div>
-                      </div>
-
-                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
-                          Building
-                        </span>
-                        <div className="font-bold text-foreground">
-                          {(hrisEmp as any).building || "Khan ABC Tradeplex"}
-                        </div>
-                      </div>
-
-                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
-                          Area & City
-                        </span>
-                        <div className="font-bold text-foreground">
-                          {(hrisEmp as any).area || "Dhanmondi"}, {(hrisEmp as any).city || "Dhaka"}
-                        </div>
-                      </div>
-
-                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
-                          Address & Country
-                        </span>
-                        <div className="font-bold text-foreground">
-                          {(hrisEmp as any).address || "House: 37, Floor: 11 (B-11), Road: 2"}, {(hrisEmp as any).country || "Bangladesh"}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Social Media Links from Add Employee File */}
-                    <div className="space-y-3 pt-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                          <Globe className="size-3.5 text-sky-500" />
-                          Configured Social Media Profiles ({hrisEmp.socialMediaLinks?.length || 0})
-                        </span>
-                        <Link
-                          to="/add-employee"
-                          search={{ id: currentEmpId } as Record<string, string>}
-                          className="text-xs text-primary hover:underline font-semibold"
+                        <div
+                          className="font-bold text-foreground truncate"
+                          title={hrisEmp.email || "rakib@pakizaknit.com"}
                         >
-                          + Manage Links
-                        </Link>
+                          {hrisEmp.email || "rakib@pakizaknit.com"}
+                        </div>
                       </div>
 
-                      {Array.isArray(hrisEmp.socialMediaLinks) &&
-                      hrisEmp.socialMediaLinks.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {hrisEmp.socialMediaLinks.map(
-                            (
-                              link: { platform: string; customPlatform?: string; url: string },
-                              i: number,
-                            ) => (
-                              <div
-                                key={i}
-                                className="flex items-center gap-2 p-2.5 rounded-xl border border-border bg-background text-xs"
-                              >
-                                <SocialMediaIcon
-                                  platform={link.platform}
-                                  className="size-4 shrink-0"
-                                />
-                                <span className="font-bold text-foreground truncate">
-                                  {link.platform === "Other" ? link.customPlatform : link.platform}
-                                </span>
-                                <span className="text-muted-foreground truncate text-[11px] font-mono">
-                                  {link.url}
-                                </span>
-                              </div>
-                            ),
-                          )}
+                      {/* Column 5: Mobile / Phone */}
+                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40 min-w-0">
+                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
+                          Mobile / Phone
+                        </span>
+                        <div className="font-bold text-foreground font-mono truncate">
+                          {(hrisEmp as any).mobile || hrisEmp.officeMob || hrisEmp.phone || "+88 01777 777344"}
                         </div>
-                      ) : (
-                        <p className="text-xs text-muted-foreground italic">
-                          No social media links added yet. You can configure them in the Add
-                          Employee File form under Contact Information.
-                        </p>
-                      )}
+                      </div>
                     </div>
+                  </div>
+
+                  {/* Configured Social Media Profiles Section */}
+                  <div className="bg-card border border-border rounded-2xl p-6 space-y-5 shadow-2xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/50">
+                      <div>
+                        <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                          <Globe className="size-4 text-sky-500" />
+                          <span>Configured Social Media Profiles ({socialLinks.length})</span>
+                        </h4>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Manage and configure social media links displayed on your Digital Business Card.
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleAddSocialLink}
+                        className="h-8.5 px-3.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 text-xs font-bold transition flex items-center gap-1.5 border border-sky-500/30 self-start sm:self-auto cursor-pointer"
+                      >
+                        <Plus className="size-3.5" />
+                        <span>Add Social Media Profile</span>
+                      </button>
+                    </div>
+
+                    {socialLinks.length === 0 ? (
+                      <div className="p-6 rounded-xl border border-dashed border-border bg-muted/20 text-center space-y-1">
+                        <p className="text-xs font-semibold text-muted-foreground">
+                          No social media links added yet.
+                        </p>
+                        <p className="text-[11px] text-muted-foreground/80">
+                          Click <strong>"Add Social Media Profile"</strong> above to attach LinkedIn, Facebook, WhatsApp, or other links.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {socialLinks.map((link) => (
+                          <div
+                            key={link.id}
+                            className="p-3.5 rounded-xl bg-muted/20 border border-border/60 hover:border-border transition space-y-2.5"
+                          >
+                            <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+                              {/* Platform Dropdown with Brand Icon */}
+                              <div className="w-full md:w-56 shrink-0 space-y-1">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                  Platform
+                                </label>
+                                <div className="relative">
+                                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <SocialMediaIcon platform={link.platform} className="size-4" />
+                                  </div>
+                                  <select
+                                    value={link.platform}
+                                    onChange={(e) =>
+                                      handleUpdateSocialLink(link.id, "platform", e.target.value)
+                                    }
+                                    className="h-10 pl-9 pr-8 rounded-xl border border-border bg-card text-xs font-semibold w-full appearance-none outline-none cursor-pointer"
+                                  >
+                                    {SUPPORTED_PLATFORMS.map((plat) => (
+                                      <option key={plat} value={plat}>
+                                        {plat}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <ChevronDown className="size-3.5 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                </div>
+                              </div>
+
+                              {/* Custom Platform Input if "Other" */}
+                              {link.platform === "Other" && (
+                                <div className="w-full md:w-44 shrink-0 space-y-1">
+                                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                                    Custom Name
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={link.customPlatform || ""}
+                                    onChange={(e) =>
+                                      handleUpdateSocialLink(link.id, "customPlatform", e.target.value)
+                                    }
+                                    placeholder="e.g. Behance"
+                                    className="h-10 px-3 rounded-xl border border-border bg-card text-xs font-semibold w-full outline-none"
+                                  />
+                                </div>
+                              )}
+
+                              {/* Profile URL Input */}
+                              <div className="flex-1 w-full space-y-1 min-w-0">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                                  Profile URL
+                                </label>
+                                <input
+                                  type="url"
+                                  value={link.url}
+                                  onChange={(e) =>
+                                    handleUpdateSocialLink(link.id, "url", e.target.value)
+                                  }
+                                  placeholder="https://..."
+                                  className="h-10 px-3 rounded-xl border border-border bg-card text-xs font-mono w-full outline-none"
+                                />
+                              </div>
+
+                              {/* Remove Button */}
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveSocialLink(link.id)}
+                                className="h-10 w-10 shrink-0 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-rose-500 flex items-center justify-center transition cursor-pointer self-end md:self-auto"
+                                title="Remove link"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+
+                        <div className="pt-2 flex justify-end">
+                          <button
+                            type="button"
+                            onClick={handleSaveSocialLinks}
+                            className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 transition flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Check className="size-3.5" />
+                            <span>Save Social Profiles</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
               {/* Tab 2: Visibility Settings */}
               {activeTab === "visibility" && (
-                <div className="bg-card border border-border rounded-2xl p-6 space-y-6 max-w-2xl shadow-2xs">
+                <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-2xs">
                   <div>
                     <h4 className="text-sm font-bold text-foreground">
                       Public Field Visibility Controls
@@ -693,13 +954,15 @@ function MyDigitalBusinessCardPage() {
                     </p>
                   </div>
 
-                  <div className="space-y-4">
-                    <label className="flex items-center justify-between p-3.5 rounded-xl border border-border hover:bg-muted/30 transition cursor-pointer">
-                      <div className="space-y-0.5">
-                        <span className="text-xs font-bold text-foreground">
+                  {/* 3-Column Grid across 2 Rows */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* 1. Show Official Email */}
+                    <label className="flex items-start justify-between gap-3 p-4 rounded-xl border border-border/80 hover:border-border hover:bg-muted/30 transition cursor-pointer bg-card/50">
+                      <div className="space-y-1 min-w-0">
+                        <span className="text-xs font-bold text-foreground block">
                           Show Official Email
                         </span>
-                        <p className="text-[11px] text-muted-foreground">
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
                           Expose email address and enable email button on public card.
                         </p>
                       </div>
@@ -709,16 +972,17 @@ function MyDigitalBusinessCardPage() {
                         onChange={(e) =>
                           setVisibility({ ...visibility, showOfficeEmail: e.target.checked })
                         }
-                        className="size-4 text-primary rounded"
+                        className="size-4 text-primary rounded shrink-0 mt-0.5 cursor-pointer"
                       />
                     </label>
 
-                    <label className="flex items-center justify-between p-3.5 rounded-xl border border-border hover:bg-muted/30 transition cursor-pointer">
-                      <div className="space-y-0.5">
-                        <span className="text-xs font-bold text-foreground">
+                    {/* 2. Show Official Phone Number */}
+                    <label className="flex items-start justify-between gap-3 p-4 rounded-xl border border-border/80 hover:border-border hover:bg-muted/30 transition cursor-pointer bg-card/50">
+                      <div className="space-y-1 min-w-0">
+                        <span className="text-xs font-bold text-foreground block">
                           Show Official Phone Number
                         </span>
-                        <p className="text-[11px] text-muted-foreground">
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
                           Expose phone number and enable Call button on public card.
                         </p>
                       </div>
@@ -728,16 +992,17 @@ function MyDigitalBusinessCardPage() {
                         onChange={(e) =>
                           setVisibility({ ...visibility, showOfficePhone: e.target.checked })
                         }
-                        className="size-4 text-primary rounded"
+                        className="size-4 text-primary rounded shrink-0 mt-0.5 cursor-pointer"
                       />
                     </label>
 
-                    <label className="flex items-center justify-between p-3.5 rounded-xl border border-border hover:bg-muted/30 transition cursor-pointer">
-                      <div className="space-y-0.5">
-                        <span className="text-xs font-bold text-foreground">
+                    {/* 3. Show Department Name */}
+                    <label className="flex items-start justify-between gap-3 p-4 rounded-xl border border-border/80 hover:border-border hover:bg-muted/30 transition cursor-pointer bg-card/50">
+                      <div className="space-y-1 min-w-0">
+                        <span className="text-xs font-bold text-foreground block">
                           Show Department Name
                         </span>
-                        <p className="text-[11px] text-muted-foreground">
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
                           Display department alongside your designation.
                         </p>
                       </div>
@@ -747,16 +1012,17 @@ function MyDigitalBusinessCardPage() {
                         onChange={(e) =>
                           setVisibility({ ...visibility, showDepartment: e.target.checked })
                         }
-                        className="size-4 text-primary rounded"
+                        className="size-4 text-primary rounded shrink-0 mt-0.5 cursor-pointer"
                       />
                     </label>
 
-                    <label className="flex items-center justify-between p-3.5 rounded-xl border border-border hover:bg-muted/30 transition cursor-pointer">
-                      <div className="space-y-0.5">
-                        <span className="text-xs font-bold text-foreground">
+                    {/* 4. Show Office Address */}
+                    <label className="flex items-start justify-between gap-3 p-4 rounded-xl border border-border/80 hover:border-border hover:bg-muted/30 transition cursor-pointer bg-card/50">
+                      <div className="space-y-1 min-w-0">
+                        <span className="text-xs font-bold text-foreground block">
                           Show Office Address
                         </span>
-                        <p className="text-[11px] text-muted-foreground">
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
                           Display corporate office location on card and include in vCard.
                         </p>
                       </div>
@@ -766,16 +1032,17 @@ function MyDigitalBusinessCardPage() {
                         onChange={(e) =>
                           setVisibility({ ...visibility, showOfficeAddress: e.target.checked })
                         }
-                        className="size-4 text-primary rounded"
+                        className="size-4 text-primary rounded shrink-0 mt-0.5 cursor-pointer"
                       />
                     </label>
 
-                    <label className="flex items-center justify-between p-3.5 rounded-xl border border-border hover:bg-muted/30 transition cursor-pointer">
-                      <div className="space-y-0.5">
-                        <span className="text-xs font-bold text-foreground">
+                    {/* 5. Show WhatsApp Contact */}
+                    <label className="flex items-start justify-between gap-3 p-4 rounded-xl border border-border/80 hover:border-border hover:bg-muted/30 transition cursor-pointer bg-card/50">
+                      <div className="space-y-1 min-w-0">
+                        <span className="text-xs font-bold text-foreground block">
                           Show WhatsApp Contact
                         </span>
-                        <p className="text-[11px] text-muted-foreground">
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
                           Display WhatsApp action button if a number is configured.
                         </p>
                       </div>
@@ -785,16 +1052,17 @@ function MyDigitalBusinessCardPage() {
                         onChange={(e) =>
                           setVisibility({ ...visibility, showWhatsApp: e.target.checked })
                         }
-                        className="size-4 text-primary rounded"
+                        className="size-4 text-primary rounded shrink-0 mt-0.5 cursor-pointer"
                       />
                     </label>
 
-                    <label className="flex items-center justify-between p-3.5 rounded-xl border border-border hover:bg-muted/30 transition cursor-pointer">
-                      <div className="space-y-0.5">
-                        <span className="text-xs font-bold text-foreground">
+                    {/* 6. Show Social Media Links */}
+                    <label className="flex items-start justify-between gap-3 p-4 rounded-xl border border-border/80 hover:border-border hover:bg-muted/30 transition cursor-pointer bg-card/50">
+                      <div className="space-y-1 min-w-0">
+                        <span className="text-xs font-bold text-foreground block">
                           Show Social Media Links
                         </span>
-                        <p className="text-[11px] text-muted-foreground">
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
                           Show brand icon cards for your LinkedIn, Facebook, and custom links.
                         </p>
                       </div>
@@ -804,20 +1072,20 @@ function MyDigitalBusinessCardPage() {
                         onChange={(e) =>
                           setVisibility({ ...visibility, showSocialLinks: e.target.checked })
                         }
-                        className="size-4 text-primary rounded"
+                        className="size-4 text-primary rounded shrink-0 mt-0.5 cursor-pointer"
                       />
                     </label>
+                  </div>
 
-                    <div className="space-y-1.5 pt-2">
-                      <label className="text-xs font-bold text-foreground">Office Address</label>
-                      <input
-                        type="text"
-                        value={officeAddress}
-                        onChange={(e) => setOfficeAddress(e.target.value)}
-                        placeholder="House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka"
-                        className="w-full h-10 px-3.5 rounded-xl border border-border bg-background text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20"
-                      />
-                    </div>
+                  <div className="space-y-1.5 pt-2 border-t border-border/50">
+                    <label className="text-xs font-bold text-foreground">Office Address</label>
+                    <input
+                      type="text"
+                      value={officeAddress}
+                      onChange={(e) => setOfficeAddress(e.target.value)}
+                      placeholder="House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka"
+                      className="w-full h-10 px-3.5 rounded-xl border border-border bg-background text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20"
+                    />
                   </div>
 
                   <div className="pt-4 border-t border-border flex justify-end">
@@ -833,101 +1101,7 @@ function MyDigitalBusinessCardPage() {
                 </div>
               )}
 
-              {/* Tab 3: WhatsApp Setup */}
-              {activeTab === "whatsapp" && (
-                <div className="bg-card border border-border rounded-2xl p-6 space-y-6 max-w-xl shadow-2xs">
-                  <div>
-                    <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-                      <MessageCircle className="size-4 text-emerald-500" />
-                      Configure Dedicated WhatsApp Number
-                    </h4>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Allow clients and partners to reach you directly on WhatsApp. You can provide
-                      a separate business WhatsApp number from your official phone.
-                    </p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-foreground">
-                        WhatsApp Number (with Country Code)
-                      </label>
-                      <input
-                        type="text"
-                        value={whatsappNumber}
-                        onChange={(e) => setWhatsappNumber(e.target.value)}
-                        placeholder="+8801750021154"
-                        className="w-full h-10 px-3.5 rounded-xl border border-border bg-background text-xs font-mono font-medium outline-none focus:ring-2 focus:ring-emerald-500/20"
-                      />
-                      <p className="text-[11px] text-muted-foreground">
-                        Example: <code className="bg-muted px-1 rounded">+8801750021154</code> or{" "}
-                        <code className="bg-muted px-1 rounded">8801750021154</code>
-                      </p>
-                    </div>
-
-                    {whatsappNumber && (
-                      <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 space-y-1">
-                        <span className="text-[11px] font-bold">Generated WhatsApp Action:</span>
-                        <div className="text-xs font-mono break-all">
-                          https://wa.me/{whatsappNumber.replace(/[^0-9]/g, "")}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="pt-4 border-t border-border flex justify-end">
-                    <button
-                      type="button"
-                      disabled={isSaving}
-                      onClick={handleSaveSettings}
-                      className="h-10 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <span>Save WhatsApp Number</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Tab 4: Share & QR */}
-              {activeTab === "share" && (
-                <div className="bg-card border border-border rounded-2xl p-6 space-y-6 max-w-xl shadow-2xs">
-                  <div>
-                    <h4 className="text-sm font-bold text-foreground">
-                      Share Your Card & Permanent Public URL
-                    </h4>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Use the scannable QR code on physical business cards, posters, or share your
-                      digital card link directly.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col items-center p-6 bg-muted/20 border border-border rounded-2xl space-y-4">
-                    <QRCodeRenderer value={publicUrl} size={220} showCopyButton />
-                  </div>
-
-                  <div className="space-y-2">
-                    <button
-                      type="button"
-                      onClick={handleShare}
-                      className="w-full h-11 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:bg-primary/90 transition flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <Share2 className="size-4" />
-                      <span>Share Card Link</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleDownloadTestVcf}
-                      className="w-full h-10 rounded-xl border border-border hover:bg-muted text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <Download className="size-4" />
-                      <span>Download My .vcf Contact Card</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Tab 5: Analytics */}
+              {/* Tab 3: Analytics */}
               {activeTab === "analytics" && (
                 <div className="space-y-6">
                   {/* Summary Metric Cards */}

@@ -163,6 +163,15 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
     employee.id === "2023043910" ||
     empIdOrToken.toLowerCase().includes("rakib");
 
+  const customUploadedPhoto =
+    employee.profilePhoto?.startsWith("data:") ||
+    employee.profilePhoto?.startsWith("blob:")
+      ? employee.profilePhoto
+      : typeof window !== "undefined"
+        ? localStorage.getItem(`cripton_dbc_uploaded_photo_${employee.id}`) ||
+          (isRakibul ? localStorage.getItem("cripton_dbc_uploaded_photo_2023043910") : null)
+        : null;
+
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-3 sm:p-6 py-6 sm:py-10 selection:bg-white selection:text-[#0a57e3]">
       {/* Outer Card Wrapper (NFC Phone Form Factor) */}
@@ -181,7 +190,56 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
         </button>
 
         {/* Hero Section: Pakiza Logo + Profile Photo + Curved Waves */}
-        {isRakibul ? (
+        {customUploadedPhoto ? (
+          /* User Uploaded Custom Image View with Matching Royal-Blue Header & Waves */
+          <div className="relative w-full pt-4 overflow-hidden bg-gradient-to-b from-[#0e5de8] via-[#0b54d7] to-[#0844b2]">
+            {/* Top-Left Pakiza Logo */}
+            <div className="flex items-center gap-2 px-5 mb-1 z-20 relative">
+              <div className="size-8 rounded-lg bg-white/10 backdrop-blur-md flex items-center justify-center text-white font-black text-sm border border-white/30 shadow-xs">
+                P
+              </div>
+              <div className="text-left">
+                <div className="text-[12px] font-black tracking-wider uppercase text-white leading-tight">
+                  PAKIZA SOFTWARE
+                </div>
+                <div className="text-[8.5px] text-white/80 italic font-serif">
+                  Excellence | Intelligence | Automation
+                </div>
+              </div>
+            </div>
+
+            {/* Uploaded Profile Photo (Cutout with Shoulders Visible) */}
+            <div className="relative w-full h-[250px] sm:h-[270px] flex items-end justify-center overflow-hidden">
+              <img
+                src={customUploadedPhoto}
+                alt={`${employee.name} - Pakiza Software`}
+                className="h-full max-h-[270px] w-auto object-contain object-bottom select-none pointer-events-none drop-shadow-[0_12px_24px_rgba(0,0,0,0.35)] z-10"
+              />
+
+              {/* Seamless Curved Wave Transition */}
+              <div className="absolute inset-x-0 bottom-0 z-20 pointer-events-none">
+                <svg
+                  viewBox="0 0 420 60"
+                  preserveAspectRatio="none"
+                  className="w-full h-14 block"
+                >
+                  <path
+                    d="M 0,25 C 100,55 220,10 420,35 L 420,60 L 0,60 Z"
+                    fill="rgba(255,255,255,0.4)"
+                  />
+                  <path
+                    d="M 0,33 C 120,58 240,18 420,40 L 420,60 L 0,60 Z"
+                    fill="rgba(255,255,255,0.9)"
+                  />
+                  <path
+                    d="M 0,40 C 130,62 250,25 420,46 L 420,60 L 0,60 Z"
+                    fill="#0844b2"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        ) : isRakibul ? (
           <div className="relative w-full overflow-hidden">
             <img
               src="/images/nfc-card-hero.png"

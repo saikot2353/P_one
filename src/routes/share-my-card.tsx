@@ -352,13 +352,6 @@ function ShareMyCardPage() {
                   </div>
 
                   <div className="flex items-center justify-between py-1.5 border-b border-border/40">
-                    <span className="text-muted-foreground">Public Token</span>
-                    <span className="font-mono font-semibold text-foreground text-[11px]">
-                      {card?.publicToken}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between py-1.5 border-b border-border/40">
                     <span className="text-muted-foreground">Official Email</span>
                     <span className="font-semibold text-foreground">{hrisEmp.email || "rakib@pakizaknit.com"}</span>
                   </div>
