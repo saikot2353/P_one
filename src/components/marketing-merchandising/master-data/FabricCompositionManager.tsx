@@ -76,12 +76,12 @@ export function FabricCompositionManager() {
 
   const isTotalValid = Math.abs(currentTotalRatio - 100) < 0.001;
 
-  // Auto-compose composition display name from non-zero entries
+  // Auto-compose composition display name from non-zero entries (space-separated, without slashes)
   const previewName = useMemo(() => {
     const parts = entries
       .filter((e) => (Number(e.ratio) || 0) > 0 && e.fiberName.trim() !== "")
       .map((e) => `${e.ratio}% ${e.fiberName.trim()}`);
-    return parts.length > 0 ? parts.join(" / ") : "Incomplete Composition";
+    return parts.length > 0 ? parts.join(" ") : "Incomplete Composition";
   }, [entries]);
 
   // Open Create Modal

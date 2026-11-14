@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { Sidebar } from "@/components/dashboard/Sidebar";
+import { DigitalBusinessCardSidebar } from "@/components/dashboard/DigitalBusinessCardSidebar";
 import {
   CreditCard,
   QrCode,
@@ -71,7 +71,7 @@ function MyDigitalBusinessCardPage() {
     name?: string;
     [key: string]: unknown;
   } | null>(null);
-  const [currentEmpId, setCurrentEmpId] = useState<string>("2023043910"); // Default Tahmid Afsar
+  const [currentEmpId, setCurrentEmpId] = useState<string>("2023043910"); // Default: Rakibul Islam Khan (Managing Director)
   const [card, setCard] = useState<DigitalBusinessCard | null>(null);
   const [analytics, setAnalytics] = useState<CardAnalyticsRecord | null>(null);
   const [copied, setCopied] = useState(false);
@@ -221,7 +221,7 @@ function MyDigitalBusinessCardPage() {
 
   return (
     <div className="flex h-screen bg-background text-foreground font-sans antialiased overflow-hidden">
-      <Sidebar />
+      <DigitalBusinessCardSidebar />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Topbar />
@@ -543,7 +543,7 @@ function MyDigitalBusinessCardPage() {
                       </Link>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                       <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
                         <span className="text-[10px] font-bold uppercase text-muted-foreground">
                           Employee Name
@@ -555,14 +555,7 @@ function MyDigitalBusinessCardPage() {
                         <span className="text-[10px] font-bold uppercase text-muted-foreground">
                           Designation
                         </span>
-                        <div className="font-bold text-foreground">{hrisEmp.title}</div>
-                      </div>
-
-                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
-                          Department
-                        </span>
-                        <div className="font-bold text-foreground">{hrisEmp.dept || "—"}</div>
+                        <div className="font-bold text-foreground">{hrisEmp.title || (hrisEmp as any).designation}</div>
                       </div>
 
                       <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
@@ -570,7 +563,7 @@ function MyDigitalBusinessCardPage() {
                           Company
                         </span>
                         <div className="font-bold text-foreground">
-                          {hrisEmp.unit || "Pakiza Software"}
+                          {hrisEmp.unit || (hrisEmp as any).company || "Pakiza Software Limited"}
                         </div>
                       </div>
 
@@ -578,15 +571,58 @@ function MyDigitalBusinessCardPage() {
                         <span className="text-[10px] font-bold uppercase text-muted-foreground">
                           Official Email
                         </span>
-                        <div className="font-bold text-foreground">{hrisEmp.email || "—"}</div>
+                        <div className="font-bold text-foreground">{hrisEmp.email || "rakib@pakizaknit.com"}</div>
                       </div>
 
                       <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
                         <span className="text-[10px] font-bold uppercase text-muted-foreground">
-                          Official Phone
+                          Mobile
+                        </span>
+                        <div className="font-bold text-foreground font-mono">
+                          {(hrisEmp as any).mobile || hrisEmp.officeMob || "+88 01777 777344"}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
+                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
+                          Website
                         </span>
                         <div className="font-bold text-foreground">
-                          {hrisEmp.officeMob || hrisEmp.phone || "—"}
+                          <a
+                            href={String((hrisEmp as any).website || "www.pakizasoftware.com").startsWith("http") ? String((hrisEmp as any).website) : `http://${(hrisEmp as any).website || "www.pakizasoftware.com"}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline font-semibold"
+                          >
+                            {(hrisEmp as any).website || "www.pakizasoftware.com"}
+                          </a>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
+                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
+                          Building
+                        </span>
+                        <div className="font-bold text-foreground">
+                          {(hrisEmp as any).building || "Khan ABC Tradeplex"}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
+                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
+                          Area & City
+                        </span>
+                        <div className="font-bold text-foreground">
+                          {(hrisEmp as any).area || "Dhanmondi"}, {(hrisEmp as any).city || "Dhaka"}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1 p-3 rounded-xl bg-muted/30 border border-border/40">
+                        <span className="text-[10px] font-bold uppercase text-muted-foreground">
+                          Address & Country
+                        </span>
+                        <div className="font-bold text-foreground">
+                          {(hrisEmp as any).address || "House: 37, Floor: 11 (B-11), Road: 2"}, {(hrisEmp as any).country || "Bangladesh"}
                         </div>
                       </div>
                     </div>
@@ -778,7 +814,7 @@ function MyDigitalBusinessCardPage() {
                         type="text"
                         value={officeAddress}
                         onChange={(e) => setOfficeAddress(e.target.value)}
-                        placeholder="Pakiza Corporate Tower, 12 Green Road, Dhaka"
+                        placeholder="House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka"
                         className="w-full h-10 px-3.5 rounded-xl border border-border bg-background text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20"
                       />
                     </div>

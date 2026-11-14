@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useMemo } from "react";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { Sidebar } from "@/components/dashboard/Sidebar";
+import { DigitalBusinessCardSidebar } from "@/components/dashboard/DigitalBusinessCardSidebar";
 import {
   BarChart3,
   Calendar,
@@ -96,7 +96,7 @@ function CardAnalyticsPage() {
 
   return (
     <div className="flex h-screen bg-background text-foreground font-sans antialiased overflow-hidden">
-      <Sidebar />
+      <DigitalBusinessCardSidebar />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Topbar />

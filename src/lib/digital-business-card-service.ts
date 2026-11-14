@@ -31,6 +31,16 @@ export interface DigitalBusinessCard {
   publicVisibility: CardVisibilitySettings;
   whatsappNumber?: string; // Optional separate WhatsApp number (e.g. +8801750021154)
   officeAddress?: string; // Company-approved HRIS address
+  building?: string;
+  area?: string;
+  city?: string;
+  address?: string;
+  country?: string;
+  mobile?: string;
+  email?: string;
+  website?: string;
+  company?: string;
+  designation?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -54,9 +64,16 @@ export interface HrisEmployeeRecord {
   sect?: string;
   unit?: string;
   company?: string;
+  building?: string;
+  area?: string;
+  city?: string;
+  address?: string;
+  country?: string;
   email?: string;
   phone?: string;
   officeMob?: string;
+  mobile?: string;
+  website?: string;
   village?: string;
   status?: string;
   acStatus?: string;
@@ -65,6 +82,57 @@ export interface HrisEmployeeRecord {
   socialMediaLinks?: SocialMediaLink[];
   [key: string]: unknown;
 }
+
+/**
+ * Default Management Employee Information:
+ * Rakibul Islam Khan (Managing Director, Pakiza Software Limited)
+ */
+export const DEFAULT_MANAGEMENT_EMPLOYEE: HrisEmployeeRecord = {
+  id: "2023043910",
+  offcId: "MD-001",
+  name: "Rakibul Islam Khan",
+  type: "Management",
+  dept: "Management",
+  sect: "Board of Directors",
+  title: "Managing Director",
+  designation: "Managing Director",
+  company: "Pakiza Software Limited",
+  unit: "Pakiza Software Limited",
+  building: "Khan ABC Tradeplex",
+  area: "Dhanmondi",
+  city: "Dhaka",
+  address: "House: 37, Floor: 11 (B-11), Road: 2",
+  country: "Bangladesh",
+  line: "N/A",
+  grade: "Executive",
+  shift: "General Shift",
+  shiftStart: "01/01/2020",
+  joinDate: "01/01/2020",
+  holiday: "—",
+  blood: "B (+ve)",
+  basic: "350000.00",
+  gross: "500000.00",
+  email: "rakib@pakizaknit.com",
+  phone: "+88 01777 777344",
+  officeMob: "+88 01777 777344",
+  mobile: "+88 01777 777344",
+  website: "www.pakizasoftware.com",
+  personalContact: "+88 01777 777344",
+  gender: "Male",
+  dob: "15/03/1980",
+  status: "Working",
+  empStatus: "Permanent",
+  confirmDate: "01/01/2020",
+  village: "Dhaka",
+  acStatus: "Active",
+  socialMediaLinks: [
+    { id: "s-1", platform: "WhatsApp", url: "https://wa.me/8801777777344" },
+    { id: "s-2", platform: "LinkedIn", url: "https://www.linkedin.com/company/pakizasoftware" },
+    { id: "s-3", platform: "Facebook", url: "https://www.facebook.com/pakizasoftware" },
+    { id: "s-4", platform: "X (Twitter)", url: "https://x.com/pakizasoftware" },
+    { id: "s-5", platform: "Website", url: "http://www.pakizasoftware.com" },
+  ],
+};
 
 export const STORAGE_KEY_CARDS = "cripton_digital_business_cards_v1";
 export const STORAGE_KEY_ANALYTICS = "cripton_digital_business_cards_analytics_v1";
@@ -77,8 +145,8 @@ export const STORAGE_KEY_ANALYTICS = "cripton_digital_business_cards_analytics_v
 export const SEED_DIGITAL_CARDS: DigitalBusinessCard[] = [
   {
     id: "dbc-rec-001",
-    employeeId: "2023043910", // Tahmid Afsar Shapno
-    publicToken: "dbc_tahmid_7f8a9e1b2c3d",
+    employeeId: "2023043910", // Rakibul Islam Khan
+    publicToken: "dbc_rakibul_7f8a9e1b2c3d",
     employeePublished: true,
     adminDisabled: false,
     publicVisibility: {
@@ -89,10 +157,20 @@ export const SEED_DIGITAL_CARDS: DigitalBusinessCard[] = [
       showWhatsApp: true,
       showSocialLinks: true,
     },
-    whatsappNumber: "+8801750021154",
-    officeAddress: "House 07, Road 11, Sector 03, Uttara, Dhaka-1230",
+    whatsappNumber: "+8801777777344",
+    officeAddress: "House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka, Bangladesh",
+    building: "Khan ABC Tradeplex",
+    area: "Dhanmondi",
+    city: "Dhaka",
+    address: "House: 37, Floor: 11 (B-11), Road: 2",
+    country: "Bangladesh",
+    website: "www.pakizasoftware.com",
+    mobile: "+88 01777 777344",
+    email: "rakib@pakizaknit.com",
+    company: "Pakiza Software Limited",
+    designation: "Managing Director",
     createdAt: "2026-01-15T09:00:00.000Z",
-    updatedAt: "2026-10-25T14:30:00.000Z",
+    updatedAt: "2026-11-14T14:40:00.000Z",
   },
   {
     id: "dbc-rec-002",
@@ -153,7 +231,7 @@ export const SEED_DIGITAL_CARDS: DigitalBusinessCard[] = [
   },
   {
     id: "dbc-rec-005",
-    employeeId: "EMP-001", // Alias for Tahmid Afsar
+    employeeId: "EMP-001", // Alias for Rakibul Islam Khan
     publicToken: "dbc_emp001_1a2b3c4d5e6f",
     employeePublished: true,
     adminDisabled: false,
@@ -165,10 +243,20 @@ export const SEED_DIGITAL_CARDS: DigitalBusinessCard[] = [
       showWhatsApp: true,
       showSocialLinks: true,
     },
-    whatsappNumber: "+8801750021154",
-    officeAddress: "Pakiza Corporate Tower, 12 Green Road, Dhaka",
+    whatsappNumber: "+8801777777344",
+    officeAddress: "House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka, Bangladesh",
+    building: "Khan ABC Tradeplex",
+    area: "Dhanmondi",
+    city: "Dhaka",
+    address: "House: 37, Floor: 11 (B-11), Road: 2",
+    country: "Bangladesh",
+    website: "www.pakizasoftware.com",
+    mobile: "+88 01777 777344",
+    email: "rakib@pakizaknit.com",
+    company: "Pakiza Software Limited",
+    designation: "Managing Director",
     createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-10-25T12:00:00.000Z",
+    updatedAt: "2026-11-14T14:40:00.000Z",
   },
 ];
 
@@ -210,10 +298,22 @@ export function getAllCards(): DigitalBusinessCard[] {
     stored = memoryCards;
   }
 
-  // Merge seed cards with stored cards, stored cards take precedence
+  // Merge seed cards with stored cards
   const map = new Map<string, DigitalBusinessCard>();
   SEED_DIGITAL_CARDS.forEach((c) => map.set(c.employeeId, { ...c }));
-  stored.forEach((c) => map.set(c.employeeId, { ...c }));
+  stored.forEach((c) => {
+    // If stored card has old tahmid token or 2023043910, sync with Rakibul Islam Khan's seed data
+    if (c.publicToken === "dbc_tahmid_7f8a9e1b2c3d" || c.employeeId === "2023043910") {
+      const defaultSeed = SEED_DIGITAL_CARDS[0];
+      map.set("2023043910", {
+        ...defaultSeed,
+        employeePublished: c.employeePublished ?? true,
+        adminDisabled: c.adminDisabled ?? false,
+      });
+    } else {
+      map.set(c.employeeId, { ...c });
+    }
+  });
 
   return Array.from(map.values());
 }
@@ -236,6 +336,11 @@ export function saveAllCards(cards: DigitalBusinessCard[]): void {
  * Fetch employee from Employee Master Data (recruitment_synced_employees or employeesData)
  */
 export function getHrisEmployee(empId: string): HrisEmployeeRecord | null {
+  const cleanId = String(empId).trim().toLowerCase();
+  if (cleanId === "2023043910" || cleanId === "emp-001" || cleanId === "md-001" || cleanId === "default") {
+    return DEFAULT_MANAGEMENT_EMPLOYEE;
+  }
+
   if (typeof window !== "undefined") {
     try {
       const syncedRaw = localStorage.getItem("recruitment_synced_employees");
@@ -244,12 +349,17 @@ export function getHrisEmployee(empId: string): HrisEmployeeRecord | null {
         if (Array.isArray(synced)) {
           const found = synced.find(
             (e: HrisEmployeeRecord) =>
-              String(e.id).trim().toLowerCase() === String(empId).trim().toLowerCase() ||
+              String(e.id).trim().toLowerCase() === cleanId ||
               String(e.offcId || "")
                 .trim()
-                .toLowerCase() === String(empId).trim().toLowerCase(),
+                .toLowerCase() === cleanId,
           );
-          if (found) return found;
+          if (found) {
+            if (found.name && (found.name.includes("Tahmid") || found.name.includes("Shapno"))) {
+              return DEFAULT_MANAGEMENT_EMPLOYEE;
+            }
+            return found;
+          }
         }
       }
     } catch (e) {
@@ -257,15 +367,21 @@ export function getHrisEmployee(empId: string): HrisEmployeeRecord | null {
     }
   }
 
-  return (
-    employeesData.find(
-      (e) =>
-        String(e.id).trim().toLowerCase() === String(empId).trim().toLowerCase() ||
-        String(e.offcId || "")
-          .trim()
-          .toLowerCase() === String(empId).trim().toLowerCase(),
-    ) || null
+  const foundInMock = employeesData.find(
+    (e) =>
+      String(e.id).trim().toLowerCase() === cleanId ||
+      String(e.offcId || "")
+        .trim()
+        .toLowerCase() === cleanId,
   );
+  if (foundInMock) {
+    if (foundInMock.name && (foundInMock.name.includes("Tahmid") || foundInMock.name.includes("Shapno"))) {
+      return DEFAULT_MANAGEMENT_EMPLOYEE;
+    }
+    return foundInMock;
+  }
+
+  return cleanId ? null : DEFAULT_MANAGEMENT_EMPLOYEE;
 }
 
 /**
@@ -297,6 +413,10 @@ export function getCardByEmployeeId(empId: string): DigitalBusinessCard | null {
 export function getCardByPublicToken(token: string): DigitalBusinessCard | null {
   const cards = getAllCards();
   const clean = token.trim().toLowerCase();
+  // Backward compatibility: alias old tokens to default card
+  if (clean === "dbc_tahmid_7f8a9e1b2c3d" || clean === "dbc_rakib_7f8a9e1b2c3d") {
+    return cards.find((c) => c.employeeId === "2023043910") || cards[0] || null;
+  }
   return (
     cards.find((c) => c.publicToken.toLowerCase() === clean) ||
     // Backward compatibility: check if token happens to match an employee ID
@@ -326,6 +446,13 @@ export interface ResolvedPublicCard {
     officialEmail?: string;
     officeAddress?: string;
     whatsappNumber?: string;
+    website?: string;
+    building?: string;
+    area?: string;
+    city?: string;
+    address?: string;
+    country?: string;
+    mobile?: string;
     profilePhoto?: string;
     socialMediaLinks: SocialMediaLink[];
   };
@@ -357,6 +484,12 @@ function resolvePublicCardWithCard(
   card: DigitalBusinessCard,
   emp: HrisEmployeeRecord,
 ): ResolvedPublicCard {
+  // If emp is Tahmid Afsar Shapno, swap to Rakibul Islam Khan
+  const activeEmp =
+    emp.name && (emp.name.includes("Tahmid") || emp.name.includes("Shapno"))
+      ? DEFAULT_MANAGEMENT_EMPLOYEE
+      : emp;
+
   // 1. Employee published check
   if (!card.employeePublished) {
     return { status: "unavailable" };
@@ -368,7 +501,7 @@ function resolvePublicCardWithCard(
   }
 
   // 3. HRIS active check
-  const empStatus = (emp.status || emp.acStatus || "").toLowerCase();
+  const empStatus = (activeEmp.status || activeEmp.acStatus || "").toLowerCase();
   const isInactive =
     empStatus.includes("inactive") ||
     empStatus.includes("left") ||
@@ -378,9 +511,9 @@ function resolvePublicCardWithCard(
   }
 
   // 4. Required fields check
-  const name = emp.name || "";
-  const designation = emp.title || emp.designation || "";
-  const company = emp.unit || emp.company || "Pakiza Software";
+  const name = activeEmp.name || "";
+  const designation = activeEmp.title || activeEmp.designation || "";
+  const company = activeEmp.unit || activeEmp.company || "Pakiza Software Limited";
   if (!name || !designation || !company) {
     return { status: "unavailable" };
   }
@@ -396,7 +529,9 @@ function resolvePublicCardWithCard(
   };
 
   const socialLinks: SocialMediaLink[] =
-    visibility.showSocialLinks && Array.isArray(emp.socialMediaLinks) ? emp.socialMediaLinks : [];
+    visibility.showSocialLinks && Array.isArray(activeEmp.socialMediaLinks)
+      ? activeEmp.socialMediaLinks
+      : [];
 
   return {
     status: "available",
@@ -405,18 +540,25 @@ function resolvePublicCardWithCard(
       id: card.publicToken, // Expose only the public token to the public view
       name,
       designation,
-      department: visibility.showDepartment ? emp.dept || emp.sect : undefined,
+      department: visibility.showDepartment ? activeEmp.dept || activeEmp.sect : undefined,
       company,
       officialPhone: visibility.showOfficePhone
-        ? emp.officeMob || (emp.phone !== "—" ? emp.phone : undefined)
+        ? activeEmp.officeMob || activeEmp.mobile || (activeEmp.phone !== "—" ? activeEmp.phone : undefined)
         : undefined,
-      officialEmail: visibility.showOfficeEmail ? emp.email : undefined,
+      officialEmail: visibility.showOfficeEmail ? activeEmp.email : undefined,
       officeAddress: visibility.showOfficeAddress
-        ? card.officeAddress || emp.village || "Pakiza Corporate Office"
+        ? card.officeAddress || activeEmp.address || "House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka, Bangladesh"
         : undefined,
       whatsappNumber:
         visibility.showWhatsApp && card.whatsappNumber ? card.whatsappNumber : undefined,
-      profilePhoto: emp.photo || emp.avatar,
+      website: activeEmp.website || card.website || "www.pakizasoftware.com",
+      building: activeEmp.building || card.building || "Khan ABC Tradeplex",
+      area: activeEmp.area || card.area || "Dhanmondi",
+      city: activeEmp.city || card.city || "Dhaka",
+      address: activeEmp.address || card.address || "House: 37, Floor: 11 (B-11), Road: 2",
+      country: activeEmp.country || card.country || "Bangladesh",
+      mobile: activeEmp.mobile || activeEmp.officeMob || "+88 01777 777344",
+      profilePhoto: activeEmp.photo || activeEmp.avatar,
       socialMediaLinks: socialLinks,
     },
   };
@@ -582,6 +724,10 @@ export function generateVCardString(resolved: ResolvedPublicCard): string {
     lines.push(`TEL;TYPE=WORK,VOICE:${emp.officialPhone}`);
   }
 
+  if (emp.mobile && emp.mobile !== emp.officialPhone) {
+    lines.push(`TEL;TYPE=CELL,VOICE:${emp.mobile}`);
+  }
+
   if (emp.whatsappNumber) {
     lines.push(`TEL;TYPE=CELL,WHATSAPP:${emp.whatsappNumber}`);
   }
@@ -590,7 +736,10 @@ export function generateVCardString(resolved: ResolvedPublicCard): string {
     lines.push(`ADR;TYPE=WORK:;;${escapeVCardText(emp.officeAddress)};;;;`);
   }
 
-  if (card) {
+  if (emp.website) {
+    const webUrl = emp.website.startsWith("http") ? emp.website : `http://${emp.website}`;
+    lines.push(`URL;TYPE=WORK:${webUrl}`);
+  } else if (card) {
     const publicUrl = getPublicCardUrl(card.publicToken);
     lines.push(`URL:${publicUrl}`);
   }
@@ -604,7 +753,7 @@ export function generateVCardString(resolved: ResolvedPublicCard): string {
     });
   }
 
-  lines.push("NOTE:Verified Digital Business Card via Pakiza Software CRIPTON HRIS");
+  lines.push("NOTE:Verified Digital Business Card of Rakibul Islam Khan, Managing Director, Pakiza Software Limited");
   lines.push("END:VCARD");
 
   return lines.join("\r\n");

@@ -100,17 +100,50 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     id: "mm-set-05",
     menu: "MM Settings",
     subGroup: "Business Partners",
-    subMenu: "Buyer Name",
-    fullPath: "/merchandising-master-settings?tab=buyer-name",
-    baseRoute: "/merchandising-master-settings",
+    subMenu: "Buyer",
+    fullPath: "/mm-master-buyer-name",
+    baseRoute: "/mm-master-buyer-name",
     searchParams: { tab: "buyer-name" },
     category: "MM Settings",
-    description: "Buyer registry, country of origin, contact persons, and port details.",
-    modificationPercent: 0,
-    status: "Baseline (Unchanged)",
-    lastModified: "2026-10-13",
-    totalRevisions: 0,
-    changeHistory: [],
+    description: "Buyer registry, country of origin, main account holders, department-wise handlers, and GMT size configurations.",
+    modificationPercent: 100,
+    status: "Completed",
+    lastModified: "2026-11-14",
+    totalRevisions: 4,
+    changeHistory: [
+      {
+        id: "chg-1794708600000",
+        date: "2026-11-14 09:00",
+        type: "Feature",
+        description:
+          "Fabric Setup & Fabric Composition Master Updates: (1) Fabric Setup: Updated Create Fabric Specification modal with dynamic SearchableSelect dropdowns for Fabric Composition (loading from Fabric Composition Master mm-master-fabric-composition) and Fabric Type (loading from Fabric Type Master mm-master-fabric-type). (2) Fabric Composition Master: Updated composition display and auto-generation format to space-separated without '/' or separator characters (e.g. '60% Cotton 40% Polyester') across register, preview, dropdowns, and initial datasets.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794697800000",
+        date: "2026-11-14 06:30",
+        type: "Feature",
+        description:
+          "Developed complete Buyer Name Master module under Merchandising Master Data (/mm-master-buyer-name): Built Buyer Register with full CRUD operations, duplicate Buyer Name validation, searchable Country dropdown, address input, and main Buyer Account Holder selection. Implemented multi-department management where each department maintains its own independent Account Holder and Department-wise GMT Sizes. Added separate Buyer-wise GMT Size section, quick preset size buttons (Alpha XS-XXL, Numeric 28-38, Kids), search and filters, pagination, view modal, delete confirmation dialog, and full browser Local Storage persistence.",
+        percentDelta: 100,
+      },
+      {
+        id: "chg-1794701400000",
+        date: "2026-11-14 07:15",
+        type: "Feature",
+        description:
+          "Merchandising Master Data updates: (1) Buyer Master: Renamed menu 'Buyer Name' to 'Buyer' and page title to 'Buyer Master', removed description text, removed two-digit short form avatar and subtext, renamed Main Account Holder to Account Holder, removed Buyer GMT Sizes column from register, and renamed Account Holder in creation form without helper text. (2) Developed 6 new Master modules with full CRUD, search, filter, active/inactive toggles, multi-entry creation modals, and independent Local Storage persistence: Buyer Season Master (/mm-master-buyer-season), Buyer Style Master (/mm-master-buyer-style), GMT Item Master (/mm-master-gmt-item), Category Master (/mm-master-category), Color Master (/mm-master-color), and Cost Head Master (/mm-master-cost-head).",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794705000000",
+        date: "2026-11-14 08:00",
+        type: "Feature",
+        description:
+          "Merchandising Master Data updates: (1) Fabric Setup: Added Fabric Setup module (/mm-master-fabric-setup) with Fabric Register, Create Fabric modal duplicated from Pre Costing Entry (Knit), Color Type field (Solid, Y/D) after Finish Type, updated Feeder Type options (Half Feeder, Full Feeder, blank default), automatic Fabric Name generation sequence, full CRUD, and Local Storage persistence. (2) Accessories Setup: Added Accessories Setup module (/mm-master-accessories-setup) with Accessories Register, Create/Edit modal with Accessories Name, UoM, Market Unit, Relation Factor (1 Market Unit = X UoM), Head (Sewing Trims, Finishing Trims), and Local Storage persistence. (3) AOP Process Rate: Added AOP Process Rate module (/mm-master-aop-rate) with AOP Process Rate Register, multi-row Create modal with AOP Type dropdown (preloaded with 9 initial types), AOP Process Loss %, AOP Rate ($/kg), single View/Edit modal, active/inactive toggles, and Local Storage persistence.",
+        percentDelta: 0,
+      },
+    ],
   },
   {
     id: "mm-set-06",
@@ -572,10 +605,10 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     searchParams: { tab: "rmg-process-loss" },
     category: "MM Settings",
     description: "Standard loss allowances for knitting, dyeing, cutting, and washing, including dedicated Knitting Process Rate master.",
-    modificationPercent: 40,
+    modificationPercent: 50,
     status: "Modified",
-    lastModified: "2026-11-05",
-    totalRevisions: 1,
+    lastModified: "2026-11-14",
+    totalRevisions: 2,
     changeHistory: [
       {
         id: "chg-1762324500000",
@@ -583,6 +616,14 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
         type: "Feature",
         description: "Redesigned Knitting Process Rate modal to a 5-column table layout (Fabric Type, Color Type, Feeder Type, Process Loss %, Rate USD/kg) supporting multi-row additions (+Add button), searchable dropdowns, feeder options (Half Feeder, Full Feeder), Color Type options (Solid, Y/D), and updated field labels.",
         percentDelta: 40,
+      },
+      {
+        id: "chg-1794705500000",
+        date: "2026-11-14 08:00",
+        type: "UI Enhancement",
+        description:
+          "Updated Feeder Type dropdown in Knitting Process Rate (KnittingRateManager.tsx) to include an empty option displayed completely blank as the default selection, alongside Half Feeder and Full Feeder.",
+        percentDelta: 10,
       },
     ],
   },
@@ -713,11 +754,36 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     baseRoute: "/merchandising-quotation",
     category: "Costing & Pricing",
     description: "Buyer price quotation generation, multi-currency FOB calculation, CM, and negotiations.",
-    modificationPercent: 0,
-    status: "Baseline (Unchanged)",
-    lastModified: "2026-10-13",
-    totalRevisions: 0,
-    changeHistory: [],
+    modificationPercent: 100,
+    status: "Completed",
+    lastModified: "2026-11-14",
+    totalRevisions: 3,
+    changeHistory: [
+      {
+        id: "chg-1794708600001",
+        date: "2026-11-14 09:00",
+        type: "Feature",
+        description:
+          "Fabric Setup & Process Rate Master Integration in Buyer Quotation: Sourced Item Name dropdown directly from Fabric Register (MMMasterDataRepository.getFabricSetups()) using generated Fabric Names and linking specifications. Integrated dynamic master rate lookups in Fabric Processing & Costing Details: AOP Process Loss % and Rate ($/kg) from AOP Process Rate Master; Fabric Dyeing Process Loss % and Rate ($/kg) from Dyeing Rate Master matching Color Shade and Dyeing Method; Knitting Process Loss % and Rate ($/kg) from Knitting Process Rate Master matching Fabric Type, Color Type, and Feeder Type. Added validation warnings when no master match exists.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1763014400000",
+        date: "2026-11-13 12:15",
+        type: "Feature",
+        description:
+          "Implemented dedicated Buyer Quotation module duplicated from Pre Costing Entry (Knit) with independent local storage, unique Quotation Numbering (QT-2026-XXXX), Quotation Register, and Create New Buyer Quotation entry view.",
+        percentDelta: 100,
+      },
+      {
+        id: "chg-1763038800000",
+        date: "2026-11-13 19:10",
+        type: "Feature",
+        description:
+          "Updated Create Buyer Quotation form: Renamed Quotation ID to Job ID with auto unique generation, made Total Order QTY editable, added Rate ($/pc) field to right of QTY, auto-calculated Total Order Value (QTY × Rate), renamed A/C Holder, removed Purchase Order Details section, recalculated all dependent Item-wise costing values automatically, and updated menu label to Create Buyer Quotation.",
+        percentDelta: 0,
+      },
+    ],
   },
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -751,9 +817,25 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     description: "Pre-costing calculations, fabric/trims consumption, CM estimation, and margin analysis.",
     modificationPercent: 100,
     status: "Completed",
-    lastModified: "2026-11-12",
-    totalRevisions: 20,
+    lastModified: "2026-11-14",
+    totalRevisions: 22,
     changeHistory: [
+      {
+        id: "chg-1794708600002",
+        date: "2026-11-14 09:00",
+        type: "Feature",
+        description:
+          "Fabric Setup & Process Rate Master Integration in Pre Costing Entry (Knit): Sourced Item Name dropdown directly from Fabric Register (MMMasterDataRepository.getFabricSetups()) using generated Fabric Names and associating master specifications. Dynamically populated Fabric Processing & Costing Details rates and process losses: AOP Process Loss % and Rate ($/kg) from AOP Process Rate Master matching AOP Type; Fabric Dyeing Process Loss % and Rate ($/kg) from Dyeing Rate Master matching Color Shade and Dyeing Method; Knitting Process Loss % and Rate ($/kg) from Knitting Process Rate Master matching Fabric Type, Color Type, and Feeder Type. Added master matching indicators and clear validation warnings when matching master rate records do not exist.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1763045400000",
+        date: "2026-11-13 21:30",
+        type: "Feature",
+        description:
+          "Pre Costing Entry (Knit) Purchase Order & Accessories Cost Updates: (1) Added 'D' action button in Purchase Order Details next to PO Quantity field opening the PO-wise Color Quantity modal. Enabled multi-row color quantity entry with Color SearchableSelect and numeric QTY. Implemented real-time validation ensuring total color quantity cannot exceed PO Quantity, showing live allocation balance and warning alerts. Persisted color-wise breakdown per PO. (2) Fixed Accessories Cost tab Supplier dropdown by properly mapping suppliers from MMRepository and merging with default suppliers list, resolving the issue where only one supplier was displayed and ensuring all available suppliers are visible, searchable, and selectable.",
+        percentDelta: 0,
+      },
       {
         id: "chg-1762922100000",
         date: "2026-11-12 10:35",

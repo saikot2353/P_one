@@ -66,7 +66,7 @@ export function KnittingRateManager() {
       id: "kr-row-1",
       fabricTypeId: "",
       colorType: "Solid",
-      feederType: "Full Feeder",
+      feederType: "",
       processLossPct: 3.5,
       knittingRate: 0.45,
     },
@@ -88,7 +88,7 @@ export function KnittingRateManager() {
         id: `kr-row-${Date.now()}`,
         fabricTypeId: activeFabricTypes[0]?.id || "",
         colorType: "Solid",
-        feederType: "Full Feeder",
+        feederType: "",
         processLossPct: 3.5,
         knittingRate: 0.45,
       },
@@ -100,8 +100,13 @@ export function KnittingRateManager() {
   const handleOpenEdit = (item: MMKnittingRate) => {
     setActiveItem(item);
     setModalMode("edit");
-    const feeder = (item.feederType ||
-      (item.fitterType?.includes("Half") ? "Half Feeder" : "Full Feeder")) as FeederTypeOption;
+    const feeder = (item.feederType !== undefined
+      ? item.feederType
+      : item.fitterType?.includes("Half")
+      ? "Half Feeder"
+      : item.fitterType?.includes("Full")
+      ? "Full Feeder"
+      : "") as FeederTypeOption;
     setRows([
       {
         id: `kr-row-${item.id}`,
@@ -129,7 +134,7 @@ export function KnittingRateManager() {
         id: `kr-row-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         fabricTypeId: activeFabricTypes[0]?.id || "",
         colorType: "Solid",
-        feederType: "Full Feeder",
+        feederType: "",
         processLossPct: 3.5,
         knittingRate: 0.45,
       },
@@ -189,7 +194,7 @@ export function KnittingRateManager() {
       const newRecords: MMKnittingRate[] = rows.map((r, idx) => {
         const matchedFabric = activeFabricTypes.find((f) => f.id === r.fabricTypeId);
         const fabricName = matchedFabric ? matchedFabric.name : "Standard Fabric";
-        const feeder = (r.feederType || "Full Feeder") as FeederTypeOption;
+        const feeder = (r.feederType ?? "") as FeederTypeOption;
         return {
           id: `kr-${Date.now()}-${idx}`,
           code: `KR-${String(rates.length + idx + 1).padStart(3, "0")}`,
@@ -211,7 +216,7 @@ export function KnittingRateManager() {
       const firstRow = rows[0];
       const matchedFabric = activeFabricTypes.find((f) => f.id === firstRow.fabricTypeId);
       const fabricName = matchedFabric ? matchedFabric.name : activeItem.fabricTypeName;
-      const feeder = (firstRow.feederType || "Full Feeder") as FeederTypeOption;
+      const feeder = (firstRow.feederType ?? "") as FeederTypeOption;
 
       const updatedActive: MMKnittingRate = {
         ...activeItem,
@@ -229,7 +234,7 @@ export function KnittingRateManager() {
       const additionalRecords: MMKnittingRate[] = rows.slice(1).map((r, idx) => {
         const mf = activeFabricTypes.find((f) => f.id === r.fabricTypeId);
         const fn = mf ? mf.name : "Standard Fabric";
-        const fdr = (r.feederType || "Full Feeder") as FeederTypeOption;
+        const fdr = (r.feederType ?? "") as FeederTypeOption;
         return {
           id: `kr-${Date.now()}-${idx}`,
           code: `KR-${String(rates.length + idx + 1).padStart(3, "0")}`,
@@ -453,8 +458,7 @@ export function KnittingRateManager() {
                     </td>
                     <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
                       <span className="inline-block px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-[11px] border border-slate-200 dark:border-slate-700">
-                        {item.feederType ||
-                          (item.fitterType?.includes("Half") ? "Half Feeder" : "Full Feeder")}
+                        {item.feederType || "—"}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
@@ -650,10 +654,7 @@ export function KnittingRateManager() {
                           </span>
                         </td>
                         <td className="p-3 border-r border-slate-200 dark:border-slate-700 font-semibold text-slate-800 dark:text-slate-200 align-middle">
-                          {activeItem?.feederType ||
-                            (activeItem?.fitterType?.includes("Half")
-                              ? "Half Feeder"
-                              : "Full Feeder")}
+                          {activeItem?.feederType || "—"}
                         </td>
                         <td className="p-3 border-r border-slate-200 dark:border-slate-700 text-right font-mono font-bold text-amber-600 dark:text-amber-400 align-middle">
                           {activeItem?.processLossPct}%

@@ -19,6 +19,7 @@ import {
   Store,
   ListChecks,
   Building2,
+  CreditCard,
 } from "lucide-react";
 
 export const Route = createFileRoute("/module-selection")({
@@ -108,6 +109,15 @@ const modules = [
     color: "from-purple-500 to-fuchsia-600",
     shadow: "shadow-purple-500/20",
     path: "/inv-dashboard",
+  },
+  {
+    id: "digital-business-card",
+    name: "Digital Business Card",
+    description: "Smart digital cards, NFC/QR sharing & contact exchange",
+    icon: CreditCard,
+    color: "from-blue-600 via-indigo-600 to-violet-600",
+    shadow: "shadow-indigo-500/20",
+    path: "/my-digital-business-card",
   },
   {
     id: "asset",

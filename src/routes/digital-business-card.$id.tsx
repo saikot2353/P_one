@@ -3,19 +3,16 @@ import { useState, useEffect } from "react";
 import {
   Phone,
   Mail,
-  MessageCircle,
+  MapPin,
+  Globe,
   Download,
   Share2,
   Copy,
   Check,
-  Building2,
-  MapPin,
-  ExternalLink,
   ShieldCheck,
   QrCode,
   AlertTriangle,
   X,
-  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -26,17 +23,18 @@ import {
   ResolvedPublicCard,
 } from "@/lib/digital-business-card-service";
 import {
-  SocialMediaIcon,
+  LinkedInIcon,
+  FacebookIcon,
+  XTwitterIcon,
+  WhatsAppIcon,
   getSafeExternalUrl,
-  getPlatformDisplayName,
-  SocialMediaLink,
 } from "@/components/social-media/SocialMediaUtils";
 import { QRCodeRenderer } from "@/components/digital-business-card/QRCodeRenderer";
 
 export const Route = createFileRoute("/digital-business-card/$id")({
   head: () => ({
     meta: [
-      { title: "Digital Business Card — CRIPTON HRIS" },
+      { title: "Digital Business Card — Pakiza Software" },
       {
         name: "description",
         content: "Verified Employee Digital Business Card by Pakiza Software & CRIPTON HRIS.",
@@ -106,12 +104,11 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
   };
 
   // State Handling: Unavailable / Not Found
-  // Rule: Must not disclose why a specific card is unavailable (never reveal internal status or admin lock)
   if (resolved.status !== "available" || !resolved.employee) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-slate-100 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 text-center shadow-2xl space-y-6">
-          <div className="size-20 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-inner">
+      <div className="min-h-screen bg-[#072460] text-slate-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 text-center shadow-2xl space-y-6">
+          <div className="size-20 mx-auto rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-300 shadow-inner">
             <AlertTriangle className="size-10" />
           </div>
 
@@ -119,13 +116,13 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
             <h1 className="text-xl font-bold tracking-tight text-white">
               Business Card Unavailable
             </h1>
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <p className="text-sm text-blue-100/80 leading-relaxed">
               This digital business card is currently inactive or not available for public preview.
             </p>
           </div>
 
-          <div className="pt-4 border-t border-white/10 text-xs text-slate-500 flex items-center justify-center gap-1.5">
-            <ShieldCheck className="size-4 text-indigo-400" />
+          <div className="pt-4 border-t border-white/10 text-xs text-blue-200/70 flex items-center justify-center gap-1.5">
+            <ShieldCheck className="size-4 text-blue-300" />
             <span>CRIPTON HRIS • Verified Enterprise Card</span>
           </div>
         </div>
@@ -138,51 +135,81 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
     ? employee.whatsappNumber.replace(/[^0-9]/g, "")
     : "";
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100 flex flex-col items-center justify-center p-4 sm:p-6 selection:bg-indigo-500 selection:text-white">
-      {/* Container - Design 10: Premium Gradient Concept */}
-      <div className="w-full max-w-md bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all">
-        {/* Banner with Vibrant Gradient & Glowing Accents */}
-        <div className="relative h-44 bg-gradient-to-tr from-indigo-600 via-blue-600 to-purple-600 p-6 flex flex-col justify-between overflow-hidden">
-          {/* Subtle geometric circles */}
-          <div className="absolute -top-10 -right-10 size-40 bg-white/15 rounded-full blur-2xl pointer-events-none" />
-          <div className="absolute -bottom-10 -left-10 size-40 bg-indigo-900/40 rounded-full blur-xl pointer-events-none" />
+  const socialLinks = employee.socialMediaLinks || [];
+  const findUrl = (name: string) => {
+    const item = socialLinks.find(
+      (l) =>
+        l.platform.toLowerCase().includes(name.toLowerCase()) ||
+        (l.customPlatform && l.customPlatform.toLowerCase().includes(name.toLowerCase())),
+    );
+    return item ? getSafeExternalUrl(item.url) : null;
+  };
 
-          {/* Top Brand Tag */}
-          <div className="relative z-10 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="size-7 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black text-xs shadow-xs border border-white/30">
+  const whatsAppUrl = sanitizedWhatsApp
+    ? `https://wa.me/${sanitizedWhatsApp}`
+    : findUrl("whatsapp") || "https://wa.me/8801777777344";
+
+  const linkedInUrl = findUrl("linkedin") || "https://www.linkedin.com/company/pakizasoftware";
+  const facebookUrl = findUrl("facebook") || "https://www.facebook.com/pakizasoftware";
+  const xUrl = findUrl("twitter") || findUrl("x") || "https://x.com/pakizasoftware";
+  const websiteUrl = employee.website
+    ? employee.website.startsWith("http")
+      ? employee.website
+      : `http://${employee.website}`
+    : findUrl("website") || "http://www.pakizasoftware.com";
+
+  const isRakibul =
+    employee.name.toLowerCase().includes("rakibul") ||
+    employee.id === "2023043910" ||
+    empIdOrToken.toLowerCase().includes("rakib");
+
+  return (
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-3 sm:p-6 py-6 sm:py-10 selection:bg-white selection:text-[#0a57e3]">
+      {/* Outer Card Wrapper (NFC Phone Form Factor) */}
+      <div
+        className="w-full max-w-[420px] rounded-[32px] sm:rounded-[36px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(10,87,227,0.45)] border border-white/20 relative flex flex-col text-white bg-[#0844b2]"
+      >
+        {/* Floating QR Modal Trigger Button (discreet top-right) */}
+        <button
+          type="button"
+          onClick={() => setShowQrModal(true)}
+          className="absolute top-4 right-4 z-30 size-9 rounded-full bg-black/25 hover:bg-black/40 text-white backdrop-blur-md flex items-center justify-center transition border border-white/20 shadow-md cursor-pointer"
+          title="Scan or View QR Code"
+          aria-label="Scan or View QR Code"
+        >
+          <QrCode className="size-4.5" />
+        </button>
+
+        {/* Hero Section: Pakiza Logo + Profile Photo + Curved Waves */}
+        {isRakibul ? (
+          <div className="relative w-full overflow-hidden">
+            <img
+              src="/images/nfc-card-hero.png"
+              alt={`${employee.name} - Pakiza Software`}
+              className="w-full h-auto block select-none pointer-events-none"
+            />
+          </div>
+        ) : (
+          /* Dynamic Fallback for other employees while maintaining identical royal-blue wave aesthetic */
+          <div className="relative w-full pt-6 pb-2 px-6 overflow-hidden bg-gradient-to-b from-[#0b5be5] to-[#0a57e3]">
+            {/* Top Logo */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="size-8 rounded-lg bg-white/10 backdrop-blur-md flex items-center justify-center text-white font-black text-sm border border-white/30">
                 P
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-white/90">
-                {employee.company}
-              </span>
+              <div className="text-left">
+                <div className="text-xs font-black tracking-wider uppercase text-white">
+                  PAKIZA SOFTWARE
+                </div>
+                <div className="text-[9px] text-white/80 italic font-serif">
+                  Excellence | Intelligence | Automation
+                </div>
+              </div>
             </div>
 
-            <button
-              onClick={() => setShowQrModal(true)}
-              className="size-8 rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-md flex items-center justify-center transition border border-white/30 shadow-xs cursor-pointer"
-              title="Show QR Code"
-            >
-              <QrCode className="size-4" />
-            </button>
-          </div>
-
-          {/* Tagline */}
-          <div className="relative z-10">
-            <span className="text-[11px] font-semibold tracking-wide text-indigo-100/90 flex items-center gap-1.5">
-              <Sparkles className="size-3 text-amber-300" />
-              Verified Digital Business Card
-            </span>
-          </div>
-        </div>
-
-        {/* Profile Details Container */}
-        <div className="relative px-6 pb-6 pt-0">
-          {/* Avatar floating over banner */}
-          <div className="relative -mt-16 flex items-end justify-between mb-4">
-            <div className="relative size-24 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 p-1 shadow-xl border-4 border-slate-900/90">
-              <div className="size-full rounded-xl bg-slate-800 flex items-center justify-center overflow-hidden font-bold text-2xl text-white">
+            {/* Profile Photo */}
+            <div className="flex justify-center my-3">
+              <div className="size-36 rounded-full border-4 border-white/30 shadow-2xl overflow-hidden bg-blue-900/60 flex items-center justify-center">
                 {employee.profilePhoto ? (
                   <img
                     src={employee.profilePhoto}
@@ -190,7 +217,7 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
                     className="size-full object-cover"
                   />
                 ) : (
-                  <span>
+                  <span className="text-3xl font-bold text-white">
                     {employee.name
                       .split(" ")
                       .map((w) => w[0])
@@ -200,241 +227,194 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
                   </span>
                 )}
               </div>
-              <div
-                className="absolute -bottom-1 -right-1 size-6 rounded-full bg-emerald-500 border-2 border-slate-950 flex items-center justify-center shadow-md text-white"
-                title="Verified Employee"
-              >
-                <ShieldCheck className="size-3.5" />
+            </div>
+
+            {/* SVG Wave Ribbon Curve */}
+            <svg
+              className="w-full h-12 text-white/95 -mb-1"
+              viewBox="0 0 400 60"
+              preserveAspectRatio="none"
+            >
+              <path
+                d="M0,35 C120,65 240,10 400,45 L400,60 L0,60 Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        )}
+
+        {/* Content Section (Middle Information Section & Footer) */}
+        <div
+          style={{
+            background: "linear-gradient(180deg, #0844b2 0%, #0a46b8 12%, #0d4abe 25%, #104ec3 40%, #1252cb 55%, #1557d1 70%, #185cd7 85%, #1e65e3 100%)",
+          }}
+          className="relative z-10 flex flex-col space-y-4 pt-1 pb-6"
+        >
+          {/* Centered Employee Name & Designation */}
+          <div className="text-center px-6 space-y-1">
+            <h1 className="text-2xl sm:text-[26px] font-bold tracking-tight text-white leading-tight">
+              {employee.name}
+            </h1>
+            <p className="text-xs sm:text-sm font-medium text-white/90">
+              {employee.designation}
+            </p>
+          </div>
+
+          {/* Contact Details Rows with Rounded-Square Container Icons */}
+          <div className="space-y-2.5 px-6 pt-1">
+            {/* Phone */}
+            <a
+              href={`tel:${employee.officialPhone || employee.mobile || "+8801777777344"}`}
+              className="flex items-center gap-3.5 text-white hover:text-white/85 transition group"
+            >
+              <div className="size-10 rounded-2xl bg-blue-500/40 border border-white/40 flex items-center justify-center text-white shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                <Phone className="size-4.5" />
+              </div>
+              <span className="text-xs sm:text-sm font-semibold tracking-wide">
+                {employee.officialPhone || employee.mobile || "+88 01777 777344"}
+              </span>
+            </a>
+
+            {/* Office Address */}
+            <div className="flex items-start gap-3.5 text-white">
+              <div className="size-10 rounded-2xl bg-blue-500/40 border border-white/40 flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
+                <MapPin className="size-4.5" />
+              </div>
+              <div className="text-xs sm:text-[13px] font-medium leading-snug text-white/95">
+                <p>House: 37, Floor: 11 (B-11), Road: 2,</p>
+                <p>Khan ABC Tradeplex, Dhanmondi, Dhaka, Bangladesh</p>
               </div>
             </div>
 
-            {/* Quick Share Action */}
-            <button
-              onClick={handleShare}
-              className="h-9 px-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-semibold text-white transition flex items-center gap-1.5 backdrop-blur-md cursor-pointer hover:border-white/30"
-            >
-              <Share2 className="size-3.5" />
-              <span>Share</span>
-            </button>
-          </div>
-
-          {/* Name & Title */}
-          <div className="space-y-1 mb-5">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <span>{employee.name}</span>
-            </h1>
-            <p className="text-sm font-semibold text-indigo-300">{employee.designation}</p>
-            {employee.department && (
-              <p className="text-xs text-slate-400 font-medium flex items-center gap-1">
-                <Building2 className="size-3.5 text-slate-500 shrink-0" />
-                <span>{employee.department}</span>
-              </p>
-            )}
-          </div>
-
-          {/* Primary Quick Actions Grid */}
-          <div className="grid grid-cols-4 gap-2 mb-6">
-            {/* Call */}
-            {employee.officialPhone ? (
-              <a
-                href={`tel:${employee.officialPhone}`}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-400/40 text-slate-200 transition group"
-              >
-                <div className="size-9 rounded-xl bg-indigo-500/20 group-hover:bg-indigo-500 text-indigo-400 group-hover:text-white flex items-center justify-center mb-1.5 transition">
-                  <Phone className="size-4" />
-                </div>
-                <span className="text-[11px] font-semibold">Call</span>
-              </a>
-            ) : (
-              <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/[0.02] border border-white/5 text-slate-600 cursor-not-allowed">
-                <div className="size-9 rounded-xl bg-white/5 text-slate-600 flex items-center justify-center mb-1.5">
-                  <Phone className="size-4" />
-                </div>
-                <span className="text-[11px] font-medium">Call</span>
-              </div>
-            )}
-
-            {/* Email */}
-            {employee.officialEmail ? (
+            {/* Optional Email if available */}
+            {employee.officialEmail && (
               <a
                 href={`mailto:${employee.officialEmail}`}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-400/40 text-slate-200 transition group"
+                className="flex items-center gap-3.5 text-white hover:text-white/85 transition group"
               >
-                <div className="size-9 rounded-xl bg-blue-500/20 group-hover:bg-blue-500 text-blue-400 group-hover:text-white flex items-center justify-center mb-1.5 transition">
-                  <Mail className="size-4" />
+                <div className="size-10 rounded-2xl bg-blue-500/40 border border-white/40 flex items-center justify-center text-white shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                  <Mail className="size-4.5" />
                 </div>
-                <span className="text-[11px] font-semibold">Email</span>
+                <span className="text-xs sm:text-[13px] font-semibold tracking-wide truncate">
+                  {employee.officialEmail}
+                </span>
               </a>
-            ) : (
-              <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/[0.02] border border-white/5 text-slate-600 cursor-not-allowed">
-                <div className="size-9 rounded-xl bg-white/5 text-slate-600 flex items-center justify-center mb-1.5">
-                  <Mail className="size-4" />
-                </div>
-                <span className="text-[11px] font-medium">Email</span>
-              </div>
             )}
 
-            {/* WhatsApp */}
-            {sanitizedWhatsApp ? (
+            {/* Optional Website if available */}
+            {employee.website && (
               <a
-                href={`https://wa.me/${sanitizedWhatsApp}`}
+                href={websiteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/40 text-slate-200 transition group"
+                className="flex items-center gap-3.5 text-white hover:text-white/85 transition group"
               >
-                <div className="size-9 rounded-xl bg-emerald-500/20 group-hover:bg-emerald-500 text-emerald-400 group-hover:text-white flex items-center justify-center mb-1.5 transition">
-                  <MessageCircle className="size-4" />
+                <div className="size-10 rounded-2xl bg-blue-500/40 border border-white/40 flex items-center justify-center text-white shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                  <Globe className="size-4.5" />
                 </div>
-                <span className="text-[11px] font-semibold">WhatsApp</span>
+                <span className="text-xs sm:text-[13px] font-semibold tracking-wide truncate">
+                  {employee.website}
+                </span>
               </a>
-            ) : (
-              <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/[0.02] border border-white/5 text-slate-600 cursor-not-allowed">
-                <div className="size-9 rounded-xl bg-white/5 text-slate-600 flex items-center justify-center mb-1.5">
-                  <MessageCircle className="size-4" />
-                </div>
-                <span className="text-[11px] font-medium">Chat</span>
-              </div>
             )}
+          </div>
 
-            {/* Save VCF */}
+          {/* Social Media Icons in Individual White Rounded-Square Containers */}
+          <div className="flex items-center justify-center gap-3 px-6 pt-2">
+            {/* WhatsApp */}
+            <a
+              href={whatsAppUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="size-12 sm:size-13 rounded-2xl bg-white hover:bg-slate-50 flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all text-[#25D366]"
+              title="WhatsApp"
+            >
+              <WhatsAppIcon className="size-6" />
+            </a>
+
+            {/* LinkedIn */}
+            <a
+              href={linkedInUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="size-12 sm:size-13 rounded-2xl bg-white hover:bg-slate-50 flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all text-[#0A66C2]"
+              title="LinkedIn"
+            >
+              <LinkedInIcon className="size-6" />
+            </a>
+
+            {/* Facebook */}
+            <a
+              href={facebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="size-12 sm:size-13 rounded-2xl bg-white hover:bg-slate-50 flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all text-[#1877F2]"
+              title="Facebook"
+            >
+              <FacebookIcon className="size-6" />
+            </a>
+
+            {/* X / Twitter */}
+            <a
+              href={xUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="size-12 sm:size-13 rounded-2xl bg-white hover:bg-slate-50 flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all text-black"
+              title="X"
+            >
+              <XTwitterIcon className="size-5 text-black" />
+            </a>
+          </div>
+
+          {/* Primary Action Buttons */}
+          <div className="space-y-3 px-6 pt-3">
+            {/* White Save Contact (VCF) Button */}
             <button
+              type="button"
               onClick={handleDownloadContact}
-              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-400/40 text-slate-200 transition group cursor-pointer"
+              className="w-full h-12 rounded-xl bg-white hover:bg-slate-100 text-[#0956d6] font-bold text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
             >
-              <div className="size-9 rounded-xl bg-purple-500/20 group-hover:bg-purple-500 text-purple-400 group-hover:text-white flex items-center justify-center mb-1.5 transition">
-                <Download className="size-4" />
-              </div>
-              <span className="text-[11px] font-semibold">Save Contact</span>
+              <Download className="size-4.5 stroke-[2.5]" />
+              <span>Save Contact (VCF)</span>
             </button>
-          </div>
 
-          {/* Section: Contact Information */}
-          <div className="space-y-3 mb-6 bg-white/[0.03] border border-white/10 rounded-2xl p-4">
-            <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Official Contact
-            </h2>
-
-            <div className="space-y-2.5 text-xs">
-              {employee.officialPhone && (
-                <div className="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
-                  <span className="text-slate-400">Phone</span>
-                  <a
-                    href={`tel:${employee.officialPhone}`}
-                    className="font-semibold text-white hover:text-indigo-300 transition font-mono"
-                  >
-                    {employee.officialPhone}
-                  </a>
-                </div>
-              )}
-
-              {employee.officialEmail && (
-                <div className="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
-                  <span className="text-slate-400">Email</span>
-                  <a
-                    href={`mailto:${employee.officialEmail}`}
-                    className="font-semibold text-white hover:text-indigo-300 transition"
-                  >
-                    {employee.officialEmail}
-                  </a>
-                </div>
-              )}
-
-              {employee.whatsappNumber && (
-                <div className="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
-                  <span className="text-slate-400">WhatsApp</span>
-                  <a
-                    href={`https://wa.me/${sanitizedWhatsApp}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold text-emerald-400 hover:underline font-mono"
-                  >
-                    {employee.whatsappNumber}
-                  </a>
-                </div>
-              )}
-
-              {employee.officeAddress && (
-                <div className="flex items-start justify-between py-1 border-b border-white/5 last:border-0 gap-4">
-                  <span className="text-slate-400 shrink-0 flex items-center gap-1">
-                    <MapPin className="size-3.5 text-slate-500" />
-                    <span>Office</span>
-                  </span>
-                  <span className="text-right text-slate-300 font-medium">
-                    {employee.officeAddress}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Section: Social Media & Online Profiles */}
-          {employee.socialMediaLinks && employee.socialMediaLinks.length > 0 && (
-            <div className="space-y-3 mb-6">
-              <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Online Profiles & Links
-              </h2>
-              <div className="grid grid-cols-2 gap-2.5">
-                {employee.socialMediaLinks.map((link: SocialMediaLink, i: number) => {
-                  const safeHref = getSafeExternalUrl(link.url);
-                  const displayName = getPlatformDisplayName(link);
-                  return (
-                    <a
-                      key={link.id || i}
-                      href={safeHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2.5 p-3 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-indigo-400/40 text-xs font-semibold text-slate-200 transition group shadow-xs"
-                    >
-                      <SocialMediaIcon
-                        platform={link.platform}
-                        className="size-4 shrink-0 transition-transform group-hover:scale-110"
-                      />
-                      <span className="truncate flex-1">{displayName}</span>
-                      <ExternalLink className="size-3 text-slate-500 group-hover:text-slate-300" />
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Add to Contact Primary Button */}
-          <div className="space-y-2">
+            {/* Transparent Share Card Button */}
             <button
-              onClick={handleDownloadContact}
-              className="w-full h-12 rounded-2xl bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-600 hover:from-indigo-600 hover:via-blue-600 hover:to-purple-700 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer hover:shadow-xl hover:-translate-y-0.5"
+              type="button"
+              onClick={handleShare}
+              className="w-full h-12 rounded-xl border border-white/80 hover:bg-white/10 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer backdrop-blur-xs active:scale-[0.99]"
             >
-              <Download className="size-4" />
-              <span>Save Contact to Phone (.vcf)</span>
-            </button>
-
-            <button
-              onClick={() => setShowQrModal(true)}
-              className="w-full h-10 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-semibold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <QrCode className="size-3.5 text-indigo-400" />
-              <span>Scan or View QR Code</span>
+              <Share2 className="size-4" />
+              <span>Share Card</span>
             </button>
           </div>
 
-          {/* Footer Branding */}
-          <div className="mt-8 pt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-500">
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="size-3.5 text-indigo-400" />
-              Pakiza Software
-            </span>
-            <span>CRIPTON HRIS v3.0</span>
+          {/* Decorative Curved Wave Elements Background (matches reference design) */}
+          <div className="absolute inset-x-0 bottom-0 pointer-events-none overflow-hidden z-0">
+            <img
+              src="/images/nfc-bottom-waves.png?v=2"
+              alt=""
+              className="w-full h-auto object-cover opacity-90 select-none block"
+            />
           </div>
         </div>
       </div>
 
       {/* QR Code Modal */}
       {showQrModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="w-full max-w-sm bg-slate-900 border border-white/15 rounded-3xl p-6 shadow-2xl relative space-y-5 animate-in fade-in zoom-in-95 duration-200">
+        <div
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setShowQrModal(false)}
+        >
+          <div
+            className="w-full max-w-sm bg-slate-900 border border-white/15 rounded-3xl p-6 shadow-2xl relative space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
+              type="button"
               onClick={() => setShowQrModal(false)}
-              className="absolute top-4 right-4 size-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition"
+              className="absolute top-4 right-4 size-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition cursor-pointer"
+              aria-label="Close"
             >
               <X className="size-4" />
             </button>
@@ -447,7 +427,7 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
             </div>
 
             {/* Authentic Vector QR Code */}
-            <div className="flex justify-center">
+            <div className="flex justify-center p-2 bg-white rounded-2xl shadow-inner">
               <QRCodeRenderer value={publicUrl} size={210} />
             </div>
 
@@ -466,7 +446,7 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
                 <button
                   type="button"
                   onClick={handleCopyUrl}
-                  className="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shrink-0"
+                  className="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shrink-0 cursor-pointer"
                   title="Copy Link"
                 >
                   {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
@@ -478,7 +458,7 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
               <button
                 type="button"
                 onClick={handleShare}
-                className="flex-1 h-10 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-bold text-white transition flex items-center justify-center gap-1.5"
+                className="flex-1 h-10 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-bold text-white transition flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Share2 className="size-3.5" />
                 <span>Share</span>
@@ -486,7 +466,7 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
               <button
                 type="button"
                 onClick={() => setShowQrModal(false)}
-                className="h-10 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
+                className="h-10 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition cursor-pointer"
               >
                 Done
               </button>

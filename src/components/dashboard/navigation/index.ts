@@ -34,6 +34,7 @@ export * from "./admin.nav";
 export * from "./welfare.nav";
 export * from "./payroll.nav";
 export * from "./reports.nav";
+export * from "./digital-business-card.nav";
 
 /**
  * Combined global navigation tree assembled from domain-specific modules.
