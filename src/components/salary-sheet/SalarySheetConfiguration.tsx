@@ -30,8 +30,12 @@ import {
   Check,
   X,
   HelpCircle,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
 } from "lucide-react";
 import { toast } from "sonner";
+import { SearchableSelect, Option } from "@/components/ui/searchable-select";
 import { mockData as rawMockEmployees } from "@/routes/monthly-salary-details";
 
 export interface SalarySheetColumn {
@@ -383,10 +387,63 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
   const [isFormulaModalOpen, setIsFormulaModalOpen] = useState(false);
   const [activeFormulaColId, setActiveFormulaColId] = useState<string | null>(null);
   const [modalFormulaExpr, setModalFormulaExpr] = useState("");
+  const [modalParamSearch, setModalParamSearch] = useState("");
+
+  // Options for SearchableSelect
+  const systemParamOptions: Option[] = useMemo(() => {
+    return SYSTEM_PARAMETERS.map((p) => ({
+      value: p.key,
+      label: `${p.nameEng} (${p.nameBng})`,
+    }));
+  }, []);
+
+  const categoryOptions: Option[] = useMemo(() => {
+    return Object.entries(CATEGORY_LABELS).map(([k, v]) => ({
+      value: k,
+      label: v.label,
+    }));
+  }, []);
+
+  const companyOptions: Option[] = [
+    { value: "Pakiza Software Limited", label: "Pakiza Software Limited" },
+    { value: "Pakiza Knit Composite Ltd", label: "Pakiza Knit Composite Ltd" },
+    { value: "Pakiza Cotton Mills Ltd", label: "Pakiza Cotton Mills Ltd" },
+    { value: "All Group Entities", label: "All Group Entities" },
+  ];
+
+  const empTypeOptions: Option[] = [
+    { value: "Worker", label: "Worker" },
+    { value: "Office Executive", label: "Office Executive" },
+    { value: "Management", label: "Management" },
+    { value: "Staff", label: "Staff" },
+    { value: "Casual", label: "Casual" },
+    { value: "All Categories", label: "All Categories" },
+  ];
+
+  const otTypeOptions: Option[] = [
+    { value: "2hrs OT", label: "2hrs OT (Standard Daily Overtime)" },
+    { value: "3hrs OT", label: "3hrs OT (Heavy Peak Overtime)" },
+    { value: "Flat OT", label: "Flat Overtime Rate" },
+    { value: "None", label: "None (No OT Calculation)" },
+  ];
+
+  // Filtered parameters for formula modal
+  const filteredModalParams = useMemo(() => {
+    const allowed = SYSTEM_PARAMETERS.filter((p) =>
+      ["salary_breakdown", "deduction", "overtime", "bonus"].includes(p.category)
+    );
+    if (!modalParamSearch.trim()) return allowed;
+    const q = modalParamSearch.toLowerCase();
+    return allowed.filter(
+      (p) =>
+        p.nameEng.toLowerCase().includes(q) ||
+        p.nameBng.includes(q) ||
+        p.key.toLowerCase().includes(q)
+    );
+  }, [modalParamSearch]);
 
   // Filter & Search inside Column Editor
   const [columnSearch, setColumnSearch] = useState("");
-  const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>("all");
 
   // Interactive Live Preview Controls
   const [showLivePreview, setShowLivePreview] = useState(true);
@@ -543,7 +600,8 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
 
   const handleOpenFormulaModal = (col: SalarySheetColumn) => {
     setActiveFormulaColId(col.id);
-    setModalFormulaExpr(col.formulaExpression || "sal_food + sal_conveyance");
+    setModalFormulaExpr(col.formulaExpression || col.paramMapping || "sal_basic");
+    setModalParamSearch("");
     setIsFormulaModalOpen(true);
   };
 
@@ -585,16 +643,15 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
   const filteredColumns = useMemo(() => {
     if (!editingTemplate) return [];
     return editingTemplate.columns.filter((c) => {
-      const matchCat = selectedCategoryTab === "all" || c.category === selectedCategoryTab;
       const matchSearch =
         !columnSearch.trim() ||
         c.labelEng.toLowerCase().includes(columnSearch.toLowerCase()) ||
         (c.labelBng && c.labelBng.includes(columnSearch)) ||
         c.paramMapping.toLowerCase().includes(columnSearch.toLowerCase()) ||
         (c.formulaExpression && c.formulaExpression.toLowerCase().includes(columnSearch.toLowerCase()));
-      return matchCat && matchSearch;
+      return matchSearch;
     });
-  }, [editingTemplate, selectedCategoryTab, columnSearch]);
+  }, [editingTemplate, columnSearch]);
 
   // Mock employee values for real-time live interactive salary sheet view
   const sampleEmployees = useMemo(() => {
@@ -1169,30 +1226,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
             {/* Top Toolbar in Configuration Mode */}
             <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 border border-blue-500/20 px-2.5 py-0.5 rounded-full">
-                    {editingTemplate.employeeType}
-                  </span>
-                  <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
-                    {editingTemplate.companyName}
-                  </span>
-                  <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
-                    {editingTemplate.columns.filter((c) => c.isVisible).length} Active Columns
-                  </span>
-                  {editingTemplate.columns.some((c) => c.mappingType === "formula") && (
-                    <span className="text-[10px] font-extrabold text-purple-700 bg-purple-50 dark:bg-purple-950 px-2 py-0.5 rounded-md border border-purple-200 dark:border-purple-800 flex items-center gap-1">
-                      <Calculator className="size-3" />
-                      {editingTemplate.columns.filter((c) => c.mappingType === "formula").length} Custom Math Formulas
-                    </span>
-                  )}
-                </div>
-                <h2 className="text-xl font-bold text-foreground mt-1 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
                   <SlidersHorizontal className="size-5 text-primary" />
                   Configuring: {editingTemplate.title}
                 </h2>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Add/delete columns, edit labels, or write mathematical formulas (+, -, ×, ÷) to combine multiple allowances into single columns.
-                </p>
               </div>
 
               <div className="flex items-center gap-2.5 flex-wrap">
@@ -1247,7 +1284,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
             <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/40 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-64 h-9 px-3 rounded-lg border border-border/60 bg-muted/10 flex items-center gap-2 text-xs">
+                  <div className="w-72 h-9 px-3 rounded-lg border border-border/60 bg-muted/10 flex items-center gap-2 text-xs">
                     <Search className="size-3.5 text-muted-foreground" />
                     <input
                       type="text"
@@ -1258,37 +1295,6 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                     />
                   </div>
                 </div>
-
-                {/* Category Filter Pills */}
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <button
-                    onClick={() => setSelectedCategoryTab("all")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      selectedCategoryTab === "all"
-                        ? "bg-primary text-primary-foreground shadow-2xs"
-                        : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                  >
-                    All ({editingTemplate.columns.length})
-                  </button>
-                  {Object.entries(CATEGORY_LABELS).map(([catKey, catInfo]) => {
-                    const count = editingTemplate.columns.filter((c) => c.category === catKey).length;
-                    const isSelected = selectedCategoryTab === catKey;
-                    return (
-                      <button
-                        key={catKey}
-                        onClick={() => setSelectedCategoryTab(catKey)}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                          isSelected
-                            ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-2xs"
-                            : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground"
-                        }`}
-                      >
-                        {catInfo.label} ({count})
-                      </button>
-                    );
-                  })}
-                </div>
               </div>
 
               {/* Columns List / Table */}
@@ -1296,15 +1302,15 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                 <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
                   <thead className="bg-muted/40 text-muted-foreground uppercase font-bold tracking-wider text-[11px] border-b border-border/40">
                     <tr>
-                      <th className="px-3 py-3 w-[50px] text-center">Order</th>
-                      <th className="px-4 py-3 w-[150px]">Section / Group</th>
-                      <th className="px-4 py-3 w-[190px]">Column Label (English)</th>
-                      <th className="px-4 py-3 w-[170px]">Column Label (বাংলা)</th>
-                      <th className="px-4 py-3 min-w-[280px]">Parameter Mapping & Formula (+, -, ×, ÷)</th>
-                      <th className="px-3 py-3 text-center w-[85px]">Align</th>
-                      <th className="px-3 py-3 text-center w-[85px]">Header</th>
-                      <th className="px-3 py-3 text-center w-[75px]">Visible</th>
-                      <th className="px-3 py-3 text-center w-[110px]">Actions</th>
+                      <th className="px-3 py-3 w-[50px] text-center">#</th>
+                      <th className="px-3 py-3 w-[150px]">Section</th>
+                      <th className="px-3 py-3 min-w-[160px]">English Label</th>
+                      <th className="px-3 py-3 min-w-[150px]">বাংলা Label</th>
+                      <th className="px-3 py-3 min-w-[320px]">Mapping & Formula</th>
+                      <th className="px-2 py-3 text-center w-[85px]">Align</th>
+                      <th className="px-2 py-3 text-center w-[75px]">Header</th>
+                      <th className="px-2 py-3 text-center w-[65px]">Show</th>
+                      <th className="px-2 py-3 text-center w-[50px]"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground font-medium">
@@ -1314,210 +1320,193 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       return (
                         <tr
                           key={col.id}
-                          className={`hover:bg-muted/30 transition-colors ${!col.isVisible ? "opacity-45 bg-muted/20" : ""}`}
+                          className={`hover:bg-muted/30 transition-colors ${!col.isVisible ? "opacity-40 bg-muted/20" : ""}`}
                         >
                           {/* Order / Reorder */}
-                          <td className="px-3 py-2.5 text-center">
+                          <td className="px-3 py-2 text-center">
                             <div className="flex items-center justify-center gap-1">
-                              <span className="font-mono text-muted-foreground text-[11px] font-bold w-4">
+                              <span className="font-mono text-muted-foreground text-xs font-semibold w-5 text-center">
                                 {fullIndex + 1}
                               </span>
-                              <div className="flex flex-col">
+                              <div className="flex flex-col -space-y-0.5 opacity-60 hover:opacity-100 transition-opacity">
                                 <button
                                   type="button"
                                   onClick={() => handleMoveColumn(col.id, "up")}
                                   disabled={fullIndex === 0}
-                                  className="text-muted-foreground hover:text-foreground disabled:opacity-20 cursor-pointer p-0.5"
-                                  title="Move Column Left"
+                                  className="text-muted-foreground hover:text-primary disabled:opacity-20 cursor-pointer p-0.5"
+                                  title="Move Up"
                                 >
-                                  <ChevronUp className="size-3.5" />
+                                  <ChevronUp className="size-3" />
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleMoveColumn(col.id, "down")}
                                   disabled={fullIndex === editingTemplate.columns.length - 1}
-                                  className="text-muted-foreground hover:text-foreground disabled:opacity-20 cursor-pointer p-0.5"
-                                  title="Move Column Right"
+                                  className="text-muted-foreground hover:text-primary disabled:opacity-20 cursor-pointer p-0.5"
+                                  title="Move Down"
                                 >
-                                  <ChevronDown className="size-3.5" />
+                                  <ChevronDown className="size-3" />
                                 </button>
                               </div>
                             </div>
                           </td>
 
                           {/* Section / Category Dropdown */}
-                          <td className="px-4 py-2.5">
-                            <select
-                              value={col.category}
-                              onChange={(e) =>
-                                handleColumnUpdate(col.id, {
-                                  category: e.target.value as SalarySheetColumn["category"],
-                                })
-                              }
-                              className="px-2 py-1 rounded-md text-[11px] font-bold border border-border/50 bg-background cursor-pointer"
-                            >
-                              {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
-                                <option key={k} value={k}>
-                                  {v.label}
-                                </option>
-                              ))}
-                            </select>
+                          <td className="px-3 py-2">
+                            <div className="w-[140px]">
+                              <SearchableSelect
+                                options={categoryOptions}
+                                value={col.category}
+                                onChange={(val) =>
+                                  handleColumnUpdate(col.id, {
+                                    category: val as SalarySheetColumn["category"],
+                                  })
+                                }
+                                className="w-full h-8 text-xs font-medium"
+                                placeholder="Section..."
+                              />
+                            </div>
                           </td>
 
                           {/* Label English */}
-                          <td className="px-4 py-2.5">
+                          <td className="px-3 py-2">
                             <input
                               type="text"
                               value={col.labelEng}
                               onChange={(e) => handleColumnUpdate(col.id, { labelEng: e.target.value })}
-                              className="w-full h-8 px-2.5 rounded-lg border border-border/60 bg-background font-bold text-xs focus:ring-2 focus:ring-primary/20 outline-none"
+                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 hover:border-border focus:border-primary/50 bg-muted/15 focus:bg-background font-semibold text-xs outline-none transition-all"
                               placeholder="e.g. Basic"
                             />
                           </td>
 
                           {/* Label Bengali */}
-                          <td className="px-4 py-2.5">
+                          <td className="px-3 py-2">
                             <input
                               type="text"
                               value={col.labelBng || ""}
                               onChange={(e) => handleColumnUpdate(col.id, { labelBng: e.target.value })}
-                              className="w-full h-8 px-2.5 rounded-lg border border-border/60 bg-background font-medium text-xs focus:ring-2 focus:ring-primary/20 outline-none"
+                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 hover:border-border focus:border-primary/50 bg-muted/15 focus:bg-background font-medium text-xs outline-none transition-all"
                               placeholder="e.g. মূল বেতন"
                             />
                           </td>
 
-                          {/* Parameter Mapping & Math Formula Controls */}
-                          <td className="px-4 py-2.5">
+                          {/* Parameter Mapping & Math Formula Controls (Single Clean Line) */}
+                          <td className="px-3 py-2">
                             {isFormula ? (
-                              <div className="flex items-center gap-2">
-                                <div className="flex-1 bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 rounded-lg px-2.5 py-1 flex items-center justify-between text-xs">
-                                  <div className="flex items-center gap-1.5 overflow-hidden">
-                                    <span className="font-mono font-black text-purple-700 dark:text-purple-300 text-[10px] bg-purple-200/60 dark:bg-purple-900/60 px-1.5 py-0.5 rounded">
-                                      fx
-                                    </span>
-                                    <span className="font-mono text-xs text-purple-900 dark:text-purple-200 truncate">
-                                      {col.formulaExpression}
-                                    </span>
-                                  </div>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenFormulaModal(col)}
-                                  className="h-8 px-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer shadow-2xs shrink-0"
-                                  title="Edit math formula"
-                                >
-                                  <Calculator className="size-3" /> Edit Formula
-                                </button>
+                              <div className="flex items-center gap-1.5 min-w-[300px]">
                                 <button
                                   type="button"
                                   onClick={() => handleColumnUpdate(col.id, { mappingType: "direct" })}
-                                  className="h-8 px-2 rounded-lg border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground text-[10px] cursor-pointer"
-                                  title="Switch to single field mapping"
+                                  className="h-8 px-2.5 rounded-lg bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-800 text-[11px] font-black flex items-center gap-1 hover:bg-purple-200 cursor-pointer shrink-0 transition-all shadow-2xs"
+                                  title="Click to switch back to Single Parameter"
                                 >
-                                  Direct
+                                  <Calculator className="size-3" /> fx Formula
                                 </button>
+                                <div
+                                  onClick={() => handleOpenFormulaModal(col)}
+                                  className="flex-1 h-8 px-2.5 rounded-lg bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 hover:border-purple-400 flex items-center justify-between gap-1.5 cursor-pointer transition-all min-w-0"
+                                  title="Click to edit formula"
+                                >
+                                  <span className="font-mono text-xs font-bold text-purple-900 dark:text-purple-100 truncate">
+                                    {col.formulaExpression || "sal_food + sal_conveyance"}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-purple-600 bg-purple-200/60 dark:bg-purple-900/60 px-1.5 py-0.5 rounded shrink-0">
+                                    Edit
+                                  </span>
+                                </div>
                               </div>
                             ) : (
-                              <div className="flex items-center gap-1.5">
-                                <select
-                                  value={col.paramMapping}
-                                  onChange={(e) => handleColumnUpdate(col.id, { paramMapping: e.target.value })}
-                                  className="w-full h-8 px-2 rounded-lg border border-border/60 bg-background text-xs font-semibold focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer"
-                                >
-                                  <optgroup label="Employee Details">
-                                    {SYSTEM_PARAMETERS.filter((p) => p.category === "employee_info").map((p) => (
-                                      <option key={p.key} value={p.key}>
-                                        {p.nameEng} ({p.nameBng})
-                                      </option>
-                                    ))}
-                                  </optgroup>
-                                  <optgroup label="Salary Breakdown">
-                                    {SYSTEM_PARAMETERS.filter((p) => p.category === "salary_breakdown").map((p) => (
-                                      <option key={p.key} value={p.key}>
-                                        {p.nameEng} ({p.nameBng})
-                                      </option>
-                                    ))}
-                                  </optgroup>
-                                  <optgroup label="Attendance Days">
-                                    {SYSTEM_PARAMETERS.filter((p) => p.category === "attendance").map((p) => (
-                                      <option key={p.key} value={p.key}>
-                                        {p.nameEng} ({p.nameBng})
-                                      </option>
-                                    ))}
-                                  </optgroup>
-                                  <optgroup label="Deductions">
-                                    {SYSTEM_PARAMETERS.filter((p) => p.category === "deduction").map((p) => (
-                                      <option key={p.key} value={p.key}>
-                                        {p.nameEng} ({p.nameBng})
-                                      </option>
-                                    ))}
-                                  </optgroup>
-                                  <optgroup label="Overtime (OT)">
-                                    {SYSTEM_PARAMETERS.filter((p) => p.category === "overtime").map((p) => (
-                                      <option key={p.key} value={p.key}>
-                                        {p.nameEng} ({p.nameBng})
-                                      </option>
-                                    ))}
-                                  </optgroup>
-                                  <optgroup label="Bonuses & Allowances">
-                                    {SYSTEM_PARAMETERS.filter((p) => p.category === "bonus").map((p) => (
-                                      <option key={p.key} value={p.key}>
-                                        {p.nameEng} ({p.nameBng})
-                                      </option>
-                                    ))}
-                                  </optgroup>
-                                  <optgroup label="Summary & Signatures">
-                                    {SYSTEM_PARAMETERS.filter((p) => p.category === "summary_signature").map((p) => (
-                                      <option key={p.key} value={p.key}>
-                                        {p.nameEng} ({p.nameBng})
-                                      </option>
-                                    ))}
-                                  </optgroup>
-                                </select>
+                              <div className="flex items-center gap-1.5 min-w-[300px]">
+                                <span className="h-8 px-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold flex items-center gap-1 shrink-0">
+                                  <span className="size-1.5 rounded-full bg-emerald-500"></span> Field
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                  <SearchableSelect
+                                    options={systemParamOptions}
+                                    value={col.paramMapping}
+                                    onChange={(newVal) => handleColumnUpdate(col.id, { paramMapping: newVal })}
+                                    placeholder="Search parameter..."
+                                    className="w-full h-8 text-xs font-semibold bg-background"
+                                  />
+                                </div>
                                 <button
                                   type="button"
-                                  onClick={() => handleOpenFormulaModal(col)}
-                                  className="h-8 px-2 rounded-lg border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center gap-1 transition-all cursor-pointer shrink-0"
-                                  title="Convert to mathematical formula (+, -, ×, ÷)"
+                                  onClick={() => {
+                                    handleColumnUpdate(col.id, {
+                                      mappingType: "formula",
+                                      formulaExpression: col.formulaExpression || col.paramMapping || "sal_basic",
+                                    });
+                                    handleOpenFormulaModal(col);
+                                  }}
+                                  className="h-8 px-2 rounded-lg border border-dashed border-border/80 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/50 text-muted-foreground hover:text-purple-600 text-[11px] font-bold flex items-center gap-1 transition-all shrink-0 cursor-pointer"
+                                  title="Switch to Formula Calculation"
                                 >
-                                  <Calculator className="size-3" /> Formula (fx)
+                                  <Calculator className="size-3" /> +fx
                                 </button>
                               </div>
                             )}
                           </td>
 
-                          {/* Alignment */}
-                          <td className="px-3 py-2.5 text-center">
-                            <select
-                              value={col.align}
-                              onChange={(e) =>
-                                handleColumnUpdate(col.id, { align: e.target.value as "left" | "center" | "right" })
-                              }
-                              className="px-2 py-1 rounded text-xs border border-border/50 bg-background cursor-pointer"
-                            >
-                              <option value="left">Left</option>
-                              <option value="center">Center</option>
-                              <option value="right">Right</option>
-                            </select>
+                          {/* Alignment (Clean Icon Group) */}
+                          <td className="px-2 py-2 text-center">
+                            <div className="inline-flex rounded-lg border border-border/50 p-0.5 bg-muted/20">
+                              <button
+                                type="button"
+                                onClick={() => handleColumnUpdate(col.id, { align: "left" })}
+                                className={`p-1 rounded transition-colors ${
+                                  col.align === "left"
+                                    ? "bg-background text-primary shadow-xs"
+                                    : "text-muted-foreground hover:text-foreground"
+                                }`}
+                                title="Align Left"
+                              >
+                                <AlignLeft className="size-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleColumnUpdate(col.id, { align: "center" })}
+                                className={`p-1 rounded transition-colors ${
+                                  col.align === "center"
+                                    ? "bg-background text-primary shadow-xs"
+                                    : "text-muted-foreground hover:text-foreground"
+                                }`}
+                                title="Align Center"
+                              >
+                                <AlignCenter className="size-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleColumnUpdate(col.id, { align: "right" })}
+                                className={`p-1 rounded transition-colors ${
+                                  col.align === "right"
+                                    ? "bg-background text-primary shadow-xs"
+                                    : "text-muted-foreground hover:text-foreground"
+                                }`}
+                                title="Align Right"
+                              >
+                                <AlignRight className="size-3" />
+                              </button>
+                            </div>
                           </td>
 
                           {/* Header Orientation */}
-                          <td className="px-3 py-2.5 text-center">
+                          <td className="px-2 py-2 text-center">
                             <button
                               type="button"
                               onClick={() => handleColumnUpdate(col.id, { isRotatedHeader: !col.isRotatedHeader })}
-                              className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors cursor-pointer ${
+                              className={`px-2 py-1 rounded-md text-[10px] font-bold border transition-colors cursor-pointer ${
                                 col.isRotatedHeader
                                   ? "bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-800"
-                                  : "bg-muted text-muted-foreground border-border/50"
+                                  : "bg-muted/30 text-muted-foreground border-border/40 hover:bg-muted"
                               }`}
+                              title="Toggle 90° Vertical Header"
                             >
                               {col.isRotatedHeader ? "90° Vert" : "Horiz"}
                             </button>
                           </td>
 
                           {/* Visible Toggle */}
-                          <td className="px-3 py-2.5 text-center">
+                          <td className="px-2 py-2 text-center">
                             <label className="relative inline-flex items-center cursor-pointer select-none">
                               <input
                                 type="checkbox"
@@ -1530,17 +1519,15 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                           </td>
 
                           {/* Delete Column Button */}
-                          <td className="px-3 py-2.5 text-center">
-                            <div className="flex items-center justify-center gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteColumn(col.id)}
-                                className="size-8 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 flex items-center justify-center transition-colors cursor-pointer"
-                                title="Delete this column from sheet"
-                              >
-                                <Trash2 className="size-3.5" />
-                              </button>
-                            </div>
+                          <td className="px-2 py-2 text-center">
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteColumn(col.id)}
+                              className="size-7 rounded-lg border border-transparent hover:border-red-500/20 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 flex items-center justify-center transition-colors cursor-pointer"
+                              title="Delete column"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </button>
                           </td>
                         </tr>
                       );
@@ -1730,78 +1717,93 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
         )
       )}
 
-      {/* Modal: Mathematical Formula Builder (jog, biyog, gun, vaag) */}
+      {/* Modal: Mathematical Formula Builder */}
       {isFormulaModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-card rounded-2xl border border-border/60 p-6 max-w-xl w-full shadow-2xl space-y-4">
+          <div className="bg-card rounded-2xl border border-border/60 p-6 max-w-3xl sm:max-w-4xl w-full shadow-2xl space-y-4">
+            {/* Header */}
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
-              <div>
-                <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                  <Calculator className="size-5 text-purple-600" />
-                  Formula Builder (গাণিতিক সূত্র ও হিসাব)
-                </h3>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Combine parameters using arithmetic operators: <strong>+ (যোগ)</strong>, <strong>− (বিয়োগ)</strong>,{" "}
-                  <strong>× (গুণ)</strong>, <strong>÷ (ভাগ)</strong>
-                </p>
+              <div className="flex items-center gap-2.5">
+                <div className="size-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center">
+                  <Calculator className="size-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-foreground">Formula Builder</h3>
+                  <p className="text-xs text-muted-foreground">Configure mathematical calculation for this column</p>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsFormulaModalOpen(false)}
-                className="size-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                className="size-8 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
               >
-                ✕
+                <X className="size-4" />
               </button>
             </div>
 
             <div className="space-y-4 text-xs">
               {/* Formula Expression Input Box */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="font-semibold text-foreground/80">
-                    Formula Expression (গাণিতিক এক্সপ্রেশন)
-                  </label>
-                  <span className="text-[10px] text-muted-foreground font-mono">
-                    Operators: +, -, *, /, (, )
-                  </span>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground">Formula Expression</label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setModalFormulaExpr((prev) => {
+                          const trimmed = prev.trim();
+                          const tokens = trimmed.split(/\s+/);
+                          if (tokens.length <= 1) return "";
+                          tokens.pop();
+                          return tokens.join(" ");
+                        });
+                      }}
+                      className="text-[11px] text-muted-foreground hover:text-foreground px-2 py-0.5 rounded border border-border/50 hover:bg-muted cursor-pointer transition-colors"
+                    >
+                      ⌫ Backspace
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setModalFormulaExpr("")}
+                      className="text-[11px] text-rose-600 hover:text-rose-700 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer transition-colors"
+                    >
+                      Clear
+                    </button>
+                  </div>
                 </div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={modalFormulaExpr}
-                    onChange={(e) => setModalFormulaExpr(e.target.value)}
-                    placeholder="e.g. sal_food + sal_conveyance + alw_arrear"
-                    className="w-full h-11 px-3 rounded-xl border border-purple-300 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/30 font-mono text-xs font-bold focus:ring-2 focus:ring-purple-500/20 outline-none text-purple-900 dark:text-purple-100"
-                  />
-                </div>
-                <div className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1 font-medium">
-                  <Sparkles className="size-3 text-purple-500" />
-                  <span>Readable: </span>
-                  <span className="text-foreground font-semibold">
-                    {formatFormulaHumanReadable(modalFormulaExpr) || "None"}
-                  </span>
-                </div>
+                <input
+                  type="text"
+                  value={modalFormulaExpr}
+                  onChange={(e) => setModalFormulaExpr(e.target.value)}
+                  placeholder="e.g. sal_food + sal_conveyance"
+                  className="w-full h-12 px-4 rounded-xl border border-purple-300 dark:border-purple-800 bg-purple-50/40 dark:bg-purple-950/30 font-mono text-sm font-bold focus:ring-2 focus:ring-purple-500/20 outline-none text-purple-950 dark:text-purple-100"
+                />
+                {modalFormulaExpr && (
+                  <div className="text-xs text-muted-foreground flex items-center gap-1.5 pt-0.5">
+                    <Sparkles className="size-3.5 text-purple-500 shrink-0" />
+                    <span className="font-semibold text-foreground/70">Preview:</span>
+                    <span className="font-medium text-foreground">{formatFormulaHumanReadable(modalFormulaExpr)}</span>
+                  </div>
+                )}
               </div>
 
-              {/* Calculator Keypad for Operators */}
+              {/* Math Operators - Only Signs */}
               <div>
-                <span className="font-semibold text-foreground/70 block mb-1.5 text-[11px]">
-                  Math Operators (চিহ্ন যোগ করুন)
-                </span>
+                <span className="text-xs font-semibold text-foreground/80 block mb-1.5">Operators</span>
                 <div className="grid grid-cols-6 gap-2">
                   {[
-                    { label: "+ (যোগ)", val: " + ", color: "bg-emerald-50 text-emerald-700 border-emerald-300" },
-                    { label: "− (বিয়োগ)", val: " - ", color: "bg-rose-50 text-rose-700 border-rose-300" },
-                    { label: "× (গুণ)", val: " * ", color: "bg-blue-50 text-blue-700 border-blue-300" },
-                    { label: "÷ (ভাগ)", val: " / ", color: "bg-amber-50 text-amber-700 border-amber-300" },
-                    { label: "(", val: " (", color: "bg-slate-100 text-slate-800 border-slate-300" },
-                    { label: ")", val: ") ", color: "bg-slate-100 text-slate-800 border-slate-300" },
+                    { label: "+", val: " + " },
+                    { label: "-", val: " - " },
+                    { label: "×", val: " * " },
+                    { label: "÷", val: " / " },
+                    { label: "(", val: " ( " },
+                    { label: ")", val: " ) " },
                   ].map((op) => (
                     <button
                       key={op.label}
                       type="button"
                       onClick={() => setModalFormulaExpr((prev) => `${prev.trim()}${op.val}`)}
-                      className={`h-8 rounded-lg border font-extrabold text-xs flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs ${op.color}`}
+                      className="h-10 rounded-xl border border-border/70 hover:border-purple-400 bg-muted/20 hover:bg-purple-50 dark:hover:bg-purple-950/50 font-mono font-bold text-base flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95 text-foreground"
                     >
                       {op.label}
                     </button>
@@ -1809,94 +1811,104 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                 </div>
               </div>
 
-              {/* Common Quick Formula Presets */}
-              <div>
-                <span className="font-semibold text-foreground/70 block mb-1.5 text-[11px]">
-                  One-Click Presets (জনপ্রিয় সূত্রসমূহ)
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {FORMULA_PRESETS.map((preset) => (
-                    <button
-                      key={preset.nameEng}
-                      type="button"
-                      onClick={() => setModalFormulaExpr(preset.expression)}
-                      className="p-2 text-left rounded-xl border border-border/60 hover:border-purple-400 bg-muted/20 hover:bg-purple-50/50 dark:hover:bg-purple-950/30 transition-all cursor-pointer group"
-                    >
-                      <div className="font-bold text-[11px] text-foreground group-hover:text-purple-600 transition-colors">
-                        {preset.nameEng}
-                      </div>
-                      <div className="font-mono text-[9.5px] text-muted-foreground truncate mt-0.5">
-                        {preset.expression}
-                      </div>
-                    </button>
-                  ))}
+              {/* Available Parameters to Insert with Real-Time Search */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-foreground/80">
+                    Available Parameters ({filteredModalParams.length})
+                  </span>
+                  <div className="w-64 h-8 px-2.5 rounded-lg border border-border/60 bg-muted/20 flex items-center gap-1.5 text-xs">
+                    <Search className="size-3.5 text-muted-foreground shrink-0" />
+                    <input
+                      type="text"
+                      placeholder="Search parameters (e.g. food, basic)..."
+                      value={modalParamSearch}
+                      onChange={(e) => setModalParamSearch(e.target.value)}
+                      className="bg-transparent border-0 outline-none w-full text-xs placeholder:text-muted-foreground text-foreground"
+                    />
+                    {modalParamSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setModalParamSearch("")}
+                        className="text-muted-foreground hover:text-foreground text-[10px] cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              {/* Available Parameters to Insert */}
-              <div>
-                <span className="font-semibold text-foreground/70 block mb-1 text-[11px]">
-                  Insert Parameters (ক্লিক করে ভেরিয়েবল যোগ করুন)
-                </span>
-                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 border border-border/40 rounded-xl bg-muted/10">
-                  {SYSTEM_PARAMETERS.filter((p) => ["salary_breakdown", "deduction", "overtime", "bonus"].includes(p.category)).map(
-                    (p) => (
+                <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto p-3 border border-border/50 rounded-xl bg-muted/10">
+                  {filteredModalParams.length === 0 ? (
+                    <div className="text-xs text-muted-foreground p-3 w-full text-center">
+                      No parameter matching "{modalParamSearch}"
+                    </div>
+                  ) : (
+                    filteredModalParams.map((p) => (
                       <button
                         key={p.key}
                         type="button"
-                        onClick={() =>
-                          setModalFormulaExpr((prev) => (prev ? `${prev.trim()} + ${p.key}` : p.key))
-                        }
-                        className="px-2 py-1 rounded-md border border-border/60 bg-background hover:bg-purple-100 hover:border-purple-300 text-[10.5px] font-bold text-foreground/80 hover:text-purple-800 transition-colors cursor-pointer"
+                        onClick={() => {
+                          setModalFormulaExpr((prev) => {
+                            const trimmed = prev.trim();
+                            if (!trimmed) return p.key;
+                            const lastChar = trimmed[trimmed.length - 1];
+                            if (["+", "-", "*", "/", "("].includes(lastChar)) {
+                              return `${trimmed} ${p.key}`;
+                            }
+                            return `${trimmed} + ${p.key}`;
+                          });
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg border border-border/60 bg-background hover:bg-purple-50 hover:border-purple-300 dark:hover:bg-purple-950/40 text-xs font-semibold text-foreground/85 hover:text-purple-700 dark:hover:text-purple-300 transition-all cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95"
                       >
-                        + {p.nameEng.split(" (")[0]}
+                        {p.nameEng.split(" (")[0]}
                       </button>
-                    )
+                    ))
                   )}
                 </div>
               </div>
 
               {/* Live Preview Evaluation on Sample Employees */}
               {modalEvaluationPreview && (
-                <div className="p-3 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
-                  <div className="flex items-center justify-between text-[11px] font-bold">
+                <div className="p-3.5 bg-slate-100/70 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold">
                     <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                      <CheckCircle2 className="size-3.5 text-emerald-600" />
-                      Live Formula Evaluation (স্যাম্পল ফলাফল):
+                      <CheckCircle2 className="size-4 text-emerald-600" />
+                      Live Sample Evaluation
                     </span>
-                    <span className="font-mono text-purple-700 dark:text-purple-300 font-extrabold">
+                    <span className="font-mono text-purple-700 dark:text-purple-300 font-extrabold text-[11px]">
                       Valid Expression
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
-                    <div className="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <div className="text-[10px] text-muted-foreground truncate">{modalEvaluationPreview.emp1Name}</div>
-                      <div className="text-sm font-black font-mono text-emerald-700 dark:text-emerald-400 mt-0.5">
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                      <span className="text-muted-foreground text-xs truncate">{modalEvaluationPreview.emp1Name}</span>
+                      <span className="text-sm font-black font-mono text-emerald-700 dark:text-emerald-400">
                         ৳{modalEvaluationPreview.emp1Val.toLocaleString()}
-                      </div>
+                      </span>
                     </div>
-                    <div className="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <div className="text-[10px] text-muted-foreground truncate">{modalEvaluationPreview.emp4Name}</div>
-                      <div className="text-sm font-black font-mono text-emerald-700 dark:text-emerald-400 mt-0.5">
+                    <div className="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                      <span className="text-muted-foreground text-xs truncate">{modalEvaluationPreview.emp4Name}</span>
+                      <span className="text-sm font-black font-mono text-emerald-700 dark:text-emerald-400">
                         ৳{modalEvaluationPreview.emp4Val.toLocaleString()}
-                      </div>
+                      </span>
                     </div>
                   </div>
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/40">
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border/40">
                 <button
                   type="button"
                   onClick={() => setIsFormulaModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-border/60 font-semibold hover:bg-muted text-xs cursor-pointer"
+                  className="px-4 py-2 rounded-xl border border-border/60 font-semibold hover:bg-muted text-xs cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleSaveFormulaModal}
-                  className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-sm cursor-pointer"
+                  className="px-6 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-sm cursor-pointer transition-all hover:scale-[1.02] active:scale-95"
                 >
                   Save Formula
                 </button>
@@ -1941,47 +1953,36 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
 
               <div>
                 <label className="font-semibold text-foreground/80 block mb-1">Target Company</label>
-                <select
+                <SearchableSelect
+                  options={companyOptions}
                   value={newCompany}
-                  onChange={(e) => setNewCompany(e.target.value)}
-                  className="w-full h-9 px-3 rounded-xl border border-border/60 bg-background font-semibold text-xs focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer"
-                >
-                  <option value="Pakiza Software Limited">Pakiza Software Limited</option>
-                  <option value="Pakiza Knit Composite Ltd">Pakiza Knit Composite Ltd</option>
-                  <option value="Pakiza Cotton Mills Ltd">Pakiza Cotton Mills Ltd</option>
-                  <option value="All Group Entities">All Group Entities</option>
-                </select>
+                  onChange={(val) => setNewCompany(val)}
+                  className="w-full h-9 text-xs font-semibold"
+                  placeholder="Select company..."
+                />
               </div>
 
               <div>
                 <label className="font-semibold text-foreground/80 block mb-1">Employee Type</label>
-                <select
+                <SearchableSelect
+                  options={empTypeOptions}
                   value={newEmpType}
-                  onChange={(e) => setNewEmpType(e.target.value)}
-                  className="w-full h-9 px-3 rounded-xl border border-border/60 bg-background font-semibold text-xs focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer"
-                >
-                  <option value="Worker">Worker</option>
-                  <option value="Office Executive">Office Executive</option>
-                  <option value="Management">Management</option>
-                  <option value="Staff">Staff</option>
-                  <option value="Casual">Casual</option>
-                  <option value="All Categories">All Categories</option>
-                </select>
+                  onChange={(val) => setNewEmpType(val)}
+                  className="w-full h-9 text-xs font-semibold"
+                  placeholder="Select employee type..."
+                />
               </div>
 
               {newEmpType === "Worker" && (
                 <div>
                   <label className="font-semibold text-foreground/80 block mb-1">OT Setup Type</label>
-                  <select
+                  <SearchableSelect
+                    options={otTypeOptions}
                     value={newOtType}
-                    onChange={(e) => setNewOtType(e.target.value)}
-                    className="w-full h-9 px-3 rounded-xl border border-border/60 bg-background font-semibold text-xs focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer"
-                  >
-                    <option value="2hrs OT">2hrs OT (Standard Daily Overtime)</option>
-                    <option value="3hrs OT">3hrs OT (Heavy Peak Overtime)</option>
-                    <option value="Flat OT">Flat Overtime Rate</option>
-                    <option value="None">None (No OT Calculation)</option>
-                  </select>
+                    onChange={(val) => setNewOtType(val)}
+                    className="w-full h-9 text-xs font-semibold"
+                    placeholder="Select OT type..."
+                  />
                 </div>
               )}
 
@@ -2047,7 +2048,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                     newColMappingType === "formula" ? "bg-purple-600 text-white shadow-2xs" : "text-muted-foreground hover:text-purple-600"
                   }`}
                 >
-                  <Calculator className="size-3.5" /> Calculated Formula (যোগ, বিয়োগ, গুণ, ভাগ)
+                  <Calculator className="size-3.5" /> Calculated Formula
                 </button>
               </div>
 
@@ -2082,47 +2083,25 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-semibold text-foreground/80 block mb-1">Category / Section</label>
-                  <select
+                  <SearchableSelect
+                    options={categoryOptions}
                     value={newColCategory}
-                    onChange={(e) => setNewColCategory(e.target.value as SalarySheetColumn["category"])}
-                    className="w-full h-9 px-3 rounded-xl border border-border/60 bg-background font-semibold text-xs focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer"
-                  >
-                    {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
-                      <option key={k} value={k}>
-                        {v.label}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setNewColCategory(val as SalarySheetColumn["category"])}
+                    className="w-full h-9 text-xs font-semibold"
+                    placeholder="Select Section..."
+                  />
                 </div>
 
-                {newColMappingType === "direct" ? (
+                {newColMappingType === "direct" && (
                   <div>
                     <label className="font-semibold text-foreground/80 block mb-1">System Parameter</label>
-                    <select
+                    <SearchableSelect
+                      options={systemParamOptions}
                       value={newColParamMapping}
-                      onChange={(e) => setNewColParamMapping(e.target.value)}
-                      className="w-full h-9 px-3 rounded-xl border border-border/60 bg-background font-semibold text-xs focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer"
-                    >
-                      {SYSTEM_PARAMETERS.map((p) => (
-                        <option key={p.key} value={p.key}>
-                          {p.nameEng} ({p.nameBng})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ) : (
-                  <div>
-                    <label className="font-semibold text-foreground/80 block mb-1">Formula Preset</label>
-                    <select
-                      onChange={(e) => setNewColFormula(e.target.value)}
-                      className="w-full h-9 px-3 rounded-xl border border-border/60 bg-background font-semibold text-xs focus:ring-2 focus:ring-purple-500/20 outline-none cursor-pointer"
-                    >
-                      {FORMULA_PRESETS.map((pr) => (
-                        <option key={pr.nameEng} value={pr.expression}>
-                          {pr.nameEng}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(val) => setNewColParamMapping(val)}
+                      className="w-full h-9 text-xs font-semibold"
+                      placeholder="Search parameter..."
+                    />
                   </div>
                 )}
               </div>
