@@ -45,6 +45,7 @@ import {
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { toast } from "sonner";
+import { SalarySheetConfiguration } from "@/components/salary-sheet/SalarySheetConfiguration";
 
 interface CompanySetupSearch {
   tab?: TabType;
@@ -69,7 +70,7 @@ export const Route = createFileRoute("/company-setup")({
   component: CompanySetupPage,
 });
 
-export type TabType = "company" | "area" | "mapping" | "department" | "section" | "unit" | "line" | "holiday" | "payslip" | "organogram";
+export type TabType = "company" | "area" | "mapping" | "department" | "section" | "unit" | "line" | "holiday" | "payslip" | "organogram" | "salary_sheet";
 
 interface PayslipField {
   key: string;
@@ -3020,6 +3021,7 @@ export function CompanySetupView({
     { type: "organogram", label: "Designation & Organogram", icon: Network },
     { type: "holiday", label: "Default Holiday Setup", icon: Calendar },
     { type: "payslip", label: "Payslip Configuration", icon: Settings },
+    { type: "salary_sheet", label: "Salary Sheet Configuration", icon: FileSpreadsheet },
   ];
 
   const mainContent = (
@@ -3074,7 +3076,7 @@ export function CompanySetupView({
               </>
             )}
           </div>
-          {!(activeTab === "payslip" && isConfiguringTemplate) && (
+          {!(activeTab === "payslip" && isConfiguringTemplate) && activeTab !== "salary_sheet" && (
             <div className="flex flex-col sm:flex-row items-center gap-2">
               <button
                 onClick={() => {
@@ -3135,7 +3137,7 @@ export function CompanySetupView({
         </div>
 
           {/* Search bar & Actions toolbar */}
-          {activeTab !== "payslip" && (
+          {activeTab !== "payslip" && activeTab !== "salary_sheet" && (
             <div className="bg-card rounded-2xl border border-border/50 p-4 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                 <div className="w-full sm:w-64 md:w-80 h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus-within:bg-background focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all flex items-center gap-2.5 shadow-sm">
@@ -3651,8 +3653,13 @@ export function CompanySetupView({
             </>
           )}
 
+          {/* Salary Sheet Configuration Tab Content */}
+          {activeTab === "salary_sheet" && (
+            <SalarySheetConfiguration onBackToOverview={embedded ? onBackToOverview : undefined} />
+          )}
+
           {/* Master Table Router */}
-          {activeTab !== "payslip" && (
+          {activeTab !== "payslip" && activeTab !== "salary_sheet" && (
             <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
 
             <div className="overflow-x-auto">

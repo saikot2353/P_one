@@ -105,6 +105,7 @@ export const nav: NavItem[] = [
       { label: "Allowances & Bonuses", to: "/configure-compensation" },
       { label: "Tax & Compliance Setup", to: "/configure-tax" },
       { label: "Payroll Configuration", to: "/payroll-configure" },
+      { label: "Salary Sheet Configuration", to: "/salary-sheet-configuration" },
       { label: "Education & Training", to: "/configure-education" },
       { label: "Leave & Policies", to: "/configure-policies" },
       { label: "Maternity Configuration", to: "/maternity-configuration" },
@@ -489,6 +490,7 @@ export const nav: NavItem[] = [
         ],
       },
       { label: "Payroll Configuration", to: "/payroll-configure" },
+      { label: "Salary Sheet Configuration", to: "/salary-sheet-configuration" },
       {
         label: "Payroll Reports",
         to: "/payroll-reports",
