@@ -40,13 +40,13 @@ export interface SalarySheetColumn {
   labelEng: string;
   labelBng?: string;
   category:
-  | "employee_info"
-  | "salary_breakdown"
-  | "attendance"
-  | "deduction"
-  | "overtime"
-  | "bonus"
-  | "summary_signature";
+    | "employee_info"
+    | "salary_breakdown"
+    | "attendance"
+    | "deduction"
+    | "overtime"
+    | "bonus"
+    | "summary_signature";
   mappingType?: "direct" | "formula";
   paramMapping: string;
   formulaExpression?: string; // e.g. "sal_food + sal_conveyance + alw_general"
@@ -1118,10 +1118,11 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <td className="px-5 py-4 text-center">
                         <button
                           onClick={() => handleToggleTemplateStatus(tpl.id)}
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all cursor-pointer ${tpl.isActive
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all cursor-pointer ${
+                            tpl.isActive
                               ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20"
                               : "bg-slate-500/10 text-slate-500 border-slate-500/20 hover:bg-slate-500/20"
-                            }`}
+                          }`}
                         >
                           {tpl.isActive ? "Active" : "Inactive"}
                         </button>
@@ -1215,10 +1216,11 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                 </button>
                 <button
                   onClick={() => setShowLivePreview(!showLivePreview)}
-                  className={`h-9 px-3.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${showLivePreview
+                  className={`h-9 px-3.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    showLivePreview
                       ? "border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
                       : "border-border/60 bg-muted/40 text-muted-foreground hover:text-foreground"
-                    }`}
+                  }`}
                 >
                   <Eye className="size-3.5" />
                   {showLivePreview ? "Hide Live View" : "Show Live View"}
@@ -1261,10 +1263,11 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <button
                     onClick={() => setSelectedCategoryTab("all")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${selectedCategoryTab === "all"
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      selectedCategoryTab === "all"
                         ? "bg-primary text-primary-foreground shadow-2xs"
                         : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground"
-                      }`}
+                    }`}
                   >
                     All ({editingTemplate.columns.length})
                   </button>
@@ -1275,10 +1278,11 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <button
                         key={catKey}
                         onClick={() => setSelectedCategoryTab(catKey)}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${isSelected
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                          isSelected
                             ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-2xs"
                             : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground"
-                          }`}
+                        }`}
                       >
                         {catInfo.label} ({count})
                       </button>
@@ -1502,10 +1506,11 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                             <button
                               type="button"
                               onClick={() => handleColumnUpdate(col.id, { isRotatedHeader: !col.isRotatedHeader })}
-                              className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors cursor-pointer ${col.isRotatedHeader
+                              className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors cursor-pointer ${
+                                col.isRotatedHeader
                                   ? "bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-800"
                                   : "bg-muted text-muted-foreground border-border/50"
-                                }`}
+                              }`}
                             >
                               {col.isRotatedHeader ? "90° Vert" : "Horiz"}
                             </button>
@@ -1570,16 +1575,18 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <button
                         type="button"
                         onClick={() => setPreviewLanguage("en")}
-                        className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${previewLanguage === "en" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
-                          }`}
+                        className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                          previewLanguage === "en" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
+                        }`}
                       >
                         English Headers
                       </button>
                       <button
                         type="button"
                         onClick={() => setPreviewLanguage("bn")}
-                        className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${previewLanguage === "bn" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
-                          }`}
+                        className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                          previewLanguage === "bn" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
+                        }`}
                       >
                         বাংলা হেডার
                       </button>
@@ -1629,8 +1636,9 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                               <th
                                 key={col.id}
                                 style={{ width: col.width || "auto" }}
-                                className={`border border-black font-extrabold uppercase px-1 py-1.5 ${isRot ? "h-[70px] align-middle" : "align-middle"
-                                  }`}
+                                className={`border border-black font-extrabold uppercase px-1 py-1.5 ${
+                                  isRot ? "h-[70px] align-middle" : "align-middle"
+                                }`}
                               >
                                 {isRot ? (
                                   <div
@@ -1662,12 +1670,13 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                               return (
                                 <td
                                   key={col.id}
-                                  className={`border border-black px-1.5 py-1 ${col.align === "left"
+                                  className={`border border-black px-1.5 py-1 ${
+                                    col.align === "left"
                                       ? "text-left"
                                       : col.align === "right"
-                                        ? "text-right font-mono"
-                                        : "text-center font-mono"
-                                    }`}
+                                      ? "text-right font-mono"
+                                      : "text-center font-mono"
+                                  }`}
                                 >
                                   {getCellValue(emp, col)}
                                 </td>
@@ -2025,16 +2034,18 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                 <button
                   type="button"
                   onClick={() => setNewColMappingType("direct")}
-                  className={`flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center ${newColMappingType === "direct" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
-                    }`}
+                  className={`flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center ${
+                    newColMappingType === "direct" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
+                  }`}
                 >
                   Single Field Parameter
                 </button>
                 <button
                   type="button"
                   onClick={() => setNewColMappingType("formula")}
-                  className={`flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1.5 ${newColMappingType === "formula" ? "bg-purple-600 text-white shadow-2xs" : "text-muted-foreground hover:text-purple-600"
-                    }`}
+                  className={`flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1.5 ${
+                    newColMappingType === "formula" ? "bg-purple-600 text-white shadow-2xs" : "text-muted-foreground hover:text-purple-600"
+                  }`}
                 >
                   <Calculator className="size-3.5" /> Calculated Formula (যোগ, বিয়োগ, গুণ, ভাগ)
                 </button>
