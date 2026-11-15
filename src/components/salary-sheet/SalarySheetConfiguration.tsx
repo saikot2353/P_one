@@ -280,13 +280,13 @@ export function formatFormulaHumanReadable(expr: string | undefined): string {
 }
 
 export const DEFAULT_SALARY_SHEET_COLUMNS: SalarySheetColumn[] = [
-  { id: "col-1", key: "sl", labelEng: "SL", labelBng: "নং", category: "employee_info", mappingType: "direct", paramMapping: "emp_sl", align: "center", width: "35px", isVisible: true, format: "number" },
-  { id: "col-2", key: "emp_card", labelEng: "ID & Name", labelBng: "আইডি ও নাম", category: "employee_info", mappingType: "direct", paramMapping: "emp_id_name", align: "left", width: "130px", isVisible: true, format: "text" },
-  { id: "col-3", key: "basic", labelEng: "Basic", labelBng: "মূল বেতন", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_basic", align: "center", width: "65px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-4", key: "house_rent", labelEng: "House Rent", labelBng: "বাড়ি ভাড়া", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_house_rent", align: "center", width: "65px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-5", key: "medical", labelEng: "Medical", labelBng: "চিকিৎসা", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_medical", align: "center", width: "60px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-6", key: "food", labelEng: "Food", labelBng: "খাদ্য", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_food", align: "center", width: "55px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-7", key: "conveyance", labelEng: "Conveyance", labelBng: "যাতায়াত", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_conveyance", align: "center", width: "60px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-1", key: "sl", labelEng: "SL", labelBng: "নং", category: "employee_info", mappingType: "direct", paramMapping: "emp_sl", align: "center", width: "24px", isVisible: true, format: "number" },
+  { id: "col-2", key: "emp_card", labelEng: "ID & Name", labelBng: "আইডি ও নাম", category: "employee_info", mappingType: "direct", paramMapping: "emp_id_name", align: "left", width: "135px", isVisible: true, format: "text" },
+  { id: "col-3", key: "basic", labelEng: "Basic", labelBng: "মূল বেতন", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_basic", align: "center", width: "52px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-4", key: "house_rent", labelEng: "House Rent", labelBng: "বাড়ি ভাড়া", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_house_rent", align: "center", width: "50px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-5", key: "medical", labelEng: "Medical", labelBng: "চিকিৎসা", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_medical", align: "center", width: "46px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-6", key: "food", labelEng: "Food", labelBng: "খাদ্য", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_food", align: "center", width: "42px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-7", key: "conveyance", labelEng: "Conveyance", labelBng: "যাতায়াত", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_conveyance", align: "center", width: "46px", isRotatedHeader: true, isVisible: true, format: "currency" },
   {
     id: "col-8",
     key: "other_alw",
@@ -297,32 +297,32 @@ export const DEFAULT_SALARY_SHEET_COLUMNS: SalarySheetColumn[] = [
     paramMapping: "custom_param",
     formulaExpression: "sal_food + sal_conveyance",
     align: "center",
-    width: "70px",
+    width: "50px",
     isRotatedHeader: true,
     isVisible: true,
     format: "currency",
   },
-  { id: "col-9", key: "gross", labelEng: "Gross", labelBng: "মোট বেতন", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_gross", align: "center", width: "70px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-10", key: "total_day", labelEng: "Total Day", labelBng: "মোট দিন", category: "attendance", mappingType: "direct", paramMapping: "att_total_day", align: "center", width: "45px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-11", key: "present", labelEng: "Present", labelBng: "উপস্থিত", category: "attendance", mappingType: "direct", paramMapping: "att_present", align: "center", width: "45px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-12", key: "holiday", labelEng: "Holiday", labelBng: "ছুটি", category: "attendance", mappingType: "direct", paramMapping: "att_holiday", align: "center", width: "45px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-13", key: "cl", labelEng: "CL", labelBng: "নৈমিত্তিক", category: "attendance", mappingType: "direct", paramMapping: "att_leave_cl", align: "center", width: "40px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-14", key: "sl", labelEng: "SL (Leave)", labelBng: "পীড়া", category: "attendance", mappingType: "direct", paramMapping: "att_leave_sl", align: "center", width: "40px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-15", key: "el", labelEng: "EL", labelBng: "অর্জিত", category: "attendance", mappingType: "direct", paramMapping: "att_leave_el", align: "center", width: "40px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-16", key: "absent", labelEng: "Absent", labelBng: "অনুপস্থিত", category: "attendance", mappingType: "direct", paramMapping: "att_absent", align: "center", width: "45px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-17", key: "abs_deduc", labelEng: "Abs. Deduc", labelBng: "অনুপস্থিত কর্তন", category: "deduction", mappingType: "direct", paramMapping: "ded_absent", align: "center", width: "55px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-18", key: "advance", labelEng: "Advance", labelBng: "অগ্রিম", category: "deduction", mappingType: "direct", paramMapping: "ded_advance", align: "center", width: "55px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-19", key: "rev_stamp", labelEng: "Rev. Stamp", labelBng: "স্ট্যাম্প", category: "deduction", mappingType: "direct", paramMapping: "ded_stamp", align: "center", width: "50px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-20", key: "wagely_ad", labelEng: "Wagely Ad", labelBng: "ওয়েজলি", category: "deduction", mappingType: "direct", paramMapping: "ded_wagely", align: "center", width: "55px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-21", key: "adjust", labelEng: "Adjust", labelBng: "সমন্বয়", category: "deduction", mappingType: "direct", paramMapping: "ded_adjust", align: "center", width: "50px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-22", key: "tax", labelEng: "Tax", labelBng: "আয়কর", category: "deduction", mappingType: "direct", paramMapping: "ded_tax", align: "center", width: "50px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-23", key: "pay_salary", labelEng: "Pay Salary", labelBng: "প্রদেয় বেতন", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_payable_salary", align: "center", width: "65px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-24", key: "ot_hour", labelEng: "OT Hour", labelBng: "OT ঘণ্টা", category: "overtime", mappingType: "direct", paramMapping: "ot_hour", align: "center", width: "45px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-25", key: "ot_rate", labelEng: "OT Rate", labelBng: "OT হার", category: "overtime", mappingType: "direct", paramMapping: "ot_rate", align: "center", width: "55px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-26", key: "ot_pay", labelEng: "OT Pay", labelBng: "মোট OT", category: "overtime", mappingType: "direct", paramMapping: "ot_pay", align: "center", width: "60px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-27", key: "att_bonus", labelEng: "Attendance Bonus", labelBng: "হাজিরা বোনাস", category: "bonus", mappingType: "direct", paramMapping: "bonus_attendance", align: "center", width: "60px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-28", key: "net_pay", labelEng: "Net Pay", labelBng: "নিট প্রদেয়", category: "summary_signature", mappingType: "direct", paramMapping: "net_pay", align: "center", width: "80px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-29", key: "signature", labelEng: "Signature", labelBng: "স্বাক্ষর", category: "summary_signature", mappingType: "direct", paramMapping: "col_signature", align: "center", width: "110px", isRotatedHeader: true, isVisible: true, format: "signature" },
+  { id: "col-9", key: "gross", labelEng: "Gross", labelBng: "মোট বেতন", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_gross", align: "center", width: "54px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-10", key: "total_day", labelEng: "Total Day", labelBng: "মোট দিন", category: "attendance", mappingType: "direct", paramMapping: "att_total_day", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-11", key: "present", labelEng: "Present", labelBng: "উপস্থিত", category: "attendance", mappingType: "direct", paramMapping: "att_present", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-12", key: "holiday", labelEng: "Holiday", labelBng: "ছুটি", category: "attendance", mappingType: "direct", paramMapping: "att_holiday", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-13", key: "cl", labelEng: "CL", labelBng: "নৈমিত্তিক", category: "attendance", mappingType: "direct", paramMapping: "att_leave_cl", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-14", key: "sl", labelEng: "SL (Leave)", labelBng: "পীড়া", category: "attendance", mappingType: "direct", paramMapping: "att_leave_sl", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-15", key: "el", labelEng: "EL", labelBng: "অর্জিত", category: "attendance", mappingType: "direct", paramMapping: "att_leave_el", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-16", key: "absent", labelEng: "Absent", labelBng: "অনুপস্থিত", category: "attendance", mappingType: "direct", paramMapping: "att_absent", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-17", key: "abs_deduc", labelEng: "Abs. Deduc", labelBng: "অনুপস্থিত কর্তন", category: "deduction", mappingType: "direct", paramMapping: "ded_absent", align: "center", width: "48px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-18", key: "advance", labelEng: "Advance", labelBng: "অগ্রিম", category: "deduction", mappingType: "direct", paramMapping: "ded_advance", align: "center", width: "48px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-19", key: "rev_stamp", labelEng: "Rev. Stamp", labelBng: "স্ট্যাম্প", category: "deduction", mappingType: "direct", paramMapping: "ded_stamp", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-20", key: "wagely_ad", labelEng: "Wagely Ad", labelBng: "ওয়েজলি", category: "deduction", mappingType: "direct", paramMapping: "ded_wagely", align: "center", width: "48px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-21", key: "adjust", labelEng: "Adjust", labelBng: "সমন্বয়", category: "deduction", mappingType: "direct", paramMapping: "ded_adjust", align: "center", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-22", key: "tax", labelEng: "Tax", labelBng: "আয়কর", category: "deduction", mappingType: "direct", paramMapping: "ded_tax", align: "center", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-23", key: "pay_salary", labelEng: "Pay Salary", labelBng: "প্রদেয় বেতন", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_payable_salary", align: "center", width: "54px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-24", key: "ot_hour", labelEng: "OT Hour", labelBng: "OT ঘণ্টা", category: "overtime", mappingType: "direct", paramMapping: "ot_hour", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-25", key: "ot_rate", labelEng: "OT Rate", labelBng: "OT হার", category: "overtime", mappingType: "direct", paramMapping: "ot_rate", align: "center", width: "46px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-26", key: "ot_pay", labelEng: "OT Pay", labelBng: "মোট OT", category: "overtime", mappingType: "direct", paramMapping: "ot_pay", align: "center", width: "48px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-27", key: "att_bonus", labelEng: "Attendance Bonus", labelBng: "হাজিরা বোনাস", category: "bonus", mappingType: "direct", paramMapping: "bonus_attendance", align: "center", width: "46px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-28", key: "net_pay", labelEng: "Net Pay", labelBng: "নিট প্রদেয়", category: "summary_signature", mappingType: "direct", paramMapping: "net_pay", align: "center", width: "62px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-29", key: "signature", labelEng: "Signature", labelBng: "স্বাক্ষর", category: "summary_signature", mappingType: "direct", paramMapping: "col_signature", align: "center", width: "85px", isRotatedHeader: true, isVisible: true, format: "signature" },
 ];
 
 export const DEFAULT_SALARY_SHEET_TEMPLATES: SalarySheetTemplate[] = [
@@ -527,7 +527,43 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
   // Column operations
   const handleColumnUpdate = (colId: string, updates: Partial<SalarySheetColumn>) => {
     if (!editingTemplate) return;
-    const updatedCols = editingTemplate.columns.map((c) => (c.id === colId ? { ...c, ...updates } : c));
+    const updatedCols = editingTemplate.columns.map((c) => {
+      if (c.id !== colId) return c;
+      const merged = { ...c, ...updates };
+      // When value is rotated vertically, squeeze column width tightly; when returned to horizontal, restore standard width
+      if (updates.isRotatedValue !== undefined) {
+        if (updates.isRotatedValue) {
+          merged.width = "24px";
+          merged.isRotatedHeader = true;
+        } else {
+          if (!c.width || parseInt(c.width) <= 30) {
+            merged.width = "52px";
+          }
+        }
+      }
+      if (updates.isRotatedHeader !== undefined) {
+        if (
+          updates.isRotatedHeader &&
+          [
+            "att_total_day",
+            "att_present",
+            "att_holiday",
+            "att_leave_cl",
+            "att_leave_sl",
+            "att_leave_el",
+            "att_leave_ml",
+            "att_absent",
+            "ot_hour",
+            "ot_extra_hour",
+            "emp_sl",
+            "ded_stamp",
+          ].includes(c.paramMapping)
+        ) {
+          merged.width = "24px";
+        }
+      }
+      return merged;
+    });
     setEditingTemplate({
       ...editingTemplate,
       columns: updatedCols,
@@ -1067,6 +1103,36 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
       emp4Val: evaluateFormula(modalFormulaExpr, emp4),
     };
   }, [modalFormulaExpr, sampleEmployees]);
+
+  // Strict compact column width calculator for realistic ledger density
+  const getEffectiveColumnWidth = (col: SalarySheetColumn): string => {
+    if (col.isRotatedValue) return "24px";
+    if (
+      [
+        "att_total_day",
+        "att_present",
+        "att_holiday",
+        "att_leave_cl",
+        "att_leave_sl",
+        "att_leave_el",
+        "att_leave_ml",
+        "att_absent",
+        "ot_hour",
+        "ot_extra_hour",
+        "emp_sl",
+        "ded_stamp",
+      ].includes(col.paramMapping)
+    ) {
+      return col.isRotatedHeader ? "24px" : "32px";
+    }
+    if (col.paramMapping === "emp_id_name") return "140px";
+    if (col.paramMapping === "col_signature") return "85px";
+    if (col.width && parseInt(col.width) > 0) {
+      if (parseInt(col.width) > 55 && col.isRotatedHeader) return "50px";
+      return col.width;
+    }
+    return col.isRotatedHeader ? "50px" : "58px";
+  };
 
   return (
     <div className="space-y-6">
@@ -1611,142 +1677,245 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
 
                 {/* The Real Salary Sheet Landscape Canvas */}
                 <div className="bg-white text-black p-4 sm:p-6 rounded-xl border border-slate-300 shadow-inner overflow-x-auto select-none font-sans">
-                  {/* Company Header Block */}
-                  <div className="text-center pb-3 border-b border-black mb-3">
-                    <h1 className="font-extrabold text-[15px] uppercase tracking-wider text-black">
-                      {editingTemplate.companyName}
-                    </h1>
-                    <p className="text-[11px] font-bold text-neutral-800 uppercase mt-0.5">
-                      {previewLanguage === "en"
-                        ? `Monthly Salary Sheet & Wage Register — July, 2026 (${editingTemplate.employeeType})`
-                        : `মাসিক বেতন বিবরণী ও মজুরি রেজিস্টার — জুলাই, ২০২৬ (${editingTemplate.employeeType})`}
-                    </p>
-                    <div className="flex items-center justify-between text-[9px] font-semibold text-neutral-600 mt-1.5 px-2">
-                      <span>Unit: PSL Unit-01</span>
-                      <span>Section: All Active Sections</span>
-                      <span>Total Employees: {sampleEmployees.length}</span>
-                      <span>Currency: BDT (৳)</span>
+                  <div className="w-fit min-w-[700px] mx-auto">
+                    {/* Company Header Block */}
+                    <div className="text-center pb-3 border-b border-black mb-3">
+                      <h1 className="font-extrabold text-[15px] uppercase tracking-wider text-black">
+                        {editingTemplate.companyName}
+                      </h1>
+                      <p className="text-[11px] font-bold text-neutral-800 uppercase mt-0.5">
+                        {previewLanguage === "en"
+                          ? `Monthly Salary Sheet & Wage Register — July, 2026 (${editingTemplate.employeeType})`
+                          : `মাসিক বেতন বিবরণী ও মজুরি রেজিস্টার — জুলাই, ২০২৬ (${editingTemplate.employeeType})`}
+                      </p>
+                      <div className="flex items-center justify-between text-[9px] font-semibold text-neutral-600 mt-1.5 px-2">
+                        <span>Unit: PSL Unit-01</span>
+                        <span>Section: All Active Sections</span>
+                        <span>Total Employees: {sampleEmployees.length}</span>
+                        <span>Currency: BDT (৳)</span>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Dynamic Table based on Active Columns */}
-                  <table className="w-full text-center border-collapse border border-black text-[9px]">
-                    <thead className="bg-slate-100 text-black border-b border-black">
-                      <tr>
+                    {/* Dynamic Table based on Active Columns */}
+                    <table className="border-collapse border border-black text-[9px] text-center table-fixed mx-auto">
+                      <colgroup>
                         {editingTemplate.columns
                           .filter((c) => c.isVisible)
                           .map((col) => {
-                            const headerTitle =
-                              previewLanguage === "bn" && col.labelBng ? col.labelBng : col.labelEng;
-                            const isRot = col.isRotatedHeader;
-                            return (
-                              <th
-                                key={col.id}
-                                style={{ width: col.width || "auto" }}
-                                className={`border border-black font-extrabold uppercase px-1 py-1.5 ${
-                                  isRot ? "h-[70px] align-middle" : "align-middle"
-                                }`}
-                              >
-                                {isRot ? (
-                                  <div
-                                    style={{
-                                      writingMode: "vertical-rl",
-                                      transform: "rotate(180deg)",
-                                      whiteSpace: "nowrap",
-                                      margin: "0 auto",
-                                      lineHeight: 1.1,
-                                      fontSize: "7.5px",
-                                    }}
-                                  >
-                                    {headerTitle}
-                                  </div>
-                                ) : (
-                                  <span className="text-[8px] tracking-tight">{headerTitle}</span>
-                                )}
-                              </th>
-                            );
+                            const w = getEffectiveColumnWidth(col);
+                            return <col key={col.id} style={{ width: w, minWidth: w, maxWidth: w }} />;
                           })}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-black text-[8px] font-medium text-black">
-                      {sampleEmployees.map((emp) => (
-                        <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
+                      </colgroup>
+                      <thead className="bg-slate-100 text-black border-b border-black">
+                        <tr>
                           {editingTemplate.columns
                             .filter((c) => c.isVisible)
                             .map((col) => {
+                              const headerTitle =
+                                previewLanguage === "bn" && col.labelBng ? col.labelBng : col.labelEng;
+                              const isRot = col.isRotatedHeader;
+                              const colW = getEffectiveColumnWidth(col);
+                              const isNarrow = parseInt(colW) <= 30;
                               return (
-                                <td
+                                <th
                                   key={col.id}
-                                  className={`border border-black px-1.5 py-1 ${
-                                    col.isRotatedValue ? "h-[65px] align-middle" : "align-middle"
-                                  } ${
-                                    col.align === "left"
-                                      ? "text-left"
-                                      : col.align === "right"
-                                      ? "text-right font-mono"
-                                      : "text-center font-mono"
-                                  }`}
+                                  style={{
+                                    width: colW,
+                                    minWidth: colW,
+                                    maxWidth: colW,
+                                  }}
+                                  className={`border border-black font-extrabold uppercase ${
+                                    isNarrow ? "px-0 py-1 overflow-hidden" : "px-1 py-1.5"
+                                  } ${isRot ? "h-[70px] align-middle" : "align-middle"}`}
                                 >
-                                  {col.isRotatedValue ? (
+                                  {isRot ? (
                                     <div
                                       style={{
                                         writingMode: "vertical-rl",
                                         transform: "rotate(180deg)",
                                         whiteSpace: "nowrap",
                                         margin: "0 auto",
-                                        lineHeight: 1.1,
+                                        lineHeight: 1,
                                         fontSize: "7.5px",
+                                        display: "block",
+                                        width: "fit-content",
                                       }}
-                                      className="inline-block"
                                     >
-                                      {getCellValue(emp, col)}
+                                      {headerTitle}
                                     </div>
                                   ) : (
-                                    getCellValue(emp, col)
+                                    <span className="text-[8px] tracking-tight">{headerTitle}</span>
+                                  )}
+                                </th>
+                              );
+                            })}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-black text-[8px] font-medium text-black">
+                        {sampleEmployees.map((emp) => (
+                          <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
+                            {editingTemplate.columns
+                              .filter((c) => c.isVisible)
+                              .map((col) => {
+                                const isValRot = col.isRotatedValue;
+                                const colW = getEffectiveColumnWidth(col);
+                                const isNarrow = parseInt(colW) <= 30;
+                                return (
+                                  <td
+                                    key={col.id}
+                                    style={{
+                                      width: colW,
+                                      minWidth: colW,
+                                      maxWidth: colW,
+                                    }}
+                                    className={`border border-black ${
+                                      isNarrow
+                                        ? "px-0 py-0.5 overflow-hidden align-middle"
+                                        : "px-1 py-1 align-middle"
+                                    } ${
+                                      col.align === "left"
+                                        ? "text-left"
+                                        : col.align === "right"
+                                        ? "text-right font-mono"
+                                        : "text-center font-mono"
+                                    }`}
+                                  >
+                                    {isValRot ? (
+                                      <div
+                                        style={{
+                                          writingMode: "vertical-rl",
+                                          transform: "rotate(180deg)",
+                                          whiteSpace: "nowrap",
+                                          margin: "0 auto",
+                                          lineHeight: 1,
+                                          fontSize: "7.5px",
+                                          display: "block",
+                                          width: "fit-content",
+                                        }}
+                                      >
+                                        {getCellValue(emp, col)}
+                                      </div>
+                                    ) : (
+                                      getCellValue(emp, col)
+                                    )}
+                                  </td>
+                                );
+                              })}
+                          </tr>
+                        ))}
+                      </tbody>
+
+                      {/* Summary Totals Row */}
+                      <tfoot className="bg-slate-100 font-bold text-black border-t-2 border-black text-[8px]">
+                        <tr>
+                          {editingTemplate.columns
+                            .filter((c) => c.isVisible)
+                            .map((col, cIdx) => {
+                              const isValRot = col.isRotatedValue;
+                              const colW = getEffectiveColumnWidth(col);
+                              const isNarrow = parseInt(colW) <= 30;
+
+                              if (cIdx === 0) {
+                                return (
+                                  <td
+                                    key={col.id}
+                                    style={{
+                                      width: colW,
+                                      minWidth: colW,
+                                      maxWidth: colW,
+                                    }}
+                                    className={`border border-black px-0.5 py-1 text-center font-black ${
+                                      isNarrow ? "overflow-hidden align-middle" : "align-middle"
+                                    }`}
+                                  >
+                                    {isValRot ? (
+                                      <div
+                                        style={{
+                                          writingMode: "vertical-rl",
+                                          transform: "rotate(180deg)",
+                                          whiteSpace: "nowrap",
+                                          margin: "0 auto",
+                                          lineHeight: 1,
+                                          fontSize: "7.5px",
+                                          display: "block",
+                                          width: "fit-content",
+                                        }}
+                                      >
+                                        TOTAL
+                                      </div>
+                                    ) : (
+                                      "TOTAL"
+                                    )}
+                                  </td>
+                                );
+                              }
+                              if (col.paramMapping === "emp_id_name") {
+                                return (
+                                  <td
+                                    key={col.id}
+                                    style={{
+                                      width: colW,
+                                      minWidth: colW,
+                                      maxWidth: colW,
+                                    }}
+                                    className="border border-black px-1.5 py-1 text-left font-black align-middle"
+                                  >
+                                    {sampleEmployees.length} Records
+                                  </td>
+                                );
+                              }
+                              return (
+                                <td
+                                  key={col.id}
+                                  style={{
+                                    width: colW,
+                                    minWidth: colW,
+                                    maxWidth: colW,
+                                  }}
+                                  className={`border border-black font-mono font-bold ${
+                                    isNarrow
+                                      ? "px-0 py-0.5 overflow-hidden align-middle"
+                                      : "px-1 py-1 align-middle"
+                                  } ${
+                                    col.align === "left"
+                                      ? "text-left"
+                                      : col.align === "right"
+                                      ? "text-right"
+                                      : "text-center"
+                                  }`}
+                                >
+                                  {isValRot ? (
+                                    <div
+                                      style={{
+                                        writingMode: "vertical-rl",
+                                        transform: "rotate(180deg)",
+                                        whiteSpace: "nowrap",
+                                        margin: "0 auto",
+                                        lineHeight: 1,
+                                        fontSize: "7.5px",
+                                        display: "block",
+                                        width: "fit-content",
+                                      }}
+                                    >
+                                      {getColumnFooterTotal(col)}
+                                    </div>
+                                  ) : (
+                                    getColumnFooterTotal(col)
                                   )}
                                 </td>
                               );
                             })}
                         </tr>
-                      ))}
-                    </tbody>
+                      </tfoot>
+                    </table>
 
-                    {/* Summary Totals Row */}
-                    <tfoot className="bg-slate-100 font-bold text-black border-t-2 border-black text-[8px]">
-                      <tr>
-                        {editingTemplate.columns
-                          .filter((c) => c.isVisible)
-                          .map((col, cIdx) => {
-                            if (cIdx === 0) {
-                              return (
-                                <td key={col.id} className="border border-black px-1 py-1 text-center font-black">
-                                  TOTAL
-                                </td>
-                              );
-                            }
-                            if (col.paramMapping === "emp_id_name") {
-                              return (
-                                <td key={col.id} className="border border-black px-1 py-1 text-left font-black">
-                                  {sampleEmployees.length} Records
-                                </td>
-                              );
-                            }
-                            return (
-                              <td key={col.id} className="border border-black px-1 py-1 font-mono text-center">
-                                {getColumnFooterTotal(col)}
-                              </td>
-                            );
-                          })}
-                      </tr>
-                    </tfoot>
-                  </table>
-
-                  {/* Signatures Footer */}
-                  <div className="grid grid-cols-4 gap-6 pt-10 text-[9px] font-bold text-neutral-800 text-center uppercase">
-                    <div className="border-t border-black pt-1">Prepared By</div>
-                    <div className="border-t border-black pt-1">Checked By</div>
-                    <div className="border-t border-black pt-1">Head of HR</div>
-                    <div className="border-t border-black pt-1">Managing Director</div>
+                    {/* Signatures Footer */}
+                    <div className="grid grid-cols-4 gap-6 pt-10 text-[9px] font-bold text-neutral-800 text-center uppercase">
+                      <div className="border-t border-black pt-1">Prepared By</div>
+                      <div className="border-t border-black pt-1">Checked By</div>
+                      <div className="border-t border-black pt-1">Head of HR</div>
+                      <div className="border-t border-black pt-1">Managing Director</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2047,7 +2216,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
       {/* Modal: Add New Custom Column (Direct or Formula) */}
       {isAddColumnOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-card rounded-2xl border border-border/60 p-6 max-w-lg w-full shadow-2xl space-y-4">
+          <div className="bg-card rounded-2xl border border-border/60 p-6 max-w-2xl sm:max-w-3xl w-full shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <div>
                 <h3 className="text-base font-bold text-foreground flex items-center gap-2">
