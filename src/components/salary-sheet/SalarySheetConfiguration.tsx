@@ -57,6 +57,7 @@ export interface SalarySheetColumn {
   width?: string;
   align: "left" | "center" | "right";
   isRotatedHeader?: boolean;
+  isRotatedValue?: boolean;
   isVisible: boolean;
   format?: "currency" | "number" | "text" | "date" | "signature";
 }
@@ -381,6 +382,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
   const [newColFormula, setNewColFormula] = useState("sal_food + sal_conveyance");
   const [newColAlign, setNewColAlign] = useState<"left" | "center" | "right">("center");
   const [newColRotated, setNewColRotated] = useState(true);
+  const [newColValueRotated, setNewColValueRotated] = useState(false);
   const [newColWidth, setNewColWidth] = useState("65px");
 
   // Formula Builder Modal for Existing Column
@@ -582,6 +584,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
       align: newColAlign,
       width: newColWidth.trim() || "65px",
       isRotatedHeader: newColRotated,
+      isRotatedValue: newColValueRotated,
       isVisible: true,
       format: newColMappingType === "formula" ? "currency" : paramDef?.format || "text",
     };
@@ -1303,14 +1306,15 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                   <thead className="bg-muted/40 text-muted-foreground uppercase font-bold tracking-wider text-[11px] border-b border-border/40">
                     <tr>
                       <th className="px-3 py-3 w-[50px] text-center">#</th>
-                      <th className="px-3 py-3 w-[150px]">Section</th>
-                      <th className="px-3 py-3 min-w-[160px]">English Label</th>
-                      <th className="px-3 py-3 min-w-[150px]">বাংলা Label</th>
-                      <th className="px-3 py-3 min-w-[320px]">Mapping & Formula</th>
+                      <th className="px-3 py-3 w-[140px]">Section</th>
+                      <th className="px-3 py-3 min-w-[150px]">English Label</th>
+                      <th className="px-3 py-3 min-w-[140px]">বাংলা Label</th>
+                      <th className="px-3 py-3 min-w-[300px]">Mapping & Formula</th>
                       <th className="px-2 py-3 text-center w-[85px]">Align</th>
-                      <th className="px-2 py-3 text-center w-[75px]">Header</th>
-                      <th className="px-2 py-3 text-center w-[65px]">Show</th>
-                      <th className="px-2 py-3 text-center w-[50px]"></th>
+                      <th className="px-2 py-3 text-center w-[75px]" title="Header Orientation">Header</th>
+                      <th className="px-2 py-3 text-center w-[75px]" title="Cell Value Orientation">Value</th>
+                      <th className="px-2 py-3 text-center w-[60px]">Show</th>
+                      <th className="px-2 py-3 text-center w-[45px]"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground font-medium">
@@ -1499,9 +1503,25 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                                   ? "bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-800"
                                   : "bg-muted/30 text-muted-foreground border-border/40 hover:bg-muted"
                               }`}
-                              title="Toggle 90° Vertical Header"
+                              title="Header Style: 90° Vertical vs Horizontal"
                             >
                               {col.isRotatedHeader ? "90° Vert" : "Horiz"}
+                            </button>
+                          </td>
+
+                          {/* Cell Value Orientation */}
+                          <td className="px-2 py-2 text-center">
+                            <button
+                              type="button"
+                              onClick={() => handleColumnUpdate(col.id, { isRotatedValue: !col.isRotatedValue })}
+                              className={`px-2 py-1 rounded-md text-[10px] font-bold border transition-colors cursor-pointer ${
+                                col.isRotatedValue
+                                  ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-800"
+                                  : "bg-muted/30 text-muted-foreground border-border/40 hover:bg-muted"
+                              }`}
+                              title="Cell Value Style: 90° Vertical vs Horizontal"
+                            >
+                              {col.isRotatedValue ? "90° Vert" : "Horiz"}
                             </button>
                           </td>
 
@@ -1658,6 +1678,8 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                                 <td
                                   key={col.id}
                                   className={`border border-black px-1.5 py-1 ${
+                                    col.isRotatedValue ? "h-[65px] align-middle" : "align-middle"
+                                  } ${
                                     col.align === "left"
                                       ? "text-left"
                                       : col.align === "right"
@@ -1665,7 +1687,23 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                                       : "text-center font-mono"
                                   }`}
                                 >
-                                  {getCellValue(emp, col)}
+                                  {col.isRotatedValue ? (
+                                    <div
+                                      style={{
+                                        writingMode: "vertical-rl",
+                                        transform: "rotate(180deg)",
+                                        whiteSpace: "nowrap",
+                                        margin: "0 auto",
+                                        lineHeight: 1.1,
+                                        fontSize: "7.5px",
+                                      }}
+                                      className="inline-block"
+                                    >
+                                      {getCellValue(emp, col)}
+                                    </div>
+                                  ) : (
+                                    getCellValue(emp, col)
+                                  )}
                                 </td>
                               );
                             })}
@@ -2129,7 +2167,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                 </div>
               )}
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
                   <label className="font-semibold text-foreground/80 block mb-1">Alignment</label>
                   <select
@@ -2150,8 +2188,20 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                     onChange={(e) => setNewColRotated(e.target.value === "vertical")}
                     className="w-full h-9 px-3 rounded-xl border border-border/60 bg-background font-semibold text-xs cursor-pointer"
                   >
-                    <option value="vertical">Vertical (90° Rotated)</option>
-                    <option value="horizontal">Horizontal Text</option>
+                    <option value="vertical">Vertical (90°)</option>
+                    <option value="horizontal">Horizontal</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-semibold text-foreground/80 block mb-1">Value Style</label>
+                  <select
+                    value={newColValueRotated ? "vertical" : "horizontal"}
+                    onChange={(e) => setNewColValueRotated(e.target.value === "vertical")}
+                    className="w-full h-9 px-3 rounded-xl border border-border/60 bg-background font-semibold text-xs cursor-pointer"
+                  >
+                    <option value="horizontal">Horizontal</option>
+                    <option value="vertical">Vertical (90°)</option>
                   </select>
                 </div>
 
