@@ -41,6 +41,7 @@ import {
   getMaternityRequests,
   logMedicalVisitAndProcess,
   checkMaternityEligibility,
+  getMaternityVerificationConfig,
 } from "@/lib/maternityLeaveStore";
 
 export const Route = createFileRoute("/maternity-medical-verification")({
@@ -206,6 +207,9 @@ function MaternityMedicalVerificationPage() {
     setTimeout(() => setToastMessage(""), 4500);
   };
 
+  const [maternityConfig, setMaternityConfig] = useState(() => getMaternityVerificationConfig());
+  const targetFollowupCount = maternityConfig.minMedicalFollowupCount || 3;
+
   const loadData = () => {
     setRequests(getMaternityRequests());
   };
@@ -213,8 +217,16 @@ function MaternityMedicalVerificationPage() {
   useEffect(() => {
     loadData();
     const handleUpdate = () => loadData();
+    const handleConfigUpdate = (e: any) => {
+      if (e.detail) setMaternityConfig(e.detail);
+      else setMaternityConfig(getMaternityVerificationConfig());
+    };
     window.addEventListener("maternity-data-updated", handleUpdate);
-    return () => window.removeEventListener("maternity-data-updated", handleUpdate);
+    window.addEventListener("maternity-config-updated", handleConfigUpdate);
+    return () => {
+      window.removeEventListener("maternity-data-updated", handleUpdate);
+      window.removeEventListener("maternity-config-updated", handleConfigUpdate);
+    };
   }, []);
 
   const filteredRequests = useMemo(() => {
@@ -334,6 +346,8 @@ function MaternityMedicalVerificationPage() {
   const openExamModal = (req: MaternityRequest) => {
     setActiveRequest(req);
     const visitCount = req.medicalStage.checkupVisits.length;
+    const currentVisitNum = visitCount + 1;
+    const isFinal = currentVisitNum >= targetFollowupCount;
 
     // Prefill form
     setDoctorName(req.medicalStage.assignedDoctor || "Dr. Farzana Yasmin, MBBS, DGO");
@@ -344,8 +358,7 @@ function MaternityMedicalVerificationPage() {
     const guessedWeeks = visitCount > 0 ? (req.medicalStage.checkupVisits[visitCount - 1].gestationalWeeks || 24) + 2 : 24;
     setGestationalWeeks(guessedWeeks);
 
-    // If already has visits, toggle default to final checkup if week >= 28 or let user choose
-    setIsFinalCheckup(visitCount >= 2);
+    setIsFinalCheckup(isFinal);
     setNextFollowupDate("2026-11-15");
     setClinicalFitness(req.medicalStage.clinicalFitness || "Normal Health - Fit to Work");
     setClinicalFindings("");
@@ -359,6 +372,9 @@ function MaternityMedicalVerificationPage() {
   const handleSaveCheckup = (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeRequest) return;
+
+    const currentVisitNum = activeRequest.medicalStage.checkupVisits.length + 1;
+    const isFinal = currentVisitNum >= targetFollowupCount;
 
     const finalFindings =
       clinicalFindings.trim() ||
@@ -385,10 +401,10 @@ function MaternityMedicalVerificationPage() {
         bloodSugar,
         clinicalFindings: finalFindings,
         prescribedVitamins: finalVitamins,
-        nextFollowupDate: isFinalCheckup ? null : nextFollowupDate,
+        nextFollowupDate: isFinal ? null : nextFollowupDate,
         medicalReports: ["Clinical_Checkup_Slip.pdf"],
       },
-      isFinalCheckup,
+      isFinal,
       undefined,
       clinicalFitness,
       finalRemarks
@@ -396,13 +412,13 @@ function MaternityMedicalVerificationPage() {
 
     setIsExamModalOpen(false);
 
-    if (isFinalCheckup) {
+    if (isFinal) {
       showToast(
-        `✅ Final medical follow-up completed for ${activeRequest.employee.name}! Case forwarded to Welfare for EDD & leave scheduling.`
+        `✅ Final medical follow-up (#${currentVisitNum}) completed for ${activeRequest.employee.name}! Case forwarded to Welfare for EDD & leave scheduling.`
       );
     } else {
       showToast(
-        `✅ Checkup logged for ${activeRequest.employee.name}. Next follow-up appointment scheduled for ${nextFollowupDate}.`
+        `✅ Follow-up #${currentVisitNum} logged for ${activeRequest.employee.name}. Next follow-up appointment scheduled for ${nextFollowupDate}.`
       );
     }
   };
@@ -793,7 +809,11 @@ function MaternityMedicalVerificationPage() {
                                   className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs flex items-center gap-1 transition"
                                 >
                                   <Stethoscope className="w-3.5 h-3.5" />
-                                  {visits.length === 0 ? "Perform Checkup" : "Follow-up / Finalize"}
+                                  {visits.length === 0
+                                    ? "Perform Checkup"
+                                    : visits.length + 1 >= targetFollowupCount
+                                    ? "Final Follow-up"
+                                    : `Follow-up #${visits.length + 1}`}
                                 </button>
                               )}
 
@@ -1353,131 +1373,148 @@ function MaternityMedicalVerificationPage() {
                 </div>
               </div>
 
-              {/* 6. Mark as Final Medical Follow-up & Forward to Welfare */}
-              <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 bg-white dark:bg-slate-900 shadow-2xs">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center gap-2.5">
-                    <input
-                      type="checkbox"
-                      id="isFinalAssessment"
-                      checked={isFinalCheckup}
-                      onChange={(e) => setIsFinalCheckup(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
-                    />
-                    <label htmlFor="isFinalAssessment" className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 cursor-pointer">
-                      Mark as Final Medical Follow-up (Forward to Welfare for Further Process)
-                    </label>
-                  </div>
-                  {isFinalCheckup && (
-                    <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/50">
-                      Final Follow-up &rarr; Forward to Welfare
-                    </span>
-                  )}
-                </div>
+              {/* 6. Medical Follow-up & Welfare Forwarding (Automated based on Follow-up Count) */}
+              {(() => {
+                const currentVisitNumber = (activeRequest.medicalStage.checkupVisits.length || 0) + 1;
+                const isCurrentFinal = currentVisitNumber >= targetFollowupCount;
 
-                {!isFinalCheckup ? (
-                  /* Schedule Next Follow-up Date (Requirement) */
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-3">
-                    <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold">
-                      <CalendarPlus className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <span>Schedule Next Follow-up Date for Re-examination</span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400 mb-1">
-                          Next Follow-up Appointment Date *
-                        </label>
-                        <input
-                          type="date"
-                          value={nextFollowupDate}
-                          onChange={(e) => setNextFollowupDate(e.target.value)}
-                          required={!isFinalCheckup}
-                          className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
-                        />
+                return (
+                  <>
+                    <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 bg-white dark:bg-slate-900 shadow-2xs">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                              isCurrentFinal
+                                ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400"
+                                : "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
+                            }`}
+                          >
+                            {isCurrentFinal ? (
+                              <ShieldCheck className="w-3.5 h-3.5" />
+                            ) : (
+                              <CalendarPlus className="w-3.5 h-3.5" />
+                            )}
+                          </div>
+                          <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                            {isCurrentFinal
+                              ? "Final Medical Follow-up"
+                              : "Medical Follow-up Schedule"}
+                          </span>
+                        </div>
+                        {isCurrentFinal ? (
+                          <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/50 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Final Follow-up &rarr; Forward to Welfare
+                          </span>
+                        ) : (
+                          <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2.5 py-0.5 rounded-md border border-blue-200/60 dark:border-blue-800/50">
+                            Follow-up {currentVisitNumber}/{targetFollowupCount}
+                          </span>
+                        )}
                       </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400 mb-1">
-                          Follow-up Examination Purpose
-                        </label>
-                        <input
-                          type="text"
-                          defaultValue="Review maternal vitals and fetal wellbeing in follow-up examination"
-                          className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* Final Clinical Follow-up & Medical Clearance - Forward to Welfare */
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-4 animate-in fade-in">
-                    <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      <span>Final Clinical Follow-up Completed &amp; Medical Clearance</span>
+
+                      {!isCurrentFinal ? (
+                        /* Schedule Next Follow-up Date (Shown for visits < targetFollowupCount) */
+                        <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold">
+                              <CalendarPlus className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                              <span>Schedule Next Follow-up Date for Re-examination</span>
+                            </div>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                              Required Follow-ups: <strong>{targetFollowupCount}</strong>
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <div>
+                              <label className="block text-slate-600 dark:text-slate-400 mb-1">
+                                Next Follow-up Appointment Date *
+                              </label>
+                              <input
+                                type="date"
+                                value={nextFollowupDate}
+                                onChange={(e) => setNextFollowupDate(e.target.value)}
+                                required={!isCurrentFinal}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-slate-600 dark:text-slate-400 mb-1">
+                                Follow-up Examination Purpose
+                              </label>
+                              <input
+                                type="text"
+                                defaultValue="Review maternal vitals and fetal wellbeing in follow-up examination"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
+                              />
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            ℹ️ Follow-up count is set to {targetFollowupCount}. At the {targetFollowupCount === 3 ? "3rd" : `#${targetFollowupCount}`} follow-up, this section will automatically be removed and the case will be forwarded to Welfare.
+                          </p>
+                        </div>
+                      ) : (
+                        /* Final Clinical Follow-up & Medical Clearance - Forward to Welfare */
+                        <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-4 animate-in fade-in">
+                          <div>
+                            <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                              Clinical Fitness Status
+                            </label>
+                            <select
+                              value={clinicalFitness}
+                              onChange={(e: any) => setClinicalFitness(e.target.value)}
+                              className="w-full sm:w-1/2 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
+                            >
+                              <option value="Normal Health - Fit to Work">Normal Health - Fit to Work</option>
+                              <option value="Fit for Light Duty">Fit for Light Duty (Restricted lifting/standing)</option>
+                              <option value="High Risk - Immediate Rest Advised">High Risk - Immediate Rest Advised</option>
+                            </select>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+                              Doctor&apos;s Final Assessment &amp; Clearance Notes
+                            </label>
+                            <textarea
+                              rows={2}
+                              value={doctorFinalRemarks}
+                              onChange={(e) => setDoctorFinalRemarks(e.target.value)}
+                              placeholder="Write clinical clearance comments (if required)..."
+                              className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-2xs resize-y min-h-[50px]"
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="p-3 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50 rounded-xl text-xs text-emerald-800 dark:text-emerald-300 flex items-start gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-semibold">All Medical Follow-up Consultations Finished</p>
-                        <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5 leading-relaxed">
-                          Upon completing this final examination, the request will be forwarded to the Welfare Department for Expected Delivery Date (EDD) recording, leave duration calculation, and scheduling.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                        Clinical Fitness Status
-                      </label>
-                      <select
-                        value={clinicalFitness}
-                        onChange={(e: any) => setClinicalFitness(e.target.value)}
-                        className="w-full sm:w-1/2 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
+                    {/* Submit Buttons */}
+                    <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setIsExamModalOpen(false)}
+                        className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100"
                       >
-                        <option value="Normal Health - Fit to Work">Normal Health - Fit to Work</option>
-                        <option value="Fit for Light Duty">Fit for Light Duty (Restricted lifting/standing)</option>
-                        <option value="High Risk - Immediate Rest Advised">High Risk - Immediate Rest Advised</option>
-                      </select>
+                        Cancel
+                      </button>
+
+                      <button
+                        type="submit"
+                        className={`px-5 py-2.5 text-xs font-semibold rounded-xl text-white shadow-md flex items-center gap-2 transition ${
+                          isCurrentFinal
+                            ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-600/25"
+                            : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-blue-600/25"
+                        }`}
+                      >
+                        <Send className="w-4 h-4" />
+                        {isCurrentFinal
+                          ? "Complete Final Follow-up & Forward to Welfare"
+                          : `Save Follow-up #${currentVisitNumber} & Schedule Next Date`}
+                      </button>
                     </div>
-
-                    <div className="space-y-1.5">
-                      <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                        Doctor&apos;s Final Assessment &amp; Clearance Notes
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={doctorFinalRemarks}
-                        onChange={(e) => setDoctorFinalRemarks(e.target.value)}
-                        placeholder="Write a comments (if required)"
-                        className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-2xs resize-y min-h-[50px]"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Submit Buttons */}
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsExamModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  className={`px-5 py-2.5 text-xs font-semibold rounded-xl text-white shadow-md flex items-center gap-2 transition ${
-                    isFinalCheckup
-                      ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-600/25"
-                      : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-blue-600/25"
-                  }`}
-                >
-                  <Send className="w-4 h-4" />
-                  {isFinalCheckup ? "Complete Final Follow-up & Forward to Welfare" : "Save Visit & Schedule Follow-up"}
-                </button>
-              </div>
+                  </>
+                );
+              })()}
             </form>
           </div>
         </div>

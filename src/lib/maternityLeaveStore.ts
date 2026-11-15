@@ -1197,7 +1197,7 @@ export interface MaternityVerificationConfig {
   ineligibilityHandling: "BLOCK" | "ALLOW_WITH_OVERRIDE" | "WARNING_ONLY";
 
   // 2. Minimum Medical Follow-up Checkup Count
-  minMedicalFollowupCount: number; // default: 2
+  minMedicalFollowupCount: number; // default: 3
   minFollowupIntervalDays: number; // default: 7
   enforceMinFollowupBeforeFinal: boolean;
   requireMandatoryVitals: boolean;
@@ -1225,7 +1225,7 @@ export const DEFAULT_MATERNITY_VERIFICATION_CONFIG: MaternityVerificationConfig 
   continuityRequirement: "STRICT_CONTINUOUS",
   ineligibilityHandling: "BLOCK",
 
-  minMedicalFollowupCount: 2,
+  minMedicalFollowupCount: 3,
   minFollowupIntervalDays: 7,
   enforceMinFollowupBeforeFinal: true,
   requireMandatoryVitals: true,
