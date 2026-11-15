@@ -239,7 +239,7 @@ function ShareMyCardPage() {
                   title="Click to zoom in"
                 >
                   <img
-                    src="/images/rakibul-islam-khan-qr-profile-card.png"
+                    src="/images/nfc-card-ui-02-1.png"
                     alt="Rakibul Islam Khan QR Profile Card"
                     className="w-full h-auto object-contain block transition-transform duration-300 group-hover:scale-[1.01]"
                   />
@@ -456,7 +456,7 @@ function ShareMyCardPage() {
             {/* Preserved Full Quality Image */}
             <div className="relative rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-black/40">
               <img
-                src="/images/rakibul-islam-khan-qr-profile-card.png"
+                src="/images/nfc-card-ui-02-1.png"
                 alt="Rakibul Islam Khan QR Profile Card - Enlarged"
                 className="max-w-full max-h-[82vh] w-auto h-auto object-contain block"
               />

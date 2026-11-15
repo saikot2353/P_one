@@ -450,7 +450,7 @@ export function DigitalBusinessCardView({ empIdOrToken }: { empIdOrToken: string
           {/* Decorative Curved Wave Elements Background (matches reference design) */}
           <div className="absolute inset-x-0 bottom-0 pointer-events-none overflow-hidden z-0">
             <img
-              src="/images/nfc-bottom-waves.png?v=2"
+              src="/images/nfc-bottom-waves.png?v=3"
               alt=""
               className="w-full h-auto object-cover opacity-90 select-none block"
             />
