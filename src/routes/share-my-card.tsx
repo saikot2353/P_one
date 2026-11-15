@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { Sidebar } from "@/components/dashboard/Sidebar";
+import { DigitalBusinessCardSidebar } from "@/components/dashboard/DigitalBusinessCardSidebar";
 import {
   Share2,
   QrCode,
@@ -15,6 +15,8 @@ import {
   Eye,
   EyeOff,
   Sparkles,
+  ZoomIn,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -47,6 +49,23 @@ function ShareMyCardPage() {
   const [currentEmpId, setCurrentEmpId] = useState<string>("2023043910");
   const [card, setCard] = useState<DigitalBusinessCard | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsZoomOpen(false);
+      }
+    };
+    if (isZoomOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [isZoomOpen]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -117,7 +136,7 @@ function ShareMyCardPage() {
 
   return (
     <div className="flex h-screen bg-background text-foreground font-sans antialiased overflow-hidden">
-      <Sidebar />
+      <DigitalBusinessCardSidebar />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Topbar />
@@ -205,9 +224,31 @@ function ShareMyCardPage() {
                   </p>
                 </div>
 
-                {/* Authentic Scannable QR Code */}
-                <div className="p-2 bg-gradient-to-tr from-indigo-500/20 via-purple-500/20 to-sky-500/20 rounded-3xl border border-white/20 shadow-md">
-                  <QRCodeRenderer value={publicUrl} size={240} />
+                {/* Rakibul Islam Khan QR Profile Card with Zoom Feature */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setIsZoomOpen(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setIsZoomOpen(true);
+                    }
+                  }}
+                  className="group relative max-w-md w-full rounded-2xl overflow-hidden border border-border/80 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 bg-background"
+                  title="Click to zoom in"
+                >
+                  <img
+                    src="/images/nfc-card-ui-02-1.png"
+                    alt="Rakibul Islam Khan QR Profile Card"
+                    className="w-full h-auto object-contain block transition-transform duration-300 group-hover:scale-[1.01]"
+                  />
+                  <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2 text-white font-medium text-xs backdrop-blur-[1px]">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 border border-white/20 shadow-lg text-white text-xs font-semibold">
+                      <ZoomIn className="size-3.5" />
+                      <span>Click to zoom</span>
+                    </span>
+                  </div>
                 </div>
 
                 {/* Permanent Public URL box */}
@@ -311,21 +352,33 @@ function ShareMyCardPage() {
                   </div>
 
                   <div className="flex items-center justify-between py-1.5 border-b border-border/40">
-                    <span className="text-muted-foreground">Public Token</span>
-                    <span className="font-mono font-semibold text-foreground text-[11px]">
-                      {card?.publicToken}
+                    <span className="text-muted-foreground">Official Email</span>
+                    <span className="font-semibold text-foreground">{hrisEmp.email || "rakib@pakizaknit.com"}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between py-1.5 border-b border-border/40">
+                    <span className="text-muted-foreground">Mobile / Phone</span>
+                    <span className="font-semibold text-foreground font-mono">
+                      {(hrisEmp as any).mobile || hrisEmp.officeMob || hrisEmp.phone || "+88 01777 777344"}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between py-1.5 border-b border-border/40">
-                    <span className="text-muted-foreground">Official Email</span>
-                    <span className="font-semibold text-foreground">{hrisEmp.email || "—"}</span>
+                    <span className="text-muted-foreground">Website</span>
+                    <a
+                      href={String((hrisEmp as any).website || "www.pakizasoftware.com").startsWith("http") ? String((hrisEmp as any).website) : `http://${(hrisEmp as any).website || "www.pakizasoftware.com"}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-primary hover:underline"
+                    >
+                      {(hrisEmp as any).website || "www.pakizasoftware.com"}
+                    </a>
                   </div>
 
-                  <div className="flex items-center justify-between py-1.5 border-b border-border/40">
-                    <span className="text-muted-foreground">Official Phone</span>
-                    <span className="font-semibold text-foreground font-mono">
-                      {hrisEmp.officeMob || hrisEmp.phone || "—"}
+                  <div className="flex flex-col py-1.5 border-b border-border/40 gap-0.5">
+                    <span className="text-muted-foreground">Office Address</span>
+                    <span className="font-medium text-foreground text-[11px] leading-relaxed">
+                      {(hrisEmp as any).address ? `${(hrisEmp as any).address}, ${(hrisEmp as any).building || ""}, ${(hrisEmp as any).area || ""}, ${(hrisEmp as any).city || ""}, ${(hrisEmp as any).country || ""}` : (card?.officeAddress || "House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka, Bangladesh")}
                     </span>
                   </div>
 
@@ -370,6 +423,47 @@ function ShareMyCardPage() {
           </div>
         </main>
       </div>
+
+      {/* Zoom / Lightbox Modal */}
+      {isZoomOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Rakibul Islam Khan QR Profile Card Zoomed View"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setIsZoomOpen(false)}
+        >
+          <div
+            className="relative max-w-4xl w-full flex flex-col items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Close Button & Header */}
+            <div className="w-full flex items-center justify-between pb-3 text-white">
+              <span className="text-xs sm:text-sm font-semibold tracking-wide text-white/90">
+                Rakibul Islam Khan — Profile Card
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsZoomOpen(false)}
+                className="inline-flex items-center justify-center size-9 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer border border-white/20 shadow-md"
+                aria-label="Close zoomed view"
+                title="Close (Esc)"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Preserved Full Quality Image */}
+            <div className="relative rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-black/40">
+              <img
+                src="/images/nfc-card-ui-02-1.png"
+                alt="Rakibul Islam Khan QR Profile Card - Enlarged"
+                className="max-w-full max-h-[82vh] w-auto h-auto object-contain block"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

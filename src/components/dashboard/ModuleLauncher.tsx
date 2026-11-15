@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   ListChecks,
   Building2,
+  CreditCard,
 } from "lucide-react";
 
 interface ModuleConfig {
@@ -82,6 +83,14 @@ const modules: ModuleConfig[] = [
     color: "from-purple-500 to-fuchsia-600",
     shadow: "shadow-purple-500/20",
     path: "/inv-dashboard",
+  },
+  {
+    id: "digital-business-card",
+    name: "Business Card",
+    icon: CreditCard,
+    color: "from-blue-600 via-indigo-600 to-violet-600",
+    shadow: "shadow-indigo-500/20",
+    path: "/my-digital-business-card",
   },
   {
     id: "asset",

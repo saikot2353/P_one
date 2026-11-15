@@ -29,8 +29,19 @@ export interface DigitalBusinessCard {
   employeePublished: boolean; // Employee publication preference
   adminDisabled: boolean; // Admin lock state
   publicVisibility: CardVisibilitySettings;
+  uploadedPhoto?: string; // Base64 data URL of user-uploaded business card/profile photo
   whatsappNumber?: string; // Optional separate WhatsApp number (e.g. +8801750021154)
   officeAddress?: string; // Company-approved HRIS address
+  building?: string;
+  area?: string;
+  city?: string;
+  address?: string;
+  country?: string;
+  mobile?: string;
+  email?: string;
+  website?: string;
+  company?: string;
+  designation?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -54,9 +65,16 @@ export interface HrisEmployeeRecord {
   sect?: string;
   unit?: string;
   company?: string;
+  building?: string;
+  area?: string;
+  city?: string;
+  address?: string;
+  country?: string;
   email?: string;
   phone?: string;
   officeMob?: string;
+  mobile?: string;
+  website?: string;
   village?: string;
   status?: string;
   acStatus?: string;
@@ -65,6 +83,57 @@ export interface HrisEmployeeRecord {
   socialMediaLinks?: SocialMediaLink[];
   [key: string]: unknown;
 }
+
+/**
+ * Default Management Employee Information:
+ * Rakibul Islam Khan (Managing Director, Pakiza Software Limited)
+ */
+export const DEFAULT_MANAGEMENT_EMPLOYEE: HrisEmployeeRecord = {
+  id: "2023043910",
+  offcId: "MD-001",
+  name: "Rakibul Islam Khan",
+  type: "Management",
+  dept: "Management",
+  sect: "Board of Directors",
+  title: "Managing Director",
+  designation: "Managing Director",
+  company: "Pakiza Software Limited",
+  unit: "Pakiza Software Limited",
+  building: "Khan ABC Tradeplex",
+  area: "Dhanmondi",
+  city: "Dhaka",
+  address: "House: 37, Floor: 11 (B-11), Road: 2",
+  country: "Bangladesh",
+  line: "N/A",
+  grade: "Executive",
+  shift: "General Shift",
+  shiftStart: "01/01/2020",
+  joinDate: "01/01/2020",
+  holiday: "—",
+  blood: "B (+ve)",
+  basic: "350000.00",
+  gross: "500000.00",
+  email: "rakib@pakizaknit.com",
+  phone: "+88 01777 777344",
+  officeMob: "+88 01777 777344",
+  mobile: "+88 01777 777344",
+  website: "www.pakizasoftware.com",
+  personalContact: "+88 01777 777344",
+  gender: "Male",
+  dob: "15/03/1980",
+  status: "Working",
+  empStatus: "Permanent",
+  confirmDate: "01/01/2020",
+  village: "Dhaka",
+  acStatus: "Active",
+  socialMediaLinks: [
+    { id: "s-1", platform: "WhatsApp", url: "https://wa.me/8801777777344" },
+    { id: "s-2", platform: "LinkedIn", url: "https://www.linkedin.com/company/pakizasoftware" },
+    { id: "s-3", platform: "Facebook", url: "https://www.facebook.com/pakizasoftware" },
+    { id: "s-4", platform: "X (Twitter)", url: "https://x.com/pakizasoftware" },
+    { id: "s-5", platform: "Website", url: "http://www.pakizasoftware.com" },
+  ],
+};
 
 export const STORAGE_KEY_CARDS = "cripton_digital_business_cards_v1";
 export const STORAGE_KEY_ANALYTICS = "cripton_digital_business_cards_analytics_v1";
@@ -77,8 +146,8 @@ export const STORAGE_KEY_ANALYTICS = "cripton_digital_business_cards_analytics_v
 export const SEED_DIGITAL_CARDS: DigitalBusinessCard[] = [
   {
     id: "dbc-rec-001",
-    employeeId: "2023043910", // Tahmid Afsar Shapno
-    publicToken: "dbc_tahmid_7f8a9e1b2c3d",
+    employeeId: "2023043910", // Rakibul Islam Khan
+    publicToken: "dbc_rakibul_7f8a9e1b2c3d",
     employeePublished: true,
     adminDisabled: false,
     publicVisibility: {
@@ -89,10 +158,20 @@ export const SEED_DIGITAL_CARDS: DigitalBusinessCard[] = [
       showWhatsApp: true,
       showSocialLinks: true,
     },
-    whatsappNumber: "+8801750021154",
-    officeAddress: "House 07, Road 11, Sector 03, Uttara, Dhaka-1230",
+    whatsappNumber: "+8801777777344",
+    officeAddress: "House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka, Bangladesh",
+    building: "Khan ABC Tradeplex",
+    area: "Dhanmondi",
+    city: "Dhaka",
+    address: "House: 37, Floor: 11 (B-11), Road: 2",
+    country: "Bangladesh",
+    website: "www.pakizasoftware.com",
+    mobile: "+88 01777 777344",
+    email: "rakib@pakizaknit.com",
+    company: "Pakiza Software Limited",
+    designation: "Managing Director",
     createdAt: "2026-01-15T09:00:00.000Z",
-    updatedAt: "2026-10-25T14:30:00.000Z",
+    updatedAt: "2026-11-14T14:40:00.000Z",
   },
   {
     id: "dbc-rec-002",
@@ -153,7 +232,7 @@ export const SEED_DIGITAL_CARDS: DigitalBusinessCard[] = [
   },
   {
     id: "dbc-rec-005",
-    employeeId: "EMP-001", // Alias for Tahmid Afsar
+    employeeId: "EMP-001", // Alias for Rakibul Islam Khan
     publicToken: "dbc_emp001_1a2b3c4d5e6f",
     employeePublished: true,
     adminDisabled: false,
@@ -165,10 +244,20 @@ export const SEED_DIGITAL_CARDS: DigitalBusinessCard[] = [
       showWhatsApp: true,
       showSocialLinks: true,
     },
-    whatsappNumber: "+8801750021154",
-    officeAddress: "Pakiza Corporate Tower, 12 Green Road, Dhaka",
+    whatsappNumber: "+8801777777344",
+    officeAddress: "House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka, Bangladesh",
+    building: "Khan ABC Tradeplex",
+    area: "Dhanmondi",
+    city: "Dhaka",
+    address: "House: 37, Floor: 11 (B-11), Road: 2",
+    country: "Bangladesh",
+    website: "www.pakizasoftware.com",
+    mobile: "+88 01777 777344",
+    email: "rakib@pakizaknit.com",
+    company: "Pakiza Software Limited",
+    designation: "Managing Director",
     createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-10-25T12:00:00.000Z",
+    updatedAt: "2026-11-14T14:40:00.000Z",
   },
 ];
 
@@ -210,10 +299,22 @@ export function getAllCards(): DigitalBusinessCard[] {
     stored = memoryCards;
   }
 
-  // Merge seed cards with stored cards, stored cards take precedence
+  // Merge seed cards with stored cards
   const map = new Map<string, DigitalBusinessCard>();
   SEED_DIGITAL_CARDS.forEach((c) => map.set(c.employeeId, { ...c }));
-  stored.forEach((c) => map.set(c.employeeId, { ...c }));
+  stored.forEach((c) => {
+    // If stored card has old tahmid token or 2023043910, sync with Rakibul Islam Khan's seed data
+    if (c.publicToken === "dbc_tahmid_7f8a9e1b2c3d" || c.employeeId === "2023043910") {
+      const defaultSeed = SEED_DIGITAL_CARDS[0];
+      map.set("2023043910", {
+        ...defaultSeed,
+        employeePublished: c.employeePublished ?? true,
+        adminDisabled: c.adminDisabled ?? false,
+      });
+    } else {
+      map.set(c.employeeId, { ...c });
+    }
+  });
 
   return Array.from(map.values());
 }
@@ -236,6 +337,11 @@ export function saveAllCards(cards: DigitalBusinessCard[]): void {
  * Fetch employee from Employee Master Data (recruitment_synced_employees or employeesData)
  */
 export function getHrisEmployee(empId: string): HrisEmployeeRecord | null {
+  const cleanId = String(empId).trim().toLowerCase();
+  if (cleanId === "2023043910" || cleanId === "emp-001" || cleanId === "md-001" || cleanId === "default") {
+    return DEFAULT_MANAGEMENT_EMPLOYEE;
+  }
+
   if (typeof window !== "undefined") {
     try {
       const syncedRaw = localStorage.getItem("recruitment_synced_employees");
@@ -244,12 +350,17 @@ export function getHrisEmployee(empId: string): HrisEmployeeRecord | null {
         if (Array.isArray(synced)) {
           const found = synced.find(
             (e: HrisEmployeeRecord) =>
-              String(e.id).trim().toLowerCase() === String(empId).trim().toLowerCase() ||
+              String(e.id).trim().toLowerCase() === cleanId ||
               String(e.offcId || "")
                 .trim()
-                .toLowerCase() === String(empId).trim().toLowerCase(),
+                .toLowerCase() === cleanId,
           );
-          if (found) return found;
+          if (found) {
+            if (found.name && (found.name.includes("Tahmid") || found.name.includes("Shapno"))) {
+              return DEFAULT_MANAGEMENT_EMPLOYEE;
+            }
+            return found;
+          }
         }
       }
     } catch (e) {
@@ -257,15 +368,21 @@ export function getHrisEmployee(empId: string): HrisEmployeeRecord | null {
     }
   }
 
-  return (
-    employeesData.find(
-      (e) =>
-        String(e.id).trim().toLowerCase() === String(empId).trim().toLowerCase() ||
-        String(e.offcId || "")
-          .trim()
-          .toLowerCase() === String(empId).trim().toLowerCase(),
-    ) || null
+  const foundInMock = employeesData.find(
+    (e) =>
+      String(e.id).trim().toLowerCase() === cleanId ||
+      String(e.offcId || "")
+        .trim()
+        .toLowerCase() === cleanId,
   );
+  if (foundInMock) {
+    if (foundInMock.name && (foundInMock.name.includes("Tahmid") || foundInMock.name.includes("Shapno"))) {
+      return DEFAULT_MANAGEMENT_EMPLOYEE;
+    }
+    return foundInMock;
+  }
+
+  return cleanId ? null : DEFAULT_MANAGEMENT_EMPLOYEE;
 }
 
 /**
@@ -297,10 +414,20 @@ export function getCardByEmployeeId(empId: string): DigitalBusinessCard | null {
 export function getCardByPublicToken(token: string): DigitalBusinessCard | null {
   const cards = getAllCards();
   const clean = token.trim().toLowerCase();
+  // Backward compatibility & cross-environment aliases: alias Rakibul's tokens to default card
+  if (
+    clean === "dbc_tahmid_7f8a9e1b2c3d" ||
+    clean === "dbc_rakib_7f8a9e1b2c3d" ||
+    clean === "dbc_rakibul_7f8a9e1b2c3d" ||
+    clean === "dbc_82d0eb59a27d407a" ||
+    clean === "dbc_emp001_1a2b3c4d5e6f"
+  ) {
+    return cards.find((c) => c.employeeId === "2023043910") || cards[0] || null;
+  }
   return (
     cards.find((c) => c.publicToken.toLowerCase() === clean) ||
-    // Backward compatibility: check if token happens to match an employee ID
     cards.find((c) => c.employeeId.toLowerCase() === clean) ||
+    cards.find((c) => c.id.toLowerCase() === clean) ||
     null
   );
 }
@@ -326,6 +453,13 @@ export interface ResolvedPublicCard {
     officialEmail?: string;
     officeAddress?: string;
     whatsappNumber?: string;
+    website?: string;
+    building?: string;
+    area?: string;
+    city?: string;
+    address?: string;
+    country?: string;
+    mobile?: string;
     profilePhoto?: string;
     socialMediaLinks: SocialMediaLink[];
   };
@@ -357,6 +491,12 @@ function resolvePublicCardWithCard(
   card: DigitalBusinessCard,
   emp: HrisEmployeeRecord,
 ): ResolvedPublicCard {
+  // If emp is Tahmid Afsar Shapno, swap to Rakibul Islam Khan
+  const activeEmp =
+    emp.name && (emp.name.includes("Tahmid") || emp.name.includes("Shapno"))
+      ? DEFAULT_MANAGEMENT_EMPLOYEE
+      : emp;
+
   // 1. Employee published check
   if (!card.employeePublished) {
     return { status: "unavailable" };
@@ -368,7 +508,7 @@ function resolvePublicCardWithCard(
   }
 
   // 3. HRIS active check
-  const empStatus = (emp.status || emp.acStatus || "").toLowerCase();
+  const empStatus = (activeEmp.status || activeEmp.acStatus || "").toLowerCase();
   const isInactive =
     empStatus.includes("inactive") ||
     empStatus.includes("left") ||
@@ -378,9 +518,9 @@ function resolvePublicCardWithCard(
   }
 
   // 4. Required fields check
-  const name = emp.name || "";
-  const designation = emp.title || emp.designation || "";
-  const company = emp.unit || emp.company || "Pakiza Software";
+  const name = activeEmp.name || "";
+  const designation = activeEmp.title || activeEmp.designation || "";
+  const company = activeEmp.unit || activeEmp.company || "Pakiza Software Limited";
   if (!name || !designation || !company) {
     return { status: "unavailable" };
   }
@@ -395,8 +535,45 @@ function resolvePublicCardWithCard(
     showSocialLinks: true,
   };
 
+  // Check stored custom social links if available in browser storage
+  let effectiveSocialLinks = activeEmp.socialMediaLinks;
+  if (typeof window !== "undefined") {
+    try {
+      const storedSocial =
+        localStorage.getItem(`cripton_dbc_social_links_${activeEmp.id}`) ||
+        (activeEmp.id === "2023043910"
+          ? localStorage.getItem("cripton_dbc_social_links_2023043910")
+          : null);
+      if (storedSocial) {
+        const parsed = JSON.parse(storedSocial);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          effectiveSocialLinks = parsed;
+        }
+      }
+    } catch (e) {
+      console.error("Error reading stored social links:", e);
+    }
+  }
+
   const socialLinks: SocialMediaLink[] =
-    visibility.showSocialLinks && Array.isArray(emp.socialMediaLinks) ? emp.socialMediaLinks : [];
+    visibility.showSocialLinks && Array.isArray(effectiveSocialLinks)
+      ? effectiveSocialLinks
+      : [];
+
+  // Check custom uploaded photo from browser storage or card
+  let storedCustomPhoto: string | undefined = card.uploadedPhoto;
+  if (!storedCustomPhoto && typeof window !== "undefined") {
+    try {
+      const p =
+        localStorage.getItem(`cripton_dbc_uploaded_photo_${activeEmp.id}`) ||
+        (activeEmp.id === "2023043910"
+          ? localStorage.getItem("cripton_dbc_uploaded_photo_2023043910")
+          : null);
+      if (p) storedCustomPhoto = p;
+    } catch (e) {
+      console.error("Error reading stored custom photo:", e);
+    }
+  }
 
   return {
     status: "available",
@@ -405,18 +582,25 @@ function resolvePublicCardWithCard(
       id: card.publicToken, // Expose only the public token to the public view
       name,
       designation,
-      department: visibility.showDepartment ? emp.dept || emp.sect : undefined,
+      department: visibility.showDepartment ? activeEmp.dept || activeEmp.sect : undefined,
       company,
       officialPhone: visibility.showOfficePhone
-        ? emp.officeMob || (emp.phone !== "—" ? emp.phone : undefined)
+        ? activeEmp.officeMob || activeEmp.mobile || (activeEmp.phone !== "—" ? activeEmp.phone : undefined)
         : undefined,
-      officialEmail: visibility.showOfficeEmail ? emp.email : undefined,
+      officialEmail: visibility.showOfficeEmail ? activeEmp.email : undefined,
       officeAddress: visibility.showOfficeAddress
-        ? card.officeAddress || emp.village || "Pakiza Corporate Office"
+        ? card.officeAddress || activeEmp.address || "House: 37, Floor: 11 (B-11), Road: 2, Khan ABC Tradeplex, Dhanmondi, Dhaka, Bangladesh"
         : undefined,
       whatsappNumber:
         visibility.showWhatsApp && card.whatsappNumber ? card.whatsappNumber : undefined,
-      profilePhoto: emp.photo || emp.avatar,
+      website: activeEmp.website || card.website || "www.pakizasoftware.com",
+      building: activeEmp.building || card.building || "Khan ABC Tradeplex",
+      area: activeEmp.area || card.area || "Dhanmondi",
+      city: activeEmp.city || card.city || "Dhaka",
+      address: activeEmp.address || card.address || "House: 37, Floor: 11 (B-11), Road: 2",
+      country: activeEmp.country || card.country || "Bangladesh",
+      mobile: activeEmp.mobile || activeEmp.officeMob || "+88 01777 777344",
+      profilePhoto: storedCustomPhoto || activeEmp.photo || activeEmp.avatar,
       socialMediaLinks: socialLinks,
     },
   };
@@ -540,18 +724,298 @@ export function setAdminDisableState(
 
 /**
  * Generate environment-based absolute Public URL
+ * Local development: http://localhost:3000/digital-business-card/dbc_82d0eb59a27d407a
+ * Vercel production: https://pakizasoft.vercel.app/digital-business-card/dbc_rakibul_7f8a9e1b2c3d
  */
 export function getPublicCardUrl(publicToken: string): string {
   let origin = "";
+  let isLocal = false;
   if (typeof window !== "undefined") {
     origin = window.location.origin;
+    isLocal =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.hostname === "0.0.0.0";
   }
-  // Allow environment override if configured
+
   const envUrl = (import.meta as unknown as { env?: { VITE_PUBLIC_APP_URL?: string } }).env
     ?.VITE_PUBLIC_APP_URL;
-  const baseUrl = envUrl ? envUrl.replace(/\/$/, "") : origin;
 
-  return `${baseUrl}/digital-business-card/${publicToken}`;
+  // Local development -> http://localhost:3000, Vercel production -> https://pakizasoft.vercel.app
+  const baseUrl = isLocal
+    ? (origin || "http://localhost:3000")
+    : (envUrl ? envUrl.replace(/\/$/, "") : (origin && origin.includes("vercel.app") ? origin : "https://pakizasoft.vercel.app"));
+
+  let resolvedToken = publicToken;
+  const isRakibulToken =
+    publicToken === "dbc_rakibul_7f8a9e1b2c3d" ||
+    publicToken === "dbc_82d0eb59a27d407a" ||
+    publicToken === "dbc_tahmid_7f8a9e1b2c3d" ||
+    publicToken === "dbc_rakib_7f8a9e1b2c3d" ||
+    publicToken === "dbc_emp001_1a2b3c4d5e6f" ||
+    publicToken === "2023043910";
+
+  if (isRakibulToken) {
+    resolvedToken = isLocal ? "dbc_82d0eb59a27d407a" : "dbc_rakibul_7f8a9e1b2c3d";
+  }
+
+  return `${baseUrl}/digital-business-card/${resolvedToken}`;
+}
+
+/**
+ * Save user uploaded business card photo to browser storage & card record
+ */
+export function saveStoredUploadedPhoto(empId: string, photoDataUrl: string): void {
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(`cripton_dbc_uploaded_photo_${empId}`, photoDataUrl);
+      if (empId === "2023043910" || empId === "EMP-001" || empId === "MD-001") {
+        localStorage.setItem("cripton_dbc_uploaded_photo_2023043910", photoDataUrl);
+      }
+    } catch (e) {
+      console.error("Failed to store custom photo in localStorage:", e);
+    }
+  }
+  updateCard(empId, { uploadedPhoto: photoDataUrl });
+}
+
+/**
+ * Get user uploaded photo from browser storage or card
+ */
+export function getStoredUploadedPhoto(empId: string): string | null {
+  if (typeof window !== "undefined") {
+    const direct = localStorage.getItem(`cripton_dbc_uploaded_photo_${empId}`);
+    if (direct) return direct;
+    if (empId === "2023043910" || empId === "EMP-001" || empId === "MD-001") {
+      const def = localStorage.getItem("cripton_dbc_uploaded_photo_2023043910");
+      if (def) return def;
+    }
+  }
+  const card = getCardByEmployeeId(empId);
+  return card?.uploadedPhoto || null;
+}
+
+/**
+ * Remove user uploaded photo
+ */
+export function removeStoredUploadedPhoto(empId: string): void {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(`cripton_dbc_uploaded_photo_${empId}`);
+    if (empId === "2023043910" || empId === "EMP-001" || empId === "MD-001") {
+      localStorage.removeItem("cripton_dbc_uploaded_photo_2023043910");
+    }
+  }
+  updateCard(empId, { uploadedPhoto: undefined });
+}
+
+/**
+ * Save employee social media links to browser storage
+ */
+export function saveEmployeeSocialLinks(empId: string, links: SocialMediaLink[]): void {
+  if (typeof window !== "undefined") {
+    try {
+      const dataStr = JSON.stringify(links);
+      localStorage.setItem(`cripton_dbc_social_links_${empId}`, dataStr);
+      if (empId === "2023043910" || empId === "EMP-001" || empId === "MD-001") {
+        localStorage.setItem("cripton_dbc_social_links_2023043910", dataStr);
+        DEFAULT_MANAGEMENT_EMPLOYEE.socialMediaLinks = links;
+      }
+    } catch (e) {
+      console.error("Failed to save social links:", e);
+    }
+  }
+}
+
+/**
+ * Get employee social media links from browser storage or master data
+ */
+export function getEmployeeSocialLinks(empId: string): SocialMediaLink[] {
+  if (typeof window !== "undefined") {
+    try {
+      const raw =
+        localStorage.getItem(`cripton_dbc_social_links_${empId}`) ||
+        (empId === "2023043910" || empId === "EMP-001" || empId === "MD-001"
+          ? localStorage.getItem("cripton_dbc_social_links_2023043910")
+          : null);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  const emp = getHrisEmployee(empId);
+  return emp?.socialMediaLinks || DEFAULT_MANAGEMENT_EMPLOYEE.socialMediaLinks || [];
+}
+
+/**
+ * Automatic Client-Side Background Removal via HTML Canvas
+ * Analyzes border/corner tones and performs connected flood-fill with feathering
+ */
+export async function removeImageBackground(
+  imageSrc: string,
+  tolerance = 32,
+): Promise<string> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined") {
+      return resolve(imageSrc);
+    }
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        const maxDimension = 1200;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDimension || h > maxDimension) {
+          if (w > h) {
+            h = Math.round((h * maxDimension) / w);
+            w = maxDimension;
+          } else {
+            w = Math.round((w * maxDimension) / h);
+            h = maxDimension;
+          }
+        }
+        canvas.width = w;
+        canvas.height = h;
+
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) return resolve(imageSrc);
+
+        ctx.drawImage(img, 0, 0, w, h);
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+
+        // Sample background color from edge border corners
+        const cornerPoints = [
+          [0, 0],
+          [w - 1, 0],
+          [0, h - 1],
+          [w - 1, h - 1],
+          [Math.floor(w / 2), 0],
+          [1, 1],
+          [w - 2, 1],
+        ];
+
+        let bgR = 0;
+        let bgG = 0;
+        let bgB = 0;
+        let count = 0;
+
+        for (const [cx, cy] of cornerPoints) {
+          const idx = (cy * w + cx) * 4;
+          // Ignore if already transparent
+          if (data[idx + 3] > 20) {
+            bgR += data[idx];
+            bgG += data[idx + 1];
+            bgB += data[idx + 2];
+            count++;
+          }
+        }
+
+        if (count === 0) {
+          // Already transparent
+          return resolve(imageSrc);
+        }
+
+        bgR = Math.round(bgR / count);
+        bgG = Math.round(bgG / count);
+        bgB = Math.round(bgB / count);
+
+        const colorDist = (r: number, g: number, b: number) => {
+          return Math.sqrt((r - bgR) ** 2 + (g - bgG) ** 2 + (b - bgB) ** 2);
+        };
+
+        const maxDist = (tolerance / 100) * 441.67;
+
+        // Flood fill from all 4 borders inward using BFS
+        const totalPixels = w * h;
+        const visited = new Uint8Array(totalPixels);
+        const queue: number[] = [];
+
+        // Top & Bottom edges
+        for (let x = 0; x < w; x++) {
+          const topIdx = x;
+          const pTop = topIdx * 4;
+          if (data[pTop + 3] > 0 && colorDist(data[pTop], data[pTop + 1], data[pTop + 2]) <= maxDist) {
+            queue.push(topIdx);
+            visited[topIdx] = 1;
+          }
+          const botIdx = (h - 1) * w + x;
+          const pBot = botIdx * 4;
+          if (data[pBot + 3] > 0 && colorDist(data[pBot], data[pBot + 1], data[pBot + 2]) <= maxDist) {
+            queue.push(botIdx);
+            visited[botIdx] = 1;
+          }
+        }
+
+        // Left & Right edges
+        for (let y = 0; y < h; y++) {
+          const leftIdx = y * w;
+          const pLeft = leftIdx * 4;
+          if (!visited[leftIdx] && data[pLeft + 3] > 0 && colorDist(data[pLeft], data[pLeft + 1], data[pLeft + 2]) <= maxDist) {
+            queue.push(leftIdx);
+            visited[leftIdx] = 1;
+          }
+          const rightIdx = y * w + (w - 1);
+          const pRight = rightIdx * 4;
+          if (!visited[rightIdx] && data[pRight + 3] > 0 && colorDist(data[pRight], data[pRight + 1], data[pRight + 2]) <= maxDist) {
+            queue.push(rightIdx);
+            visited[rightIdx] = 1;
+          }
+        }
+
+        // Run BFS
+        let head = 0;
+        while (head < queue.length) {
+          const curr = queue[head++];
+          const cx = curr % w;
+          const cy = Math.floor(curr / w);
+
+          const neighbors = [
+            curr + 1, // right
+            curr - 1, // left
+            curr + w, // down
+            curr - w, // up
+          ];
+
+          for (let i = 0; i < 4; i++) {
+            const next = neighbors[i];
+            const nx = next % w;
+            const ny = Math.floor(next / w);
+
+            if (nx >= 0 && nx < w && ny >= 0 && ny < h && Math.abs(nx - cx) <= 1 && Math.abs(ny - cy) <= 1) {
+              if (!visited[next]) {
+                const p = next * 4;
+                if (data[p + 3] === 0 || colorDist(data[p], data[p + 1], data[p + 2]) <= maxDist) {
+                  visited[next] = 1;
+                  queue.push(next);
+                }
+              }
+            }
+          }
+        }
+
+        // Set alpha to 0 for all connected background pixels
+        for (let i = 0; i < totalPixels; i++) {
+          if (visited[i] === 1) {
+            data[i * 4 + 3] = 0;
+          }
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
+      } catch (err) {
+        console.error("Background removal error:", err);
+        resolve(imageSrc);
+      }
+    };
+    img.onerror = () => resolve(imageSrc);
+    img.src = imageSrc;
+  });
 }
 
 /**
@@ -582,6 +1046,10 @@ export function generateVCardString(resolved: ResolvedPublicCard): string {
     lines.push(`TEL;TYPE=WORK,VOICE:${emp.officialPhone}`);
   }
 
+  if (emp.mobile && emp.mobile !== emp.officialPhone) {
+    lines.push(`TEL;TYPE=CELL,VOICE:${emp.mobile}`);
+  }
+
   if (emp.whatsappNumber) {
     lines.push(`TEL;TYPE=CELL,WHATSAPP:${emp.whatsappNumber}`);
   }
@@ -590,7 +1058,10 @@ export function generateVCardString(resolved: ResolvedPublicCard): string {
     lines.push(`ADR;TYPE=WORK:;;${escapeVCardText(emp.officeAddress)};;;;`);
   }
 
-  if (card) {
+  if (emp.website) {
+    const webUrl = emp.website.startsWith("http") ? emp.website : `http://${emp.website}`;
+    lines.push(`URL;TYPE=WORK:${webUrl}`);
+  } else if (card) {
     const publicUrl = getPublicCardUrl(card.publicToken);
     lines.push(`URL:${publicUrl}`);
   }
@@ -604,7 +1075,7 @@ export function generateVCardString(resolved: ResolvedPublicCard): string {
     });
   }
 
-  lines.push("NOTE:Verified Digital Business Card via Pakiza Software CRIPTON HRIS");
+  lines.push("NOTE:Verified Digital Business Card of Rakibul Islam Khan, Managing Director, Pakiza Software Limited");
   lines.push("END:VCARD");
 
   return lines.join("\r\n");

@@ -16,12 +16,14 @@ import {
   User,
   ShieldCheck,
   Edit,
+  ImageIcon,
 } from "lucide-react";
 import {
   PreCostingRecord,
   KnitFabricCostItemRow,
   PreCostingItemRow,
   KnitOtherCostRow,
+  getStoredAttachmentsForRecord,
 } from "./PreCostingKnitManager";
 import { MMRepository } from "../../lib/marketing-merchandising-data";
 
@@ -295,7 +297,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
     };
   });
 
-  // Back-to-Back LC Details
+  // Back-to-Back LC Details (Sewing Trims combined into Accessories & Trims)
   const b2bItems = [
     {
       item: "Yarn (Local / Import B2B)",
@@ -312,22 +314,10 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
       pctMat: 40,
     },
     {
-      item: "Sewing Trims",
-      source: undefined,
-      material: sewingAccCost,
-      pctFob: totalOrderValue > 0 ? (sewingAccCost / totalOrderValue) * 100 : 0,
-      pctMat: 100,
-    },
-    {
       item: "Accessories & Trims (Local / Import)",
       source: undefined,
-      material: finishingAccCost > 0 ? finishingAccCost : Math.max(0, totalAccessoriesCost - sewingAccCost),
-      pctFob:
-        totalOrderValue > 0
-          ? ((finishingAccCost > 0 ? finishingAccCost : Math.max(0, totalAccessoriesCost - sewingAccCost)) /
-              totalOrderValue) *
-            100
-          : 0,
+      material: totalAccessoriesCost,
+      pctFob: totalOrderValue > 0 ? (totalAccessoriesCost / totalOrderValue) * 100 : 0,
       pctMat: 100,
     },
     ...embellishmentB2B,
@@ -335,6 +325,18 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
 
   const totalB2BMaterial = b2bItems.reduce((acc, it) => acc + it.material, 0);
   const totalB2BPctFob = totalOrderValue > 0 ? (totalB2BMaterial / totalOrderValue) * 100 : 0;
+
+  // Style Image resolution
+  const attachments =
+    record.attachments && record.attachments.length > 0 && record.attachments.some((a) => Boolean(a.dataUrl))
+      ? record.attachments
+      : getStoredAttachmentsForRecord(record.id, record.preCostId);
+
+  const styleImage = attachments.find(
+    (a) =>
+      a.storageType === "image" ||
+      (a.dataUrl && (a.dataUrl.startsWith("data:image/") || /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(a.fileName)))
+  );
 
   const handlePrint = () => {
     window.print();
@@ -465,6 +467,14 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Style No</span>
                   <span className="font-black text-slate-900 block">{record.style}</span>
                   <span className="text-[10px] text-slate-500 block truncate">{record.styleDescription}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">GMT Item</span>
+                  <span className="font-bold text-slate-900 block">{record.gmtItem || "T-Shirt"}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Category</span>
+                  <span className="font-bold text-slate-900 block">{record.category || "Men"}</span>
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Order Confirm Date</span>
@@ -828,58 +838,10 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                       </td>
                     </tr>
 
-                    {/* 4. Category: Finishing Accessories */}
+                    {/* 4. Category: Sewing Accessories */}
                     <tr className="bg-slate-50/90 font-black text-slate-800 text-[11px] border-t border-slate-300">
                       <td colSpan={6} className="py-1.5 px-3 uppercase text-indigo-800 tracking-wider">
-                        4. Finishing Accessories
-                      </td>
-                    </tr>
-                    {finishingAcc.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="py-1.5 px-3 text-slate-400 italic text-center">
-                          No finishing accessories entered.
-                        </td>
-                      </tr>
-                    ) : (
-                      finishingAcc.map((item, idx) => (
-                        <tr key={`fin-${idx}`} className="hover:bg-slate-50 text-[11.5px]">
-                          <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
-                            {item.head}
-                          </td>
-                          <td className="py-1.5 px-3">
-                            <span className="font-semibold text-slate-900 block">{item.item}</span>
-                            <span className="text-[10px] text-slate-500">
-                              {item.description || item.supplier} • {item.nStatus}
-                            </span>
-                          </td>
-                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                            {item.consumption}
-                          </td>
-                          <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
-                            {(Number(item.finalQty) || 0).toLocaleString()} {item.unit || "pcs"}
-                          </td>
-                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                            ${(Number(item.rate) || 0).toFixed(3)}
-                          </td>
-                          <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
-                            ${(Number(item.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                    <tr className="bg-indigo-50/50 font-bold text-indigo-900 text-xs">
-                      <td colSpan={5} className="py-1.5 px-3 text-right uppercase text-[10px]">
-                        Sub Total — Finishing Accessories:
-                      </td>
-                      <td className="py-1.5 px-3 text-right font-mono font-black text-indigo-900">
-                        ${finishingAccCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </td>
-                    </tr>
-
-                    {/* 5. Category: Sewing Accessories */}
-                    <tr className="bg-slate-50/90 font-black text-slate-800 text-[11px] border-t border-slate-300">
-                      <td colSpan={6} className="py-1.5 px-3 uppercase text-indigo-800 tracking-wider">
-                        5. Sewing Accessories
+                        4. Sewing Accessories
                       </td>
                     </tr>
                     {sewingAcc.length === 0 ? (
@@ -895,8 +857,13 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                             {item.head}
                           </td>
                           <td className="py-1.5 px-3">
-                            <span className="font-semibold text-slate-900 block">{item.item}</span>
-                            <span className="text-[10px] text-slate-500">
+                            <span className="font-semibold text-slate-900 inline-flex items-center gap-1.5">
+                              <span>{item.item}</span>
+                              <span className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[9.5px] font-mono font-bold text-slate-600">
+                                {item.unit || "Pcs"}
+                              </span>
+                            </span>
+                            <span className="text-[10px] text-slate-500 block">
                               {item.description || item.supplier} • {item.nStatus}
                             </span>
                           </td>
@@ -921,6 +888,59 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                       </td>
                       <td className="py-1.5 px-3 text-right font-mono font-black text-indigo-900">
                         ${sewingAccCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                    </tr>
+
+                    {/* 5. Category: Finishing Accessories */}
+                    <tr className="bg-slate-50/90 font-black text-slate-800 text-[11px] border-t border-slate-300">
+                      <td colSpan={6} className="py-1.5 px-3 uppercase text-indigo-800 tracking-wider">
+                        5. Finishing Accessories
+                      </td>
+                    </tr>
+                    {finishingAcc.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-1.5 px-3 text-slate-400 italic text-center">
+                          No finishing accessories entered.
+                        </td>
+                      </tr>
+                    ) : (
+                      finishingAcc.map((item, idx) => (
+                        <tr key={`fin-${idx}`} className="hover:bg-slate-50 text-[11.5px]">
+                          <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
+                            {item.head}
+                          </td>
+                          <td className="py-1.5 px-3">
+                            <span className="font-semibold text-slate-900 inline-flex items-center gap-1.5">
+                              <span>{item.item}</span>
+                              <span className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[9.5px] font-mono font-bold text-slate-600">
+                                {item.unit || "Pcs"}
+                              </span>
+                            </span>
+                            <span className="text-[10px] text-slate-500 block">
+                              {item.description || item.supplier} • {item.nStatus}
+                            </span>
+                          </td>
+                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                            {item.consumption}
+                          </td>
+                          <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
+                            {(Number(item.finalQty) || 0).toLocaleString()} {item.unit || "pcs"}
+                          </td>
+                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                            ${(Number(item.rate) || 0).toFixed(3)}
+                          </td>
+                          <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
+                            ${(Number(item.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                    <tr className="bg-indigo-50/50 font-bold text-indigo-900 text-xs">
+                      <td colSpan={5} className="py-1.5 px-3 text-right uppercase text-[10px]">
+                        Sub Total — Finishing Accessories:
+                      </td>
+                      <td className="py-1.5 px-3 text-right font-mono font-black text-indigo-900">
+                        ${finishingAccCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                     </tr>
 
@@ -985,28 +1005,33 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                         </td>
                       </tr>
                     ) : (
-                      otherCostItems.map((o, idx) => (
-                        <tr key={`oth-${idx}`} className="hover:bg-slate-50 text-[11.5px]">
-                          <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
-                            {o.costHead || o.head || "Others"}
-                          </td>
-                          <td className="py-1.5 px-3 font-semibold text-slate-900">
-                            {o.description}
-                          </td>
-                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                            {(o.qtyInDz ?? Number((totalOrderQtyPcs / 12).toFixed(2))).toLocaleString()} dz
-                          </td>
-                          <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
-                            {(o.gmtQty ?? totalOrderQtyPcs).toLocaleString()} pcs
-                          </td>
-                          <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                            ${(Number(o.unitRateDz) || 0).toFixed(3)}/dz
-                          </td>
-                          <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
-                            ${(Number(o.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </td>
-                        </tr>
-                      ))
+                      otherCostItems.map((o, idx) => {
+                        const isPct = o.costHead === "Commercial Cost" || o.costHead === "Commission";
+                        return (
+                          <tr key={`oth-${idx}`} className="hover:bg-slate-50 text-[11.5px]">
+                            <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
+                              {o.costHead || o.head || "Others"}
+                            </td>
+                            <td className="py-1.5 px-3 font-semibold text-slate-900">
+                              {o.description}
+                            </td>
+                            <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                              {isPct ? "—" : `${(o.qtyInDz ?? Number((totalOrderQtyPcs / 12).toFixed(2))).toLocaleString()} dz`}
+                            </td>
+                            <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
+                              {isPct ? "—" : `${(o.gmtQty ?? totalOrderQtyPcs).toLocaleString()} pcs`}
+                            </td>
+                            <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                              {isPct
+                                ? `${o.costPercent ?? o.rateOrPct ?? 0}%`
+                                : `$${(Number(o.unitRateDz) || 0).toFixed(3)}/dz`}
+                            </td>
+                            <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
+                              ${(Number(o.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                     <tr className="bg-indigo-50/50 font-bold text-indigo-900 text-xs">
                       <td colSpan={5} className="py-1.5 px-3 text-right uppercase text-[10px]">
@@ -1131,6 +1156,36 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
               RIGHT COLUMN (col-span-4): Summary Panels & Indicators
              ════════════════════════════════════════════════════════════ */}
           <div className="lg:col-span-4 space-y-5">
+            {/* Style Image Card */}
+            <div className="border border-slate-300 rounded-xl overflow-hidden bg-white shadow-xs">
+              <div className="bg-slate-100 px-3.5 py-1.5 border-b border-slate-300 flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                  <ImageIcon className="size-3.5 text-indigo-600" />
+                  Style Image
+                </span>
+                <span className="text-[10px] font-mono text-slate-500 truncate max-w-[150px]">
+                  {record.style}
+                </span>
+              </div>
+              <div className="p-3 flex items-center justify-center bg-slate-50/60 min-h-[140px] max-h-[220px] overflow-hidden">
+                {styleImage?.dataUrl ? (
+                  <img
+                    src={styleImage.dataUrl}
+                    alt={styleImage.title || record.style || "Style Image"}
+                    className="max-h-[200px] w-auto max-w-full object-contain rounded-lg border border-slate-200 shadow-2xs"
+                  />
+                ) : (
+                  <div className="text-center py-5 px-3">
+                    <ImageIcon className="size-8 text-slate-300 mx-auto mb-1" />
+                    <p className="text-[11px] font-semibold text-slate-600">No Style Image Uploaded</p>
+                    <p className="text-[9.5px] text-slate-400 mt-0.5">
+                      Upload style sketches or photos under Style & Pre Costing Images in Pre Costing Entry.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* E. Right-side Order & Cost Summary Card */}
             <div className="border border-slate-300 rounded-xl overflow-hidden bg-slate-50/60 shadow-xs">
               <div className="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between">

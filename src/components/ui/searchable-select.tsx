@@ -10,7 +10,7 @@ export interface Option {
 }
 
 export interface SearchableSelectProps {
-  options: Option[];
+  options: (Option | string)[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -38,20 +38,35 @@ export function SearchableSelect({
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
 
+  const normalizedOptions = React.useMemo<Option[]>(() => {
+    if (!Array.isArray(options)) return [];
+    return options.map((opt) => {
+      if (typeof opt === "string") {
+        return { value: opt, label: opt };
+      }
+      if (opt && typeof opt === "object") {
+        return {
+          value: opt.value ?? opt.label ?? "",
+          label: opt.label ?? opt.value ?? "",
+        };
+      }
+      return { value: String(opt), label: String(opt) };
+    });
+  }, [options]);
+
   const selectedOption = React.useMemo(() => {
-    return (options || []).find((opt) => opt.value === value || opt.label === value);
-  }, [options, value]);
+    return normalizedOptions.find((opt) => opt.value === value || opt.label === value);
+  }, [normalizedOptions, value]);
 
   const filteredOptions = React.useMemo(() => {
-    const safeOptions = Array.isArray(options) ? options : [];
     const q = searchValue.trim().toLowerCase();
-    if (!q) return safeOptions;
-    return safeOptions.filter(
+    if (!q) return normalizedOptions;
+    return normalizedOptions.filter(
       (opt) =>
         (opt.label || "").toLowerCase().includes(q) ||
         (opt.value || "").toLowerCase().includes(q)
     );
-  }, [options, searchValue]);
+  }, [normalizedOptions, searchValue]);
 
   React.useEffect(() => {
     if (open) {
@@ -114,7 +129,7 @@ export function SearchableSelect({
   const showCustomOption =
     allowCustom &&
     searchValue.trim() !== "" &&
-    !(options || []).some(
+    !normalizedOptions.some(
       (o) =>
         (o.label || "").toLowerCase() === searchValue.trim().toLowerCase() ||
         (o.value || "").toLowerCase() === searchValue.trim().toLowerCase()

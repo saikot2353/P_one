@@ -114,6 +114,12 @@ export interface MMBuyerQuotation {
 // ----------------------------------------------------------------------------
 // 3. Style-Wise Pre-Costing Model (Item-level persistent identifiers)
 // ----------------------------------------------------------------------------
+export interface MMPreCostPOColorRow {
+  id: string;
+  color: string;
+  quantity: number;
+}
+
 export interface MMPreCostPO {
   id: string;
   sl?: number;
@@ -122,6 +128,7 @@ export interface MMPreCostPO {
   rate: number;
   value: number;
   remarks?: string;
+  colorBreakdown?: MMPreCostPOColorRow[];
 }
 
 export interface MMPreCostItem {
@@ -7865,6 +7872,60 @@ export const INITIAL_MM_ACCESSORIES_MASTER: MMAccessoriesMasterItem[] = [
     description: "Non-toxic moisture absorber packet for export carton",
     unit: "Pcs",
     defaultRate: 0.012,
+  },
+  {
+    id: "acc-m-016b",
+    itemCode: "ACC-POLY-01",
+    itemName: "Single Poly Bag (10x15 inch)",
+    category: "Finishing Trims",
+    description: "Transparent individual garment poly bag (PP/LDPE)",
+    unit: "Pcs",
+    defaultRate: 0.028,
+  },
+  {
+    id: "acc-m-016c",
+    itemCode: "ACC-POLY-02",
+    itemName: "Blister Poly Bag (Master Poly)",
+    category: "Finishing Trims",
+    description: "Heavy duty blister pack master poly bag for assortment pack",
+    unit: "Pcs",
+    defaultRate: 0.075,
+  },
+  {
+    id: "acc-m-016d",
+    itemCode: "ACC-BRD-01",
+    itemName: "Back Board / Collar Insert",
+    category: "Finishing Trims",
+    description: "Duplex board folding insert for neat garment presentation",
+    unit: "Pcs",
+    defaultRate: 0.035,
+  },
+  {
+    id: "acc-m-016e",
+    itemCode: "ACC-STAY-01",
+    itemName: "Plastic Collar Stay / Butterfly",
+    category: "Finishing Trims",
+    description: "Collar band support butterfly for shirt and henley necklines",
+    unit: "Pcs",
+    defaultRate: 0.018,
+  },
+  {
+    id: "acc-m-016f",
+    itemCode: "ACC-TIS-01",
+    itemName: "Acid-Free Tissue Paper (18x24 inch)",
+    category: "Finishing Trims",
+    description: "White acid-free interleaving packing tissue paper",
+    unit: "Pcs",
+    defaultRate: 0.015,
+  },
+  {
+    id: "acc-m-016g",
+    itemCode: "ACC-CTN-02",
+    itemName: "Inner Carton (5-Ply Corrugated)",
+    category: "Finishing Trims",
+    description: "Secondary inner display carton box",
+    unit: "Pcs",
+    defaultRate: 0.95,
   },
 
   // Wash Treatments

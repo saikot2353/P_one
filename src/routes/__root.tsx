@@ -150,7 +150,8 @@ function RootComponent() {
       const isPublicPath =
         currentPath === "/login" ||
         currentPath === "/e-recruitment-form" ||
-        currentPath.startsWith("/digital-business-card");
+        currentPath.startsWith("/digital-business-card") ||
+        currentPath.startsWith("/supplier-portal");
 
       if (!isLoggedIn && !isPublicPath) {
         navigate({ to: "/login" });
@@ -212,10 +213,12 @@ function RootComponent() {
     }
   }, []);
 
+  const isSupplierPortal = currentPath.startsWith("/supplier-portal");
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
-      <Chatbot />
+      {!isSupplierPortal && <Chatbot />}
     </QueryClientProvider>
   );
 }
