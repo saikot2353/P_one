@@ -66,15 +66,6 @@ const modules = [
     path: "/",
   },
   {
-    id: "merchandising",
-    name: "Merchandising",
-    description: "Product catalog and sales planning",
-    icon: Store,
-    color: "from-teal-500 to-emerald-600",
-    shadow: "shadow-teal-500/20",
-    path: "/merchandising-dashboard",
-  },
-  {
     id: "marketing-merchandising",
     name: "Marketing & Merchandising",
     description: "Item-level cost saving, Pre-Costing, BOM, Bookings & PI engine",
@@ -118,6 +109,24 @@ const modules = [
     color: "from-blue-600 via-indigo-600 to-violet-600",
     shadow: "shadow-indigo-500/20",
     path: "/my-digital-business-card",
+  },
+  {
+    id: "dashboard",
+    name: "My Dashboard",
+    description: "Personal overview and stats",
+    icon: LayoutDashboard,
+    color: "from-indigo-500 to-blue-600",
+    shadow: "shadow-indigo-500/20",
+    path: "/my-dashboard",
+  },
+  {
+    id: "merchandising",
+    name: "Merchandising",
+    description: "Product catalog and sales planning",
+    icon: Store,
+    color: "from-teal-500 to-emerald-600",
+    shadow: "shadow-teal-500/20",
+    path: "/merchandising-dashboard",
   },
   {
     id: "asset",
@@ -174,15 +183,6 @@ const modules = [
     path: "/",
   },
   {
-    id: "dashboard",
-    name: "My Dashboard",
-    description: "Personal overview and stats",
-    icon: LayoutDashboard,
-    color: "from-indigo-500 to-blue-600",
-    shadow: "shadow-indigo-500/20",
-    path: "/my-dashboard",
-  },
-  {
     id: "changes",
     name: "Changes!",
     description: "System updates and additions",
@@ -196,10 +196,11 @@ const modules = [
 const ACTIVE_MODULE_IDS = [
   "org-master",
   "hris",
-  "merchandising",
+  "marketing-merchandising",
   "finance",
   "procurement",
   "inventory",
+  "digital-business-card",
   "dashboard",
 ];
 

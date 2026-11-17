@@ -41,7 +41,9 @@ export function FabricConsumptionRegisterView({
   // Filters State
   const [searchQuery, setSearchQuery] = useState("");
   const [filterBuyer, setFilterBuyer] = useState("ALL");
-  const [filterStatus, setFilterStatus] = useState<string>("ALL");
+  const [filterStatus, setFilterStatus] = useState<string>(
+    registerRole === "cad" ? "Pending CAD" : "ALL"
+  );
   const [filterResponseStatus, setFilterResponseStatus] = useState<string>("ALL");
   const [filterMerchandiser, setFilterMerchandiser] = useState("ALL");
   const [filterDateFrom, setFilterDateFrom] = useState("");
@@ -62,7 +64,7 @@ export function FabricConsumptionRegisterView({
   const handleResetFilters = () => {
     setSearchQuery("");
     setFilterBuyer("ALL");
-    setFilterStatus("ALL");
+    setFilterStatus(registerRole === "cad" ? "Pending CAD" : "ALL");
     setFilterResponseStatus("ALL");
     setFilterMerchandiser("ALL");
     setFilterDateFrom("");

@@ -24,6 +24,7 @@ import {
   Maximize2,
   Download,
   Paperclip,
+  Upload,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -42,6 +43,7 @@ import {
   MMFabricConsumptionAttachment,
 } from "../../lib/marketing-merchandising-data";
 import { SearchableSelect } from "../ui/searchable-select";
+import { MMMasterDataRepository } from "../../lib/merchandising-master-data";
 import MMFabricConsumptionAttachmentModal from "./MMFabricConsumptionAttachmentModal";
 import FabricConsumptionPreviewModal from "./FabricConsumptionPreviewModal";
 
@@ -77,6 +79,98 @@ export function FabricConsumptionCadForm({
 
   // Preview Report Modal State
   const [showPreviewReportModal, setShowPreviewReportModal] = useState<boolean>(false);
+
+  // CAD Image Attachments State (GMT Image + Multiple CAD Images)
+  const [gmtImage, setGmtImage] = useState<{ id: string; name: string; dataUrl: string; size?: string } | null>(null);
+  const [cadImages, setCadImages] = useState<Array<{ id: string; name: string; dataUrl: string; size?: string }>>([]);
+  const [previewZoomImage, setPreviewZoomImage] = useState<{ url: string; title: string } | null>(null);
+
+  // Compress image helper to prevent localStorage overflow (max 1200px dimension, JPEG 0.85)
+  const compressImage = (file: File): Promise<{ dataUrl: string; size: string }> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1200;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+            const approxKb = Math.round((dataUrl.length * 3) / 4 / 1024);
+            resolve({ dataUrl, size: `${approxKb} KB` });
+          } else {
+            resolve({ dataUrl: e.target?.result as string, size: `${Math.round(file.size / 1024)} KB` });
+          }
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleGmtImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { dataUrl, size } = await compressImage(file);
+      setGmtImage({
+        id: `gmt-${Date.now()}`,
+        name: file.name,
+        dataUrl,
+        size,
+      });
+      toast.success(`GMT image "${file.name}" uploaded successfully.`);
+    } catch {
+      toast.error("Failed to process GMT image.");
+    }
+  };
+
+  const handleCadImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    try {
+      const newItems: Array<{ id: string; name: string; dataUrl: string; size?: string }> = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const { dataUrl, size } = await compressImage(file);
+        newItems.push({
+          id: `cad-img-${Date.now()}-${i}`,
+          name: file.name,
+          dataUrl,
+          size,
+        });
+      }
+      setCadImages((prev) => [...prev, ...newItems]);
+      toast.success(`${newItems.length} CAD image(s) uploaded successfully.`);
+    } catch {
+      toast.error("Failed to process CAD image(s).");
+    }
+  };
+
+  const handleRemoveGmtImage = () => {
+    setGmtImage(null);
+    toast.success("GMT Image removed.");
+  };
+
+  const handleRemoveCadImage = (id: string) => {
+    setCadImages((prev) => prev.filter((item) => item.id !== id));
+    toast.success("CAD Image removed.");
+  };
 
   // Logged-in user helper
   const getLoggedInUser = (): string => {
@@ -174,6 +268,8 @@ export function FabricConsumptionCadForm({
     setCadResponseStatus("Not Received");
     setAttachments([]);
     setRows([]);
+    setGmtImage(null);
+    setCadImages([]);
     setNotes("..");
     setComments("ONE BODY ONE WAY CUTTING.");
   };
@@ -206,6 +302,18 @@ export function FabricConsumptionCadForm({
     setAttachments(rec.attachments || []);
     setHistory(rec.history || []);
 
+    // Restore CAD attachments (images)
+    if (rec.gmtImage) {
+      if (typeof rec.gmtImage === "string") {
+        setGmtImage({ id: "gmt-loaded", name: "GMT Image", dataUrl: rec.gmtImage });
+      } else {
+        setGmtImage(rec.gmtImage);
+      }
+    } else {
+      setGmtImage(null);
+    }
+    setCadImages(rec.cadImages || []);
+
     // If CAD rows are empty (newly opened by CAD), populate 7 default rows from template
     if (!rec.rows || rec.rows.length === 0) {
       setRows(INITIAL_APEROL_CAD_ROWS.map((r, i) => ({ ...r, id: `cad-r-${Date.now()}-${i + 1}` })));
@@ -236,6 +344,24 @@ export function FabricConsumptionCadForm({
     config.configuredSizes.forEach((cs) => set.add(cs));
     return Array.from(set).map((sz) => ({ value: sz, label: sz }));
   }, [buyer]);
+
+  // Fabrication options sourced from Merchandising Master Data → Fabric Setup → Fabric Register
+  const fabricOptions = useMemo(() => {
+    try {
+      const setups = MMMasterDataRepository.getFabricSetups();
+      return setups.map((f) => ({
+        value: f.fabricName,
+        label: `${f.fabricName}${f.fabricComposition ? ` (${f.fabricComposition})` : ""}`,
+      }));
+    } catch {
+      return [];
+    }
+  }, []);
+
+  // Standard Body Parts options for searchable dropdown
+  const bodyPartOptions = useMemo(() => {
+    return cadBodyParts.map((bp) => ({ value: bp, label: bp }));
+  }, [cadBodyParts]);
 
   // Handle Buyer change: refresh available Style and Size Range options.
   // Clear a previously selected Style or Size Range if no longer valid for newly selected Buyer.
@@ -378,6 +504,8 @@ export function FabricConsumptionCadForm({
       status: "Draft",
       cadResponseStatus: "Not Received",
       attachments,
+      gmtImage: gmtImage || undefined,
+      cadImages: cadImages.length > 0 ? cadImages : undefined,
       rows: rows.length > 0 ? rows : [],
       totalFinishKg: totals.totalFinishKg,
       totalWaste10Kg: totals.totalWaste10Kg,
@@ -428,6 +556,8 @@ export function FabricConsumptionCadForm({
       status: "Pending CAD",
       cadResponseStatus: "Not Received",
       attachments,
+      gmtImage: gmtImage || undefined,
+      cadImages: cadImages.length > 0 ? cadImages : undefined,
       rows: rows.length > 0 ? rows : [],
       totalFinishKg: totals.totalFinishKg,
       totalWaste10Kg: totals.totalWaste10Kg,
@@ -476,7 +606,7 @@ export function FabricConsumptionCadForm({
         const markerLength = Number(target.markerLength) || 0;
         const diaFinish = Number(target.diaFinish) || 0;
         const fabricGsm = Number(target.fabricGsm) || 0;
-        const law = Number(target.law) || 1550;
+        const law = Number(target.law) || 1550000;
         const markerQty = Number(target.markerQty) || 1;
         if (law > 0 && markerQty > 0) {
           target.finishKgConsumption = Number(
@@ -506,7 +636,7 @@ export function FabricConsumptionCadForm({
         const ml = field === "markerLength" ? Number(value) || 0 : Number(target.markerLength) || 0;
         const df = field === "diaFinish" ? Number(value) || 0 : Number(target.diaFinish) || 0;
         const gsm = field === "fabricGsm" ? Number(value) || 0 : Number(target.fabricGsm) || 0;
-        const law = field === "law" ? Number(value) || 1550 : Number(target.law) || 1550;
+        const law = field === "law" ? Number(value) || 1550000 : Number(target.law) || 1550000;
         const mq = field === "markerQty" ? Number(value) || 1 : Number(target.markerQty) || 1;
 
         if (law > 0 && mq > 0) {
@@ -551,7 +681,7 @@ export function FabricConsumptionCadForm({
       finishKgConsumption: 0,
       waste10Consumption: 0,
       diaMake: "OPEN",
-      law: 1550,
+      law: 1550000,
       condumption: 12,
       cuttableFinish: 2,
       consumptionRatio: 0,
@@ -591,6 +721,8 @@ export function FabricConsumptionCadForm({
       cadResponseStatus: "In Progress",
       cadAssignedTo,
       attachments,
+      gmtImage: gmtImage || undefined,
+      cadImages: cadImages.length > 0 ? cadImages : undefined,
       rows,
       totalFinishKg: totals.totalFinishKg,
       totalWaste10Kg: totals.totalWaste10Kg,
@@ -649,6 +781,8 @@ export function FabricConsumptionCadForm({
       cadSubmittedBy: loggedIn,
       cadSubmissionTimestamp: now,
       attachments,
+      gmtImage: gmtImage || undefined,
+      cadImages: cadImages.length > 0 ? cadImages : undefined,
       rows,
       totalFinishKg: totals.totalFinishKg,
       totalWaste10Kg: totals.totalWaste10Kg,
@@ -949,23 +1083,27 @@ export function FabricConsumptionCadForm({
             )}
           </div>
 
-          {/* Fabrication * — Blank by default, editable in both Merchant and CAD response modes */}
+          {/* Fabrication * — Searchable dropdown populated from Merchandising Master Data → Fabric Setup → Fabric Register */}
           <div className="lg:col-span-2">
             <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
               Fabrication <span className="text-rose-500">*</span>
             </label>
-            <input
-              type="text"
-              readOnly={mode === "view"}
-              value={fabrication}
-              onChange={(e) => setFabrication(e.target.value)}
-              placeholder="e.g. BODY+SLV 370 GSM"
-              className={`w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 font-semibold text-xs transition-all ${
-                mode === "view"
-                  ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                  : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-teal-500 border-indigo-200 dark:border-indigo-800"
-              }`}
-            />
+            {mode === "view" ? (
+              <input
+                type="text"
+                readOnly
+                value={fabrication || "—"}
+                className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs"
+              />
+            ) : (
+              <SearchableSelect
+                options={fabricOptions}
+                value={fabrication}
+                onChange={setFabrication}
+                placeholder="Search Fabric from Register..."
+                allowCustom={true}
+              />
+            )}
           </div>
 
           {/* Season */}
@@ -1146,23 +1284,17 @@ export function FabricConsumptionCadForm({
                         {idx + 1}
                       </td>
 
-                      {/* Name of Body Parts: Searchable list without row + button */}
+                      {/* Name of Body Parts: Searchable select with custom option */}
                       <td className="py-1.5 px-2">
                         {mode === "cad-response" ? (
-                          <div className="relative">
-                            <input
-                              type="text"
+                          <div className="min-w-[150px]">
+                            <SearchableSelect
+                              options={bodyPartOptions}
                               value={row.bodyPart}
-                              onChange={(e) => handleUpdateCadRow(idx, "bodyPart", e.target.value)}
-                              list={`body-part-suggestions-${idx}`}
-                              placeholder="Select or type body part..."
-                              className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs focus:ring-2 focus:ring-teal-500"
+                              onChange={(val) => handleUpdateCadRow(idx, "bodyPart", val)}
+                              placeholder="Select body part..."
+                              allowCustom={true}
                             />
-                            <datalist id={`body-part-suggestions-${idx}`}>
-                              {cadBodyParts.map((bp) => (
-                                <option key={bp} value={bp} />
-                              ))}
-                            </datalist>
                           </div>
                         ) : (
                           <span className="font-bold text-slate-800 dark:text-slate-200">
@@ -1332,18 +1464,18 @@ export function FabricConsumptionCadForm({
                         )}
                       </td>
 
-                      {/* Law (1550) — Left aligned consistently */}
+                      {/* Law (1550000) — Left aligned consistently */}
                       <td className="py-1.5 px-2 text-left">
                         {mode === "cad-response" ? (
                           <input
                             type="number"
-                            value={row.law}
+                            value={row.law || 1550000}
                             onChange={(e) => handleUpdateCadRow(idx, "law", e.target.value)}
                             className="w-full h-8 px-2 text-left rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono text-rose-600 font-bold"
                           />
                         ) : (
                           <span className="font-mono text-rose-600 font-bold block text-left">
-                            {row.law}
+                            {row.law || 1550000}
                           </span>
                         )}
                       </td>
@@ -1442,25 +1574,8 @@ export function FabricConsumptionCadForm({
             </table>
           </div>
 
-          {/* Notes and Comments */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                Note:
-              </label>
-              <input
-                type="text"
-                readOnly={mode === "view"}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="e.g. .."
-                className={`w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold ${
-                  mode === "view"
-                    ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                    : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500"
-                }`}
-              />
-            </div>
+          {/* Comments */}
+          <div className="pt-2">
             <div>
               <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
                 Comments:
@@ -1507,42 +1622,202 @@ export function FabricConsumptionCadForm({
         </div>
       )}
 
-      {/* ── SECTION 3: REQUEST & RESPONSE WORKFLOW HISTORY ──────────── */}
-      {history && history.length > 0 && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
-          <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
-            <span className="w-1.5 h-4 bg-slate-500 rounded-full inline-block" />
-            <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-              3. Request & Response Workflow History
+      {/* ── SECTION 3: CAD ATTACHMENTS (GMT & CAD IMAGES) ──────────── */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-4 bg-teal-600 rounded-full inline-block" />
+            <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
+              <Layers className="size-4 text-teal-600" />
+              <span>3. CAD Attachments</span>
             </h2>
           </div>
+          <span className="text-[11px] text-slate-400 font-medium">
+            Upload style garment references & CAD marker visual layouts
+          </span>
+        </div>
 
-          <div className="space-y-2">
-            {history.map((h, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 text-xs"
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="size-2 rounded-full bg-teal-500"></span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{h.action}</span>
-                  <span className="text-slate-400">•</span>
-                  <span className="text-slate-500 font-medium">{h.user}</span>
-                  {h.notes && (
-                    <>
-                      <span className="text-slate-400">•</span>
-                      <span className="text-slate-600 dark:text-slate-400 italic text-[11px]">{h.notes}</span>
-                    </>
-                  )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* A. GMT Image (Single Upload) */}
+          <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-950/30 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 block">
+                  GMT Image
+                </label>
+                <p className="text-[11px] text-slate-500">Single style reference garment photo</p>
+              </div>
+              {gmtImage && mode !== "view" && (
+                <button
+                  type="button"
+                  onClick={handleRemoveGmtImage}
+                  className="px-2 py-1 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                >
+                  <Trash2 className="size-3.5" />
+                  <span>Remove</span>
+                </button>
+              )}
+            </div>
+
+            {gmtImage ? (
+              <div className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col items-center p-2">
+                <div
+                  className="relative w-full h-48 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center cursor-pointer"
+                  onClick={() => setPreviewZoomImage({ url: gmtImage.dataUrl, title: `GMT Image — ${gmtImage.name}` })}
+                >
+                  <img
+                    src={gmtImage.dataUrl}
+                    alt={gmtImage.name}
+                    className="w-full h-full object-contain"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1.5 text-xs font-bold">
+                    <Maximize2 className="size-4" />
+                    <span>Click to Zoom</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 font-mono text-[11px] text-slate-400">
-                  <span>{h.timestamp}</span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                    {h.status}
+                <div className="w-full mt-2 flex items-center justify-between text-xs px-1 text-slate-600 dark:text-slate-300">
+                  <span className="font-semibold truncate max-w-[200px]" title={gmtImage.name}>
+                    {gmtImage.name}
                   </span>
+                  {gmtImage.size && <span className="font-mono text-[11px] text-slate-400">{gmtImage.size}</span>}
                 </div>
               </div>
-            ))}
+            ) : (
+              <label
+                className={`border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/10 transition-all ${
+                  mode === "view" ? "opacity-60 pointer-events-none" : ""
+                }`}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleGmtImageUpload}
+                  className="hidden"
+                  disabled={mode === "view"}
+                />
+                <div className="p-3 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 mb-2">
+                  <Upload className="size-5" />
+                </div>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  Click to Upload GMT Image
+                </span>
+                <span className="text-[10px] text-slate-400 mt-1">PNG, JPG, WEBP up to 5MB</span>
+              </label>
+            )}
+          </div>
+
+          {/* B. CAD Image (Multiple Uploads) */}
+          <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-950/30 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 block">
+                  CAD Image(s)
+                </label>
+                <p className="text-[11px] text-slate-500">Multiple CAD marker layouts & cut plans</p>
+              </div>
+              {mode !== "view" && (
+                <label className="px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold cursor-pointer flex items-center gap-1.5 transition shadow-xs">
+                  <Plus className="size-3.5" />
+                  <span>Add CAD Images</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleCadImagesUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+
+            {cadImages.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-56 overflow-y-auto p-1">
+                {cadImages.map((img) => (
+                  <div
+                    key={img.id}
+                    className="group relative rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5 flex flex-col items-center"
+                  >
+                    <div
+                      className="relative w-full h-24 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center cursor-pointer"
+                      onClick={() => setPreviewZoomImage({ url: img.dataUrl, title: `CAD Marker — ${img.name}` })}
+                    >
+                      <img src={img.dataUrl} alt={img.name} className="w-full h-full object-contain" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                        <Maximize2 className="size-4" />
+                      </div>
+                    </div>
+                    <div className="w-full mt-1.5 flex items-center justify-between text-[11px] px-1 text-slate-600 dark:text-slate-300">
+                      <span className="font-semibold truncate max-w-[90px]" title={img.name}>
+                        {img.name}
+                      </span>
+                      {mode !== "view" && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCadImage(img.id)}
+                          className="text-rose-500 hover:text-rose-700 cursor-pointer ml-1"
+                          title="Delete CAD Image"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <label
+                className={`border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/10 transition-all ${
+                  mode === "view" ? "opacity-60 pointer-events-none" : ""
+                }`}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleCadImagesUpload}
+                  className="hidden"
+                  disabled={mode === "view"}
+                />
+                <div className="p-3 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 mb-2">
+                  <Upload className="size-5" />
+                </div>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  Click to Upload CAD Images
+                </span>
+                <span className="text-[10px] text-slate-400 mt-1">Select one or multiple CAD files</span>
+              </label>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Image Fullscreen Zoom Modal ── */}
+      {previewZoomImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setPreviewZoomImage(null)}
+        >
+          <div
+            className="relative max-w-4xl max-h-[90vh] bg-slate-900 border border-white/20 rounded-2xl overflow-hidden p-2 flex flex-col items-center shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-full flex items-center justify-between px-3 py-2 text-white border-b border-white/10">
+              <span className="text-xs font-bold truncate">{previewZoomImage.title}</span>
+              <button
+                type="button"
+                onClick={() => setPreviewZoomImage(null)}
+                className="p-1 rounded-lg hover:bg-white/10 text-white transition cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            <div className="p-2 overflow-auto max-h-[80vh] flex items-center justify-center">
+              <img
+                src={previewZoomImage.url}
+                alt={previewZoomImage.title}
+                className="max-w-full max-h-[75vh] object-contain rounded-lg"
+              />
+            </div>
           </div>
         </div>
       )}
@@ -1643,6 +1918,7 @@ export function FabricConsumptionCadForm({
         data={{
           requestNo,
           requestDate,
+          jobId: recordId ? MMRepository.getFabricConsumptionCadById(recordId)?.jobId || `JOB-2026-${recordId.slice(-4)}` : "JOB-2026-0842",
           buyer,
           styleOrder,
           efficiency,
@@ -1660,6 +1936,8 @@ export function FabricConsumptionCadForm({
           notes,
           comments,
           attachments,
+          gmtImage: gmtImage || undefined,
+          cadImages: cadImages.length > 0 ? cadImages : undefined,
           rows,
           totals,
         }}

@@ -45,14 +45,6 @@ const modules: ModuleConfig[] = [
     path: "/",
   },
   {
-    id: "merchandising",
-    name: "Merchandising",
-    icon: Store,
-    color: "from-teal-500 to-emerald-600",
-    shadow: "shadow-teal-500/20",
-    path: "/merchandising-dashboard",
-  },
-  {
     id: "marketing-merchandising",
     name: "Marketing & Merchandising",
     icon: Store,
@@ -91,6 +83,22 @@ const modules: ModuleConfig[] = [
     color: "from-blue-600 via-indigo-600 to-violet-600",
     shadow: "shadow-indigo-500/20",
     path: "/my-digital-business-card",
+  },
+  {
+    id: "dashboard",
+    name: "Dashboard",
+    icon: LayoutDashboard,
+    color: "from-indigo-500 to-blue-600",
+    shadow: "shadow-indigo-500/20",
+    path: "/my-dashboard",
+  },
+  {
+    id: "merchandising",
+    name: "Merchandising",
+    icon: Store,
+    color: "from-teal-500 to-emerald-600",
+    shadow: "shadow-teal-500/20",
+    path: "/merchandising-dashboard",
   },
   {
     id: "asset",
@@ -139,14 +147,6 @@ const modules: ModuleConfig[] = [
     color: "from-pink-500 to-rose-600",
     shadow: "shadow-pink-500/20",
     path: "/",
-  },
-  {
-    id: "dashboard",
-    name: "Dashboard",
-    icon: LayoutDashboard,
-    color: "from-indigo-500 to-blue-600",
-    shadow: "shadow-indigo-500/20",
-    path: "/my-dashboard",
   },
   {
     id: "changes",

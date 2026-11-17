@@ -756,9 +756,25 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     description: "Buyer price quotation generation, multi-currency FOB calculation, CM, and negotiations.",
     modificationPercent: 100,
     status: "Completed",
-    lastModified: "2026-11-14",
-    totalRevisions: 3,
+    lastModified: "2026-11-17",
+    totalRevisions: 5,
     changeHistory: [
+      {
+        id: "chg-1794852000000",
+        date: "2026-11-17 07:25",
+        type: "Feature",
+        description:
+          "Buyer Costing Sheet (New) Updates: Renamed header banner to 'Order Specification & Costing Header'; dynamically populated Size Range dropdown from Buyer Master & Buyer Department Master configured sizes; converted fixed Fabrication and Color fields into dynamic multi-entry rows with '+ Add Fabric' and '+ Add Color' buttons and remove options; in 2.1 Fabric Cost, automated Consumption population from Consumption with Cutting Wastage upon entering text in 'Used In' with full subsequent manual override, and locked MAIN FABRIC Rate as read-only synced directly with Final Fabric Price Per KG; updated Yarn Cost table column headings to Yarn, Rate, %, and COST (USD); upgraded 3.5 AOP Cost with COST (USD) column heading, multi-AOP process support with '+ Add AOP Process', AOP Process Loss (%) entry, and dynamic AOP Process Loss Amount calculation using (FABRIC PRICE PER KG + Total AOP Cost) × AOP PROCESS LOSS (%) / 100 with updated Final Fabric Price Per KG; fully persisted in browser Local Storage.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794848000000",
+        date: "2026-11-17 05:45",
+        type: "Feature",
+        description:
+          "Complete Replacement of Create Buyer Quotation: Rebuilt costing entry form with enterprise Light Theme and Royal Blue accents (#4169E1) strictly adhering to Pakiza Knit Composite Ltd. Buyer Costing Sheet (New) reference. Implemented Section 1 (Header: Costing No., Date, Buyer Master cascade, Department, Season, Style No/Description, Shipment Date, Size Range, Fabrication 1 & 2 from Fabric Register, CAD Consumption in KG, Cutting Wastage % & Consumption, Style Image upload with zoom preview, Color 1 & 2, Garment Qty, Target FOB), Section 2 (Garment Cost Breakdown with Fabric, 12 Accessories dozen-basis items, Embellishments, Washing & Dyeing, Other Costs), Section 3 (Fabric Price Calculation with Yarn composition rates, Knitting charges, Dyeing & Finishing 7 processes, Process Loss %, AOP Toggle & Rate, Final Fabric Price per KG, 'Apply to Main Fabric' action), Section 4 (Production & Machine Income with CM/Dz, Efficiency, SMV, Daily Productivity, Available Days, Required Machines, Daily & Total Machine Income), Section 5 (Final Costing & Pricing Summary with GMT Wastage, Bank Deferred Cost 3%, Commercial Cost 5%, Garment Price/Pc, Profit Margin 2%, FOB Price, and Target GAP indicator). Fully integrated with Buyer Quotation Register and persistent Local Storage.",
+        percentDelta: 0,
+      },
       {
         id: "chg-1794708600001",
         date: "2026-11-14 09:00",

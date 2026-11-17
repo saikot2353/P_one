@@ -6,6 +6,7 @@ import { MMCadItemRow, MMFabricConsumptionAttachment } from "../../lib/marketing
 export interface FabricConsumptionPreviewData {
   requestNo: string;
   requestDate: string;
+  jobId?: string;
   buyer: string;
   styleOrder: string;
   efficiency?: string;
@@ -23,6 +24,8 @@ export interface FabricConsumptionPreviewData {
   notes?: string;
   comments?: string;
   attachments?: MMFabricConsumptionAttachment[];
+  gmtImage?: { id: string; name: string; dataUrl: string; size?: string } | string;
+  cadImages?: Array<{ id: string; name: string; dataUrl: string; size?: string }>;
   rows: MMCadItemRow[];
   totals: {
     totalFinishKg: number;
@@ -66,6 +69,10 @@ export default function FabricConsumptionPreviewModal({
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 print:p-0 print:bg-white print:static print:inset-auto">
       {/* Print-specific style overrides */}
       <style>{`
+        @page {
+          size: landscape;
+          margin: 10mm;
+        }
         @media print {
           body * {
             visibility: hidden;
@@ -112,7 +119,7 @@ export default function FabricConsumptionPreviewModal({
       {/* Modal Dialog Card */}
       <div
         id="fabric-consumption-report-modal"
-        className="relative w-full max-w-5xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh] overflow-hidden print:max-h-none print:border-none print:shadow-none print:rounded-none"
+        className="relative w-full max-w-6xl xl:max-w-7xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh] overflow-hidden print:max-h-none print:border-none print:shadow-none print:rounded-none"
       >
         {/* Top Control Bar (Screen Only) */}
         <div className="no-print flex items-center justify-between px-6 py-3.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 shrink-0">
@@ -188,69 +195,57 @@ export default function FabricConsumptionPreviewModal({
             </div>
           </div>
 
-          {/* ── Request Header Information ── */}
-          <div className="rounded-xl border border-slate-300 dark:border-slate-700 overflow-hidden bg-slate-50/50 dark:bg-slate-800/30">
-            <div className="bg-slate-100 dark:bg-slate-800 px-4 py-2 border-b border-slate-300 dark:border-slate-700 flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                Request Header Information
-              </span>
-              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                Status: <strong className="text-teal-700 dark:text-teal-400 font-bold">{data.status}</strong>
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-3 gap-x-4 p-4 text-xs">
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Request No</span>
-                <span className="font-mono font-bold text-slate-900 dark:text-white">{data.requestNo}</span>
-              </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Request Date</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{data.requestDate}</span>
-              </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Buyer</span>
-                <span className="font-bold text-slate-900 dark:text-white">{data.buyer}</span>
-              </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Style</span>
-                <span className="font-bold text-slate-900 dark:text-white">{data.styleOrder}</span>
-              </div>
-
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Marker Efficiency</span>
-                <span className="font-bold text-indigo-700 dark:text-indigo-400 font-mono">
-                  {data.efficiency ? `${data.efficiency}%` : "—"}
+          {/* ── Request Header Information: Single Horizontal Row ── */}
+          <div className="rounded-xl border border-slate-300 dark:border-slate-700 overflow-hidden bg-slate-50/70 dark:bg-slate-800/40">
+            <div className="grid grid-cols-2 sm:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-slate-300 dark:divide-slate-700 text-center">
+              {/* 1. Style Name */}
+              <div className="p-3">
+                <span className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-0.5">
+                  Style Name
+                </span>
+                <span className="font-black text-xs sm:text-sm text-slate-900 dark:text-white truncate block">
+                  {data.styleOrder || "—"}
                 </span>
               </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Size Range</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{data.sizeRange || "—"}</span>
-              </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Fabrication</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{data.fabrication || "—"}</span>
-              </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Season</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{data.season || "—"}</span>
+
+              {/* 2. Buyer */}
+              <div className="p-3">
+                <span className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-0.5">
+                  Buyer
+                </span>
+                <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white truncate block">
+                  {data.buyer || "—"}
+                </span>
               </div>
 
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Merchandiser</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{data.merchandiser}</span>
+              {/* 3. Efficiency */}
+              <div className="p-3">
+                <span className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-0.5">
+                  Efficiency
+                </span>
+                <span className="font-black text-xs sm:text-sm text-indigo-700 dark:text-indigo-400 font-mono block">
+                  {data.efficiency ? `${data.efficiency.replace("%", "")}%` : "—"}
+                </span>
               </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">CAD Assigned To</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{data.cadAssignedTo || "—"}</span>
+
+              {/* 4. Size Range */}
+              <div className="p-3">
+                <span className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-0.5">
+                  Size Range
+                </span>
+                <span className="font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200 block">
+                  {data.sizeRange || "—"}
+                </span>
               </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">CAD Response Date</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{data.cadResponseDate || "Pending"}</span>
-              </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">CAD Response Status</span>
-                <span className="font-bold text-emerald-700 dark:text-emerald-400">{data.cadResponseStatus}</span>
+
+              {/* 5. Job No. */}
+              <div className="p-3 col-span-2 sm:col-span-1">
+                <span className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-0.5">
+                  Job No.
+                </span>
+                <span className="font-bold font-mono text-xs sm:text-sm text-teal-700 dark:text-teal-400 block">
+                  {data.jobId || "JOB-2026-0842"}
+                </span>
               </div>
             </div>
           </div>
@@ -278,7 +273,6 @@ export default function FabricConsumptionPreviewModal({
                     <th className="py-2 px-2 text-right">DIA Cut</th>
                     <th className="py-2 px-2 text-right">Marker QTY</th>
                     <th className="py-2 px-2 text-right">Fabric GSM</th>
-                    <th className="py-2 px-2 text-center">Calculation</th>
                     <th className="py-2 px-2.5 text-right font-black text-emerald-800 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20">
                       Finish/KG Consumption
                     </th>
@@ -295,7 +289,7 @@ export default function FabricConsumptionPreviewModal({
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                   {data.rows.length === 0 ? (
                     <tr>
-                      <td colSpan={12} className="py-8 text-center text-slate-400 italic">
+                      <td colSpan={11} className="py-8 text-center text-slate-400 italic">
                         No body part calculation rows entered yet.
                       </td>
                     </tr>
@@ -338,17 +332,6 @@ export default function FabricConsumptionPreviewModal({
                             ? Number(row.fabricGsm)
                             : "—"}
                         </td>
-                        <td className="py-1.5 px-2 text-center">
-                          <span
-                            className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                              row.calculationMode === "Manual"
-                                ? "bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700"
-                                : "bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800"
-                            }`}
-                          >
-                            {row.calculationMode || "Auto"}
-                          </span>
-                        </td>
                         <td className="py-1.5 px-2.5 text-right font-mono font-bold text-emerald-800 dark:text-emerald-400 bg-emerald-50/30 dark:bg-emerald-950/10">
                           {row.finishKgConsumption !== undefined && row.finishKgConsumption !== null
                             ? Number(row.finishKgConsumption).toFixed(3)
@@ -375,9 +358,6 @@ export default function FabricConsumptionPreviewModal({
                     <td colSpan={7} className="py-2.5 px-3 text-right uppercase tracking-wider text-[11px]">
                       Finish Total:
                     </td>
-                    <td className="py-2.5 px-2 text-center text-[10px] text-slate-600 dark:text-slate-400">
-                      {autoCount} Auto / {manualCount} Man
-                    </td>
                     <td className="py-2.5 px-2.5 text-right font-mono text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-100/60 dark:bg-emerald-950/60">
                       {data.totals.totalFinishKg.toFixed(3)}
                     </td>
@@ -396,42 +376,6 @@ export default function FabricConsumptionPreviewModal({
             </div>
           </div>
 
-          {/* ── Consumption Summary Highlights ── */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-            <div className="p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/30">
-              <span className="block text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400">
-                Total Finish Fabric
-              </span>
-              <span className="text-sm font-black font-mono text-emerald-900 dark:text-emerald-200">
-                {data.totals.totalFinishKg.toFixed(3)} Kg
-              </span>
-            </div>
-            <div className="p-3 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/30">
-              <span className="block text-[10px] uppercase font-bold text-teal-700 dark:text-teal-400">
-                Total Waste (+10%)
-              </span>
-              <span className="text-sm font-black font-mono text-teal-900 dark:text-teal-200">
-                {data.totals.totalWaste10Kg.toFixed(3)} Kg
-              </span>
-            </div>
-            <div className="p-3 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/30">
-              <span className="block text-[10px] uppercase font-bold text-indigo-700 dark:text-indigo-400">
-                WASH 10% (Total Waste)
-              </span>
-              <span className="text-sm font-black font-mono text-indigo-900 dark:text-indigo-200">
-                {data.totals.wash10Pct.toFixed(3)} Kg
-              </span>
-            </div>
-            <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40">
-              <span className="block text-[10px] uppercase font-bold text-slate-600 dark:text-slate-400">
-                Marker Efficiency
-              </span>
-              <span className="text-sm font-black font-mono text-slate-900 dark:text-white">
-                {data.efficiency ? `${data.efficiency}%` : "N/A"}
-              </span>
-            </div>
-          </div>
-
           {/* ── Remarks & Notes ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/30 space-y-1">
@@ -445,9 +389,6 @@ export default function FabricConsumptionPreviewModal({
               <p className="text-slate-700 dark:text-slate-300 font-bold uppercase">
                 {data.comments || "ONE BODY ONE WAY CUTTING."}
               </p>
-              {data.notes && data.notes !== ".." && (
-                <p className="text-[11px] text-slate-500">Note: {data.notes}</p>
-              )}
             </div>
           </div>
 
@@ -466,6 +407,59 @@ export default function FabricConsumptionPreviewModal({
                     📎 {att.fileName} ({att.fileSize})
                   </span>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── CAD Attachments Gallery: GMT Image & CAD Images ── */}
+          {(data.gmtImage || (data.cadImages && data.cadImages.length > 0)) && (
+            <div className="rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 p-4 space-y-3">
+              <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white block border-b border-slate-200 dark:border-slate-700 pb-2">
+                CAD Attachments & Visual Layouts
+              </span>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {/* GMT Image */}
+                {data.gmtImage && (
+                  <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 bg-white dark:bg-slate-900 flex flex-col items-center">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-teal-700 dark:text-teal-400 mb-1.5">
+                      GMT Reference Image
+                    </span>
+                    <div className="w-full h-36 bg-slate-50 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center p-1 border border-slate-100 dark:border-slate-800">
+                      <img
+                        src={typeof data.gmtImage === "string" ? data.gmtImage : data.gmtImage.dataUrl}
+                        alt="GMT Reference"
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    </div>
+                    <span className="text-[10px] text-slate-500 font-semibold mt-1.5 truncate max-w-full">
+                      {typeof data.gmtImage === "string" ? "GMT Image" : data.gmtImage.name}
+                    </span>
+                  </div>
+                )}
+
+                {/* CAD Images */}
+                {data.cadImages &&
+                  data.cadImages.map((img, idx) => (
+                    <div
+                      key={img.id || idx}
+                      className="border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 bg-white dark:bg-slate-900 flex flex-col items-center"
+                    >
+                      <span className="text-[10px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-400 mb-1.5">
+                        CAD Marker #{idx + 1}
+                      </span>
+                      <div className="w-full h-36 bg-slate-50 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center p-1 border border-slate-100 dark:border-slate-800">
+                        <img
+                          src={img.dataUrl}
+                          alt={img.name || `CAD Marker ${idx + 1}`}
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                      <span className="text-[10px] text-slate-500 font-semibold mt-1.5 truncate max-w-full">
+                        {img.name || `Marker Layout ${idx + 1}`}
+                      </span>
+                    </div>
+                  ))}
               </div>
             </div>
           )}

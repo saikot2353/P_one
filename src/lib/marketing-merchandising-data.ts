@@ -8058,7 +8058,7 @@ export interface MMCadItemRow {
   finishKgConsumption: number; // Auto: (markerLength * diaFinish * fabricGsm / law / markerQty) * condumption
   waste10Consumption: number; // Formula: finishKgConsumption * 1.1
   diaMake: MMCadDiaMake; // "OPEN" | "TUBE"
-  law: number; // Default: 1550
+  law: number; // Default: 1550000
   condumption: number; // 12 for DZ, 1 for PCS (Default: 12)
   cuttableFinish: number; // Default: 2
   consumptionRatio: number; // Formula: row finishKgConsumption / totalFinishKg * 100
@@ -8115,6 +8115,10 @@ export interface MMFabricConsumptionCadRecord {
   // Attached documents from Merchant and CAD teams
   attachments?: MMFabricConsumptionAttachment[];
 
+  // CAD Attachments (Images)
+  gmtImage?: { id: string; name: string; dataUrl: string; size?: string } | string;
+  cadImages?: Array<{ id: string; name: string; dataUrl: string; size?: string }>;
+
   history?: Array<{
     timestamp: string;
     user: string;
@@ -8145,7 +8149,7 @@ export function calculateCadRow(
   const diaCut = Number((diaFinish - cuttableFinish).toFixed(2));
   const markerQty = Number(row.markerQty) || 1;
   const fabricGsm = Number(row.fabricGsm) || 0;
-  const law = Number(row.law) || 1550;
+  const law = Number(row.law) || 1550000;
 
   // Condumption: 12 for DZ, 1 for PCS (Default: 12)
   let condumption = 12;
@@ -8254,7 +8258,7 @@ export const INITIAL_APEROL_CAD_ROWS: MMCadItemRow[] = [
     finishKgConsumption: 5201.961,
     waste10Consumption: 5722.157,
     diaMake: "OPEN",
-    law: 1550,
+    law: 1550000,
     condumption: 12,
     cuttableFinish: 2,
     consumptionRatio: 54.75,
@@ -8272,7 +8276,7 @@ export const INITIAL_APEROL_CAD_ROWS: MMCadItemRow[] = [
     finishKgConsumption: 2749.935,
     waste10Consumption: 3024.929,
     diaMake: "OPEN",
-    law: 1550,
+    law: 1550000,
     condumption: 12,
     cuttableFinish: 2,
     consumptionRatio: 28.94,
@@ -8290,7 +8294,7 @@ export const INITIAL_APEROL_CAD_ROWS: MMCadItemRow[] = [
     finishKgConsumption: 208.103,
     waste10Consumption: 228.914,
     diaMake: "OPEN",
-    law: 1550,
+    law: 1550000,
     condumption: 12,
     cuttableFinish: 2,
     consumptionRatio: 2.19,
@@ -8308,7 +8312,7 @@ export const INITIAL_APEROL_CAD_ROWS: MMCadItemRow[] = [
     finishKgConsumption: 894.194,
     waste10Consumption: 983.613,
     diaMake: "OPEN",
-    law: 1550,
+    law: 1550000,
     condumption: 12,
     cuttableFinish: 2,
     consumptionRatio: 9.41,
@@ -8326,7 +8330,7 @@ export const INITIAL_APEROL_CAD_ROWS: MMCadItemRow[] = [
     finishKgConsumption: 447.097,
     waste10Consumption: 491.806,
     diaMake: "OPEN",
-    law: 1550,
+    law: 1550000,
     condumption: 12,
     cuttableFinish: 2,
     consumptionRatio: 4.71,
@@ -8344,7 +8348,7 @@ export const INITIAL_APEROL_CAD_ROWS: MMCadItemRow[] = [
     finishKgConsumption: 0.642,
     waste10Consumption: 0.707,
     diaMake: "OPEN",
-    law: 1550,
+    law: 1550000,
     condumption: 12,
     cuttableFinish: 2,
     consumptionRatio: 0.01,
@@ -8362,7 +8366,7 @@ export const INITIAL_APEROL_CAD_ROWS: MMCadItemRow[] = [
     finishKgConsumption: 0.04,
     waste10Consumption: 0.044,
     diaMake: "OPEN",
-    law: 1550,
+    law: 1550000,
     condumption: 12,
     cuttableFinish: 2,
     consumptionRatio: 0.0,
@@ -8524,7 +8528,7 @@ export const INITIAL_MM_FABRIC_CONSUMPTION_CAD: MMFabricConsumptionCadRecord[] =
         finishKgConsumption: 2603.871,
         waste10Consumption: 2864.258,
         diaMake: "OPEN",
-        law: 1550,
+        law: 1550000,
         condumption: 12,
         cuttableFinish: 2,
         consumptionRatio: 86.84,
@@ -8542,7 +8546,7 @@ export const INITIAL_MM_FABRIC_CONSUMPTION_CAD: MMFabricConsumptionCadRecord[] =
         finishKgConsumption: 318.251,
         waste10Consumption: 350.076,
         diaMake: "OPEN",
-        law: 1550,
+        law: 1550000,
         condumption: 12,
         cuttableFinish: 2,
         consumptionRatio: 10.61,
@@ -8560,7 +8564,7 @@ export const INITIAL_MM_FABRIC_CONSUMPTION_CAD: MMFabricConsumptionCadRecord[] =
         finishKgConsumption: 76.671,
         waste10Consumption: 84.338,
         diaMake: "OPEN",
-        law: 1550,
+        law: 1550000,
         condumption: 12,
         cuttableFinish: 2,
         consumptionRatio: 2.56,
