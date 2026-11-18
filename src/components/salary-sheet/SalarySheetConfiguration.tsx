@@ -33,6 +33,13 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  Building2,
+  Split,
+  Briefcase,
+  ArrowUpDown,
+  ArrowDownAZ,
+  ArrowUpZA,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SearchableSelect, Option } from "@/components/ui/searchable-select";
@@ -44,6 +51,7 @@ export interface SalarySheetColumn {
   labelEng: string;
   labelBng?: string;
   category:
+    | "none"
     | "employee_info"
     | "salary_breakdown"
     | "attendance"
@@ -51,9 +59,7 @@ export interface SalarySheetColumn {
     | "overtime"
     | "bonus"
     | "summary_signature";
-  mappingType?: "direct" | "formula";
   paramMapping: string;
-  formulaExpression?: string; // e.g. "sal_food + sal_conveyance + alw_general"
   width?: string;
   align: "left" | "center" | "right";
   isRotatedHeader?: boolean;
@@ -71,6 +77,9 @@ export interface SalarySheetTemplate {
   isActive: boolean;
   description?: string;
   columns: SalarySheetColumn[];
+  groupBy?: "department" | "section";
+  sortMode?: "designation" | "alphabetical";
+  alphabeticalOrder?: "asc" | "desc";
 }
 
 export interface SystemParameterDef {
@@ -121,218 +130,123 @@ export const SYSTEM_PARAMETERS: SystemParameterDef[] = [
 
   // Deductions
   { key: "ded_absent", nameEng: "Absent Deduction", nameBng: "অনুপস্থিতজনিত কর্তন", category: "deduction", sampleValue: 0, format: "currency" },
-  { key: "ded_advance", nameEng: "Salary Advance Deduction", nameBng: "অগ্রিম বেতন কর্তন", category: "deduction", sampleValue: 0, format: "currency" },
-  { key: "ded_stamp", nameEng: "Revenue Stamp (৳10)", nameBng: "রেভিনিউ স্ট্যাম্প (৳১০)", category: "deduction", sampleValue: 10, format: "currency" },
-  { key: "ded_wagely", nameEng: "Wagely / Instant Advance", nameBng: "ওয়েজলি অগ্রিম", category: "deduction", sampleValue: 0, format: "currency" },
-  { key: "ded_adjust", nameEng: "Adjustment / Loan Deduction", nameBng: "সমন্বয় / ঋণ কর্তন", category: "deduction", sampleValue: 0, format: "currency" },
-  { key: "ded_tax", nameEng: "Income Tax (TDS)", nameBng: "উৎস কর (আয়কর)", category: "deduction", sampleValue: 417, format: "currency" },
+  { key: "ded_advance", nameEng: "Salary Advance Deduction", nameBng: "অগ্রিম বেতন কর্তন", category: "deduction", sampleValue: 5000, format: "currency" },
+  { key: "ded_loan", nameEng: "Loan / Installment Deduction", nameBng: "ঋণ কর্তন", category: "deduction", sampleValue: 0, format: "currency" },
+  { key: "ded_tax", nameEng: "Income Tax (TDS)", nameBng: "উৎস কর (আয়কর)", category: "deduction", sampleValue: 0, format: "currency" },
+  { key: "ded_stamp", nameEng: "Revenue Stamp (৳10)", nameBng: "রেভিনিউ স্ট্যাম্প (৳১০)", category: "deduction", sampleValue: 0, format: "currency" },
   { key: "ded_lunch", nameEng: "Lunch / Canteen Deduction", nameBng: "লাঞ্চ কর্তন", category: "deduction", sampleValue: 0, format: "currency" },
+  { key: "ded_wagely", nameEng: "Wagely / Instant Advance", nameBng: "ওয়েজলি অগ্রিম", category: "deduction", sampleValue: 0, format: "currency" },
+  { key: "ded_adjust", nameEng: "Adjustment Deduction", nameBng: "সমন্বয় কর্তন", category: "deduction", sampleValue: 0, format: "currency" },
+  { key: "ded_fair_shop", nameEng: "Fair Price Shop Deduction", nameBng: "ন্যায্য দোকান কর্তন", category: "deduction", sampleValue: 0, format: "currency" },
   { key: "ded_provident_fund", nameEng: "Provident Fund (PF)", nameBng: "ভবিষ্য তহবিল (PF)", category: "deduction", sampleValue: 0, format: "currency" },
-  { key: "ded_total", nameEng: "Total Deductions", nameBng: "মোট কর্তন", category: "deduction", sampleValue: 427, format: "currency" },
+  { key: "ded_total", nameEng: "Total Deductions", nameBng: "মোট কর্তন", category: "deduction", sampleValue: 5000, format: "currency" },
 
   // Overtime
   { key: "ot_hour", nameEng: "OT Hours Worked", nameBng: "ওভারটাইম ঘণ্টা", category: "overtime", sampleValue: 0, format: "number" },
-  { key: "ot_rate", nameEng: "OT Hourly Rate", nameBng: "ওভারটাইম হার", category: "overtime", sampleValue: 750.0, format: "currency" },
+  { key: "ot_rate", nameEng: "OT Hourly Rate", nameBng: "ওভারটাইম হার", category: "overtime", sampleValue: 0, format: "currency" },
   { key: "ot_pay", nameEng: "Total Overtime Pay", nameBng: "মোট ওভারটাইম", category: "overtime", sampleValue: 0, format: "currency" },
   { key: "ot_extra_hour", nameEng: "Extra / Friday OT Hours", nameBng: "অতিরিক্ত OT ঘণ্টা", category: "overtime", sampleValue: 0, format: "number" },
 
-  // Bonuses
-  { key: "bonus_attendance", nameEng: "Attendance Bonus", nameBng: "উপস্থিতি বোনাস", category: "bonus", sampleValue: 0, format: "currency" },
-  { key: "bonus_behavior", nameEng: "Behavior / Compliance Bonus", nameBng: "আচরণ বোনাস", category: "bonus", sampleValue: 0, format: "currency" },
+  // Bonuses & Allowances
   { key: "bonus_festival", nameEng: "Festival / Eid Bonus", nameBng: "উৎসব বোনাস", category: "bonus", sampleValue: 0, format: "currency" },
+  { key: "alw_holiday", nameEng: "Holiday Allowance", nameBng: "ছুটির ভাতা", category: "bonus", sampleValue: 0, format: "currency" },
+  { key: "alw_arrear", nameEng: "Alw + Arrear / Previous Due", nameBng: "বকেয়া ভাতা", category: "bonus", sampleValue: 0, format: "currency" },
+  { key: "alw_tiffin", nameEng: "Tiffin Bill", nameBng: "টিফিন বিল", category: "bonus", sampleValue: 0, format: "currency" },
+  { key: "alw_night", nameEng: "Night Bill", nameBng: "নাইট বিল", category: "bonus", sampleValue: 0, format: "currency" },
+  { key: "bonus_behavior", nameEng: "Behavior / Compliance Bonus", nameBng: "আচরণ বোনাস", category: "bonus", sampleValue: 0, format: "currency" },
+  { key: "bonus_attendance", nameEng: "Attendance Bonus", nameBng: "উপস্থিতি বোনাস", category: "bonus", sampleValue: 0, format: "currency" },
   { key: "bonus_production", nameEng: "Production Incentive", nameBng: "উৎপাদন বোনাস", category: "bonus", sampleValue: 0, format: "currency" },
 
   // Summary & Signatures
-  { key: "net_pay", nameEng: "Net Payable Salary", nameBng: "প্রদেয় নিট বেতন", category: "summary_signature", sampleValue: 128333, format: "currency" },
+  { key: "net_pay", nameEng: "Net Payable Salary", nameBng: "প্রদেয় নিট বেতন", category: "summary_signature", sampleValue: 16200, format: "currency" },
+  { key: "pay_bank", nameEng: "Bank Pay (Disbursement)", nameBng: "ব্যাংক পে", category: "summary_signature", sampleValue: 16200, format: "currency" },
+  { key: "pay_cash", nameEng: "Cash Pay (Disbursement)", nameBng: "নগদ পে", category: "summary_signature", sampleValue: 0, format: "currency" },
   { key: "col_signature", nameEng: "Employee Signature / Thumbprint", nameBng: "স্বাক্ষর বা টিপসই", category: "summary_signature", sampleValue: "", format: "signature" },
   { key: "col_remarks", nameEng: "Remarks / Bank Status", nameBng: "মন্তব্য", category: "summary_signature", sampleValue: "Paid", format: "text" },
   { key: "custom_param", nameEng: "Custom / Calculated Formula", nameBng: "কাস্টম / হিসাবকৃত সূত্র", category: "summary_signature", sampleValue: "-", format: "text" },
 ];
 
 export const CATEGORY_LABELS: Record<SalarySheetColumn["category"], { label: string; bng: string; color: string; badge: string }> = {
+  none: { label: "None (No Section)", bng: "কোন সেকশন নেই", color: "text-slate-600 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700", badge: "bg-slate-500" },
   employee_info: { label: "Employee Info", bng: "কর্মচারী বিবরণ", color: "text-blue-600 bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-900", badge: "bg-blue-500" },
   salary_breakdown: { label: "Salary Breakdown", bng: "বেতনের বিবরণ", color: "text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-900", badge: "bg-emerald-500" },
   attendance: { label: "Attendance", bng: "উপস্থিতি", color: "text-amber-700 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-900", badge: "bg-amber-500" },
-  deduction: { label: "Deductions", bng: "কর্তনসমূহ", color: "text-rose-700 bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-900", badge: "bg-rose-500" },
-  overtime: { label: "Overtime (OT)", bng: "ওভারটাইম", color: "text-indigo-700 bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-900", badge: "bg-indigo-500" },
+  deduction: { label: "Deduction", bng: "কর্তনসমূহ", color: "text-rose-700 bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-900", badge: "bg-rose-500" },
+  overtime: { label: "Overtime", bng: "ওভারটাইম", color: "text-indigo-700 bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-900", badge: "bg-indigo-500" },
   bonus: { label: "Bonuses & Allowances", bng: "বোনাস ও অতিরিক্ত", color: "text-purple-700 bg-purple-50 dark:bg-purple-950/50 border-purple-200 dark:border-purple-900", badge: "bg-purple-500" },
   summary_signature: { label: "Net Pay & Signature", bng: "নিট বেতন ও স্বাক্ষর", color: "text-slate-800 bg-slate-100 dark:bg-slate-800/80 border-slate-300 dark:border-slate-700", badge: "bg-slate-600" },
 };
 
-// One-Click Formula Presets for Allowances, OT, Net Pay, etc.
-export const FORMULA_PRESETS = [
-  {
-    nameEng: "Other Allowance (Food + Conveyance)",
-    nameBng: "অন্যান্য ভাতা (খাদ্য + যাতায়াত)",
-    expression: "sal_food + sal_conveyance",
-    category: "salary_breakdown",
-  },
-  {
-    nameEng: "All Non-Basic Allowances (House Rent + Medical + Food + Conveyance)",
-    nameBng: "সকল ভাতা (বাড়ি ভাড়া + চিকিৎসা + খাদ্য + যাতায়াত)",
-    expression: "sal_house_rent + sal_medical + sal_food + sal_conveyance",
-    category: "salary_breakdown",
-  },
-  {
-    nameEng: "Combined Medical & Conveyance (Medical + Conveyance)",
-    nameBng: "চিকিৎসা ও যাতায়াত ভাতা",
-    expression: "sal_medical + sal_conveyance",
-    category: "salary_breakdown",
-  },
-  {
-    nameEng: "Earned Gross Wages (Basic + House + Medical + Food + Conveyance)",
-    nameBng: "উপার্জিত মোট মজুরি",
-    expression: "sal_basic + sal_house_rent + sal_medical + sal_food + sal_conveyance",
-    category: "salary_breakdown",
-  },
-  {
-    nameEng: "Calculated OT Amount (OT Hours × OT Rate)",
-    nameBng: "ওভারটাইম পরিমাণ (OT ঘণ্টা × OT হার)",
-    expression: "ot_hour * ot_rate",
-    category: "overtime",
-  },
-  {
-    nameEng: "Total Statutory Deductions (Absent + Advance + Stamp + Tax + Wagely)",
-    nameBng: "আইনসম্মত কর্তনসমূহ",
-    expression: "ded_absent + ded_advance + ded_stamp + ded_tax + ded_wagely",
-    category: "deduction",
-  },
-  {
-    nameEng: "Net Take-Home Pay (Gross - Total Deductions + OT Pay + Attendance Bonus)",
-    nameBng: "প্রদেয় নিট বেতন",
-    expression: "sal_gross - ded_total + ot_pay + bonus_attendance",
-    category: "summary_signature",
-  },
-];
-
-// Mathematical Evaluator supporting +, -, *, /, (, )
-export function evaluateFormula(expr: string | undefined, emp: any): number {
-  if (!expr || !expr.trim()) return 0;
-
-  const paramValues: Record<string, number> = {
-    sal_basic: emp.basic || 0,
-    sal_house_rent: emp.houseRent || 0,
-    sal_medical: emp.medical || 0,
-    sal_food: emp.food || 0,
-    sal_conveyance: emp.conveyance || 0,
-    sal_gross: emp.gross || 0,
-    sal_payable_salary: emp.payableSalary || 0,
-    alw_arrear: emp.arrear || 0,
-    alw_general: emp.genAlw || 0,
-    att_total_day: emp.totalDay || 0,
-    att_present: emp.present || 0,
-    att_holiday: emp.holiday || 0,
-    att_leave_cl: emp.cl || 0,
-    att_leave_sl: emp.sl || 0,
-    att_leave_el: emp.el || 0,
-    att_leave_ml: emp.ml || 0,
-    att_absent: emp.absent || 0,
-    att_payable_days: emp.payableDays || 0,
-    ded_absent: emp.absDeduc || 0,
-    ded_advance: emp.advance || 0,
-    ded_stamp: emp.revStamp || 0,
-    ded_wagely: emp.wagelyAd || 0,
-    ded_adjust: emp.adjust || 0,
-    ded_tax: emp.tax || 0,
-    ded_lunch: emp.lunch || 0,
-    ded_provident_fund: emp.pf || 0,
-    ded_total: emp.totalDeduc || 0,
-    ot_hour: emp.otHour || 0,
-    ot_rate: emp.otRate || 0,
-    ot_pay: emp.otPay || 0,
-    bonus_attendance: emp.attendanceBonus || 0,
-    bonus_behavior: emp.behaviorBonus || 0,
-    bonus_festival: emp.festivalBonus || 0,
-    bonus_production: 0,
-    net_pay: emp.netPay || 0,
-  };
-
-  try {
-    let sanitized = expr;
-    const sortedKeys = Object.keys(paramValues).sort((a, b) => b.length - a.length);
-    for (const key of sortedKeys) {
-      const regex = new RegExp(`\\b${key}\\b`, "g");
-      sanitized = sanitized.replace(regex, String(paramValues[key] ?? 0));
-    }
-
-    // Only allow safe math tokens
-    if (!/^[0-9+\-*/().\s]+$/.test(sanitized)) {
-      return 0;
-    }
-
-    const result = Function(`"use strict"; return (${sanitized})`)();
-    return typeof result === "number" && !isNaN(result) && isFinite(result)
-      ? Math.round(result * 100) / 100
-      : 0;
-  } catch {
-    return 0;
-  }
-}
-
-export function formatFormulaHumanReadable(expr: string | undefined): string {
-  if (!expr) return "";
-  let readable = expr;
-  for (const param of SYSTEM_PARAMETERS) {
-    const regex = new RegExp(`\\b${param.key}\\b`, "g");
-    readable = readable.replace(regex, `[${param.nameEng.split(" (")[0]}]`);
-  }
-  return readable;
-}
 
 export const DEFAULT_SALARY_SHEET_COLUMNS: SalarySheetColumn[] = [
-  { id: "col-1", key: "sl", labelEng: "SL", labelBng: "নং", category: "employee_info", mappingType: "direct", paramMapping: "emp_sl", align: "center", width: "24px", isVisible: true, format: "number" },
-  { id: "col-2", key: "emp_card", labelEng: "ID & Name", labelBng: "আইডি ও নাম", category: "employee_info", mappingType: "direct", paramMapping: "emp_id_name", align: "left", width: "135px", isVisible: true, format: "text" },
-  { id: "col-3", key: "basic", labelEng: "Basic", labelBng: "মূল বেতন", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_basic", align: "center", width: "52px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-4", key: "house_rent", labelEng: "House Rent", labelBng: "বাড়ি ভাড়া", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_house_rent", align: "center", width: "50px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-5", key: "medical", labelEng: "Medical", labelBng: "চিকিৎসা", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_medical", align: "center", width: "46px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-6", key: "food", labelEng: "Food", labelBng: "খাদ্য", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_food", align: "center", width: "42px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-7", key: "conveyance", labelEng: "Conveyance", labelBng: "যাতায়াত", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_conveyance", align: "center", width: "46px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  {
-    id: "col-8",
-    key: "other_alw",
-    labelEng: "Other Allowance",
-    labelBng: "অন্যান্য ভাতা",
-    category: "salary_breakdown",
-    mappingType: "formula",
-    paramMapping: "custom_param",
-    formulaExpression: "sal_food + sal_conveyance",
-    align: "center",
-    width: "50px",
-    isRotatedHeader: true,
-    isVisible: true,
-    format: "currency",
-  },
-  { id: "col-9", key: "gross", labelEng: "Gross", labelBng: "মোট বেতন", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_gross", align: "center", width: "54px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-10", key: "total_day", labelEng: "Total Day", labelBng: "মোট দিন", category: "attendance", mappingType: "direct", paramMapping: "att_total_day", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-11", key: "present", labelEng: "Present", labelBng: "উপস্থিত", category: "attendance", mappingType: "direct", paramMapping: "att_present", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-12", key: "holiday", labelEng: "Holiday", labelBng: "ছুটি", category: "attendance", mappingType: "direct", paramMapping: "att_holiday", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-13", key: "cl", labelEng: "CL", labelBng: "নৈমিত্তিক", category: "attendance", mappingType: "direct", paramMapping: "att_leave_cl", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-14", key: "sl", labelEng: "SL (Leave)", labelBng: "পীড়া", category: "attendance", mappingType: "direct", paramMapping: "att_leave_sl", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-15", key: "el", labelEng: "EL", labelBng: "অর্জিত", category: "attendance", mappingType: "direct", paramMapping: "att_leave_el", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-16", key: "absent", labelEng: "Absent", labelBng: "অনুপস্থিত", category: "attendance", mappingType: "direct", paramMapping: "att_absent", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-17", key: "abs_deduc", labelEng: "Abs. Deduc", labelBng: "অনুপস্থিত কর্তন", category: "deduction", mappingType: "direct", paramMapping: "ded_absent", align: "center", width: "48px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-18", key: "advance", labelEng: "Advance", labelBng: "অগ্রিম", category: "deduction", mappingType: "direct", paramMapping: "ded_advance", align: "center", width: "48px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-19", key: "rev_stamp", labelEng: "Rev. Stamp", labelBng: "স্ট্যাম্প", category: "deduction", mappingType: "direct", paramMapping: "ded_stamp", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-20", key: "wagely_ad", labelEng: "Wagely Ad", labelBng: "ওয়েজলি", category: "deduction", mappingType: "direct", paramMapping: "ded_wagely", align: "center", width: "48px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-21", key: "adjust", labelEng: "Adjust", labelBng: "সমন্বয়", category: "deduction", mappingType: "direct", paramMapping: "ded_adjust", align: "center", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-22", key: "tax", labelEng: "Tax", labelBng: "আয়কর", category: "deduction", mappingType: "direct", paramMapping: "ded_tax", align: "center", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-23", key: "pay_salary", labelEng: "Pay Salary", labelBng: "প্রদেয় বেতন", category: "salary_breakdown", mappingType: "direct", paramMapping: "sal_payable_salary", align: "center", width: "54px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-24", key: "ot_hour", labelEng: "OT Hour", labelBng: "OT ঘণ্টা", category: "overtime", mappingType: "direct", paramMapping: "ot_hour", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
-  { id: "col-25", key: "ot_rate", labelEng: "OT Rate", labelBng: "OT হার", category: "overtime", mappingType: "direct", paramMapping: "ot_rate", align: "center", width: "46px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-26", key: "ot_pay", labelEng: "OT Pay", labelBng: "মোট OT", category: "overtime", mappingType: "direct", paramMapping: "ot_pay", align: "center", width: "48px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-27", key: "att_bonus", labelEng: "Attendance Bonus", labelBng: "হাজিরা বোনাস", category: "bonus", mappingType: "direct", paramMapping: "bonus_attendance", align: "center", width: "46px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-28", key: "net_pay", labelEng: "Net Pay", labelBng: "নিট প্রদেয়", category: "summary_signature", mappingType: "direct", paramMapping: "net_pay", align: "center", width: "62px", isRotatedHeader: true, isVisible: true, format: "currency" },
-  { id: "col-29", key: "signature", labelEng: "Signature", labelBng: "স্বাক্ষর", category: "summary_signature", mappingType: "direct", paramMapping: "col_signature", align: "center", width: "85px", isRotatedHeader: true, isVisible: true, format: "signature" },
+  // 1. Employee Info (No Section / Standalone)
+  { id: "col-1", key: "sl", labelEng: "SL", labelBng: "নং", category: "none", paramMapping: "emp_sl", align: "center", width: "24px", isVisible: true, format: "number" },
+  { id: "col-2", key: "emp_card", labelEng: "ID & Name", labelBng: "আইডি ও নাম", category: "none", paramMapping: "emp_id_name", align: "left", width: "135px", isVisible: true, format: "text" },
+
+  // 2. Salary Breakdown (Section)
+  { id: "col-3", key: "basic", labelEng: "Basic", labelBng: "মূল বেতন", category: "salary_breakdown", paramMapping: "sal_basic", align: "right", width: "48px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-4", key: "house_rent", labelEng: "House Rent", labelBng: "বাড়ি ভাড়া", category: "salary_breakdown", paramMapping: "sal_house_rent", align: "right", width: "48px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-5", key: "medical", labelEng: "Medical", labelBng: "চিকিৎসা", category: "salary_breakdown", paramMapping: "sal_medical", align: "right", width: "46px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-6", key: "food", labelEng: "Food", labelBng: "খাদ্য", category: "salary_breakdown", paramMapping: "sal_food", align: "right", width: "42px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-7", key: "conveyance", labelEng: "Conveyance", labelBng: "যাতায়াত", category: "salary_breakdown", paramMapping: "sal_conveyance", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-8", key: "gross", labelEng: "Gross", labelBng: "মোট বেতন", category: "salary_breakdown", paramMapping: "sal_gross", align: "right", width: "52px", isRotatedHeader: true, isVisible: true, format: "currency" },
+
+  // 3. Attendance (Section)
+  { id: "col-9", key: "total_day", labelEng: "Working Day", labelBng: "কার্যদিবস", category: "attendance", paramMapping: "att_total_day", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-10", key: "holiday", labelEng: "Holiday", labelBng: "ছুটি", category: "attendance", paramMapping: "att_holiday", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-11", key: "present", labelEng: "Present", labelBng: "উপস্থিত", category: "attendance", paramMapping: "att_present", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-12", key: "cl", labelEng: "CL", labelBng: "নৈমিত্তিক", category: "attendance", paramMapping: "att_leave_cl", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-13", key: "sl", labelEng: "SL", labelBng: "পীড়া", category: "attendance", paramMapping: "att_leave_sl", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-14", key: "el", labelEng: "EL", labelBng: "অর্জিত", category: "attendance", paramMapping: "att_leave_el", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-15", key: "ml", labelEng: "ML", labelBng: "প্রসূতি", category: "attendance", paramMapping: "att_leave_ml", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-16", key: "absent", labelEng: "Absent", labelBng: "অনুপস্থিত", category: "attendance", paramMapping: "att_absent", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+
+  // 4. Deduction (Section)
+  { id: "col-17", key: "abs_deduc", labelEng: "Absent Deduct", labelBng: "অনুপস্থিত কর্তন", category: "deduction", paramMapping: "ded_absent", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-18", key: "advance", labelEng: "Advance", labelBng: "অগ্রিম", category: "deduction", paramMapping: "ded_advance", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-19", key: "loan", labelEng: "Loan", labelBng: "ঋণ", category: "deduction", paramMapping: "ded_loan", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-20", key: "tax", labelEng: "Tax", labelBng: "আয়কর", category: "deduction", paramMapping: "ded_tax", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-21", key: "rev_stamp", labelEng: "Revenue Stamp", labelBng: "স্ট্যাম্প", category: "deduction", paramMapping: "ded_stamp", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-22", key: "lunch", labelEng: "Lunch Deduct", labelBng: "লাঞ্চ কর্তন", category: "deduction", paramMapping: "ded_lunch", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-23", key: "wagely_ad", labelEng: "Wagely", labelBng: "ওয়েজলি", category: "deduction", paramMapping: "ded_wagely", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-24", key: "adjust", labelEng: "Adjust", labelBng: "সমন্বয়", category: "deduction", paramMapping: "ded_adjust", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-25", key: "fair_shop", labelEng: "Fair Shop", labelBng: "দোকান", category: "deduction", paramMapping: "ded_fair_shop", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+
+  // 5. Pay Salary (Standalone - No Section)
+  { id: "col-26", key: "pay_salary", labelEng: "Pay Salary", labelBng: "প্রদেয় বেতন", category: "none", paramMapping: "sal_payable_salary", align: "right", width: "52px", isRotatedHeader: true, isVisible: true, format: "currency" },
+
+  // 6. Overtime (Section)
+  { id: "col-27", key: "ot_hour", labelEng: "OT Hour", labelBng: "OT ঘণ্টা", category: "overtime", paramMapping: "ot_hour", align: "center", width: "24px", isRotatedHeader: true, isVisible: true, format: "number" },
+  { id: "col-28", key: "ot_rate", labelEng: "OT Rate", labelBng: "OT হার", category: "overtime", paramMapping: "ot_rate", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-29", key: "ot_pay", labelEng: "OT Pay", labelBng: "মোট OT", category: "overtime", paramMapping: "ot_pay", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+
+  // 7. Bonuses & Allowances (Section)
+  { id: "col-30", key: "festival_bonus", labelEng: "Festival Bonus", labelBng: "উৎসব বোনাস", category: "bonus", paramMapping: "bonus_festival", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-31", key: "holiday_alw", labelEng: "Holiday Allowance", labelBng: "ছুটির ভাতা", category: "bonus", paramMapping: "alw_holiday", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-32", key: "alw_arrear", labelEng: "Alw+Arrear", labelBng: "বকেয়া ভাতা", category: "bonus", paramMapping: "alw_arrear", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-33", key: "tiffin", labelEng: "Tiffin", labelBng: "টিফিন", category: "bonus", paramMapping: "alw_tiffin", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-34", key: "night_bill", labelEng: "Night Bill", labelBng: "নাইট বিল", category: "bonus", paramMapping: "alw_night", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-35", key: "behavior_bonus", labelEng: "Behavior Bonus", labelBng: "আচরণ বোনাস", category: "bonus", paramMapping: "bonus_behavior", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-36", key: "att_bonus", labelEng: "Attendance bonus", labelBng: "হাজিরা বোনাস", category: "bonus", paramMapping: "bonus_attendance", align: "right", width: "44px", isRotatedHeader: true, isVisible: true, format: "currency" },
+
+  // 8. Net Pay, Bank Pay, Cash Pay & Signature (Standalone - No Section)
+  { id: "col-37", key: "net_pay", labelEng: "Net Pay", labelBng: "নিট প্রদেয়", category: "none", paramMapping: "net_pay", align: "right", width: "56px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-38", key: "bank_pay", labelEng: "Bank Pay", labelBng: "ব্যাংক পে", category: "none", paramMapping: "pay_bank", align: "right", width: "54px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-39", key: "cash_pay", labelEng: "Cash Pay", labelBng: "নগদ পে", category: "none", paramMapping: "pay_cash", align: "right", width: "46px", isRotatedHeader: true, isVisible: true, format: "currency" },
+  { id: "col-40", key: "signature", labelEng: "Signature", labelBng: "স্বাক্ষর", category: "none", paramMapping: "col_signature", align: "center", width: "85px", isRotatedHeader: true, isVisible: true, format: "signature" },
 ];
 
 export const DEFAULT_SALARY_SHEET_TEMPLATES: SalarySheetTemplate[] = [
   {
     id: "sheet-tpl-1",
-    title: "Standard Full Landscape Salary Sheet (WH)",
+    title: "Standard Full Landscape Salary",
     companyName: "Pakiza Software Limited",
-    employeeType: "Worker",
+    employeeType: "OFFICE STAFF",
     otType: "2hrs OT",
     isActive: true,
+    groupBy: "department",
+    sortMode: "designation",
+    alphabeticalOrder: "asc",
     description: "Standard compliant factory salary sheet with full breakdown, attendance matrix, OT calculation, and stamp deductions.",
     columns: DEFAULT_SALARY_SHEET_COLUMNS,
   },
@@ -342,6 +256,9 @@ export const DEFAULT_SALARY_SHEET_TEMPLATES: SalarySheetTemplate[] = [
     companyName: "Pakiza Software Limited",
     employeeType: "Office Executive",
     isActive: true,
+    groupBy: "department",
+    sortMode: "designation",
+    alphabeticalOrder: "asc",
     description: "Corporate office executive monthly salary register with bank transfer and income tax columns.",
     columns: DEFAULT_SALARY_SHEET_COLUMNS.filter((c) => !["ot_hour", "ot_rate", "ot_pay"].includes(c.key)),
   },
@@ -351,6 +268,9 @@ export const DEFAULT_SALARY_SHEET_TEMPLATES: SalarySheetTemplate[] = [
     companyName: "Pakiza Knit Composite Ltd",
     employeeType: "All Categories",
     isActive: false,
+    groupBy: "section",
+    sortMode: "alphabetical",
+    alphabeticalOrder: "asc",
     description: "Compact audit-friendly monthly register with key attendance and statutory wage columns.",
     columns: DEFAULT_SALARY_SHEET_COLUMNS.filter((c) => !["wagely_ad", "adjust"].includes(c.key)),
   },
@@ -371,25 +291,23 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
   const [newCompany, setNewCompany] = useState("Pakiza Software Limited");
   const [newEmpType, setNewEmpType] = useState("Worker");
   const [newOtType, setNewOtType] = useState("2hrs OT");
+  const [newGroupBy, setNewGroupBy] = useState<"department" | "section">("department");
+  const [newSortMode, setNewSortMode] = useState<"designation" | "alphabetical">("designation");
+  const [newAlphaOrder, setNewAlphaOrder] = useState<"asc" | "desc">("asc");
+
+  // Live preview group filter
+  const [previewGroupFilter, setPreviewGroupFilter] = useState<string>("all");
 
   // Add column modal
   const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
   const [newColLabelEng, setNewColLabelEng] = useState("");
   const [newColLabelBng, setNewColLabelBng] = useState("");
-  const [newColCategory, setNewColCategory] = useState<SalarySheetColumn["category"]>("salary_breakdown");
-  const [newColMappingType, setNewColMappingType] = useState<"direct" | "formula">("direct");
+  const [newColCategory, setNewColCategory] = useState<SalarySheetColumn["category"]>("none");
   const [newColParamMapping, setNewColParamMapping] = useState("sal_basic");
-  const [newColFormula, setNewColFormula] = useState("sal_food + sal_conveyance");
   const [newColAlign, setNewColAlign] = useState<"left" | "center" | "right">("center");
   const [newColRotated, setNewColRotated] = useState(true);
   const [newColValueRotated, setNewColValueRotated] = useState(false);
-  const [newColWidth, setNewColWidth] = useState("65px");
-
-  // Formula Builder Modal for Existing Column
-  const [isFormulaModalOpen, setIsFormulaModalOpen] = useState(false);
-  const [activeFormulaColId, setActiveFormulaColId] = useState<string | null>(null);
-  const [modalFormulaExpr, setModalFormulaExpr] = useState("");
-  const [modalParamSearch, setModalParamSearch] = useState("");
+  const [newColWidth, setNewColWidth] = useState("48px");
 
   // Options for SearchableSelect
   const systemParamOptions: Option[] = useMemo(() => {
@@ -400,10 +318,15 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
   }, []);
 
   const categoryOptions: Option[] = useMemo(() => {
-    return Object.entries(CATEGORY_LABELS).map(([k, v]) => ({
-      value: k,
-      label: v.label,
-    }));
+    return [
+      { value: "none", label: "None (No Section / Standalone)" },
+      ...Object.entries(CATEGORY_LABELS)
+        .filter(([k]) => k !== "none")
+        .map(([k, v]) => ({
+          value: k,
+          label: v.label,
+        })),
+    ];
   }, []);
 
   const companyOptions: Option[] = [
@@ -429,23 +352,9 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
     { value: "None", label: "None (No OT Calculation)" },
   ];
 
-  // Filtered parameters for formula modal
-  const filteredModalParams = useMemo(() => {
-    const allowed = SYSTEM_PARAMETERS.filter((p) =>
-      ["salary_breakdown", "deduction", "overtime", "bonus"].includes(p.category)
-    );
-    if (!modalParamSearch.trim()) return allowed;
-    const q = modalParamSearch.toLowerCase();
-    return allowed.filter(
-      (p) =>
-        p.nameEng.toLowerCase().includes(q) ||
-        p.nameBng.includes(q) ||
-        p.key.toLowerCase().includes(q)
-    );
-  }, [modalParamSearch]);
-
   // Filter & Search inside Column Editor
   const [columnSearch, setColumnSearch] = useState("");
+  const [activeCategoryTab, setActiveCategoryTab] = useState<string>("all");
 
   // Interactive Live Preview Controls
   const [showLivePreview, setShowLivePreview] = useState(true);
@@ -456,7 +365,31 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
     const saved = localStorage.getItem("salary_sheet_templates_data");
     if (saved) {
       try {
-        setTemplates(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        const upgraded = Array.isArray(parsed)
+          ? parsed.map((t: SalarySheetTemplate) => {
+              const baseT = {
+                ...t,
+                groupBy: t.groupBy || "department",
+                sortMode: t.sortMode || "designation",
+                alphabeticalOrder: t.alphabeticalOrder || "asc",
+              };
+              if (t.id === "sheet-tpl-1") {
+                return {
+                  ...baseT,
+                  title: "Standard Full Landscape Salary",
+                  employeeType: t.employeeType || "OFFICE STAFF",
+                  columns:
+                    t.columns.length < 35
+                      ? JSON.parse(JSON.stringify(DEFAULT_SALARY_SHEET_COLUMNS))
+                      : t.columns,
+                };
+              }
+              return baseT;
+            })
+          : DEFAULT_SALARY_SHEET_TEMPLATES;
+        setTemplates(upgraded);
+        localStorage.setItem("salary_sheet_templates_data", JSON.stringify(upgraded));
       } catch {
         setTemplates(DEFAULT_SALARY_SHEET_TEMPLATES);
       }
@@ -485,6 +418,9 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
       employeeType: newEmpType,
       otType: newEmpType === "Worker" ? newOtType : undefined,
       isActive: true,
+      groupBy: newGroupBy,
+      sortMode: newSortMode,
+      alphabeticalOrder: newAlphaOrder,
       description: `Custom salary sheet layout for ${newEmpType} at ${newCompany}.`,
       columns: JSON.parse(JSON.stringify(DEFAULT_SALARY_SHEET_COLUMNS)),
     };
@@ -496,6 +432,33 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
     setEditingTemplate(newTpl);
     setIsConfiguring(true);
     toast.success("Salary Sheet template created! Now configure its columns.");
+  };
+
+  const handleUpdateGrouping = (groupBy: "department" | "section") => {
+    if (!editingTemplate) return;
+    const updated = { ...editingTemplate, groupBy };
+    setEditingTemplate(updated);
+    const updatedTemplates = templates.map((t) => (t.id === updated.id ? updated : t));
+    saveTemplates(updatedTemplates);
+    toast.success(`Sheet grouping set to ${groupBy === "department" ? "Department-Wise" : "Section-Wise"}`);
+  };
+
+  const handleUpdateSortMode = (sortMode: "designation" | "alphabetical") => {
+    if (!editingTemplate) return;
+    const updated = { ...editingTemplate, sortMode };
+    setEditingTemplate(updated);
+    const updatedTemplates = templates.map((t) => (t.id === updated.id ? updated : t));
+    saveTemplates(updatedTemplates);
+    toast.success(`Employee sorting set to ${sortMode === "designation" ? "Designation-Wise" : "Alphabetical"}`);
+  };
+
+  const handleUpdateAlphaOrder = (alphabeticalOrder: "asc" | "desc") => {
+    if (!editingTemplate) return;
+    const updated = { ...editingTemplate, alphabeticalOrder };
+    setEditingTemplate(updated);
+    const updatedTemplates = templates.map((t) => (t.id === updated.id ? updated : t));
+    saveTemplates(updatedTemplates);
+    toast.success(`Alphabetical order set to ${alphabeticalOrder === "asc" ? "Ascending (A-Z)" : "Descending (Z-A)"}`);
   };
 
   const handleDeleteTemplate = (id: string) => {
@@ -614,15 +577,13 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
       labelEng: newColLabelEng.trim(),
       labelBng: newColLabelBng.trim() || undefined,
       category: newColCategory,
-      mappingType: newColMappingType,
-      paramMapping: newColMappingType === "formula" ? "custom_param" : newColParamMapping,
-      formulaExpression: newColMappingType === "formula" ? newColFormula : undefined,
+      paramMapping: newColParamMapping,
       align: newColAlign,
-      width: newColWidth.trim() || "65px",
+      width: newColWidth.trim() || "48px",
       isRotatedHeader: newColRotated,
       isRotatedValue: newColValueRotated,
       isVisible: true,
-      format: newColMappingType === "formula" ? "currency" : paramDef?.format || "text",
+      format: paramDef?.format || "currency",
     };
 
     const updatedCols = [...editingTemplate.columns, newCol];
@@ -635,25 +596,6 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
     setNewColLabelEng("");
     setNewColLabelBng("");
     toast.success(`Column "${newCol.labelEng}" added successfully!`);
-  };
-
-  const handleOpenFormulaModal = (col: SalarySheetColumn) => {
-    setActiveFormulaColId(col.id);
-    setModalFormulaExpr(col.formulaExpression || col.paramMapping || "sal_basic");
-    setModalParamSearch("");
-    setIsFormulaModalOpen(true);
-  };
-
-  const handleSaveFormulaModal = () => {
-    if (!editingTemplate || !activeFormulaColId) return;
-    handleColumnUpdate(activeFormulaColId, {
-      mappingType: "formula",
-      paramMapping: "custom_param",
-      formulaExpression: modalFormulaExpr.trim(),
-    });
-    setIsFormulaModalOpen(false);
-    setActiveFormulaColId(null);
-    toast.success("Mathematical formula updated for column!");
   };
 
   const handleRestoreDefaultColumns = () => {
@@ -682,260 +624,353 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
   const filteredColumns = useMemo(() => {
     if (!editingTemplate) return [];
     return editingTemplate.columns.filter((c) => {
+      const matchCategory = activeCategoryTab === "all" || c.category === activeCategoryTab;
+      if (!matchCategory) return false;
+
       const matchSearch =
         !columnSearch.trim() ||
         c.labelEng.toLowerCase().includes(columnSearch.toLowerCase()) ||
         (c.labelBng && c.labelBng.includes(columnSearch)) ||
-        c.paramMapping.toLowerCase().includes(columnSearch.toLowerCase()) ||
-        (c.formulaExpression && c.formulaExpression.toLowerCase().includes(columnSearch.toLowerCase()));
+        c.paramMapping.toLowerCase().includes(columnSearch.toLowerCase());
       return matchSearch;
     });
-  }, [editingTemplate, columnSearch]);
+  }, [editingTemplate, columnSearch, activeCategoryTab]);
 
-  // Mock employee values for real-time live interactive salary sheet view
+  // Mock employee values for real-time live interactive salary sheet view matching factory register
   const sampleEmployees = useMemo(() => {
     return [
       {
         serialNo: 1,
-        id: "2025058109",
-        name: "Mohammad Methoun Ahmed",
-        designation: "Sr. Manager",
-        grade: "Grade-02",
-        department: "Business Automation",
-        section: "Core Development",
-        unit: "PSL Unit-01",
-        line: "N/A",
-        joinDate: "22/12/2025",
+        id: "2019013884",
+        officeId: "2019013884",
+        name: "Javed Mia",
+        designation: "Helper (Cook)",
+        grade: "None",
+        department: "HR, Admin and Compliance",
+        section: "Canteen & Support",
+        unit: "ALL",
+        line: "ALL",
+        joinDate: "12/01/2019",
         bankAcc: "1501203498810001",
-        basic: 78000,
-        houseRent: 39000,
-        medical: 7800,
+        basic: 12720,
+        houseRent: 6360,
+        medical: 1272,
         food: 0,
-        conveyance: 5200,
-        gross: 130000,
-        totalDay: 31,
+        conveyance: 848,
+        gross: 21200,
+        totalDay: 23,
+        holiday: 8,
         present: 20,
-        holiday: 6,
         cl: 3,
-        sl: 2,
+        sl: 0,
         el: 0,
         ml: 0,
         absent: 0,
-        payableDays: 31,
         absDeduc: 0,
-        advance: 0,
-        revStamp: 10,
+        advance: 5000,
+        loan: 0,
+        tax: 0,
+        revStamp: 0,
+        lunch: 0,
         wagelyAd: 0,
         adjust: 0,
-        tax: 417,
-        lunch: 0,
-        pf: 0,
-        totalDeduc: 427,
-        payableSalary: 128333,
+        fairShop: 0,
+        payableSalary: 16200,
         otHour: 0,
-        otRate: 750.0,
+        otRate: 0,
         otPay: 0,
+        festivalBonus: 0,
+        holidayAllowance: 0,
+        alwArrear: 0,
+        tiffin: 0,
+        nightBill: 0,
         behaviorBonus: 0,
         attendanceBonus: 0,
-        festivalBonus: 0,
-        netPay: 128333,
+        netPay: 16200,
+        bankPay: 16200,
+        cashPay: 0,
       },
       {
         serialNo: 2,
-        id: "2026058685",
-        name: "Md Johirul Islam",
-        designation: "Executive",
-        grade: "Grade-05",
-        department: "Business Automation",
-        section: "Core Development",
-        unit: "PSL Unit-01",
-        line: "N/A",
-        joinDate: "15/02/2026",
+        id: "2021022804",
+        officeId: "2021022804",
+        name: "Kaikobad Howlader",
+        designation: "Security Guard",
+        grade: "None",
+        department: "HR, Admin and Compliance",
+        section: "Security Section",
+        unit: "ALL",
+        line: "ALL",
+        joinDate: "12/01/2021",
         bankAcc: "1501203498810002",
-        basic: 20400,
-        houseRent: 10200,
-        medical: 2040,
-        food: 0,
-        conveyance: 1360,
-        gross: 34000,
-        totalDay: 31,
+        basic: 8933,
+        houseRent: 4417,
+        medical: 750,
+        food: 1250,
+        conveyance: 450,
+        gross: 15700,
+        totalDay: 23,
+        holiday: 8,
         present: 23,
-        holiday: 6,
-        cl: 1,
-        sl: 1,
+        cl: 0,
+        sl: 0,
         el: 0,
         ml: 0,
         absent: 0,
-        payableDays: 31,
         absDeduc: 0,
         advance: 0,
-        revStamp: 10,
+        loan: 0,
+        tax: 0,
+        revStamp: 0,
+        lunch: 0,
         wagelyAd: 0,
         adjust: 0,
-        tax: 0,
-        lunch: 0,
-        pf: 0,
-        totalDeduc: 10,
-        payableSalary: 36750,
+        fairShop: 0,
+        payableSalary: 15700,
         otHour: 0,
-        otRate: 196.15,
+        otRate: 0,
         otPay: 0,
-        behaviorBonus: 0,
-        attendanceBonus: 0,
         festivalBonus: 0,
-        netPay: 36750,
+        holidayAllowance: 0,
+        alwArrear: 0,
+        tiffin: 0,
+        nightBill: 0,
+        behaviorBonus: 200,
+        attendanceBonus: 300,
+        netPay: 16200,
+        bankPay: 16200,
+        cashPay: 0,
       },
       {
         serialNo: 3,
+        id: "2021028542",
+        officeId: "2021028542",
+        name: "Zakir Hossain",
+        designation: "Executive",
+        grade: "None",
+        department: "HR, Admin and Compliance",
+        section: "Compliance Management",
+        unit: "ALL",
+        line: "ALL",
+        joinDate: "09/30/2021",
+        bankAcc: "1501203498810003",
+        basic: 18900,
+        houseRent: 9450,
+        medical: 1890,
+        food: 0,
+        conveyance: 1260,
+        gross: 31500,
+        totalDay: 23,
+        holiday: 8,
+        present: 22,
+        cl: 1,
+        sl: 0,
+        el: 0,
+        ml: 0,
+        absent: 0,
+        absDeduc: 0,
+        advance: 2500,
+        loan: 0,
+        tax: 1250,
+        revStamp: 0,
+        lunch: 0,
+        wagelyAd: 0,
+        adjust: 0,
+        fairShop: 0,
+        payableSalary: 27750,
+        otHour: 0,
+        otRate: 0,
+        otPay: 0,
+        festivalBonus: 0,
+        holidayAllowance: 0,
+        alwArrear: 0,
+        tiffin: 0,
+        nightBill: 0,
+        behaviorBonus: 0,
+        attendanceBonus: 0,
+        netPay: 27750,
+        bankPay: 27750,
+        cashPay: 0,
+      },
+      {
+        serialNo: 4,
         id: "2022035599",
+        officeId: "2022035599",
         name: "Dipon Saha",
         designation: "Manager",
         grade: "Grade-03",
-        department: "Business Automation",
-        section: "Core Development",
-        unit: "PSL Unit-01",
-        line: "N/A",
+        department: "HR, Admin and Compliance",
+        section: "HR Operations",
+        unit: "ALL",
+        line: "ALL",
         joinDate: "01/03/2022",
-        bankAcc: "1501203498810003",
+        bankAcc: "1501203498810004",
         basic: 40200,
         houseRent: 20100,
         medical: 4020,
         food: 0,
         conveyance: 2680,
         gross: 67000,
-        totalDay: 31,
+        totalDay: 23,
+        holiday: 8,
         present: 23,
-        holiday: 6,
         cl: 0,
-        sl: 2,
+        sl: 0,
         el: 0,
         ml: 0,
         absent: 0,
-        payableDays: 31,
         absDeduc: 0,
         advance: 0,
-        revStamp: 10,
+        loan: 0,
+        tax: 0,
+        revStamp: 0,
+        lunch: 0,
         wagelyAd: 0,
         adjust: 0,
-        tax: 0,
-        lunch: 0,
-        pf: 0,
-        totalDeduc: 10,
+        fairShop: 0,
         payableSalary: 67000,
         otHour: 0,
-        otRate: 386.54,
+        otRate: 0,
         otPay: 0,
+        festivalBonus: 0,
+        holidayAllowance: 0,
+        alwArrear: 0,
+        tiffin: 0,
+        nightBill: 0,
         behaviorBonus: 0,
         attendanceBonus: 0,
-        festivalBonus: 0,
         netPay: 67000,
-      },
-      {
-        serialNo: 4,
-        id: "2024052333",
-        name: "Md. Al-Amin Hossain",
-        designation: "Sr. Executive",
-        grade: "Grade-04",
-        department: "RMG Operations",
-        section: "Cutting Section",
-        unit: "Unit-01",
-        line: "Line-02",
-        joinDate: "10/05/2024",
-        bankAcc: "1501203498810004",
-        basic: 28800,
-        houseRent: 14400,
-        medical: 2880,
-        food: 0,
-        conveyance: 1920,
-        gross: 48000,
-        totalDay: 31,
-        present: 21,
-        holiday: 6,
-        cl: 2,
-        sl: 2,
-        el: 0,
-        ml: 0,
-        absent: 0,
-        payableDays: 31,
-        absDeduc: 0,
-        advance: 0,
-        revStamp: 10,
-        wagelyAd: 0,
-        adjust: 0,
-        tax: 0,
-        lunch: 0,
-        pf: 0,
-        totalDeduc: 10,
-        payableSalary: 46750,
-        otHour: 18,
-        otRate: 276.92,
-        otPay: 4984,
-        behaviorBonus: 0,
-        attendanceBonus: 1000,
-        festivalBonus: 0,
-        netPay: 52734,
+        bankPay: 67000,
+        cashPay: 0,
       },
       {
         serialNo: 5,
-        id: "2024052410",
-        name: "Mst. Sharmin Akter",
-        designation: "Quality Inspector",
-        grade: "Grade-06",
-        department: "Quality Assurance",
-        section: "Finishing QA",
-        unit: "Unit-01",
-        line: "Line-01",
-        joinDate: "18/06/2024",
+        id: "2025058109",
+        officeId: "2025058109",
+        name: "Mohammad Methoun Ahmed",
+        designation: "Sr. Manager",
+        grade: "Grade-02",
+        department: "Business Automation",
+        section: "Core Development",
+        unit: "ALL",
+        line: "ALL",
+        joinDate: "22/12/2025",
         bankAcc: "1501203498810005",
-        basic: 24600,
-        houseRent: 12300,
-        medical: 2460,
+        basic: 78000,
+        houseRent: 39000,
+        medical: 7800,
         food: 0,
-        conveyance: 1640,
-        gross: 41000,
-        totalDay: 31,
-        present: 22,
-        holiday: 6,
-        cl: 0,
-        sl: 3,
+        conveyance: 5200,
+        gross: 130000,
+        totalDay: 23,
+        holiday: 8,
+        present: 20,
+        cl: 3,
+        sl: 0,
         el: 0,
         ml: 0,
         absent: 0,
-        payableDays: 31,
         absDeduc: 0,
         advance: 0,
-        revStamp: 10,
+        loan: 0,
+        tax: 417,
+        revStamp: 0,
+        lunch: 0,
         wagelyAd: 0,
         adjust: 0,
-        tax: 0,
-        lunch: 0,
-        pf: 0,
-        totalDeduc: 10,
-        payableSalary: 39750,
-        otHour: 24,
-        otRate: 236.54,
-        otPay: 5676,
-        behaviorBonus: 0,
-        attendanceBonus: 1000,
+        fairShop: 0,
+        payableSalary: 128333,
+        otHour: 0,
+        otRate: 0,
+        otPay: 0,
         festivalBonus: 0,
-        netPay: 46426,
+        holidayAllowance: 0,
+        alwArrear: 0,
+        tiffin: 0,
+        nightBill: 0,
+        behaviorBonus: 0,
+        attendanceBonus: 0,
+        netPay: 128333,
+        bankPay: 128333,
+        cashPay: 0,
       },
     ];
   }, []);
 
-  // Helper to extract value based on column definition (direct or formula)
-  const getCellValue = (emp: any, col: SalarySheetColumn) => {
-    // 1. Formula Calculation Mode
-    if (col.mappingType === "formula" && col.formulaExpression) {
-      const calcResult = evaluateFormula(col.formulaExpression, emp);
-      return (
-        <span className="font-mono font-semibold text-purple-700 dark:text-purple-300">
-          {calcResult.toLocaleString()}
-        </span>
-      );
-    }
+  // Designation Hierarchy ranking (RMG & Corporate hierarchy)
+  const getDesignationRank = (desig: string): number => {
+    const d = desig.toLowerCase().trim();
+    if (d.includes("director") || d.includes("general manager") || d.includes("gm")) return 1;
+    if (d.includes("sr. manager") || d.includes("senior manager")) return 2;
+    if (d.includes("manager")) return 3;
+    if (d.includes("asst. manager") || d.includes("assistant manager")) return 4;
+    if (d.includes("sr. executive") || d.includes("senior executive")) return 5;
+    if (d.includes("executive")) return 6;
+    if (d.includes("officer")) return 7;
+    if (d.includes("supervisor")) return 8;
+    if (d.includes("operator")) return 9;
+    if (d.includes("guard")) return 10;
+    if (d.includes("helper") || d.includes("cook")) return 11;
+    return 20;
+  };
 
-    // 2. Direct Parameter Mapping Mode
+  // Dynamically sorted employees according to template's sortMode & alphabeticalOrder
+  const sortedSampleEmployees = useMemo(() => {
+    const sortMode = editingTemplate?.sortMode || "designation";
+    const alphaOrder = editingTemplate?.alphabeticalOrder || "asc";
+    const multiplier = alphaOrder === "desc" ? -1 : 1;
+
+    const list = [...sampleEmployees];
+
+    list.sort((a, b) => {
+      if (sortMode === "designation") {
+        const rankA = getDesignationRank(a.designation);
+        const rankB = getDesignationRank(b.designation);
+        if (rankA !== rankB) {
+          return rankA - rankB;
+        }
+        // Within same designation, alphabetical sorting by employee name
+        return a.name.localeCompare(b.name) * multiplier;
+      } else {
+        // Direct Alphabetical by employee name
+        return a.name.localeCompare(b.name) * multiplier;
+      }
+    });
+
+    return list.map((emp, idx) => ({
+      ...emp,
+      serialNo: idx + 1,
+    }));
+  }, [editingTemplate?.sortMode, editingTemplate?.alphabeticalOrder, sampleEmployees]);
+
+  // Distinct groups based on groupBy setting
+  const availableGroups = useMemo(() => {
+    const isSection = editingTemplate?.groupBy === "section";
+    const groupMap = new Map<string, number>();
+    sortedSampleEmployees.forEach((emp) => {
+      const key = isSection ? (emp.section || "General Section") : (emp.department || "General Department");
+      groupMap.set(key, (groupMap.get(key) || 0) + 1);
+    });
+    return Array.from(groupMap.entries()).map(([name, count]) => ({ name, count }));
+  }, [editingTemplate?.groupBy, sortedSampleEmployees]);
+
+  // Filtered employees for preview canvas
+  const displayEmployees = useMemo(() => {
+    if (previewGroupFilter === "all") return sortedSampleEmployees;
+    const isSection = editingTemplate?.groupBy === "section";
+    return sortedSampleEmployees
+      .filter((emp) => {
+        const key = isSection ? (emp.section || "General Section") : (emp.department || "General Department");
+        return key === previewGroupFilter;
+      })
+      .map((emp, idx) => ({
+        ...emp,
+        serialNo: idx + 1,
+      }));
+  }, [previewGroupFilter, editingTemplate?.groupBy, sortedSampleEmployees]);
+
+  // Helper to extract value based on column definition
+  const getCellValue = (emp: any, col: SalarySheetColumn) => {
     switch (col.paramMapping) {
       case "emp_sl":
         return emp.serialNo;
@@ -961,88 +996,115 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
         return emp.bankAcc;
       case "emp_id_name":
         return (
-          <div className="text-left font-sans p-1 leading-tight min-w-[120px]">
-            <span className="font-bold text-black dark:text-slate-900 block text-[8px]">{emp.id}</span>
-            <span className="text-black dark:text-slate-900 font-semibold block text-[7.5px] leading-tight">{emp.name}</span>
+          <div className="text-left font-sans p-1 leading-tight min-w-[125px]">
+            <span className="font-extrabold text-black dark:text-slate-900 block text-[8px] tracking-tight">{emp.id}</span>
+            <span className="text-neutral-500 block text-[6.5px]">Office ID: {emp.officeId || emp.id}</span>
+            <span className="text-black dark:text-slate-900 font-extrabold block text-[7.5px] leading-tight">{emp.name}</span>
             <span className="text-neutral-600 block text-[6.5px]">{emp.designation}</span>
-            <div className="flex justify-between mt-1 text-[6px] text-neutral-500 border-t border-neutral-200 pt-0.5">
-              <span>{emp.grade}</span>
+            <div className="flex justify-between mt-0.5 text-[6px] text-neutral-500">
+              <span>Grade: {emp.grade || "None"}</span>
               <span>JD: {emp.joinDate}</span>
             </div>
           </div>
         );
       case "sal_basic":
-        return emp.basic ? emp.basic.toLocaleString() : "-";
+        return Number(emp.basic || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       case "sal_house_rent":
-        return emp.houseRent ? emp.houseRent.toLocaleString() : "-";
+        return Number(emp.houseRent || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       case "sal_medical":
-        return emp.medical ? emp.medical.toLocaleString() : "-";
+        return Number(emp.medical || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       case "sal_food":
-        return emp.food ? emp.food.toLocaleString() : "-";
+        return Number(emp.food || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       case "sal_conveyance":
-        return emp.conveyance ? emp.conveyance.toLocaleString() : "-";
+        return Number(emp.conveyance || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       case "sal_gross":
-        return emp.gross ? emp.gross.toLocaleString() : "-";
+        return (
+          <span className="font-bold text-black dark:text-slate-900">
+            {Number(emp.gross || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        );
       case "sal_payable_salary":
-        return emp.payableSalary ? emp.payableSalary.toLocaleString() : "-";
+        return (
+          <span className="font-bold text-black dark:text-slate-900">
+            {Number(emp.payableSalary || 0).toLocaleString()}
+          </span>
+        );
       case "alw_arrear":
-        return "-";
+        return emp.alwArrear ? Number(emp.alwArrear).toLocaleString() : "0";
+      case "alw_holiday":
+        return emp.holidayAllowance ? Number(emp.holidayAllowance).toLocaleString() : "0";
+      case "alw_tiffin":
+        return emp.tiffin ? Number(emp.tiffin).toLocaleString() : "0";
+      case "alw_night":
+        return emp.nightBill ? Number(emp.nightBill).toLocaleString() : "0";
       case "alw_general":
-        return "-";
+        return "0";
       case "att_total_day":
-        return emp.totalDay;
-      case "att_present":
-        return emp.present;
+        return emp.totalDay ?? 23;
       case "att_holiday":
-        return emp.holiday;
+        return emp.holiday ?? 8;
+      case "att_present":
+        return emp.present ?? 20;
       case "att_leave_cl":
-        return emp.cl || "-";
+        return emp.cl ?? 0;
       case "att_leave_sl":
-        return emp.sl || "-";
+        return emp.sl ?? 0;
       case "att_leave_el":
-        return emp.el || "-";
+        return emp.el ?? 0;
       case "att_leave_ml":
-        return emp.ml || "-";
+        return emp.ml ?? 0;
       case "att_absent":
-        return emp.absent || "-";
+        return emp.absent ?? 0;
       case "att_payable_days":
-        return emp.payableDays;
+        return emp.payableDays || emp.totalDay || 23;
       case "ded_absent":
-        return emp.absDeduc ? emp.absDeduc.toLocaleString() : "-";
+        return emp.absDeduc ? Number(emp.absDeduc).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0";
       case "ded_advance":
-        return emp.advance ? emp.advance.toLocaleString() : "-";
-      case "ded_stamp":
-        return emp.revStamp ? emp.revStamp.toLocaleString() : "-";
-      case "ded_wagely":
-        return emp.wagelyAd ? emp.wagelyAd.toLocaleString() : "-";
-      case "ded_adjust":
-        return emp.adjust ? emp.adjust.toLocaleString() : "-";
+        return emp.advance ? Number(emp.advance).toLocaleString() : "0";
+      case "ded_loan":
+        return emp.loan ? Number(emp.loan).toLocaleString() : "0";
       case "ded_tax":
-        return emp.tax ? emp.tax.toLocaleString() : "-";
+        return emp.tax ? Number(emp.tax).toLocaleString() : "0";
+      case "ded_stamp":
+        return emp.revStamp ?? 0;
       case "ded_lunch":
-        return "-";
+        return emp.lunch ? Number(emp.lunch).toLocaleString() : "0";
+      case "ded_wagely":
+        return emp.wagelyAd ? Number(emp.wagelyAd).toLocaleString() : "0";
+      case "ded_adjust":
+        return emp.adjust ? Number(emp.adjust).toLocaleString() : "0";
+      case "ded_fair_shop":
+        return emp.fairShop ? Number(emp.fairShop).toLocaleString() : "0";
       case "ded_provident_fund":
-        return "-";
+        return "0";
       case "ded_total":
-        return emp.totalDeduc ? emp.totalDeduc.toLocaleString() : "-";
+        return (Number(emp.advance || 0) + Number(emp.tax || 0) + Number(emp.loan || 0)).toLocaleString();
       case "ot_hour":
-        return emp.otHour || "-";
+        return Number(emp.otHour || 0).toFixed(2);
       case "ot_rate":
-        return emp.otRate ? emp.otRate.toFixed(2) : "-";
+        return Number(emp.otRate || 0).toFixed(2);
       case "ot_pay":
-        return emp.otPay ? emp.otPay.toLocaleString() : "-";
+        return Number(emp.otPay || 0).toFixed(2);
       case "bonus_attendance":
-        return emp.attendanceBonus ? emp.attendanceBonus.toLocaleString() : "-";
+        return emp.attendanceBonus ? Number(emp.attendanceBonus).toLocaleString() : "0";
       case "bonus_behavior":
-        return emp.behaviorBonus ? emp.behaviorBonus.toLocaleString() : "-";
+        return emp.behaviorBonus ? Number(emp.behaviorBonus).toLocaleString() : "0";
       case "bonus_festival":
-        return emp.festivalBonus ? emp.festivalBonus.toLocaleString() : "-";
+        return emp.festivalBonus ? Number(emp.festivalBonus).toLocaleString() : "0";
       case "bonus_production":
-        return "-";
+        return "0";
       case "net_pay":
-        return <span className="font-bold text-black dark:text-slate-900">{emp.netPay.toLocaleString()}</span>;
+        return (
+          <span className="font-extrabold text-black dark:text-slate-900">
+            {Number(emp.netPay || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        );
+      case "pay_bank":
+        return Number(emp.bankPay || emp.netPay || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      case "pay_cash":
+        return Number(emp.cashPay || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       case "col_signature":
-        return <div className="h-9 min-w-[70px]"></div>;
+        return <div className="h-9 min-w-[75px]"></div>;
       case "col_remarks":
         return <span className="text-[7.5px] font-semibold text-emerald-700">PAID</span>;
       default:
@@ -1052,57 +1114,57 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
 
   // Helper to compute footer total for a column
   const getColumnFooterTotal = (col: SalarySheetColumn) => {
-    if (col.mappingType === "formula" && col.formulaExpression) {
-      const sum = sampleEmployees.reduce((acc, emp) => acc + evaluateFormula(col.formulaExpression, emp), 0);
-      return sum ? sum.toLocaleString() : "-";
-    }
-
-    switch (col.paramMapping) {
-      case "sal_basic":
-        return "192,000";
-      case "sal_house_rent":
-        return "96,000";
-      case "sal_medical":
-        return "18,480";
-      case "sal_food":
-        return "0";
-      case "sal_conveyance":
-        return "12,800";
-      case "sal_gross":
-        return "320,000";
-      case "sal_payable_salary":
-        return "318,583";
-      case "ded_stamp":
-        return "50";
-      case "ded_tax":
-        return "417";
-      case "ded_total":
-        return "467";
-      case "ot_hour":
-        return "42";
-      case "ot_pay":
-        return "10,660";
-      case "bonus_attendance":
-        return "2,000";
-      case "net_pay":
-        return "326,943";
-      default:
-        return "-";
-    }
-  };
-
-  // Formula evaluation preview for active column in modal
-  const modalEvaluationPreview = useMemo(() => {
-    if (!modalFormulaExpr.trim()) return null;
-    const emp1 = sampleEmployees[0];
-    const emp4 = sampleEmployees[3];
-    return {
-      emp1Name: emp1.name,
-      emp1Val: evaluateFormula(modalFormulaExpr, emp1),
-      emp4Name: emp4.name,
-      emp4Val: evaluateFormula(modalFormulaExpr, emp4),
+    const fieldMap: Record<string, string> = {
+      sal_basic: "basic",
+      sal_house_rent: "houseRent",
+      sal_medical: "medical",
+      sal_food: "food",
+      sal_conveyance: "conveyance",
+      sal_gross: "gross",
+      att_total_day: "totalDay",
+      att_holiday: "holiday",
+      att_present: "present",
+      att_leave_cl: "cl",
+      att_leave_sl: "sl",
+      att_leave_el: "el",
+      att_leave_ml: "ml",
+      att_absent: "absent",
+      ded_absent: "absDeduc",
+      ded_advance: "advance",
+      ded_loan: "loan",
+      ded_tax: "tax",
+      ded_stamp: "revStamp",
+      ded_lunch: "lunch",
+      ded_wagely: "wagelyAd",
+      ded_adjust: "adjust",
+      ded_fair_shop: "fairShop",
+      sal_payable_salary: "payableSalary",
+      ot_hour: "otHour",
+      ot_rate: "otRate",
+      ot_pay: "otPay",
+      bonus_festival: "festivalBonus",
+      alw_holiday: "holidayAllowance",
+      alw_arrear: "alwArrear",
+      alw_tiffin: "tiffin",
+      alw_night: "nightBill",
+      bonus_behavior: "behaviorBonus",
+      bonus_attendance: "attendanceBonus",
+      net_pay: "netPay",
+      pay_bank: "bankPay",
+      pay_cash: "cashPay",
     };
-  }, [modalFormulaExpr, sampleEmployees]);
+
+    const prop = fieldMap[col.paramMapping];
+    if (prop) {
+      const sum = displayEmployees.reduce((acc, emp: any) => acc + (Number(emp[prop]) || 0), 0);
+      if (col.format === "currency") {
+        return sum.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      return sum ? sum.toLocaleString() : "0";
+    }
+
+    return "-";
+  };
 
   // Strict compact column width calculator for realistic ledger density
   const getEffectiveColumnWidth = (col: SalarySheetColumn): string => {
@@ -1127,12 +1189,75 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
     }
     if (col.paramMapping === "emp_id_name") return "140px";
     if (col.paramMapping === "col_signature") return "85px";
+    if (["sal_gross", "sal_payable_salary", "net_pay", "pay_bank"].includes(col.paramMapping)) {
+      return "58px";
+    }
     if (col.width && parseInt(col.width) > 0) {
       if (parseInt(col.width) > 55 && col.isRotatedHeader) return "50px";
       return col.width;
     }
     return col.isRotatedHeader ? "50px" : "58px";
   };
+
+  // Group consecutive columns under tier-1 sections for the authentic landscape sheet
+  const headerGroups = useMemo(() => {
+    if (!editingTemplate) return [];
+    const visibleCols = editingTemplate.columns.filter((c) => c.isVisible);
+    const groups: {
+      type: "group" | "standalone";
+      categoryKey?: SalarySheetColumn["category"];
+      labelEng: string;
+      labelBng: string;
+      colSpan: number;
+      columns: SalarySheetColumn[];
+    }[] = [];
+
+    const isStandaloneCol = (col: SalarySheetColumn) => {
+      if (col.category === "none") return true;
+      if (col.category === "employee_info") return true;
+      return [
+        "emp_sl",
+        "emp_id_name",
+        "sal_payable_salary",
+        "net_pay",
+        "pay_bank",
+        "pay_cash",
+        "col_signature",
+        "col_remarks",
+      ].includes(col.paramMapping);
+    };
+
+    for (const col of visibleCols) {
+      if (isStandaloneCol(col)) {
+        groups.push({
+          type: "standalone",
+          categoryKey: col.category,
+          labelEng: col.labelEng,
+          labelBng: col.labelBng || col.labelEng,
+          colSpan: 1,
+          columns: [col],
+        });
+        continue;
+      }
+
+      const lastGroup = groups[groups.length - 1];
+      if (lastGroup && lastGroup.type === "group" && lastGroup.categoryKey === col.category) {
+        lastGroup.colSpan += 1;
+        lastGroup.columns.push(col);
+      } else {
+        const catInfo = CATEGORY_LABELS[col.category] || { label: col.category, bng: col.category };
+        groups.push({
+          type: "group",
+          categoryKey: col.category,
+          labelEng: catInfo.label,
+          labelBng: catInfo.bng,
+          colSpan: 1,
+          columns: [col],
+        });
+      }
+    }
+    return groups;
+  }, [editingTemplate]);
 
   return (
     <div className="space-y-6">
@@ -1152,10 +1277,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
               </div>
               <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2 mt-1">
                 <FileSpreadsheet className="size-6 text-primary" />
-                Salary Sheet Configuration & Formulas
+                Salary Sheet Configuration
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Customize column layouts, add mathematical formula columns (+, -, ×, ÷) like "Other Allowance", and map system parameters.
+                Customize column layouts, set section groupings (or None for standalone headers), and map system field parameters.
               </p>
             </div>
 
@@ -1198,7 +1323,6 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
               <tbody className="divide-y divide-border/30 text-foreground">
                 {templates.map((tpl, idx) => {
                   const activeColCount = tpl.columns.filter((c) => c.isVisible).length;
-                  const formulaColCount = tpl.columns.filter((c) => c.mappingType === "formula").length;
                   return (
                     <tr key={tpl.id} className="group hover:bg-muted/40 transition-colors">
                       <td className="px-5 py-4 text-center text-muted-foreground font-mono border-r border-border/30">
@@ -1215,11 +1339,16 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                         </div>
                         <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
                           <span>{tpl.description}</span>
-                          {formulaColCount > 0 && (
-                            <span className="inline-flex items-center gap-1 font-mono font-bold text-purple-600 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.2 rounded text-[10px] border border-purple-200 dark:border-purple-800">
-                              <Calculator className="size-3" /> {formulaColCount} Formula {formulaColCount === 1 ? "Col" : "Cols"}
-                            </span>
-                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 flex items-center gap-1">
+                            {tpl.groupBy === "section" ? <Split className="size-3" /> : <Building2 className="size-3" />}
+                            {tpl.groupBy === "section" ? "Section-Wise" : "Department-Wise"}
+                          </span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex items-center gap-1">
+                            <Briefcase className="size-3" />
+                            {tpl.sortMode === "alphabetical" ? "Alphabetical" : "Designation"} ({tpl.alphabeticalOrder === "desc" ? "Z→A" : "A→Z"})
+                          </span>
                         </div>
                       </td>
                       <td className="px-5 py-4 text-foreground/80 font-medium">{tpl.companyName}</td>
@@ -1257,7 +1386,11 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => {
-                              setEditingTemplate(JSON.parse(JSON.stringify(tpl)));
+                              let tplToEdit = JSON.parse(JSON.stringify(tpl));
+                              if (tplToEdit.id === "sheet-tpl-1" && tplToEdit.columns.length < 35) {
+                                tplToEdit.columns = JSON.parse(JSON.stringify(DEFAULT_SALARY_SHEET_COLUMNS));
+                              }
+                              setEditingTemplate(tplToEdit);
                               setIsConfiguring(true);
                             }}
                             className="h-8 px-3 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
@@ -1293,59 +1426,202 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
         editingTemplate && (
           <div className="space-y-6">
             {/* Top Toolbar in Configuration Mode */}
-            <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                  <SlidersHorizontal className="size-5 text-primary" />
-                  Configuring: {editingTemplate.title}
-                </h2>
+            <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 uppercase tracking-wide">
+                      {editingTemplate.employeeType}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-muted text-muted-foreground border border-border/50">
+                      {editingTemplate.companyName}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                      {editingTemplate.columns.filter((c) => c.isVisible).length} Active Columns
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                    <SlidersHorizontal className="size-5 text-primary" />
+                    Configuring: {editingTemplate.title}
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Add new columns, delete unwanted ones, customize headers (English/Bengali), and map database parameters.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <button
+                    onClick={() => {
+                      setNewColLabelEng("");
+                      setNewColLabelBng("");
+                      setIsAddColumnOpen(true);
+                    }}
+                    className="h-9 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                  >
+                    <Plus className="size-4" /> Add Column
+                  </button>
+                  <button
+                    onClick={handleRestoreDefaultColumns}
+                    className="h-9 px-3.5 rounded-xl border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors cursor-pointer"
+                    title="Reset to standard default columns"
+                  >
+                    <RotateCcw className="size-3.5" /> Restore Defaults
+                  </button>
+                  <button
+                    onClick={() => setShowLivePreview(!showLivePreview)}
+                    className={`h-9 px-3.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
+                      showLivePreview
+                        ? "border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
+                        : "border-border/60 bg-muted/40 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Eye className="size-3.5" />
+                    {showLivePreview ? "Hide Live View" : "Show Live View"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsConfiguring(false);
+                      setEditingTemplate(null);
+                    }}
+                    className="h-9 px-3.5 rounded-xl border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="size-3.5" /> Back to Templates
+                  </button>
+                  <button
+                    onClick={handleSaveConfiguration}
+                    className="h-9 px-5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer hover:scale-[1.02] active:scale-95"
+                  >
+                    <Save className="size-4" /> Save Configuration
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <button
-                  onClick={() => {
-                    setNewColLabelEng("");
-                    setNewColLabelBng("");
-                    setNewColMappingType("direct");
-                    setIsAddColumnOpen(true);
-                  }}
-                  className="h-9 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
-                >
-                  <Plus className="size-4" /> Add Column
-                </button>
-                <button
-                  onClick={handleRestoreDefaultColumns}
-                  className="h-9 px-3.5 rounded-xl border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors cursor-pointer"
-                  title="Reset to standard default columns"
-                >
-                  <RotateCcw className="size-3.5" /> Restore Defaults
-                </button>
-                <button
-                  onClick={() => setShowLivePreview(!showLivePreview)}
-                  className={`h-9 px-3.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
-                    showLivePreview
-                      ? "border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
-                      : "border-border/60 bg-muted/40 text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Eye className="size-3.5" />
-                  {showLivePreview ? "Hide Live View" : "Show Live View"}
-                </button>
-                <button
-                  onClick={() => {
-                    setIsConfiguring(false);
-                    setEditingTemplate(null);
-                  }}
-                  className="h-9 px-3.5 rounded-xl border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <ArrowLeft className="size-3.5" /> Back to Templates
-                </button>
-                <button
-                  onClick={handleSaveConfiguration}
-                  className="h-9 px-5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer hover:scale-[1.02] active:scale-95"
-                >
-                  <Save className="size-4" /> Save Configuration
-                </button>
+              {/* Sheet Grouping & Employee Ordering Rules */}
+              <div className="rounded-xl border border-border/60 bg-muted/20 p-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {/* 1. Group By: Department vs Section */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-foreground flex items-center gap-1">
+                      <Building2 className="size-3 text-blue-600" />
+                      Sheet Grouping
+                    </label>
+                    <div className="grid grid-cols-2 gap-1 bg-background/80 p-0.5 rounded-lg border border-border/60">
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateGrouping("department")}
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                          editingTemplate.groupBy !== "section"
+                            ? "bg-blue-600 text-white shadow-2xs"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Building2 className="size-3" /> Department Wise
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateGrouping("section")}
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                          editingTemplate.groupBy === "section"
+                            ? "bg-blue-600 text-white shadow-2xs"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Split className="size-3" /> Section Wise
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 2. Primary Sort: Designation vs Alphabetical */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-foreground flex items-center gap-1">
+                      <Briefcase className="size-3 text-purple-600" />
+                      Primary Ordering
+                    </label>
+                    <div className="grid grid-cols-2 gap-1 bg-background/80 p-0.5 rounded-lg border border-border/60">
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateSortMode("designation")}
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                          editingTemplate.sortMode !== "alphabetical"
+                            ? "bg-purple-600 text-white shadow-2xs"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Briefcase className="size-3" /> Designation Wise
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateSortMode("alphabetical")}
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                          editingTemplate.sortMode === "alphabetical"
+                            ? "bg-purple-600 text-white shadow-2xs"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <ArrowDownAZ className="size-3" /> Alphabetical
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 3. Alphabetical Order: Ascending vs Descending */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-foreground flex items-center gap-1">
+                      <ArrowUpDown className="size-3 text-emerald-600" />
+                      Alphabetical Order
+                    </label>
+                    <div className="grid grid-cols-2 gap-1 bg-background/80 p-0.5 rounded-lg border border-border/60">
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateAlphaOrder("asc")}
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                          editingTemplate.alphabeticalOrder !== "desc"
+                            ? "bg-emerald-600 text-white shadow-2xs"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <ArrowDownAZ className="size-3" /> Ascending (A → Z)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateAlphaOrder("desc")}
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                          editingTemplate.alphabeticalOrder === "desc"
+                            ? "bg-emerald-600 text-white shadow-2xs"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <ArrowUpZA className="size-3" /> Descending (Z → A)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category Filter Pills (matching authentic UI) */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-t border-border/30 pt-3">
+                {[
+                  { key: "all", label: "All", count: editingTemplate.columns.length },
+                  { key: "none", label: "No Section (None)", count: editingTemplate.columns.filter((c) => c.category === "none").length },
+                  { key: "salary_breakdown", label: "Salary Breakdown", count: editingTemplate.columns.filter((c) => c.category === "salary_breakdown").length },
+                  { key: "attendance", label: "Attendance", count: editingTemplate.columns.filter((c) => c.category === "attendance").length },
+                  { key: "deduction", label: "Deduction", count: editingTemplate.columns.filter((c) => c.category === "deduction").length },
+                  { key: "overtime", label: "Overtime", count: editingTemplate.columns.filter((c) => c.category === "overtime").length },
+                  { key: "bonus", label: "Bonuses & Allowances", count: editingTemplate.columns.filter((c) => c.category === "bonus").length },
+                  { key: "employee_info", label: "Employee Info", count: editingTemplate.columns.filter((c) => c.category === "employee_info").length },
+                ].filter((cat) => cat.key === "all" || cat.count > 0).map((cat) => (
+                  <button
+                    key={cat.key}
+                    type="button"
+                    onClick={() => setActiveCategoryTab(cat.key)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      activeCategoryTab === cat.key
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {cat.label} ({cat.count})
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -1357,7 +1633,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                     <Search className="size-3.5 text-muted-foreground" />
                     <input
                       type="text"
-                      placeholder="Search column, mapping, formula..."
+                      placeholder="Search column or parameter..."
                       value={columnSearch}
                       onChange={(e) => setColumnSearch(e.target.value)}
                       className="bg-transparent border-0 outline-none w-full text-foreground placeholder:text-muted-foreground text-xs font-medium"
@@ -1372,10 +1648,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                   <thead className="bg-muted/40 text-muted-foreground uppercase font-bold tracking-wider text-[11px] border-b border-border/40">
                     <tr>
                       <th className="px-3 py-3 w-[50px] text-center">#</th>
-                      <th className="px-3 py-3 w-[140px]">Section</th>
+                      <th className="px-3 py-3 w-[150px]">Section</th>
                       <th className="px-3 py-3 min-w-[150px]">English Label</th>
                       <th className="px-3 py-3 min-w-[140px]">বাংলা Label</th>
-                      <th className="px-3 py-3 min-w-[300px]">Mapping & Formula</th>
+                      <th className="px-3 py-3 min-w-[240px]">System Field Parameter</th>
                       <th className="px-2 py-3 text-center w-[85px]">Align</th>
                       <th className="px-2 py-3 text-center w-[75px]" title="Header Orientation">Header</th>
                       <th className="px-2 py-3 text-center w-[75px]" title="Cell Value Orientation">Value</th>
@@ -1386,7 +1662,6 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                   <tbody className="divide-y divide-border/30 text-foreground font-medium">
                     {filteredColumns.map((col) => {
                       const fullIndex = editingTemplate.columns.findIndex((c) => c.id === col.id);
-                      const isFormula = col.mappingType === "formula";
                       return (
                         <tr
                           key={col.id}
@@ -1423,7 +1698,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
 
                           {/* Section / Category Dropdown */}
                           <td className="px-3 py-2">
-                            <div className="w-[140px]">
+                            <div className="w-[150px]">
                               <SearchableSelect
                                 options={categoryOptions}
                                 value={col.category}
@@ -1460,61 +1735,23 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                             />
                           </td>
 
-                          {/* Parameter Mapping & Math Formula Controls (Single Clean Line) */}
+                          {/* System Field Parameter (Only Field Mapping) */}
                           <td className="px-3 py-2">
-                            {isFormula ? (
-                              <div className="flex items-center gap-1.5 min-w-[300px]">
-                                <button
-                                  type="button"
-                                  onClick={() => handleColumnUpdate(col.id, { mappingType: "direct" })}
-                                  className="h-8 px-2.5 rounded-lg bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-800 text-[11px] font-black flex items-center gap-1 hover:bg-purple-200 cursor-pointer shrink-0 transition-all shadow-2xs"
-                                  title="Click to switch back to Single Parameter"
-                                >
-                                  <Calculator className="size-3" /> fx Formula
-                                </button>
-                                <div
-                                  onClick={() => handleOpenFormulaModal(col)}
-                                  className="flex-1 h-8 px-2.5 rounded-lg bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 hover:border-purple-400 flex items-center justify-between gap-1.5 cursor-pointer transition-all min-w-0"
-                                  title="Click to edit formula"
-                                >
-                                  <span className="font-mono text-xs font-bold text-purple-900 dark:text-purple-100 truncate">
-                                    {col.formulaExpression || "sal_food + sal_conveyance"}
-                                  </span>
-                                  <span className="text-[10px] font-bold text-purple-600 bg-purple-200/60 dark:bg-purple-900/60 px-1.5 py-0.5 rounded shrink-0">
-                                    Edit
-                                  </span>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-1.5 min-w-[300px]">
-                                <span className="h-8 px-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold flex items-center gap-1 shrink-0">
-                                  <span className="size-1.5 rounded-full bg-emerald-500"></span> Field
-                                </span>
-                                <div className="flex-1 min-w-0">
-                                  <SearchableSelect
-                                    options={systemParamOptions}
-                                    value={col.paramMapping}
-                                    onChange={(newVal) => handleColumnUpdate(col.id, { paramMapping: newVal })}
-                                    placeholder="Search parameter..."
-                                    className="w-full h-8 text-xs font-semibold bg-background"
-                                  />
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    handleColumnUpdate(col.id, {
-                                      mappingType: "formula",
-                                      formulaExpression: col.formulaExpression || col.paramMapping || "sal_basic",
-                                    });
-                                    handleOpenFormulaModal(col);
-                                  }}
-                                  className="h-8 px-2 rounded-lg border border-dashed border-border/80 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/50 text-muted-foreground hover:text-purple-600 text-[11px] font-bold flex items-center gap-1 transition-all shrink-0 cursor-pointer"
-                                  title="Switch to Formula Calculation"
-                                >
-                                  <Calculator className="size-3" /> +fx
-                                </button>
-                              </div>
-                            )}
+                            <div className="w-full min-w-[240px]">
+                              <SearchableSelect
+                                options={systemParamOptions}
+                                value={col.paramMapping}
+                                onChange={(newVal) => {
+                                  const paramDef = SYSTEM_PARAMETERS.find((p) => p.key === newVal);
+                                  handleColumnUpdate(col.id, {
+                                    paramMapping: newVal,
+                                    format: paramDef?.format || col.format || "text",
+                                  });
+                                }}
+                                placeholder="Select parameter..."
+                                className="w-full h-8 text-xs font-semibold bg-background"
+                              />
+                            </div>
                           </td>
 
                           {/* Alignment (Clean Icon Group) */}
@@ -1642,7 +1879,40 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                     </h3>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {/* Group Filter Switcher */}
+                    <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border/50 text-xs font-bold">
+                      <span className="px-2 text-muted-foreground text-[11px] font-semibold flex items-center gap-1">
+                        {editingTemplate.groupBy === "section" ? <Split className="size-3 text-blue-600" /> : <Building2 className="size-3 text-blue-600" />}
+                        {editingTemplate.groupBy === "section" ? "Section:" : "Department:"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewGroupFilter("all")}
+                        className={`px-2 py-0.5 rounded-lg transition-all cursor-pointer text-xs ${
+                          previewGroupFilter === "all"
+                            ? "bg-background text-foreground shadow-2xs font-bold"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        All ({sortedSampleEmployees.length})
+                      </button>
+                      {availableGroups.map((g) => (
+                        <button
+                          key={g.name}
+                          type="button"
+                          onClick={() => setPreviewGroupFilter(g.name)}
+                          className={`px-2 py-0.5 rounded-lg transition-all cursor-pointer text-xs ${
+                            previewGroupFilter === g.name
+                              ? "bg-background text-primary shadow-2xs font-bold"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {g.name} ({g.count})
+                        </button>
+                      ))}
+                    </div>
+
                     {/* Language Switch */}
                     <div className="flex items-center bg-muted/60 p-1 rounded-xl border border-border/50 text-xs font-bold">
                       <button
@@ -1678,21 +1948,60 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                 {/* The Real Salary Sheet Landscape Canvas */}
                 <div className="bg-white text-black p-4 sm:p-6 rounded-xl border border-slate-300 shadow-inner overflow-x-auto select-none font-sans">
                   <div className="w-fit min-w-[700px] mx-auto">
-                    {/* Company Header Block */}
-                    <div className="text-center pb-3 border-b border-black mb-3">
-                      <h1 className="font-extrabold text-[15px] uppercase tracking-wider text-black">
-                        {editingTemplate.companyName}
-                      </h1>
-                      <p className="text-[11px] font-bold text-neutral-800 uppercase mt-0.5">
-                        {previewLanguage === "en"
-                          ? `Monthly Salary Sheet & Wage Register — July, 2026 (${editingTemplate.employeeType})`
-                          : `মাসিক বেতন বিবরণী ও মজুরি রেজিস্টার — জুলাই, ২০২৬ (${editingTemplate.employeeType})`}
+                    {/* Factory Header Block */}
+                    <div className="relative pb-2 mb-2 text-center">
+                      <div className="absolute right-0 top-0 text-[8px] font-semibold text-neutral-700">
+                        Page: 1 of 8
+                      </div>
+                      <div className="flex items-center justify-center gap-2 mb-0.5">
+                        <div className="size-5 rounded bg-black text-white font-black flex items-center justify-center text-[10px]">
+                          P
+                        </div>
+                        <h1 className="font-black text-[14px] uppercase tracking-wider text-black">
+                          {editingTemplate.companyName}
+                        </h1>
+                      </div>
+                      <p className="text-[8.5px] font-medium text-neutral-700">
+                        Kha-48C Tropicana, House-27 Road-02, Dhaka-1209
                       </p>
-                      <div className="flex items-center justify-between text-[9px] font-semibold text-neutral-600 mt-1.5 px-2">
-                        <span>Unit: PSL Unit-01</span>
-                        <span>Section: All Active Sections</span>
-                        <span>Total Employees: {sampleEmployees.length}</span>
-                        <span>Currency: BDT (৳)</span>
+                      <p className="text-[10px] font-black text-black underline uppercase mt-0.5 tracking-wide">
+                        {previewLanguage === "en"
+                          ? `Monthly Salary Sheet - Oct, 2026`
+                          : `মাসিক বেতন বিবরণী - অক্টোবর, ২০২৬`}
+                      </p>
+                    </div>
+
+                    {/* Meta Filter Strip matching factory report */}
+                    <div className="border border-black px-3 py-1 mb-2.5 flex items-center justify-between text-[8px] font-bold text-black uppercase bg-slate-50/50 flex-wrap gap-2">
+                      <div>
+                        <span className="font-semibold text-neutral-600">Employee Type: </span>
+                        <span>{editingTemplate.employeeType}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-neutral-600">
+                          {editingTemplate.groupBy === "section" ? "Section: " : "Department: "}
+                        </span>
+                        <span>
+                          {previewGroupFilter === "all"
+                            ? (editingTemplate.groupBy === "section" ? "ALL SECTIONS" : "HR, Admin and Compliance")
+                            : previewGroupFilter}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-neutral-600">Ordering: </span>
+                        <span className="text-purple-900 font-extrabold">
+                          {editingTemplate.sortMode === "designation"
+                            ? `Designation → Name (${editingTemplate.alphabeticalOrder?.toUpperCase() || "ASC"})`
+                            : `Name Alphabetical (${editingTemplate.alphabeticalOrder?.toUpperCase() || "ASC"})`}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-neutral-600">Unit: </span>
+                        <span>ALL</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-neutral-600">Line: </span>
+                        <span>ALL</span>
                       </div>
                     </div>
 
@@ -1707,26 +2016,29 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                           })}
                       </colgroup>
                       <thead className="bg-slate-100 text-black border-b border-black">
+                        {/* Tier 1 Header: Section Super-headers and Standalone Columns */}
                         <tr>
-                          {editingTemplate.columns
-                            .filter((c) => c.isVisible)
-                            .map((col) => {
+                          {headerGroups.map((group, gIdx) => {
+                            if (group.type === "standalone") {
+                              const col = group.columns[0];
                               const headerTitle =
                                 previewLanguage === "bn" && col.labelBng ? col.labelBng : col.labelEng;
                               const isRot = col.isRotatedHeader;
                               const colW = getEffectiveColumnWidth(col);
                               const isNarrow = parseInt(colW) <= 30;
+
                               return (
                                 <th
-                                  key={col.id}
+                                  key={`th-standalone-${col.id}`}
+                                  rowSpan={2}
                                   style={{
                                     width: colW,
                                     minWidth: colW,
                                     maxWidth: colW,
                                   }}
-                                  className={`border border-black font-extrabold uppercase ${
+                                  className={`border border-black font-extrabold uppercase bg-slate-100 ${
                                     isNarrow ? "px-0 py-1 overflow-hidden" : "px-1 py-1.5"
-                                  } ${isRot ? "h-[70px] align-middle" : "align-middle"}`}
+                                  } align-middle`}
                                 >
                                   {isRot ? (
                                     <div
@@ -1748,11 +2060,71 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                                   )}
                                 </th>
                               );
-                            })}
+                            }
+
+                            // Tier 1 Group Section Header
+                            const sectionTitle = previewLanguage === "bn" ? group.labelBng : group.labelEng;
+                            return (
+                              <th
+                                key={`th-group-${gIdx}`}
+                                colSpan={group.colSpan}
+                                className="border border-black font-extrabold uppercase bg-slate-200 text-black py-1 px-1 text-[8.5px] tracking-wider text-center align-middle"
+                              >
+                                {sectionTitle}
+                              </th>
+                            );
+                          })}
+                        </tr>
+
+                        {/* Tier 2 Header: Sub-headers for Grouped Columns */}
+                        <tr>
+                          {headerGroups.flatMap((group) => {
+                            if (group.type === "standalone") return [];
+                            return group.columns.map((col) => {
+                              const headerTitle =
+                                previewLanguage === "bn" && col.labelBng ? col.labelBng : col.labelEng;
+                              const isRot = col.isRotatedHeader;
+                              const colW = getEffectiveColumnWidth(col);
+                              const isNarrow = parseInt(colW) <= 30;
+
+                              return (
+                                <th
+                                  key={`th-sub-${col.id}`}
+                                  style={{
+                                    width: colW,
+                                    minWidth: colW,
+                                    maxWidth: colW,
+                                  }}
+                                  className={`border border-black font-extrabold uppercase bg-slate-100 text-black ${
+                                    isNarrow ? "px-0 py-1 overflow-hidden" : "px-1 py-1"
+                                  } ${isRot ? "h-[65px] align-middle" : "align-middle"}`}
+                                >
+                                  {isRot ? (
+                                    <div
+                                      style={{
+                                        writingMode: "vertical-rl",
+                                        transform: "rotate(180deg)",
+                                        whiteSpace: "nowrap",
+                                        margin: "0 auto",
+                                        lineHeight: 1,
+                                        fontSize: "7.5px",
+                                        display: "block",
+                                        width: "fit-content",
+                                      }}
+                                    >
+                                      {headerTitle}
+                                    </div>
+                                  ) : (
+                                    <span className="text-[8px] tracking-tight">{headerTitle}</span>
+                                  )}
+                                </th>
+                              );
+                            });
+                          })}
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-black text-[8px] font-medium text-black">
-                        {sampleEmployees.map((emp) => (
+                        {displayEmployees.map((emp) => (
                           <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
                             {editingTemplate.columns
                               .filter((c) => c.isVisible)
@@ -1924,207 +2296,6 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
         )
       )}
 
-      {/* Modal: Mathematical Formula Builder */}
-      {isFormulaModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-card rounded-2xl border border-border/60 p-6 max-w-3xl sm:max-w-4xl w-full shadow-2xl space-y-4">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-border/40 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="size-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center">
-                  <Calculator className="size-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-foreground">Formula Builder</h3>
-                  <p className="text-xs text-muted-foreground">Configure mathematical calculation for this column</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsFormulaModalOpen(false)}
-                className="size-8 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-
-            <div className="space-y-4 text-xs">
-              {/* Formula Expression Input Box */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-foreground">Formula Expression</label>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setModalFormulaExpr((prev) => {
-                          const trimmed = prev.trim();
-                          const tokens = trimmed.split(/\s+/);
-                          if (tokens.length <= 1) return "";
-                          tokens.pop();
-                          return tokens.join(" ");
-                        });
-                      }}
-                      className="text-[11px] text-muted-foreground hover:text-foreground px-2 py-0.5 rounded border border-border/50 hover:bg-muted cursor-pointer transition-colors"
-                    >
-                      ⌫ Backspace
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setModalFormulaExpr("")}
-                      className="text-[11px] text-rose-600 hover:text-rose-700 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer transition-colors"
-                    >
-                      Clear
-                    </button>
-                  </div>
-                </div>
-                <input
-                  type="text"
-                  value={modalFormulaExpr}
-                  onChange={(e) => setModalFormulaExpr(e.target.value)}
-                  placeholder="e.g. sal_food + sal_conveyance"
-                  className="w-full h-12 px-4 rounded-xl border border-purple-300 dark:border-purple-800 bg-purple-50/40 dark:bg-purple-950/30 font-mono text-sm font-bold focus:ring-2 focus:ring-purple-500/20 outline-none text-purple-950 dark:text-purple-100"
-                />
-                {modalFormulaExpr && (
-                  <div className="text-xs text-muted-foreground flex items-center gap-1.5 pt-0.5">
-                    <Sparkles className="size-3.5 text-purple-500 shrink-0" />
-                    <span className="font-semibold text-foreground/70">Preview:</span>
-                    <span className="font-medium text-foreground">{formatFormulaHumanReadable(modalFormulaExpr)}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Math Operators - Only Signs */}
-              <div>
-                <span className="text-xs font-semibold text-foreground/80 block mb-1.5">Operators</span>
-                <div className="grid grid-cols-6 gap-2">
-                  {[
-                    { label: "+", val: " + " },
-                    { label: "-", val: " - " },
-                    { label: "×", val: " * " },
-                    { label: "÷", val: " / " },
-                    { label: "(", val: " ( " },
-                    { label: ")", val: " ) " },
-                  ].map((op) => (
-                    <button
-                      key={op.label}
-                      type="button"
-                      onClick={() => setModalFormulaExpr((prev) => `${prev.trim()}${op.val}`)}
-                      className="h-10 rounded-xl border border-border/70 hover:border-purple-400 bg-muted/20 hover:bg-purple-50 dark:hover:bg-purple-950/50 font-mono font-bold text-base flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95 text-foreground"
-                    >
-                      {op.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Available Parameters to Insert with Real-Time Search */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-foreground/80">
-                    Available Parameters ({filteredModalParams.length})
-                  </span>
-                  <div className="w-64 h-8 px-2.5 rounded-lg border border-border/60 bg-muted/20 flex items-center gap-1.5 text-xs">
-                    <Search className="size-3.5 text-muted-foreground shrink-0" />
-                    <input
-                      type="text"
-                      placeholder="Search parameters (e.g. food, basic)..."
-                      value={modalParamSearch}
-                      onChange={(e) => setModalParamSearch(e.target.value)}
-                      className="bg-transparent border-0 outline-none w-full text-xs placeholder:text-muted-foreground text-foreground"
-                    />
-                    {modalParamSearch && (
-                      <button
-                        type="button"
-                        onClick={() => setModalParamSearch("")}
-                        className="text-muted-foreground hover:text-foreground text-[10px] cursor-pointer"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto p-3 border border-border/50 rounded-xl bg-muted/10">
-                  {filteredModalParams.length === 0 ? (
-                    <div className="text-xs text-muted-foreground p-3 w-full text-center">
-                      No parameter matching "{modalParamSearch}"
-                    </div>
-                  ) : (
-                    filteredModalParams.map((p) => (
-                      <button
-                        key={p.key}
-                        type="button"
-                        onClick={() => {
-                          setModalFormulaExpr((prev) => {
-                            const trimmed = prev.trim();
-                            if (!trimmed) return p.key;
-                            const lastChar = trimmed[trimmed.length - 1];
-                            if (["+", "-", "*", "/", "("].includes(lastChar)) {
-                              return `${trimmed} ${p.key}`;
-                            }
-                            return `${trimmed} + ${p.key}`;
-                          });
-                        }}
-                        className="px-2.5 py-1.5 rounded-lg border border-border/60 bg-background hover:bg-purple-50 hover:border-purple-300 dark:hover:bg-purple-950/40 text-xs font-semibold text-foreground/85 hover:text-purple-700 dark:hover:text-purple-300 transition-all cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95"
-                      >
-                        {p.nameEng.split(" (")[0]}
-                      </button>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {/* Live Preview Evaluation on Sample Employees */}
-              {modalEvaluationPreview && (
-                <div className="p-3.5 bg-slate-100/70 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                      <CheckCircle2 className="size-4 text-emerald-600" />
-                      Live Sample Evaluation
-                    </span>
-                    <span className="font-mono text-purple-700 dark:text-purple-300 font-extrabold text-[11px]">
-                      Valid Expression
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                      <span className="text-muted-foreground text-xs truncate">{modalEvaluationPreview.emp1Name}</span>
-                      <span className="text-sm font-black font-mono text-emerald-700 dark:text-emerald-400">
-                        ৳{modalEvaluationPreview.emp1Val.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                      <span className="text-muted-foreground text-xs truncate">{modalEvaluationPreview.emp4Name}</span>
-                      <span className="text-sm font-black font-mono text-emerald-700 dark:text-emerald-400">
-                        ৳{modalEvaluationPreview.emp4Val.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border/40">
-                <button
-                  type="button"
-                  onClick={() => setIsFormulaModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-border/60 font-semibold hover:bg-muted text-xs cursor-pointer transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveFormulaModal}
-                  className="px-6 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-sm cursor-pointer transition-all hover:scale-[1.02] active:scale-95"
-                >
-                  Save Formula
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Modal: Add New Salary Sheet Template */}
       {isCreateOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
@@ -2193,6 +2364,98 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                 </div>
               )}
 
+              <div className="pt-2 border-t border-border/40 space-y-3">
+                <span className="text-[11px] font-bold text-foreground/90 uppercase tracking-wider block">
+                  Grouping & Sorting Rules
+                </span>
+
+                <div>
+                  <label className="font-semibold text-foreground/80 block mb-1">Sheet Grouping</label>
+                  <div className="grid grid-cols-2 gap-2 bg-muted/20 p-1 rounded-xl border border-border/50">
+                    <button
+                      type="button"
+                      onClick={() => setNewGroupBy("department")}
+                      className={`py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
+                        newGroupBy === "department"
+                          ? "bg-background text-primary shadow-2xs font-bold border border-border/60"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Department Wise
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewGroupBy("section")}
+                      className={`py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
+                        newGroupBy === "section"
+                          ? "bg-background text-primary shadow-2xs font-bold border border-border/60"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Section Wise
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="font-semibold text-foreground/80 block mb-1">Primary Sort</label>
+                    <div className="grid grid-cols-2 gap-1 bg-muted/20 p-0.5 rounded-xl border border-border/50">
+                      <button
+                        type="button"
+                        onClick={() => setNewSortMode("designation")}
+                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${
+                          newSortMode === "designation"
+                            ? "bg-background text-purple-600 shadow-2xs font-bold border border-border/60"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Designation
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setNewSortMode("alphabetical")}
+                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${
+                          newSortMode === "alphabetical"
+                            ? "bg-background text-purple-600 shadow-2xs font-bold border border-border/60"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Alphabetical
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-foreground/80 block mb-1">Alphabetical Order</label>
+                    <div className="grid grid-cols-2 gap-1 bg-muted/20 p-0.5 rounded-xl border border-border/50">
+                      <button
+                        type="button"
+                        onClick={() => setNewAlphaOrder("asc")}
+                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${
+                          newAlphaOrder === "asc"
+                            ? "bg-background text-emerald-600 shadow-2xs font-bold border border-border/60"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Asc (A-Z)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setNewAlphaOrder("desc")}
+                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${
+                          newAlphaOrder === "desc"
+                            ? "bg-background text-emerald-600 shadow-2xs font-bold border border-border/60"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Desc (Z-A)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-border/40">
                 <button
                   type="button"
@@ -2224,7 +2487,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                   Add Column to Salary Sheet
                 </h3>
                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Define header labels, and map to either a direct parameter or a mathematical formula.
+                  Define header labels, assign an optional section grouping (or None for standalone), and select a system field parameter.
                 </p>
               </div>
               <button
@@ -2237,28 +2500,6 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
             </div>
 
             <form onSubmit={handleAddCustomColumn} className="space-y-4 text-xs">
-              {/* Mapping Mode Switch: Direct vs Math Formula */}
-              <div className="flex items-center bg-muted/60 p-1 rounded-xl border border-border/50 text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => setNewColMappingType("direct")}
-                  className={`flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center ${
-                    newColMappingType === "direct" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
-                  }`}
-                >
-                  Single Field Parameter
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setNewColMappingType("formula")}
-                  className={`flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1.5 ${
-                    newColMappingType === "formula" ? "bg-purple-600 text-white shadow-2xs" : "text-muted-foreground hover:text-purple-600"
-                  }`}
-                >
-                  <Calculator className="size-3.5" /> Calculated Formula
-                </button>
-              </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-semibold text-foreground/80 block mb-1">
@@ -2299,42 +2540,17 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                   />
                 </div>
 
-                {newColMappingType === "direct" && (
-                  <div>
-                    <label className="font-semibold text-foreground/80 block mb-1">System Parameter</label>
-                    <SearchableSelect
-                      options={systemParamOptions}
-                      value={newColParamMapping}
-                      onChange={(val) => setNewColParamMapping(val)}
-                      className="w-full h-9 text-xs font-semibold"
-                      placeholder="Search parameter..."
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Formula input when in formula mode */}
-              {newColMappingType === "formula" && (
-                <div className="p-3 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-xl space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="font-bold text-purple-900 dark:text-purple-200 text-[11px] flex items-center gap-1.5">
-                      <Calculator className="size-3.5" />
-                      Formula Expression (e.g. sal_food + sal_conveyance)
-                    </label>
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    value={newColFormula}
-                    onChange={(e) => setNewColFormula(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-slate-900 font-mono text-xs font-bold text-purple-900 dark:text-purple-100 outline-none"
-                    placeholder="sal_food + sal_conveyance"
+                <div>
+                  <label className="font-semibold text-foreground/80 block mb-1">System Field Parameter</label>
+                  <SearchableSelect
+                    options={systemParamOptions}
+                    value={newColParamMapping}
+                    onChange={(val) => setNewColParamMapping(val)}
+                    className="w-full h-9 text-xs font-semibold"
+                    placeholder="Search parameter..."
                   />
-                  <div className="text-[10.5px] text-purple-700 dark:text-purple-300">
-                    Preview: {formatFormulaHumanReadable(newColFormula)}
-                  </div>
                 </div>
-              )}
+              </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
