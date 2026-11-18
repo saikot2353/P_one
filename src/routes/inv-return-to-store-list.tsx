@@ -17,6 +17,7 @@ import {
   History,
   X,
   FileSpreadsheet,
+  Eye,
 } from "lucide-react";
 import {
   MaterialIssue,
@@ -58,11 +59,17 @@ function ReturnToStoreListPage() {
   const [issueIdFilter, setIssueIdFilter] = useState("");
   const [mrIdFilter, setMrIdFilter] = useState("");
   const [employeeFilter, setEmployeeFilter] = useState("");
+  const [itemNameFilter, setItemNameFilter] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("All");
   const [warehouseFilter, setWarehouseFilter] = useState("All");
-  const [issueDateFilter, setIssueDateFilter] = useState("");
+  const [fromIssueDateFilter, setFromIssueDateFilter] = useState("");
+  const [toIssueDateFilter, setToIssueDateFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+
+  // Issuer Return History Modal State (D Button)
+  const [issuerHistoryModalOpen, setIssuerHistoryModalOpen] = useState(false);
+  const [selectedIssuerIssue, setSelectedIssuerIssue] = useState<MaterialIssue | null>(null);
 
   // Preview Report State
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
@@ -74,6 +81,42 @@ function ReturnToStoreListPage() {
     issues.forEach((i) => i.department && set.add(i.department));
     return Array.from(set);
   }, [issues]);
+
+  // Unique item names for Item Name filter suggestions
+  const allUniqueItemNames = useMemo(() => {
+    const set = new Set<string>();
+    issues.forEach((i) => {
+      i.items?.forEach((it) => {
+        if (it.itemName) set.add(it.itemName);
+      });
+    });
+    return Array.from(set).sort();
+  }, [issues]);
+
+  // Issuer returns for D button modal
+  const matchedIssuerReturns = useMemo(() => {
+    if (!selectedIssuerIssue) return [];
+    const emp = (selectedIssuerIssue.issuedTo || "").toLowerCase().trim();
+    const empId = (selectedIssuerIssue.employeeId || "").toLowerCase().trim();
+    const issId = selectedIssuerIssue.id;
+    const issNum = (selectedIssuerIssue.issueNumber || "").toLowerCase().trim();
+
+    return returns.filter((ret) => {
+      const retEmp = (ret.issuedTo || "").toLowerCase().trim();
+      const retEmpId = (ret.employeeId || "").toLowerCase().trim();
+      const retIssId = ret.issueId;
+      const retIssNum = (ret.issueNumber || "").toLowerCase().trim();
+
+      const sameEmp =
+        (emp && retEmp && (retEmp.includes(emp) || emp.includes(retEmp))) ||
+        (empId && retEmpId && retEmpId === empId);
+      const sameIssue =
+        (issId && retIssId && retIssId === issId) ||
+        (issNum && retIssNum && retIssNum === issNum);
+
+      return sameEmp || sameIssue;
+    });
+  }, [selectedIssuerIssue, returns]);
 
   // Eligible Issues
   const filteredIssues = useMemo(() => {
@@ -107,13 +150,25 @@ function ReturnToStoreListPage() {
       if (employeeFilter.trim() && !iss.issuedTo.toLowerCase().includes(employeeFilter.toLowerCase())) {
         return false;
       }
+      if (itemNameFilter.trim()) {
+        const q = itemNameFilter.trim().toLowerCase();
+        const hasMatchingItem = iss.items?.some(
+          (it) =>
+            it.itemName.toLowerCase().includes(q) ||
+            (it.itemCode && it.itemCode.toLowerCase().includes(q))
+        );
+        if (!hasMatchingItem) return false;
+      }
       if (departmentFilter !== "All" && iss.department !== departmentFilter) {
         return false;
       }
       if (warehouseFilter !== "All" && iss.warehouseStore !== warehouseFilter) {
         return false;
       }
-      if (issueDateFilter && iss.issueDate !== issueDateFilter) {
+      if (fromIssueDateFilter && iss.issueDate < fromIssueDateFilter) {
+        return false;
+      }
+      if (toIssueDateFilter && iss.issueDate > toIssueDateFilter) {
         return false;
       }
       if (statusFilter !== "All") {
@@ -135,9 +190,11 @@ function ReturnToStoreListPage() {
     issueIdFilter,
     mrIdFilter,
     employeeFilter,
+    itemNameFilter,
     departmentFilter,
     warehouseFilter,
-    issueDateFilter,
+    fromIssueDateFilter,
+    toIssueDateFilter,
     statusFilter,
   ]);
 
@@ -337,8 +394,8 @@ function ReturnToStoreListPage() {
 
               {isFiltersOpen && (
                 <div className="p-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
-                    {/* Material Issue ID */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {/* 1. Material Issue ID */}
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                         Material Issue ID
@@ -352,7 +409,7 @@ function ReturnToStoreListPage() {
                       />
                     </div>
 
-                    {/* MR ID */}
+                    {/* 2. MR ID */}
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                         MR ID
@@ -366,7 +423,7 @@ function ReturnToStoreListPage() {
                       />
                     </div>
 
-                    {/* Employee / Issued To */}
+                    {/* 3. Employee / Issued To */}
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                         Employee / Issued To
@@ -380,7 +437,27 @@ function ReturnToStoreListPage() {
                       />
                     </div>
 
-                    {/* Department */}
+                    {/* 4. Item Name (Added after Employee / Issued To) */}
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Item Name
+                      </label>
+                      <input
+                        type="text"
+                        list="return-queue-items-list"
+                        placeholder="Search item name or code..."
+                        value={itemNameFilter}
+                        onChange={(e) => setItemNameFilter(e.target.value)}
+                        className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                      />
+                      <datalist id="return-queue-items-list">
+                        {allUniqueItemNames.map((name) => (
+                          <option key={name} value={name} />
+                        ))}
+                      </datalist>
+                    </div>
+
+                    {/* 5. Department */}
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                         Department
@@ -399,7 +476,7 @@ function ReturnToStoreListPage() {
                       </select>
                     </div>
 
-                    {/* Warehouse / Store */}
+                    {/* 6. Warehouse / Store */}
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                         Warehouse / Store
@@ -418,20 +495,33 @@ function ReturnToStoreListPage() {
                       </select>
                     </div>
 
-                    {/* Issue Date */}
+                    {/* 7. From Issue Date */}
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                        Issue Date
+                        From Issue Date
                       </label>
                       <input
                         type="date"
-                        value={issueDateFilter}
-                        onChange={(e) => setIssueDateFilter(e.target.value)}
+                        value={fromIssueDateFilter}
+                        onChange={(e) => setFromIssueDateFilter(e.target.value)}
                         className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                       />
                     </div>
 
-                    {/* Status */}
+                    {/* 8. To Issue Date */}
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        To Issue Date
+                      </label>
+                      <input
+                        type="date"
+                        value={toIssueDateFilter}
+                        onChange={(e) => setToIssueDateFilter(e.target.value)}
+                        className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                      />
+                    </div>
+
+                    {/* 9. Status */}
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                         Status
@@ -447,24 +537,29 @@ function ReturnToStoreListPage() {
                         <option value="Fully Returned">Fully Returned</option>
                       </select>
                     </div>
-                  </div>
 
-                  <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
-                    <button
-                      onClick={() => {
-                        setSearchQuery("");
-                        setIssueIdFilter("");
-                        setMrIdFilter("");
-                        setEmployeeFilter("");
-                        setDepartmentFilter("All");
-                        setWarehouseFilter("All");
-                        setIssueDateFilter("");
-                        setStatusFilter("All");
-                      }}
-                      className="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
-                    >
-                      Reset Filters
-                    </button>
+                    {/* 10. Reset Filters Action Button */}
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setIssueIdFilter("");
+                          setMrIdFilter("");
+                          setEmployeeFilter("");
+                          setItemNameFilter("");
+                          setDepartmentFilter("All");
+                          setWarehouseFilter("All");
+                          setFromIssueDateFilter("");
+                          setToIssueDateFilter("");
+                          setStatusFilter("All");
+                        }}
+                        className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <RotateCcw className="size-3.5 text-slate-400" />
+                        Reset Filters
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -504,6 +599,7 @@ function ReturnToStoreListPage() {
                       <th className="py-3 px-3.5">Issue Date</th>
                       <th className="py-3 px-3.5">Department</th>
                       <th className="py-3 px-3.5">Issued To</th>
+                      <th className="py-3 px-3 text-center">Details</th>
                       <th className="py-3 px-3.5 text-center">Total Items</th>
                       <th className="py-3 px-3.5 text-right">Issued Quantity</th>
                       <th className="py-3 px-3.5 text-right">Prev Returned</th>
@@ -519,7 +615,7 @@ function ReturnToStoreListPage() {
                   <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                     {filteredIssues.length === 0 ? (
                       <tr>
-                        <td colSpan={12} className="py-12 text-center text-slate-400">
+                        <td colSpan={13} className="py-12 text-center text-slate-400">
                           <div className="flex flex-col items-center justify-center gap-2">
                             <CheckCircle2 className="size-8 text-orange-300 stroke-[1.5]" />
                             <p className="text-xs font-semibold text-slate-600">
@@ -565,6 +661,21 @@ function ReturnToStoreListPage() {
                                 <User className="size-3 text-slate-400" />
                                 <span>{iss.issuedTo}</span>
                               </div>
+                            </td>
+
+                            {/* Details Column — D Button */}
+                            <td className="py-3 px-3 text-center">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedIssuerIssue(iss);
+                                  setIssuerHistoryModalOpen(true);
+                                }}
+                                className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-orange-100 hover:bg-orange-200 text-orange-700 font-black text-[11px] shadow-2xs border border-orange-200 hover:border-orange-300 transition-all cursor-pointer active:scale-95"
+                                title={`View return history for ${iss.issuedTo}`}
+                              >
+                                D
+                              </button>
                             </td>
                             <td className="py-3 px-3.5 text-center font-bold font-mono">
                               {iss.totalItems}
@@ -712,6 +823,126 @@ function ReturnToStoreListPage() {
             </div>
           )}
         </div>
+
+        {/* Issuer Return History Modal (Triggered by 'D' Button) */}
+        {issuerHistoryModalOpen && selectedIssuerIssue && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+              {/* Modal Header */}
+              <div className="px-6 py-4.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-orange-500/20 border border-orange-400/30 flex items-center justify-center text-orange-400">
+                    <History className="size-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black tracking-tight text-white flex items-center gap-2">
+                      Issuer Return History
+                    </h3>
+                    <p className="text-[11px] text-slate-300">
+                      Return records for <span className="font-semibold text-orange-300">{selectedIssuerIssue.issuedTo}</span> ({selectedIssuerIssue.department})
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIssuerHistoryModalOpen(false);
+                    setSelectedIssuerIssue(null);
+                  }}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors cursor-pointer"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              {/* Modal Body: Return History Table */}
+              <div className="p-6">
+                <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="py-2.5 px-4 font-bold">Return ID</th>
+                        <th className="py-2.5 px-4 font-bold">Date</th>
+                        <th className="py-2.5 px-4 font-bold text-center w-28">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-[11px] font-medium text-slate-700">
+                      {matchedIssuerReturns.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="py-10 text-center text-slate-400">
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <RotateCcw className="size-7 text-slate-300" />
+                              <p className="text-xs font-semibold text-slate-600">
+                                No Return History Found
+                              </p>
+                              <p className="text-[10px] text-slate-400">
+                                No previous store returns recorded for {selectedIssuerIssue.issuedTo}.
+                              </p>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        matchedIssuerReturns.map((ret) => (
+                          <tr key={ret.id} className="hover:bg-slate-50/70 transition-colors">
+                            {/* Return ID — clicking opens Return to Store Entry form in Editable Mode */}
+                            <td className="py-3 px-4">
+                              <Link
+                                to="/inv-issue-return"
+                                search={{ returnId: ret.id, issueId: ret.issueId, mode: "edit" }}
+                                className="font-mono font-bold text-orange-600 hover:text-orange-700 hover:underline inline-flex items-center gap-1.5"
+                                title="Open Return in Editable Mode"
+                              >
+                                <span>{ret.returnNumber}</span>
+                                <span className="text-[9.5px] px-1.5 py-0.2 rounded bg-orange-50 text-orange-600 border border-orange-200 font-sans font-semibold">
+                                  Edit
+                                </span>
+                              </Link>
+                            </td>
+
+                            {/* Date — displays date on which material was returned */}
+                            <td className="py-3 px-4 font-mono text-slate-600">
+                              {ret.returnDate}
+                            </td>
+
+                            {/* Action — View button opens Return to Store Entry in View-Only Mode */}
+                            <td className="py-3 px-4 text-center">
+                              <Link
+                                to="/inv-issue-return"
+                                search={{ returnId: ret.id, issueId: ret.issueId, mode: "view" }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors shadow-2xs"
+                                title="Open Return in View-Only Mode"
+                              >
+                                <Eye className="size-3.5 text-slate-500" />
+                                <span>View</span>
+                              </Link>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-xs text-slate-500">
+                  Total return records: <strong className="text-slate-700">{matchedIssuerReturns.length}</strong>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIssuerHistoryModalOpen(false);
+                    setSelectedIssuerIssue(null);
+                  }}
+                  className="px-4 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Preview Report Modal */}
         <StandardPreviewReportModal

@@ -18,16 +18,20 @@ import {
   PackageCheck,
   Check,
   Trash2,
+  Eye,
+  Edit,
 } from "lucide-react";
 import {
   MaterialIssue,
   StoreReturn,
   StoreReturnItem,
   getStoredMaterialIssues,
+  getStoredStoreReturns,
   postStoreReturn,
 } from "@/lib/inventory-requisition-issue-data";
 import { DEFAULT_ITEMS, ItemProductMaster, getStoredData } from "@/lib/procurement-master-data";
 import { getItemTrackingMode } from "@/lib/item-tracking-utils";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
   LocationAllocationModal,
   BatchAllocationModal,
@@ -42,12 +46,16 @@ import {
 
 interface IssueReturnSearch {
   issueId?: string;
+  returnId?: string;
+  mode?: "edit" | "view";
 }
 
 export const Route = createFileRoute("/inv-issue-return")({
   validateSearch: (search: Record<string, unknown>): IssueReturnSearch => {
     return {
       issueId: search.issueId as string | undefined,
+      returnId: search.returnId as string | undefined,
+      mode: search.mode as "edit" | "view" | undefined,
     };
   },
   head: () => ({
@@ -67,10 +75,24 @@ function InvIssueReturnPage() {
   const navigate = useNavigate();
 
   const issues = useMemo(() => getStoredMaterialIssues(), []);
+  const returns = useMemo(() => getStoredStoreReturns(), []);
   const catalogItems = useMemo(
     () => getStoredData<ItemProductMaster[]>("proc_items_v2", DEFAULT_ITEMS),
     []
   );
+
+  // Check if viewing or editing an existing Return slip
+  const existingReturn = useMemo(() => {
+    if (!searchParams.returnId) return null;
+    return (
+      returns.find(
+        (r) => r.id === searchParams.returnId || r.returnNumber === searchParams.returnId
+      ) || null
+    );
+  }, [searchParams.returnId, returns]);
+
+  const isViewMode = searchParams.mode === "view";
+  const isEditMode = searchParams.mode === "edit" || Boolean(existingReturn && !isViewMode);
 
   // Issues eligible for return
   const eligibleIssues = useMemo(() => {
@@ -84,6 +106,7 @@ function InvIssueReturnPage() {
   }, [issues]);
 
   const [selectedIssueId, setSelectedIssueId] = useState<string>(() => {
+    if (existingReturn) return existingReturn.issueId;
     if (searchParams.issueId) return searchParams.issueId;
     if (eligibleIssues.length > 0) return eligibleIssues[0].id;
     return "";
@@ -97,20 +120,45 @@ function InvIssueReturnPage() {
   }, [selectedIssueId, issues]);
 
   // Form Fields
-  const [returnNumber] = useState<string>(
-    () => `RET-2026-${String(Math.floor(1000 + Math.random() * 9000))}`
-  );
-  const [returnDate, setReturnDate] = useState<string>(() =>
-    new Date().toISOString().slice(0, 10)
-  );
-  const [remarks, setRemarks] = useState<string>("");
+  const [returnNumber] = useState<string>(() => {
+    if (existingReturn) return existingReturn.returnNumber;
+    return `RET-2026-${String(Math.floor(1000 + Math.random() * 9000))}`;
+  });
+  const [returnDate, setReturnDate] = useState<string>(() => {
+    if (existingReturn) return existingReturn.returnDate;
+    return new Date().toISOString().slice(0, 10);
+  });
+  const [remarks, setRemarks] = useState<string>(() => {
+    if (existingReturn) return existingReturn.remarks || "";
+    return "";
+  });
 
-  // Items State (loaded from activeIssue)
+  // Items State
   const [returnItems, setReturnItems] = useState<StoreReturnItem[]>([]);
 
-  // Auto-populate when activeIssue changes
+  // Auto-populate when existingReturn or activeIssue changes
   useEffect(() => {
-    if (activeIssue) {
+    if (existingReturn) {
+      const items: StoreReturnItem[] = existingReturn.items.map((it, idx) => ({
+        id: it.id || `sri-${Date.now()}-${idx}`,
+        sl: idx + 1,
+        issueItemId: it.issueItemId,
+        itemCode: it.itemCode,
+        itemName: it.itemName,
+        specification: it.specification,
+        uom: it.uom,
+        originallyIssuedQty: it.originallyIssuedQty,
+        previouslyReturnedQty: it.previouslyReturnedQty || 0,
+        returnableQty: it.returnableQty || it.originallyIssuedQty,
+        returnStore: it.returnStore || existingReturn.warehouseStore || "Central Store",
+        returnQty: it.returnQty,
+        returnCondition: it.returnCondition || "Good (Restock)",
+        batchAllocations: it.batchAllocations || [],
+        locationAllocations: it.locationAllocations || [],
+        remarks: it.remarks || "",
+      }));
+      setReturnItems(items);
+    } else if (activeIssue) {
       const items: StoreReturnItem[] = activeIssue.items.map((it, idx) => {
         const originallyIssued = Number(it.issueQty) || 0;
         const previouslyReturned = 0; // Per item base
@@ -139,7 +187,22 @@ function InvIssueReturnPage() {
     } else {
       setReturnItems([]);
     }
-  }, [activeIssue]);
+  }, [existingReturn, activeIssue]);
+
+  // Options for Searchable Material Issue ID select
+  const issueOptions = useMemo(() => {
+    const optionsMap = new Map<string, string>();
+    eligibleIssues.forEach((iss) => {
+      optionsMap.set(iss.id, `${iss.issueNumber} — ${iss.issuedTo} (${iss.department})`);
+    });
+    if (activeIssue && !optionsMap.has(activeIssue.id)) {
+      optionsMap.set(
+        activeIssue.id,
+        `${activeIssue.issueNumber} — ${activeIssue.issuedTo} (${activeIssue.department})`
+      );
+    }
+    return Array.from(optionsMap.entries()).map(([value, label]) => ({ value, label }));
+  }, [eligibleIssues, activeIssue]);
 
   // Handle Return Qty Change with strict validation
   const handleReturnQtyChange = (id: string, newQtyStr: string) => {
@@ -272,7 +335,7 @@ function InvIssueReturnPage() {
     const itemsToReturn = returnItems.filter((i) => i.returnQty > 0);
 
     const newReturn: StoreReturn = {
-      id: `ret-${Date.now()}`,
+      id: existingReturn ? existingReturn.id : `ret-${Date.now()}`,
       returnNumber,
       issueId: activeIssue.id,
       issueNumber: activeIssue.issueNumber,
@@ -285,8 +348,8 @@ function InvIssueReturnPage() {
       warehouseStore: activeIssue.warehouseStore,
       totalItems: itemsToReturn.length,
       totalReturnQty: totalReturnQuantity,
-      receivedQty: 0,
-      status: "Pending Receive",
+      receivedQty: existingReturn?.receivedQty || 0,
+      status: existingReturn?.status || "Pending Receive",
       items: itemsToReturn,
       remarks,
     };
@@ -295,7 +358,9 @@ function InvIssueReturnPage() {
     postStoreReturn(newReturn);
 
     toast.success(
-      `Return to Store ${returnNumber} submitted for store receive! Issue returnable balance updated.`
+      existingReturn
+        ? `Return to Store ${returnNumber} updated successfully!`
+        : `Return to Store ${returnNumber} submitted for store receive! Issue returnable balance updated.`
     );
     navigate({ to: "/inv-return-to-store-list" });
   };
@@ -380,7 +445,11 @@ function InvIssueReturnPage() {
               <div>
                 <div className="flex items-center gap-2.5">
                   <h1 className="text-xl font-black text-slate-800 tracking-tight">
-                    Return to Store Entry
+                    {isViewMode
+                      ? "Return to Store (View Only)"
+                      : isEditMode
+                      ? "Edit Return to Store"
+                      : "Return to Store Entry"}
                   </h1>
                   <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-700 border border-orange-200">
                     {returnNumber}
@@ -390,9 +459,21 @@ function InvIssueReturnPage() {
                       Against Issue {activeIssue.issueNumber}
                     </span>
                   )}
+                  {isViewMode && (
+                    <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-300">
+                      View-Only Mode
+                    </span>
+                  )}
+                  {isEditMode && (
+                    <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-300">
+                      Editable Mode
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Return unconsumed materials back to store with automated stock replenishment
+                  {isViewMode
+                    ? "View-only inspection of store return transaction"
+                    : "Return unconsumed materials back to store with automated stock replenishment"}
                 </p>
               </div>
             </div>
@@ -401,26 +482,48 @@ function InvIssueReturnPage() {
               <button
                 type="button"
                 onClick={() => setPreviewReportOpen(true)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-sm transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-sm transition-colors cursor-pointer"
               >
                 <Printer className="size-3.5 text-slate-600" />
                 Preview Note
               </button>
 
-              <button
-                type="button"
-                onClick={handlePostReturn}
-                disabled={validationErrors.length > 0}
-                className="flex items-center gap-2 px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold shadow-md shadow-orange-500/20 active:scale-95 transition-all"
-              >
-                <CheckCircle2 className="size-4" />
-                Confirm & Post Return
-              </button>
+              {isViewMode ? (
+                <>
+                  {existingReturn && (
+                    <Link
+                      to="/inv-issue-return"
+                      search={{ returnId: existingReturn.id, issueId: existingReturn.issueId, mode: "edit" }}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold shadow-sm transition-all"
+                    >
+                      <Edit className="size-3.5" />
+                      Edit Return
+                    </Link>
+                  )}
+                  <Link
+                    to="/inv-return-to-store-list"
+                    className="flex items-center gap-2 px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold shadow-sm transition-all"
+                  >
+                    <ArrowLeft className="size-4" />
+                    Back to List
+                  </Link>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handlePostReturn}
+                  disabled={validationErrors.length > 0}
+                  className="flex items-center gap-2 px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold shadow-md shadow-orange-500/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  <CheckCircle2 className="size-4" />
+                  {existingReturn ? "Save & Update Return" : "Confirm & Post Return"}
+                </button>
+              )}
             </div>
           </div>
 
           {/* Validation Notice */}
-          {validationErrors.length > 0 && (
+          {!isViewMode && validationErrors.length > 0 && (
             <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3">
               <AlertTriangle className="size-5 text-rose-600 shrink-0 mt-0.5" />
               <div>
@@ -451,23 +554,19 @@ function InvIssueReturnPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Select Issue Dropdown */}
+              {/* Select Issue Dropdown (Searchable) */}
               <div>
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                   Material Issue ID *
                 </label>
-                <select
+                <SearchableSelect
+                  options={issueOptions}
                   value={selectedIssueId}
-                  onChange={(e) => setSelectedIssueId(e.target.value)}
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-mono font-bold text-indigo-600 focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none"
-                >
-                  <option value="">-- Select Material Issue --</option>
-                  {eligibleIssues.map((iss) => (
-                    <option key={iss.id} value={iss.id}>
-                      {iss.issueNumber} — {iss.issuedTo} ({iss.department})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => !isViewMode && setSelectedIssueId(val)}
+                  placeholder="Search Material Issue ID..."
+                  disabled={isViewMode}
+                  className="w-full text-xs font-mono font-bold text-indigo-600"
+                />
               </div>
 
               {/* MR ID */}
@@ -544,7 +643,9 @@ function InvIssueReturnPage() {
                   type="date"
                   value={returnDate}
                   onChange={(e) => setReturnDate(e.target.value)}
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none"
+                  disabled={isViewMode}
+                  readOnly={isViewMode}
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none disabled:bg-slate-100 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -558,7 +659,9 @@ function InvIssueReturnPage() {
                   placeholder="Enter overall return remarks or reason..."
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                  disabled={isViewMode}
+                  readOnly={isViewMode}
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -590,13 +693,13 @@ function InvIssueReturnPage() {
                     <th className="py-3 px-3 text-right w-32 bg-orange-50/60 font-black text-orange-900">
                       Return Qty *
                     </th>
-                    <th className="py-3 px-3 text-center w-16">Action</th>
+                    {!isViewMode && <th className="py-3 px-3 text-center w-16">Action</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                   {returnItems.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="py-10 text-center text-slate-400">
+                      <td colSpan={isViewMode ? 9 : 10} className="py-10 text-center text-slate-400">
                         No issued items loaded. Please select a Material Issue above.
                       </td>
                     </tr>
@@ -644,78 +747,42 @@ function InvIssueReturnPage() {
                                 min="0"
                                 max={item.originallyIssuedQty}
                                 value={item.returnQty}
+                                readOnly={isViewMode}
+                                disabled={isViewMode}
                                 onChange={(e) => handleReturnQtyChange(item.id, e.target.value)}
-                                className={`w-24 h-7 rounded border px-2 text-right font-mono font-bold text-xs outline-none transition-all ${
+                                className={`w-24 h-7 rounded border px-2 text-right font-mono font-bold text-xs outline-none transition-all disabled:bg-slate-100 disabled:text-slate-700 ${
                                   hasError
                                     ? "border-rose-400 bg-rose-50 text-rose-700 ring-2 ring-rose-500/20"
                                     : "border-orange-300 bg-white text-orange-900 focus:ring-2 focus:ring-orange-500/20"
                                 }`}
                               />
-                              <span className="text-[9.5px] font-semibold text-slate-400">
-                                Max: {item.originallyIssuedQty}
-                              </span>
+                              {!isViewMode && (
+                                <span className="text-[9.5px] font-semibold text-slate-400">
+                                  Max: {item.originallyIssuedQty}
+                                </span>
+                              )}
                             </div>
                           </td>
 
                           {/* Delete Item Action */}
-                          <td className="py-3 px-3 text-center">
-                            <button
-                              type="button"
-                              title="Remove item from this return"
-                              onClick={() => handleDeleteReturnItem(item.id)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                            >
-                              <Trash2 className="size-3.5" />
-                            </button>
-                          </td>
+                          {!isViewMode && (
+                            <td className="py-3 px-3 text-center">
+                              <button
+                                type="button"
+                                title="Remove item from this return"
+                                onClick={() => handleDeleteReturnItem(item.id)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                              >
+                                <Trash2 className="size-3.5" />
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       );
                     })
                   )}
                 </tbody>
               </table>
-            </div>
-
-            {/* Total Counters */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Items to Return
-                </span>
-                <span className="text-lg font-black text-slate-800 font-mono mt-0.5 block">
-                  {returnItems.filter((i) => i.returnQty > 0).length} of {returnItems.length}
-                </span>
-              </div>
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Total Return Quantity
-                </span>
-                <span className="text-lg font-black text-orange-600 font-mono mt-0.5 block">
-                  {totalReturnQuantity.toLocaleString()}
-                </span>
-              </div>
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Stock Addition Effect
-                </span>
-                <span className="text-xs font-bold text-emerald-600 mt-1 block">
-                  Good condition items will increase available store stock immediately upon posting
-                </span>
-              </div>
-            </div>
-
-            {/* Remarks */}
-            <div>
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                Return Remarks / Store Receiving Verification
-              </label>
-              <textarea
-                rows={3}
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-                placeholder="Enter remarks for store keeper receipt and verification..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
-              />
             </div>
           </div>
         </div>

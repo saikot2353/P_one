@@ -286,58 +286,6 @@ export function BuyerQuotationReport({ record, onBack, onEdit }: BuyerQuotationR
     };
   });
 
-  // Embellishment categories for Back-to-Back LC Details
-  const embCats = ["Print", "Embroidery", "GMT Wash"] as const;
-  const embellishmentB2B = embCats.map((cat) => {
-    const matching = embellishmentItems.filter((e) => {
-      const h = (e.costHead || "").toLowerCase();
-      if (cat === "GMT Wash") return h.includes("wash");
-      if (cat === "Embroidery") return h.includes("embroid");
-      return h.includes("print");
-    });
-    const material = matching.reduce((s, e) => s + (Number(e.amount) || 0), 0);
-    const source = matching.length > 0 ? (matching[0].source || "In-house") : "In-house";
-    const isSubContract = source.toLowerCase().includes("sub");
-    const pctMat = isSubContract ? 100 : 40;
-    const pctFob = totalOrderValue > 0 ? (material / totalOrderValue) * 100 : 0;
-    return {
-      item: cat,
-      source: matching.length > 0 ? source : undefined,
-      material,
-      pctFob,
-      pctMat,
-    };
-  });
-
-  // Back-to-Back LC Details (Sewing Trims combined into Accessories & Trims)
-  const b2bItems = [
-    {
-      item: "Yarn (Local / Import B2B)",
-      source: undefined,
-      material: totalYarnCost,
-      pctFob: totalOrderValue > 0 ? (totalYarnCost / totalOrderValue) * 100 : 0,
-      pctMat: 100,
-    },
-    {
-      item: "Fabric Processing (Knitting & Dyeing)",
-      source: undefined,
-      material: totalKnittingCost + totalDyeingCost,
-      pctFob: totalOrderValue > 0 ? ((totalKnittingCost + totalDyeingCost) / totalOrderValue) * 100 : 0,
-      pctMat: 40,
-    },
-    {
-      item: "Accessories & Trims (Local / Import)",
-      source: undefined,
-      material: totalAccessoriesCost,
-      pctFob: totalOrderValue > 0 ? (totalAccessoriesCost / totalOrderValue) * 100 : 0,
-      pctMat: 100,
-    },
-    ...embellishmentB2B,
-  ];
-
-  const totalB2BMaterial = b2bItems.reduce((acc, it) => acc + it.material, 0);
-  const totalB2BPctFob = totalOrderValue > 0 ? (totalB2BMaterial / totalOrderValue) * 100 : 0;
-
   // Style Image resolution
   const attachments =
     record.attachments && record.attachments.length > 0 && record.attachments.some((a) => Boolean(a.dataUrl))
@@ -424,16 +372,10 @@ export function BuyerQuotationReport({ record, onBack, onEdit }: BuyerQuotationR
       >
         {/* Document Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b-2 border-slate-800 gap-4">
-          <div className="space-y-1">
+          <div>
             <h1 className="text-xl md:text-2xl font-black uppercase tracking-wider text-slate-950">
-              Pakiza Knit Composite Ltd.
+              Pre-Cost Sheet Report
             </h1>
-            <p className="text-xs text-slate-600 font-medium">
-              Gorai, Mirzapur, Tangail, Bangladesh • Tel: +880-2-9883181 • Email: merchandising@pakizagroup.com
-            </p>
-            <p className="text-[11px] text-slate-500 font-mono">
-              Composite Knit Garment Manufacturing, Pre-Costing & Price Analysis Sheet
-            </p>
           </div>
 
           <div className="text-right shrink-0 space-y-1">
@@ -1092,7 +1034,13 @@ export function BuyerQuotationReport({ record, onBack, onEdit }: BuyerQuotationR
                       <td className="py-2 px-3 text-center font-mono font-bold text-slate-400">1</td>
                       <td className="py-2 px-3 font-bold text-slate-900">Preparation & Costing</td>
                       <td className="py-2 px-3 font-semibold text-slate-800">
-                        {record.createdBy || record.merchandiser || "Tanvir Ahmed"}
+                        {(() => {
+                          const c = (record.createdBy || record.merchandiser || "").trim();
+                          if (!c || c.toLowerCase().includes("shapno") || c.toLowerCase().includes("tanvir")) {
+                            return "Rashidul Islam";
+                          }
+                          return c;
+                        })()}
                       </td>
                       <td className="py-2 px-3 text-slate-500">Merchandiser</td>
                       <td className="py-2 px-3 text-center">
@@ -1332,69 +1280,7 @@ export function BuyerQuotationReport({ record, onBack, onEdit }: BuyerQuotationR
               </div>
             </div>
 
-            {/* G. Back-to-Back LC Details */}
-            <div className="border border-slate-300 rounded-xl overflow-hidden bg-white shadow-xs">
-              <div className="bg-slate-100/90 px-3.5 py-2 border-b border-slate-300 flex items-center justify-between">
-                <span className="text-[11px] font-black uppercase tracking-wider text-slate-900">
-                  Back-to-Back LC Details
-                </span>
-                <span className="text-[10px] font-mono text-slate-500">
-                  Material %
-                </span>
-              </div>
-
-              <div className="p-3">
-                <table className="w-full text-xs text-left">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-[9.5px] uppercase font-bold text-slate-500">
-                    <tr>
-                      <th className="py-1.5 px-2">Item</th>
-                      <th className="py-1.5 px-2 text-right">Material ($)</th>
-                      <th className="py-1.5 px-2 text-right">% FOB</th>
-                      <th className="py-1.5 px-2 text-right">% MAT</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-[11.5px]">
-                    {b2bItems.map((b, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50">
-                        <td className="py-1.5 px-2 font-semibold text-slate-800">
-                          {b.item}
-                          {b.source && (
-                            <span className="ml-1.5 text-[9.5px] font-normal text-slate-500">
-                              ({b.source})
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-1.5 px-2 text-right font-mono font-bold text-slate-900">
-                          ${b.material.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </td>
-                        <td className="py-1.5 px-2 text-right font-mono text-indigo-700">
-                          {b.pctFob.toFixed(1)}%
-                        </td>
-                        <td className="py-1.5 px-2 text-right font-mono font-bold text-slate-700">
-                          {b.pctMat}%
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="bg-slate-100 font-black border-t-2 border-slate-300 text-xs">
-                      <td className="py-2 px-2 uppercase text-[10px]">Total Material:</td>
-                      <td className="py-2 px-2 text-right font-mono text-indigo-700">
-                        ${totalB2BMaterial.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </td>
-                      <td className="py-2 px-2 text-right font-mono text-indigo-700">
-                        {totalB2BPctFob.toFixed(1)}%
-                      </td>
-                      <td className="py-2 px-2 text-right font-mono text-indigo-700">
-                        —
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
-
-            {/* H. Key Takeaways Panel */}
+            {/* G. Key Takeaways Panel */}
             <div className="border border-indigo-200 bg-indigo-50/40 rounded-xl p-4 space-y-2.5">
               <div className="flex items-center gap-2 text-indigo-900">
                 <CheckCircle2 className="size-4 text-indigo-600" />
@@ -1452,7 +1338,15 @@ export function BuyerQuotationReport({ record, onBack, onEdit }: BuyerQuotationR
             {/* Formal Signatures Box */}
             <div className="pt-6 border-t border-slate-300 grid grid-cols-2 gap-4 text-center text-xs">
               <div className="border-t border-slate-400 pt-1">
-                <p className="font-bold text-slate-800">{record.merchandiser || "Tanvir Ahmed"}</p>
+                <p className="font-bold text-slate-800">
+                  {(() => {
+                    const m = (record.merchandiser || "").trim();
+                    if (!m || m.toLowerCase().includes("shapno") || m.toLowerCase().includes("tanvir")) {
+                      return "Rashidul Islam";
+                    }
+                    return m;
+                  })()}
+                </p>
                 <p className="text-[10px] text-slate-500">Merchandiser</p>
               </div>
               <div className="border-t border-slate-400 pt-1">

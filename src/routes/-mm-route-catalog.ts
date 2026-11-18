@@ -833,9 +833,17 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     description: "Pre-costing calculations, fabric/trims consumption, CM estimation, and margin analysis.",
     modificationPercent: 100,
     status: "Completed",
-    lastModified: "2026-11-14",
-    totalRevisions: 22,
+    lastModified: "2026-11-17",
+    totalRevisions: 23,
     changeHistory: [
+      {
+        id: "chg-1794863700000",
+        date: "2026-11-17 13:15",
+        type: "UI Enhancement",
+        description:
+          "Pre-Cost Sheet Report Updates: (1) Removed 'Pakiza Knit Composite Ltd.', company contact details, and tagline from the report header, replaced with clean 'Pre-Cost Sheet Report' heading. (2) Completely removed the Back-to-Back LC Details section and unused B2B data structures. (3) Updated Merchandiser signature block to display 'Rashidul Islam' and aligned the preparation step in the timeline.",
+        percentDelta: 0,
+      },
       {
         id: "chg-1794708600002",
         date: "2026-11-14 09:00",

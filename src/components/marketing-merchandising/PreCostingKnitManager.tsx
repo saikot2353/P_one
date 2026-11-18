@@ -1684,7 +1684,7 @@ const INITIAL_RECORDS: PreCostingRecord[] = [
     ourRef: "REF-99238",
     acHolder: "Md. Rashidul Islam",
     buyer: "H&M Hennes & Mauritz",
-    merchandiser: "Tanvir Ahmed",
+    merchandiser: "Rashidul Islam",
     style: "HM-KT-8841",
     styleDescription: "Ladies Ribbed Henley Neck Knit T-Shirt",
     season: "Autumn / Winter 2026",
@@ -2358,7 +2358,7 @@ export function PreCostingKnitManager({
         if (u.name) return u.name;
       }
     } catch {}
-    return MM_MERCHANTS_MASTER[0]?.name || "Tanvir Ahmed";
+    return MM_MERCHANTS_MASTER[0]?.name || "Rashidul Islam";
   };
 
   // Attachment Modal & Lightbox Preview States
