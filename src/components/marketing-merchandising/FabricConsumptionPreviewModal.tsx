@@ -238,13 +238,13 @@ export default function FabricConsumptionPreviewModal({
                 </span>
               </div>
 
-              {/* 5. Job No. */}
+              {/* 5. Fabrication */}
               <div className="p-3 col-span-2 sm:col-span-1">
                 <span className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-0.5">
-                  Job No.
+                  Fabrication *
                 </span>
-                <span className="font-bold font-mono text-xs sm:text-sm text-teal-700 dark:text-teal-400 block">
-                  {data.jobId || "JOB-2026-0842"}
+                <span className="font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200 block">
+                  {data.fabrication || "—"}
                 </span>
               </div>
             </div>
@@ -418,21 +418,21 @@ export default function FabricConsumptionPreviewModal({
                 CAD Attachments & Visual Layouts
               </span>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* GMT Image */}
                 {data.gmtImage && (
-                  <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 bg-white dark:bg-slate-900 flex flex-col items-center">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-teal-700 dark:text-teal-400 mb-1.5">
+                  <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-white dark:bg-slate-900 flex flex-col">
+                    <span className="text-xs font-black uppercase tracking-wider text-teal-700 dark:text-teal-400 mb-2">
                       GMT Reference Image
                     </span>
-                    <div className="w-full h-36 bg-slate-50 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center p-1 border border-slate-100 dark:border-slate-800">
+                    <div className="w-full min-h-[220px] max-h-[460px] bg-slate-50 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center p-2 border border-slate-100 dark:border-slate-800">
                       <img
                         src={typeof data.gmtImage === "string" ? data.gmtImage : data.gmtImage.dataUrl}
                         alt="GMT Reference"
-                        className="max-h-full max-w-full object-contain"
+                        className="w-full h-auto max-h-[440px] object-contain rounded"
                       />
                     </div>
-                    <span className="text-[10px] text-slate-500 font-semibold mt-1.5 truncate max-w-full">
+                    <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold mt-2 truncate">
                       {typeof data.gmtImage === "string" ? "GMT Image" : data.gmtImage.name}
                     </span>
                   </div>
@@ -443,19 +443,19 @@ export default function FabricConsumptionPreviewModal({
                   data.cadImages.map((img, idx) => (
                     <div
                       key={img.id || idx}
-                      className="border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 bg-white dark:bg-slate-900 flex flex-col items-center"
+                      className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-white dark:bg-slate-900 flex flex-col"
                     >
-                      <span className="text-[10px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-400 mb-1.5">
+                      <span className="text-xs font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-400 mb-2">
                         CAD Marker #{idx + 1}
                       </span>
-                      <div className="w-full h-36 bg-slate-50 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center p-1 border border-slate-100 dark:border-slate-800">
+                      <div className="w-full min-h-[220px] max-h-[460px] bg-slate-50 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center p-2 border border-slate-100 dark:border-slate-800">
                         <img
                           src={img.dataUrl}
                           alt={img.name || `CAD Marker ${idx + 1}`}
-                          className="max-h-full max-w-full object-contain"
+                          className="w-full h-auto max-h-[440px] object-contain rounded"
                         />
                       </div>
-                      <span className="text-[10px] text-slate-500 font-semibold mt-1.5 truncate max-w-full">
+                      <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold mt-2 truncate">
                         {img.name || `Marker Layout ${idx + 1}`}
                       </span>
                     </div>

@@ -590,7 +590,11 @@ export function FabricConsumptionCadForm({
     if (mode === "view") return;
     setRows((prev) => {
       const copy = [...prev];
-      const target = { ...copy[index], [field]: value };
+      let val = value;
+      if (field === "law") {
+        val = value === "" ? "" : Number(value);
+      }
+      const target = { ...copy[index], [field]: val };
 
       // Condumption conversion helper
       let condVal = 12;
@@ -601,19 +605,9 @@ export function FabricConsumptionCadForm({
         condVal = Number(target.condumption) === 1 ? 1 : 12;
       }
 
-      // If user toggled mode to Auto, recompute finishKgConsumption and waste10Consumption immediately
-      if (field === "calculationMode" && value === "Auto") {
-        const markerLength = Number(target.markerLength) || 0;
-        const diaFinish = Number(target.diaFinish) || 0;
-        const fabricGsm = Number(target.fabricGsm) || 0;
-        const law = Number(target.law) || 1550000;
-        const markerQty = Number(target.markerQty) || 1;
-        if (law > 0 && markerQty > 0) {
-          target.finishKgConsumption = Number(
-            (((markerLength * diaFinish * fabricGsm) / law / markerQty) * condVal).toFixed(3)
-          );
-        }
-        target.waste10Consumption = Number((target.finishKgConsumption * 1.1).toFixed(3));
+      // If user updated law, ensure calculation mode is Auto so both columns recompute dynamically
+      if (field === "law") {
+        target.calculationMode = "Auto";
       }
 
       // If user changed diaFinish or cuttableFinish, recompute diaCut
@@ -623,21 +617,22 @@ export function FabricConsumptionCadForm({
         target.diaCut = Number((df - cf).toFixed(2));
       }
 
-      // If in Auto mode and any formula variable changed, recalculate finish consumption & waste+10%
+      // If in Auto mode (or toggled to Auto / updated law) and any formula variable changed, recalculate finish consumption & waste+10%
       if (
-        target.calculationMode === "Auto" &&
+        (target.calculationMode === "Auto" || (field === "calculationMode" && value === "Auto") || field === "law") &&
         (field === "markerLength" ||
           field === "diaFinish" ||
           field === "fabricGsm" ||
           field === "law" ||
           field === "markerQty" ||
-          field === "condumption")
+          field === "condumption" ||
+          (field === "calculationMode" && value === "Auto"))
       ) {
-        const ml = field === "markerLength" ? Number(value) || 0 : Number(target.markerLength) || 0;
-        const df = field === "diaFinish" ? Number(value) || 0 : Number(target.diaFinish) || 0;
-        const gsm = field === "fabricGsm" ? Number(value) || 0 : Number(target.fabricGsm) || 0;
-        const law = field === "law" ? Number(value) || 1550000 : Number(target.law) || 1550000;
-        const mq = field === "markerQty" ? Number(value) || 1 : Number(target.markerQty) || 1;
+        const ml = Number(target.markerLength) || 0;
+        const df = Number(target.diaFinish) || 0;
+        const gsm = Number(target.fabricGsm) || 0;
+        const law = Number(target.law) || 1550000;
+        const mq = Number(target.markerQty) || 1;
 
         if (law > 0 && mq > 0) {
           target.finishKgConsumption = Number((((ml * df * gsm) / law / mq) * condVal).toFixed(3));
@@ -646,7 +641,7 @@ export function FabricConsumptionCadForm({
       }
 
       // In Manual mode, allow user to set finishKgConsumption or waste10Consumption manually
-      if (target.calculationMode === "Manual") {
+      if (target.calculationMode === "Manual" && field !== "law") {
         if (field === "finishKgConsumption") {
           target.finishKgConsumption = Number(value) || 0;
           // If waste10Consumption is not yet set or was zero, update it as default 1.1
@@ -1469,13 +1464,13 @@ export function FabricConsumptionCadForm({
                         {mode === "cad-response" ? (
                           <input
                             type="number"
-                            value={row.law || 1550000}
+                            value={row.law ?? 1550000}
                             onChange={(e) => handleUpdateCadRow(idx, "law", e.target.value)}
                             className="w-full h-8 px-2 text-left rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono text-rose-600 font-bold"
                           />
                         ) : (
                           <span className="font-mono text-rose-600 font-bold block text-left">
-                            {row.law || 1550000}
+                            {row.law ?? 1550000}
                           </span>
                         )}
                       </td>
@@ -1623,173 +1618,176 @@ export function FabricConsumptionCadForm({
       )}
 
       {/* ── SECTION 3: CAD ATTACHMENTS (GMT & CAD IMAGES) ──────────── */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-4 bg-teal-600 rounded-full inline-block" />
-            <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
-              <Layers className="size-4 text-teal-600" />
-              <span>3. CAD Attachments</span>
-            </h2>
-          </div>
-          <span className="text-[11px] text-slate-400 font-medium">
-            Upload style garment references & CAD marker visual layouts
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* A. GMT Image (Single Upload) */}
-          <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-950/30 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 block">
-                  GMT Image
-                </label>
-                <p className="text-[11px] text-slate-500">Single style reference garment photo</p>
-              </div>
-              {gmtImage && mode !== "view" && (
-                <button
-                  type="button"
-                  onClick={handleRemoveGmtImage}
-                  className="px-2 py-1 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
-                >
-                  <Trash2 className="size-3.5" />
-                  <span>Remove</span>
-                </button>
-              )}
+      {/* Hidden when creating a new request; visible in CAD response mode, view mode, or when CAD data exists */}
+      {(mode === "cad-response" || mode === "view" || (mode !== "create" && status !== "Draft")) && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-4 bg-teal-600 rounded-full inline-block" />
+              <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
+                <Layers className="size-4 text-teal-600" />
+                <span>3. CAD Attachments</span>
+              </h2>
             </div>
-
-            {gmtImage ? (
-              <div className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col items-center p-2">
-                <div
-                  className="relative w-full h-48 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center cursor-pointer"
-                  onClick={() => setPreviewZoomImage({ url: gmtImage.dataUrl, title: `GMT Image — ${gmtImage.name}` })}
-                >
-                  <img
-                    src={gmtImage.dataUrl}
-                    alt={gmtImage.name}
-                    className="w-full h-full object-contain"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1.5 text-xs font-bold">
-                    <Maximize2 className="size-4" />
-                    <span>Click to Zoom</span>
-                  </div>
-                </div>
-                <div className="w-full mt-2 flex items-center justify-between text-xs px-1 text-slate-600 dark:text-slate-300">
-                  <span className="font-semibold truncate max-w-[200px]" title={gmtImage.name}>
-                    {gmtImage.name}
-                  </span>
-                  {gmtImage.size && <span className="font-mono text-[11px] text-slate-400">{gmtImage.size}</span>}
-                </div>
-              </div>
-            ) : (
-              <label
-                className={`border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/10 transition-all ${
-                  mode === "view" ? "opacity-60 pointer-events-none" : ""
-                }`}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleGmtImageUpload}
-                  className="hidden"
-                  disabled={mode === "view"}
-                />
-                <div className="p-3 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 mb-2">
-                  <Upload className="size-5" />
-                </div>
-                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Click to Upload GMT Image
-                </span>
-                <span className="text-[10px] text-slate-400 mt-1">PNG, JPG, WEBP up to 5MB</span>
-              </label>
-            )}
+            <span className="text-[11px] text-slate-400 font-medium">
+              Upload style garment references & CAD marker visual layouts
+            </span>
           </div>
 
-          {/* B. CAD Image (Multiple Uploads) */}
-          <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-950/30 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 block">
-                  CAD Image(s)
-                </label>
-                <p className="text-[11px] text-slate-500">Multiple CAD marker layouts & cut plans</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* A. CAD Image (Multiple Uploads) — Left Box */}
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-950/30 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 block">
+                    CAD Image(s)
+                  </label>
+                  <p className="text-[11px] text-slate-500">Multiple CAD marker layouts & cut plans</p>
+                </div>
+                {mode !== "view" && (
+                  <label className="px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold cursor-pointer flex items-center gap-1.5 transition shadow-xs">
+                    <Plus className="size-3.5" />
+                    <span>Add CAD Images</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleCadImagesUpload}
+                      className="hidden"
+                    />
+                  </label>
+                )}
               </div>
-              {mode !== "view" && (
-                <label className="px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold cursor-pointer flex items-center gap-1.5 transition shadow-xs">
-                  <Plus className="size-3.5" />
-                  <span>Add CAD Images</span>
+
+              {cadImages.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-56 overflow-y-auto p-1">
+                  {cadImages.map((img) => (
+                    <div
+                      key={img.id}
+                      className="group relative rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5 flex flex-col items-center"
+                    >
+                      <div
+                        className="relative w-full h-24 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center cursor-pointer"
+                        onClick={() => setPreviewZoomImage({ url: img.dataUrl, title: `CAD Marker — ${img.name}` })}
+                      >
+                        <img src={img.dataUrl} alt={img.name} className="w-full h-full object-contain" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                          <Maximize2 className="size-4" />
+                        </div>
+                      </div>
+                      <div className="w-full mt-1.5 flex items-center justify-between text-[11px] px-1 text-slate-600 dark:text-slate-300">
+                        <span className="font-semibold truncate max-w-[90px]" title={img.name}>
+                          {img.name}
+                        </span>
+                        {mode !== "view" && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveCadImage(img.id)}
+                            className="text-rose-500 hover:text-rose-700 cursor-pointer ml-1"
+                            title="Delete CAD Image"
+                          >
+                            <X className="size-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <label
+                  className={`border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/10 transition-all ${
+                    mode === "view" ? "opacity-60 pointer-events-none" : ""
+                  }`}
+                >
                   <input
                     type="file"
                     accept="image/*"
                     multiple
                     onChange={handleCadImagesUpload}
                     className="hidden"
+                    disabled={mode === "view"}
                   />
+                  <div className="p-3 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 mb-2">
+                    <Upload className="size-5" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    Click to Upload CAD Images
+                  </span>
+                  <span className="text-[10px] text-slate-400 mt-1">Select one or multiple CAD files</span>
                 </label>
               )}
             </div>
 
-            {cadImages.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-56 overflow-y-auto p-1">
-                {cadImages.map((img) => (
-                  <div
-                    key={img.id}
-                    className="group relative rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5 flex flex-col items-center"
+            {/* B. GMT Image (Single Upload) — Right Box */}
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-950/30 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 block">
+                    GMT Image
+                  </label>
+                  <p className="text-[11px] text-slate-500">Single style reference garment photo</p>
+                </div>
+                {gmtImage && mode !== "view" && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveGmtImage}
+                    className="px-2 py-1 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
                   >
-                    <div
-                      className="relative w-full h-24 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center cursor-pointer"
-                      onClick={() => setPreviewZoomImage({ url: img.dataUrl, title: `CAD Marker — ${img.name}` })}
-                    >
-                      <img src={img.dataUrl} alt={img.name} className="w-full h-full object-contain" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                        <Maximize2 className="size-4" />
-                      </div>
-                    </div>
-                    <div className="w-full mt-1.5 flex items-center justify-between text-[11px] px-1 text-slate-600 dark:text-slate-300">
-                      <span className="font-semibold truncate max-w-[90px]" title={img.name}>
-                        {img.name}
-                      </span>
-                      {mode !== "view" && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveCadImage(img.id)}
-                          className="text-rose-500 hover:text-rose-700 cursor-pointer ml-1"
-                          title="Delete CAD Image"
-                        >
-                          <X className="size-3.5" />
-                        </button>
-                      )}
+                    <Trash2 className="size-3.5" />
+                    <span>Remove</span>
+                  </button>
+                )}
+              </div>
+
+              {gmtImage ? (
+                <div className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col items-center p-2">
+                  <div
+                    className="relative w-full h-48 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center cursor-pointer"
+                    onClick={() => setPreviewZoomImage({ url: gmtImage.dataUrl, title: `GMT Image — ${gmtImage.name}` })}
+                  >
+                    <img
+                      src={gmtImage.dataUrl}
+                      alt={gmtImage.name}
+                      className="w-full h-full object-contain"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1.5 text-xs font-bold">
+                      <Maximize2 className="size-4" />
+                      <span>Click to Zoom</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <label
-                className={`border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/10 transition-all ${
-                  mode === "view" ? "opacity-60 pointer-events-none" : ""
-                }`}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleCadImagesUpload}
-                  className="hidden"
-                  disabled={mode === "view"}
-                />
-                <div className="p-3 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 mb-2">
-                  <Upload className="size-5" />
+                  <div className="w-full mt-2 flex items-center justify-between text-xs px-1 text-slate-600 dark:text-slate-300">
+                    <span className="font-semibold truncate max-w-[200px]" title={gmtImage.name}>
+                      {gmtImage.name}
+                    </span>
+                    {gmtImage.size && <span className="font-mono text-[11px] text-slate-400">{gmtImage.size}</span>}
+                  </div>
                 </div>
-                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Click to Upload CAD Images
-                </span>
-                <span className="text-[10px] text-slate-400 mt-1">Select one or multiple CAD files</span>
-              </label>
-            )}
+              ) : (
+                <label
+                  className={`border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/10 transition-all ${
+                    mode === "view" ? "opacity-60 pointer-events-none" : ""
+                  }`}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleGmtImageUpload}
+                    className="hidden"
+                    disabled={mode === "view"}
+                  />
+                  <div className="p-3 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 mb-2">
+                    <Upload className="size-5" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    Click to Upload GMT Image
+                  </span>
+                  <span className="text-[10px] text-slate-400 mt-1">PNG, JPG, WEBP up to 5MB</span>
+                </label>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ── Image Fullscreen Zoom Modal ── */}
       {previewZoomImage && (

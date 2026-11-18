@@ -28,6 +28,7 @@ import {
   getStoredMaterialIssues,
   getStoredStoreReturns,
   postStoreReturn,
+  isIssueReturnable,
 } from "@/lib/inventory-requisition-issue-data";
 import { DEFAULT_ITEMS, ItemProductMaster, getStoredData } from "@/lib/procurement-master-data";
 import { getItemTrackingMode } from "@/lib/item-tracking-utils";
@@ -94,9 +95,10 @@ function InvIssueReturnPage() {
   const isViewMode = searchParams.mode === "view";
   const isEditMode = searchParams.mode === "edit" || Boolean(existingReturn && !isViewMode);
 
-  // Issues eligible for return
+  // Issues eligible for return (Strictly marked as returnable with returnable qty > 0)
   const eligibleIssues = useMemo(() => {
     return issues.filter((iss) => {
+      if (!isIssueReturnable(iss)) return false;
       const returnable =
         iss.returnableQty !== undefined
           ? iss.returnableQty
@@ -107,7 +109,10 @@ function InvIssueReturnPage() {
 
   const [selectedIssueId, setSelectedIssueId] = useState<string>(() => {
     if (existingReturn) return existingReturn.issueId;
-    if (searchParams.issueId) return searchParams.issueId;
+    if (searchParams.issueId) {
+      const match = issues.find((i) => i.id === searchParams.issueId || i.issueNumber === searchParams.issueId);
+      if (match && isIssueReturnable(match)) return match.id;
+    }
     if (eligibleIssues.length > 0) return eligibleIssues[0].id;
     return "";
   });
@@ -189,20 +194,22 @@ function InvIssueReturnPage() {
     }
   }, [existingReturn, activeIssue]);
 
-  // Options for Searchable Material Issue ID select
+  // Options for Searchable Material Issue ID select (Strictly returnable issues)
   const issueOptions = useMemo(() => {
     const optionsMap = new Map<string, string>();
     eligibleIssues.forEach((iss) => {
-      optionsMap.set(iss.id, `${iss.issueNumber} — ${iss.issuedTo} (${iss.department})`);
+      if (isIssueReturnable(iss)) {
+        optionsMap.set(iss.id, `${iss.issueNumber} — ${iss.issuedTo} (${iss.department})`);
+      }
     });
-    if (activeIssue && !optionsMap.has(activeIssue.id)) {
+    if (activeIssue && (existingReturn || isIssueReturnable(activeIssue)) && !optionsMap.has(activeIssue.id)) {
       optionsMap.set(
         activeIssue.id,
         `${activeIssue.issueNumber} — ${activeIssue.issuedTo} (${activeIssue.department})`
       );
     }
     return Array.from(optionsMap.entries()).map(([value, label]) => ({ value, label }));
-  }, [eligibleIssues, activeIssue]);
+  }, [eligibleIssues, activeIssue, existingReturn]);
 
   // Handle Return Qty Change with strict validation
   const handleReturnQtyChange = (id: string, newQtyStr: string) => {

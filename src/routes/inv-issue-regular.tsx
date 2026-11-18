@@ -32,6 +32,8 @@ import {
   getStoredMaterialIssues,
   getAvailableStockForItem,
   postMaterialIssue,
+  isIssueReturnable,
+  setReturnableIssueStatus,
 } from "@/lib/inventory-requisition-issue-data";
 import {
   DEFAULT_ITEMS,
@@ -169,6 +171,25 @@ function InvIssueRegularPage() {
   const [remarks, setRemarks] = useState<string>(
     () => viewingIssueRecord?.remarks || ""
   );
+
+  // Is Returnable Item state (default: unchecked/false)
+  const [isReturnableItem, setIsReturnableItem] = useState<boolean>(() => {
+    if (viewingIssueRecord) {
+      return isIssueReturnable(viewingIssueRecord);
+    }
+    return false;
+  });
+
+  const handleToggleReturnable = (checked: boolean) => {
+    setIsReturnableItem(checked);
+    // Immediately persist returnable status in Local Storage
+    if (issueNumber) {
+      setReturnableIssueStatus(issueNumber, checked);
+    }
+    if (viewingIssueRecord?.id) {
+      setReturnableIssueStatus(viewingIssueRecord.id, checked);
+    }
+  };
 
   // Items State (loaded from viewingIssueRecord, activeMR, or added dynamically in Direct Issue)
   const [issueItems, setIssueItems] = useState<MaterialIssueItem[]>([]);
@@ -617,9 +638,15 @@ function InvIssueRegularPage() {
       status: "Posted",
       items: validItems,
       remarks,
+      isReturnableItem,
+      isReturnable: isReturnableItem,
       previouslyReturnedQty: viewingIssueRecord?.previouslyReturnedQty || 0,
       returnableQty: totalIssueQuantity,
     };
+
+    // Save returnable status to Local Storage
+    setReturnableIssueStatus(issueToSave.id, isReturnableItem);
+    setReturnableIssueStatus(issueToSave.issueNumber, isReturnableItem);
 
     // Deducts stock, updates MR if requisition-linked, saves issue
     postMaterialIssue(issueToSave);
@@ -649,6 +676,7 @@ function InvIssueRegularPage() {
         { label: "Department", value: isIssueByRequisition ? (activeMR?.department || "-") : directDepartment },
         { label: "Issued To", value: isIssueByRequisition ? (activeMR?.requestedBy || "-") : directIssuedTo },
         { label: "Warehouse / Store", value: selectedIssueStore || "-" },
+        { label: "Is Returnable Item?", value: isReturnableItem ? "Yes" : "No" },
       ],
       tableHeaders: isIssueByRequisition
         ? [
@@ -964,8 +992,31 @@ function InvIssueRegularPage() {
                     )}
                   </div>
 
-                  {/* Field 6: Remarks / Dispatch Notes (Spans Row 2 across all 5 cols) */}
-                  <div className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-5">
+                  {/* Field 6: Is Returnable Item? */}
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                      Is Returnable Item?
+                    </label>
+                    <div className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 flex items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        id="isReturnableItemDirect"
+                        disabled={isViewMode}
+                        checked={isReturnableItem}
+                        onChange={(e) => handleToggleReturnable(e.target.checked)}
+                        className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
+                      />
+                      <label
+                        htmlFor="isReturnableItemDirect"
+                        className="text-xs font-semibold text-slate-700 cursor-pointer select-none"
+                      >
+                        Returnable Item
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Field 7: Remarks / Dispatch Notes (Spans Row 2 across remaining 4 cols) */}
+                  <div className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-4">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                       Remarks / Dispatch Notes
                     </label>
@@ -1091,8 +1142,31 @@ function InvIssueRegularPage() {
                     />
                   </div>
 
-                  {/* Row 2 - Field 8: Remarks / Dispatch Notes (Spans remaining 3 cols: 1+1+3 = 5 cols) */}
-                  <div className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-3">
+                  {/* Row 2 - Field 8: Is Returnable Item? (Immediately after MR Required Date) */}
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                      Is Returnable Item?
+                    </label>
+                    <div className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 flex items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        id="isReturnableItemReq"
+                        disabled={isViewMode}
+                        checked={isReturnableItem}
+                        onChange={(e) => handleToggleReturnable(e.target.checked)}
+                        className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
+                      />
+                      <label
+                        htmlFor="isReturnableItemReq"
+                        className="text-xs font-semibold text-slate-700 cursor-pointer select-none"
+                      >
+                        Returnable Item
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Row 2 - Field 9: Remarks / Dispatch Notes (Spans remaining 2 cols: 1+1+1+2 = 5 cols) */}
+                  <div className="col-span-1 sm:col-span-2 md:col-span-2 lg:col-span-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                       Remarks / Dispatch Notes
                     </label>

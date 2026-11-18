@@ -24,12 +24,14 @@ import {
   StoreReturn,
   getStoredMaterialIssues,
   getStoredStoreReturns,
+  isIssueReturnable,
 } from "@/lib/inventory-requisition-issue-data";
 import { DEFAULT_WAREHOUSES, getStoredData } from "@/lib/procurement-master-data";
 import {
   StandardPreviewReportModal,
   StandardReportData,
 } from "@/components/reports/StandardPreviewReportModal";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export const Route = createFileRoute("/inv-return-to-store-list")({
   head: () => ({
@@ -47,7 +49,11 @@ export const Route = createFileRoute("/inv-return-to-store-list")({
 function ReturnToStoreListPage() {
   const navigate = useNavigate();
 
-  const [issues] = useState<MaterialIssue[]>(() => getStoredMaterialIssues());
+  const [rawIssues] = useState<MaterialIssue[]>(() => getStoredMaterialIssues());
+  // Strictly filter only those issues marked as Returnable Item
+  const issues = useMemo(() => {
+    return rawIssues.filter((iss) => isIssueReturnable(iss));
+  }, [rawIssues]);
   const [returns] = useState<StoreReturn[]>(() => getStoredStoreReturns());
   const warehouses = getStoredData("proc_warehouses_v2", DEFAULT_WAREHOUSES);
 
@@ -82,15 +88,38 @@ function ReturnToStoreListPage() {
     return Array.from(set);
   }, [issues]);
 
-  // Unique item names for Item Name filter suggestions
-  const allUniqueItemNames = useMemo(() => {
-    const set = new Set<string>();
-    issues.forEach((i) => {
-      i.items?.forEach((it) => {
-        if (it.itemName) set.add(it.itemName);
+  // Unique item options for smart searchable dropdown filter
+  const itemFilterOptions = useMemo(() => {
+    const itemMap = new Map<string, { code?: string; count: number }>();
+    issues.forEach((iss) => {
+      iss.items?.forEach((it) => {
+        if (it.itemName) {
+          const trimmedName = it.itemName.trim();
+          const existing = itemMap.get(trimmedName);
+          if (existing) {
+            existing.count += 1;
+            if (!existing.code && it.itemCode) existing.code = it.itemCode;
+          } else {
+            itemMap.set(trimmedName, { code: it.itemCode, count: 1 });
+          }
+        }
       });
     });
-    return Array.from(set).sort();
+
+    const opts: { value: string; label: string }[] = [
+      { value: "ALL", label: "All Items" },
+    ];
+
+    Array.from(itemMap.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .forEach(([itemName, meta]) => {
+        opts.push({
+          value: itemName,
+          label: meta.code ? `${itemName} (${meta.code})` : itemName,
+        });
+      });
+
+    return opts;
   }, [issues]);
 
   // Issuer returns for D button modal
@@ -150,11 +179,13 @@ function ReturnToStoreListPage() {
       if (employeeFilter.trim() && !iss.issuedTo.toLowerCase().includes(employeeFilter.toLowerCase())) {
         return false;
       }
-      if (itemNameFilter.trim()) {
+      if (itemNameFilter.trim() && itemNameFilter.trim() !== "ALL") {
         const q = itemNameFilter.trim().toLowerCase();
         const hasMatchingItem = iss.items?.some(
           (it) =>
+            it.itemName.toLowerCase() === q ||
             it.itemName.toLowerCase().includes(q) ||
+            (it.itemCode && it.itemCode.toLowerCase() === q) ||
             (it.itemCode && it.itemCode.toLowerCase().includes(q))
         );
         if (!hasMatchingItem) return false;
@@ -437,24 +468,29 @@ function ReturnToStoreListPage() {
                       />
                     </div>
 
-                    {/* 4. Item Name (Added after Employee / Issued To) */}
+                    {/* 4. Item Name (Smart Searchable Dropdown with dynamic filtering) */}
                     <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                        Item Name
-                      </label>
-                      <input
-                        type="text"
-                        list="return-queue-items-list"
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                          Item Name
+                        </label>
+                        {itemNameFilter && itemNameFilter !== "ALL" && (
+                          <button
+                            type="button"
+                            onClick={() => setItemNameFilter("ALL")}
+                            className="text-[10px] text-orange-600 hover:text-orange-700 font-semibold cursor-pointer"
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                      <SearchableSelect
+                        options={itemFilterOptions}
+                        value={itemNameFilter || "ALL"}
+                        onChange={(val) => setItemNameFilter(val === "ALL" ? "" : val)}
                         placeholder="Search item name or code..."
-                        value={itemNameFilter}
-                        onChange={(e) => setItemNameFilter(e.target.value)}
-                        className="w-full h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                        className="w-full text-xs font-semibold text-slate-700"
                       />
-                      <datalist id="return-queue-items-list">
-                        {allUniqueItemNames.map((name) => (
-                          <option key={name} value={name} />
-                        ))}
-                      </datalist>
                     </div>
 
                     {/* 5. Department */}

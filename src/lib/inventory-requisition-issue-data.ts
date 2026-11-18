@@ -119,7 +119,9 @@ export interface MaterialIssue {
   status: "Draft" | "Posted";
   items: MaterialIssueItem[];
   remarks?: string;
-  // Returnable tracking counters
+  // Returnable tracking counters & status
+  isReturnableItem?: boolean;
+  isReturnable?: boolean;
   previouslyReturnedQty: number;
   returnableQty: number;
 }
@@ -401,6 +403,8 @@ export const DEFAULT_MATERIAL_ISSUES: MaterialIssue[] = [
     totalItems: 2,
     totalIssueQty: 600,
     status: "Posted",
+    isReturnableItem: true,
+    isReturnable: true,
     previouslyReturnedQty: 50,
     returnableQty: 550,
     items: [
@@ -463,6 +467,8 @@ export const DEFAULT_MATERIAL_ISSUES: MaterialIssue[] = [
     totalItems: 1,
     totalIssueQty: 50,
     status: "Posted",
+    isReturnableItem: false,
+    isReturnable: false,
     previouslyReturnedQty: 0,
     returnableQty: 50,
     items: [
@@ -649,7 +655,48 @@ const STORAGE_KEYS = {
   MATERIAL_REQUISITIONS: "cripton_material_requisitions_v2",
   MATERIAL_ISSUES: "cripton_material_issues_v2",
   STORE_RETURNS: "cripton_store_returns_v2",
+  RETURNABLE_ISSUES_MAP: "cripton_returnable_issues_map_v1",
 };
+
+export function getReturnableIssuesMap(): Record<string, boolean> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.RETURNABLE_ISSUES_MAP);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function setReturnableIssueStatus(issueIdOrNumber: string, isReturnable: boolean): void {
+  if (typeof window === "undefined" || !issueIdOrNumber) return;
+  try {
+    const map = getReturnableIssuesMap();
+    map[issueIdOrNumber] = isReturnable;
+    localStorage.setItem(STORAGE_KEYS.RETURNABLE_ISSUES_MAP, JSON.stringify(map));
+  } catch (e) {
+    console.error("Failed to save returnable issue status:", e);
+  }
+}
+
+export function isIssueReturnable(issue: Partial<MaterialIssue> | null | undefined): boolean {
+  if (!issue) return false;
+  // First check localStorage map if explicitly tracked
+  if (typeof window !== "undefined") {
+    const map = getReturnableIssuesMap();
+    if (issue.id && map[issue.id] !== undefined) return Boolean(map[issue.id]);
+    if (issue.issueNumber && map[issue.issueNumber] !== undefined) return Boolean(map[issue.issueNumber]);
+  }
+
+  // Next check issue property if defined
+  if (issue.isReturnableItem === true || issue.isReturnable === true) return true;
+  if (issue.isReturnableItem === false || issue.isReturnable === false) return false;
+
+  // Fallback for default seed issue iss-2026-001 (ISS-2026-0001)
+  if (issue.id === "iss-2026-001" || issue.issueNumber === "ISS-2026-0001") return true;
+
+  return false;
+}
 
 export function getStoredMaterialRequisitions(): MaterialRequisition[] {
   return getStoredData(STORAGE_KEYS.MATERIAL_REQUISITIONS, DEFAULT_MATERIAL_REQUISITIONS);
@@ -748,6 +795,10 @@ export function getAvailableStockForItem(warehouseStore: string, itemCode: strin
  * 4. Reduces stock dynamically.
  */
 export function postMaterialIssue(issue: MaterialIssue): void {
+  const isRet = isIssueReturnable(issue);
+  if (issue.id) setReturnableIssueStatus(issue.id, isRet);
+  if (issue.issueNumber) setReturnableIssueStatus(issue.issueNumber, isRet);
+
   const currentIssues = getStoredMaterialIssues();
   const updatedIssues = [issue, ...currentIssues.filter((i) => i.id !== issue.id)];
   setStoredMaterialIssues(updatedIssues);
