@@ -51,14 +51,14 @@ export interface SalarySheetColumn {
   labelEng: string;
   labelBng?: string;
   category:
-    | "none"
-    | "employee_info"
-    | "salary_breakdown"
-    | "attendance"
-    | "deduction"
-    | "overtime"
-    | "bonus"
-    | "summary_signature";
+  | "none"
+  | "employee_info"
+  | "salary_breakdown"
+  | "attendance"
+  | "deduction"
+  | "overtime"
+  | "bonus"
+  | "summary_signature";
   paramMapping: string;
   width?: string;
   align: "left" | "center" | "right";
@@ -368,25 +368,25 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
         const parsed = JSON.parse(saved);
         const upgraded = Array.isArray(parsed)
           ? parsed.map((t: SalarySheetTemplate) => {
-              const baseT = {
-                ...t,
-                groupBy: t.groupBy || "department",
-                sortMode: t.sortMode || "designation",
-                alphabeticalOrder: t.alphabeticalOrder || "asc",
+            const baseT = {
+              ...t,
+              groupBy: t.groupBy || "department",
+              sortMode: t.sortMode || "designation",
+              alphabeticalOrder: t.alphabeticalOrder || "asc",
+            };
+            if (t.id === "sheet-tpl-1") {
+              return {
+                ...baseT,
+                title: "Standard Full Landscape Salary",
+                employeeType: t.employeeType || "OFFICE STAFF",
+                columns:
+                  t.columns.length < 35
+                    ? JSON.parse(JSON.stringify(DEFAULT_SALARY_SHEET_COLUMNS))
+                    : t.columns,
               };
-              if (t.id === "sheet-tpl-1") {
-                return {
-                  ...baseT,
-                  title: "Standard Full Landscape Salary",
-                  employeeType: t.employeeType || "OFFICE STAFF",
-                  columns:
-                    t.columns.length < 35
-                      ? JSON.parse(JSON.stringify(DEFAULT_SALARY_SHEET_COLUMNS))
-                      : t.columns,
-                };
-              }
-              return baseT;
-            })
+            }
+            return baseT;
+          })
           : DEFAULT_SALARY_SHEET_TEMPLATES;
         setTemplates(upgraded);
         localStorage.setItem("salary_sheet_templates_data", JSON.stringify(upgraded));
@@ -1373,11 +1373,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <td className="px-5 py-4 text-center">
                         <button
                           onClick={() => handleToggleTemplateStatus(tpl.id)}
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all cursor-pointer ${
-                            tpl.isActive
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all cursor-pointer ${tpl.isActive
                               ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20"
                               : "bg-slate-500/10 text-slate-500 border-slate-500/20 hover:bg-slate-500/20"
-                          }`}
+                            }`}
                         >
                           {tpl.isActive ? "Active" : "Inactive"}
                         </button>
@@ -1469,11 +1468,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                   </button>
                   <button
                     onClick={() => setShowLivePreview(!showLivePreview)}
-                    className={`h-9 px-3.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
-                      showLivePreview
+                    className={`h-9 px-3.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${showLivePreview
                         ? "border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
                         : "border-border/60 bg-muted/40 text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <Eye className="size-3.5" />
                     {showLivePreview ? "Hide Live View" : "Show Live View"}
@@ -1509,22 +1507,20 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <button
                         type="button"
                         onClick={() => handleUpdateGrouping("department")}
-                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                          editingTemplate.groupBy !== "section"
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${editingTemplate.groupBy !== "section"
                             ? "bg-blue-600 text-white shadow-2xs"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         <Building2 className="size-3" /> Department Wise
                       </button>
                       <button
                         type="button"
                         onClick={() => handleUpdateGrouping("section")}
-                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                          editingTemplate.groupBy === "section"
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${editingTemplate.groupBy === "section"
                             ? "bg-blue-600 text-white shadow-2xs"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         <Split className="size-3" /> Section Wise
                       </button>
@@ -1541,22 +1537,20 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <button
                         type="button"
                         onClick={() => handleUpdateSortMode("designation")}
-                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                          editingTemplate.sortMode !== "alphabetical"
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${editingTemplate.sortMode !== "alphabetical"
                             ? "bg-purple-600 text-white shadow-2xs"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         <Briefcase className="size-3" /> Designation Wise
                       </button>
                       <button
                         type="button"
                         onClick={() => handleUpdateSortMode("alphabetical")}
-                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                          editingTemplate.sortMode === "alphabetical"
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${editingTemplate.sortMode === "alphabetical"
                             ? "bg-purple-600 text-white shadow-2xs"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         <ArrowDownAZ className="size-3" /> Alphabetical
                       </button>
@@ -1573,22 +1567,20 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <button
                         type="button"
                         onClick={() => handleUpdateAlphaOrder("asc")}
-                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                          editingTemplate.alphabeticalOrder !== "desc"
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${editingTemplate.alphabeticalOrder !== "desc"
                             ? "bg-emerald-600 text-white shadow-2xs"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         <ArrowDownAZ className="size-3" /> Ascending (A → Z)
                       </button>
                       <button
                         type="button"
                         onClick={() => handleUpdateAlphaOrder("desc")}
-                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                          editingTemplate.alphabeticalOrder === "desc"
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${editingTemplate.alphabeticalOrder === "desc"
                             ? "bg-emerald-600 text-white shadow-2xs"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         <ArrowUpZA className="size-3" /> Descending (Z → A)
                       </button>
@@ -1613,11 +1605,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                     key={cat.key}
                     type="button"
                     onClick={() => setActiveCategoryTab(cat.key)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                      activeCategoryTab === cat.key
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${activeCategoryTab === cat.key
                         ? "bg-blue-600 text-white shadow-xs"
                         : "bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     {cat.label} ({cat.count})
                   </button>
@@ -1760,11 +1751,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                               <button
                                 type="button"
                                 onClick={() => handleColumnUpdate(col.id, { align: "left" })}
-                                className={`p-1 rounded transition-colors ${
-                                  col.align === "left"
+                                className={`p-1 rounded transition-colors ${col.align === "left"
                                     ? "bg-background text-primary shadow-xs"
                                     : "text-muted-foreground hover:text-foreground"
-                                }`}
+                                  }`}
                                 title="Align Left"
                               >
                                 <AlignLeft className="size-3" />
@@ -1772,11 +1762,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                               <button
                                 type="button"
                                 onClick={() => handleColumnUpdate(col.id, { align: "center" })}
-                                className={`p-1 rounded transition-colors ${
-                                  col.align === "center"
+                                className={`p-1 rounded transition-colors ${col.align === "center"
                                     ? "bg-background text-primary shadow-xs"
                                     : "text-muted-foreground hover:text-foreground"
-                                }`}
+                                  }`}
                                 title="Align Center"
                               >
                                 <AlignCenter className="size-3" />
@@ -1784,11 +1773,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                               <button
                                 type="button"
                                 onClick={() => handleColumnUpdate(col.id, { align: "right" })}
-                                className={`p-1 rounded transition-colors ${
-                                  col.align === "right"
+                                className={`p-1 rounded transition-colors ${col.align === "right"
                                     ? "bg-background text-primary shadow-xs"
                                     : "text-muted-foreground hover:text-foreground"
-                                }`}
+                                  }`}
                                 title="Align Right"
                               >
                                 <AlignRight className="size-3" />
@@ -1801,11 +1789,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                             <button
                               type="button"
                               onClick={() => handleColumnUpdate(col.id, { isRotatedHeader: !col.isRotatedHeader })}
-                              className={`px-2 py-1 rounded-md text-[10px] font-bold border transition-colors cursor-pointer ${
-                                col.isRotatedHeader
+                              className={`px-2 py-1 rounded-md text-[10px] font-bold border transition-colors cursor-pointer ${col.isRotatedHeader
                                   ? "bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-800"
                                   : "bg-muted/30 text-muted-foreground border-border/40 hover:bg-muted"
-                              }`}
+                                }`}
                               title="Header Style: 90° Vertical vs Horizontal"
                             >
                               {col.isRotatedHeader ? "90° Vert" : "Horiz"}
@@ -1817,11 +1804,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                             <button
                               type="button"
                               onClick={() => handleColumnUpdate(col.id, { isRotatedValue: !col.isRotatedValue })}
-                              className={`px-2 py-1 rounded-md text-[10px] font-bold border transition-colors cursor-pointer ${
-                                col.isRotatedValue
+                              className={`px-2 py-1 rounded-md text-[10px] font-bold border transition-colors cursor-pointer ${col.isRotatedValue
                                   ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-800"
                                   : "bg-muted/30 text-muted-foreground border-border/40 hover:bg-muted"
-                              }`}
+                                }`}
                               title="Cell Value Style: 90° Vertical vs Horizontal"
                             >
                               {col.isRotatedValue ? "90° Vert" : "Horiz"}
@@ -1889,11 +1875,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <button
                         type="button"
                         onClick={() => setPreviewGroupFilter("all")}
-                        className={`px-2 py-0.5 rounded-lg transition-all cursor-pointer text-xs ${
-                          previewGroupFilter === "all"
+                        className={`px-2 py-0.5 rounded-lg transition-all cursor-pointer text-xs ${previewGroupFilter === "all"
                             ? "bg-background text-foreground shadow-2xs font-bold"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         All ({sortedSampleEmployees.length})
                       </button>
@@ -1902,11 +1887,10 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                           key={g.name}
                           type="button"
                           onClick={() => setPreviewGroupFilter(g.name)}
-                          className={`px-2 py-0.5 rounded-lg transition-all cursor-pointer text-xs ${
-                            previewGroupFilter === g.name
+                          className={`px-2 py-0.5 rounded-lg transition-all cursor-pointer text-xs ${previewGroupFilter === g.name
                               ? "bg-background text-primary shadow-2xs font-bold"
                               : "text-muted-foreground hover:text-foreground"
-                          }`}
+                            }`}
                         >
                           {g.name} ({g.count})
                         </button>
@@ -1918,18 +1902,16 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <button
                         type="button"
                         onClick={() => setPreviewLanguage("en")}
-                        className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                          previewLanguage === "en" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
-                        }`}
+                        className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${previewLanguage === "en" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
+                          }`}
                       >
                         English Headers
                       </button>
                       <button
                         type="button"
                         onClick={() => setPreviewLanguage("bn")}
-                        className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                          previewLanguage === "bn" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
-                        }`}
+                        className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${previewLanguage === "bn" ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground"
+                          }`}
                       >
                         বাংলা হেডার
                       </button>
@@ -2036,9 +2018,8 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                                     minWidth: colW,
                                     maxWidth: colW,
                                   }}
-                                  className={`border border-black font-extrabold uppercase bg-slate-100 ${
-                                    isNarrow ? "px-0 py-1 overflow-hidden" : "px-1 py-1.5"
-                                  } align-middle`}
+                                  className={`border border-black font-extrabold uppercase bg-slate-100 ${isNarrow ? "px-0 py-1 overflow-hidden" : "px-1 py-1.5"
+                                    } align-middle`}
                                 >
                                   {isRot ? (
                                     <div
@@ -2095,9 +2076,8 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                                     minWidth: colW,
                                     maxWidth: colW,
                                   }}
-                                  className={`border border-black font-extrabold uppercase bg-slate-100 text-black ${
-                                    isNarrow ? "px-0 py-1 overflow-hidden" : "px-1 py-1"
-                                  } ${isRot ? "h-[65px] align-middle" : "align-middle"}`}
+                                  className={`border border-black font-extrabold uppercase bg-slate-100 text-black ${isNarrow ? "px-0 py-1 overflow-hidden" : "px-1 py-1"
+                                    } ${isRot ? "h-[65px] align-middle" : "align-middle"}`}
                                 >
                                   {isRot ? (
                                     <div
@@ -2140,17 +2120,15 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                                       minWidth: colW,
                                       maxWidth: colW,
                                     }}
-                                    className={`border border-black ${
-                                      isNarrow
+                                    className={`border border-black ${isNarrow
                                         ? "px-0 py-0.5 overflow-hidden align-middle"
                                         : "px-1 py-1 align-middle"
-                                    } ${
-                                      col.align === "left"
+                                      } ${col.align === "left"
                                         ? "text-left"
                                         : col.align === "right"
-                                        ? "text-right font-mono"
-                                        : "text-center font-mono"
-                                    }`}
+                                          ? "text-right font-mono"
+                                          : "text-center font-mono"
+                                      }`}
                                   >
                                     {isValRot ? (
                                       <div
@@ -2196,9 +2174,8 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                                       minWidth: colW,
                                       maxWidth: colW,
                                     }}
-                                    className={`border border-black px-0.5 py-1 text-center font-black ${
-                                      isNarrow ? "overflow-hidden align-middle" : "align-middle"
-                                    }`}
+                                    className={`border border-black px-0.5 py-1 text-center font-black ${isNarrow ? "overflow-hidden align-middle" : "align-middle"
+                                      }`}
                                   >
                                     {isValRot ? (
                                       <div
@@ -2244,17 +2221,15 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                                     minWidth: colW,
                                     maxWidth: colW,
                                   }}
-                                  className={`border border-black font-mono font-bold ${
-                                    isNarrow
+                                  className={`border border-black font-mono font-bold ${isNarrow
                                       ? "px-0 py-0.5 overflow-hidden align-middle"
                                       : "px-1 py-1 align-middle"
-                                  } ${
-                                    col.align === "left"
+                                    } ${col.align === "left"
                                       ? "text-left"
                                       : col.align === "right"
-                                      ? "text-right"
-                                      : "text-center"
-                                  }`}
+                                        ? "text-right"
+                                        : "text-center"
+                                    }`}
                                 >
                                   {isValRot ? (
                                     <div
@@ -2375,22 +2350,20 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                     <button
                       type="button"
                       onClick={() => setNewGroupBy("department")}
-                      className={`py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
-                        newGroupBy === "department"
+                      className={`py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all ${newGroupBy === "department"
                           ? "bg-background text-primary shadow-2xs font-bold border border-border/60"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Department Wise
                     </button>
                     <button
                       type="button"
                       onClick={() => setNewGroupBy("section")}
-                      className={`py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
-                        newGroupBy === "section"
+                      className={`py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all ${newGroupBy === "section"
                           ? "bg-background text-primary shadow-2xs font-bold border border-border/60"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Section Wise
                     </button>
@@ -2404,22 +2377,20 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <button
                         type="button"
                         onClick={() => setNewSortMode("designation")}
-                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${
-                          newSortMode === "designation"
+                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${newSortMode === "designation"
                             ? "bg-background text-purple-600 shadow-2xs font-bold border border-border/60"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         Designation
                       </button>
                       <button
                         type="button"
                         onClick={() => setNewSortMode("alphabetical")}
-                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${
-                          newSortMode === "alphabetical"
+                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${newSortMode === "alphabetical"
                             ? "bg-background text-purple-600 shadow-2xs font-bold border border-border/60"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         Alphabetical
                       </button>
@@ -2432,22 +2403,20 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                       <button
                         type="button"
                         onClick={() => setNewAlphaOrder("asc")}
-                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${
-                          newAlphaOrder === "asc"
+                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${newAlphaOrder === "asc"
                             ? "bg-background text-emerald-600 shadow-2xs font-bold border border-border/60"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         Asc (A-Z)
                       </button>
                       <button
                         type="button"
                         onClick={() => setNewAlphaOrder("desc")}
-                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${
-                          newAlphaOrder === "desc"
+                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${newAlphaOrder === "desc"
                             ? "bg-background text-emerald-600 shadow-2xs font-bold border border-border/60"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         Desc (Z-A)
                       </button>
