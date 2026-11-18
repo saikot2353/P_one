@@ -1527,7 +1527,37 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                     </div>
                   </div>
 
-                  {/* 2. Primary Sort: Designation vs Alphabetical */}
+                  {/* 2. Alphabetical Order: Ascending vs Descending */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-foreground flex items-center gap-1">
+                      <ArrowUpDown className="size-3 text-emerald-600" />
+                      Sheet Grouping Order
+                    </label>
+                    <div className="grid grid-cols-2 gap-1 bg-background/80 p-0.5 rounded-lg border border-border/60">
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateAlphaOrder("asc")}
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${editingTemplate.alphabeticalOrder !== "desc"
+                          ? "bg-emerald-600 text-white shadow-2xs"
+                          : "text-muted-foreground hover:text-foreground"
+                          }`}
+                      >
+                        <ArrowDownAZ className="size-3" /> Ascending (A → Z)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateAlphaOrder("desc")}
+                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${editingTemplate.alphabeticalOrder === "desc"
+                          ? "bg-emerald-600 text-white shadow-2xs"
+                          : "text-muted-foreground hover:text-foreground"
+                          }`}
+                      >
+                        <ArrowUpZA className="size-3" /> Descending (Z → A)
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 3. Primary Sort: Designation vs Alphabetical */}
                   <div className="space-y-1">
                     <label className="text-[11px] font-bold text-foreground flex items-center gap-1">
                       <Briefcase className="size-3 text-purple-600" />
@@ -1552,37 +1582,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                           : "text-muted-foreground hover:text-foreground"
                           }`}
                       >
-                        <ArrowDownAZ className="size-3" /> Department Wise Descending
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 3. Alphabetical Order: Ascending vs Descending */}
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-foreground flex items-center gap-1">
-                      <ArrowUpDown className="size-3 text-emerald-600" />
-                      Alphabetical Order
-                    </label>
-                    <div className="grid grid-cols-2 gap-1 bg-background/80 p-0.5 rounded-lg border border-border/60">
-                      <button
-                        type="button"
-                        onClick={() => handleUpdateAlphaOrder("asc")}
-                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${editingTemplate.alphabeticalOrder !== "desc"
-                          ? "bg-emerald-600 text-white shadow-2xs"
-                          : "text-muted-foreground hover:text-foreground"
-                          }`}
-                      >
-                        <ArrowDownAZ className="size-3" /> Ascending (A → Z)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleUpdateAlphaOrder("desc")}
-                        className={`h-7.5 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${editingTemplate.alphabeticalOrder === "desc"
-                          ? "bg-emerald-600 text-white shadow-2xs"
-                          : "text-muted-foreground hover:text-foreground"
-                          }`}
-                      >
-                        <ArrowUpZA className="size-3" /> Descending (Z → A)
+                        <ArrowDownAZ className="size-3" /> Designation Wise Descending
                       </button>
                     </div>
                   </div>
@@ -2372,33 +2372,7 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
 
                 <div className="grid grid-cols-2 gap-2.5">
                   <div>
-                    <label className="font-semibold text-foreground/80 block mb-1">Primary Sort</label>
-                    <div className="grid grid-cols-2 gap-1 bg-muted/20 p-0.5 rounded-xl border border-border/50">
-                      <button
-                        type="button"
-                        onClick={() => setNewSortMode("designation")}
-                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${newSortMode === "designation"
-                          ? "bg-background text-purple-600 shadow-2xs font-bold border border-border/60"
-                          : "text-muted-foreground hover:text-foreground"
-                          }`}
-                      >
-                        Designation
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setNewSortMode("alphabetical")}
-                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${newSortMode === "alphabetical"
-                          ? "bg-background text-purple-600 shadow-2xs font-bold border border-border/60"
-                          : "text-muted-foreground hover:text-foreground"
-                          }`}
-                      >
-                        Alphabetical
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="font-semibold text-foreground/80 block mb-1">Alphabetical Order</label>
+                    <label className="font-semibold text-foreground/80 block mb-1">Sheet Grouping Order</label>
                     <div className="grid grid-cols-2 gap-1 bg-muted/20 p-0.5 rounded-xl border border-border/50">
                       <button
                         type="button"
@@ -2419,6 +2393,32 @@ export function SalarySheetConfiguration({ onBackToOverview }: Props) {
                           }`}
                       >
                         Desc (Z-A)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-foreground/80 block mb-1">Designation Ordering</label>
+                    <div className="grid grid-cols-2 gap-1 bg-muted/20 p-0.5 rounded-xl border border-border/50">
+                      <button
+                        type="button"
+                        onClick={() => setNewSortMode("designation")}
+                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${newSortMode === "designation"
+                          ? "bg-background text-purple-600 shadow-2xs font-bold border border-border/60"
+                          : "text-muted-foreground hover:text-foreground"
+                          }`}
+                      >
+                        Designation
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setNewSortMode("alphabetical")}
+                        className={`py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all ${newSortMode === "alphabetical"
+                          ? "bg-background text-purple-600 shadow-2xs font-bold border border-border/60"
+                          : "text-muted-foreground hover:text-foreground"
+                          }`}
+                      >
+                        Alphabetical
                       </button>
                     </div>
                   </div>
