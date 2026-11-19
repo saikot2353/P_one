@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { InventorySidebar } from "@/components/dashboard/InventorySidebar";
 import { InventoryTopbar } from "@/components/dashboard/InventoryTopbar";
@@ -8,6 +8,9 @@ import {
   Filter,
   Plus,
   Eye,
+  Pencil,
+  Trash2,
+  AlertTriangle,
   Calendar,
   Building2,
   Package,
@@ -21,7 +24,9 @@ import {
 import {
   OpeningStockRecord,
   getStoredOpeningStocks,
+  setStoredOpeningStocks,
 } from "@/lib/procurement-order-inventory-data";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/inv-opening-stock-list")({
   head: () => ({
@@ -39,7 +44,22 @@ export const Route = createFileRoute("/inv-opening-stock-list")({
 
 export function OpeningStockListPage() {
   const navigate = useNavigate();
-  const [openingRecords] = useState<OpeningStockRecord[]>(() => getStoredOpeningStocks());
+  const [openingRecords, setOpeningRecords] = useState<OpeningStockRecord[]>(() => getStoredOpeningStocks());
+  const [recordToDelete, setRecordToDelete] = useState<OpeningStockRecord | null>(null);
+
+  // Sync state with Local Storage
+  useEffect(() => {
+    setOpeningRecords(getStoredOpeningStocks());
+  }, []);
+
+  const handleConfirmDelete = () => {
+    if (!recordToDelete) return;
+    const updated = openingRecords.filter((r) => r.id !== recordToDelete.id);
+    setOpeningRecords(updated);
+    setStoredOpeningStocks(updated);
+    toast.success(`Opening Stock "${recordToDelete.openingStockId}" deleted successfully.`);
+    setRecordToDelete(null);
+  };
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
@@ -226,7 +246,7 @@ export function OpeningStockListPage() {
                     <th className="py-2.5 px-3 text-right font-bold w-24">Item Count</th>
                     <th className="py-2.5 px-3 text-right font-bold w-28">Total Qty</th>
                     <th className="py-2.5 px-3 text-right font-bold w-32">Total Valuation</th>
-                    <th className="py-2.5 px-3 text-center font-bold w-20">Action</th>
+                    <th className="py-2.5 px-3 text-center font-bold w-28 whitespace-nowrap">Transaction Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -276,20 +296,48 @@ export function OpeningStockListPage() {
                         <td className="py-2.5 px-3 text-right font-mono font-bold text-foreground whitespace-nowrap">
                           ৳ {rec.totalValue.toLocaleString()}
                         </td>
-                        <td className="py-2.5 px-3 text-center">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              navigate({
-                                to: "/inv-yarn-opening-stock",
-                                search: { mode: "view", id: rec.id, voucherNo: rec.openingStockId },
-                              })
-                            }
-                            className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 cursor-pointer transition-colors inline-flex items-center justify-center"
-                            title="View Opening Stock Form"
-                          >
-                            <Eye className="size-3.5" />
-                          </button>
+                        <td className="py-2.5 px-3 text-center whitespace-nowrap">
+                          <div className="flex items-center justify-center gap-1.5">
+                            {/* View Button */}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                navigate({
+                                  to: "/inv-yarn-opening-stock",
+                                  search: { mode: "view", id: rec.id, voucherNo: rec.openingStockId },
+                                })
+                              }
+                              className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 cursor-pointer transition-colors inline-flex items-center justify-center"
+                              title="View Opening Stock Form"
+                            >
+                              <Eye className="size-3.5" />
+                            </button>
+
+                            {/* Edit Button */}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                navigate({
+                                  to: "/inv-yarn-opening-stock",
+                                  search: { mode: "edit", id: rec.id, voucherNo: rec.openingStockId },
+                                })
+                              }
+                              className="p-1.5 rounded-lg border border-amber-200 dark:border-amber-800/60 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 cursor-pointer transition-colors inline-flex items-center justify-center"
+                              title="Edit Opening Stock Balance"
+                            >
+                              <Pencil className="size-3.5" />
+                            </button>
+
+                            {/* Delete Button */}
+                            <button
+                              type="button"
+                              onClick={() => setRecordToDelete(rec)}
+                              className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer transition-colors inline-flex items-center justify-center"
+                              title="Delete Opening Stock Record"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -382,6 +430,70 @@ export function OpeningStockListPage() {
                 className="px-4 py-2 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/80 text-foreground cursor-pointer"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog Modal */}
+      {recordToDelete && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-card w-full max-w-md rounded-2xl border border-border shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-rose-600">
+              <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800">
+                <AlertTriangle className="size-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-foreground">Confirm Delete</h3>
+                <p className="text-xs text-muted-foreground">Opening Stock Removal</p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-muted/30 border border-border space-y-1.5 text-xs">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Voucher ID:</span>
+                <span className="font-mono font-bold text-foreground">{recordToDelete.openingStockId}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Store / Warehouse:</span>
+                <span className="font-semibold text-foreground truncate max-w-[220px]" title={recordToDelete.storeName}>
+                  {recordToDelete.storeName}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Quantity:</span>
+                <span className="font-mono font-bold text-primary">
+                  {recordToDelete.totalQuantity.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Valuation:</span>
+                <span className="font-mono font-bold text-foreground">
+                  ৳ {recordToDelete.totalValue.toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Are you sure you want to delete Opening Stock voucher <strong className="text-foreground">{recordToDelete.openingStockId}</strong>? This action will permanently remove this record from the register.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setRecordToDelete(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/80 text-foreground transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-colors cursor-pointer"
+              >
+                <Trash2 className="size-3.5" />
+                <span>Confirm Delete</span>
               </button>
             </div>
           </div>

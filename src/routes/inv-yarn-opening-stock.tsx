@@ -82,13 +82,14 @@ export function OpeningStockPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const isViewMode = search.mode === "view";
+  const isEditMode = search.mode === "edit";
 
   const [openingRecords, setOpeningRecords] = useState<OpeningStockRecord[]>(() =>
     getStoredOpeningStocks()
   );
 
   const targetRecord = useMemo(() => {
-    if (!isViewMode) return null;
+    if (!isViewMode && !isEditMode) return null;
     return (
       openingRecords.find(
         (r) =>
@@ -96,10 +97,10 @@ export function OpeningStockPage() {
           (search.voucherNo && r.openingStockId === search.voucherNo) ||
           (search.id && r.openingStockId === search.id)
       ) ||
-      openingRecords[0] ||
+      (isViewMode ? openingRecords[0] : null) ||
       null
     );
-  }, [openingRecords, isViewMode, search.id, search.voucherNo]);
+  }, [openingRecords, isViewMode, isEditMode, search.id, search.voucherNo]);
 
   // Form State
   const [openingStockId] = useState(
@@ -468,7 +469,7 @@ export function OpeningStockPage() {
     }
 
     const newRecord: OpeningStockRecord = {
-      id: `os-${Date.now()}`,
+      id: isEditMode && targetRecord ? targetRecord.id : `os-${Date.now()}`,
       openingStockId,
       stockDate,
       storeId: currentStore.id,
@@ -500,7 +501,9 @@ export function OpeningStockPage() {
       })),
     };
 
-    const updated = [newRecord, ...openingRecords];
+    const updated = isEditMode && targetRecord
+      ? openingRecords.map((r) => (r.id === targetRecord.id ? newRecord : r))
+      : [newRecord, ...openingRecords];
     setOpeningRecords(updated);
     setStoredOpeningStocks(updated);
 
@@ -508,7 +511,9 @@ export function OpeningStockPage() {
     setIsWarehouseLocked(true);
 
     toast.success(
-      `Opening Stock "${openingStockId}" posted successfully! Initial inventory recorded for ${currentStore.storeName}.`
+      isEditMode
+        ? `Opening Stock "${openingStockId}" updated and saved successfully!`
+        : `Opening Stock "${openingStockId}" posted successfully! Initial inventory recorded for ${currentStore.storeName}.`
     );
     navigate({ to: "/inv-opening-stock-list" });
   };
@@ -544,6 +549,11 @@ export function OpeningStockPage() {
               {isViewMode && (
                 <span className="text-xs font-bold px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20">
                   View Mode
+                </span>
+              )}
+              {isEditMode && (
+                <span className="text-xs font-bold px-2.5 py-1 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                  Edit Mode
                 </span>
               )}
               <button
@@ -842,7 +852,7 @@ export function OpeningStockPage() {
                       onClick={handleSubmitOpeningStock}
                       className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all cursor-pointer"
                     >
-                      <CheckCircle2 className="size-4" /> Post Opening Stock
+                      <CheckCircle2 className="size-4" /> {isEditMode ? "Update & Save Opening Stock" : "Post Opening Stock"}
                     </button>
                   </>
                 ) : (
