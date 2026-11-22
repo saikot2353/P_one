@@ -294,6 +294,7 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "Initial Shift Setup", to: "/shift-control-center" },
       { label: "Shift Roster Assignment", to: "/shift-roster-assignment" },
+      { label: "Security Roster", to: "/security-roster" },
     ],
   },
   {
@@ -385,6 +386,7 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "OT Requisition", to: "/manage-overtime", search: { tab: "requisition" } },
       { label: "Approve OT Requisition", to: "/approve-overtime" },
+      { label: "Budget wise OT Req", to: "/budget-wise-ot-req" },
       { label: "OT Requisition List", to: "/manage-overtime", search: { tab: "requisition-list" } },
       { label: "Submit OT Req", to: "/manage-overtime", search: { tab: "submit" } },
       { label: "Submitted OT List", to: "/manage-overtime", search: { tab: "submitted-list" } },

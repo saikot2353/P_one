@@ -306,6 +306,12 @@ export interface UnifiedAidRecord {
   beneficiaryPhone?: string;
   beneficiaryNid?: string;
   beneficiaryAddress?: string;
+  beneficiaries?: Array<{
+    id?: string;
+    name: string;
+    phone?: string;
+    address?: string;
+  }>;
   institutionName?: string;
   institutionRepresentative?: string;
   institutionContactPhone?: string;
@@ -349,6 +355,14 @@ const INITIAL_UNIFIED_RECORDS: UnifiedAidRecord[] = [
     beneficiaryName: "Shakil Ahmed (Staff Self)",
     beneficiaryPhone: "01711-223344",
     beneficiaryAddress: "Sreepur, Gazipur",
+    beneficiaries: [
+      {
+        id: "ben-zk1-1",
+        name: "Shakil Ahmed (Staff Self)",
+        phone: "01711-223344",
+        address: "Sreepur, Gazipur",
+      },
+    ],
     asnafCategory: "Al-Masakin",
     justificationDetails: "Verified medical bills for urgent valve repair surgery at NICVD.",
     agencyStatus: "Verified",
@@ -4846,108 +4860,12 @@ function ZakatAndFinancialAidPage() {
                     </div>
                   </div>
 
-                  {/* 1. BENEFICIARY DETAILS (Recipient) */}
+                  {/* 1. AGENT DETAILS (At Top - Matching Reference Design) */}
                   <div className="border border-slate-300 rounded-md px-3.5 py-2 bg-white text-[11px]">
-                    <div className="text-[10px] font-bold text-slate-800 uppercase tracking-wider pb-1 mb-1.5 border-b border-slate-200 flex items-center justify-between">
-                      <span>BENEFICIARY DETAILS</span>
-                      <span className="text-[9px] font-mono text-slate-500 font-semibold">
-                        {viewRecord.fundType === "Zakat" ? "SHARIAH ELIGIBLE RECIPIENT" : "WELFARE RECIPIENT"}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1 gap-x-8">
-                      {/* Left Column */}
-                      <div className="space-y-1">
-                        <div className="flex items-center">
-                          <span className="w-26 sm:w-28 font-semibold text-slate-700 shrink-0">
-                            Beneficiary Name
-                          </span>
-                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="font-bold text-slate-900">
-                            {viewRecord.beneficiaryName || "Mokbul Hossain"}
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <span className="w-26 sm:w-28 font-semibold text-slate-700 shrink-0">
-                            Contact Phone
-                          </span>
-                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="font-mono text-slate-800">
-                            {viewRecord.beneficiaryPhone || "01933-778899"}
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <span className="w-26 sm:w-28 font-semibold text-slate-700 shrink-0">
-                            District / Area
-                          </span>
-                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="text-slate-800">
-                            {viewRecord.beneficiaryAddress || "Bhaluka, Mymensingh"}
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <span className="w-26 sm:w-28 font-semibold text-slate-700 shrink-0">
-                            Asnaf Category
-                          </span>
-                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="font-semibold text-slate-900">
-                            {viewRecord.asnafCategory || (viewRecord.fundType === "Zakat" ? "Al-Fuqara" : "General Welfare")}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Right Column */}
-                      <div className="space-y-1">
-                        <div className="flex items-center">
-                          <span className="w-22 sm:w-24 font-semibold text-slate-700 shrink-0">
-                            Channel
-                          </span>
-                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="font-bold text-slate-900">
-                            {viewRecord.disbursementChannel}
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <span className="w-22 sm:w-24 font-semibold text-slate-700 shrink-0">
-                            Fund Type
-                          </span>
-                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="text-slate-800">
-                            {viewRecord.fundType}
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <span className="w-22 sm:w-24 font-semibold text-slate-700 shrink-0">
-                            Purpose
-                          </span>
-                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="text-slate-800">
-                            {viewRecord.purposeCategory || "Vehicle"}
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <span className="w-22 sm:w-24 font-semibold text-slate-700 shrink-0">
-                            Mode
-                          </span>
-                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="text-slate-800">
-                            {viewRecord.disbursementMode}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 2. AGENT DETAILS (Matching Reference Image) */}
-                  <div className="border border-slate-300 rounded-md px-3.5 py-2 bg-white text-[11px]">
-                    <div className="text-[10px] font-bold text-slate-800 uppercase tracking-wider pb-1 mb-1.5 border-b border-slate-200 flex items-center justify-between">
+                    <div className="text-[10px] font-bold text-slate-800 uppercase tracking-wider pb-1 mb-1.5 border-b border-slate-200">
                       <span>AGENT DETAILS</span>
-                      <span className="text-[9px] font-mono text-slate-500 font-semibold">
-                        {viewRecord.disbursementChannel === "Direct Employee"
-                          ? "DIRECT APPLICANT"
-                          : "NOMINATING STAFF AGENT"}
-                      </span>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1 gap-x-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-y-1 gap-x-8">
                       {/* Left Column */}
                       <div className="space-y-1">
                         <div className="flex items-center">
@@ -4956,7 +4874,7 @@ function ZakatAndFinancialAidPage() {
                           </span>
                           <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
                           <span className="font-bold text-slate-900 font-mono">
-                            {viewRecord.employeeId || "2019003881"}
+                            {viewRecord.employeeId || "2023043021"}
                           </span>
                         </div>
                         <div className="flex items-center">
@@ -4964,8 +4882,8 @@ function ZakatAndFinancialAidPage() {
                             Employee Name
                           </span>
                           <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="font-bold text-slate-900">
-                            {viewRecord.employeeName || "Mizanur Rahman"}
+                          <span className="font-bold text-slate-900 truncate">
+                            {viewRecord.employeeName || "Shakil Ahmed"}
                           </span>
                         </div>
                         <div className="flex items-center">
@@ -5008,7 +4926,7 @@ function ZakatAndFinancialAidPage() {
                             Company
                           </span>
                           <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="font-bold text-slate-900">
+                          <span className="font-bold text-slate-900 truncate">
                             Pakiza Software Limited
                           </span>
                         </div>
@@ -5017,7 +4935,7 @@ function ZakatAndFinancialAidPage() {
                             Area Name
                           </span>
                           <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="font-medium text-slate-800">
+                          <span className="font-medium text-slate-800 truncate">
                             PSL -Operation
                           </span>
                         </div>
@@ -5026,8 +4944,8 @@ function ZakatAndFinancialAidPage() {
                             Department
                           </span>
                           <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="font-medium text-slate-800">
-                            {viewRecord.employeeDept || "Quality Assurance"}
+                          <span className="font-medium text-slate-800 truncate">
+                            {viewRecord.employeeDept || "Maintenance"}
                           </span>
                         </div>
                         <div className="flex items-center">
@@ -5035,8 +4953,8 @@ function ZakatAndFinancialAidPage() {
                             Designation
                           </span>
                           <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
-                          <span className="font-medium text-slate-800">
-                            {viewRecord.employeeDesignation || "Sr. QA Inspector"}
+                          <span className="font-medium text-slate-800 truncate">
+                            {viewRecord.employeeDesignation || "Sr. Electrician"}
                           </span>
                         </div>
                         <div className="flex items-center">
@@ -5052,7 +4970,68 @@ function ZakatAndFinancialAidPage() {
                     </div>
                   </div>
 
-                  {/* 2. ZAKAT & FINANCIAL AID DETAILS TABLE (Neutral Subtle Border Grid) */}
+                  {/* 2. BENEFICIARY DETAILS (Under Agent Details - One Line per Beneficiary, Multi-Beneficiary Capable) */}
+                  <div className="border border-slate-300 rounded-md px-3.5 py-2 bg-white text-[11px]">
+                    <div className="text-[10px] font-bold text-slate-800 uppercase tracking-wider pb-1 mb-1.5 border-b border-slate-200">
+                      <span>BENEFICIARY DETAILS</span>
+                    </div>
+
+                    <div className="divide-y divide-slate-100">
+                      {((viewRecord.beneficiaries && viewRecord.beneficiaries.length > 0)
+                        ? viewRecord.beneficiaries
+                        : [
+                            {
+                              id: "ben-1",
+                              name: viewRecord.beneficiaryName,
+                              phone: viewRecord.beneficiaryPhone || "—",
+                              address: viewRecord.beneficiaryAddress || "—",
+                            },
+                          ]
+                      ).map((ben, idx, arr) => (
+                        <div
+                          key={ben.id || idx}
+                          className={`grid grid-cols-1 sm:grid-cols-12 print:grid-cols-12 gap-y-1 gap-x-4 items-center text-[11px] ${
+                            idx > 0 ? "pt-1.5 mt-1.5" : ""
+                          }`}
+                        >
+                          {/* Beneficiary Name */}
+                          <div className="sm:col-span-5 print:col-span-5 flex items-center min-w-0">
+                            <span className="w-28 sm:w-30 font-semibold text-slate-700 shrink-0">
+                              {arr.length > 1 ? `${idx + 1}. Beneficiary Name` : "Beneficiary Name"}
+                            </span>
+                            <span className="font-semibold text-slate-700 mx-1.5 shrink-0">:</span>
+                            <span className="font-bold text-slate-900 truncate">
+                              {ben.name || viewRecord.beneficiaryName || "—"}
+                            </span>
+                          </div>
+
+                          {/* Contact Phone */}
+                          <div className="sm:col-span-3 print:col-span-3 flex items-center shrink-0">
+                            <span className="font-semibold text-slate-700 shrink-0">
+                              Contact Phone
+                            </span>
+                            <span className="font-semibold text-slate-700 mx-1.5 shrink-0">:</span>
+                            <span className="font-mono text-slate-800">
+                              {ben.phone || viewRecord.beneficiaryPhone || "—"}
+                            </span>
+                          </div>
+
+                          {/* Address */}
+                          <div className="sm:col-span-4 print:col-span-4 flex items-center min-w-0">
+                            <span className="font-semibold text-slate-700 shrink-0">
+                              Address
+                            </span>
+                            <span className="font-semibold text-slate-700 mx-1.5 shrink-0">:</span>
+                            <span className="text-slate-800 truncate">
+                              {ben.address || viewRecord.beneficiaryAddress || "—"}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 3. ZAKAT & FINANCIAL AID DETAILS TABLE (Neutral Subtle Border Grid) */}
                   <div className="border border-slate-300 rounded-md overflow-hidden bg-white">
                     <div className="overflow-x-auto">
                       <table className="w-full text-center text-xs border-collapse">
@@ -5118,7 +5097,7 @@ function ZakatAndFinancialAidPage() {
                     </div>
                   </div>
 
-                  {/* 3. PURCHASED ASSET TABLE (Neutral Subtle Border Grid) */}
+                  {/* 4. PURCHASED ASSET TABLE (Neutral Subtle Border Grid) */}
                   {(viewRecord.disbursementMode === "Asset Purchased" || viewRecord.assetDetails) && (
                     <div className="border border-slate-300 rounded-md overflow-hidden bg-white">
                       <div className="overflow-x-auto">

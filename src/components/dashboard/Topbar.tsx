@@ -310,6 +310,7 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Shift Schedule Configurator", parent: "Manage Shift", to: "/" },
   { label: "Shift Rotation Planner", parent: "Manage Shift", to: "/" },
   { label: "Shift Roster", parent: "Manage Shift", to: "/" },
+  { label: "Security Roster", parent: "Manage Shift", to: "/security-roster" },
   { label: "Late Attendance Policy", parent: "Manage Shift", to: "/" },
   // Budget
   { label: "Annual Budget Tracker", parent: "Budget", to: "/" },
