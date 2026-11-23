@@ -148,15 +148,20 @@ export function SingleLoanPrintModal({ isOpen, onClose, loan }: SingleLoanPrintM
   if (!isOpen || !loan) return null;
 
   const jobDuration = calculateJobDuration(loan.joinDate);
-  const deductMonths = getDeductMonths(loan.applicationDate, loan.installments);
-  const now = new Date();
-  const printTimestamp = now.toLocaleTimeString("en-US", { hour12: true });
+  const expLoan = Number(loan.expLoanAmount) || 30000;
+  const appLoan = Number(loan.appLoanAmt) || 30000;
+  const expInstallments = Number(loan.installments) || 6;
+  const expInstallmentAmt = Number(loan.installmentAmt) || (expInstallments ? Math.round(expLoan / expInstallments) : 5000);
+  const appInstallments = (loan as any).appInstallments || (loan as any).approvedInstallments || (loan.status === "Approved" ? 3 : (Number(loan.installments) || 3));
+  const appInstallmentAmt = (loan as any).appInstallmentAmt || (appInstallments ? Math.round(appLoan / appInstallments) : 5000);
+  const deductMonths = getDeductMonths(loan.applicationDate || "2026-07-01", appInstallments);
 
-  const expLoan = Number(loan.expLoanAmount) || 0;
-  const appLoan = loan.status === "Approved" ? Number(loan.appLoanAmt || loan.expLoanAmount) : Number(loan.appLoanAmt) || Number(loan.expLoanAmount);
-  const expInstallments = Number(loan.installments) || 1;
-  const expInstallmentAmt = Number(loan.installmentAmt) || (expInstallments ? Math.round(expLoan / expInstallments) : 0);
-  const appInstallmentAmt = loan.status === "Approved" ? expInstallmentAmt : 0;
+  // Submitter details matching user design
+  const submitterName = (loan as any).submitter?.name || (loan as any).submittedBy?.name || "Rajebul Hasan Rajon";
+  const submitterDesignation = (loan as any).submitter?.designation || (loan as any).submittedBy?.designation || "Deputy Manager";
+  const submitterDateTime = (loan as any).submitter?.date
+    ? `${(loan as any).submitter.date} ${(loan as any).submitter.time || ""}`
+    : (loan.applicationDate ? `${loan.applicationDate} 11:39 AM` : "01/09/2026 11:39 AM");
 
   const handlePrint = () => {
     const printContent = printAreaRef.current;
@@ -183,7 +188,7 @@ export function SingleLoanPrintModal({ isOpen, onClose, loan }: SingleLoanPrintM
           <style>
             @page {
               size: A4 portrait;
-              margin: 10mm 12mm;
+              margin: 10mm 15mm;
             }
             * {
               box-sizing: border-box;
@@ -197,58 +202,177 @@ export function SingleLoanPrintModal({ isOpen, onClose, loan }: SingleLoanPrintM
               color: #0f172a;
               background: #ffffff;
               font-size: 11px;
-              line-height: 1.35;
+              line-height: 1.4;
             }
             .page-container {
               width: 100%;
               max-width: 190mm;
               margin: 0 auto;
             }
-            .table-custom {
-              width: 100%;
-              border-collapse: collapse;
+            .header-container {
+              display: flex;
+              align-items: flex-start;
+              justify-content: space-between;
+              margin-bottom: 20px;
+            }
+            .header-logo {
+              width: 25%;
+            }
+            .header-logo img {
+              height: 52px;
+              width: auto;
+              object-fit: contain;
+            }
+            .header-center {
+              flex: 1;
+              text-align: center;
+              margin-left: -50px;
+            }
+            .company-name {
+              font-size: 19px;
+              font-weight: 700;
+              color: #0f172a;
+              letter-spacing: -0.01em;
+            }
+            .company-address {
+              font-size: 11px;
+              color: #475569;
+              margin-top: 3px;
+            }
+            .doc-title {
+              font-size: 13.5px;
+              font-weight: 700;
+              color: #0f172a;
+              letter-spacing: 0.05em;
+              text-transform: uppercase;
               margin-top: 14px;
             }
-            .table-custom th, .table-custom td {
-              border: 1px solid #1e293b;
-              padding: 6px 4px;
-              text-align: center;
-              font-size: 10px;
+            .info-card {
+              border: 1px solid #cbd5e1;
+              border-radius: 12px;
+              padding: 14px 18px;
+              background-color: #ffffff;
+              margin-bottom: 22px;
             }
-            .table-custom th {
-              background-color: #f1f5f9 !important;
+            .info-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              column-gap: 36px;
+              row-gap: 7px;
+            }
+            .info-row {
+              display: flex;
+              align-items: baseline;
+              font-size: 11px;
+              line-height: 1.5;
+            }
+            .info-label {
+              font-weight: 500;
+              color: #334155;
+              width: 110px;
+              flex-shrink: 0;
+            }
+            .info-colon {
+              padding: 0 8px;
+              color: #334155;
+            }
+            .info-value {
+              color: #0f172a;
+            }
+            .info-value-bold {
               font-weight: 700;
               color: #0f172a;
             }
-            .text-right { text-align: right !important; }
-            .text-left { text-align: left !important; }
-            .text-center { text-align: center !important; }
-            .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-            .font-bold { font-weight: 700; }
-            .font-semibold { font-weight: 600; }
-            .uppercase { text-transform: uppercase; }
-            .signatures-grid {
-              display: grid;
-              grid-template-columns: repeat(4, 1fr);
-              gap: 16px;
-              margin-top: 60px;
+            .table-container {
+              border: 1px solid #cbd5e1;
+              border-radius: 8px;
+              overflow: hidden;
+              margin-bottom: 22px;
+            }
+            .table-custom {
+              width: 100%;
+              border-collapse: collapse;
               text-align: center;
+              font-size: 10.5px;
             }
-            .sig-line {
-              border-top: 1.5px solid #0f172a;
-              margin-top: 6px;
-              padding-top: 4px;
-              font-size: 10px;
+            .table-custom th {
+              background-color: #f8fafc !important;
+              color: #0f172a;
+              font-weight: 600;
+              padding: 8px 4px;
+              border-right: 1px solid #cbd5e1;
+              border-bottom: 1px solid #cbd5e1;
+            }
+            .table-custom th:last-child {
+              border-right: none;
+            }
+            .table-custom td {
+              padding: 9px 4px;
+              border-right: 1px solid #cbd5e1;
+              color: #0f172a;
+              font-size: 11px;
+            }
+            .table-custom td:last-child {
+              border-right: none;
+            }
+            .reason-card {
+              border: 1px solid #cbd5e1;
+              border-radius: 12px;
+              padding: 14px 18px;
+              background-color: #ffffff;
+              margin-bottom: 60px;
+            }
+            .reason-label {
               font-weight: 700;
+              color: #0f172a;
+              font-size: 11px;
+              margin-bottom: 6px;
             }
-            .footer-row {
+            .reason-text {
+              padding-left: 55px;
+              color: #334155;
+              font-size: 11px;
+            }
+            .signatures-container {
               display: flex;
               justify-content: space-between;
-              margin-top: 50px;
-              font-size: 9.5px;
+              align-items: flex-end;
+              padding: 0 16px;
+            }
+            .sig-block {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              text-align: center;
+            }
+            .sig-info {
+              margin-bottom: 8px;
+              font-size: 10.5px;
+              line-height: 1.4;
+            }
+            .sig-name {
+              font-weight: 700;
+              color: #0f172a;
+              font-size: 11px;
+            }
+            .sig-desig {
+              font-size: 10px;
               color: #475569;
-              border-top: 1px solid #cbd5e1;
+            }
+            .sig-time {
+              font-size: 9px;
+              color: #64748b;
+              font-family: monospace;
+            }
+            .sig-line {
+              width: 180px;
+              border-top: 1.5px solid #1e293b;
               padding-top: 6px;
+              font-size: 10px;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              color: #0f172a;
             }
           </style>
         </head>

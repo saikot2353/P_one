@@ -52,6 +52,7 @@ import {
   Gift,
   HelpCircle,
   Shield,
+  Pencil,
 } from "lucide-react";
 import { CADENCE_CONFIG, calculateInstallmentCount } from "./zakat-list";
 
@@ -305,6 +306,12 @@ export interface UnifiedAidRecord {
   beneficiaryPhone?: string;
   beneficiaryNid?: string;
   beneficiaryAddress?: string;
+  beneficiaries?: Array<{
+    id?: string;
+    name: string;
+    phone?: string;
+    address?: string;
+  }>;
   institutionName?: string;
   institutionRepresentative?: string;
   institutionContactPhone?: string;
@@ -348,6 +355,14 @@ const INITIAL_UNIFIED_RECORDS: UnifiedAidRecord[] = [
     beneficiaryName: "Shakil Ahmed (Staff Self)",
     beneficiaryPhone: "01711-223344",
     beneficiaryAddress: "Sreepur, Gazipur",
+    beneficiaries: [
+      {
+        id: "ben-zk1-1",
+        name: "Shakil Ahmed (Staff Self)",
+        phone: "01711-223344",
+        address: "Sreepur, Gazipur",
+      },
+    ],
     asnafCategory: "Al-Masakin",
     justificationDetails: "Verified medical bills for urgent valve repair surgery at NICVD.",
     agencyStatus: "Verified",
@@ -1781,6 +1796,12 @@ function ZakatAndFinancialAidPage() {
 
   // View Details Modal State
   const [viewRecord, setViewRecord] = useState<UnifiedAidRecord | null>(null);
+  const [dossierViewMode, setDossierViewMode] = useState<"standard" | "print">("standard");
+  const [previewDocModal, setPreviewDocModal] = useState<{
+    name: string;
+    ext: string;
+    size: string;
+  } | null>(null);
 
   // Available employees
   const availableEmployees = useMemo(() => {
@@ -4374,172 +4395,948 @@ function ZakatAndFinancialAidPage() {
       {/* 9. VIEW DOSSIER MODAL                                     */}
       {/* ========================================================= */}
       {viewRecord && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto animate-in zoom-in-95 duration-150">
-            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="relative w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto animate-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
-                <div
-                  className={`size-10 rounded-xl flex items-center justify-center font-black ${
-                    viewRecord.fundType === "Zakat"
-                      ? "bg-emerald-100 text-emerald-800"
-                      : "bg-blue-100 text-blue-800"
-                  }`}
-                >
-                  {viewRecord.fundType === "Zakat" ? <ShieldCheck className="size-5" /> : <Banknote className="size-5" />}
+                <div className="size-10 rounded-xl bg-blue-50 border border-blue-200/80 dark:bg-blue-950/50 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <FileText className="size-5" />
                 </div>
                 <div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Disbursement Dossier
+                  <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    DISBURSEMENT DOSSIER
                   </div>
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                     {viewRecord.id} &bull; {viewRecord.fundType}
                   </h3>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setViewRecord(null)}
-                className="size-8 rounded-full bg-slate-200/60 hover:bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 flex items-center justify-center cursor-pointer"
-              >
-                <X className="size-4" />
-              </button>
+
+              {/* View Mode Toggle: Standard Dossier vs Print View */}
+              <div className="flex items-center gap-2.5">
+                <div className="inline-flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/80">
+                  <button
+                    type="button"
+                    onClick={() => setDossierViewMode("standard")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      dossierViewMode === "standard"
+                        ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs"
+                        : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    Dossier View
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDossierViewMode("print")}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      dossierViewMode === "print"
+                        ? "bg-emerald-600 text-white shadow-xs"
+                        : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <Printer className="size-3.5" /> Print View
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewRecord(null);
+                    setDossierViewMode("standard");
+                  }}
+                  className="size-8 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
             </div>
 
-            <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                <div>
-                  <span className="text-[9px] font-bold uppercase text-slate-400 block">Amount</span>
-                  <span className="font-mono text-base font-black text-slate-900 dark:text-white">
-                    ৳ {viewRecord.amount.toLocaleString()}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[9px] font-bold uppercase text-slate-400 block">Channel</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">
-                    {viewRecord.disbursementChannel}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[9px] font-bold uppercase text-slate-400 block">Mode</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">
-                    {viewRecord.disbursementMode}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[9px] font-bold uppercase text-slate-400 block">Status</span>
-                  <span className="font-bold text-emerald-700 dark:text-emerald-400">
-                    {viewRecord.agencyStatus}
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-1.5 border-t border-slate-100 dark:border-slate-800 pt-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Beneficiary</span>
-                  {viewRecord.batchRecipientInfo && (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                      <Users className="size-3" />
-                      {viewRecord.batchRecipientInfo} {viewRecord.batchDriveTitle ? `• ${viewRecord.batchDriveTitle}` : ""}
-                    </span>
-                  )}
-                </div>
-                <div className="text-sm font-bold text-slate-900 dark:text-white">
-                  {viewRecord.beneficiaryName}
-                </div>
-                {viewRecord.disbursementChannel === "Via Employee Agent" && viewRecord.employeeName && (
-                  <div className="text-xs text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
-                    <Users className="size-3" />
-                    <span>Authorized Staff Agent: {viewRecord.employeeName} {viewRecord.employeeDept ? `(${viewRecord.employeeDept} - ${viewRecord.employeeDesignation || ""})` : ""}</span>
+            {/* Body */}
+            {dossierViewMode === "standard" ? (
+              <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto text-xs">
+              {/* 1. EMPLOYEE DETAILS Card (Beneficiary Section) */}
+              <div className="border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 bg-white dark:bg-slate-900/50 shadow-2xs space-y-4">
+                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800/80 pb-3">
+                  <div className="size-6 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <User className="size-3.5" />
                   </div>
-                )}
-                {viewRecord.beneficiaryPhone && (
-                  <div className="text-slate-500 font-mono text-xs">Phone: {viewRecord.beneficiaryPhone}</div>
-                )}
-                {viewRecord.beneficiaryAddress && (
-                  <div className="text-slate-500 text-xs">Address: {viewRecord.beneficiaryAddress}</div>
-                )}
-              </div>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                    EMPLOYEE DETAILS
+                  </h4>
+                </div>
 
-              {viewRecord.assetDetails && (
-                <div className="p-3.5 bg-indigo-50/60 dark:bg-indigo-950/30 rounded-xl border border-indigo-200 dark:border-indigo-900/50 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-indigo-700 uppercase block">Physical Asset Specs</span>
-                    {viewRecord.assetDetails.items && viewRecord.assetDetails.items.length > 1 && (
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200">
-                        {viewRecord.assetDetails.items.length} Items Purchased
-                      </span>
-                    )}
+                <div className="flex items-center gap-5">
+                  <div className="size-16 rounded-2xl bg-blue-600 text-white font-bold text-2xl flex items-center justify-center shrink-0 shadow-xs">
+                    {(viewRecord.employeeName || viewRecord.beneficiaryName || "S")
+                      .trim()
+                      .charAt(0)
+                      .toUpperCase()}
                   </div>
-                  {viewRecord.assetDetails.items && viewRecord.assetDetails.items.length > 0 ? (
-                    <div className="space-y-1.5 pt-1">
-                      {viewRecord.assetDetails.items.map((it, idx) => (
-                        <div key={it.id || idx} className="flex items-center justify-between text-xs bg-white/80 dark:bg-slate-900/60 p-2 rounded-lg border border-indigo-100 dark:border-indigo-900/40">
-                          <div>
-                            <span className="font-bold text-slate-900 dark:text-white">{it.assetName}</span>
-                            <span className="text-slate-500 text-[11px] ml-1.5 font-medium">({it.quantity || "1 Unit"})</span>
-                          </div>
-                          {it.amount !== undefined && (
-                            <span className="font-bold font-mono text-emerald-700 dark:text-emerald-400">
-                              ৳ {it.amount.toLocaleString()}
-                            </span>
-                          )}
-                        </div>
-                      ))}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2.5 flex-1 text-xs">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <span className="w-28 text-slate-400 dark:text-slate-500 font-semibold">
+                          Employee Name:
+                        </span>
+                        <span className="font-bold text-slate-900 dark:text-white">
+                          {viewRecord.employeeName || viewRecord.beneficiaryName}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="w-28 text-slate-400 dark:text-slate-500 font-semibold">
+                          Designation:
+                        </span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">
+                          {viewRecord.employeeDesignation || "Sr. Electrician"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="w-28 text-slate-400 dark:text-slate-500 font-semibold">
+                          Office ID:
+                        </span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">
+                          {viewRecord.employeeId ? `PAL${viewRecord.employeeId.slice(-6)}` : "PAL000024"}
+                        </span>
+                      </div>
                     </div>
-                  ) : (
-                    <>
-                      <div className="font-bold text-slate-900 dark:text-white">
-                        {viewRecord.assetDetails.assetName}
-                      </div>
-                      <div className="text-[11px] text-slate-600 dark:text-slate-300">
-                        Quantity: {viewRecord.assetDetails.assetQuantity || "1 Unit"}
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
 
-              {viewRecord.fundType === "Zakat" && viewRecord.asnafCategory && (
-                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-900/50 space-y-1">
-                  <span className="text-[10px] font-bold text-emerald-800 uppercase block">Quranic Asnaf Category</span>
-                  <div className="font-bold text-emerald-900 dark:text-emerald-300">
-                    {viewRecord.asnafCategory}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <span className="w-28 text-slate-400 dark:text-slate-500 font-semibold">
+                          Employee ID:
+                        </span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">
+                          {viewRecord.employeeId || "202610059550"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="w-28 text-slate-400 dark:text-slate-500 font-semibold">
+                          Department:
+                        </span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">
+                          {viewRecord.employeeDept || "Maintenance"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. ZAKAT & FINANCIAL AID DETAILS Section */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider">
+                  <Banknote className="size-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>ZAKAT &amp; FINANCIAL AID DETAILS</span>
+                </div>
+
+                <div className="border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900/50 shadow-2xs">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+                          <th className="py-4 px-4 whitespace-nowrap">REQUEST TYPE</th>
+                          <th className="py-4 px-4 whitespace-nowrap">BENEFICIARY CHANNEL</th>
+                          <th className="py-4 px-4 whitespace-nowrap">ASNAF CATEGORY</th>
+                          <th className="py-4 px-4 whitespace-nowrap">PURPOSE CATEGORY</th>
+                          <th className="py-4 px-4 whitespace-nowrap">DISBURSEMENT AMOUNT</th>
+                          <th className="py-4 px-4 whitespace-nowrap">DURATION (INSTALLMENT)</th>
+                          <th className="py-4 px-4 whitespace-nowrap">TOTAL DISBURSEMENT</th>
+                          <th className="py-4 px-4 whitespace-nowrap">HANDOVER DEADLINE</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="text-slate-900 dark:text-white font-bold text-xs">
+                          <td className="py-4 px-4 whitespace-nowrap">
+                            {viewRecord.isRecurring
+                              ? viewRecord.fundType === "Zakat"
+                                ? "Recurring Zakat"
+                                : "Recurring Aid"
+                              : viewRecord.fundType === "Zakat"
+                                ? "Regular Zakat"
+                                : "Financial Aid"}
+                          </td>
+                          <td className="py-4 px-4 whitespace-nowrap">
+                            {viewRecord.disbursementChannel}
+                          </td>
+                          <td className="py-4 px-4 whitespace-nowrap">
+                            {viewRecord.asnafCategory || (viewRecord.fundType === "Zakat" ? "Al-Masakin" : "—")}
+                          </td>
+                          <td className="py-4 px-4 whitespace-nowrap">
+                            {viewRecord.purposeCategory || "Farm Animal"}
+                          </td>
+                          <td className="py-4 px-4 whitespace-nowrap font-bold text-emerald-600 dark:text-emerald-400">
+                            ৳{viewRecord.amount.toLocaleString()}
+                          </td>
+                          <td className="py-4 px-4 whitespace-nowrap text-slate-400 font-normal">
+                            {viewRecord.isRecurring && viewRecord.installmentTotal
+                              ? `${viewRecord.installmentNumber || 1}/${viewRecord.installmentTotal}`
+                              : "—"}
+                          </td>
+                          <td className="py-4 px-4 whitespace-nowrap font-bold text-emerald-600 dark:text-emerald-400">
+                            ৳{(
+                              viewRecord.isRecurring && viewRecord.installmentTotal
+                                ? viewRecord.amount * viewRecord.installmentTotal
+                                : viewRecord.amount
+                            ).toLocaleString()}
+                          </td>
+                          <td className="py-4 px-4 whitespace-nowrap">
+                            {(() => {
+                              if (!viewRecord.distributionDeadline) return "01/12/2026";
+                              const p = viewRecord.distributionDeadline.split("-");
+                              return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : viewRecord.distributionDeadline;
+                            })()}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. PURCHASED ASSET SPECIFICATION & ITEMS (If Mode is Asset Purchased) */}
+              {(viewRecord.disbursementMode === "Asset Purchased" || viewRecord.assetDetails) && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-indigo-800 dark:text-indigo-400 font-bold text-xs uppercase tracking-wider">
+                    <ShoppingBag className="size-4 text-indigo-600 dark:text-indigo-400" />
+                    <span>PURCHASED ASSET DETAILS &amp; SPECIFICATION</span>
+                  </div>
+
+                  <div className="border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900/50 shadow-2xs">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-800/40">
+                            <th className="py-3 px-4 w-14 text-center">SL</th>
+                            <th className="py-3 px-4">ASSET NAME</th>
+                            <th className="py-3 px-4 w-40 text-right">QUANTITY</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                          {((viewRecord.assetDetails?.items && viewRecord.assetDetails.items.length > 0)
+                            ? viewRecord.assetDetails.items
+                            : [
+                                {
+                                  id: "ast-1",
+                                  assetName:
+                                    viewRecord.assetDetails?.assetName ||
+                                    viewRecord.purposeSpecificDescription ||
+                                    `${viewRecord.purposeCategory || "Equipment"} Package`,
+                                  assetType:
+                                    viewRecord.assetDetails?.assetType ||
+                                    viewRecord.purposeCategory ||
+                                    "Physical Asset",
+                                  quantity: viewRecord.assetDetails?.assetQuantity || "1 Unit",
+                                  amount: viewRecord.amount,
+                                  vendorOrMarket:
+                                    viewRecord.assetDetails?.vendorOrMarket ||
+                                    "Corporate Approved Vendor",
+                                },
+                              ]
+                          ).map((item, idx) => (
+                            <tr
+                              key={item.id || idx}
+                              className="text-slate-900 dark:text-white font-medium text-xs hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
+                            >
+                              <td className="py-3.5 px-4 text-center font-mono text-slate-400 dark:text-slate-500">
+                                {String(idx + 1).padStart(2, "0")}
+                              </td>
+                              <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                                {item.assetName}
+                              </td>
+                              <td className="py-3.5 px-4 text-right font-semibold text-slate-700 dark:text-slate-200">
+                                {item.quantity || "1 Unit"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               )}
 
-              <div className="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">Justification & Notes</span>
-                <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                  {viewRecord.justificationDetails}
+              {/* Justification & Notes */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider block">
+                  JUSTIFICATION &amp; NOTES
+                </span>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  {viewRecord.justificationDetails || "For testing"}
                 </p>
               </div>
 
-              {viewRecord.attachments && viewRecord.attachments.length > 0 && (
-                <div className="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Attached Documents</span>
-                  <div className="space-y-1">
-                    {viewRecord.attachments.map((att) => (
-                      <div
-                        key={att.id}
-                        className="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center justify-between text-xs"
-                      >
-                        <span className="font-mono text-slate-700 dark:text-slate-300">{att.name}</span>
-                        <span className="text-[10px] text-slate-400">{att.size}</span>
-                      </div>
-                    ))}
+              {/* Attached Documents (Simple) */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider block">
+                  ATTACHED DOCUMENTS
+                </span>
+                <div className="space-y-2">
+                  {viewRecord.attachments && viewRecord.attachments.length > 0 ? (
+                    viewRecord.attachments.map((att, idx) => {
+                      const ext = att.name.includes(".")
+                        ? att.name.split(".").pop()?.toUpperCase()
+                        : "FILE";
+                      return (
+                        <div
+                          key={att.id || idx}
+                          onClick={() =>
+                            setPreviewDocModal({
+                              name: att.name,
+                              ext,
+                              size: att.size || "620 KB",
+                            })
+                          }
+                          className="px-4 py-3 bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs shadow-2xs hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer transition-colors"
+                        >
+                          <span className="font-mono text-slate-700 dark:text-slate-300">
+                            {att.name}
+                          </span>
+                          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase">
+                            {ext}
+                          </span>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div
+                      onClick={() =>
+                        setPreviewDocModal({
+                          name: "1795079883_5153ded5.jpg",
+                          ext: "JPG",
+                          size: "840 KB",
+                        })
+                      }
+                      className="px-4 py-3 bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs shadow-2xs hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer transition-colors"
+                    >
+                      <span className="font-mono text-slate-700 dark:text-slate-300">
+                        1795079883_5153ded5.jpg
+                      </span>
+                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase">
+                        JPG
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Section 1: Approval Workflow & Signatures */}
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 space-y-4 shadow-2xs">
+                <div className="flex items-center gap-2">
+                  <div className="size-6 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <FileText className="size-3.5" />
                   </div>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                    Approval Workflow &amp; Signatures
+                  </h4>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Step 1 */}
+                  <div className="rounded-xl border border-amber-200/60 dark:border-amber-800/40 bg-amber-50/20 dark:bg-amber-950/10 p-4 border-l-4 border-l-amber-500 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        HR LAYER
+                      </span>
+                      <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase flex items-center gap-1">
+                        ⏳ PENDING
+                      </span>
+                    </div>
+
+                    <div className="space-y-0.5">
+                      <h5 className="font-bold text-slate-900 dark:text-white text-xs">
+                        Sohanur Rahman Sohan
+                      </h5>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                        Executive
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                        HR, Admin and Compliance
+                      </p>
+                    </div>
+
+                    <div className="border-t border-amber-100/70 dark:border-amber-900/40 pt-2 flex items-center justify-between text-[10px] font-semibold text-amber-700/80 dark:text-amber-400/80">
+                      <span>N/A</span>
+                      <span>N/A</span>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="rounded-xl border border-amber-200/60 dark:border-amber-800/40 bg-amber-50/20 dark:bg-amber-950/10 p-4 border-l-4 border-l-amber-500 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        HR LAYER
+                      </span>
+                      <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase flex items-center gap-1">
+                        ⏳ PENDING
+                      </span>
+                    </div>
+
+                    <div className="space-y-0.5">
+                      <h5 className="font-bold text-slate-900 dark:text-white text-xs">
+                        Rajebul Hasan Rajon
+                      </h5>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                        Deputy Manager
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                        HR, Admin and Compliance
+                      </p>
+                    </div>
+
+                    <div className="border-t border-amber-100/70 dark:border-amber-900/40 pt-2 flex items-center justify-between text-[10px] font-semibold text-amber-700/80 dark:text-amber-400/80">
+                      <span>N/A</span>
+                      <span>N/A</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Comments & Approval Notes */}
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 space-y-3 shadow-2xs">
+                <div className="flex items-center gap-2">
+                  <div className="size-6 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <FileText className="size-3.5" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                    Comments &amp; Approval Notes
+                  </h4>
+                </div>
+
+                <div className="pt-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-6">
+                    COMMENT HISTORY &amp; NOTES
+                  </span>
+                  <div className="py-8 text-center text-slate-400 dark:text-slate-500 text-xs font-medium">
+                    No comments or approval notes yet.
+                  </div>
+                </div>
+              </div>
+            </div>
+            ) : (
+              /* ========================================================= */
+              /* PRINT VIEW DESIGN (A4 Corporate Printable Voucher)        */
+              /* ========================================================= */
+              <div className="p-2 sm:p-4 bg-slate-100/90 dark:bg-slate-950/90 flex justify-center items-center overflow-hidden">
+                <div
+                  id="printable-dossier-voucher"
+                  className="w-full max-w-[210mm] bg-white text-slate-900 px-6 py-5 sm:px-8 sm:py-6 rounded-lg border border-slate-300 shadow-sm space-y-3 text-xs font-sans print:border-none print:shadow-none print:p-0 print:max-w-none print:w-full print:m-0 print:rounded-none"
+                >
+                  {/* Print Document Letterhead Matching Image Reference */}
+                  <div className="relative flex flex-col sm:flex-row items-center sm:items-start justify-between gap-3 pb-1.5 border-b border-slate-200">
+                    {/* Left: Pakiza Software Ribbon Mark & Typography */}
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <svg className="w-10 h-8 shrink-0" viewBox="0 0 100 80" fill="none">
+                        <path d="M12 52 C 16 26, 46 12, 74 12 C 64 32, 44 46, 20 54 Z" fill="#1e3a8a" />
+                        <path d="M18 54 C 36 49, 66 36, 82 14 C 86 30, 72 56, 36 68 Z" fill="#2563eb" />
+                        <path d="M36 68 C 62 55, 78 35, 84 22 C 80 52, 52 73, 30 75 Z" fill="#38bdf8" />
+                      </svg>
+                      <div className="leading-tight">
+                        <div className="text-lg font-black tracking-tight text-slate-900 font-sans">
+                          PAKIZA
+                        </div>
+                        <div className="text-[11px] font-black tracking-widest text-slate-800 font-sans -mt-0.5">
+                          SOFTWARE
+                        </div>
+                        <div className="text-[6.5px] font-medium tracking-tight text-slate-500 italic">
+                          Excellence | Intelligence | Automation
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Center: Company Name, Address & Form Title */}
+                    <div className="text-center sm:flex-1 sm:pr-20">
+                      <h1 className="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+                        Pakiza Software Limited
+                      </h1>
+                      <p className="text-[10px] text-slate-600">
+                        Khan ABC Tradeplex, House:37 Road:02, Dhaka 1209
+                      </p>
+                      <h2 className="text-xs sm:text-[13px] font-black uppercase tracking-wider text-slate-900 mt-1.5 font-sans">
+                        {viewRecord.fundType === "Zakat" ? "ZAKAT APPLICATION" : "FINANCIAL AID APPLICATION"}
+                      </h2>
+                    </div>
+                  </div>
+
+                  {/* 1. AGENT DETAILS (At Top - Matching Reference Design) */}
+                  <div className="border border-slate-300 rounded-md px-3.5 py-2 bg-white text-[11px]">
+                    <div className="text-[10px] font-bold text-slate-800 uppercase tracking-wider pb-1 mb-1.5 border-b border-slate-200">
+                      <span>AGENT DETAILS</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-y-1 gap-x-8">
+                      {/* Left Column */}
+                      <div className="space-y-1">
+                        <div className="flex items-center">
+                          <span className="w-26 sm:w-28 font-semibold text-slate-700 shrink-0">
+                            Employee Id
+                          </span>
+                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
+                          <span className="font-bold text-slate-900 font-mono">
+                            {viewRecord.employeeId || "2023043021"}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="w-26 sm:w-28 font-semibold text-slate-700 shrink-0">
+                            Employee Name
+                          </span>
+                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
+                          <span className="font-bold text-slate-900 truncate">
+                            {viewRecord.employeeName || "Shakil Ahmed"}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="w-26 sm:w-28 font-semibold text-slate-700 shrink-0">
+                            Employee Type
+                          </span>
+                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
+                          <span className="font-medium text-slate-800">
+                            {viewRecord.employeeDesignation?.toLowerCase().includes("engineer") ||
+                            viewRecord.employeeDesignation?.toLowerCase().includes("manager") ||
+                            viewRecord.employeeDesignation?.toLowerCase().includes("inspector")
+                              ? "Staff"
+                              : "Worker"}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="w-26 sm:w-28 font-semibold text-slate-700 shrink-0">
+                            Joining Date
+                          </span>
+                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
+                          <span className="font-medium text-slate-800">
+                            04/10/2023
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="w-26 sm:w-28 font-semibold text-slate-700 shrink-0">
+                            Job Duration
+                          </span>
+                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
+                          <span className="font-medium text-slate-800">
+                            15 Days 01 Months 03 Years
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Right Column */}
+                      <div className="space-y-1">
+                        <div className="flex items-center">
+                          <span className="w-22 sm:w-24 font-semibold text-slate-700 shrink-0">
+                            Company
+                          </span>
+                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
+                          <span className="font-bold text-slate-900 truncate">
+                            Pakiza Software Limited
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="w-22 sm:w-24 font-semibold text-slate-700 shrink-0">
+                            Area Name
+                          </span>
+                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
+                          <span className="font-medium text-slate-800 truncate">
+                            PSL -Operation
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="w-22 sm:w-24 font-semibold text-slate-700 shrink-0">
+                            Department
+                          </span>
+                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
+                          <span className="font-medium text-slate-800 truncate">
+                            {viewRecord.employeeDept || "Maintenance"}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="w-22 sm:w-24 font-semibold text-slate-700 shrink-0">
+                            Designation
+                          </span>
+                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
+                          <span className="font-medium text-slate-800 truncate">
+                            {viewRecord.employeeDesignation || "Sr. Electrician"}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="w-22 sm:w-24 font-semibold text-slate-700 shrink-0">
+                            Unit
+                          </span>
+                          <span className="font-semibold text-slate-700 mx-2 shrink-0">:</span>
+                          <span className="font-medium text-slate-800">
+                            PSL
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. BENEFICIARY DETAILS (Under Agent Details - One Line per Beneficiary, Multi-Beneficiary Capable) */}
+                  <div className="border border-slate-300 rounded-md px-3.5 py-2 bg-white text-[11px]">
+                    <div className="text-[10px] font-bold text-slate-800 uppercase tracking-wider pb-1 mb-1.5 border-b border-slate-200">
+                      <span>BENEFICIARY DETAILS</span>
+                    </div>
+
+                    <div className="divide-y divide-slate-100">
+                      {((viewRecord.beneficiaries && viewRecord.beneficiaries.length > 0)
+                        ? viewRecord.beneficiaries
+                        : [
+                            {
+                              id: "ben-1",
+                              name: viewRecord.beneficiaryName,
+                              phone: viewRecord.beneficiaryPhone || "—",
+                              address: viewRecord.beneficiaryAddress || "—",
+                            },
+                          ]
+                      ).map((ben, idx, arr) => (
+                        <div
+                          key={ben.id || idx}
+                          className={`grid grid-cols-1 sm:grid-cols-12 print:grid-cols-12 gap-y-1 gap-x-4 items-center text-[11px] ${
+                            idx > 0 ? "pt-1.5 mt-1.5" : ""
+                          }`}
+                        >
+                          {/* Beneficiary Name */}
+                          <div className="sm:col-span-5 print:col-span-5 flex items-center min-w-0">
+                            <span className="w-28 sm:w-30 font-semibold text-slate-700 shrink-0">
+                              {arr.length > 1 ? `${idx + 1}. Beneficiary Name` : "Beneficiary Name"}
+                            </span>
+                            <span className="font-semibold text-slate-700 mx-1.5 shrink-0">:</span>
+                            <span className="font-bold text-slate-900 truncate">
+                              {ben.name || viewRecord.beneficiaryName || "—"}
+                            </span>
+                          </div>
+
+                          {/* Contact Phone */}
+                          <div className="sm:col-span-3 print:col-span-3 flex items-center shrink-0">
+                            <span className="font-semibold text-slate-700 shrink-0">
+                              Contact Phone
+                            </span>
+                            <span className="font-semibold text-slate-700 mx-1.5 shrink-0">:</span>
+                            <span className="font-mono text-slate-800">
+                              {ben.phone || viewRecord.beneficiaryPhone || "—"}
+                            </span>
+                          </div>
+
+                          {/* Address */}
+                          <div className="sm:col-span-4 print:col-span-4 flex items-center min-w-0">
+                            <span className="font-semibold text-slate-700 shrink-0">
+                              Address
+                            </span>
+                            <span className="font-semibold text-slate-700 mx-1.5 shrink-0">:</span>
+                            <span className="text-slate-800 truncate">
+                              {ben.address || viewRecord.beneficiaryAddress || "—"}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 3. ZAKAT & FINANCIAL AID DETAILS TABLE (Neutral Subtle Border Grid) */}
+                  <div className="border border-slate-300 rounded-md overflow-hidden bg-white">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-center text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50 border-b border-slate-300 text-[10px] font-bold text-slate-800">
+                            <th className="py-1.5 px-2 border-r border-slate-300 w-9">SL</th>
+                            <th className="py-1.5 px-2.5 border-r border-slate-300 whitespace-nowrap">Request Type</th>
+                            <th className="py-1.5 px-2.5 border-r border-slate-300 whitespace-nowrap">Beneficiary Channel</th>
+                            <th className="py-1.5 px-2.5 border-r border-slate-300 whitespace-nowrap">Asnaf Category</th>
+                            <th className="py-1.5 px-2.5 border-r border-slate-300 whitespace-nowrap">Purpose Category</th>
+                            <th className="py-1.5 px-2.5 border-r border-slate-300 whitespace-nowrap">Disbursement Amount</th>
+                            <th className="py-1.5 px-2.5 border-r border-slate-300 whitespace-nowrap">Duration (Installment)</th>
+                            <th className="py-1.5 px-2.5 border-r border-slate-300 whitespace-nowrap">Total Disbursement</th>
+                            <th className="py-1.5 px-2.5 whitespace-nowrap">Handover Deadline</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="text-slate-900 font-bold text-[11px] hover:bg-slate-50/50">
+                            <td className="py-2 px-2 border-r border-slate-300 font-mono">1</td>
+                            <td className="py-2 px-2.5 border-r border-slate-300 whitespace-nowrap font-semibold">
+                              {viewRecord.isRecurring
+                                ? viewRecord.fundType === "Zakat"
+                                  ? "Recurring Zakat"
+                                  : "Recurring Aid"
+                                : viewRecord.fundType === "Zakat"
+                                  ? "Regular Zakat"
+                                  : "Financial Aid"}
+                            </td>
+                            <td className="py-2 px-2.5 border-r border-slate-300 whitespace-nowrap font-medium">
+                              {viewRecord.disbursementChannel}
+                            </td>
+                            <td className="py-2 px-2.5 border-r border-slate-300 whitespace-nowrap font-semibold">
+                              {viewRecord.asnafCategory || (viewRecord.fundType === "Zakat" ? "Al-Masakin" : "—")}
+                            </td>
+                            <td className="py-2 px-2.5 border-r border-slate-300 whitespace-nowrap font-semibold">
+                              {viewRecord.purposeCategory || "Farm Animal"}
+                            </td>
+                            <td className="py-2 px-2.5 border-r border-slate-300 whitespace-nowrap font-mono font-bold text-slate-900">
+                              ৳{viewRecord.amount.toLocaleString()}
+                            </td>
+                            <td className="py-2 px-2.5 border-r border-slate-300 whitespace-nowrap text-slate-500 font-normal">
+                              {viewRecord.isRecurring && viewRecord.installmentTotal
+                                ? `${viewRecord.installmentNumber || 1}/${viewRecord.installmentTotal}`
+                                : "—"}
+                            </td>
+                            <td className="py-2 px-2.5 border-r border-slate-300 whitespace-nowrap font-mono font-bold text-slate-900">
+                              ৳{(
+                                viewRecord.isRecurring && viewRecord.installmentTotal
+                                  ? viewRecord.amount * viewRecord.installmentTotal
+                                  : viewRecord.amount
+                              ).toLocaleString()}
+                            </td>
+                            <td className="py-2 px-2.5 whitespace-nowrap font-mono text-slate-800">
+                              {(() => {
+                                if (!viewRecord.distributionDeadline) return "01/12/2026";
+                                const p = viewRecord.distributionDeadline.split("-");
+                                return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : viewRecord.distributionDeadline;
+                              })()}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* 4. PURCHASED ASSET TABLE (Neutral Subtle Border Grid) */}
+                  {(viewRecord.disbursementMode === "Asset Purchased" || viewRecord.assetDetails) && (
+                    <div className="border border-slate-300 rounded-md overflow-hidden bg-white">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-center text-xs border-collapse">
+                          <thead>
+                            <tr className="bg-slate-50 border-b border-slate-300 text-[10px] font-bold text-slate-800">
+                              <th className="py-1.5 px-2 border-r border-slate-300 w-9">SL</th>
+                              <th className="py-1.5 px-3 border-r border-slate-300 text-left">Asset Name</th>
+                              <th className="py-1.5 px-3 w-32 text-center">Quantity</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {((viewRecord.assetDetails?.items && viewRecord.assetDetails.items.length > 0)
+                              ? viewRecord.assetDetails.items
+                              : [
+                                  {
+                                    id: "print-ast-1",
+                                    assetName:
+                                      viewRecord.assetDetails?.assetName ||
+                                      viewRecord.purposeSpecificDescription ||
+                                      "Heavy Duty 48V Battery Cargo Auto-Van",
+                                    quantity: viewRecord.assetDetails?.assetQuantity || "1 Unit",
+                                  },
+                                ]
+                            ).map((ast, idx) => (
+                              <tr key={ast.id || idx} className="text-slate-900 font-bold text-[11px] hover:bg-slate-50/50">
+                                <td className="py-1.5 px-2 border-r border-slate-300 font-mono text-slate-600">
+                                  {idx + 1}
+                                </td>
+                                <td className="py-1.5 px-3 border-r border-slate-300 text-left text-slate-900 font-semibold">
+                                  {ast.assetName}
+                                </td>
+                                <td className="py-1.5 px-3 text-center font-semibold text-slate-800">
+                                  {ast.quantity || "1 Unit"}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 4. REASON BOX (Neutral Subtle Border) */}
+                  <div className="border border-slate-300 rounded-md px-3.5 py-2 bg-white min-h-[42px] text-[11px]">
+                    <span className="font-bold text-slate-900 block">
+                      Reason :
+                    </span>
+                    <div className="pl-6 sm:pl-12 pt-0.5 text-slate-800 font-medium">
+                      {viewRecord.justificationDetails || "Family Issue"}
+                    </div>
+                  </div>
+
+                  {/* 5. AUTHORIZATION & SIGNATURES (Matching Reference Design) */}
+                  <div className="pt-6 px-4 sm:px-8 flex items-end justify-between">
+                    {/* Left: Submitted By */}
+                    <div className="w-48 text-center">
+                      <div className="pb-1 text-xs">
+                        <p className="font-bold text-slate-900 leading-tight">
+                          Rajebul Hasan Rajon
+                        </p>
+                        <p className="text-[10px] text-slate-600 leading-tight mt-0.5">
+                          Deputy Manager
+                        </p>
+                        <p className="text-[9.5px] text-slate-500 font-mono mt-0.5">
+                          01/09/2026 11:39 AM
+                        </p>
+                      </div>
+                      <div className="border-t-2 border-slate-700 pt-1">
+                        <span className="text-[10.5px] font-black uppercase tracking-wider text-slate-900">
+                          SUBMITTED BY
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right: Approved By */}
+                    <div className="w-48 text-center">
+                      <div className="h-[42px] flex items-end justify-center pb-1 text-xs">
+                        {/* Signature area */}
+                      </div>
+                      <div className="border-t-2 border-slate-700 pt-1">
+                        <span className="text-[10.5px] font-black uppercase tracking-wider text-slate-900">
+                          APPROVED BY
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="p-4 sm:p-5 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                {dossierViewMode === "print" ? (
+                  <button
+                    type="button"
+                    onClick={() => setDossierViewMode("standard")}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer"
+                  >
+                    &larr; Return to Interactive Dossier
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setDossierViewMode("print")}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <Printer className="size-3.5" /> View Printable Voucher
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                {dossierViewMode === "print" && (
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
+                  >
+                    <Printer className="size-4" /> Print Document
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewRecord(null);
+                    setDossierViewMode("standard");
+                  }}
+                  className="px-6 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                >
+                  CLOSE DOSSIER
+                </button>
+              </div>
+            </div>
+
+            {/* Print Media Query Style: Strict A4 One-Page Setup */}
+            <style>{`
+              @page {
+                size: A4 portrait;
+                margin: 10mm 12mm;
+              }
+              @media print {
+                html, body {
+                  width: 210mm !important;
+                  height: 297mm !important;
+                  margin: 0 !important;
+                  padding: 0 !important;
+                  overflow: hidden !important;
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                }
+                body * {
+                  visibility: hidden !important;
+                }
+                #printable-dossier-voucher, #printable-dossier-voucher * {
+                  visibility: visible !important;
+                }
+                #printable-dossier-voucher {
+                  position: absolute !important;
+                  left: 0 !important;
+                  top: 0 !important;
+                  width: 100% !important;
+                  max-width: 100% !important;
+                  margin: 0 !important;
+                  padding: 0 !important;
+                  border: none !important;
+                  box-shadow: none !important;
+                  border-radius: 0 !important;
+                  background: white !important;
+                  color: black !important;
+                  page-break-after: avoid !important;
+                  page-break-inside: avoid !important;
+                }
+              }
+            `}</style>
+          </div>
+        </div>
+      )}
+      {/* Document Preview Modal */}
+      {previewDocModal && (
+        <div className="fixed inset-0 z-60 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto animate-in zoom-in-95 duration-150">
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="size-8 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 flex items-center justify-center">
+                  <FileText className="size-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-md">
+                    {previewDocModal.name}
+                  </h4>
+                  <p className="text-[10px] text-slate-400 font-mono">
+                    {previewDocModal.ext} &bull; {previewDocModal.size}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewDocModal(null)}
+                className="size-7 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center cursor-pointer"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
+            <div className="p-8 bg-slate-50 dark:bg-slate-950/50 flex flex-col items-center justify-center text-center min-h-[240px]">
+              {previewDocModal.ext === "PDF" ? (
+                <div className="space-y-3 max-w-md">
+                  <div className="size-16 mx-auto rounded-2xl bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 flex items-center justify-center border border-rose-200 dark:border-rose-800 shadow-sm">
+                    <FileText className="size-8" />
+                  </div>
+                  <h5 className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                    {previewDocModal.name}
+                  </h5>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Verified medical discharge summary, clinical diagnostic invoices, and official hospital billing vouchers attached for Zakat clearance audit.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3 max-w-md">
+                  <div className="size-16 mx-auto rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 flex items-center justify-center border border-blue-200 dark:border-blue-800 shadow-sm">
+                    <FileText className="size-8" />
+                  </div>
+                  <h5 className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                    {previewDocModal.name}
+                  </h5>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Physical photo verification document uploaded during field assessment and beneficiary identity verification.
+                  </p>
                 </div>
               )}
             </div>
-
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end">
+            <div className="p-3.5 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setViewRecord(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-white hover:bg-slate-900 cursor-pointer"
+                onClick={() => setPreviewDocModal(null)}
+                className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
               >
-                Close Dossier
+                Close Preview
               </button>
             </div>
           </div>

@@ -51,6 +51,7 @@ export const payrollCompensationNav: NavItem[] = [
         to: "/manage-overtime",
         search: { tab: "individual-review" },
       },
+      { label: "Budget wise OT Req", to: "/budget-wise-ot-req" },
       { label: "Lunce Requisition", to: "/lunch-requisition" },
       { label: "Festival Allowance", to: "/festival-allowance" },
     ],
