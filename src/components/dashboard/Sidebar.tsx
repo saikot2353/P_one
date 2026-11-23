@@ -40,6 +40,7 @@ import {
   FileSpreadsheet,
   Smartphone,
   Network,
+  Sparkles,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -74,6 +75,7 @@ export interface NavItem {
 
 export const nav: NavItem[] = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard },
+  { label: "Dashboard Maker", to: "/dashboard-maker", icon: Sparkles },
   { label: "Messenger", to: "/messenger", icon: MessageSquare },
   { label: "Phonebook", to: "/phonebook", icon: BookUser },
   {
@@ -106,6 +108,7 @@ export const nav: NavItem[] = [
       { label: "Tax & Compliance Setup", to: "/configure-tax" },
       { label: "Payroll Configuration", to: "/payroll-configure" },
       { label: "Salary Sheet Configuration", to: "/salary-sheet-configuration" },
+      { label: "Dashboard Maker", to: "/dashboard-maker" },
       { label: "Education & Training", to: "/configure-education" },
       { label: "Leave & Policies", to: "/configure-policies" },
       { label: "Maternity Configuration", to: "/maternity-configuration" },
