@@ -143,8 +143,8 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
               settings?.buyers && settings.buyers.length > 0
                 ? settings.buyers
                 : settings?.buyer && settings.buyer !== "All Buyers"
-                ? [settings.buyer]
-                : [];
+                  ? [settings.buyer]
+                  : [];
             if (activeBuyers.length === 0) return null;
             const isMulti = activeBuyers.length > 1;
             const badgeLabel = isMulti
@@ -632,15 +632,13 @@ function renderWidgetContent(
 
             {/* Variance Card */}
             <div
-              className={`p-2.5 rounded-xl border flex flex-col justify-between ${
-                isUnderBudget ? "bg-teal-500/10 border-teal-500/20" : "bg-rose-500/10 border-rose-500/20"
-              }`}
+              className={`p-2.5 rounded-xl border flex flex-col justify-between ${isUnderBudget ? "bg-teal-500/10 border-teal-500/20" : "bg-rose-500/10 border-rose-500/20"
+                }`}
             >
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-[10px] font-bold uppercase tracking-wider ${
-                    isUnderBudget ? "text-teal-700 dark:text-teal-300" : "text-rose-600"
-                  }`}
+                  className={`text-[10px] font-bold uppercase tracking-wider ${isUnderBudget ? "text-teal-700 dark:text-teal-300" : "text-rose-600"
+                    }`}
                 >
                   Variance
                 </span>
@@ -650,24 +648,21 @@ function renderWidgetContent(
               </div>
               <div className="mt-1 flex items-baseline gap-1">
                 <span
-                  className={`text-lg sm:text-xl font-black font-mono ${
-                    isUnderBudget ? "text-teal-700 dark:text-teal-300" : "text-rose-600"
-                  }`}
+                  className={`text-lg sm:text-xl font-black font-mono ${isUnderBudget ? "text-teal-700 dark:text-teal-300" : "text-rose-600"
+                    }`}
                 >
                   {isUnderBudget ? `-${Math.abs(varianceHrs).toLocaleString()}` : `+${varianceHrs.toLocaleString()}`}
                 </span>
                 <span
-                  className={`text-[10px] font-bold ${
-                    isUnderBudget ? "text-teal-600" : "text-rose-600"
-                  }`}
+                  className={`text-[10px] font-bold ${isUnderBudget ? "text-teal-600" : "text-rose-600"
+                    }`}
                 >
                   hrs ({variancePct}%)
                 </span>
               </div>
               <div
-                className={`text-[9.5px] font-bold flex items-center gap-1 ${
-                  isUnderBudget ? "text-teal-700 dark:text-teal-300" : "text-rose-600"
-                }`}
+                className={`text-[9.5px] font-bold flex items-center gap-1 ${isUnderBudget ? "text-teal-700 dark:text-teal-300" : "text-rose-600"
+                  }`}
               >
                 <CheckCircle2 className="size-3" /> {isUnderBudget ? "Within Budget Limit" : "Exceeded Budget!"}
               </div>
@@ -1327,11 +1322,10 @@ function renderWidgetContent(
                   </div>
                   <div className="text-[10.5px] text-muted-foreground">{item.role} • {item.type}</div>
                 </div>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${
-                  item.status.includes("Pending")
-                    ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                    : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                }`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${item.status.includes("Pending")
+                  ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                  : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                  }`}>
                   {item.status}
                 </span>
               </div>
@@ -1358,11 +1352,10 @@ function renderWidgetContent(
                   <div className="font-bold text-foreground truncate">{item.name}</div>
                   <div className="text-[10.5px] text-muted-foreground">{item.role} • {item.type}</div>
                 </div>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${
-                  item.status.includes("Pending")
-                    ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                    : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                }`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${item.status.includes("Pending")
+                  ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                  : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                  }`}>
                   {item.status}
                 </span>
               </div>
@@ -1384,11 +1377,10 @@ function renderWidgetContent(
                 <div className="font-bold text-foreground truncate">{item.name}</div>
                 <div className="text-[10.5px] text-muted-foreground">{item.role} • {item.type}</div>
               </div>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${
-                item.status.includes("Pending")
-                  ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                  : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-              }`}>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${item.status.includes("Pending")
+                ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                }`}>
                 {item.status}
               </span>
             </div>
@@ -1430,8 +1422,8 @@ function renderWidgetContent(
         settings?.buyers && settings.buyers.length > 0
           ? settings.buyers
           : settings?.buyer && settings.buyer !== "All Buyers"
-          ? [settings.buyer]
-          : [];
+            ? [settings.buyer]
+            : [];
 
       const PROFILES: Record<string, { pcs: number; fob: number; onTime: number; styles: number }> = {
         "H&M Group": { pcs: 691000, fob: 5.64, onTime: 98.2, styles: 14 },
@@ -1528,8 +1520,8 @@ function renderWidgetContent(
         settings?.buyers && settings.buyers.length > 0
           ? settings.buyers
           : settings?.buyer && settings.buyer !== "All Buyers"
-          ? [settings.buyer]
-          : [];
+            ? [settings.buyer]
+            : [];
 
       const ALL_BUYERS = [
         { name: "H&M Group", value: 38, pcs: "691K", color: "#2563eb" },
@@ -1644,8 +1636,8 @@ function renderWidgetContent(
         settings?.buyers && settings.buyers.length > 0
           ? settings.buyers
           : settings?.buyer && settings.buyer !== "All Buyers"
-          ? [settings.buyer]
-          : [];
+            ? [settings.buyer]
+            : [];
 
       const ALL_SHIPMENTS = [
         { po: "PO-78421", buyer: "H&M Group", style: "Cotton Slub Tee", qty: "48,000 Pcs", due: "3 Days Left", risk: "High" },
@@ -1659,8 +1651,8 @@ function renderWidgetContent(
       const shipments =
         activeBuyers.length > 0
           ? ALL_SHIPMENTS.filter((s) =>
-              activeBuyers.some((ab) => ab.toLowerCase().includes(s.buyer.toLowerCase().split(" ")[0]))
-            )
+            activeBuyers.some((ab) => ab.toLowerCase().includes(s.buyer.toLowerCase().split(" ")[0]))
+          )
           : ALL_SHIPMENTS.slice(0, 4);
 
       return (
@@ -1802,9 +1794,8 @@ function renderWidgetContent(
                 <span className="font-bold text-foreground block">{t.item}</span>
                 <span className="text-[10px] text-muted-foreground">{t.from} → {t.to} ({t.qty})</span>
               </div>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                t.status === "Delivered" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-blue-500/10 text-blue-600 border-blue-500/20"
-              }`}>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${t.status === "Delivered" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-blue-500/10 text-blue-600 border-blue-500/20"
+                }`}>
                 {t.status}
               </span>
             </div>
