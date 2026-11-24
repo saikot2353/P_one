@@ -86,6 +86,19 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     supportedScopes: ["personal", "managed_depts", "department", "company"],
   },
   {
+    id: "hr_ot_requisition_vs_utilization",
+    name: "Overtime Requisition vs Overtime Utilization",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "Line supervisor OT hours requisition vs productive floor utilization rate, idle hours, and output efficiency.",
+    iconName: "Timer",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "OT Utilization",
+    supportedScopes: ["personal", "managed_depts", "department", "company"],
+  },
+  {
     id: "hr_attendance_pie",
     name: "Attendance Distribution Chart",
     module: "hris",
@@ -368,6 +381,7 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
       { id: "w_hr_3", componentId: "hr_late_absent_pie", colSpan: 4 },
       { id: "w_hr_4", componentId: "hr_ot_bar_chart", colSpan: 4 },
       { id: "w_hr_9", componentId: "hr_ot_requisition_vs_consumption", colSpan: 6 },
+      { id: "w_hr_10", componentId: "hr_ot_requisition_vs_utilization", colSpan: 6 },
       { id: "w_hr_5", componentId: "hr_headcount_trend", colSpan: 6 },
       { id: "w_hr_6", componentId: "hr_department_split", colSpan: 6 },
       { id: "w_hr_7", componentId: "hr_leave_approvals", colSpan: 6 },
@@ -435,8 +449,8 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
   },
 ];
 
-const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v3";
-const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v3";
+const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v4";
+const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v4";
 
 export function loadDashboardTemplates(): DashboardTemplate[] {
   if (typeof window === "undefined") return DEFAULT_DASHBOARD_TEMPLATES;

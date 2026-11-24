@@ -735,6 +735,245 @@ function renderWidgetContent(
       );
     }
 
+    case "hr_ot_requisition_vs_utilization": {
+      // Overtime Requisition vs Productive Floor Utilization
+      let reqHours = 14800;
+      let utilHours = 13920;
+      let unutilHours = 880;
+      let utilRate = 94.1;
+      let otOutputPcs = "256,120 Pcs";
+      let pcsPerHour = "18.4 Pcs/Hr";
+      let otTitle = "Factory Floor (6 Lines & Finishing)";
+
+      let utilData: Array<{
+        name: string;
+        requisition: number;
+        utilized: number;
+        unutilized: number;
+        rate: number;
+      }> = [
+        { name: "Sewing L-01", requisition: 2800, utilized: 2680, unutilized: 120, rate: 95.7 },
+        { name: "Sewing L-02", requisition: 2750, utilized: 2620, unutilized: 130, rate: 95.3 },
+        { name: "Sewing L-03", requisition: 2500, utilized: 2450, unutilized: 50, rate: 98.0 },
+        { name: "Sewing L-04", requisition: 2400, utilized: 2210, unutilized: 190, rate: 92.1 },
+        { name: "Cutting Sec", requisition: 2350, utilized: 2210, unutilized: 140, rate: 94.0 },
+        { name: "Finishing", requisition: 2000, utilized: 1750, unutilized: 250, rate: 87.5 },
+      ];
+
+      if (scope === "personal") {
+        reqHours = 20.0;
+        utilHours = 18.5;
+        unutilHours = 1.5;
+        utilRate = 92.5;
+        otOutputPcs = "100% Tasks";
+        pcsPerHour = "1.0 Task/Hr";
+        otTitle = "My Personal OT Utilization";
+        utilData = [
+          { name: "Sat", requisition: 3.5, utilized: 3.0, unutilized: 0.5, rate: 85.7 },
+          { name: "Sun", requisition: 3.0, utilized: 3.0, unutilized: 0, rate: 100 },
+          { name: "Mon", requisition: 3.5, utilized: 3.5, unutilized: 0, rate: 100 },
+          { name: "Tue", requisition: 3.0, utilized: 2.5, unutilized: 0.5, rate: 83.3 },
+          { name: "Wed", requisition: 4.0, utilized: 3.5, unutilized: 0.5, rate: 87.5 },
+          { name: "Thu", requisition: 3.0, utilized: 3.0, unutilized: 0, rate: 100 },
+        ];
+      } else if (scope === "managed_depts") {
+        const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
+        reqHours = 8400;
+        utilHours = 8050;
+        unutilHours = 350;
+        utilRate = 95.8;
+        otOutputPcs = "148,500 Pcs";
+        pcsPerHour = "18.4 Pcs/Hr";
+        otTitle = `Head of: ${managed.map((m) => m.split(" ")[0]).join(" & ")}`;
+        utilData = [
+          { name: "Sewing L-01", requisition: 1850, utilized: 1780, unutilized: 70, rate: 96.2 },
+          { name: "Sewing L-02", requisition: 1750, utilized: 1700, unutilized: 50, rate: 97.1 },
+          { name: "Sewing L-03", requisition: 1650, utilized: 1610, unutilized: 40, rate: 97.6 },
+          { name: "Sewing L-04", requisition: 1550, utilized: 1460, unutilized: 90, rate: 94.2 },
+          { name: "Cutting Sec", requisition: 1600, utilized: 1500, unutilized: 100, rate: 93.8 },
+        ];
+      } else if (scope === "department") {
+        const dept = settings?.department || "Sewing Floor";
+        reqHours = 6800;
+        utilHours = 6550;
+        unutilHours = 250;
+        utilRate = 96.3;
+        otOutputPcs = "121,000 Pcs";
+        pcsPerHour = "18.5 Pcs/Hr";
+        otTitle = `${dept} Line OT Utilization`;
+        utilData = [
+          { name: "Line-01", requisition: 1850, utilized: 1780, unutilized: 70, rate: 96.2 },
+          { name: "Line-02", requisition: 1750, utilized: 1700, unutilized: 50, rate: 97.1 },
+          { name: "Line-03", requisition: 1650, utilized: 1610, unutilized: 40, rate: 97.6 },
+          { name: "Line-04", requisition: 1550, utilized: 1460, unutilized: 90, rate: 94.2 },
+        ];
+      }
+
+      return (
+        <div className="space-y-3">
+          {/* Top KPI Summary Grid */}
+          <div className={`grid ${colSpan <= 3 ? "grid-cols-2" : "grid-cols-4"} gap-2`}>
+            {/* Requisitioned Hours */}
+            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Requisitioned</span>
+                <Clock className="w-3.5 h-3.5 text-blue-500" />
+              </div>
+              <div className="mt-1">
+                <span className="text-base sm:text-lg font-black text-foreground">
+                  {reqHours.toLocaleString()}
+                  <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
+                </span>
+                <div className="text-[10px] text-muted-foreground truncate">Approved Floor Budget</div>
+              </div>
+            </div>
+
+            {/* Utilized Hours */}
+            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Floor Utilized</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              </div>
+              <div className="mt-1">
+                <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">
+                  {utilHours.toLocaleString()}
+                  <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
+                </span>
+                <div className="text-[10px] text-emerald-600/80 font-medium truncate">Productive Output Time</div>
+              </div>
+            </div>
+
+            {/* Utilization Rate */}
+            <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">Utilization Rate</span>
+                <Percent className="w-3.5 h-3.5 text-indigo-500" />
+              </div>
+              <div className="mt-1">
+                <span className="text-base sm:text-lg font-black text-indigo-600 dark:text-indigo-400">
+                  {utilRate}%
+                </span>
+                <div className="text-[10px] text-indigo-600/80 font-medium truncate">Target: ≥92.0%</div>
+              </div>
+            </div>
+
+            {/* Idle / Saved Hours */}
+            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Idle / Unutilized</span>
+                <Timer className="w-3.5 h-3.5 text-amber-500" />
+              </div>
+              <div className="mt-1">
+                <span className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400">
+                  {unutilHours.toLocaleString()}
+                  <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
+                </span>
+                <div className="text-[10px] text-amber-600/80 font-medium truncate">Prevented Leakage</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Scope Header & Production Rate Banner */}
+          <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-muted/40 border border-border/50 text-xs">
+            <div className="flex items-center gap-1.5 truncate">
+              <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 animate-pulse" />
+              <span className="font-semibold text-foreground truncate">{otTitle}</span>
+            </div>
+            <div className="flex items-center gap-3 shrink-0 text-[11px]">
+              <span className="text-muted-foreground hidden sm:inline">
+                Output: <strong className="text-foreground">{otOutputPcs}</strong>
+              </span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-500/30">
+                ⚡ {pcsPerHour}
+              </span>
+            </div>
+          </div>
+
+          {/* Chart or Compact Progress View */}
+          {colSpan <= 3 ? (
+            <div className="space-y-2 pt-1">
+              {utilData.map((row) => (
+                <div key={row.name} className="p-2 rounded-lg bg-muted/30 border border-border/40 text-xs">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-foreground">{row.name}</span>
+                    <span
+                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                        row.rate >= 95
+                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                          : row.rate >= 90
+                          ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
+                          : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                      }`}
+                    >
+                      {row.rate.toFixed(1)}% Rate
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
+                    <span>Req: {row.requisition}h</span>
+                    <span>Utilized: {row.utilized}h</span>
+                    <span>Idle: {row.unutilized}h</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden flex">
+                    <div
+                      className="h-full bg-emerald-500 rounded-l-full"
+                      style={{ width: `${Math.min(100, row.rate)}%` }}
+                    />
+                    <div
+                      className="h-full bg-amber-400"
+                      style={{ width: `${Math.max(0, 100 - row.rate)}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-48 w-full pt-1">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={utilData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                  <XAxis dataKey="name" tick={{ fontSize: 9.5 }} />
+                  <YAxis tick={{ fontSize: 9.5 }} />
+                  <Tooltip
+                    formatter={(val: any, name: any) => [
+                      `${val} Hours`,
+                      name === "requisition"
+                        ? "OT Requisition (Approved Budget)"
+                        : name === "utilized"
+                        ? "Floor Utilized (Productive Output)"
+                        : "Idle / Unutilized (Saved)",
+                    ]}
+                    contentStyle={{
+                      backgroundColor: "#1e293b",
+                      borderColor: "#334155",
+                      borderRadius: "8px",
+                      fontSize: "11px",
+                      color: "#fff",
+                    }}
+                  />
+                  <Legend
+                    verticalAlign="top"
+                    height={26}
+                    formatter={(val) => (
+                      <span className="text-[10px] font-bold text-muted-foreground">
+                        {val === "requisition"
+                          ? "Requisition (Approved)"
+                          : val === "utilized"
+                          ? "Floor Utilized"
+                          : "Idle / Unutilized"}
+                      </span>
+                    )}
+                  />
+                  <Bar dataKey="requisition" fill="#3b82f6" radius={[3, 3, 0, 0]} name="requisition" />
+                  <Bar dataKey="utilized" fill="#10b981" radius={[3, 3, 0, 0]} name="utilized" />
+                  <Bar dataKey="unutilized" fill="#f59e0b" radius={[3, 3, 0, 0]} name="unutilized" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     case "hr_attendance_pie":
       const pieLayoutClass =
         colSpan <= 3 ? "flex flex-col items-center gap-2.5" : "flex flex-col sm:flex-row items-center gap-3";
