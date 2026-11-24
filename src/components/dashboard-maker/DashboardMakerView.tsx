@@ -608,11 +608,10 @@ export const DashboardMakerView: React.FC = () => {
                   key={cat}
                   type="button"
                   onClick={() => setCategoryFilter(cat)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                    categoryFilter === cat
-                      ? "bg-primary text-primary-foreground shadow-2xs"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${categoryFilter === cat
+                    ? "bg-primary text-primary-foreground shadow-2xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }`}
                 >
                   {cat}
                 </button>
@@ -648,9 +647,8 @@ export const DashboardMakerView: React.FC = () => {
               return (
                 <div
                   key={tpl.id}
-                  className={`bg-card rounded-2xl border p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md ${
-                    isActive ? "border-emerald-500/80 ring-2 ring-emerald-500/20" : "border-border/60"
-                  }`}
+                  className={`bg-card rounded-2xl border p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md ${isActive ? "border-emerald-500/80 ring-2 ring-emerald-500/20" : "border-border/60"
+                    }`}
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-2">
@@ -776,11 +774,10 @@ export const DashboardMakerView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsSideDrawerOpen(!isSideDrawerOpen)}
-                  className={`h-8 px-2.5 rounded-lg border text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
-                    isSideDrawerOpen
-                      ? "border-primary/40 bg-primary/10 text-primary"
-                      : "border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`h-8 px-2.5 rounded-lg border text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${isSideDrawerOpen
+                    ? "border-primary/40 bg-primary/10 text-primary"
+                    : "border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground"
+                    }`}
                   title="Toggle Components Side Panel"
                 >
                   {isSideDrawerOpen ? <PanelLeftClose className="size-3.5" /> : <PanelLeftOpen className="size-3.5" />}
@@ -792,9 +789,8 @@ export const DashboardMakerView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setCanvasDevice("desktop")}
-                    className={`p-1 rounded transition-colors cursor-pointer ${
-                      canvasDevice === "desktop" ? "bg-background text-primary shadow-xs font-bold" : "text-muted-foreground"
-                    }`}
+                    className={`p-1 rounded transition-colors cursor-pointer ${canvasDevice === "desktop" ? "bg-background text-primary shadow-xs font-bold" : "text-muted-foreground"
+                      }`}
                     title="Desktop Wide View"
                   >
                     <Monitor className="size-3.5" />
@@ -802,9 +798,8 @@ export const DashboardMakerView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setCanvasDevice("tablet")}
-                    className={`p-1 rounded transition-colors cursor-pointer ${
-                      canvasDevice === "tablet" ? "bg-background text-primary shadow-xs font-bold" : "text-muted-foreground"
-                    }`}
+                    className={`p-1 rounded transition-colors cursor-pointer ${canvasDevice === "tablet" ? "bg-background text-primary shadow-xs font-bold" : "text-muted-foreground"
+                      }`}
                     title="Tablet Mode (768px)"
                   >
                     <Tablet className="size-3.5" />
@@ -812,9 +807,8 @@ export const DashboardMakerView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setCanvasDevice("mobile")}
-                    className={`p-1 rounded transition-colors cursor-pointer ${
-                      canvasDevice === "mobile" ? "bg-background text-primary shadow-xs font-bold" : "text-muted-foreground"
-                    }`}
+                    className={`p-1 rounded transition-colors cursor-pointer ${canvasDevice === "mobile" ? "bg-background text-primary shadow-xs font-bold" : "text-muted-foreground"
+                      }`}
                     title="Mobile Mode (420px)"
                   >
                     <Smartphone className="size-3.5" />
@@ -906,11 +900,10 @@ export const DashboardMakerView: React.FC = () => {
                       key={mod.id}
                       type="button"
                       onClick={() => setComponentModuleFilter(mod.id)}
-                      className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold transition-all cursor-pointer whitespace-nowrap ${
-                        componentModuleFilter === mod.id
-                          ? "bg-blue-600 text-white shadow-2xs"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                      }`}
+                      className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold transition-all cursor-pointer whitespace-nowrap ${componentModuleFilter === mod.id
+                        ? "bg-blue-600 text-white shadow-2xs"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        }`}
                     >
                       {mod.label}
                     </button>
@@ -941,13 +934,12 @@ export const DashboardMakerView: React.FC = () => {
                         key={comp.id}
                         draggable={true}
                         onDragStart={(e) => onDragStartNew(e, comp.id)}
-                        className={`group p-2.5 rounded-xl border transition-all text-xs flex items-center justify-between gap-2 cursor-grab active:cursor-grabbing hover:shadow-sm select-none ${
-                          isBeingDragged
-                            ? "opacity-50 ring-2 ring-blue-500 bg-blue-500/10 border-blue-500"
-                            : isAdded
+                        className={`group p-2.5 rounded-xl border transition-all text-xs flex items-center justify-between gap-2 cursor-grab active:cursor-grabbing hover:shadow-sm select-none ${isBeingDragged
+                          ? "opacity-50 ring-2 ring-blue-500 bg-blue-500/10 border-blue-500"
+                          : isAdded
                             ? "border-emerald-500/40 bg-emerald-500/5 hover:border-emerald-500/70"
                             : "border-border/60 bg-background hover:border-blue-400 hover:bg-blue-50/25 dark:hover:bg-blue-950/25"
-                        }`}
+                          }`}
                         title="Drag this card into the dashboard view, or click +"
                       >
                         <div className="flex items-center gap-2 min-w-0">
@@ -990,11 +982,10 @@ export const DashboardMakerView: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => addComponentAtPosition(comp.id)}
-                            className={`size-6 rounded-md flex items-center justify-center transition-all cursor-pointer ${
-                              isAdded
-                                ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white"
-                                : "bg-primary/10 text-primary hover:bg-primary hover:text-white"
-                            }`}
+                            className={`size-6 rounded-md flex items-center justify-center transition-all cursor-pointer ${isAdded
+                              ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white"
+                              : "bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                              }`}
                             title="Click to add to canvas"
                           >
                             <Plus className="size-3.5" />
@@ -1044,24 +1035,22 @@ export const DashboardMakerView: React.FC = () => {
 
               {/* Rendered Canvas Frame according to Device */}
               <div
-                className={`mx-auto transition-all duration-300 w-full ${
-                  canvasDevice === "tablet"
-                    ? "max-w-3xl border-x-4 border-slate-300 dark:border-slate-800 p-3 rounded-2xl bg-muted/10 shadow-xl"
-                    : canvasDevice === "mobile"
+                className={`mx-auto transition-all duration-300 w-full ${canvasDevice === "tablet"
+                  ? "max-w-3xl border-x-4 border-slate-300 dark:border-slate-800 p-3 rounded-2xl bg-muted/10 shadow-xl"
+                  : canvasDevice === "mobile"
                     ? "max-w-sm border-x-4 border-slate-300 dark:border-slate-800 p-2 rounded-2xl bg-muted/10 shadow-xl"
                     : "w-full"
-                }`}
+                  }`}
               >
                 {/* Empty State / Initial Dropzone */}
                 {editingTemplate.widgets.length === 0 ? (
                   <div
                     onDragOver={(e) => onDragOverSlot(e, 0)}
                     onDrop={(e) => onDropSlot(e, 0)}
-                    className={`p-16 text-center border-2 border-dashed rounded-2xl space-y-3 cursor-pointer transition-all ${
-                      hoveredDropIndex === 0
-                        ? "border-blue-600 bg-blue-600/10 scale-[1.01]"
-                        : "border-blue-400/60 bg-blue-50/20 dark:bg-blue-950/20"
-                    }`}
+                    className={`p-16 text-center border-2 border-dashed rounded-2xl space-y-3 cursor-pointer transition-all ${hoveredDropIndex === 0
+                      ? "border-blue-600 bg-blue-600/10 scale-[1.01]"
+                      : "border-blue-400/60 bg-blue-50/20 dark:bg-blue-950/20"
+                      }`}
                   >
                     <div className="size-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center mx-auto shadow-md">
                       <ArrowDownToLine className="size-7 animate-bounce" />
@@ -1078,11 +1067,10 @@ export const DashboardMakerView: React.FC = () => {
                       <div
                         onDragOver={(e) => onDragOverSlot(e, 0)}
                         onDrop={(e) => onDropSlot(e, 0)}
-                        className={`col-span-12 transition-all duration-200 rounded-xl flex items-center justify-center border-2 border-dashed cursor-pointer ${
-                          hoveredDropIndex === 0
-                            ? "h-20 bg-blue-600 text-white border-blue-600 shadow-xl scale-[1.01]"
-                            : "h-14 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/60 hover:border-blue-600 animate-pulse"
-                        }`}
+                        className={`col-span-12 transition-all duration-200 rounded-xl flex items-center justify-center border-2 border-dashed cursor-pointer ${hoveredDropIndex === 0
+                          ? "h-20 bg-blue-600 text-white border-blue-600 shadow-xl scale-[1.01]"
+                          : "h-14 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/60 hover:border-blue-600 animate-pulse"
+                          }`}
                       >
                         <div className="flex items-center gap-2 font-bold text-xs">
                           <Plus className="size-4 animate-bounce" />
@@ -1115,9 +1103,8 @@ export const DashboardMakerView: React.FC = () => {
                         <React.Fragment key={widget.id}>
                           {/* The Widget Box */}
                           <div
-                            className={`${colSpanClass} relative group transition-all duration-200 ${
-                              isBeingDragged ? "opacity-30 scale-95" : ""
-                            }`}
+                            className={`${colSpanClass} relative group transition-all duration-200 ${isBeingDragged ? "opacity-30 scale-95" : ""
+                              }`}
                             onDragOver={(e) => onDragOverSlot(e, idx)}
                             onDrop={(e) => onDropSlot(e, idx)}
                           >
@@ -1166,8 +1153,8 @@ export const DashboardMakerView: React.FC = () => {
                                         widget.settings?.buyers && widget.settings.buyers.length > 0
                                           ? widget.settings.buyers
                                           : widget.settings?.buyer && widget.settings.buyer !== "All Buyers"
-                                          ? [widget.settings.buyer]
-                                          : []
+                                            ? [widget.settings.buyer]
+                                            : []
                                       }
                                       colSpan={effectiveColSpan}
                                       onChange={(buyers) => {
@@ -1178,8 +1165,8 @@ export const DashboardMakerView: React.FC = () => {
                                             buyers.length === 1
                                               ? buyers[0]
                                               : buyers.length === 0
-                                              ? "All Buyers"
-                                              : `${buyers.length} Buyers`,
+                                                ? "All Buyers"
+                                                : `${buyers.length} Buyers`,
                                         });
                                       }}
                                     />
@@ -1280,11 +1267,10 @@ export const DashboardMakerView: React.FC = () => {
                             <div
                               onDragOver={(e) => onDragOverSlot(e, idx + 1)}
                               onDrop={(e) => onDropSlot(e, idx + 1)}
-                              className={`col-span-12 transition-all duration-200 rounded-xl flex items-center justify-center border-2 border-dashed cursor-pointer ${
-                                isHoveredSlot
-                                  ? "h-20 bg-blue-600 text-white border-blue-600 shadow-xl scale-[1.01]"
-                                  : "h-14 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/60 hover:border-blue-600 animate-pulse"
-                              }`}
+                              className={`col-span-12 transition-all duration-200 rounded-xl flex items-center justify-center border-2 border-dashed cursor-pointer ${isHoveredSlot
+                                ? "h-20 bg-blue-600 text-white border-blue-600 shadow-xl scale-[1.01]"
+                                : "h-14 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/60 hover:border-blue-600 animate-pulse"
+                                }`}
                             >
                               <div className="flex items-center gap-2 font-bold text-xs">
                                 <Plus className="size-4 animate-bounce" />
@@ -1304,11 +1290,10 @@ export const DashboardMakerView: React.FC = () => {
                     <div
                       onDragOver={(e) => onDragOverSlot(e, editingTemplate.widgets.length)}
                       onDrop={(e) => onDropSlot(e, editingTemplate.widgets.length)}
-                      className={`col-span-12 p-6 text-center border-2 border-dashed rounded-2xl transition-all cursor-pointer flex flex-col items-center justify-center gap-2 ${
-                        hoveredDropIndex === editingTemplate.widgets.length
-                          ? "border-blue-600 bg-blue-600 text-white shadow-xl scale-[1.01]"
-                          : "border-border/70 hover:border-blue-500 hover:bg-blue-50/15 dark:hover:bg-blue-950/20 text-muted-foreground"
-                      }`}
+                      className={`col-span-12 p-6 text-center border-2 border-dashed rounded-2xl transition-all cursor-pointer flex flex-col items-center justify-center gap-2 ${hoveredDropIndex === editingTemplate.widgets.length
+                        ? "border-blue-600 bg-blue-600 text-white shadow-xl scale-[1.01]"
+                        : "border-border/70 hover:border-blue-500 hover:bg-blue-50/15 dark:hover:bg-blue-950/20 text-muted-foreground"
+                        }`}
                     >
                       <div className="size-10 rounded-xl bg-blue-600/10 text-blue-600 flex items-center justify-center">
                         <Plus className="size-5" />
@@ -1381,11 +1366,10 @@ export const DashboardMakerView: React.FC = () => {
                     {configuringDef.supportedScopes.includes("personal") && (
                       <div
                         onClick={() => handleUpdateWidgetScope(configuringWidget.id, "personal")}
-                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${
-                          configuringWidget.settings?.scope === "personal"
-                            ? "border-blue-600 bg-blue-500/10 shadow-xs"
-                            : "border-border/60 hover:border-blue-400 bg-background"
-                        }`}
+                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${configuringWidget.settings?.scope === "personal"
+                          ? "border-blue-600 bg-blue-500/10 shadow-xs"
+                          : "border-border/60 hover:border-blue-400 bg-background"
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="size-7 rounded-xl bg-blue-600/10 text-blue-600 flex items-center justify-center">
@@ -1408,11 +1392,10 @@ export const DashboardMakerView: React.FC = () => {
                     {configuringDef.supportedScopes.includes("managed_depts") && (
                       <div
                         onClick={() => handleUpdateWidgetScope(configuringWidget.id, "managed_depts")}
-                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${
-                          configuringWidget.settings?.scope === "managed_depts"
-                            ? "border-amber-500 bg-amber-500/10 shadow-xs"
-                            : "border-border/60 hover:border-amber-400 bg-background"
-                        }`}
+                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${configuringWidget.settings?.scope === "managed_depts"
+                          ? "border-amber-500 bg-amber-500/10 shadow-xs"
+                          : "border-border/60 hover:border-amber-400 bg-background"
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="size-7 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
@@ -1438,11 +1421,10 @@ export const DashboardMakerView: React.FC = () => {
                     {configuringDef.supportedScopes.includes("department") && (
                       <div
                         onClick={() => handleUpdateWidgetScope(configuringWidget.id, "department")}
-                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${
-                          configuringWidget.settings?.scope === "department"
-                            ? "border-purple-600 bg-purple-500/10 shadow-xs"
-                            : "border-border/60 hover:border-purple-400 bg-background"
-                        }`}
+                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${configuringWidget.settings?.scope === "department"
+                          ? "border-purple-600 bg-purple-500/10 shadow-xs"
+                          : "border-border/60 hover:border-purple-400 bg-background"
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="size-7 rounded-xl bg-purple-600/10 text-purple-600 flex items-center justify-center">
@@ -1465,11 +1447,10 @@ export const DashboardMakerView: React.FC = () => {
                     {configuringDef.supportedScopes.includes("company") && (
                       <div
                         onClick={() => handleUpdateWidgetScope(configuringWidget.id, "company")}
-                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${
-                          (!configuringWidget.settings?.scope || configuringWidget.settings.scope === "company")
-                            ? "border-emerald-600 bg-emerald-500/10 shadow-xs"
-                            : "border-border/60 hover:border-emerald-400 bg-background"
-                        }`}
+                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${(!configuringWidget.settings?.scope || configuringWidget.settings.scope === "company")
+                          ? "border-emerald-600 bg-emerald-500/10 shadow-xs"
+                          : "border-border/60 hover:border-emerald-400 bg-background"
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="size-7 rounded-xl bg-emerald-600/10 text-emerald-600 flex items-center justify-center">
@@ -1522,22 +1503,20 @@ export const DashboardMakerView: React.FC = () => {
                                   managedDepartments: updated,
                                 });
                               }}
-                              className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
-                                isChecked
-                                  ? "bg-amber-500/10 border-amber-500/50 text-foreground font-bold shadow-2xs"
-                                  : "bg-background border-border/60 hover:border-amber-300 text-muted-foreground"
-                              }`}
+                              className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${isChecked
+                                ? "bg-amber-500/10 border-amber-500/50 text-foreground font-bold shadow-2xs"
+                                : "bg-background border-border/60 hover:border-amber-300 text-muted-foreground"
+                                }`}
                             >
                               <div className="min-w-0 pr-2">
                                 <div className="text-xs truncate">{dept.name}</div>
                                 <div className="text-[10px] text-muted-foreground font-mono">{dept.count}</div>
                               </div>
                               <div
-                                className={`size-4 rounded-md border flex items-center justify-center shrink-0 ${
-                                  isChecked
-                                    ? "bg-amber-500 border-amber-600 text-white"
-                                    : "border-border/80 bg-background"
-                                }`}
+                                className={`size-4 rounded-md border flex items-center justify-center shrink-0 ${isChecked
+                                  ? "bg-amber-500 border-amber-600 text-white"
+                                  : "border-border/80 bg-background"
+                                  }`}
                               >
                                 {isChecked && <Check className="size-3 stroke-[3]" />}
                               </div>
@@ -1683,15 +1662,14 @@ export const DashboardMakerView: React.FC = () => {
                                 next.length === 1
                                   ? next[0]
                                   : next.length === 0
-                                  ? "All Buyers"
-                                  : `${next.length} Buyers`,
+                                    ? "All Buyers"
+                                    : `${next.length} Buyers`,
                             });
                           }}
-                          className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all select-none ${
-                            isChecked
-                              ? "bg-teal-500/10 border-teal-500 text-foreground font-bold shadow-2xs"
-                              : "bg-background border-border/60 hover:border-teal-300 text-muted-foreground"
-                          }`}
+                          className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all select-none ${isChecked
+                            ? "bg-teal-500/10 border-teal-500 text-foreground font-bold shadow-2xs"
+                            : "bg-background border-border/60 hover:border-teal-300 text-muted-foreground"
+                            }`}
                         >
                           <div className="min-w-0 pr-2">
                             <div className="text-xs truncate flex items-center gap-1.5">
@@ -1705,11 +1683,10 @@ export const DashboardMakerView: React.FC = () => {
                             </div>
                           </div>
                           <div
-                            className={`size-4 rounded-md border flex items-center justify-center shrink-0 ${
-                              isChecked
-                                ? "bg-teal-600 border-teal-600 text-white"
-                                : "border-border/80 bg-background"
-                            }`}
+                            className={`size-4 rounded-md border flex items-center justify-center shrink-0 ${isChecked
+                              ? "bg-teal-600 border-teal-600 text-white"
+                              : "border-border/80 bg-background"
+                              }`}
                           >
                             {isChecked && <Check className="size-3 stroke-[3]" />}
                           </div>
@@ -1743,11 +1720,10 @@ export const DashboardMakerView: React.FC = () => {
                               warehouse: w.id,
                             })
                           }
-                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
-                            isSelected
-                              ? "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-300 font-bold"
-                              : "border-border/60 hover:border-amber-400 bg-background text-foreground"
-                          }`}
+                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${isSelected
+                            ? "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-300 font-bold"
+                            : "border-border/60 hover:border-amber-400 bg-background text-foreground"
+                            }`}
                         >
                           <div className="min-w-0 pr-2">
                             <span className="truncate block font-bold text-xs">{w.name}</span>
@@ -1843,11 +1819,10 @@ export const DashboardMakerView: React.FC = () => {
                           key={w.val}
                           type="button"
                           onClick={() => handleWidgetColSpanChange(configuringWidget.id, w.val)}
-                          className={`h-9 flex-1 rounded-xl border font-bold text-xs cursor-pointer transition-colors ${
-                            configuringWidget.colSpan === w.val
-                              ? "bg-primary text-primary-foreground border-primary shadow-2xs"
-                              : "border-border/60 bg-background text-muted-foreground hover:text-foreground"
-                          }`}
+                          className={`h-9 flex-1 rounded-xl border font-bold text-xs cursor-pointer transition-colors ${configuringWidget.colSpan === w.val
+                            ? "bg-primary text-primary-foreground border-primary shadow-2xs"
+                            : "border-border/60 bg-background text-muted-foreground hover:text-foreground"
+                            }`}
                         >
                           {w.label}
                         </button>
