@@ -29,6 +29,7 @@ import {
   BadgeAlert,
   Percent,
   Sparkles,
+  User,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -45,56 +46,115 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { DashboardWidgetConfig, DASHBOARD_COMPONENTS_CATALOG } from "./dashboard-maker-types";
+import {
+  DashboardWidgetConfig,
+  DASHBOARD_COMPONENTS_CATALOG,
+  WidgetSettings,
+  WidgetColSpan,
+} from "./dashboard-maker-types";
 
 interface WidgetRendererProps {
   widget: DashboardWidgetConfig;
   isCompact?: boolean;
+  onUpdateSettings?: (newSettings: WidgetSettings) => void;
 }
 
-const COLORS = [
-  "#2563eb", // blue
-  "#10b981", // emerald
-  "#f59e0b", // amber
-  "#8b5cf6", // purple
-  "#ec4899", // pink
-  "#06b6d4", // cyan
-  "#f43f5e", // rose
-];
-
-export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({ widget, isCompact = false }) => {
+export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
+  widget,
+  isCompact = false,
+  onUpdateSettings,
+}) => {
   const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === widget.componentId);
   const displayTitle = widget.customTitle || def?.name || "Dashboard Widget";
+  const settings = widget.settings;
 
   return (
     <div className="h-full bg-card rounded-2xl border border-border/60 shadow-xs p-4 sm:p-5 flex flex-col justify-between transition-all hover:border-border hover:shadow-sm">
       {/* Widget Header */}
       <div className="flex items-center justify-between pb-3 border-b border-border/40 gap-2 mb-3">
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <div className="size-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
             {getWidgetIcon(def?.iconName || "Layers")}
           </div>
-          <div className="min-w-0">
-            <h4 className="text-xs sm:text-sm font-bold text-foreground truncate">{displayTitle}</h4>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-xs sm:text-sm font-bold text-foreground truncate" title={displayTitle}>
+              {displayTitle}
+            </h4>
             <div className="flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
-              <span className="font-semibold uppercase tracking-wider text-[9.5px] px-1.5 py-0.2 rounded bg-muted/60 text-muted-foreground/90">
-                {def?.moduleLabel || "Module"}
+              <span className="font-semibold uppercase tracking-wider text-[9.5px] px-1.5 py-0.2 rounded bg-muted/60 text-muted-foreground/90 shrink-0">
+                {def?.moduleLabel.split(" ")[0] || "Module"}
               </span>
-              <span>•</span>
-              <span className="truncate">{def?.category}</span>
+              {(widget.colSpan || 12) > 3 && (
+                <>
+                  <span>•</span>
+                  <span className="truncate">{def?.category}</span>
+                </>
+              )}
             </div>
           </div>
         </div>
-        {def?.badge && (
-          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 shrink-0">
-            {def.badge}
-          </span>
-        )}
+
+        {/* Dynamic Scope / Filter Badge (Compact, non-intrusive) */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {settings?.scope === "personal" && (
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1 shrink-0"
+              title="Scope: My Self (Personal)"
+            >
+              <User className="size-3" /> {(widget.colSpan || 12) > 3 ? "My Self" : ""}
+            </span>
+          )}
+
+          {settings?.scope === "department" && (
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 flex items-center gap-1 shrink-0"
+              title={`Scope: ${settings.department || "Department"}`}
+            >
+              <Building2 className="size-3" /> {(widget.colSpan || 12) > 3 ? (settings.department ? settings.department.split(" ")[0] : "Dept") : ""}
+            </span>
+          )}
+
+          {(!settings?.scope || settings?.scope === "company") && def?.supportedScopes && (
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1 shrink-0"
+              title="Scope: Entire Company"
+            >
+              🏢 {(widget.colSpan || 12) > 3 ? "Company" : ""}
+            </span>
+          )}
+
+          {settings?.buyer && settings.buyer !== "All Buyers" && (
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20 flex items-center gap-1 shrink-0"
+              title={`Buyer: ${settings.buyer}`}
+            >
+              <Store className="size-3" /> {(widget.colSpan || 12) > 3 ? settings.buyer.split(" ")[0] : ""}
+            </span>
+          )}
+
+          {settings?.warehouse && settings.warehouse !== "All Warehouses" && (
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1 shrink-0"
+              title={`Warehouse: ${settings.warehouse}`}
+            >
+              <Package className="size-3" /> {(widget.colSpan || 12) > 3 ? settings.warehouse.split(" ")[0] : ""}
+            </span>
+          )}
+
+          {def?.badge && !def?.supportedScopes && !settings?.scope && !settings?.buyer && !settings?.warehouse && (
+            <span
+              className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 shrink-0"
+              title={def.badge}
+            >
+              {(widget.colSpan || 12) > 3 ? def.badge : "★"}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Widget Content Body */}
       <div className="flex-1 min-h-[140px] flex flex-col justify-center">
-        {renderWidgetContent(widget.componentId, isCompact)}
+        {renderWidgetContent(widget.componentId, isCompact, settings, widget.colSpan || 12)}
       </div>
     </div>
   );
@@ -147,14 +207,160 @@ function getWidgetIcon(name: string) {
   }
 }
 
-function renderWidgetContent(componentId: string, isCompact: boolean) {
+function getMetricGridClass(colSpan: WidgetColSpan = 12, count: number = 4): string {
+  if (colSpan <= 3) {
+    // 25% card (colSpan 3): 1 column vertical stack, clean & readable!
+    return "grid grid-cols-1 gap-2 py-1";
+  }
+  if (colSpan <= 4) {
+    // 33% card (colSpan 4): 2 columns
+    return "grid grid-cols-2 gap-2 py-1";
+  }
+  if (colSpan <= 6) {
+    // 50% card
+    return count >= 5 ? "grid grid-cols-2 sm:grid-cols-3 gap-2.5 py-1" : "grid grid-cols-2 gap-2.5 py-1";
+  }
+  // 100% full width
+  return count >= 5 ? "grid grid-cols-2 sm:grid-cols-5 gap-2.5 py-1" : "grid grid-cols-2 sm:grid-cols-4 gap-2.5 py-1";
+}
+
+function renderWidgetContent(
+  componentId: string,
+  isCompact: boolean,
+  settings?: WidgetSettings,
+  colSpan: WidgetColSpan = 12
+) {
+  const scope = settings?.scope || "company";
+
   switch (componentId) {
     // ----------------------------------------------------
-    // HRIS Components
+    // HRIS Components (Dynamic Scope: Personal vs Dept vs Company)
     // ----------------------------------------------------
     case "hr_quick_stats":
+      if (scope === "personal") {
+        return (
+          <div className={getMetricGridClass(colSpan, 5)}>
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
+                Today's Status
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-lg sm:text-xl font-black text-emerald-700 dark:text-emerald-300">
+                  Present
+                </span>
+              </div>
+              <div className="text-[10px] text-emerald-600/80 font-medium mt-1 flex items-center gap-1">
+                <CheckCircle2 className="size-3" /> In: 08:48 AM
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+              <span className="text-[10.5px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
+                Monthly Working
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">21 / 22</span>
+                <span className="text-[10px] text-blue-600 font-bold">95.5%</span>
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-1">1 Day Weekend Duty</div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <span className="text-[10.5px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
+                My Late Punches
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-amber-700 dark:text-amber-300">1 Time</span>
+              </div>
+              <div className="text-[10px] text-amber-600/80 font-medium mt-1">12 min grace OK</div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+              <span className="text-[10.5px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider block">
+                Leaves Taken
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 dark:text-purple-300">2 Days</span>
+              </div>
+              <div className="text-[10px] text-purple-600/80 font-medium mt-1">Remaining: 12 Days</div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+              <span className="text-[10.5px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider block">
+                My Overtime
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-cyan-700 dark:text-cyan-300">16.5h</span>
+              </div>
+              <div className="text-[10px] text-cyan-600/80 font-medium mt-1">Est OT: ৳4,120</div>
+            </div>
+          </div>
+        );
+      }
+
+      if (scope === "department") {
+        const deptName = settings?.department || "Sewing Floor";
+        return (
+          <div className={getMetricGridClass(colSpan, 5)}>
+            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block truncate">
+                {deptName} Staff
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">680</span>
+                <span className="text-[10px] text-muted-foreground">Operators</span>
+              </div>
+              <div className="text-[10px] text-blue-600/80 font-medium mt-1">Total in Department</div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">
+                Present on Floor
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">652</span>
+                <span className="text-[10px] text-emerald-600 font-bold">95.9%</span>
+              </div>
+              <div className="text-[10px] text-emerald-600/80 font-medium mt-1">Active on sewing lines</div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+              <span className="text-[10.5px] font-bold text-rose-600 uppercase tracking-wider block">
+                Floor Absentees
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-rose-700 dark:text-rose-300">18</span>
+                <span className="text-[10px] text-rose-600 font-bold">2.6%</span>
+              </div>
+              <div className="text-[10px] text-rose-600/80 font-medium mt-1">Uninformed delay</div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <span className="text-[10.5px] font-bold text-amber-600 uppercase tracking-wider block">
+                Late Punches
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-amber-700 dark:text-amber-300">24</span>
+              </div>
+              <div className="text-[10px] text-amber-600/80 font-medium mt-1">Shift-1 late arrivals</div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">
+                On Approved Leave
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 dark:text-purple-300">10</span>
+              </div>
+              <div className="text-[10px] text-purple-600/80 font-medium mt-1">Medical & Casual</div>
+            </div>
+          </div>
+        );
+      }
+
+      // Default: Company Wide
       return (
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 py-1">
+        <div className={getMetricGridClass(colSpan, 5)}>
           <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
             <span className="text-[10.5px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
               Total Workforce
@@ -219,6 +425,90 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
       );
 
     case "hr_attendance_pie":
+      const pieLayoutClass =
+        colSpan <= 3 ? "flex flex-col items-center gap-2.5" : "flex flex-col sm:flex-row items-center gap-3";
+      const pieChartClass = colSpan <= 3 ? "w-full h-36" : "w-full sm:w-1/2 h-44";
+      const pieLegendClass = colSpan <= 3 ? "w-full space-y-1 text-xs" : "w-full sm:w-1/2 space-y-1.5 text-xs";
+
+      if (scope === "personal") {
+        const myData = [
+          { name: "My Present Days", value: 21, color: "#10b981" },
+          { name: "Weekends / Off", value: 8, color: "#3b82f6" },
+          { name: "Approved Leave", value: 1, color: "#8b5cf6" },
+          { name: "Late Entry", value: 1, color: "#f59e0b" },
+        ];
+        return (
+          <div className={pieLayoutClass}>
+            <div className={pieChartClass}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={myData} innerRadius={colSpan <= 3 ? 34 : 42} outerRadius={colSpan <= 3 ? 54 : 65} paddingAngle={4} dataKey="value">
+                    {myData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className={pieLegendClass}>
+              {myData.map((d) => (
+                <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
+                  <div className="flex items-center gap-1.5">
+                    <div className="size-2 rounded-full" style={{ backgroundColor: d.color }} />
+                    <span className="text-muted-foreground font-medium text-[11px] truncate">{d.name}</span>
+                  </div>
+                  <span className="font-mono font-bold text-foreground text-[11px]">{d.value} Days</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (scope === "department") {
+        const deptName = settings?.department || "Sewing Floor";
+        const deptData = [
+          { name: "Present", value: 652, color: "#10b981" },
+          { name: "Absent", value: 18, color: "#f43f5e" },
+          { name: "Late Entry", value: 24, color: "#f59e0b" },
+          { name: "On Leave", value: 10, color: "#8b5cf6" },
+        ];
+        return (
+          <div className={pieLayoutClass}>
+            <div className={pieChartClass}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={deptData} innerRadius={colSpan <= 3 ? 34 : 42} outerRadius={colSpan <= 3 ? 54 : 65} paddingAngle={4} dataKey="value">
+                    {deptData.map((entry, index) => (
+                      <Cell key={`cell-dept-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(val: any) => [`${val} staff`, deptName]}
+                    contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className={pieLegendClass}>
+              <div className="text-[10.5px] font-bold text-purple-600 mb-1 flex items-center gap-1 truncate">
+                <Building2 className="size-3" /> {deptName}
+              </div>
+              {deptData.map((d) => (
+                <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
+                  <div className="flex items-center gap-1.5">
+                    <div className="size-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+                    <span className="text-muted-foreground font-medium text-[11px]">{d.name}</span>
+                  </div>
+                  <span className="font-mono font-bold text-foreground text-[11px]">{d.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
       const attData = [
         { name: "Present", value: 1196, color: "#10b981" },
         { name: "Absent", value: 42, color: "#f43f5e" },
@@ -226,11 +516,11 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
         { name: "Leave", value: 10, color: "#8b5cf6" },
       ];
       return (
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="w-full sm:w-1/2 h-44">
+        <div className={pieLayoutClass}>
+          <div className={pieChartClass}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={attData} innerRadius={42} outerRadius={65} paddingAngle={4} dataKey="value">
+                <Pie data={attData} innerRadius={colSpan <= 3 ? 34 : 42} outerRadius={colSpan <= 3 ? 54 : 65} paddingAngle={4} dataKey="value">
                   {attData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -242,7 +532,7 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="w-full sm:w-1/2 space-y-1.5 text-xs">
+          <div className={pieLegendClass}>
             {attData.map((d) => (
               <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
                 <div className="flex items-center gap-1.5">
@@ -257,6 +547,11 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
       );
 
     case "hr_late_absent_pie":
+      const latePieLayoutClass =
+        colSpan <= 3 ? "flex flex-col items-center gap-2.5" : "flex flex-col sm:flex-row items-center gap-3";
+      const latePieChartClass = colSpan <= 3 ? "w-full h-36" : "w-full sm:w-1/2 h-44";
+      const latePieLegendClass = colSpan <= 3 ? "w-full space-y-1 text-xs" : "w-full sm:w-1/2 space-y-1.5 text-xs";
+
       const lateData = [
         { name: "Grace Period (<15m)", value: 48, color: "#f59e0b" },
         { name: "Heavy Delay (>30m)", value: 25, color: "#fb923c" },
@@ -264,11 +559,11 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
         { name: "Medical Absent", value: 14, color: "#f43f5e" },
       ];
       return (
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="w-full sm:w-1/2 h-44">
+        <div className={latePieLayoutClass}>
+          <div className={latePieChartClass}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={lateData} innerRadius={38} outerRadius={62} paddingAngle={3} dataKey="value">
+                <Pie data={lateData} innerRadius={colSpan <= 3 ? 32 : 38} outerRadius={colSpan <= 3 ? 52 : 62} paddingAngle={3} dataKey="value">
                   {lateData.map((entry, index) => (
                     <Cell key={`cell-late-${index}`} fill={entry.color} />
                   ))}
@@ -277,7 +572,7 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="w-full sm:w-1/2 space-y-1.5 text-xs">
+          <div className={latePieLegendClass}>
             {lateData.map((d) => (
               <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
                 <span className="text-muted-foreground text-[11px] truncate">{d.name}</span>
@@ -289,6 +584,66 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
       );
 
     case "hr_ot_bar_chart":
+      if (scope === "personal") {
+        const myOtData = [
+          { day: "Sat", hours: 2.5 },
+          { day: "Sun", hours: 2.0 },
+          { day: "Mon", hours: 3.0 },
+          { day: "Tue", hours: 2.0 },
+          { day: "Wed", hours: 3.5 },
+          { day: "Thu", hours: 2.0 },
+          { day: "Fri", hours: 1.5 },
+        ];
+        return (
+          <div className="h-44 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={myOtData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                <XAxis dataKey="day" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip
+                  formatter={(val: any) => [`${val} hrs logged`, "My Overtime"]}
+                  contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
+                />
+                <Bar dataKey="hours" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        );
+      }
+
+      if (scope === "department") {
+        const deptName = settings?.department || "Sewing Floor";
+        const deptOtData = [
+          { day: "Sat", hours: 240, cost: 33000 },
+          { day: "Sun", hours: 320, cost: 44000 },
+          { day: "Mon", hours: 310, cost: 42000 },
+          { day: "Tue", hours: 340, cost: 47000 },
+          { day: "Wed", hours: 290, cost: 40000 },
+          { day: "Thu", hours: 350, cost: 49000 },
+          { day: "Fri", hours: 160, cost: 22000 },
+        ];
+        return (
+          <div className="h-44 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={deptOtData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                <XAxis dataKey="day" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip
+                  formatter={(val: any, name: any) => [
+                    name === "hours" ? `${val} hrs` : `৳${val.toLocaleString()}`,
+                    `${deptName} OT`,
+                  ]}
+                  contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
+                />
+                <Bar dataKey="hours" fill="#a855f7" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        );
+      }
+
       const otData = [
         { day: "Sat", hours: 420, cost: 58000 },
         { day: "Sun", hours: 610, cost: 84000 },
@@ -371,6 +726,35 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
       );
 
     case "hr_leave_approvals":
+      if (scope === "personal") {
+        return (
+          <div className="space-y-2">
+            <div className="p-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex items-center justify-between gap-2 text-xs">
+              <div>
+                <div className="font-bold text-foreground">Casual Leave (1 Day)</div>
+                <div className="text-[10.5px] text-muted-foreground">Nov 12, 2026 • Family Urgent Work</div>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                Approved
+              </span>
+            </div>
+            <div className="p-2.5 rounded-xl border border-border/50 bg-muted/20 flex items-center justify-between gap-2 text-xs">
+              <div>
+                <div className="font-bold text-foreground">Medical Leave (1 Day)</div>
+                <div className="text-[10.5px] text-muted-foreground">Nov 04, 2026 • Doctor Consultation</div>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                Approved
+              </span>
+            </div>
+            <div className="p-2 rounded-lg bg-muted/30 border border-border/40 text-[10.5px] flex items-center justify-between font-mono font-bold">
+              <span className="text-muted-foreground">My Leave Balance:</span>
+              <span className="text-foreground">CL: 9d | SL: 11d | EL: 14d</span>
+            </div>
+          </div>
+        );
+      }
+
       const leaveList = [
         { name: "Javed Mia", role: "Sewing Operator", type: "Earn Leave (3d)", reason: "Family Event", status: "Pending Manager" },
         { name: "Kaikobad Howlader", role: "Quality Inspector", type: "Medical Leave (2d)", reason: "Fever & Clinic", status: "Pending HR" },
@@ -398,23 +782,23 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
 
     case "hr_recruitment_pipeline":
       return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center py-2">
-          <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
+        <div className={getMetricGridClass(colSpan, 4)}>
+          <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-center">
             <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">Openings</span>
             <span className="text-xl font-mono font-bold text-foreground mt-1 block">18</span>
             <span className="text-[10px] text-muted-foreground">Requisitions</span>
           </div>
-          <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20">
+          <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-center">
             <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wider block">Screening</span>
             <span className="text-xl font-mono font-bold text-foreground mt-1 block">142</span>
             <span className="text-[10px] text-muted-foreground">CVs In-Review</span>
           </div>
-          <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
+          <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center">
             <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider block">Interview</span>
             <span className="text-xl font-mono font-bold text-foreground mt-1 block">24</span>
             <span className="text-[10px] text-muted-foreground">This Week</span>
           </div>
-          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
             <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block">Offered</span>
             <span className="text-xl font-mono font-bold text-foreground mt-1 block">6</span>
             <span className="text-[10px] text-muted-foreground">Accepted</span>
@@ -423,20 +807,43 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
       );
 
     // ----------------------------------------------------
-    // Merchandising (MM) Components
+    // Merchandising (MM) Components (Dynamic Buyer Filtering)
     // ----------------------------------------------------
     case "mm_order_pipeline":
+      const buyer = settings?.buyer;
+      let orderVol = "1.82M";
+      let fobVal = "$14.85M";
+      let onTime = "96.4%";
+      let note = "36 Running Orders";
+
+      if (buyer === "H&M Group") {
+        orderVol = "691K";
+        fobVal = "$5.64M";
+        onTime = "98.2%";
+        note = "14 Running Styles (Polo/Tee)";
+      } else if (buyer === "Zara / Inditex") {
+        orderVol = "436K";
+        fobVal = "$3.82M";
+        onTime = "95.8%";
+        note = "8 Running Styles (Fleece/Rib)";
+      } else if (buyer === "Target USA") {
+        orderVol = "327K";
+        fobVal = "$2.84M";
+        onTime = "94.0%";
+        note = "6 Running Styles (Pyjama)";
+      }
+
       return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 py-1">
+        <div className={getMetricGridClass(colSpan, 4)}>
           <div className="p-3 rounded-xl bg-teal-500/10 border border-teal-500/20">
             <span className="text-[10.5px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider block">
               Total Order Volume
             </span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-foreground">1.82M</span>
+              <span className="text-xl sm:text-2xl font-black font-mono text-foreground">{orderVol}</span>
               <span className="text-[10px] text-muted-foreground">Pieces</span>
             </div>
-            <div className="text-[10px] text-teal-600/80 font-medium mt-1">36 Running Orders</div>
+            <div className="text-[10px] text-teal-600/80 font-medium mt-1 truncate">{note}</div>
           </div>
 
           <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20">
@@ -444,9 +851,9 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
               Total FOB Value
             </span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-foreground">$14.85M</span>
+              <span className="text-xl sm:text-2xl font-black font-mono text-foreground">{fobVal}</span>
             </div>
-            <div className="text-[10px] text-sky-600/80 font-medium mt-1">Avg FOB: $8.15 / Pc</div>
+            <div className="text-[10px] text-sky-600/80 font-medium mt-1">Export FOB Value</div>
           </div>
 
           <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
@@ -455,7 +862,7 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
             </span>
             <div className="flex items-baseline gap-1 mt-1">
               <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">
-                96.4%
+                {onTime}
               </span>
             </div>
             <div className="text-[10px] text-emerald-600/80 font-medium mt-1">Inspection 1st pass: 98%</div>
@@ -483,12 +890,17 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
         { name: "Next UK", value: 12, pcs: "218K", color: "#8b5cf6" },
         { name: "C&A Europe", value: 8, pcs: "145K", color: "#ec4899" },
       ];
+      const buyerPieLayoutClass =
+        colSpan <= 3 ? "flex flex-col items-center gap-2.5" : "flex flex-col sm:flex-row items-center gap-3";
+      const buyerPieChartClass = colSpan <= 3 ? "w-full h-36" : "w-full sm:w-1/2 h-44";
+      const buyerPieLegendClass = colSpan <= 3 ? "w-full space-y-1 text-xs" : "w-full sm:w-1/2 space-y-1.5 text-xs";
+
       return (
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="w-full sm:w-1/2 h-44">
+        <div className={buyerPieLayoutClass}>
+          <div className={buyerPieChartClass}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={buyerData} innerRadius={40} outerRadius={65} paddingAngle={4} dataKey="value">
+                <Pie data={buyerData} innerRadius={colSpan <= 3 ? 32 : 40} outerRadius={colSpan <= 3 ? 52 : 65} paddingAngle={4} dataKey="value">
                   {buyerData.map((b) => (
                     <Cell key={b.name} fill={b.color} />
                   ))}
@@ -497,7 +909,7 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="w-full sm:w-1/2 space-y-1.5 text-xs">
+          <div className={buyerPieLegendClass}>
             {buyerData.map((b) => (
               <div key={b.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
                 <div className="flex items-center gap-1.5">
@@ -585,30 +997,53 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
       );
 
     // ----------------------------------------------------
-    // Inventory Components
+    // Inventory Components (Dynamic Warehouse Filter)
     // ----------------------------------------------------
     case "inv_stock_valuation":
+      const wh = settings?.warehouse;
+      let val = "৳18.42 Cr";
+      let skus = "4,820";
+      let turnover = "6.4x";
+      let alertCount = "14 Items";
+
+      if (wh === "Trims & Accessories Warehouse") {
+        val = "৳2.85 Cr";
+        skus = "1,420";
+        turnover = "8.2x";
+        alertCount = "4 Items";
+      } else if (wh === "Central Raw Material Store") {
+        val = "৳11.20 Cr";
+        skus = "1,840";
+        turnover = "5.8x";
+        alertCount = "6 Items";
+      } else if (wh === "Chemical & Dyeing Store") {
+        val = "৳4.37 Cr";
+        skus = "980";
+        turnover = "7.1x";
+        alertCount = "3 Items";
+      }
+
       return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 py-1">
+        <div className={getMetricGridClass(colSpan, 4)}>
           <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Total Stock Valuation</span>
-            <span className="text-xl font-black font-mono text-foreground mt-1 block">৳18.42 Cr</span>
-            <span className="text-[10px] text-muted-foreground">Raw Material + Trims</span>
+            <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Stock Valuation</span>
+            <span className="text-xl font-black font-mono text-foreground mt-1 block">{val}</span>
+            <span className="text-[10px] text-muted-foreground truncate">{wh || "All Stores"}</span>
           </div>
           <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
             <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">Active Stock Items</span>
-            <span className="text-xl font-black font-mono text-foreground mt-1 block">4,820</span>
+            <span className="text-xl font-black font-mono text-foreground mt-1 block">{skus}</span>
             <span className="text-[10px] text-muted-foreground">Distinct SKUs</span>
           </div>
           <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
             <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">Inventory Turnover</span>
-            <span className="text-xl font-black font-mono text-foreground mt-1 block">6.4x</span>
-            <span className="text-[10px] text-muted-foreground">Days of supply: 28d</span>
+            <span className="text-xl font-black font-mono text-foreground mt-1 block">{turnover}</span>
+            <span className="text-[10px] text-muted-foreground">Days of supply</span>
           </div>
           <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-            <span className="text-[10.5px] font-bold text-rose-600 uppercase tracking-wider block">Safety Threshold Alert</span>
-            <span className="text-xl font-black font-mono text-rose-600 mt-1 block">14 Items</span>
-            <span className="text-[10px] text-muted-foreground">Below min level</span>
+            <span className="text-[10.5px] font-bold text-rose-600 uppercase tracking-wider block">Safety Alert</span>
+            <span className="text-xl font-black font-mono text-rose-600 mt-1 block">{alertCount}</span>
+            <span className="text-[10px] text-muted-foreground">Below threshold</span>
           </div>
         </div>
       );
@@ -689,8 +1124,90 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
     // Accounts & Finance Components
     // ----------------------------------------------------
     case "acc_payroll_payout":
+      if (scope === "personal") {
+        return (
+          <div className={getMetricGridClass(colSpan, 4)}>
+            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">
+                My Net Payable
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">৳38,500</span>
+              </div>
+              <div className="text-[10px] text-blue-600/80 font-medium mt-1">Salary: Nov 2026</div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">
+                Gross Earnings
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">
+                  ৳42,000
+                </span>
+              </div>
+              <div className="text-[10px] text-emerald-600/80 font-medium mt-1">Basic + Allowances</div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">
+                Disbursement Mode
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-sm sm:text-base font-black font-mono text-purple-700 dark:text-purple-300 truncate">
+                  Bank Asia
+                </span>
+              </div>
+              <div className="text-[10px] text-purple-600/80 font-medium mt-1">A/C: ***892 (BEFTN)</div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+              <span className="text-[10.5px] font-bold text-rose-600 uppercase tracking-wider block">
+                Total Deductions
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-xl sm:text-2xl font-black font-mono text-rose-700 dark:text-rose-300">
+                  ৳3,500
+                </span>
+              </div>
+              <div className="text-[10px] text-rose-600/80 font-medium mt-1">Tax ৳2K • PF ৳1.5K</div>
+            </div>
+          </div>
+        );
+      }
+
+      if (scope === "department") {
+        const deptName = settings?.department || "Sewing Floor";
+        return (
+          <div className={getMetricGridClass(colSpan, 4)}>
+            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block truncate">
+                {deptName} Wage Bill
+              </span>
+              <span className="text-xl font-black font-mono text-foreground mt-1 block">৳1.68 Cr</span>
+              <span className="text-[10px] text-muted-foreground">Department Total</span>
+            </div>
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Bank Transfer</span>
+              <span className="text-xl font-black font-mono text-emerald-700 dark:text-emerald-300 mt-1 block">৳1.45 Cr</span>
+              <span className="text-[10px] text-muted-foreground">86.3% of department</span>
+            </div>
+            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">Cash / MFS</span>
+              <span className="text-xl font-black font-mono text-blue-700 dark:text-blue-300 mt-1 block">৳23.0 Lac</span>
+              <span className="text-[10px] text-muted-foreground">Floor worker cash</span>
+            </div>
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <span className="text-[10.5px] font-bold text-amber-600 uppercase tracking-wider block">Deductions</span>
+              <span className="text-xl font-black font-mono text-amber-700 dark:text-amber-300 mt-1 block">৳12.8 Lac</span>
+              <span className="text-[10px] text-muted-foreground">Department Deductions</span>
+            </div>
+          </div>
+        );
+      }
+
       return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 py-1">
+        <div className={getMetricGridClass(colSpan, 4)}>
           <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
             <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">Net Payroll Payable</span>
             <span className="text-xl font-black font-mono text-foreground mt-1 block">৳3.28 Cr</span>
@@ -764,7 +1281,7 @@ function renderWidgetContent(componentId: string, isCompact: boolean) {
     // ----------------------------------------------------
     case "proc_active_po":
       return (
-        <div className="grid grid-cols-2 gap-2 text-center py-1">
+        <div className={colSpan <= 3 ? "grid grid-cols-1 gap-2 py-1" : "grid grid-cols-2 gap-2 text-center py-1"}>
           <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
             <span className="text-[10.5px] font-bold text-cyan-600 uppercase tracking-wider block">Open POs</span>
             <span className="text-2xl font-black font-mono text-foreground mt-1 block">142</span>

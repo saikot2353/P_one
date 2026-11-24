@@ -18,6 +18,7 @@ import {
   loadDashboardTemplates,
   getActiveDashboardTemplateId,
   WidgetColSpan,
+  DASHBOARD_COMPONENTS_CATALOG,
 } from "@/components/dashboard-maker/dashboard-maker-types";
 import { DashboardWidgetRenderer } from "@/components/dashboard-maker/DashboardWidgetRenderer";
 import { Sparkles, LayoutDashboard } from "lucide-react";
@@ -120,10 +121,13 @@ function DashboardPage() {
 
               <div className="grid grid-cols-12 gap-3.5 lg:gap-4.5">
                 {activeTemplate.widgets.map((widget) => {
-                  const spanClass = getGridColSpanClass(widget.colSpan);
+                  const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === widget.componentId);
+                  const minSpan = def?.minColSpan || 3;
+                  const effectiveSpan = Math.max(widget.colSpan, minSpan) as WidgetColSpan;
+                  const spanClass = getGridColSpanClass(effectiveSpan);
                   return (
                     <div key={widget.id} className={spanClass}>
-                      <DashboardWidgetRenderer widget={widget} />
+                      <DashboardWidgetRenderer widget={{ ...widget, colSpan: effectiveSpan }} />
                     </div>
                   );
                 })}

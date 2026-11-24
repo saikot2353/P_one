@@ -37,6 +37,10 @@ import {
   ArrowDownToLine,
   Maximize2,
   HelpCircle,
+  User,
+  X,
+  Check,
+  Filter,
 } from "lucide-react";
 import {
   DashboardTemplate,
@@ -49,8 +53,36 @@ import {
   setActiveDashboardTemplateId,
   DEFAULT_DASHBOARD_TEMPLATES,
   WidgetColSpan,
+  WidgetSettings,
 } from "./dashboard-maker-types";
 import { DashboardWidgetRenderer } from "./DashboardWidgetRenderer";
+
+const DEPARTMENTS_LIST = [
+  { id: "Sewing Floor", name: "Sewing Floor (সুইং ফ্লোর)", count: "680 Operators" },
+  { id: "Cutting Unit", name: "Cutting Unit (কাটিং সেকশন)", count: "140 Staff" },
+  { id: "Finishing & Pack", name: "Finishing & Packing (ফিনিশিং)", count: "210 Staff" },
+  { id: "Quality Assurance", name: "Quality Assurance (কোয়ালিটি)", count: "95 Staff" },
+  { id: "HR & Compliance", name: "HR, Admin & Compliance (এইচ আর)", count: "48 Staff" },
+  { id: "Merchandising", name: "Merchandising (মার্চেন্ডাইজিং)", count: "42 Staff" },
+  { id: "Accounts & Finance", name: "Accounts & Finance (একাউন্টস)", count: "33 Staff" },
+];
+
+const BUYERS_LIST = [
+  "All Buyers",
+  "H&M Group",
+  "Zara / Inditex",
+  "Target USA",
+  "Next UK",
+  "C&A Europe",
+];
+
+const WAREHOUSES_LIST = [
+  "All Warehouses",
+  "Central Raw Material Store",
+  "Trims & Accessories Warehouse",
+  "Chemical & Dyeing Store",
+  "Finished Goods Store",
+];
 
 type DragItemData =
   | { type: "new_component"; componentId: string }
@@ -78,8 +110,20 @@ export const DashboardMakerView: React.FC = () => {
   const [draggedItem, setDraggedItem] = useState<DragItemData | null>(null);
   const [hoveredDropIndex, setHoveredDropIndex] = useState<number | null>(null);
 
+  // Widget Configuration Modal State
+  const [configuringWidgetId, setConfiguringWidgetId] = useState<string | null>(null);
+
   // Toast Notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const configuringWidget = useMemo(() => {
+    return editingTemplate?.widgets.find((w) => w.id === configuringWidgetId) || null;
+  }, [editingTemplate, configuringWidgetId]);
+
+  const configuringDef = useMemo(() => {
+    if (!configuringWidget) return null;
+    return DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === configuringWidget.componentId) || null;
+  }, [configuringWidget]);
 
   useEffect(() => {
     const loaded = loadDashboardTemplates();
@@ -87,6 +131,24 @@ export const DashboardMakerView: React.FC = () => {
     const active = getActiveDashboardTemplateId();
     setActiveId(active);
   }, []);
+
+  // Auto-heal widgets whose saved colSpan is below minColSpan (e.g. from previous sessions)
+  useEffect(() => {
+    if (!editingTemplate) return;
+    let modified = false;
+    const healed = editingTemplate.widgets.map((w) => {
+      const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === w.componentId);
+      const minSpan = def?.minColSpan || 3;
+      if (w.colSpan < minSpan) {
+        modified = true;
+        return { ...w, colSpan: minSpan };
+      }
+      return w;
+    });
+    if (modified) {
+      setEditingTemplate((prev) => (prev ? { ...prev, widgets: healed } : null));
+    }
+  }, [editingTemplate?.id]);
 
   // Global safety listener for drag cleanup
   useEffect(() => {
@@ -323,6 +385,34 @@ export const DashboardMakerView: React.FC = () => {
     setEditingTemplate({
       ...editingTemplate,
       widgets: editingTemplate.widgets.map((w) => (w.id === widgetId ? { ...w, customTitle: title } : w)),
+    });
+  };
+
+  // Update Widget Settings (Scope, Buyer, Warehouse, Period, etc.)
+  const handleUpdateWidgetSettings = (widgetId: string, newSettings: WidgetSettings) => {
+    if (!editingTemplate) return;
+    setEditingTemplate({
+      ...editingTemplate,
+      widgets: editingTemplate.widgets.map((w) =>
+        w.id === widgetId ? { ...w, settings: { ...(w.settings || {}), ...newSettings } } : w
+      ),
+    });
+    showToast("Widget settings updated");
+  };
+
+  // Update Widget Scope (Personal / Department / Company)
+  const handleUpdateWidgetScope = (
+    widgetId: string,
+    scope: "personal" | "department" | "company"
+  ) => {
+    if (!editingTemplate) return;
+    const currentWidget = editingTemplate.widgets.find((w) => w.id === widgetId);
+    const currentSettings = currentWidget?.settings || {};
+    handleUpdateWidgetSettings(widgetId, {
+      ...currentSettings,
+      scope,
+      department:
+        scope === "department" ? currentSettings.department || "Sewing Floor" : currentSettings.department,
     });
   };
 
@@ -853,13 +943,28 @@ export const DashboardMakerView: React.FC = () => {
                           </div>
 
                           <div className="min-w-0">
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 flex-wrap">
                               <span className="text-[9px] font-bold uppercase tracking-wider px-1 py-0.2 rounded bg-muted text-muted-foreground">
                                 {comp.moduleLabel.split(" ")[0]}
                               </span>
                               <span className="text-[9px] text-muted-foreground truncate">
                                 • {comp.category.split(" ")[0]}
                               </span>
+                              {comp.supportedScopes && (
+                                <span className="text-[8.5px] font-bold px-1 py-0.2 rounded bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                                  Multi-Scope
+                                </span>
+                              )}
+                              {comp.hasBuyerFilter && (
+                                <span className="text-[8.5px] font-bold px-1 py-0.2 rounded bg-teal-500/10 text-teal-600 border border-teal-500/20">
+                                  Buyer
+                                </span>
+                              )}
+                              {comp.hasWarehouseFilter && (
+                                <span className="text-[8.5px] font-bold px-1 py-0.2 rounded bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                                  Store
+                                </span>
+                              )}
                             </div>
                             <div className="font-bold text-foreground text-xs truncate leading-tight mt-0.5">
                               {comp.name}
@@ -978,10 +1083,19 @@ export const DashboardMakerView: React.FC = () => {
 
                     {editingTemplate.widgets.map((widget, idx) => {
                       const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === widget.componentId);
-                      const colSpanClass = getColSpanClass(widget.colSpan, canvasDevice);
+                      const minSpan = def?.minColSpan || 3;
+                      const effectiveColSpan = Math.max(widget.colSpan, minSpan) as WidgetColSpan;
+                      const colSpanClass = getColSpanClass(effectiveColSpan, canvasDevice);
                       const isBeingDragged =
                         draggedItem?.type === "existing_widget" && draggedItem.widgetId === widget.id;
                       const isHoveredSlot = hoveredDropIndex === idx + 1;
+
+                      const availableSpans = [
+                        { label: "25%", val: 3 as WidgetColSpan },
+                        { label: "33%", val: 4 as WidgetColSpan },
+                        { label: "50%", val: 6 as WidgetColSpan },
+                        { label: "100%", val: 12 as WidgetColSpan },
+                      ].filter((s) => s.val >= minSpan);
 
                       return (
                         <React.Fragment key={widget.id}>
@@ -996,16 +1110,16 @@ export const DashboardMakerView: React.FC = () => {
                             {/* Editable Widget Wrapper */}
                             <div className="h-full rounded-2xl border border-border/80 bg-card overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
                               {/* Prominent Drag Header Bar with Clear Drag Cue */}
-                              <div className="bg-muted/50 border-b border-border/60 px-3 py-2 flex items-center justify-between gap-2 text-xs">
+                              <div className="bg-muted/50 border-b border-border/60 px-2.5 py-1.5 sm:px-3 sm:py-2 flex items-center justify-between gap-1.5 sm:gap-2 text-xs">
                                 {/* Drag Handle & Title */}
-                                <div className="flex items-center gap-2 min-w-0">
+                                <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
                                   <div
                                     draggable={true}
                                     onDragStart={(e) => onDragStartExisting(e, widget.id, idx)}
-                                    className="cursor-grab active:cursor-grabbing px-2 py-1 rounded-md bg-background hover:bg-blue-600 hover:text-white border border-border/60 text-muted-foreground transition-all flex items-center gap-1 font-bold text-[10.5px] shadow-2xs select-none"
+                                    className="cursor-grab active:cursor-grabbing px-1.5 py-0.5 rounded-md bg-background hover:bg-blue-600 hover:text-white border border-border/60 text-muted-foreground transition-all flex items-center gap-1 font-bold text-[10px] shadow-2xs select-none shrink-0"
                                     title="Click and drag to reorder on canvas"
                                   >
-                                    <GripVertical className="size-3.5" />
+                                    <GripVertical className="size-3" />
                                     <span>#{idx + 1}</span>
                                   </div>
 
@@ -1013,72 +1127,148 @@ export const DashboardMakerView: React.FC = () => {
                                     type="text"
                                     value={widget.customTitle || def?.name}
                                     onChange={(e) => handleWidgetTitleChange(widget.id, e.target.value)}
-                                    className="font-bold text-xs text-foreground bg-transparent border-b border-transparent hover:border-border focus:border-primary outline-none truncate max-w-[160px] sm:max-w-xs"
+                                    className="font-bold text-xs text-foreground bg-transparent border-b border-transparent hover:border-border focus:border-primary outline-none truncate w-full min-w-[70px]"
                                     title="Click to rename widget title"
                                   />
                                 </div>
 
-                                {/* Width Pills, Duplicate & Delete */}
+                                {/* Width Pills, Dynamic Filters & Actions */}
                                 <div className="flex items-center gap-1 shrink-0">
-                                  {/* Width selector pills */}
-                                  <div className="hidden sm:inline-flex rounded-lg border border-border/60 p-0.5 bg-background text-[10px] font-bold">
-                                    {[
-                                      { label: "25%", val: 3 as WidgetColSpan },
-                                      { label: "33%", val: 4 as WidgetColSpan },
-                                      { label: "50%", val: 6 as WidgetColSpan },
-                                      { label: "100%", val: 12 as WidgetColSpan },
-                                    ].map((w) => (
-                                      <button
-                                        key={w.val}
-                                        type="button"
-                                        onClick={() => handleWidgetColSpanChange(widget.id, w.val)}
-                                        className={`px-1.5 py-0.5 rounded cursor-pointer transition-colors ${
-                                          widget.colSpan === w.val
-                                            ? "bg-primary text-primary-foreground shadow-2xs"
-                                            : "text-muted-foreground hover:text-foreground"
-                                        }`}
-                                        title={`Set width: ${w.label}`}
-                                      >
-                                        {w.label}
-                                      </button>
+                                  {/* Quick Scope Switcher Dropdown (visible if colSpan >= 4) */}
+                                  {def?.supportedScopes && effectiveColSpan >= 4 && (
+                                    <select
+                                      value={widget.settings?.scope || "company"}
+                                      onChange={(e) => handleUpdateWidgetScope(widget.id, e.target.value as any)}
+                                      className={`h-6 px-1.5 rounded-md border border-border/80 bg-background font-bold text-foreground cursor-pointer outline-none focus:border-primary shrink-0 ${
+                                        effectiveColSpan === 4 ? "text-[9.5px] max-w-[75px] truncate" : "text-[10px]"
+                                      }`}
+                                      title="Switch Scope: My Self / Department / Company"
+                                    >
+                                      {def.supportedScopes.includes("personal") && (
+                                        <option value="personal">👤 My Self</option>
+                                      )}
+                                      {def.supportedScopes.includes("department") && (
+                                        <option value="department">👥 Dept</option>
+                                      )}
+                                      {def.supportedScopes.includes("company") && (
+                                        <option value="company">🏢 Company</option>
+                                      )}
+                                    </select>
+                                  )}
+
+                                  {/* Quick Buyer Filter Dropdown (visible if colSpan >= 4) */}
+                                  {def?.hasBuyerFilter && effectiveColSpan >= 4 && (
+                                    <select
+                                      value={widget.settings?.buyer || "All Buyers"}
+                                      onChange={(e) =>
+                                        handleUpdateWidgetSettings(widget.id, {
+                                          ...(widget.settings || {}),
+                                          buyer: e.target.value,
+                                        })
+                                      }
+                                      className={`h-6 px-1.5 rounded-md border border-teal-500/40 bg-teal-500/10 text-teal-700 dark:text-teal-300 font-bold cursor-pointer outline-none focus:border-teal-500 shrink-0 ${
+                                        effectiveColSpan === 4 ? "text-[9.5px] max-w-[75px] truncate" : "text-[10px] max-w-[85px] truncate"
+                                      }`}
+                                      title="Filter by International Buyer"
+                                    >
+                                      {BUYERS_LIST.map((b) => (
+                                        <option key={b} value={b}>
+                                          {b}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  )}
+
+                                  {/* Quick Warehouse Filter Dropdown (visible if colSpan >= 4) */}
+                                  {def?.hasWarehouseFilter && effectiveColSpan >= 4 && (
+                                    <select
+                                      value={widget.settings?.warehouse || "All Warehouses"}
+                                      onChange={(e) =>
+                                        handleUpdateWidgetSettings(widget.id, {
+                                          ...(widget.settings || {}),
+                                          warehouse: e.target.value,
+                                        })
+                                      }
+                                      className={`h-6 px-1.5 rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 font-bold cursor-pointer outline-none focus:border-amber-500 shrink-0 ${
+                                        effectiveColSpan === 4 ? "text-[9.5px] max-w-[75px] truncate" : "text-[10px] max-w-[85px] truncate"
+                                      }`}
+                                      title="Filter by Warehouse Store"
+                                    >
+                                      {WAREHOUSES_LIST.map((w) => (
+                                        <option key={w} value={w}>
+                                          {w.split(" ")[0]}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  )}
+
+                                  {/* Width selector dropdown */}
+                                  <select
+                                    value={effectiveColSpan}
+                                    onChange={(e) =>
+                                      handleWidgetColSpanChange(widget.id, Number(e.target.value) as WidgetColSpan)
+                                    }
+                                    className="h-6 px-1 rounded-md border border-border/70 bg-background text-[10px] font-bold text-muted-foreground hover:text-foreground cursor-pointer outline-none focus:border-primary shrink-0"
+                                    title="Set Card Width"
+                                  >
+                                    {availableSpans.map((s) => (
+                                      <option key={s.val} value={s.val}>
+                                        {s.label}
+                                      </option>
                                     ))}
-                                  </div>
+                                  </select>
 
-                                  {/* Duplicate button */}
+                                  {/* Settings / Configuration Modal Button */}
                                   <button
                                     type="button"
-                                    onClick={() => handleDuplicateWidget(widget, idx)}
-                                    className="size-6 rounded border border-border/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
-                                    title="Duplicate Widget"
+                                    onClick={() => setConfiguringWidgetId(widget.id)}
+                                    className="size-6 rounded-md border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+                                    title="Detailed Card Configuration (Scope, Department, Filters)"
                                   >
-                                    <Copy className="size-3" />
+                                    <SlidersHorizontal className="size-3" />
                                   </button>
 
-                                  {/* Up / Down Move buttons */}
-                                  <button
-                                    type="button"
-                                    disabled={idx === 0}
-                                    onClick={() => moveWidgetToPosition(idx, idx - 1)}
-                                    className="size-6 rounded border border-border/50 hover:bg-muted disabled:opacity-20 flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
-                                    title="Move Up"
-                                  >
-                                    <MoveUp className="size-3" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={idx === editingTemplate.widgets.length - 1}
-                                    onClick={() => moveWidgetToPosition(idx, idx + 2)}
-                                    className="size-6 rounded border border-border/50 hover:bg-muted disabled:opacity-20 flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
-                                    title="Move Down"
-                                  >
-                                    <MoveDown className="size-3" />
-                                  </button>
+                                  {/* Duplicate button (visible on cards with span >= 6) */}
+                                  {effectiveColSpan >= 6 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDuplicateWidget(widget, idx)}
+                                      className="size-6 rounded-md border border-border/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
+                                      title="Duplicate Widget"
+                                    >
+                                      <Copy className="size-3" />
+                                    </button>
+                                  )}
+
+                                  {/* Up / Down Move buttons (visible on wider cards) */}
+                                  {effectiveColSpan >= 6 && (
+                                    <div className="hidden xl:flex items-center gap-1">
+                                      <button
+                                        type="button"
+                                        disabled={idx === 0}
+                                        onClick={() => moveWidgetToPosition(idx, idx - 1)}
+                                        className="size-6 rounded-md border border-border/50 hover:bg-muted disabled:opacity-20 flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
+                                        title="Move Up"
+                                      >
+                                        <MoveUp className="size-3" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        disabled={idx === editingTemplate.widgets.length - 1}
+                                        onClick={() => moveWidgetToPosition(idx, idx + 2)}
+                                        className="size-6 rounded-md border border-border/50 hover:bg-muted disabled:opacity-20 flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
+                                        title="Move Down"
+                                      >
+                                        <MoveDown className="size-3" />
+                                      </button>
+                                    </div>
+                                  )}
 
                                   {/* Delete Widget */}
                                   <button
                                     type="button"
                                     onClick={() => handleRemoveWidget(widget.id)}
-                                    className="size-6 rounded border border-transparent hover:border-rose-500/30 text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 flex items-center justify-center cursor-pointer transition-colors"
+                                    className="size-6 rounded-md border border-transparent hover:border-rose-500/30 text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 flex items-center justify-center shrink-0 cursor-pointer transition-colors"
                                     title="Remove Widget"
                                   >
                                     <Trash2 className="size-3" />
@@ -1088,7 +1278,11 @@ export const DashboardMakerView: React.FC = () => {
 
                               {/* Live Rendered Content */}
                               <div className="p-3 sm:p-4 flex-1">
-                                <DashboardWidgetRenderer widget={widget} isCompact={canvasDevice === "mobile"} />
+                                <DashboardWidgetRenderer
+                                  widget={{ ...widget, colSpan: effectiveColSpan }}
+                                  isCompact={canvasDevice === "mobile"}
+                                  onUpdateSettings={(newSettings) => handleUpdateWidgetSettings(widget.id, newSettings)}
+                                />
                               </div>
                             </div>
                           </div>
@@ -1143,6 +1337,356 @@ export const DashboardMakerView: React.FC = () => {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ----------------------------------------------------------- */}
+      {/* 3. WIDGET DETAILED CONFIGURATION MODAL                     */}
+      {/* ----------------------------------------------------------- */}
+      {configuringWidget && configuringDef && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-card border border-border/80 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-border/60 flex items-center justify-between bg-muted/30">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="size-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <SlidersHorizontal className="size-5" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-base font-bold text-foreground flex items-center gap-2 truncate">
+                    <span>Configure Card:</span>
+                    <span className="text-primary truncate">
+                      {configuringWidget.customTitle || configuringDef.name}
+                    </span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground truncate">
+                    Choose data scope (Personal / Dept / Company), filters, and presentation options.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setConfiguringWidgetId(null)}
+                className="size-8 rounded-xl border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center cursor-pointer transition-colors shrink-0"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Modal Content Form */}
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+              {/* Scope Selector if supported */}
+              {configuringDef.supportedScopes && (
+                <div className="space-y-2.5">
+                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    <User className="size-3.5 text-primary" />
+                    Target Data Scope (ডাটা স্কোপ নির্বাচন - নিজের / ডিপার্টমেন্ট / কোম্পানি)
+                  </label>
+                  <p className="text-[11px] text-muted-foreground">
+                    কার্ডে কার তথ্য দেখতে চান তা নির্বাচন করুন।
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    {/* Personal Scope */}
+                    {configuringDef.supportedScopes.includes("personal") && (
+                      <div
+                        onClick={() => handleUpdateWidgetScope(configuringWidget.id, "personal")}
+                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                          configuringWidget.settings?.scope === "personal"
+                            ? "border-blue-600 bg-blue-500/10 shadow-xs"
+                            : "border-border/60 hover:border-blue-400 bg-background"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="size-7 rounded-xl bg-blue-600/10 text-blue-600 flex items-center justify-center">
+                            <User className="size-4" />
+                          </div>
+                          {configuringWidget.settings?.scope === "personal" && (
+                            <CheckCircle2 className="size-4 text-blue-600" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs text-foreground">My Self (আমার নিজের)</div>
+                          <div className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                            ব্যক্তিগত উপস্থিতি, ইন-টাইম, ওভারটাইম এবং ছুটির হিসাব
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Department Scope */}
+                    {configuringDef.supportedScopes.includes("department") && (
+                      <div
+                        onClick={() => handleUpdateWidgetScope(configuringWidget.id, "department")}
+                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                          configuringWidget.settings?.scope === "department"
+                            ? "border-purple-600 bg-purple-500/10 shadow-xs"
+                            : "border-border/60 hover:border-purple-400 bg-background"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="size-7 rounded-xl bg-purple-600/10 text-purple-600 flex items-center justify-center">
+                            <Building2 className="size-4" />
+                          </div>
+                          {configuringWidget.settings?.scope === "department" && (
+                            <CheckCircle2 className="size-4 text-purple-600" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs text-foreground">Department (ডিপার্টমেন্ট)</div>
+                          <div className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                            নির্দিষ্ট সেকশন বা ফ্লোরের সমন্বিত রিপোর্ট
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Company Scope */}
+                    {configuringDef.supportedScopes.includes("company") && (
+                      <div
+                        onClick={() => handleUpdateWidgetScope(configuringWidget.id, "company")}
+                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                          (!configuringWidget.settings?.scope || configuringWidget.settings.scope === "company")
+                            ? "border-emerald-600 bg-emerald-500/10 shadow-xs"
+                            : "border-border/60 hover:border-emerald-400 bg-background"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="size-7 rounded-xl bg-emerald-600/10 text-emerald-600 flex items-center justify-center">
+                            <Layers className="size-4" />
+                          </div>
+                          {(!configuringWidget.settings?.scope || configuringWidget.settings.scope === "company") && (
+                            <CheckCircle2 className="size-4 text-emerald-600" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs text-foreground">Entire Company (পুরো কোম্পানি)</div>
+                          <div className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                            কারখানার সর্বমোট ১,২৪৮ জন কর্মীর সম্মিলিত ডাটা
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* If Department selected, choose specific department */}
+                  {configuringWidget.settings?.scope === "department" && (
+                    <div className="p-3.5 rounded-2xl bg-purple-500/5 border border-purple-500/20 space-y-2 mt-2">
+                      <label className="text-[11px] font-bold text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                        <Building2 className="size-3.5" />
+                        Select Manufacturing / Office Department:
+                      </label>
+                      <select
+                        value={configuringWidget.settings.department || "Sewing Floor"}
+                        onChange={(e) =>
+                          handleUpdateWidgetSettings(configuringWidget.id, {
+                            ...configuringWidget.settings,
+                            department: e.target.value,
+                          })
+                        }
+                        className="w-full h-9 px-3 rounded-xl border border-purple-500/30 bg-background font-semibold text-xs text-foreground cursor-pointer outline-none focus:border-purple-500"
+                      >
+                        {DEPARTMENTS_LIST.map((dept) => (
+                          <option key={dept.id} value={dept.id}>
+                            {dept.name} — {dept.count}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Buyer Filter */}
+              {configuringDef.hasBuyerFilter && (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    <Store className="size-3.5 text-teal-600" />
+                    Target International Buyer (বায়ার ফিল্টার)
+                  </label>
+                  <p className="text-[11px] text-muted-foreground">
+                    নির্দিষ্ট বায়ারের এক্সপোর্ট অর্ডার পাইপলাইন ও টিএন্ডএ মাইলস্টোন দেখতে বায়ার ফিল্টার করুন।
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {BUYERS_LIST.map((b) => {
+                      const isSelected = (configuringWidget.settings?.buyer || "All Buyers") === b;
+                      return (
+                        <button
+                          key={b}
+                          type="button"
+                          onClick={() =>
+                            handleUpdateWidgetSettings(configuringWidget.id, {
+                              ...configuringWidget.settings,
+                              buyer: b,
+                            })
+                          }
+                          className={`p-2 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                            isSelected
+                              ? "bg-teal-500/10 border-teal-500 text-teal-700 dark:text-teal-300 font-bold"
+                              : "border-border/60 hover:border-teal-400 bg-background text-foreground"
+                          }`}
+                        >
+                          <span className="truncate">{b}</span>
+                          {isSelected && <Check className="size-3.5 text-teal-600 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Warehouse Filter */}
+              {configuringDef.hasWarehouseFilter && (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    <Package className="size-3.5 text-amber-600" />
+                    Target Warehouse Store (স্টোর ফিল্টার)
+                  </label>
+                  <p className="text-[11px] text-muted-foreground">
+                    নির্দিষ্ট গোডাউন বা সেন্ট্রাল র মেটেরিয়াল স্টোরের স্টক ভ্যালুয়েশন প্রদর্শন করুন।
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {WAREHOUSES_LIST.map((w) => {
+                      const isSelected = (configuringWidget.settings?.warehouse || "All Warehouses") === w;
+                      return (
+                        <button
+                          key={w}
+                          type="button"
+                          onClick={() =>
+                            handleUpdateWidgetSettings(configuringWidget.id, {
+                              ...configuringWidget.settings,
+                              warehouse: w,
+                            })
+                          }
+                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                            isSelected
+                              ? "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-300 font-bold"
+                              : "border-border/60 hover:border-amber-400 bg-background text-foreground"
+                          }`}
+                        >
+                          <span className="truncate">{w}</span>
+                          {isSelected && <Check className="size-3.5 text-amber-600 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Time Period Filter & Employee Category */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    <Clock className="size-3.5 text-muted-foreground" />
+                    Reporting Period (সময়সীমা)
+                  </label>
+                  <select
+                    value={configuringWidget.settings?.period || "month"}
+                    onChange={(e) =>
+                      handleUpdateWidgetSettings(configuringWidget.id, {
+                        ...configuringWidget.settings,
+                        period: e.target.value as any,
+                      })
+                    }
+                    className="w-full h-9 px-3 rounded-xl border border-border/70 bg-background font-semibold text-xs text-foreground cursor-pointer outline-none focus:border-primary"
+                  >
+                    <option value="today">Today (আজকের সারাংশ)</option>
+                    <option value="week">This Week (চলতি সপ্তাহ)</option>
+                    <option value="month">This Month (চলতি মাস)</option>
+                    <option value="year">Fiscal Year (চলতি অর্থবছর)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    <Users className="size-3.5 text-muted-foreground" />
+                    Employee Category (কর্মীর ধরণ)
+                  </label>
+                  <select
+                    value={configuringWidget.settings?.employeeCategory || "all"}
+                    onChange={(e) =>
+                      handleUpdateWidgetSettings(configuringWidget.id, {
+                        ...configuringWidget.settings,
+                        employeeCategory: e.target.value as any,
+                      })
+                    }
+                    className="w-full h-9 px-3 rounded-xl border border-border/70 bg-background font-semibold text-xs text-foreground cursor-pointer outline-none focus:border-primary"
+                  >
+                    <option value="all">All Workforce (সকল কর্মী - Worker & Staff)</option>
+                    <option value="worker">Floor Workers / Operators (শুধুমাত্র অপারেটর)</option>
+                    <option value="staff">Office & Technical Staff (অফিস ও টেকনিক্যাল স্টাফ)</option>
+                    <option value="management">Management & Executives (ম্যানেজমেন্ট)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Custom Title and Card Width */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/40">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-foreground">Custom Widget Title (কার্ডের নাম)</label>
+                  <input
+                    type="text"
+                    value={configuringWidget.customTitle || configuringDef.name}
+                    onChange={(e) => handleWidgetTitleChange(configuringWidget.id, e.target.value)}
+                    className="w-full h-9 px-3 rounded-xl border border-border/70 bg-background font-bold text-xs text-foreground outline-none focus:border-primary"
+                    placeholder="Enter custom title"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-foreground">Card Width on Dashboard (প্রস্থ)</label>
+                    {configuringDef?.minColSpan && configuringDef.minColSpan > 3 && (
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">
+                        Min width: {configuringDef.minColSpan === 6 ? "50%" : "33%"} (KPI Banner)
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {[
+                      { label: "25%", val: 3 as WidgetColSpan },
+                      { label: "33%", val: 4 as WidgetColSpan },
+                      { label: "50%", val: 6 as WidgetColSpan },
+                      { label: "100%", val: 12 as WidgetColSpan },
+                    ]
+                      .filter((w) => !configuringDef?.minColSpan || w.val >= configuringDef.minColSpan)
+                      .map((w) => (
+                        <button
+                          key={w.val}
+                          type="button"
+                          onClick={() => handleWidgetColSpanChange(configuringWidget.id, w.val)}
+                          className={`h-9 flex-1 rounded-xl border font-bold text-xs cursor-pointer transition-colors ${
+                            configuringWidget.colSpan === w.val
+                              ? "bg-primary text-primary-foreground border-primary shadow-2xs"
+                              : "border-border/60 bg-background text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {w.label}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 sm:p-5 border-t border-border/60 bg-muted/20 flex items-center justify-between gap-3">
+              <span className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                <CheckCircle2 className="size-4 text-emerald-600" />
+                Live canvas updates immediately in real-time
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setConfiguringWidgetId(null);
+                  showToast("Configuration saved for this widget");
+                }}
+                className="h-9 px-5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-colors cursor-pointer shadow-sm"
+              >
+                Done & Apply
+              </button>
             </div>
           </div>
         </div>
