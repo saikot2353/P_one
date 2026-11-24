@@ -41,7 +41,16 @@ import {
   X,
   Check,
   Filter,
+  Crown,
 } from "lucide-react";
+import {
+  ScopeDropdown,
+  BuyerMultiSelectDropdown,
+  WarehouseDropdown,
+  WidthDropdown,
+  BUYER_OPTIONS,
+  WAREHOUSE_OPTIONS,
+} from "./DashboardDropdowns";
 import {
   DashboardTemplate,
   DashboardWidgetConfig,
@@ -112,6 +121,7 @@ export const DashboardMakerView: React.FC = () => {
 
   // Widget Configuration Modal State
   const [configuringWidgetId, setConfiguringWidgetId] = useState<string | null>(null);
+  const [modalBuyerSearch, setModalBuyerSearch] = useState("");
 
   // Toast Notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -400,10 +410,10 @@ export const DashboardMakerView: React.FC = () => {
     showToast("Widget settings updated");
   };
 
-  // Update Widget Scope (Personal / Department / Company)
+  // Update Widget Scope (Personal / Managed Depts / Department / Company)
   const handleUpdateWidgetScope = (
     widgetId: string,
-    scope: "personal" | "department" | "company"
+    scope: "personal" | "managed_depts" | "department" | "company"
   ) => {
     if (!editingTemplate) return;
     const currentWidget = editingTemplate.widgets.find((w) => w.id === widgetId);
@@ -413,6 +423,10 @@ export const DashboardMakerView: React.FC = () => {
       scope,
       department:
         scope === "department" ? currentSettings.department || "Sewing Floor" : currentSettings.department,
+      managedDepartments:
+        scope === "managed_depts"
+          ? currentSettings.managedDepartments || ["Sewing Floor", "Cutting Unit"]
+          : currentSettings.managedDepartments,
     });
   };
 
@@ -1133,90 +1147,64 @@ export const DashboardMakerView: React.FC = () => {
                                 </div>
 
                                 {/* Width Pills, Dynamic Filters & Actions */}
-                                <div className="flex items-center gap-1 shrink-0">
-                                  {/* Quick Scope Switcher Dropdown (visible if colSpan >= 4) */}
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  {/* Professional Scope Switcher Dropdown (visible if colSpan >= 4) */}
                                   {def?.supportedScopes && effectiveColSpan >= 4 && (
-                                    <select
+                                    <ScopeDropdown
                                       value={widget.settings?.scope || "company"}
-                                      onChange={(e) => handleUpdateWidgetScope(widget.id, e.target.value as any)}
-                                      className={`h-6 px-1.5 rounded-md border border-border/80 bg-background font-bold text-foreground cursor-pointer outline-none focus:border-primary shrink-0 ${
-                                        effectiveColSpan === 4 ? "text-[9.5px] max-w-[75px] truncate" : "text-[10px]"
-                                      }`}
-                                      title="Switch Scope: My Self / Department / Company"
-                                    >
-                                      {def.supportedScopes.includes("personal") && (
-                                        <option value="personal">👤 My Self</option>
-                                      )}
-                                      {def.supportedScopes.includes("department") && (
-                                        <option value="department">👥 Dept</option>
-                                      )}
-                                      {def.supportedScopes.includes("company") && (
-                                        <option value="company">🏢 Company</option>
-                                      )}
-                                    </select>
+                                      supportedScopes={def.supportedScopes}
+                                      colSpan={effectiveColSpan}
+                                      managedDepartmentCount={widget.settings?.managedDepartments?.length || 2}
+                                      onChange={(sc) => handleUpdateWidgetScope(widget.id, sc)}
+                                    />
                                   )}
 
-                                  {/* Quick Buyer Filter Dropdown (visible if colSpan >= 4) */}
+                                  {/* Professional Searchable Multi-Select Buyer Filter (visible if colSpan >= 4) */}
                                   {def?.hasBuyerFilter && effectiveColSpan >= 4 && (
-                                    <select
-                                      value={widget.settings?.buyer || "All Buyers"}
-                                      onChange={(e) =>
+                                    <BuyerMultiSelectDropdown
+                                      selectedBuyers={
+                                        widget.settings?.buyers && widget.settings.buyers.length > 0
+                                          ? widget.settings.buyers
+                                          : widget.settings?.buyer && widget.settings.buyer !== "All Buyers"
+                                          ? [widget.settings.buyer]
+                                          : []
+                                      }
+                                      colSpan={effectiveColSpan}
+                                      onChange={(buyers) => {
                                         handleUpdateWidgetSettings(widget.id, {
                                           ...(widget.settings || {}),
-                                          buyer: e.target.value,
-                                        })
-                                      }
-                                      className={`h-6 px-1.5 rounded-md border border-teal-500/40 bg-teal-500/10 text-teal-700 dark:text-teal-300 font-bold cursor-pointer outline-none focus:border-teal-500 shrink-0 ${
-                                        effectiveColSpan === 4 ? "text-[9.5px] max-w-[75px] truncate" : "text-[10px] max-w-[85px] truncate"
-                                      }`}
-                                      title="Filter by International Buyer"
-                                    >
-                                      {BUYERS_LIST.map((b) => (
-                                        <option key={b} value={b}>
-                                          {b}
-                                        </option>
-                                      ))}
-                                    </select>
+                                          buyers,
+                                          buyer:
+                                            buyers.length === 1
+                                              ? buyers[0]
+                                              : buyers.length === 0
+                                              ? "All Buyers"
+                                              : `${buyers.length} Buyers`,
+                                        });
+                                      }}
+                                    />
                                   )}
 
-                                  {/* Quick Warehouse Filter Dropdown (visible if colSpan >= 4) */}
+                                  {/* Professional Warehouse Filter Dropdown (visible if colSpan >= 4) */}
                                   {def?.hasWarehouseFilter && effectiveColSpan >= 4 && (
-                                    <select
+                                    <WarehouseDropdown
                                       value={widget.settings?.warehouse || "All Warehouses"}
-                                      onChange={(e) =>
+                                      colSpan={effectiveColSpan}
+                                      onChange={(wh) =>
                                         handleUpdateWidgetSettings(widget.id, {
                                           ...(widget.settings || {}),
-                                          warehouse: e.target.value,
+                                          warehouse: wh,
                                         })
                                       }
-                                      className={`h-6 px-1.5 rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 font-bold cursor-pointer outline-none focus:border-amber-500 shrink-0 ${
-                                        effectiveColSpan === 4 ? "text-[9.5px] max-w-[75px] truncate" : "text-[10px] max-w-[85px] truncate"
-                                      }`}
-                                      title="Filter by Warehouse Store"
-                                    >
-                                      {WAREHOUSES_LIST.map((w) => (
-                                        <option key={w} value={w}>
-                                          {w.split(" ")[0]}
-                                        </option>
-                                      ))}
-                                    </select>
+                                    />
                                   )}
 
-                                  {/* Width selector dropdown */}
-                                  <select
+                                  {/* Professional Width selector dropdown */}
+                                  <WidthDropdown
                                     value={effectiveColSpan}
-                                    onChange={(e) =>
-                                      handleWidgetColSpanChange(widget.id, Number(e.target.value) as WidgetColSpan)
-                                    }
-                                    className="h-6 px-1 rounded-md border border-border/70 bg-background text-[10px] font-bold text-muted-foreground hover:text-foreground cursor-pointer outline-none focus:border-primary shrink-0"
-                                    title="Set Card Width"
-                                  >
-                                    {availableSpans.map((s) => (
-                                      <option key={s.val} value={s.val}>
-                                        {s.label}
-                                      </option>
-                                    ))}
-                                  </select>
+                                    availableSpans={availableSpans}
+                                    onChange={(val) => handleWidgetColSpanChange(widget.id, val)}
+                                  />
 
                                   {/* Settings / Configuration Modal Button */}
                                   <button
@@ -1388,7 +1376,7 @@ export const DashboardMakerView: React.FC = () => {
                     কার্ডে কার তথ্য দেখতে চান তা নির্বাচন করুন।
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                     {/* Personal Scope */}
                     {configuringDef.supportedScopes.includes("personal") && (
                       <div
@@ -1411,6 +1399,36 @@ export const DashboardMakerView: React.FC = () => {
                           <div className="font-bold text-xs text-foreground">My Self (আমার নিজের)</div>
                           <div className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
                             ব্যক্তিগত উপস্থিতি, ইন-টাইম, ওভারটাইম এবং ছুটির হিসাব
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Head of Dept / Managed Depts Scope */}
+                    {configuringDef.supportedScopes.includes("managed_depts") && (
+                      <div
+                        onClick={() => handleUpdateWidgetScope(configuringWidget.id, "managed_depts")}
+                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                          configuringWidget.settings?.scope === "managed_depts"
+                            ? "border-amber-500 bg-amber-500/10 shadow-xs"
+                            : "border-border/60 hover:border-amber-400 bg-background"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="size-7 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                            <Crown className="size-4 text-amber-500" />
+                          </div>
+                          {configuringWidget.settings?.scope === "managed_depts" && (
+                            <CheckCircle2 className="size-4 text-amber-600" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs text-foreground flex items-center gap-1">
+                            <span>My Managed Depts</span>
+                            <span className="text-[10px] text-amber-600 font-bold">(বিভাগীয় প্রধান)</span>
+                          </div>
+                          <div className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                            আমি যে যে ডিপার্টমেন্টের হেড — শুধুমাত্র সেই বিভাগগুলোর সম্মিলিত রিপোর্ট
                           </div>
                         </div>
                       </div>
@@ -1471,6 +1489,65 @@ export const DashboardMakerView: React.FC = () => {
                     )}
                   </div>
 
+                  {/* If Head of Dept (Managed Depts) selected: choose which departments to include */}
+                  {configuringWidget.settings?.scope === "managed_depts" && (
+                    <div className="p-3.5 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-2 mt-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                          <Crown className="size-3.5 text-amber-500" />
+                          Select Departments You Manage as Head (যে যে বিভাগের আপনি প্রধান):
+                        </label>
+                        <span className="text-[10px] text-muted-foreground font-mono">
+                          {(configuringWidget.settings.managedDepartments || ["Sewing Floor", "Cutting Unit"]).length} selected
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {DEPARTMENTS_LIST.map((dept) => {
+                          const currentSelected =
+                            configuringWidget.settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
+                          const isChecked = currentSelected.includes(dept.id);
+                          return (
+                            <label
+                              key={dept.id}
+                              onClick={() => {
+                                let updated: string[];
+                                if (isChecked) {
+                                  if (currentSelected.length <= 1) return; // Keep at least one
+                                  updated = currentSelected.filter((id) => id !== dept.id);
+                                } else {
+                                  updated = [...currentSelected, dept.id];
+                                }
+                                handleUpdateWidgetSettings(configuringWidget.id, {
+                                  ...configuringWidget.settings,
+                                  managedDepartments: updated,
+                                });
+                              }}
+                              className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                                isChecked
+                                  ? "bg-amber-500/10 border-amber-500/50 text-foreground font-bold shadow-2xs"
+                                  : "bg-background border-border/60 hover:border-amber-300 text-muted-foreground"
+                              }`}
+                            >
+                              <div className="min-w-0 pr-2">
+                                <div className="text-xs truncate">{dept.name}</div>
+                                <div className="text-[10px] text-muted-foreground font-mono">{dept.count}</div>
+                              </div>
+                              <div
+                                className={`size-4 rounded-md border flex items-center justify-center shrink-0 ${
+                                  isChecked
+                                    ? "bg-amber-500 border-amber-600 text-white"
+                                    : "border-border/80 bg-background"
+                                }`}
+                              >
+                                {isChecked && <Check className="size-3 stroke-[3]" />}
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {/* If Department selected, choose specific department */}
                   {configuringWidget.settings?.scope === "department" && (
                     <div className="p-3.5 rounded-2xl bg-purple-500/5 border border-purple-500/20 space-y-2 mt-2">
@@ -1499,38 +1576,144 @@ export const DashboardMakerView: React.FC = () => {
                 </div>
               )}
 
-              {/* Buyer Filter */}
+              {/* Searchable Multi-Select Buyer Filter in Modal */}
               {configuringDef.hasBuyerFilter && (
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                    <Store className="size-3.5 text-teal-600" />
-                    Target International Buyer (বায়ার ফিল্টার)
-                  </label>
-                  <p className="text-[11px] text-muted-foreground">
-                    নির্দিষ্ট বায়ারের এক্সপোর্ট অর্ডার পাইপলাইন ও টিএন্ডএ মাইলস্টোন দেখতে বায়ার ফিল্টার করুন।
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {BUYERS_LIST.map((b) => {
-                      const isSelected = (configuringWidget.settings?.buyer || "All Buyers") === b;
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <Store className="size-3.5 text-teal-600" />
+                        Target International Buyers (মাল্টি-সিলেক্ট বায়ার ফিল্টার)
+                      </label>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        এক বা একাধিক বায়ার নির্বাচন করুন। সার্চ করে নির্দিষ্ট বায়ার ফিল্টার করা যাবে।
+                      </p>
+                    </div>
+                    {(() => {
+                      const curBuyers = configuringWidget.settings?.buyers || [];
+                      const isAll = curBuyers.length === 0 || curBuyers.length === BUYER_OPTIONS.length;
                       return (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 shrink-0 font-mono">
+                          {isAll ? "All Buyers Selected" : `${curBuyers.length} of ${BUYER_OPTIONS.length} Selected`}
+                        </span>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Search Bar & Quick Toggles */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-0.5">
+                    <div className="relative flex-1">
+                      <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <input
+                        type="text"
+                        value={modalBuyerSearch}
+                        onChange={(e) => setModalBuyerSearch(e.target.value)}
+                        placeholder="Search buyer name, country, code..."
+                        className="w-full h-8 pl-8 pr-7 text-xs bg-muted/40 border border-border/70 rounded-xl outline-none focus:border-teal-500 focus:bg-background text-foreground transition-all"
+                      />
+                      {modalBuyerSearch && (
                         <button
-                          key={b}
                           type="button"
-                          onClick={() =>
+                          onClick={() => setModalBuyerSearch("")}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                          <X className="size-3" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1.5 text-xs shrink-0">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleUpdateWidgetSettings(configuringWidget.id, {
+                            ...configuringWidget.settings,
+                            buyers: [],
+                            buyer: "All Buyers",
+                          })
+                        }
+                        className="px-2.5 py-1.5 rounded-xl border border-teal-500/30 bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 dark:text-teal-300 font-bold text-[11px] cursor-pointer transition-colors"
+                      >
+                        ✓ Select All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleUpdateWidgetSettings(configuringWidget.id, {
+                            ...configuringWidget.settings,
+                            buyers: [BUYER_OPTIONS[0].id],
+                            buyer: BUYER_OPTIONS[0].id,
+                          })
+                        }
+                        className="px-2.5 py-1.5 rounded-xl border border-border/70 bg-background hover:bg-muted text-muted-foreground hover:text-foreground font-semibold text-[11px] cursor-pointer transition-colors"
+                      >
+                        Reset Primary
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Grid of Searchable Buyer Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1 pt-1">
+                    {BUYER_OPTIONS.filter((b) => {
+                      if (!modalBuyerSearch.trim()) return true;
+                      const q = modalBuyerSearch.toLowerCase();
+                      return (
+                        b.name.toLowerCase().includes(q) ||
+                        b.country.toLowerCase().includes(q) ||
+                        b.code.toLowerCase().includes(q)
+                      );
+                    }).map((buyer) => {
+                      const curBuyers = configuringWidget.settings?.buyers || [];
+                      const isAll = curBuyers.length === 0 || curBuyers.length === BUYER_OPTIONS.length;
+                      const isChecked = isAll || curBuyers.includes(buyer.id);
+                      return (
+                        <div
+                          key={buyer.id}
+                          onClick={() => {
+                            let next: string[];
+                            if (curBuyers.includes(buyer.id)) {
+                              next = curBuyers.filter((id) => id !== buyer.id);
+                            } else {
+                              next = [...curBuyers, buyer.id];
+                            }
                             handleUpdateWidgetSettings(configuringWidget.id, {
                               ...configuringWidget.settings,
-                              buyer: b,
-                            })
-                          }
-                          className={`p-2 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
-                            isSelected
-                              ? "bg-teal-500/10 border-teal-500 text-teal-700 dark:text-teal-300 font-bold"
-                              : "border-border/60 hover:border-teal-400 bg-background text-foreground"
+                              buyers: next,
+                              buyer:
+                                next.length === 1
+                                  ? next[0]
+                                  : next.length === 0
+                                  ? "All Buyers"
+                                  : `${next.length} Buyers`,
+                            });
+                          }}
+                          className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all select-none ${
+                            isChecked
+                              ? "bg-teal-500/10 border-teal-500 text-foreground font-bold shadow-2xs"
+                              : "bg-background border-border/60 hover:border-teal-300 text-muted-foreground"
                           }`}
                         >
-                          <span className="truncate">{b}</span>
-                          {isSelected && <Check className="size-3.5 text-teal-600 shrink-0" />}
-                        </button>
+                          <div className="min-w-0 pr-2">
+                            <div className="text-xs truncate flex items-center gap-1.5">
+                              <span className="font-bold">{buyer.name}</span>
+                              <span className="text-[9.5px] px-1 py-0.2 rounded bg-muted/60 text-muted-foreground font-mono">
+                                {buyer.code}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-muted-foreground truncate">
+                              {buyer.country} • {buyer.tier}
+                            </div>
+                          </div>
+                          <div
+                            className={`size-4 rounded-md border flex items-center justify-center shrink-0 ${
+                              isChecked
+                                ? "bg-teal-600 border-teal-600 text-white"
+                                : "border-border/80 bg-background"
+                            }`}
+                          >
+                            {isChecked && <Check className="size-3 stroke-[3]" />}
+                          </div>
+                        </div>
                       );
                     })}
                   </div>
@@ -1548,16 +1731,16 @@ export const DashboardMakerView: React.FC = () => {
                     নির্দিষ্ট গোডাউন বা সেন্ট্রাল র মেটেরিয়াল স্টোরের স্টক ভ্যালুয়েশন প্রদর্শন করুন।
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {WAREHOUSES_LIST.map((w) => {
-                      const isSelected = (configuringWidget.settings?.warehouse || "All Warehouses") === w;
+                    {WAREHOUSE_OPTIONS.map((w) => {
+                      const isSelected = (configuringWidget.settings?.warehouse || "All Warehouses") === w.id;
                       return (
                         <button
-                          key={w}
+                          key={w.id}
                           type="button"
                           onClick={() =>
                             handleUpdateWidgetSettings(configuringWidget.id, {
                               ...configuringWidget.settings,
-                              warehouse: w,
+                              warehouse: w.id,
                             })
                           }
                           className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
@@ -1566,7 +1749,10 @@ export const DashboardMakerView: React.FC = () => {
                               : "border-border/60 hover:border-amber-400 bg-background text-foreground"
                           }`}
                         >
-                          <span className="truncate">{w}</span>
+                          <div className="min-w-0 pr-2">
+                            <span className="truncate block font-bold text-xs">{w.name}</span>
+                            <span className="truncate block text-[10px] text-muted-foreground">{w.desc}</span>
+                          </div>
                           {isSelected && <Check className="size-3.5 text-amber-600 shrink-0" />}
                         </button>
                       );

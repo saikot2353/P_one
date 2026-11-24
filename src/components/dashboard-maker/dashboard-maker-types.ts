@@ -9,9 +9,11 @@ export type DashboardModule =
 export type WidgetColSpan = 1 | 2 | 3 | 4 | 6 | 12;
 
 export interface WidgetSettings {
-  scope?: "personal" | "team" | "department" | "company"; // My Personal, Team, Department, Company-wide
+  scope?: "personal" | "managed_depts" | "team" | "department" | "company"; // My Personal, Head of Dept (My Managed Depts), Team, Department, Company-wide
+  managedDepartments?: string[]; // e.g. ["Sewing Floor", "Cutting Unit"]
   department?: string; // e.g. "All Departments", "Sewing Floor", "Cutting Unit", "Finishing", "Quality", "Admin"
   buyer?: string; // e.g. "All Buyers", "H&M Group", "Zara / Inditex", "Target USA", "Next UK", "C&A Europe"
+  buyers?: string[]; // Multi-selected buyers list (e.g. ["H&M Group", "Zara / Inditex"])
   warehouse?: string; // e.g. "All Warehouses", "Central Raw Material Store", "Trims Warehouse", "Chemical Store"
   period?: "today" | "week" | "month" | "year";
   employeeCategory?: "all" | "worker" | "staff" | "management";
@@ -28,7 +30,7 @@ export interface DashboardComponentDefinition {
   defaultColSpan: WidgetColSpan;
   minColSpan?: WidgetColSpan;
   badge?: string;
-  supportedScopes?: Array<"personal" | "department" | "company">;
+  supportedScopes?: Array<"personal" | "managed_depts" | "department" | "company">;
   hasBuyerFilter?: boolean;
   hasWarehouseFilter?: boolean;
 }
@@ -63,12 +65,25 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     module: "hris",
     moduleLabel: "HRIS & Workforce",
     category: "Metric Cards",
-    description: "Configurable stats: View Personal, Departmental, or Entire Company-wide attendance.",
+    description: "Configurable stats: View Personal, Head of Dept, Departmental, or Entire Company-wide attendance.",
     iconName: "Users",
     defaultColSpan: 12,
     minColSpan: 6,
     badge: "Multi-Scope",
-    supportedScopes: ["personal", "department", "company"],
+    supportedScopes: ["personal", "managed_depts", "department", "company"],
+  },
+  {
+    id: "hr_ot_requisition_vs_consumption",
+    name: "OT Requisition vs Consumption",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "Line supervisor OT hours requested vs actual biometric punch OT consumed with budget variance.",
+    iconName: "Timer",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "OT Analysis",
+    supportedScopes: ["personal", "managed_depts", "department", "company"],
   },
   {
     id: "hr_attendance_pie",
@@ -76,10 +91,10 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     module: "hris",
     moduleLabel: "HRIS & Workforce",
     category: "Chart & Analytics",
-    description: "Attendance split: Personal monthly attendance, Department presence, or Full company ratio.",
+    description: "Attendance split: Personal monthly attendance, Managed depts, Department presence, or Full company ratio.",
     iconName: "PieChart",
     defaultColSpan: 4,
-    supportedScopes: ["personal", "department", "company"],
+    supportedScopes: ["personal", "managed_depts", "department", "company"],
   },
   {
     id: "hr_late_absent_pie",
@@ -90,7 +105,7 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     description: "Visual ratio of morning punch anomalies, delayed entries and unscheduled absentees.",
     iconName: "Clock",
     defaultColSpan: 4,
-    supportedScopes: ["department", "company"],
+    supportedScopes: ["managed_depts", "department", "company"],
   },
   {
     id: "hr_ot_bar_chart",
@@ -98,10 +113,10 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     module: "hris",
     moduleLabel: "HRIS & Workforce",
     category: "Chart & Analytics",
-    description: "Overtime hours: My personal logged hours vs Department vs Company total.",
+    description: "Overtime hours: My personal logged hours vs Managed depts vs Department vs Company total.",
     iconName: "BarChart3",
     defaultColSpan: 4,
-    supportedScopes: ["personal", "department", "company"],
+    supportedScopes: ["personal", "managed_depts", "department", "company"],
   },
   {
     id: "hr_headcount_trend",
@@ -112,7 +127,7 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     description: "12-month rolling recruitment hires vs exits curve across all manufacturing plants.",
     iconName: "TrendingUp",
     defaultColSpan: 6,
-    supportedScopes: ["department", "company"],
+    supportedScopes: ["managed_depts", "department", "company"],
   },
   {
     id: "hr_department_split",
@@ -130,10 +145,10 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     module: "hris",
     moduleLabel: "HRIS & Workforce",
     category: "Feed & Queue",
-    description: "Dynamic feed: My own leave history & balance, or manager approval queue.",
+    description: "Dynamic feed: My own leave history, manager approval queue for managed departments, or company queue.",
     iconName: "CalendarX",
     defaultColSpan: 6,
-    supportedScopes: ["personal", "department", "company"],
+    supportedScopes: ["personal", "managed_depts", "department", "company"],
   },
   {
     id: "hr_recruitment_pipeline",
@@ -169,6 +184,7 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     description: "Volume & value breakdown by major international buyers (H&M, Zara, Target, Next, C&A).",
     iconName: "PieChart",
     defaultColSpan: 6,
+    minColSpan: 4,
     hasBuyerFilter: true,
   },
   {
@@ -180,6 +196,7 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     description: "Milestone status across Lab Dip, Yarn In-house, PP Sample, Bulk Cutting, and Finishing.",
     iconName: "CalendarDays",
     defaultColSpan: 6,
+    minColSpan: 4,
     badge: "Buyer Filter",
     hasBuyerFilter: true,
   },
@@ -259,12 +276,12 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     module: "accounts",
     moduleLabel: "Accounts & Finance",
     category: "Metric Cards",
-    description: "Configurable payroll: My personal monthly payslip, department wage bill, or company disbursement.",
+    description: "Configurable payroll: My personal monthly payslip, managed depts, department wage bill, or company disbursement.",
     iconName: "Banknote",
     defaultColSpan: 12,
     minColSpan: 6,
     badge: "Multi-Scope",
-    supportedScopes: ["personal", "department", "company"],
+    supportedScopes: ["personal", "managed_depts", "department", "company"],
   },
   {
     id: "acc_department_cost",
@@ -331,6 +348,7 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
       { id: "w_6", componentId: "inv_stock_valuation", colSpan: 12 },
       { id: "w_7", componentId: "inv_low_stock_alerts", colSpan: 6 },
       { id: "w_8", componentId: "acc_payroll_payout", colSpan: 6 },
+      { id: "w_9", componentId: "hr_ot_requisition_vs_consumption", colSpan: 6 },
     ],
   },
   {
@@ -349,6 +367,7 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
       { id: "w_hr_2", componentId: "hr_attendance_pie", colSpan: 4 },
       { id: "w_hr_3", componentId: "hr_late_absent_pie", colSpan: 4 },
       { id: "w_hr_4", componentId: "hr_ot_bar_chart", colSpan: 4 },
+      { id: "w_hr_9", componentId: "hr_ot_requisition_vs_consumption", colSpan: 6 },
       { id: "w_hr_5", componentId: "hr_headcount_trend", colSpan: 6 },
       { id: "w_hr_6", componentId: "hr_department_split", colSpan: 6 },
       { id: "w_hr_7", componentId: "hr_leave_approvals", colSpan: 6 },
@@ -416,8 +435,8 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
   },
 ];
 
-const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v2";
-const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v2";
+const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v3";
+const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v3";
 
 export function loadDashboardTemplates(): DashboardTemplate[] {
   if (typeof window === "undefined") return DEFAULT_DASHBOARD_TEMPLATES;
