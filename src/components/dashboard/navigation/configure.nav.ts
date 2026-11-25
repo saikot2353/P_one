@@ -14,6 +14,8 @@ export const configureNav: NavItem[] = [
       { label: "Allowances & Bonuses", to: "/configure-compensation" },
       { label: "Tax & Compliance Setup", to: "/configure-tax" },
       { label: "Payroll Configuration", to: "/payroll-configure" },
+      { label: "Salary Sheet Configuration", to: "/salary-sheet-configuration" },
+      { label: "Dashboard Maker", to: "/dashboard-maker" },
       { label: "Education & Training", to: "/configure-education" },
       { label: "Leave & Policies", to: "/configure-policies" },
       { label: "Maternity Configuration", to: "/maternity-configuration" },

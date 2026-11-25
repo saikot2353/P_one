@@ -9,11 +9,13 @@ import {
   Network,
   Lightbulb,
   CalendarDays,
+  Sparkles,
 } from "lucide-react";
 import type { NavItem } from "./types";
 
 export const coreDashboardNav: NavItem[] = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard },
+  { label: "Dashboard Maker", to: "/dashboard-maker", icon: Sparkles },
   { label: "Messenger", to: "/messenger", icon: MessageSquare },
   { label: "Phonebook", to: "/phonebook", icon: BookUser },
 ];

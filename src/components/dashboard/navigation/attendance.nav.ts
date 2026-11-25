@@ -29,6 +29,7 @@ export const shiftNav: NavItem[] = [
     subitems: [
       { label: "Initial Shift Setup", to: "/shift-control-center" },
       { label: "Shift Roster Assignment", to: "/shift-roster-assignment" },
+      { label: "Security Roster", to: "/security-roster" },
     ],
   },
 ];
