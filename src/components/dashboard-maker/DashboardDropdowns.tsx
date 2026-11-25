@@ -14,7 +14,7 @@ import {
   Square,
   Sparkles,
 } from "lucide-react";
-import { WidgetColSpan } from "./dashboard-maker-types";
+import { WidgetColSpan, DashboardChipDefinition } from "./dashboard-maker-types";
 
 // ============================================================================
 // BUYERS & WAREHOUSES MASTER CATALOG
@@ -69,192 +69,225 @@ function useOutsideClick(ref: React.RefObject<HTMLElement | null>, handler: () =
 // ============================================================================
 // 1. PROFESSIONAL SCOPE DROPDOWN (Personal, Head of Dept, Dept, Company)
 // ============================================================================
+export const AREA_OPTIONS = [
+  "Dhaka North / Gazipur",
+  "Ashulia / Savar",
+  "Chattogram EPZ",
+  "Narayanganj Zone",
+];
+
+export const DEPARTMENT_OPTIONS = [
+  "Sewing Floor",
+  "Cutting Unit",
+  "Finishing & Packing",
+  "Quality Assurance",
+  "Merchandising",
+  "HR & Compliance",
+  "Accounts & Finance",
+  "Store & Inventory",
+];
+
 interface ScopeDropdownProps {
-  value: string;
-  supportedScopes: Array<"personal" | "managed_depts" | "department" | "company">;
+  value?: string;
+  areas?: string[];
+  departments?: string[];
+  supportedScopes: Array<"personal" | "area" | "managed_depts" | "department" | "company">;
   colSpan: number;
   managedDepartmentCount?: number;
-  onChange: (scope: "personal" | "managed_depts" | "department" | "company") => void;
+  onChange: (
+    scope: "personal" | "area" | "managed_depts" | "department" | "company",
+    extras?: { areas?: string[]; departments?: string[] }
+  ) => void;
 }
 
 export const ScopeDropdown: React.FC<ScopeDropdownProps> = ({
   value,
+  areas = ["Dhaka North / Gazipur"],
+  departments = ["Sewing Floor", "Cutting Unit"],
   supportedScopes,
-  colSpan,
-  managedDepartmentCount = 2,
   onChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [deptSearch, setDeptSearch] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   useOutsideClick(containerRef, () => setIsOpen(false));
 
   const scope = value || "company";
+  const isDeptMode = scope === "department" || scope === "managed_depts";
 
-  // Visual meta for the active button
-  const getTriggerMeta = () => {
-    switch (scope) {
-      case "personal":
-        return {
-          icon: <User className="size-3 text-blue-500" />,
-          label: "My Self",
-          cls: "border-blue-500/40 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20",
-        };
-      case "managed_depts":
-        return {
-          icon: <Crown className="size-3 text-amber-500" />,
-          label: colSpan <= 4 ? "Head" : `Head (${managedDepartmentCount})`,
-          cls: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20",
-        };
-      case "department":
-        return {
-          icon: <Building2 className="size-3 text-purple-500" />,
-          label: "Dept",
-          cls: "border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20",
-        };
-      case "company":
-      default:
-        return {
-          icon: <Layers className="size-3 text-emerald-500" />,
-          label: "Company",
-          cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20",
-        };
-    }
+  const getTriggerLabel = () => {
+    if (scope === "personal") return "Self";
+    if (scope === "area") return areas.length > 1 ? `Area (${areas.length})` : areas[0]?.split(" ")[0] || "Area";
+    if (isDeptMode) return departments.length > 0 ? `Dept (${departments.length})` : "Department";
+    return "All Company";
   };
 
-  const current = getTriggerMeta();
+  const getTriggerCls = () => {
+    if (scope === "personal") return "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300";
+    if (scope === "area") return "border-indigo-500/30 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300";
+    if (isDeptMode) return "border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300";
+    return "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+  };
+
+  const toggleArea = (area: string) => {
+    const exists = areas.includes(area);
+    let next: string[];
+    if (exists) {
+      if (areas.length <= 1) return;
+      next = areas.filter((a) => a !== area);
+    } else {
+      next = [...areas, area];
+    }
+    onChange("area", { areas: next });
+  };
+
+  const toggleDept = (dept: string) => {
+    const exists = departments.includes(dept);
+    let next: string[];
+    if (exists) {
+      if (departments.length <= 1) return;
+      next = departments.filter((d) => d !== dept);
+    } else {
+      next = [...departments, dept];
+    }
+    onChange("department", { departments: next });
+  };
+
+  const filteredDepts = useMemo(() => {
+    if (!deptSearch.trim()) return DEPARTMENT_OPTIONS;
+    const q = deptSearch.toLowerCase();
+    return DEPARTMENT_OPTIONS.filter((d) => d.toLowerCase().includes(q));
+  }, [deptSearch]);
 
   return (
     <div ref={containerRef} className="relative inline-block text-left">
-      {/* Trigger Button */}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`h-6 px-2 rounded-md border text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all shadow-2xs select-none ${current.cls}`}
-        title="Switch Reporting Scope"
+        className={`h-6 px-2.5 rounded-md border text-[10.5px] font-semibold flex items-center gap-1 cursor-pointer transition-colors select-none ${getTriggerCls()}`}
       >
-        {current.icon}
-        <span className="truncate max-w-[65px]">{current.label}</span>
-        <ChevronDown className={`size-3 transition-transform duration-200 opacity-70 ${isOpen ? "rotate-180" : ""}`} />
+        <span className="truncate max-w-[90px]">{getTriggerLabel()}</span>
+        <ChevronDown className={`size-3 transition-transform duration-150 opacity-70 ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
-      {/* Floating Popover Menu */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1.5 w-60 rounded-2xl bg-popover/98 backdrop-blur-md border border-border/80 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1">
-          <div className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/50 flex items-center justify-between">
-            <span>Select Data Scope</span>
-            <span className="text-[9px] text-primary">Live Filter</span>
-          </div>
+        <div className="absolute right-0 top-full mt-1.5 w-60 rounded-xl bg-popover border border-border shadow-xl p-1.5 z-50 space-y-1">
+          {supportedScopes.includes("personal") && (
+            <button
+              type="button"
+              onClick={() => {
+                onChange("personal");
+                setIsOpen(false);
+              }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${
+                scope === "personal" ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
+              }`}
+            >
+              <span>Self</span>
+              {scope === "personal" && <Check className="size-3.5" />}
+            </button>
+          )}
 
-          <div className="space-y-0.5 pt-0.5">
-            {supportedScopes.includes("personal") && (
+          <button
+            type="button"
+            onClick={() => onChange("area", { areas })}
+            className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${
+              scope === "area" ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
+            }`}
+          >
+            <span>Area</span>
+            {scope === "area" && <Check className="size-3.5" />}
+          </button>
+
+          {scope === "area" && (
+            <div className="pl-2 pr-1 py-1 space-y-0.5 border-l-2 border-primary/30 ml-2">
+              {AREA_OPTIONS.map((area) => {
+                const checked = areas.includes(area);
+                return (
+                  <button
+                    key={area}
+                    type="button"
+                    onClick={() => toggleArea(area)}
+                    className="w-full text-left px-2 py-1 rounded text-[11px] flex items-center justify-between hover:bg-muted cursor-pointer text-foreground"
+                  >
+                    <span className="truncate">{area}</span>
+                    <span
+                      className={`size-3.5 rounded border flex items-center justify-center shrink-0 ${
+                        checked ? "bg-primary border-primary text-primary-foreground" : "border-border"
+                      }`}
+                    >
+                      {checked && <Check className="size-2.5 stroke-[3]" />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {supportedScopes.includes("company") && (
+            <button
+              type="button"
+              onClick={() => {
+                onChange("company");
+                setIsOpen(false);
+              }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${
+                scope === "company" ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
+              }`}
+            >
+              <span>All Company</span>
+              {scope === "company" && <Check className="size-3.5" />}
+            </button>
+          )}
+
+          {(supportedScopes.includes("department") || supportedScopes.includes("managed_depts")) && (
+            <>
               <button
                 type="button"
-                onClick={() => {
-                  onChange("personal");
-                  setIsOpen(false);
-                }}
-                className={`w-full text-left px-2.5 py-2 rounded-xl flex items-center justify-between cursor-pointer transition-all ${
-                  scope === "personal"
-                    ? "bg-blue-500/15 text-blue-700 dark:text-blue-300 font-bold"
-                    : "hover:bg-muted/70 text-foreground"
+                onClick={() => onChange("department", { departments })}
+                className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${
+                  isDeptMode ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
                 }`}
               >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="size-6 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
-                    <User className="size-3.5" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-bold leading-tight">My Self (আমার নিজের)</div>
-                    <div className="text-[9.5px] text-muted-foreground truncate">ব্যক্তিগত উপস্থিতি ও ওভারটাইম</div>
-                  </div>
-                </div>
-                {scope === "personal" && <Check className="size-3.5 text-blue-600 shrink-0" />}
+                <span>Department</span>
+                {isDeptMode && <Check className="size-3.5" />}
               </button>
-            )}
 
-            {supportedScopes.includes("managed_depts") && (
-              <button
-                type="button"
-                onClick={() => {
-                  onChange("managed_depts");
-                  setIsOpen(false);
-                }}
-                className={`w-full text-left px-2.5 py-2 rounded-xl flex items-center justify-between cursor-pointer transition-all ${
-                  scope === "managed_depts"
-                    ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold"
-                    : "hover:bg-muted/70 text-foreground"
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="size-6 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
-                    <Crown className="size-3.5" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-bold leading-tight flex items-center gap-1">
-                      <span>Head of Dept</span>
-                      <span className="text-[9px] px-1 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-mono">
-                        {managedDepartmentCount} Depts
-                      </span>
-                    </div>
-                    <div className="text-[9.5px] text-muted-foreground truncate">বিভাগীয় প্রধানের ফ্লোর রিপোর্ট</div>
-                  </div>
-                </div>
-                {scope === "managed_depts" && <Check className="size-3.5 text-amber-600 shrink-0" />}
-              </button>
-            )}
-
-            {supportedScopes.includes("department") && (
-              <button
-                type="button"
-                onClick={() => {
-                  onChange("department");
-                  setIsOpen(false);
-                }}
-                className={`w-full text-left px-2.5 py-2 rounded-xl flex items-center justify-between cursor-pointer transition-all ${
-                  scope === "department"
-                    ? "bg-purple-500/15 text-purple-700 dark:text-purple-300 font-bold"
-                    : "hover:bg-muted/70 text-foreground"
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="size-6 rounded-lg bg-purple-500/10 text-purple-600 flex items-center justify-center shrink-0">
-                    <Building2 className="size-3.5" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-bold leading-tight">Single Department</div>
-                    <div className="text-[9.5px] text-muted-foreground truncate">নির্দিষ্ট সেকশনের একক রিপোর্ট</div>
+              {isDeptMode && (
+                <div className="pl-2 pr-1 py-1 space-y-1 border-l-2 border-primary/30 ml-2">
+                  <input
+                    type="text"
+                    value={deptSearch}
+                    onChange={(e) => setDeptSearch(e.target.value)}
+                    placeholder="Search dept..."
+                    className="w-full h-6 px-2 text-[11px] bg-muted/40 border border-border rounded outline-none focus:border-primary"
+                  />
+                  <div className="max-h-36 overflow-y-auto space-y-0.5">
+                    {filteredDepts.map((dept) => {
+                      const checked = departments.includes(dept);
+                      return (
+                        <button
+                          key={dept}
+                          type="button"
+                          onClick={() => toggleDept(dept)}
+                          className="w-full text-left px-2 py-1 rounded text-[11px] flex items-center justify-between hover:bg-muted cursor-pointer text-foreground"
+                        >
+                          <span className="truncate">{dept}</span>
+                          <span
+                            className={`size-3.5 rounded border flex items-center justify-center shrink-0 ${
+                              checked ? "bg-primary border-primary text-primary-foreground" : "border-border"
+                            }`}
+                          >
+                            {checked && <Check className="size-2.5 stroke-[3]" />}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-                {scope === "department" && <Check className="size-3.5 text-purple-600 shrink-0" />}
-              </button>
-            )}
-
-            {supportedScopes.includes("company") && (
-              <button
-                type="button"
-                onClick={() => {
-                  onChange("company");
-                  setIsOpen(false);
-                }}
-                className={`w-full text-left px-2.5 py-2 rounded-xl flex items-center justify-between cursor-pointer transition-all ${
-                  scope === "company"
-                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold"
-                    : "hover:bg-muted/70 text-foreground"
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="size-6 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-                    <Layers className="size-3.5" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-bold leading-tight">Entire Company</div>
-                    <div className="text-[9.5px] text-muted-foreground truncate">পুরো ফ্যাক্টরির ১,২৪৮ কর্মী</div>
-                  </div>
-                </div>
-                {scope === "company" && <Check className="size-3.5 text-emerald-600 shrink-0" />}
-              </button>
-            )}
-          </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>
@@ -606,6 +639,123 @@ export const WidthDropdown: React.FC<WidthDropdownProps> = ({
                     {s.desc && <span className="text-[9.5px] text-muted-foreground block">{s.desc}</span>}
                   </div>
                   {isSelected && <Check className="size-3.5 text-primary shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
+// 5. METRIC CHIPS CUSTOMIZER POPOVER (ADD / REMOVE CHIPS PER CARD)
+// ============================================================================
+interface ChipsDropdownProps {
+  availableChips: DashboardChipDefinition[];
+  enabledChips: string[];
+  onChange: (newEnabledChips: string[]) => void;
+}
+
+export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
+  availableChips,
+  enabledChips,
+  onChange,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  useOutsideClick(containerRef, () => setIsOpen(false));
+
+  const toggleChip = (id: string) => {
+    if (enabledChips.includes(id)) {
+      // Keep at least 1 chip visible
+      if (enabledChips.length <= 1) return;
+      onChange(enabledChips.filter((c) => c !== id));
+    } else {
+      // Maintain catalog order
+      const next = availableChips
+        .map((c) => c.id)
+        .filter((cid) => cid === id || enabledChips.includes(cid));
+      onChange(next);
+    }
+  };
+
+  const handleSelectAll = () => {
+    onChange(availableChips.map((c) => c.id));
+  };
+
+  const handleResetDefault = () => {
+    onChange(availableChips.filter((c) => c.defaultEnabled !== false).map((c) => c.id));
+  };
+
+  return (
+    <div ref={containerRef} className="relative inline-block text-left">
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="h-6 px-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all shadow-2xs select-none"
+        title="Add or remove metric chips inside this card"
+      >
+        <Layers className="size-2.5 text-indigo-600 dark:text-indigo-400" />
+        <span>
+          {enabledChips.length}/{availableChips.length} Chips
+        </span>
+        <ChevronDown className={`size-2.5 transition-transform duration-200 opacity-60 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-1.5 w-60 rounded-2xl bg-popover/98 backdrop-blur-md border border-border/80 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1.5">
+          <div className="flex items-center justify-between px-1.5 pb-1.5 border-b border-border/50">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+              Visible Chips ({enabledChips.length})
+            </span>
+            <div className="flex items-center gap-1 text-[10px]">
+              <button
+                type="button"
+                onClick={handleSelectAll}
+                className="px-1.5 py-0.5 rounded hover:bg-muted font-semibold text-primary cursor-pointer"
+              >
+                All
+              </button>
+              <button
+                type="button"
+                onClick={handleResetDefault}
+                className="px-1.5 py-0.5 rounded hover:bg-muted font-medium text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                Default
+              </button>
+            </div>
+          </div>
+
+          <div className="max-h-56 overflow-y-auto space-y-1">
+            {availableChips.map((chip) => {
+              const isChecked = enabledChips.includes(chip.id);
+              const isOnlyOne = isChecked && enabledChips.length <= 1;
+              return (
+                <button
+                  key={chip.id}
+                  type="button"
+                  disabled={isOnlyOne}
+                  onClick={() => toggleChip(chip.id)}
+                  className={`w-full text-left px-2.5 py-1.5 rounded-xl border flex items-center justify-between transition-all ${
+                    isOnlyOne ? "opacity-70 cursor-not-allowed" : "cursor-pointer"
+                  } ${
+                    isChecked
+                      ? "bg-indigo-500/10 border-indigo-500/40 text-foreground font-semibold"
+                      : "bg-background border-border/50 hover:border-indigo-300 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <span className="text-xs truncate pr-2">{chip.label}</span>
+                  <span
+                    className={`size-4 rounded-md border flex items-center justify-center shrink-0 transition-all ${
+                      isChecked
+                        ? "bg-indigo-600 border-indigo-600 text-white"
+                        : "border-border/80 bg-background"
+                    }`}
+                  >
+                    {isChecked && <Check className="size-3 stroke-[3]" />}
+                  </span>
                 </button>
               );
             })}

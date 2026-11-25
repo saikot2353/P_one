@@ -53,6 +53,7 @@ import {
 import {
   DashboardWidgetConfig,
   DASHBOARD_COMPONENTS_CATALOG,
+  getEffectiveEnabledChips,
   WidgetSettings,
   WidgetColSpan,
 } from "./dashboard-maker-types";
@@ -108,41 +109,29 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
         {/* Dynamic Scope / Filter Badge (Compact, non-intrusive) */}
         <div className="flex items-center gap-1.5 shrink-0">
           {settings?.scope === "personal" && (
-            <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1 shrink-0"
-              title="Scope: My Self (Personal)"
-            >
-              <User className="size-3" /> {(widget.colSpan || 12) > 3 ? "My Self" : ""}
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shrink-0">
+              Self
             </span>
           )}
 
-          {settings?.scope === "managed_depts" && (
-            <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex items-center gap-1 shrink-0"
-              title={`Scope: Head of Dept (${settings.managedDepartments?.join(", ") || "Sewing & Cutting"})`}
-            >
-              <Crown className="size-3 text-amber-500" />
-              {(widget.colSpan || 12) > 3 ? (
-                <span>Head: {settings.managedDepartments && settings.managedDepartments.length > 0 ? settings.managedDepartments.map((d) => d.split(" ")[0]).join("&") : "My Depts"}</span>
-              ) : ""}
+          {settings?.scope === "area" && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shrink-0">
+              {(settings.areas?.length || 0) > 1 ? `Area (${settings.areas?.length})` : settings.areas?.[0]?.split(" ")[0] || "Area"}
             </span>
           )}
 
-          {settings?.scope === "department" && (
-            <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 flex items-center gap-1 shrink-0"
-              title={`Scope: ${settings.department || "Department"}`}
-            >
-              <Building2 className="size-3" /> {(widget.colSpan || 12) > 3 ? (settings.department ? settings.department.split(" ")[0] : "Dept") : ""}
+          {(settings?.scope === "managed_depts" || settings?.scope === "department") && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shrink-0">
+              {(() => {
+                const depts = settings.departments || settings.managedDepartments || (settings.department ? [settings.department] : []);
+                return depts.length > 1 ? `Dept (${depts.length})` : depts[0]?.split(" ")[0] || "Dept";
+              })()}
             </span>
           )}
 
           {(!settings?.scope || settings?.scope === "company") && def?.supportedScopes && (
-            <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1 shrink-0"
-              title="Scope: Entire Company"
-            >
-              🏢 {(widget.colSpan || 12) > 3 ? "Company" : ""}
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">
+              All Company
             </span>
           )}
 
@@ -271,6 +260,7 @@ function getWidgetIcon(name: string) {
 }
 
 function getMetricGridClass(colSpan: WidgetColSpan = 12, count: number = 4): string {
+  if (count <= 1) return "grid grid-cols-1 gap-2.5 py-1";
   if (colSpan <= 3) {
     // 25% card (colSpan 3): 1 column vertical stack, clean & readable!
     return "grid grid-cols-1 gap-2 py-1";
@@ -281,10 +271,16 @@ function getMetricGridClass(colSpan: WidgetColSpan = 12, count: number = 4): str
   }
   if (colSpan <= 6) {
     // 50% card
+    if (count === 2) return "grid grid-cols-2 gap-2.5 py-1";
+    if (count === 3) return "grid grid-cols-1 sm:grid-cols-3 gap-2.5 py-1";
     return count >= 5 ? "grid grid-cols-2 sm:grid-cols-3 gap-2.5 py-1" : "grid grid-cols-2 gap-2.5 py-1";
   }
   // 100% full width
-  return count >= 5 ? "grid grid-cols-2 sm:grid-cols-5 gap-2.5 py-1" : "grid grid-cols-2 sm:grid-cols-4 gap-2.5 py-1";
+  if (count === 2) return "grid grid-cols-1 sm:grid-cols-2 gap-2.5 py-1";
+  if (count === 3) return "grid grid-cols-1 sm:grid-cols-3 gap-2.5 py-1";
+  if (count === 4) return "grid grid-cols-2 sm:grid-cols-4 gap-2.5 py-1";
+  if (count === 5) return "grid grid-cols-2 sm:grid-cols-5 gap-2.5 py-1";
+  return "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 py-1";
 }
 
 function renderWidgetContent(
@@ -294,265 +290,405 @@ function renderWidgetContent(
   colSpan: WidgetColSpan = 12
 ) {
   const scope = settings?.scope || "company";
+  const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === componentId);
+  const enabledChips = getEffectiveEnabledChips(def, settings);
+  const isChipVisible = (chipId: string) => enabledChips.length === 0 || enabledChips.includes(chipId);
 
   switch (componentId) {
     // ----------------------------------------------------
     // HRIS Components (Dynamic Scope: Personal vs Dept vs Company)
     // ----------------------------------------------------
-    case "hr_quick_stats":
+    case "hr_quick_stats": {
+      type StatChip = {
+        id: string;
+        label: string;
+        value: string;
+        unit?: string;
+        pct?: string;
+        note: string;
+        boxClass: string;
+        labelClass: string;
+        valueClass: string;
+        noteClass: string;
+      };
+
+      let chips: StatChip[] = [];
+
       if (scope === "personal") {
-        return (
-          <div className={getMetricGridClass(colSpan, 5)}>
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
-                Today's Status
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-lg sm:text-xl font-black text-emerald-700 dark:text-emerald-300">
-                  Present
-                </span>
-              </div>
-              <div className="text-[10px] text-emerald-600/80 font-medium mt-1 flex items-center gap-1">
-                <CheckCircle2 className="size-3" /> In: 08:48 AM
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <span className="text-[10.5px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
-                Monthly Working
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">21 / 22</span>
-                <span className="text-[10px] text-blue-600 font-bold">95.5%</span>
-              </div>
-              <div className="text-[10px] text-muted-foreground mt-1">1 Day Weekend Duty</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
-                My Late Punches
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-amber-700 dark:text-amber-300">1 Time</span>
-              </div>
-              <div className="text-[10px] text-amber-600/80 font-medium mt-1">12 min grace OK</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider block">
-                Leaves Taken
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 dark:text-purple-300">2 Days</span>
-              </div>
-              <div className="text-[10px] text-purple-600/80 font-medium mt-1">Remaining: 12 Days</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-              <span className="text-[10.5px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider block">
-                My Overtime
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-cyan-700 dark:text-cyan-300">16.5h</span>
-              </div>
-              <div className="text-[10px] text-cyan-600/80 font-medium mt-1">Est OT: ৳4,120</div>
-            </div>
-          </div>
-        );
-      }
-
-      if (scope === "managed_depts") {
+        chips = [
+          {
+            id: "total_workforce",
+            label: "Today's Status",
+            value: "Present",
+            note: "In: 08:48 AM",
+            boxClass: "bg-emerald-500/10 border-emerald-500/20",
+            labelClass: "text-emerald-600 dark:text-emerald-400",
+            valueClass: "text-emerald-700 dark:text-emerald-300",
+            noteClass: "text-emerald-600/80",
+          },
+          {
+            id: "present_today",
+            label: "Monthly Working",
+            value: "21 / 22",
+            pct: "95.5%",
+            note: "1 Day Weekend Duty",
+            boxClass: "bg-blue-500/10 border-blue-500/20",
+            labelClass: "text-blue-600 dark:text-blue-400",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+          {
+            id: "absent",
+            label: "Leaves Taken",
+            value: "2 Days",
+            note: "Remaining: 12 Days",
+            boxClass: "bg-purple-500/10 border-purple-500/20",
+            labelClass: "text-purple-600 dark:text-purple-400",
+            valueClass: "text-purple-700 dark:text-purple-300",
+            noteClass: "text-purple-600/80",
+          },
+          {
+            id: "late_punch",
+            label: "My Late Punches",
+            value: "1 Time",
+            note: "12 min grace OK",
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-600 dark:text-amber-400",
+            valueClass: "text-amber-700 dark:text-amber-300",
+            noteClass: "text-amber-600/80",
+          },
+          {
+            id: "on_leave",
+            label: "My Overtime",
+            value: "16.5h",
+            note: "Est OT: ৳4,120",
+            boxClass: "bg-cyan-500/10 border-cyan-500/20",
+            labelClass: "text-cyan-600 dark:text-cyan-400",
+            valueClass: "text-cyan-700 dark:text-cyan-300",
+            noteClass: "text-cyan-600/80",
+          },
+          {
+            id: "ot_active",
+            label: "Shift Schedule",
+            value: "General",
+            note: "08:00 AM – 05:00 PM",
+            boxClass: "bg-indigo-500/10 border-indigo-500/20",
+            labelClass: "text-indigo-600 dark:text-indigo-400",
+            valueClass: "text-indigo-700 dark:text-indigo-300",
+            noteClass: "text-indigo-600/80",
+          },
+          {
+            id: "new_joiners",
+            label: "Attendance Bonus",
+            value: "Eligible",
+            note: "Zero Uninformed Abs",
+            boxClass: "bg-teal-500/10 border-teal-500/20",
+            labelClass: "text-teal-600 dark:text-teal-400",
+            valueClass: "text-teal-700 dark:text-teal-300",
+            noteClass: "text-teal-600/80",
+          },
+          {
+            id: "early_leave",
+            label: "Early Departure",
+            value: "0",
+            note: "This Month",
+            boxClass: "bg-slate-500/10 border-slate-500/20",
+            labelClass: "text-slate-600 dark:text-slate-400",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+        ];
+      } else if (scope === "managed_depts") {
         const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
         const label = managed.map((m) => m.split(" ")[0]).join(" + ");
-        return (
-          <div className={getMetricGridClass(colSpan, 5)}>
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wider block truncate">
-                {label} (Head)
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">820</span>
-                <span className="text-[10px] text-muted-foreground">Workers</span>
-              </div>
-              <div className="text-[10px] text-amber-600/90 font-medium mt-1 truncate">
-                {managed.length} Managed Departments
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
-                Present on Duty
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">
-                  785
-                </span>
-                <span className="text-[10px] text-emerald-600 font-bold">95.7%</span>
-              </div>
-              <div className="text-[10px] text-emerald-600/80 font-medium mt-1 flex items-center gap-1">
-                <CheckCircle2 className="size-3" /> Across Managed Lines
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-              <span className="text-[10.5px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">
-                Absentees
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-rose-700 dark:text-rose-300">21</span>
-                <span className="text-[10px] text-rose-600 font-bold">2.6%</span>
-              </div>
-              <div className="text-[10px] text-rose-600/80 font-medium mt-1">Uninformed delay</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
-                Late Punches
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-amber-700 dark:text-amber-300">14</span>
-              </div>
-              <div className="text-[10px] text-amber-600/80 font-medium mt-1">Under 15m grace</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider block">
-                On Approved Leave
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 dark:text-purple-300">14</span>
-              </div>
-              <div className="text-[10px] text-purple-600/80 font-medium mt-1">Approved by Me</div>
-            </div>
-          </div>
-        );
-      }
-
-      if (scope === "department") {
+        chips = [
+          {
+            id: "total_workforce",
+            label: `${label} (Head)`,
+            value: "820",
+            unit: "Workers",
+            note: `${managed.length} Managed Departments`,
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-700 dark:text-amber-300",
+            valueClass: "text-foreground",
+            noteClass: "text-amber-600/90",
+          },
+          {
+            id: "present_today",
+            label: "Present on Duty",
+            value: "785",
+            pct: "95.7%",
+            note: "Across Managed Lines",
+            boxClass: "bg-emerald-500/10 border-emerald-500/20",
+            labelClass: "text-emerald-600 dark:text-emerald-400",
+            valueClass: "text-emerald-700 dark:text-emerald-300",
+            noteClass: "text-emerald-600/80",
+          },
+          {
+            id: "absent",
+            label: "Absentees",
+            value: "21",
+            pct: "2.6%",
+            note: "Uninformed delay",
+            boxClass: "bg-rose-500/10 border-rose-500/20",
+            labelClass: "text-rose-600 dark:text-rose-400",
+            valueClass: "text-rose-700 dark:text-rose-300",
+            noteClass: "text-rose-600/80",
+          },
+          {
+            id: "late_punch",
+            label: "Late Punches",
+            value: "14",
+            note: "Under 15m grace",
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-600 dark:text-amber-400",
+            valueClass: "text-amber-700 dark:text-amber-300",
+            noteClass: "text-amber-600/80",
+          },
+          {
+            id: "on_leave",
+            label: "On Approved Leave",
+            value: "14",
+            note: "Approved by Me",
+            boxClass: "bg-purple-500/10 border-purple-500/20",
+            labelClass: "text-purple-600 dark:text-purple-400",
+            valueClass: "text-purple-700 dark:text-purple-300",
+            noteClass: "text-purple-600/80",
+          },
+          {
+            id: "ot_active",
+            label: "Active on OT",
+            value: "412",
+            pct: "52.5%",
+            note: "Night shift scheduled",
+            boxClass: "bg-indigo-500/10 border-indigo-500/20",
+            labelClass: "text-indigo-600 dark:text-indigo-400",
+            valueClass: "text-indigo-700 dark:text-indigo-300",
+            noteClass: "text-indigo-600/80",
+          },
+          {
+            id: "new_joiners",
+            label: "New Joiners (MTD)",
+            value: "+9",
+            note: "Line onboarding",
+            boxClass: "bg-teal-500/10 border-teal-500/20",
+            labelClass: "text-teal-600 dark:text-teal-400",
+            valueClass: "text-teal-700 dark:text-teal-300",
+            noteClass: "text-teal-600/80",
+          },
+          {
+            id: "early_leave",
+            label: "Early Departure",
+            value: "4",
+            note: "Gate pass logged",
+            boxClass: "bg-slate-500/10 border-slate-500/20",
+            labelClass: "text-slate-600 dark:text-slate-400",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+        ];
+      } else if (scope === "department") {
         const deptName = settings?.department || "Sewing Floor";
-        return (
-          <div className={getMetricGridClass(colSpan, 5)}>
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block truncate">
-                {deptName} Staff
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">680</span>
-                <span className="text-[10px] text-muted-foreground">Operators</span>
-              </div>
-              <div className="text-[10px] text-blue-600/80 font-medium mt-1">Total in Department</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">
-                Present on Floor
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">652</span>
-                <span className="text-[10px] text-emerald-600 font-bold">95.9%</span>
-              </div>
-              <div className="text-[10px] text-emerald-600/80 font-medium mt-1">Active on sewing lines</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-              <span className="text-[10.5px] font-bold text-rose-600 uppercase tracking-wider block">
-                Floor Absentees
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-rose-700 dark:text-rose-300">18</span>
-                <span className="text-[10px] text-rose-600 font-bold">2.6%</span>
-              </div>
-              <div className="text-[10px] text-rose-600/80 font-medium mt-1">Uninformed delay</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-600 uppercase tracking-wider block">
-                Late Punches
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-amber-700 dark:text-amber-300">24</span>
-              </div>
-              <div className="text-[10px] text-amber-600/80 font-medium mt-1">Shift-1 late arrivals</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">
-                On Approved Leave
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 dark:text-purple-300">10</span>
-              </div>
-              <div className="text-[10px] text-purple-600/80 font-medium mt-1">Medical & Casual</div>
-            </div>
-          </div>
-        );
+        chips = [
+          {
+            id: "total_workforce",
+            label: `${deptName} Staff`,
+            value: "680",
+            unit: "Operators",
+            note: "Total in Department",
+            boxClass: "bg-blue-500/10 border-blue-500/20",
+            labelClass: "text-blue-600",
+            valueClass: "text-foreground",
+            noteClass: "text-blue-600/80",
+          },
+          {
+            id: "present_today",
+            label: "Present on Floor",
+            value: "652",
+            pct: "95.9%",
+            note: "Active on sewing lines",
+            boxClass: "bg-emerald-500/10 border-emerald-500/20",
+            labelClass: "text-emerald-600",
+            valueClass: "text-emerald-700 dark:text-emerald-300",
+            noteClass: "text-emerald-600/80",
+          },
+          {
+            id: "absent",
+            label: "Floor Absentees",
+            value: "18",
+            pct: "2.6%",
+            note: "Uninformed delay",
+            boxClass: "bg-rose-500/10 border-rose-500/20",
+            labelClass: "text-rose-600",
+            valueClass: "text-rose-700 dark:text-rose-300",
+            noteClass: "text-rose-600/80",
+          },
+          {
+            id: "late_punch",
+            label: "Late Punches",
+            value: "24",
+            note: "Shift-1 late arrivals",
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-600",
+            valueClass: "text-amber-700 dark:text-amber-300",
+            noteClass: "text-amber-600/80",
+          },
+          {
+            id: "on_leave",
+            label: "On Approved Leave",
+            value: "10",
+            note: "Medical & Casual",
+            boxClass: "bg-purple-500/10 border-purple-500/20",
+            labelClass: "text-purple-600",
+            valueClass: "text-purple-700 dark:text-purple-300",
+            noteClass: "text-purple-600/80",
+          },
+          {
+            id: "ot_active",
+            label: "Active on OT",
+            value: "340",
+            pct: "52.1%",
+            note: "OT Requisitioned",
+            boxClass: "bg-indigo-500/10 border-indigo-500/20",
+            labelClass: "text-indigo-600",
+            valueClass: "text-indigo-700 dark:text-indigo-300",
+            noteClass: "text-indigo-600/80",
+          },
+          {
+            id: "new_joiners",
+            label: "New Joiners (MTD)",
+            value: "+6",
+            note: "This month",
+            boxClass: "bg-teal-500/10 border-teal-500/20",
+            labelClass: "text-teal-600",
+            valueClass: "text-teal-700 dark:text-teal-300",
+            noteClass: "text-teal-600/80",
+          },
+          {
+            id: "early_leave",
+            label: "Early Departure",
+            value: "3",
+            note: "Gate pass logged",
+            boxClass: "bg-slate-500/10 border-slate-500/20",
+            labelClass: "text-slate-600",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+        ];
+      } else {
+        chips = [
+          {
+            id: "total_workforce",
+            label: "Total Workforce",
+            value: "1,248",
+            unit: "Staff",
+            note: "+14 this month",
+            boxClass: "bg-blue-500/10 border-blue-500/20",
+            labelClass: "text-blue-600 dark:text-blue-400",
+            valueClass: "text-foreground",
+            noteClass: "text-blue-600/80",
+          },
+          {
+            id: "present_today",
+            label: "Present Today",
+            value: "1,196",
+            pct: "95.8%",
+            note: "Floor On-Duty",
+            boxClass: "bg-emerald-500/10 border-emerald-500/20",
+            labelClass: "text-emerald-600 dark:text-emerald-400",
+            valueClass: "text-emerald-700 dark:text-emerald-300",
+            noteClass: "text-emerald-600/80",
+          },
+          {
+            id: "absent",
+            label: "Absent",
+            value: "42",
+            pct: "3.4%",
+            note: "18 Uninformed",
+            boxClass: "bg-rose-500/10 border-rose-500/20",
+            labelClass: "text-rose-600 dark:text-rose-400",
+            valueClass: "text-rose-700 dark:text-rose-300",
+            noteClass: "text-rose-600/80",
+          },
+          {
+            id: "late_punch",
+            label: "Late Punch",
+            value: "73",
+            pct: "5.8%",
+            note: "Grace period applied",
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-600 dark:text-amber-400",
+            valueClass: "text-amber-700 dark:text-amber-300",
+            noteClass: "text-amber-600/80",
+          },
+          {
+            id: "on_leave",
+            label: "On Leave",
+            value: "10",
+            pct: "0.8%",
+            note: "Approved & Logged",
+            boxClass: "bg-purple-500/10 border-purple-500/20",
+            labelClass: "text-purple-600 dark:text-purple-400",
+            valueClass: "text-purple-700 dark:text-purple-300",
+            noteClass: "text-purple-600/80",
+          },
+          {
+            id: "ot_active",
+            label: "Active on OT",
+            value: "618",
+            pct: "51.7%",
+            note: "Night shift active",
+            boxClass: "bg-indigo-500/10 border-indigo-500/20",
+            labelClass: "text-indigo-600 dark:text-indigo-400",
+            valueClass: "text-indigo-700 dark:text-indigo-300",
+            noteClass: "text-indigo-600/80",
+          },
+          {
+            id: "new_joiners",
+            label: "New Joiners (MTD)",
+            value: "+14",
+            note: "Across 6 units",
+            boxClass: "bg-teal-500/10 border-teal-500/20",
+            labelClass: "text-teal-600 dark:text-teal-400",
+            valueClass: "text-teal-700 dark:text-teal-300",
+            noteClass: "text-teal-600/80",
+          },
+          {
+            id: "early_leave",
+            label: "Early Departure",
+            value: "7",
+            pct: "0.6%",
+            note: "Approved gate pass",
+            boxClass: "bg-slate-500/10 border-slate-500/20",
+            labelClass: "text-slate-600 dark:text-slate-400",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+        ];
       }
 
-      // Default: Company Wide
+      const visibleChips = chips.filter((c) => isChipVisible(c.id));
+
       return (
-        <div className={getMetricGridClass(colSpan, 5)}>
-          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <span className="text-[10.5px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
-              Total Workforce
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-foreground">1,248</span>
-              <span className="text-[10px] text-muted-foreground">Staff</span>
-            </div>
-            <div className="text-[10px] text-blue-600/80 font-medium mt-1 flex items-center gap-1">
-              <ArrowUpRight className="size-3" /> +14 this month
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
-              Present Today
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">
-                1,196
+        <div className={getMetricGridClass(colSpan, visibleChips.length)}>
+          {visibleChips.map((chip) => (
+            <div key={chip.id} className={`p-3 rounded-xl border ${chip.boxClass}`}>
+              <span className={`text-[10.5px] font-bold uppercase tracking-wider block truncate ${chip.labelClass}`}>
+                {chip.label}
               </span>
-              <span className="text-[10px] text-emerald-600 font-bold">95.8%</span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className={`text-xl sm:text-2xl font-black font-mono ${chip.valueClass}`}>
+                  {chip.value}
+                </span>
+                {chip.unit && <span className="text-[10px] text-muted-foreground">{chip.unit}</span>}
+                {chip.pct && <span className={`text-[10px] font-bold ${chip.labelClass}`}>{chip.pct}</span>}
+              </div>
+              <div className={`text-[10px] font-medium mt-1 truncate ${chip.noteClass}`}>{chip.note}</div>
             </div>
-            <div className="text-[10px] text-emerald-600/80 font-medium mt-1 flex items-center gap-1">
-              <CheckCircle2 className="size-3" /> Floor On-Duty
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-            <span className="text-[10.5px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">
-              Absent
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-rose-700 dark:text-rose-300">42</span>
-              <span className="text-[10px] text-rose-600 font-bold">3.4%</span>
-            </div>
-            <div className="text-[10px] text-rose-600/80 font-medium mt-1">18 Uninformed</div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <span className="text-[10.5px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
-              Late Punch
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-amber-700 dark:text-amber-300">73</span>
-              <span className="text-[10px] text-amber-600 font-bold">5.8%</span>
-            </div>
-            <div className="text-[10px] text-amber-600/80 font-medium mt-1">Grace period applied</div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-            <span className="text-[10.5px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider block">
-              On Leave
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 dark:text-purple-300">10</span>
-              <span className="text-[10px] text-purple-600 font-bold">0.8%</span>
-            </div>
-            <div className="text-[10px] text-purple-600/80 font-medium mt-1">Approved & Logged</div>
-          </div>
+          ))}
         </div>
       );
+    }
 
     case "hr_ot_requisition_vs_consumption": {
       // OT Requisition vs Actual Consumption (Biometric Punch)
@@ -842,66 +978,79 @@ function renderWidgetContent(
       return (
         <div className="space-y-3">
           {/* Top KPI Summary Grid */}
-          <div className={`grid ${colSpan <= 3 ? "grid-cols-2" : "grid-cols-4"} gap-2`}>
-            {/* Requisitioned Hours */}
-            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Requisitioned</span>
-                <Clock className="w-3.5 h-3.5 text-blue-500" />
-              </div>
-              <div className="mt-1">
-                <span className="text-base sm:text-lg font-black text-foreground">
-                  {reqHours.toLocaleString()}
-                  <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
-                </span>
-                <div className="text-[10px] text-muted-foreground truncate">Approved Floor Budget</div>
-              </div>
-            </div>
+          {(() => {
+            const visibleCount = ["req_hours", "util_hours", "util_rate", "idle_hours"].filter((id) => isChipVisible(id)).length;
+            return (
+              <div className={getMetricGridClass(colSpan, Math.max(1, visibleCount))}>
+                {/* Requisitioned Hours */}
+                {isChipVisible("req_hours") && (
+                  <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Requisitioned</span>
+                      <Clock className="w-3.5 h-3.5 text-blue-500" />
+                    </div>
+                    <div className="mt-1">
+                      <span className="text-base sm:text-lg font-black text-foreground">
+                        {reqHours.toLocaleString()}
+                        <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
+                      </span>
+                      <div className="text-[10px] text-muted-foreground truncate">Approved Floor Budget</div>
+                    </div>
+                  </div>
+                )}
 
-            {/* Utilized Hours */}
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Floor Utilized</span>
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-              </div>
-              <div className="mt-1">
-                <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">
-                  {utilHours.toLocaleString()}
-                  <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
-                </span>
-                <div className="text-[10px] text-emerald-600/80 font-medium truncate">Productive Output Time</div>
-              </div>
-            </div>
+                {/* Utilized Hours */}
+                {isChipVisible("util_hours") && (
+                  <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Floor Utilized</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                    </div>
+                    <div className="mt-1">
+                      <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">
+                        {utilHours.toLocaleString()}
+                        <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
+                      </span>
+                      <div className="text-[10px] text-emerald-600/80 font-medium truncate">Productive Output Time</div>
+                    </div>
+                  </div>
+                )}
 
-            {/* Utilization Rate */}
-            <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">Utilization Rate</span>
-                <Percent className="w-3.5 h-3.5 text-indigo-500" />
-              </div>
-              <div className="mt-1">
-                <span className="text-base sm:text-lg font-black text-indigo-600 dark:text-indigo-400">
-                  {utilRate}%
-                </span>
-                <div className="text-[10px] text-indigo-600/80 font-medium truncate">Target: ≥92.0%</div>
-              </div>
-            </div>
+                {/* Utilization Rate */}
+                {isChipVisible("util_rate") && (
+                  <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">Utilization Rate</span>
+                      <Percent className="w-3.5 h-3.5 text-indigo-500" />
+                    </div>
+                    <div className="mt-1">
+                      <span className="text-base sm:text-lg font-black text-indigo-600 dark:text-indigo-400">
+                        {utilRate}%
+                      </span>
+                      <div className="text-[10px] text-indigo-600/80 font-medium truncate">Target: ≥92.0%</div>
+                    </div>
+                  </div>
+                )}
 
-            {/* Idle / Saved Hours */}
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Idle / Unutilized</span>
-                <Timer className="w-3.5 h-3.5 text-amber-500" />
+                {/* Idle / Saved Hours */}
+                {isChipVisible("idle_hours") && (
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Idle / Unutilized</span>
+                      <Timer className="w-3.5 h-3.5 text-amber-500" />
+                    </div>
+                    <div className="mt-1">
+                      <span className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400">
+                        {unutilHours.toLocaleString()}
+                        <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
+                      </span>
+                      <div className="text-[10px] text-amber-600/80 font-medium truncate">Prevented Leakage</div>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="mt-1">
-                <span className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400">
-                  {unutilHours.toLocaleString()}
-                  <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
-                </span>
-                <div className="text-[10px] text-amber-600/80 font-medium truncate">Prevented Leakage</div>
-              </div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* Scope Header & Production Rate Banner */}
           <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-muted/40 border border-border/50 text-xs">
@@ -1152,20 +1301,41 @@ function renderWidgetContent(
             </span>
           </div>
 
-          <div className={`grid ${colSpan <= 3 ? "grid-cols-2" : "grid-cols-3"} gap-2`}>
-            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <div className="text-[10px] font-bold text-emerald-600 uppercase">Budget Amt</div>
-              <div className="text-sm font-black text-foreground">৳{budgetAmt.toLocaleString()}</div>
-            </div>
-            <div className="p-2 rounded-xl bg-orange-500/10 border border-orange-500/20">
-              <div className="text-[10px] font-bold text-orange-600 uppercase">Actual OT</div>
-              <div className="text-sm font-black text-foreground">৳{actualOtAmt.toLocaleString()}</div>
-            </div>
-            <div className={`p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 ${colSpan <= 3 ? "col-span-2" : ""}`}>
-              <div className="text-[10px] font-bold text-blue-600 uppercase">Request OT</div>
-              <div className="text-sm font-black text-foreground">৳{requestOtAmt.toLocaleString()}</div>
-            </div>
-          </div>
+          {(() => {
+            const budgetChips = [
+              isChipVisible("budget_amt") && (
+                <div key="budget_amt" className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="text-[10px] font-bold text-emerald-600 uppercase">Budget Amt</div>
+                  <div className="text-sm font-black text-foreground">৳{budgetAmt.toLocaleString()}</div>
+                </div>
+              ),
+              isChipVisible("actual_ot") && (
+                <div key="actual_ot" className="p-2 rounded-xl bg-orange-500/10 border border-orange-500/20">
+                  <div className="text-[10px] font-bold text-orange-600 uppercase">Actual OT</div>
+                  <div className="text-sm font-black text-foreground">৳{actualOtAmt.toLocaleString()}</div>
+                </div>
+              ),
+              isChipVisible("request_ot") && (
+                <div key="request_ot" className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                  <div className="text-[10px] font-bold text-blue-600 uppercase">Request OT</div>
+                  <div className="text-sm font-black text-foreground">৳{requestOtAmt.toLocaleString()}</div>
+                </div>
+              ),
+              isChipVisible("diff_actual") && (
+                <div key="diff_actual" className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                  <div className="text-[10px] font-bold text-rose-600 uppercase">Diff (Bud-Act)</div>
+                  <div className="text-sm font-black text-foreground">৳{diffBudgetActual.toLocaleString()}</div>
+                </div>
+              ),
+              isChipVisible("diff_request") && (
+                <div key="diff_request" className="p-2 rounded-xl bg-red-500/10 border border-red-500/20">
+                  <div className="text-[10px] font-bold text-red-600 uppercase">Diff (Bud-Req)</div>
+                  <div className="text-sm font-black text-foreground">৳{diffBudgetRequest.toLocaleString()}</div>
+                </div>
+              ),
+            ].filter(Boolean);
+            return <div className={getMetricGridClass(colSpan, Math.max(1, budgetChips.length))}>{budgetChips}</div>;
+          })()}
 
           <div className="h-48 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -2044,9 +2214,9 @@ function renderWidgetContent(
             : `${totStyles} Styles across ${activeBuyers.length} Buyers`;
       }
 
-      return (
-        <div className={getMetricGridClass(colSpan, 4)}>
-          <div className="p-3 rounded-xl bg-teal-500/10 border border-teal-500/20">
+      const mmChips = [
+        isChipVisible("order_volume") && (
+          <div key="order_volume" className="p-3 rounded-xl bg-teal-500/10 border border-teal-500/20">
             <span className="text-[10.5px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider block">
               Total Order Volume
             </span>
@@ -2056,8 +2226,9 @@ function renderWidgetContent(
             </div>
             <div className="text-[10px] text-teal-600/80 font-medium mt-1 truncate">{note}</div>
           </div>
-
-          <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20">
+        ),
+        isChipVisible("fob_value") && (
+          <div key="fob_value" className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20">
             <span className="text-[10.5px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider block">
               Total FOB Value
             </span>
@@ -2066,8 +2237,9 @@ function renderWidgetContent(
             </div>
             <div className="text-[10px] text-sky-600/80 font-medium mt-1">Export FOB Value</div>
           </div>
-
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+        ),
+        isChipVisible("on_time_perf") && (
+          <div key="on_time_perf" className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
             <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
               On-Time Performance
             </span>
@@ -2078,8 +2250,9 @@ function renderWidgetContent(
             </div>
             <div className="text-[10px] text-emerald-600/80 font-medium mt-1">Inspection 1st pass: 98%</div>
           </div>
-
-          <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+        ),
+        isChipVisible("capacity_util") && (
+          <div key="capacity_util" className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
             <span className="text-[10.5px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block">
               Capacity Utilization
             </span>
@@ -2090,8 +2263,10 @@ function renderWidgetContent(
             </div>
             <div className="text-[10px] text-indigo-600/80 font-medium mt-1">Booked thru March 2027</div>
           </div>
-        </div>
-      );
+        ),
+      ].filter(Boolean);
+
+      return <div className={getMetricGridClass(colSpan, mmChips.length)}>{mmChips}</div>;
     }
 
     case "mm_buyer_distribution": {
@@ -2286,30 +2461,38 @@ function renderWidgetContent(
         alertCount = "3 Items";
       }
 
-      return (
-        <div className={getMetricGridClass(colSpan, 4)}>
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+      const invChips = [
+        isChipVisible("total_stock") && (
+          <div key="total_stock" className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
             <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Stock Valuation</span>
             <span className="text-xl font-black font-mono text-foreground mt-1 block">{val}</span>
             <span className="text-[10px] text-muted-foreground truncate">{wh || "All Stores"}</span>
           </div>
-          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+        ),
+        isChipVisible("in_transit") && (
+          <div key="in_transit" className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
             <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">Active Stock Items</span>
             <span className="text-xl font-black font-mono text-foreground mt-1 block">{skus}</span>
             <span className="text-[10px] text-muted-foreground">Distinct SKUs</span>
           </div>
-          <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+        ),
+        isChipVisible("monthly_issue") && (
+          <div key="monthly_issue" className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
             <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">Inventory Turnover</span>
             <span className="text-xl font-black font-mono text-foreground mt-1 block">{turnover}</span>
             <span className="text-[10px] text-muted-foreground">Days of supply</span>
           </div>
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+        ),
+        isChipVisible("low_stock") && (
+          <div key="low_stock" className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
             <span className="text-[10.5px] font-bold text-rose-600 uppercase tracking-wider block">Safety Alert</span>
             <span className="text-xl font-black font-mono text-rose-600 mt-1 block">{alertCount}</span>
             <span className="text-[10px] text-muted-foreground">Below threshold</span>
           </div>
-        </div>
-      );
+        ),
+      ].filter(Boolean);
+
+      return <div className={getMetricGridClass(colSpan, invChips.length)}>{invChips}</div>;
 
     case "inv_low_stock_alerts":
       const lowStockItems = [

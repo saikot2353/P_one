@@ -48,14 +48,18 @@ import {
   BuyerMultiSelectDropdown,
   WarehouseDropdown,
   WidthDropdown,
+  ChipsDropdown,
   BUYER_OPTIONS,
   WAREHOUSE_OPTIONS,
+  AREA_OPTIONS,
+  DEPARTMENT_OPTIONS,
 } from "./DashboardDropdowns";
 import {
   DashboardTemplate,
   DashboardWidgetConfig,
   DashboardComponentDefinition,
   DASHBOARD_COMPONENTS_CATALOG,
+  getEffectiveEnabledChips,
   loadDashboardTemplates,
   saveDashboardTemplates,
   getActiveDashboardTemplateId,
@@ -413,20 +417,21 @@ export const DashboardMakerView: React.FC = () => {
   // Update Widget Scope (Personal / Managed Depts / Department / Company)
   const handleUpdateWidgetScope = (
     widgetId: string,
-    scope: "personal" | "managed_depts" | "department" | "company"
+    scope: "personal" | "area" | "managed_depts" | "department" | "company",
+    extras?: { areas?: string[]; departments?: string[] }
   ) => {
     if (!editingTemplate) return;
     const currentWidget = editingTemplate.widgets.find((w) => w.id === widgetId);
     const currentSettings = currentWidget?.settings || {};
+    const nextDepts = extras?.departments ?? currentSettings.departments ?? currentSettings.managedDepartments ?? ["Sewing Floor", "Cutting Unit"];
+    const nextAreas = extras?.areas ?? currentSettings.areas ?? ["Dhaka North / Gazipur"];
     handleUpdateWidgetSettings(widgetId, {
       ...currentSettings,
       scope,
-      department:
-        scope === "department" ? currentSettings.department || "Sewing Floor" : currentSettings.department,
-      managedDepartments:
-        scope === "managed_depts"
-          ? currentSettings.managedDepartments || ["Sewing Floor", "Cutting Unit"]
-          : currentSettings.managedDepartments,
+      areas: nextAreas,
+      departments: nextDepts,
+      department: nextDepts[0] || currentSettings.department || "Sewing Floor",
+      managedDepartments: nextDepts,
     });
   };
 
@@ -1139,10 +1144,16 @@ export const DashboardMakerView: React.FC = () => {
                                   {def?.supportedScopes && effectiveColSpan >= 4 && (
                                     <ScopeDropdown
                                       value={widget.settings?.scope || "company"}
+                                      areas={widget.settings?.areas || ["Dhaka North / Gazipur"]}
+                                      departments={
+                                        widget.settings?.departments ||
+                                        widget.settings?.managedDepartments ||
+                                        (widget.settings?.department ? [widget.settings.department] : ["Sewing Floor", "Cutting Unit"])
+                                      }
                                       supportedScopes={def.supportedScopes}
                                       colSpan={effectiveColSpan}
-                                      managedDepartmentCount={widget.settings?.managedDepartments?.length || 2}
-                                      onChange={(sc) => handleUpdateWidgetScope(widget.id, sc)}
+                                      managedDepartmentCount={widget.settings?.departments?.length || widget.settings?.managedDepartments?.length || 2}
+                                      onChange={(sc, extras) => handleUpdateWidgetScope(widget.id, sc, extras)}
                                     />
                                   )}
 
@@ -1181,6 +1192,20 @@ export const DashboardMakerView: React.FC = () => {
                                         handleUpdateWidgetSettings(widget.id, {
                                           ...(widget.settings || {}),
                                           warehouse: wh,
+                                        })
+                                      }
+                                    />
+                                  )}
+
+                                  {/* Metric Chips Customizer (Add / Remove Chips) */}
+                                  {def?.availableChips && def.availableChips.length > 0 && (
+                                    <ChipsDropdown
+                                      availableChips={def.availableChips}
+                                      enabledChips={getEffectiveEnabledChips(def, widget.settings)}
+                                      onChange={(chips) =>
+                                        handleUpdateWidgetSettings(widget.id, {
+                                          ...(widget.settings || {}),
+                                          enabledChips: chips,
                                         })
                                       }
                                     />
@@ -1322,236 +1347,129 @@ export const DashboardMakerView: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="bg-card border border-border/80 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-border/60 flex items-center justify-between bg-muted/30">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="size-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <SlidersHorizontal className="size-5" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2 truncate">
-                    <span>Configure Card:</span>
-                    <span className="text-primary truncate">
-                      {configuringWidget.customTitle || configuringDef.name}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-muted-foreground truncate">
-                    Choose data scope (Personal / Dept / Company), filters, and presentation options.
-                  </p>
-                </div>
-              </div>
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+              <h3 className="text-base font-bold text-foreground truncate">
+                {configuringWidget.customTitle || configuringDef.name}
+              </h3>
               <button
                 type="button"
                 onClick={() => setConfiguringWidgetId(null)}
-                className="size-8 rounded-xl border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center cursor-pointer transition-colors shrink-0"
+                className="size-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center cursor-pointer transition-colors shrink-0"
               >
                 <X className="size-4" />
               </button>
             </div>
 
             {/* Modal Content Form */}
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs">
-              {/* Scope Selector if supported */}
+            <div className="p-6 overflow-y-auto space-y-5 flex-1 text-xs">
+              {/* Clean Data Scope Selector */}
               {configuringDef.supportedScopes && (
-                <div className="space-y-2.5">
-                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                    <User className="size-3.5 text-primary" />
-                    Target Data Scope (ডাটা স্কোপ নির্বাচন - নিজের / ডিপার্টমেন্ট / কোম্পানি)
-                  </label>
-                  <p className="text-[11px] text-muted-foreground">
-                    কার্ডে কার তথ্য দেখতে চান তা নির্বাচন করুন।
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                    {/* Personal Scope */}
-                    {configuringDef.supportedScopes.includes("personal") && (
-                      <div
-                        onClick={() => handleUpdateWidgetScope(configuringWidget.id, "personal")}
-                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${configuringWidget.settings?.scope === "personal"
-                          ? "border-blue-600 bg-blue-500/10 shadow-xs"
-                          : "border-border/60 hover:border-blue-400 bg-background"
-                          }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="size-7 rounded-xl bg-blue-600/10 text-blue-600 flex items-center justify-center">
-                            <User className="size-4" />
-                          </div>
-                          {configuringWidget.settings?.scope === "personal" && (
-                            <CheckCircle2 className="size-4 text-blue-600" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="font-bold text-xs text-foreground">My Self (আমার নিজের)</div>
-                          <div className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
-                            ব্যক্তিগত উপস্থিতি, ইন-টাইম, ওভারটাইম এবং ছুটির হিসাব
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Head of Dept / Managed Depts Scope */}
-                    {configuringDef.supportedScopes.includes("managed_depts") && (
-                      <div
-                        onClick={() => handleUpdateWidgetScope(configuringWidget.id, "managed_depts")}
-                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${configuringWidget.settings?.scope === "managed_depts"
-                          ? "border-amber-500 bg-amber-500/10 shadow-xs"
-                          : "border-border/60 hover:border-amber-400 bg-background"
-                          }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="size-7 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
-                            <Crown className="size-4 text-amber-500" />
-                          </div>
-                          {configuringWidget.settings?.scope === "managed_depts" && (
-                            <CheckCircle2 className="size-4 text-amber-600" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="font-bold text-xs text-foreground flex items-center gap-1">
-                            <span>My Managed Depts</span>
-                            <span className="text-[10px] text-amber-600 font-bold">(বিভাগীয় প্রধান)</span>
-                          </div>
-                          <div className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
-                            আমি যে যে ডিপার্টমেন্টের হেড — শুধুমাত্র সেই বিভাগগুলোর সম্মিলিত রিপোর্ট
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Department Scope */}
-                    {configuringDef.supportedScopes.includes("department") && (
-                      <div
-                        onClick={() => handleUpdateWidgetScope(configuringWidget.id, "department")}
-                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${configuringWidget.settings?.scope === "department"
-                          ? "border-purple-600 bg-purple-500/10 shadow-xs"
-                          : "border-border/60 hover:border-purple-400 bg-background"
-                          }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="size-7 rounded-xl bg-purple-600/10 text-purple-600 flex items-center justify-center">
-                            <Building2 className="size-4" />
-                          </div>
-                          {configuringWidget.settings?.scope === "department" && (
-                            <CheckCircle2 className="size-4 text-purple-600" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="font-bold text-xs text-foreground">Department (ডিপার্টমেন্ট)</div>
-                          <div className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
-                            নির্দিষ্ট সেকশন বা ফ্লোরের সমন্বিত রিপোর্ট
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Company Scope */}
-                    {configuringDef.supportedScopes.includes("company") && (
-                      <div
-                        onClick={() => handleUpdateWidgetScope(configuringWidget.id, "company")}
-                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${(!configuringWidget.settings?.scope || configuringWidget.settings.scope === "company")
-                          ? "border-emerald-600 bg-emerald-500/10 shadow-xs"
-                          : "border-border/60 hover:border-emerald-400 bg-background"
-                          }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="size-7 rounded-xl bg-emerald-600/10 text-emerald-600 flex items-center justify-center">
-                            <Layers className="size-4" />
-                          </div>
-                          {(!configuringWidget.settings?.scope || configuringWidget.settings.scope === "company") && (
-                            <CheckCircle2 className="size-4 text-emerald-600" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="font-bold text-xs text-foreground">Entire Company (পুরো কোম্পানি)</div>
-                          <div className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
-                            কারখানার সর্বমোট ১,২৪৮ জন কর্মীর সম্মিলিত ডাটা
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-foreground block">Data Scope</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                      { id: "personal" as const, label: "Self", visible: configuringDef.supportedScopes.includes("personal") },
+                      { id: "area" as const, label: "Area", visible: true },
+                      {
+                        id: "department" as const,
+                        label: "Department",
+                        visible:
+                          configuringDef.supportedScopes.includes("department") ||
+                          configuringDef.supportedScopes.includes("managed_depts"),
+                      },
+                      { id: "company" as const, label: "All Company", visible: configuringDef.supportedScopes.includes("company") },
+                    ]
+                      .filter((s) => s.visible)
+                      .map((item) => {
+                        const curScope = configuringWidget.settings?.scope || "company";
+                        const isActive =
+                          item.id === "department"
+                            ? curScope === "department" || curScope === "managed_depts"
+                            : curScope === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => handleUpdateWidgetScope(configuringWidget.id, item.id)}
+                            className={`h-9 px-3 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${isActive
+                              ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                              : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                              }`}
+                          >
+                            {item.label}
+                          </button>
+                        );
+                      })}
                   </div>
 
-                  {/* If Head of Dept (Managed Depts) selected: choose which departments to include */}
-                  {configuringWidget.settings?.scope === "managed_depts" && (
-                    <div className="p-3.5 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-2 mt-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-[11px] font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
-                          <Crown className="size-3.5 text-amber-500" />
-                          Select Departments You Manage as Head (যে যে বিভাগের আপনি প্রধান):
-                        </label>
-                        <span className="text-[10px] text-muted-foreground font-mono">
-                          {(configuringWidget.settings.managedDepartments || ["Sewing Floor", "Cutting Unit"]).length} selected
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {DEPARTMENTS_LIST.map((dept) => {
-                          const currentSelected =
+                  {/* Multi-select Areas */}
+                  {configuringWidget.settings?.scope === "area" && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {AREA_OPTIONS.map((area) => {
+                        const current = configuringWidget.settings?.areas || ["Dhaka North / Gazipur"];
+                        const checked = current.includes(area);
+                        return (
+                          <button
+                            key={area}
+                            type="button"
+                            onClick={() => {
+                              let next: string[];
+                              if (checked) {
+                                if (current.length <= 1) return;
+                                next = current.filter((a) => a !== area);
+                              } else {
+                                next = [...current, area];
+                              }
+                              handleUpdateWidgetScope(configuringWidget.id, "area", { areas: next });
+                            }}
+                            className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${checked
+                              ? "bg-indigo-600 text-white border-indigo-600"
+                              : "bg-background text-muted-foreground border-border hover:text-foreground"
+                              }`}
+                          >
+                            {checked && <Check className="size-3" />}
+                            <span>{area}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Multi-select Departments */}
+                  {(configuringWidget.settings?.scope === "department" ||
+                    configuringWidget.settings?.scope === "managed_depts") && (
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {DEPARTMENT_OPTIONS.map((dept) => {
+                          const current =
+                            configuringWidget.settings?.departments ||
                             configuringWidget.settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
-                          const isChecked = currentSelected.includes(dept.id);
+                          const checked = current.includes(dept);
                           return (
-                            <label
-                              key={dept.id}
+                            <button
+                              key={dept}
+                              type="button"
                               onClick={() => {
-                                let updated: string[];
-                                if (isChecked) {
-                                  if (currentSelected.length <= 1) return; // Keep at least one
-                                  updated = currentSelected.filter((id) => id !== dept.id);
+                                let next: string[];
+                                if (checked) {
+                                  if (current.length <= 1) return;
+                                  next = current.filter((d) => d !== dept);
                                 } else {
-                                  updated = [...currentSelected, dept.id];
+                                  next = [...current, dept];
                                 }
-                                handleUpdateWidgetSettings(configuringWidget.id, {
-                                  ...configuringWidget.settings,
-                                  managedDepartments: updated,
-                                });
+                                handleUpdateWidgetScope(configuringWidget.id, "department", { departments: next });
                               }}
-                              className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${isChecked
-                                ? "bg-amber-500/10 border-amber-500/50 text-foreground font-bold shadow-2xs"
-                                : "bg-background border-border/60 hover:border-amber-300 text-muted-foreground"
+                              className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${checked
+                                ? "bg-purple-600 text-white border-purple-600"
+                                : "bg-background text-muted-foreground border-border hover:text-foreground"
                                 }`}
                             >
-                              <div className="min-w-0 pr-2">
-                                <div className="text-xs truncate">{dept.name}</div>
-                                <div className="text-[10px] text-muted-foreground font-mono">{dept.count}</div>
-                              </div>
-                              <div
-                                className={`size-4 rounded-md border flex items-center justify-center shrink-0 ${isChecked
-                                  ? "bg-amber-500 border-amber-600 text-white"
-                                  : "border-border/80 bg-background"
-                                  }`}
-                              >
-                                {isChecked && <Check className="size-3 stroke-[3]" />}
-                              </div>
-                            </label>
+                              {checked && <Check className="size-3" />}
+                              <span>{dept}</span>
+                            </button>
                           );
                         })}
                       </div>
-                    </div>
-                  )}
-
-                  {/* If Department selected, choose specific department */}
-                  {configuringWidget.settings?.scope === "department" && (
-                    <div className="p-3.5 rounded-2xl bg-purple-500/5 border border-purple-500/20 space-y-2 mt-2">
-                      <label className="text-[11px] font-bold text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
-                        <Building2 className="size-3.5" />
-                        Select Manufacturing / Office Department:
-                      </label>
-                      <select
-                        value={configuringWidget.settings.department || "Sewing Floor"}
-                        onChange={(e) =>
-                          handleUpdateWidgetSettings(configuringWidget.id, {
-                            ...configuringWidget.settings,
-                            department: e.target.value,
-                          })
-                        }
-                        className="w-full h-9 px-3 rounded-xl border border-purple-500/30 bg-background font-semibold text-xs text-foreground cursor-pointer outline-none focus:border-purple-500"
-                      >
-                        {DEPARTMENTS_LIST.map((dept) => (
-                          <option key={dept.id} value={dept.id}>
-                            {dept.name} — {dept.count}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
+                    )}
                 </div>
               )}
 
@@ -1737,75 +1655,165 @@ export const DashboardMakerView: React.FC = () => {
                 </div>
               )}
 
-              {/* Time Period Filter & Employee Category */}
+              {/* Metric Chips Add / Remove Section */}
+              {configuringDef.availableChips && configuringDef.availableChips.length > 0 && (
+                <div className="space-y-2.5 p-3.5 rounded-2xl border border-indigo-500/20 bg-indigo-500/5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                      <Layers className="size-3.5 text-indigo-600" />
+                      Metric Chips ({getEffectiveEnabledChips(configuringDef, configuringWidget.settings).length}/{configuringDef.availableChips.length})
+                    </label>
+                    <div className="flex items-center gap-2 text-[11px]">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleUpdateWidgetSettings(configuringWidget.id, {
+                            ...(configuringWidget.settings || {}),
+                            enabledChips: configuringDef.availableChips!.map((c) => c.id),
+                          })
+                        }
+                        className="font-semibold text-primary hover:underline cursor-pointer"
+                      >
+                        Add All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleUpdateWidgetSettings(configuringWidget.id, {
+                            ...(configuringWidget.settings || {}),
+                            enabledChips: configuringDef.availableChips!
+                              .filter((c) => c.defaultEnabled !== false)
+                              .map((c) => c.id),
+                          })
+                        }
+                        className="font-medium text-muted-foreground hover:text-foreground hover:underline cursor-pointer"
+                      >
+                        Reset Default
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {configuringDef.availableChips.map((chip) => {
+                      const activeChips = getEffectiveEnabledChips(configuringDef, configuringWidget.settings);
+                      const isActive = activeChips.includes(chip.id);
+                      const isLastOne = isActive && activeChips.length <= 1;
+                      return (
+                        <button
+                          key={chip.id}
+                          type="button"
+                          disabled={isLastOne}
+                          onClick={() => {
+                            let next: string[];
+                            if (isActive) {
+                              if (activeChips.length <= 1) return;
+                              next = activeChips.filter((id) => id !== chip.id);
+                            } else {
+                              next = configuringDef.availableChips!
+                                .map((c) => c.id)
+                                .filter((id) => id === chip.id || activeChips.includes(id));
+                            }
+                            handleUpdateWidgetSettings(configuringWidget.id, {
+                              ...(configuringWidget.settings || {}),
+                              enabledChips: next,
+                            });
+                          }}
+                          className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${isLastOne ? "opacity-75 cursor-not-allowed" : "cursor-pointer"
+                            } ${isActive
+                              ? "bg-indigo-600 text-white border-indigo-600 shadow-xs"
+                              : "bg-background text-muted-foreground border-border hover:border-indigo-400 hover:text-foreground"
+                            }`}
+                        >
+                          {isActive ? <Check className="size-3.5" /> : <Plus className="size-3.5" />}
+                          <span>{chip.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Period & Category */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                    <Clock className="size-3.5 text-muted-foreground" />
-                    Reporting Period (সময়সীমা)
-                  </label>
-                  <select
-                    value={configuringWidget.settings?.period || "month"}
-                    onChange={(e) =>
-                      handleUpdateWidgetSettings(configuringWidget.id, {
-                        ...configuringWidget.settings,
-                        period: e.target.value as any,
-                      })
-                    }
-                    className="w-full h-9 px-3 rounded-xl border border-border/70 bg-background font-semibold text-xs text-foreground cursor-pointer outline-none focus:border-primary"
-                  >
-                    <option value="today">Today (আজকের সারাংশ)</option>
-                    <option value="week">This Week (চলতি সপ্তাহ)</option>
-                    <option value="month">This Month (চলতি মাস)</option>
-                    <option value="year">Fiscal Year (চলতি অর্থবছর)</option>
-                  </select>
+                  <label className="text-xs font-bold text-foreground block">Period</label>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[
+                      { id: "today", label: "Today" },
+                      { id: "week", label: "Week" },
+                      { id: "month", label: "Month" },
+                      { id: "year", label: "Year" },
+                    ].map((p) => {
+                      const active = (configuringWidget.settings?.period || "month") === p.id;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() =>
+                            handleUpdateWidgetSettings(configuringWidget.id, {
+                              ...configuringWidget.settings,
+                              period: p.id as any,
+                            })
+                          }
+                          className={`h-8 rounded-lg border text-xs font-semibold cursor-pointer transition-colors ${active
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background text-muted-foreground border-border hover:text-foreground"
+                            }`}
+                        >
+                          {p.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                    <Users className="size-3.5 text-muted-foreground" />
-                    Employee Category (কর্মীর ধরণ)
-                  </label>
-                  <select
-                    value={configuringWidget.settings?.employeeCategory || "all"}
-                    onChange={(e) =>
-                      handleUpdateWidgetSettings(configuringWidget.id, {
-                        ...configuringWidget.settings,
-                        employeeCategory: e.target.value as any,
-                      })
-                    }
-                    className="w-full h-9 px-3 rounded-xl border border-border/70 bg-background font-semibold text-xs text-foreground cursor-pointer outline-none focus:border-primary"
-                  >
-                    <option value="all">All Workforce (সকল কর্মী - Worker & Staff)</option>
-                    <option value="worker">Floor Workers / Operators (শুধুমাত্র অপারেটর)</option>
-                    <option value="staff">Office & Technical Staff (অফিস ও টেকনিক্যাল স্টাফ)</option>
-                    <option value="management">Management & Executives (ম্যানেজমেন্ট)</option>
-                  </select>
+                  <label className="text-xs font-bold text-foreground block">Category</label>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[
+                      { id: "all", label: "All" },
+                      { id: "worker", label: "Worker" },
+                      { id: "staff", label: "Staff" },
+                      { id: "management", label: "Mgmt" },
+                    ].map((c) => {
+                      const active = (configuringWidget.settings?.employeeCategory || "all") === c.id;
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() =>
+                            handleUpdateWidgetSettings(configuringWidget.id, {
+                              ...configuringWidget.settings,
+                              employeeCategory: c.id as any,
+                            })
+                          }
+                          className={`h-8 rounded-lg border text-xs font-semibold cursor-pointer transition-colors ${active
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background text-muted-foreground border-border hover:text-foreground"
+                            }`}
+                        >
+                          {c.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
-              {/* Custom Title and Card Width */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/40">
+              {/* Title and Width */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/50">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Custom Widget Title (কার্ডের নাম)</label>
+                  <label className="text-xs font-bold text-foreground block">Title</label>
                   <input
                     type="text"
                     value={configuringWidget.customTitle || configuringDef.name}
                     onChange={(e) => handleWidgetTitleChange(configuringWidget.id, e.target.value)}
-                    className="w-full h-9 px-3 rounded-xl border border-border/70 bg-background font-bold text-xs text-foreground outline-none focus:border-primary"
-                    placeholder="Enter custom title"
+                    className="w-full h-9 px-3 rounded-xl border border-border bg-background font-semibold text-xs text-foreground outline-none focus:border-primary"
+                    placeholder="Card title"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-foreground">Card Width on Dashboard (প্রস্থ)</label>
-                    {configuringDef?.minColSpan && configuringDef.minColSpan > 3 && (
-                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">
-                        Min width: {configuringDef.minColSpan === 6 ? "50%" : "33%"} (KPI Banner)
-                      </span>
-                    )}
-                  </div>
+                  <label className="text-xs font-bold text-foreground block">Width</label>
                   <div className="flex items-center gap-1.5">
                     {[
                       { label: "25%", val: 3 as WidgetColSpan },
@@ -1820,8 +1828,8 @@ export const DashboardMakerView: React.FC = () => {
                           type="button"
                           onClick={() => handleWidgetColSpanChange(configuringWidget.id, w.val)}
                           className={`h-9 flex-1 rounded-xl border font-bold text-xs cursor-pointer transition-colors ${configuringWidget.colSpan === w.val
-                            ? "bg-primary text-primary-foreground border-primary shadow-2xs"
-                            : "border-border/60 bg-background text-muted-foreground hover:text-foreground"
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "border-border bg-background text-muted-foreground hover:text-foreground"
                             }`}
                         >
                           {w.label}
@@ -1833,20 +1841,16 @@ export const DashboardMakerView: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 sm:p-5 border-t border-border/60 bg-muted/20 flex items-center justify-between gap-3">
-              <span className="text-[11px] text-muted-foreground flex items-center gap-1.5">
-                <CheckCircle2 className="size-4 text-emerald-600" />
-                Live canvas updates immediately in real-time
-              </span>
+            <div className="px-6 py-3.5 border-t border-border bg-muted/20 flex items-center justify-end">
               <button
                 type="button"
                 onClick={() => {
                   setConfiguringWidgetId(null);
-                  showToast("Configuration saved for this widget");
+                  showToast("Configuration saved");
                 }}
-                className="h-9 px-5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-colors cursor-pointer shadow-sm"
+                className="h-9 px-5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-colors cursor-pointer"
               >
-                Done & Apply
+                Done
               </button>
             </div>
           </div>
