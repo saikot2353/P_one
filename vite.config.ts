@@ -63,6 +63,9 @@ export default defineConfig(({ command, mode }) => {
               if (id.includes("@radix-ui")) return "vendor-radix";
               if (id.includes("date-fns")) return "vendor-date";
               if (id.includes("lodash")) return "vendor-lodash";
+              if (id.includes("@tanstack/react-router") || id.includes("@tanstack/router-core")) return "vendor-router";
+              if (id.includes("@tanstack/react-query") || id.includes("@tanstack/query-core")) return "vendor-query";
+              if (id.includes("zod") || id.includes("react-hook-form") || id.includes("@hookform")) return "vendor-forms";
             }
           },
         },
@@ -70,7 +73,11 @@ export default defineConfig(({ command, mode }) => {
     },
 
     plugins: [
-      tanstackStart(),
+      tanstackStart({
+        spa: {
+          enabled: true,
+        },
+      }),
 
       command === "build" &&
         nitro({

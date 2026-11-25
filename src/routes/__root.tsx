@@ -208,7 +208,6 @@ function RootComponent() {
         ];
         keysToClear.forEach((key) => localStorage.removeItem(key));
         localStorage.setItem(versionKey, "true");
-        window.location.reload();
       }
     }
   }, []);
