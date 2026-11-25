@@ -398,6 +398,103 @@ function renderWidgetContent(
             noteClass: "text-muted-foreground",
           },
         ];
+      } else if (scope === "area") {
+        const areasList = settings?.areas || ["Dhaka North / Gazipur"];
+        const factor = Math.min(1, Math.max(0.28, areasList.length / 3));
+        const areaLabel = areasList.length > 1 ? `${areasList.length} Areas` : areasList[0].split(" ")[0];
+        const total = Math.round(1248 * factor);
+        const pres = Math.round(1196 * factor);
+        const abs = Math.round(42 * factor);
+        const late = Math.round(73 * factor);
+        const leave = Math.round(10 * factor);
+        chips = [
+          {
+            id: "total_workforce",
+            label: `${areaLabel} Staff`,
+            value: total.toLocaleString(),
+            unit: "Staff",
+            note: `${areasList.length} Area(s)`,
+            boxClass: "bg-indigo-500/10 border-indigo-500/20",
+            labelClass: "text-indigo-600 dark:text-indigo-400",
+            valueClass: "text-foreground",
+            noteClass: "text-indigo-600/80",
+          },
+          {
+            id: "present_today",
+            label: "Present Today",
+            value: pres.toLocaleString(),
+            pct: `${((pres / total) * 100).toFixed(1)}%`,
+            note: "Area On-Duty",
+            boxClass: "bg-emerald-500/10 border-emerald-500/20",
+            labelClass: "text-emerald-600 dark:text-emerald-400",
+            valueClass: "text-emerald-700 dark:text-emerald-300",
+            noteClass: "text-emerald-600/80",
+          },
+          {
+            id: "absent",
+            label: "Absent",
+            value: abs.toString(),
+            pct: `${((abs / total) * 100).toFixed(1)}%`,
+            note: "Area Absentees",
+            boxClass: "bg-rose-500/10 border-rose-500/20",
+            labelClass: "text-rose-600 dark:text-rose-400",
+            valueClass: "text-rose-700 dark:text-rose-300",
+            noteClass: "text-rose-600/80",
+          },
+          {
+            id: "late_punch",
+            label: "Late Punch",
+            value: late.toString(),
+            pct: `${((late / total) * 100).toFixed(1)}%`,
+            note: "Grace applied",
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-600 dark:text-amber-400",
+            valueClass: "text-amber-700 dark:text-amber-300",
+            noteClass: "text-amber-600/80",
+          },
+          {
+            id: "on_leave",
+            label: "On Leave",
+            value: leave.toString(),
+            pct: `${((leave / total) * 100).toFixed(1)}%`,
+            note: "Approved Leave",
+            boxClass: "bg-purple-500/10 border-purple-500/20",
+            labelClass: "text-purple-600 dark:text-purple-400",
+            valueClass: "text-purple-700 dark:text-purple-300",
+            noteClass: "text-purple-600/80",
+          },
+          {
+            id: "ot_active",
+            label: "Active on OT",
+            value: Math.round(618 * factor).toString(),
+            pct: "51.7%",
+            note: "Night shift active",
+            boxClass: "bg-cyan-500/10 border-cyan-500/20",
+            labelClass: "text-cyan-600 dark:text-cyan-400",
+            valueClass: "text-cyan-700 dark:text-cyan-300",
+            noteClass: "text-cyan-600/80",
+          },
+          {
+            id: "new_joiners",
+            label: "New Joiners (MTD)",
+            value: `+${Math.max(1, Math.round(14 * factor))}`,
+            note: "In selected area",
+            boxClass: "bg-teal-500/10 border-teal-500/20",
+            labelClass: "text-teal-600 dark:text-teal-400",
+            valueClass: "text-teal-700 dark:text-teal-300",
+            noteClass: "text-teal-600/80",
+          },
+          {
+            id: "early_leave",
+            label: "Early Departure",
+            value: Math.max(1, Math.round(7 * factor)).toString(),
+            note: "Approved gate pass",
+            boxClass: "bg-slate-500/10 border-slate-500/20",
+            labelClass: "text-slate-600 dark:text-slate-400",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+        ];
       } else if (scope === "managed_depts") {
         const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
         const label = managed.map((m) => m.split(" ")[0]).join(" + ");
@@ -723,6 +820,21 @@ function renderWidgetContent(
           { name: "Wed", requisition: 4.0, consumed: 3.5, variance: -0.5 },
           { name: "Thu", requisition: 3.0, consumed: 3.0, variance: 0 },
         ];
+      } else if (scope === "area") {
+        const areasList = settings?.areas || ["Dhaka North / Gazipur"];
+        const factor = Math.min(1, Math.max(0.3, areasList.length / 3));
+        otReq = Math.round(14800 * factor);
+        otCons = Math.round(13920 * factor);
+        otCostBud = `৳${(37.0 * factor).toFixed(1)}L`;
+        otCostAct = `৳${(34.8 * factor).toFixed(1)}L`;
+        otSavedCost = `৳${(2.2 * factor).toFixed(2)}L`;
+        otTitle = areasList.length > 1 ? `${areasList.length} Selected Areas` : areasList[0];
+        otReqData = otReqData.map((d) => ({
+          ...d,
+          requisition: Math.round(d.requisition * factor),
+          consumed: Math.round(d.consumed * factor),
+          variance: Math.round(d.variance * factor),
+        }));
       } else if (scope === "managed_depts") {
         const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
         otReq = 8400;
@@ -942,6 +1054,21 @@ function renderWidgetContent(
           { name: "Wed", requisition: 4.0, utilized: 3.5, unutilized: 0.5, rate: 87.5 },
           { name: "Thu", requisition: 3.0, utilized: 3.0, unutilized: 0, rate: 100 },
         ];
+      } else if (scope === "area") {
+        const areasList = settings?.areas || ["Dhaka North / Gazipur"];
+        const factor = Math.min(1, Math.max(0.3, areasList.length / 3));
+        reqHours = Math.round(14800 * factor);
+        utilHours = Math.round(13920 * factor);
+        unutilHours = Math.max(0, reqHours - utilHours);
+        utilRate = 94.1;
+        otOutputPcs = `${Math.round(256120 * factor).toLocaleString()} Pcs`;
+        otTitle = areasList.length > 1 ? `${areasList.length} Selected Areas` : areasList[0];
+        utilData = utilData.map((d) => ({
+          ...d,
+          requisition: Math.round(d.requisition * factor),
+          utilized: Math.round(d.utilized * factor),
+          unutilized: Math.round(d.unutilized * factor),
+        }));
       } else if (scope === "managed_depts") {
         const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
         reqHours = 8400;
@@ -1372,6 +1499,11 @@ function renderWidgetContent(
     }
 
     case "hr_ot_request_vs_actual": {
+      const areasCount = settings?.areas?.length || 1;
+      const deptsList = settings?.departments || settings?.managedDepartments || (settings?.department ? [settings.department] : ["Sewing Floor", "Cutting Unit"]);
+      const deptFactor = Math.min(1, Math.max(0.25, deptsList.length / 6));
+      const areaFactor = Math.min(1, Math.max(0.3, areasCount / 3));
+
       let actualMp = 284;
       let reqMp = 310;
       let actualHr = 1920;
@@ -1379,20 +1511,20 @@ function renderWidgetContent(
       let actualAmt = 147800;
       let reqAmt = 159298;
 
-      if (scope === "managed_depts") {
-        actualMp = 172;
-        reqMp = 190;
-        actualHr = 1140;
-        reqHr = 1250;
-        actualAmt = 89400;
-        reqAmt = 98200;
-      } else if (scope === "department") {
-        actualMp = 98;
-        reqMp = 110;
-        actualHr = 640;
-        reqHr = 720;
-        actualAmt = 49600;
-        reqAmt = 55800;
+      if (scope === "area") {
+        actualMp = Math.round(284 * areaFactor);
+        reqMp = Math.round(310 * areaFactor);
+        actualHr = Math.round(1920 * areaFactor);
+        reqHr = Math.round(2069 * areaFactor);
+        actualAmt = Math.round(147800 * areaFactor);
+        reqAmt = Math.round(159298 * areaFactor);
+      } else if (scope === "managed_depts" || scope === "department") {
+        actualMp = Math.round(284 * deptFactor);
+        reqMp = Math.round(310 * deptFactor);
+        actualHr = Math.round(1920 * deptFactor);
+        reqHr = Math.round(2069 * deptFactor);
+        actualAmt = Math.round(147800 * deptFactor);
+        reqAmt = Math.round(159298 * deptFactor);
       }
 
       const diffMp = actualMp - reqMp;
@@ -1400,16 +1532,58 @@ function renderWidgetContent(
       const diffAmt = actualAmt - reqAmt;
 
       const reqActualData = [
-        { name: "Actual MP", value: actualMp, displayVal: actualMp, color: "#16a34a", unit: "MP" },
-        { name: "Requested MP", value: reqMp, displayVal: reqMp, color: "#22c55e", unit: "MP" },
-        { name: "Diff MP", value: Math.abs(diffMp), displayVal: diffMp, color: "#dc2626", unit: "MP" },
-        { name: "Actual OT Hr", value: actualHr, displayVal: actualHr, color: "#ea580c", unit: "Hrs" },
-        { name: "Requested OT Hr", value: reqHr, displayVal: reqHr, color: "#f97316", unit: "Hrs" },
-        { name: "Diff OT Hr", value: Math.abs(diffHr), displayVal: diffHr, color: "#dc2626", unit: "Hrs" },
-        { name: "Actual OT Amt", value: actualAmt, displayVal: actualAmt, color: "#0284c7", unit: "৳" },
-        { name: "Requested OT Amt", value: reqAmt, displayVal: reqAmt, color: "#0ea5e9", unit: "৳" },
-        { name: "Diff OT Amt", value: Math.abs(diffAmt), displayVal: diffAmt, color: "#dc2626", unit: "৳" },
+        ...(isChipVisible("mp_summary")
+          ? [
+              { name: "Actual MP", value: actualMp, displayVal: actualMp, color: "#16a34a", unit: "MP" },
+              { name: "Requested MP", value: reqMp, displayVal: reqMp, color: "#22c55e", unit: "MP" },
+              { name: "Diff MP", value: Math.abs(diffMp), displayVal: diffMp, color: "#dc2626", unit: "MP" },
+            ]
+          : []),
+        ...(isChipVisible("hr_summary")
+          ? [
+              { name: "Actual OT Hr", value: actualHr, displayVal: actualHr, color: "#ea580c", unit: "Hrs" },
+              { name: "Requested OT Hr", value: reqHr, displayVal: reqHr, color: "#f97316", unit: "Hrs" },
+              { name: "Diff OT Hr", value: Math.abs(diffHr), displayVal: diffHr, color: "#dc2626", unit: "Hrs" },
+            ]
+          : []),
+        ...(isChipVisible("amt_summary")
+          ? [
+              { name: "Actual OT Amt", value: actualAmt, displayVal: actualAmt, color: "#0284c7", unit: "৳" },
+              { name: "Requested OT Amt", value: reqAmt, displayVal: reqAmt, color: "#0ea5e9", unit: "৳" },
+              { name: "Diff OT Amt", value: Math.abs(diffAmt), displayVal: diffAmt, color: "#dc2626", unit: "৳" },
+            ]
+          : []),
       ];
+
+      const otReqActualCards = [
+        isChipVisible("mp_summary") && (
+          <div key="mp_summary" className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+            <div className="text-[10px] font-bold text-emerald-600 uppercase">Manpower (MP)</div>
+            <div className="text-xs font-black text-foreground mt-0.5">
+              Actual: {actualMp} <span className="text-muted-foreground font-semibold">/ Req: {reqMp}</span>
+            </div>
+            <div className="text-[10px] font-bold text-rose-600">Diff MP: {diffMp}</div>
+          </div>
+        ),
+        isChipVisible("hr_summary") && (
+          <div key="hr_summary" className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20">
+            <div className="text-[10px] font-bold text-orange-600 uppercase">OT Hours</div>
+            <div className="text-xs font-black text-foreground mt-0.5">
+              Actual: {actualHr.toLocaleString()} <span className="text-muted-foreground font-semibold">/ Req: {reqHr.toLocaleString()}</span>
+            </div>
+            <div className="text-[10px] font-bold text-rose-600">Diff Hr: {diffHr.toLocaleString()}</div>
+          </div>
+        ),
+        isChipVisible("amt_summary") && (
+          <div key="amt_summary" className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
+            <div className="text-[10px] font-bold text-blue-600 uppercase">OT Amount (৳)</div>
+            <div className="text-xs font-black text-foreground mt-0.5">
+              Actual: ৳{actualAmt.toLocaleString()} <span className="text-muted-foreground font-semibold">/ Req: ৳{reqAmt.toLocaleString()}</span>
+            </div>
+            <div className="text-[10px] font-bold text-rose-600">Diff Amt: ৳{diffAmt.toLocaleString()}</div>
+          </div>
+        ),
+      ].filter(Boolean);
 
       return (
         <div className="space-y-3">
@@ -1423,28 +1597,8 @@ function renderWidgetContent(
             </span>
           </div>
 
-          <div className={`grid ${colSpan <= 3 ? "grid-cols-1" : "grid-cols-3"} gap-2`}>
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <div className="text-[10px] font-bold text-emerald-600 uppercase">Manpower (MP)</div>
-              <div className="text-xs font-black text-foreground mt-0.5">
-                Actual: {actualMp} <span className="text-muted-foreground font-semibold">/ Req: {reqMp}</span>
-              </div>
-              <div className="text-[10px] font-bold text-rose-600">Diff MP: {diffMp}</div>
-            </div>
-            <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20">
-              <div className="text-[10px] font-bold text-orange-600 uppercase">OT Hours</div>
-              <div className="text-xs font-black text-foreground mt-0.5">
-                Actual: {actualHr.toLocaleString()} <span className="text-muted-foreground font-semibold">/ Req: {reqHr.toLocaleString()}</span>
-              </div>
-              <div className="text-[10px] font-bold text-rose-600">Diff Hr: {diffHr.toLocaleString()}</div>
-            </div>
-            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <div className="text-[10px] font-bold text-blue-600 uppercase">OT Amount (৳)</div>
-              <div className="text-xs font-black text-foreground mt-0.5">
-                Actual: ৳{actualAmt.toLocaleString()} <span className="text-muted-foreground font-semibold">/ Req: ৳{reqAmt.toLocaleString()}</span>
-              </div>
-              <div className="text-[10px] font-bold text-rose-600">Diff Amt: ৳{diffAmt.toLocaleString()}</div>
-            </div>
+          <div className={getMetricGridClass(colSpan, Math.max(1, otReqActualCards.length))}>
+            {otReqActualCards}
           </div>
 
           <div className="h-52 w-full pt-2">
@@ -1484,182 +1638,97 @@ function renderWidgetContent(
       );
     }
 
-    case "hr_attendance_pie":
+    case "hr_attendance_pie": {
       const pieLayoutClass =
         colSpan <= 3 ? "flex flex-col items-center gap-2.5" : "flex flex-col sm:flex-row items-center gap-3";
       const pieChartClass = colSpan <= 3 ? "w-full h-36" : "w-full sm:w-1/2 h-44";
       const pieLegendClass = colSpan <= 3 ? "w-full space-y-1 text-xs" : "w-full sm:w-1/2 space-y-1.5 text-xs";
 
+      const areasList = settings?.areas || ["Dhaka North / Gazipur"];
+      const deptsList = settings?.departments || settings?.managedDepartments || (settings?.department ? [settings.department] : ["Sewing Floor", "Cutting Unit"]);
+
+      let rawPie: Array<{ chipId: string; name: string; value: number; color: string; unit?: string }> = [];
+      let pieSubTitle = "";
+
       if (scope === "personal") {
-        const myData = [
-          { name: "My Present Days", value: 21, color: "#10b981" },
-          { name: "Weekends / Off", value: 8, color: "#3b82f6" },
-          { name: "Approved Leave", value: 1, color: "#8b5cf6" },
-          { name: "Late Entry", value: 1, color: "#f59e0b" },
+        rawPie = [
+          { chipId: "present", name: "My Present Days", value: 21, color: "#10b981", unit: "Days" },
+          { chipId: "absent", name: "Weekends / Off", value: 8, color: "#3b82f6", unit: "Days" },
+          { chipId: "leave", name: "Approved Leave", value: 1, color: "#8b5cf6", unit: "Days" },
+          { chipId: "late", name: "Late Entry", value: 1, color: "#f59e0b", unit: "Days" },
         ];
-        return (
-          <div className={pieLayoutClass}>
-            <div className={pieChartClass}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={myData} innerRadius={colSpan <= 3 ? 34 : 42} outerRadius={colSpan <= 3 ? 54 : 65} paddingAngle={4} dataKey="value">
-                    {myData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className={pieLegendClass}>
-              {myData.map((d) => (
-                <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-1.5">
-                    <div className="size-2 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="text-muted-foreground font-medium text-[11px] truncate">{d.name}</span>
-                  </div>
-                  <span className="font-mono font-bold text-foreground text-[11px]">{d.value} Days</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
+      } else if (scope === "area") {
+        const factor = Math.min(1, Math.max(0.28, areasList.length / 3));
+        pieSubTitle = areasList.length > 1 ? `${areasList.length} Areas` : areasList[0];
+        rawPie = [
+          { chipId: "present", name: "Present", value: Math.round(1196 * factor), color: "#10b981" },
+          { chipId: "absent", name: "Absent", value: Math.round(42 * factor), color: "#f43f5e" },
+          { chipId: "late", name: "Late Entry", value: Math.round(73 * factor), color: "#f59e0b" },
+          { chipId: "leave", name: "Leave", value: Math.round(10 * factor), color: "#8b5cf6" },
+        ];
+      } else if (scope === "managed_depts" || scope === "department") {
+        const factor = Math.min(1, Math.max(0.22, deptsList.length / 6));
+        pieSubTitle = deptsList.length > 1 ? `${deptsList.length} Departments` : deptsList[0];
+        rawPie = [
+          { chipId: "present", name: "Present", value: Math.round(1196 * factor), color: "#10b981" },
+          { chipId: "absent", name: "Absent", value: Math.round(42 * factor), color: "#f43f5e" },
+          { chipId: "late", name: "Late Entry", value: Math.round(73 * factor), color: "#f59e0b" },
+          { chipId: "leave", name: "Leave", value: Math.round(10 * factor), color: "#8b5cf6" },
+        ];
+      } else {
+        rawPie = [
+          { chipId: "present", name: "Present", value: 1196, color: "#10b981" },
+          { chipId: "absent", name: "Absent", value: 42, color: "#f43f5e" },
+          { chipId: "late", name: "Late Entry", value: 73, color: "#f59e0b" },
+          { chipId: "leave", name: "Leave", value: 10, color: "#8b5cf6" },
+        ];
       }
 
-      if (scope === "managed_depts") {
-        const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
-        const deptTitle = `Head: ${managed.map((m) => m.split(" ")[0]).join(" & ")}`;
-        const mData = [
-          { name: "Present", value: 785, color: "#10b981" },
-          { name: "Absent", value: 21, color: "#f43f5e" },
-          { name: "Late Entry", value: 14, color: "#f59e0b" },
-          { name: "On Leave", value: 14, color: "#8b5cf6" },
-        ];
-        return (
-          <div className={pieLayoutClass}>
-            <div className={pieChartClass}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={mData}
-                    innerRadius={colSpan <= 3 ? 34 : 42}
-                    outerRadius={colSpan <= 3 ? 54 : 65}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {mData.map((entry, index) => (
-                      <Cell key={`cell-mdept-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(val: any) => [`${val} staff`, deptTitle]}
-                    contentStyle={{
-                      backgroundColor: "#1e293b",
-                      borderColor: "#334155",
-                      borderRadius: "8px",
-                      fontSize: "11px",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className={pieLegendClass}>
-              <div className="text-[10.5px] font-bold text-amber-600 mb-1 flex items-center gap-1 truncate">
-                <Crown className="size-3 text-amber-500" /> {deptTitle} (820 Staff)
-              </div>
-              {mData.map((d) => (
-                <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-1.5">
-                    <div className="size-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="text-muted-foreground font-medium text-[11px]">{d.name}</span>
-                  </div>
-                  <span className="font-mono font-bold text-foreground text-[11px]">{d.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      }
+      const filteredPie = rawPie.filter((d) => isChipVisible(d.chipId));
+      const pieData = filteredPie.length > 0 ? filteredPie : rawPie;
 
-      if (scope === "department") {
-        const deptName = settings?.department || "Sewing Floor";
-        const deptData = [
-          { name: "Present", value: 652, color: "#10b981" },
-          { name: "Absent", value: 18, color: "#f43f5e" },
-          { name: "Late Entry", value: 24, color: "#f59e0b" },
-          { name: "On Leave", value: 10, color: "#8b5cf6" },
-        ];
-        return (
-          <div className={pieLayoutClass}>
-            <div className={pieChartClass}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={deptData} innerRadius={colSpan <= 3 ? 34 : 42} outerRadius={colSpan <= 3 ? 54 : 65} paddingAngle={4} dataKey="value">
-                    {deptData.map((entry, index) => (
-                      <Cell key={`cell-dept-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(val: any) => [`${val} staff`, deptName]}
-                    contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className={pieLegendClass}>
-              <div className="text-[10.5px] font-bold text-purple-600 mb-1 flex items-center gap-1 truncate">
-                <Building2 className="size-3" /> {deptName}
-              </div>
-              {deptData.map((d) => (
-                <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-1.5">
-                    <div className="size-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="text-muted-foreground font-medium text-[11px]">{d.name}</span>
-                  </div>
-                  <span className="font-mono font-bold text-foreground text-[11px]">{d.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      }
-
-      const attData = [
-        { name: "Present", value: 1196, color: "#10b981" },
-        { name: "Absent", value: 42, color: "#f43f5e" },
-        { name: "Late Entry", value: 73, color: "#f59e0b" },
-        { name: "Leave", value: 10, color: "#8b5cf6" },
-      ];
       return (
         <div className={pieLayoutClass}>
           <div className={pieChartClass}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={attData} innerRadius={colSpan <= 3 ? 34 : 42} outerRadius={colSpan <= 3 ? 54 : 65} paddingAngle={4} dataKey="value">
-                  {attData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                <Pie
+                  data={pieData}
+                  innerRadius={colSpan <= 3 ? 34 : 42}
+                  outerRadius={colSpan <= 3 ? 54 : 65}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${entry.chipId}-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(val: any) => [`${val} employees`, "Count"]}
+                  formatter={(val: any, name: any) => [`${val}`, name]}
                   contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
           <div className={pieLegendClass}>
-            {attData.map((d) => (
-              <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
+            {pieSubTitle && (
+              <div className="text-[10.5px] font-bold text-primary mb-1 truncate">{pieSubTitle}</div>
+            )}
+            {pieData.map((d) => (
+              <div key={d.chipId} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
                 <div className="flex items-center gap-1.5">
                   <div className="size-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                  <span className="text-muted-foreground font-medium">{d.name}</span>
+                  <span className="text-muted-foreground font-medium text-[11px]">{d.name}</span>
                 </div>
-                <span className="font-mono font-bold text-foreground">{d.value.toLocaleString()}</span>
+                <span className="font-mono font-bold text-foreground text-[11px]">
+                  {d.value.toLocaleString()}{d.unit ? ` ${d.unit}` : ""}
+                </span>
               </div>
             ))}
           </div>
         </div>
       );
+    }
 
     case "hr_late_absent_pie":
       const latePieLayoutClass =
@@ -2336,15 +2405,15 @@ function renderWidgetContent(
       );
     }
 
-    case "mm_tna_critical_path":
+    case "mm_tna_critical_path": {
       const milestones = [
-        { title: "Lab Dip Approval", status: "Completed", pct: 100, color: "bg-emerald-500" },
-        { title: "Yarn In-House", status: "Completed", pct: 100, color: "bg-emerald-500" },
-        { title: "PP Sample Submission", status: "Approved", pct: 100, color: "bg-emerald-500" },
-        { title: "Bulk Fabric Knitting", status: "On-Track", pct: 85, color: "bg-blue-500" },
-        { title: "Sewing Floor Input", status: "Running", pct: 60, color: "bg-purple-500" },
-        { title: "Ex-Factory Shipment", status: "Pending", pct: 15, color: "bg-amber-500" },
-      ];
+        { id: "lab_dip", title: "Lab Dip Approval", status: "Completed", pct: 100, color: "bg-emerald-500" },
+        { id: "yarn_inhouse", title: "Yarn In-House", status: "Completed", pct: 100, color: "bg-emerald-500" },
+        { id: "pp_sample", title: "PP Sample Submission", status: "Approved", pct: 100, color: "bg-emerald-500" },
+        { id: "bulk_knitting", title: "Bulk Fabric Knitting", status: "On-Track", pct: 85, color: "bg-blue-500" },
+        { id: "sewing_input", title: "Sewing Floor Input", status: "Running", pct: 60, color: "bg-purple-500" },
+        { id: "ex_factory", title: "Ex-Factory Shipment", status: "Pending", pct: 15, color: "bg-amber-500" },
+      ].filter((m) => isChipVisible(m.id));
       return (
         <div className="space-y-2 py-1">
           {milestones.map((m) => (
@@ -2360,6 +2429,7 @@ function renderWidgetContent(
           ))}
         </div>
       );
+    }
 
     case "mm_line_efficiency":
       const lines = [
@@ -2568,144 +2638,60 @@ function renderWidgetContent(
     // ----------------------------------------------------
     // Accounts & Finance Components
     // ----------------------------------------------------
-    case "acc_payroll_payout":
+    case "acc_payroll_payout": {
+      const areasList = settings?.areas || ["Dhaka North / Gazipur"];
+      const deptsList = settings?.departments || settings?.managedDepartments || (settings?.department ? [settings.department] : ["Sewing Floor", "Cutting Unit"]);
+
+      let payChips: Array<{ id: string; label: string; value: string; sub: string; cls: string; titleCls: string; valCls: string }> = [];
+
       if (scope === "personal") {
-        return (
-          <div className={getMetricGridClass(colSpan, 4)}>
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">
-                My Net Payable
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">৳38,500</span>
-              </div>
-              <div className="text-[10px] text-blue-600/80 font-medium mt-1">Salary: Nov 2026</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">
-                Gross Earnings
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">
-                  ৳42,000
-                </span>
-              </div>
-              <div className="text-[10px] text-emerald-600/80 font-medium mt-1">Basic + Allowances</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">
-                Disbursement Mode
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-sm sm:text-base font-black font-mono text-purple-700 dark:text-purple-300 truncate">
-                  Bank Asia
-                </span>
-              </div>
-              <div className="text-[10px] text-purple-600/80 font-medium mt-1">A/C: ***892 (BEFTN)</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-              <span className="text-[10.5px] font-bold text-rose-600 uppercase tracking-wider block">
-                Total Deductions
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-rose-700 dark:text-rose-300">
-                  ৳3,500
-                </span>
-              </div>
-              <div className="text-[10px] text-rose-600/80 font-medium mt-1">Tax ৳2K • PF ৳1.5K</div>
-            </div>
-          </div>
-        );
+        payChips = [
+          { id: "gross_payroll", label: "Gross Earnings", value: "৳42,000", sub: "Basic + Allowances", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
+          { id: "ot_payout", label: "OT Allowance", value: "৳4,120", sub: "16.5 hrs approved", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
+          { id: "net_disbursed", label: "My Net Payable", value: "৳38,500", sub: "Bank Asia ***892", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
+          { id: "pending_bank", label: "Deductions", value: "৳3,500", sub: "Tax ৳2K • PF ৳1.5K", cls: "bg-rose-500/10 border-rose-500/20", titleCls: "text-rose-600", valCls: "text-rose-700 dark:text-rose-300" },
+        ];
+      } else if (scope === "area") {
+        const factor = Math.min(1, Math.max(0.3, areasList.length / 3));
+        payChips = [
+          { id: "gross_payroll", label: "Area Wage Bill", value: `৳${(3.28 * factor).toFixed(2)} Cr`, sub: `${areasList.length} Area(s)`, cls: "bg-indigo-500/10 border-indigo-500/20", titleCls: "text-indigo-600", valCls: "text-foreground" },
+          { id: "ot_payout", label: "OT Allowance", value: `৳${(38.4 * factor).toFixed(1)} Lac`, sub: "Overtime payout", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
+          { id: "net_disbursed", label: "Bank Transfer", value: `৳${(2.89 * factor).toFixed(2)} Cr`, sub: "BEFTN / EFT", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
+          { id: "pending_bank", label: "Pending / Cash", value: `৳${(39.2 * factor).toFixed(1)} Lac`, sub: "Floor cash & MFS", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-700 dark:text-amber-300" },
+        ];
+      } else if (scope === "managed_depts" || scope === "department") {
+        const factor = Math.min(1, Math.max(0.25, deptsList.length / 6));
+        const label = deptsList.length > 1 ? `${deptsList.length} Depts` : deptsList[0];
+        payChips = [
+          { id: "gross_payroll", label: `${label} Wage Bill`, value: `৳${(3.28 * factor).toFixed(2)} Cr`, sub: "Selected Depts", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
+          { id: "ot_payout", label: "OT Allowance", value: `৳${(38.4 * factor).toFixed(1)} Lac`, sub: "Approved OT", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
+          { id: "net_disbursed", label: "Bank Transfer", value: `৳${(2.89 * factor).toFixed(2)} Cr`, sub: "88% of wage bill", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
+          { id: "pending_bank", label: "Cash / MFS", value: `৳${(39.2 * factor).toFixed(1)} Lac`, sub: "Floor worker cash", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-700 dark:text-amber-300" },
+        ];
+      } else {
+        payChips = [
+          { id: "gross_payroll", label: "Net Payroll Payable", value: "৳3.28 Cr", sub: "For Month: Nov 2026", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
+          { id: "ot_payout", label: "OT Allowance", value: "৳38.4 Lac", sub: "Approved OT payout", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
+          { id: "net_disbursed", label: "Bank Transfer (88%)", value: "৳2.89 Cr", sub: "BEFTN / EFT Routing", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
+          { id: "pending_bank", label: "Pending / Cash (12%)", value: "৳39.2 Lac", sub: "Floor worker cash", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-700 dark:text-amber-300" },
+        ];
       }
 
-      if (scope === "managed_depts") {
-        const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
-        const title = `Head: ${managed.map((m) => m.split(" ")[0]).join(" & ")}`;
-        return (
-          <div className={getMetricGridClass(colSpan, 4)}>
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wider block truncate">
-                {title} Wage Bill
-              </span>
-              <span className="text-xl font-black font-mono text-foreground mt-1 block">৳2.04 Cr</span>
-              <span className="text-[10px] text-muted-foreground">{managed.length} Managed Depts</span>
-            </div>
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Bank Transfer</span>
-              <span className="text-xl font-black font-mono text-emerald-700 dark:text-emerald-300 mt-1 block">৳1.78 Cr</span>
-              <span className="text-[10px] text-muted-foreground">87.2% of wage bill</span>
-            </div>
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">Cash / MFS</span>
-              <span className="text-xl font-black font-mono text-blue-700 dark:text-blue-300 mt-1 block">৳26.0 Lac</span>
-              <span className="text-[10px] text-muted-foreground">Floor worker cash</span>
-            </div>
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">Deductions</span>
-              <span className="text-xl font-black font-mono text-purple-700 dark:text-purple-300 mt-1 block">৳15.2 Lac</span>
-              <span className="text-[10px] text-muted-foreground">Tax & PF deductions</span>
-            </div>
-          </div>
-        );
-      }
-
-      if (scope === "department") {
-        const deptName = settings?.department || "Sewing Floor";
-        return (
-          <div className={getMetricGridClass(colSpan, 4)}>
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block truncate">
-                {deptName} Wage Bill
-              </span>
-              <span className="text-xl font-black font-mono text-foreground mt-1 block">৳1.68 Cr</span>
-              <span className="text-[10px] text-muted-foreground">Department Total</span>
-            </div>
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Bank Transfer</span>
-              <span className="text-xl font-black font-mono text-emerald-700 dark:text-emerald-300 mt-1 block">৳1.45 Cr</span>
-              <span className="text-[10px] text-muted-foreground">86.3% of department</span>
-            </div>
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">Cash / MFS</span>
-              <span className="text-xl font-black font-mono text-blue-700 dark:text-blue-300 mt-1 block">৳23.0 Lac</span>
-              <span className="text-[10px] text-muted-foreground">Floor worker cash</span>
-            </div>
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-600 uppercase tracking-wider block">Deductions</span>
-              <span className="text-xl font-black font-mono text-amber-700 dark:text-amber-300 mt-1 block">৳12.8 Lac</span>
-              <span className="text-[10px] text-muted-foreground">Department Deductions</span>
-            </div>
-          </div>
-        );
-      }
-
+      const visiblePayChips = payChips.filter((c) => isChipVisible(c.id));
       return (
-        <div className={getMetricGridClass(colSpan, 4)}>
-          <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-            <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">Net Payroll Payable</span>
-            <span className="text-xl font-black font-mono text-foreground mt-1 block">৳3.28 Cr</span>
-            <span className="text-[10px] text-muted-foreground">For Month: Nov 2026</span>
-          </div>
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Bank Transfer (88%)</span>
-            <span className="text-xl font-black font-mono text-emerald-700 dark:text-emerald-300 mt-1 block">৳2.89 Cr</span>
-            <span className="text-[10px] text-muted-foreground">BEFTN / EFT Routing</span>
-          </div>
-          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">Cash / MFS (12%)</span>
-            <span className="text-xl font-black font-mono text-blue-700 dark:text-blue-300 mt-1 block">৳39.2 Lac</span>
-            <span className="text-[10px] text-muted-foreground">Floor worker cash</span>
-          </div>
-          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <span className="text-[10.5px] font-bold text-amber-600 uppercase tracking-wider block">Total Deductions</span>
-            <span className="text-xl font-black font-mono text-amber-700 dark:text-amber-300 mt-1 block">৳24.6 Lac</span>
-            <span className="text-[10px] text-muted-foreground">Tax, Advance & Stamp</span>
-          </div>
+        <div className={getMetricGridClass(colSpan, Math.max(1, visiblePayChips.length))}>
+          {visiblePayChips.map((c) => (
+            <div key={c.id} className={`p-3 rounded-xl border ${c.cls}`}>
+              <span className={`text-[10.5px] font-bold uppercase tracking-wider block truncate ${c.titleCls}`}>
+                {c.label}
+              </span>
+              <span className={`text-xl font-black font-mono mt-1 block ${c.valCls}`}>{c.value}</span>
+              <span className="text-[10px] text-muted-foreground">{c.sub}</span>
+            </div>
+          ))}
         </div>
       );
+    }
 
     case "acc_department_cost":
       const costData = [
