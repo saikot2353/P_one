@@ -25,13 +25,26 @@ export type TransferStatus =
   | "Cancelled";
 
 export interface TransferBatchAllocation {
+  sourceBatchNumber?: string;
+  destinationBatchNumber?: string;
   batchNumber: string;
   quantity: number;
+  fromWarehouse?: string;
+  fromStore?: string;
+  toWarehouse?: string;
+  toStore?: string;
+  expiryDate?: string;
 }
 
 export interface TransferLocationAllocation {
+  sourceLocationName?: string;
+  destinationLocationName?: string;
   locationName: string;
   quantity: number;
+  fromWarehouse?: string;
+  fromStore?: string;
+  toWarehouse?: string;
+  toStore?: string;
 }
 
 export interface InterCompanyTransferItem {
@@ -1170,4 +1183,27 @@ export function saveStockWriteOff(wo: StockWriteOff): void {
     current.unshift(wo);
   }
   saveStoredStockWriteOffs(current);
+}
+
+/**
+ * Helper to resolve the currently logged-in user's company / organization.
+ * Falls back to primary ERP default company ("Pakiza Knit Composite Ltd").
+ */
+export function getLoggedInUserCompany(): string {
+  if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem("cripton_current_user");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.company) return parsed.company;
+        if (parsed?.companyName) return parsed.companyName;
+        if (parsed?.organization) return parsed.organization;
+      }
+      const storedComp = localStorage.getItem("cripton_selected_company") || localStorage.getItem("cripton_user_company");
+      if (storedComp) return storedComp;
+    } catch {
+      // fallback
+    }
+  }
+  return "Pakiza Knit Composite Ltd";
 }

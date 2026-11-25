@@ -25,7 +25,15 @@ import {
   MMAccessoriesMasterItem,
   ApprovalStatus,
   MMYarnBookingTagRecord,
+  MMMainOrder,
+  MMSCLCMaster,
 } from "../../lib/marketing-merchandising-data";
+import {
+  PurchaseRequisition,
+  PRItem,
+  getStoredPurchaseRequisitions,
+  setStoredPurchaseRequisitions,
+} from "../../lib/procurement-requisition-data";
 import {
   MMMasterDataRepository,
   MMFabricComposition,
@@ -34,6 +42,8 @@ import {
   MMYarnCount,
   MMDyeingRate,
   MMKnittingRate,
+  MMYarnDyeingRate,
+  findMatchingYarnDyeingRate,
   MMFabricSetupRecord,
   MMAopProcessRateRecord,
   MM_MASTER_STORAGE_KEYS,
@@ -100,10 +110,23 @@ export interface KnitYarnDetailRow {
   ratioPct: number;
   finalQtyKg: number;
   ratePerKg: number;
+  masterRatePerKg?: number;
   yarnCost: number;
   brand: string;
   vendor?: string;
   bookingTag?: MMYarnBookingTagRecord;
+}
+
+export interface YarnBookingAllocationRowState {
+  id: string;
+  blockBookingNo: string;
+  blockBookingId?: string;
+  yarnItemId: string;
+  yarnItemName: string;
+  supplierName?: string;
+  availableBalance: number;
+  tagQtyKg: number;
+  remainingBalance: number;
 }
 
 export interface KnitFabricCostItemRow {
@@ -137,24 +160,28 @@ export interface KnitFabricCostItemRow {
   dyeingMethod: string;
   dyeingProcessLossPct: number;
   dyeingRate: number;
+  masterDyeingRate?: number;
   dyeingCost: number;
   requiredGreigeQty: number;
   // Knitting
   knittingProcessLossPct: number;
   requiredYarnKg: number;
   knittingRate: number;
+  masterKnittingRate?: number;
   knittingCost: number;
   // Yarn Dyeing
   ydType?: string;
   ydProcessLossPct?: number;
   requiredDyedYarnKg?: number;
   ydRate?: number;
+  masterYdRate?: number;
   ydCost?: number;
   // AOP
   aopType?: string;
   aopProcessLossPct?: number;
   requiredDyedQty?: number;
   aopRate?: number;
+  masterAopRate?: number;
   aopCost?: number;
   // Finishing
   washingRate?: number;
@@ -193,7 +220,7 @@ export const YD_DYEING_METHODS = [
   "Dispersed",
   "2 Part Dye",
   "Normal Wash",
-  "White Dyeing",
+  "White Wash",
   "N/A",
 ] as const;
 
@@ -256,11 +283,8 @@ export const YARN_COLOR_TYPES = ["Solid", "Y/D"] as const;
 export const OTHER_COST_HEADS = [
   "Testing Cost",
   "Courier Cost",
-  "Commercial Cost",
   "Freight Cost",
   "Inspection Cost",
-  "Commission",
-  "Development",
 ] as const;
 
 export const EMBELLISHMENT_COST_HEADS = [
@@ -336,6 +360,12 @@ export interface PreCostingRecord {
   category?: string;
   preCostDate: string;
   contractNo?: string;
+  scLcNo?: string;
+  salesContractNo?: string;
+  linkedOrderId?: string;
+  linkedOrderNo?: string;
+  orderId?: string;
+  orderNo?: string;
   ourRef?: string;
   acHolder: string;
   buyer: string;
@@ -350,6 +380,15 @@ export interface PreCostingRecord {
   efficiencyPct: number;
   cmDz?: number;
   note: string;
+  // Overheads & Commercial Basis (Section 1)
+  commissionPct?: number;
+  commissionValue?: number;
+  financialPct?: number;
+  financialValue?: number;
+  samplingPct?: number;
+  samplingValue?: number;
+  commercialPct?: number;
+  commercialValue?: number;
   // Multiple Purchase Orders
   poRows: MMPreCostPO[];
   // Item-wise costing details
@@ -1138,21 +1177,25 @@ export function computeKnitFabricRow(
     dyeingMethod: row.dyeingMethod || "Reactive",
     dyeingProcessLossPct,
     dyeingRate,
+    masterDyeingRate: row.masterDyeingRate !== undefined ? row.masterDyeingRate : (row as any)?.masterDyeingRate,
     dyeingCost,
     requiredGreigeQty,
     knittingProcessLossPct,
     requiredYarnKg,
     knittingRate,
+    masterKnittingRate: row.masterKnittingRate !== undefined ? row.masterKnittingRate : (row as any)?.masterKnittingRate,
     knittingCost,
     ydType,
     ydProcessLossPct,
     requiredDyedYarnKg,
     ydRate,
+    masterYdRate: row.masterYdRate !== undefined ? row.masterYdRate : (row as any)?.masterYdRate,
     ydCost,
     aopType,
     aopProcessLossPct,
     requiredDyedQty,
     aopRate,
+    masterAopRate: row.masterAopRate !== undefined ? row.masterAopRate : (row as any)?.masterAopRate,
     aopCost,
     washingRate,
     washingCost,
@@ -1479,8 +1522,10 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
           dyeingMethod: "Reactive",
           dyeingProcessLossPct: 4,
           dyeingRate: 0.85,
+          masterDyeingRate: 0.85,
           knittingProcessLossPct: 3,
           knittingRate: 0.45,
+          masterKnittingRate: 0.45,
           yarnDetails: [
             {
               id: `yd-mig-${idx + 1}-1`,
@@ -1492,6 +1537,7 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
               ratioPct: 100,
               finalQtyKg: it.finalQty || 5000,
               ratePerKg: 3.45,
+              masterRatePerKg: 3.45,
               yarnCost: Number(((it.finalQty || 5000) * 3.45).toFixed(2)),
               brand: "Square Textiles",
             },
@@ -1538,8 +1584,10 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
         dyeingMethod: "Reactive",
         dyeingProcessLossPct: 4,
         dyeingRate: 0.85,
+        masterDyeingRate: 0.85,
         knittingProcessLossPct: 3,
         knittingRate: 0.45,
+        masterKnittingRate: 0.45,
         yarnDetails: [
           {
             id: "yd-def-1",
@@ -1551,6 +1599,7 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
             ratioPct: 100,
             finalQtyKg: 4400,
             ratePerKg: 3.45,
+            masterRatePerKg: 3.45,
             yarnCost: 15180,
             brand: "Square Textiles",
           },
@@ -1582,21 +1631,73 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
     ];
   }
 
-  if (!hasExplicitOthers && otherCostItems.length === 0) {
+  // Strip out Commercial Cost, Commission, Development from otherCostItems and migrate their values
+  const oldComm = (r.otherCostItems || []).find(
+    (o: any) => o.costHead === "Commission" || o.head === "Commission"
+  );
+  const oldCommercial = (r.otherCostItems || []).find(
+    (o: any) => o.costHead === "Commercial Cost" || o.head === "Commercial Cost"
+  );
+  const oldDev = (r.otherCostItems || []).find(
+    (o: any) => o.costHead === "Development" || o.head === "Development"
+  );
+
+  const commissionPct =
+    r.commissionPct !== undefined
+      ? Number(r.commissionPct) || 0
+      : (oldComm?.costPercent ?? oldComm?.rateOrPct ?? 0);
+  const financialPct = r.financialPct !== undefined ? Number(r.financialPct) || 0 : 0;
+  const samplingPct =
+    r.samplingPct !== undefined
+      ? Number(r.samplingPct) || 0
+      : (oldDev?.costPercent ?? oldDev?.rateOrPct ?? 0);
+  const commercialPct =
+    r.commercialPct !== undefined
+      ? Number(r.commercialPct) || 0
+      : (oldCommercial?.costPercent ?? oldCommercial?.rateOrPct ?? 0);
+
+  const commissionValue =
+    r.commissionValue !== undefined
+      ? Number(r.commissionValue) || 0
+      : Number(((effectivePoVal * (commissionPct || 0)) / 100).toFixed(2));
+  const financialValue =
+    r.financialValue !== undefined
+      ? Number(r.financialValue) || 0
+      : Number(((effectivePoVal * (financialPct || 0)) / 100).toFixed(2));
+  const samplingValue =
+    r.samplingValue !== undefined
+      ? Number(r.samplingValue) || 0
+      : Number(((effectivePoVal * (samplingPct || 0)) / 100).toFixed(2));
+  const commercialValue =
+    r.commercialValue !== undefined
+      ? Number(r.commercialValue) || 0
+      : Number(((effectivePoVal * (commercialPct || 0)) / 100).toFixed(2));
+
+  otherCostItems = (otherCostItems || []).filter(
+    (o) =>
+      o.costHead !== "Commercial Cost" &&
+      o.head !== "Commercial Cost" &&
+      o.costHead !== "Commission" &&
+      o.head !== "Commission" &&
+      o.costHead !== "Development" &&
+      o.head !== "Development"
+  );
+
+  if (otherCostItems.length === 0) {
     otherCostItems = [
       computeOtherCostRow(
         {
           id: "oc-def-1",
           sl: 1,
-          head: "Commercial Cost",
-          costHead: "Commercial Cost",
-          description: "Bank charge, LC transmission, & documentation",
-          supplier: "Commercial Bank",
-          calcBasis: "Percentage of Order Value",
-          basisValue: effectivePoVal,
-          rateOrPct: 1.25,
-          costPercent: 1.25,
-          amount: Number(((effectivePoVal * 1.25) / 100).toFixed(2)),
+          head: "Testing Cost",
+          costHead: "Testing Cost",
+          description: "Lab testing, color fastness & shrinkage test",
+          supplier: "SGS / ITS",
+          calcBasis: "Fixed Lump Sum",
+          basisValue: 250,
+          rateOrPct: 250,
+          unitRateDz: 0.15,
+          amount: 250,
         },
         effectivePoVal,
         totalOrderQty
@@ -1660,6 +1761,14 @@ export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreC
     cpm: cpmVal,
     efficiencyPct: effVal,
     cmDz: cmDzVal,
+    commissionPct,
+    commissionValue,
+    financialPct,
+    financialValue,
+    samplingPct,
+    samplingValue,
+    commercialPct,
+    commercialValue,
     consumptionUnit,
     fabricEntry,
     knitFabricItems,
@@ -1680,7 +1789,13 @@ const INITIAL_RECORDS: PreCostingRecord[] = [
     gmtItem: "T-Shirt",
     category: "Women",
     preCostDate: "2026-09-15",
-    contractNo: "CT-PKCL-2026-881",
+    contractNo: "SC-HM-2026-081",
+    scLcNo: "SC-HM-2026-081",
+    salesContractNo: "SC-HM-2026-081",
+    linkedOrderId: "ord-001",
+    linkedOrderNo: "ORD-2026-001",
+    orderId: "ord-001",
+    orderNo: "ORD-2026-001",
     ourRef: "REF-99238",
     acHolder: "Md. Rashidul Islam",
     buyer: "H&M Hennes & Mauritz",
@@ -1693,10 +1808,18 @@ const INITIAL_RECORDS: PreCostingRecord[] = [
     cpm: 0.065,
     efficiencyPct: 65,
     cmDz: 5.54,
+    commissionPct: 2.0,
+    commissionValue: 3238.99,
+    financialPct: 1.5,
+    financialValue: 2429.24,
+    samplingPct: 0.5,
+    samplingValue: 809.75,
+    commercialPct: 1.25,
+    commercialValue: 2024.37,
     note: "Style Pre Costing (Knit) based on confirmed tech pack v2. Fabric production scheduled in Mirzapur unit.",
     poRows: [
-      { id: "po-kt-1", sl: 1, poNumber: "PO-HM-99881-A", poQuantity: 25000, rate: 4.15, value: 103750, remarks: "Main Lot Delivery" },
-      { id: "po-kt-2", sl: 2, poNumber: "PO-HM-99881-B", poQuantity: 14024, rate: 4.15, value: 58199.6, remarks: "Repeat Shipment Lot" },
+      { id: "po-kt-1", sl: 1, poNumber: "PO-HM-99881-A", poQuantity: 25000, rate: 4.15, value: 103750, deliveryDate: "2026-11-20", remarks: "Main Lot Delivery" },
+      { id: "po-kt-2", sl: 2, poNumber: "PO-HM-99881-B", poQuantity: 14024, rate: 4.15, value: 58199.6, deliveryDate: "2026-12-15", remarks: "Repeat Shipment Lot" },
     ],
     items: [
       {
@@ -1886,7 +2009,11 @@ function createVersionSnapshot(r: PreCostingRecord): MMPreCostVersionSnapshot {
       gmtItem: r.gmtItem || "T-Shirt",
       category: r.category || "Men",
       preCostDate: r.preCostDate || new Date().toISOString().split("T")[0],
-      contractNo: r.contractNo || "",
+      contractNo: r.contractNo || r.scLcNo || "",
+      scLcNo: r.scLcNo || r.contractNo || "",
+      salesContractNo: r.salesContractNo || r.scLcNo || r.contractNo || "",
+      linkedOrderId: r.linkedOrderId || r.orderId,
+      linkedOrderNo: r.linkedOrderNo || r.orderNo,
       ourRef: r.ourRef || "",
       acHolder: r.acHolder || "",
       buyer: r.buyer || "",
@@ -2066,6 +2193,20 @@ export function PreCostingKnitManager({
   );
   const [accessoriesMasterItems] = useState<MMAccessoriesMasterItem[]>(() => MMRepository.getAccessoriesMaster());
   const [suppliersMaster] = useState<any[]>(() => MMRepository.getSuppliers());
+  const [confirmOrders, setConfirmOrders] = useState<MMMainOrder[]>(() => {
+    try {
+      return MMRepository.getOrders();
+    } catch {
+      return [];
+    }
+  });
+  const [scLcMasterList] = useState<MMSCLCMaster[]>(() => {
+    try {
+      return MMRepository.getSCLCs();
+    } catch {
+      return [];
+    }
+  });
 
   // Merchandising Master Data sources for Knit Fabric & Yarn
   const [masterFabricCompositions, setMasterFabricCompositions] = useState<MMFabricComposition[]>(() => MMMasterDataRepository.getFabricCompositions());
@@ -2073,6 +2214,7 @@ export function PreCostingKnitManager({
   const [masterSpinningTypes, setMasterSpinningTypes] = useState<MMSpinningType[]>(() => MMMasterDataRepository.getSpinningTypes());
   const [masterYarnCounts, setMasterYarnCounts] = useState<MMYarnCount[]>(() => MMMasterDataRepository.getYarnCounts());
   const [masterDyeingRates, setMasterDyeingRates] = useState<MMDyeingRate[]>(() => MMMasterDataRepository.getDyeingRates());
+  const [masterYarnDyeingRates, setMasterYarnDyeingRates] = useState<MMYarnDyeingRate[]>(() => MMMasterDataRepository.getYarnDyeingRates());
   const [masterKnittingRates, setMasterKnittingRates] = useState<MMKnittingRate[]>(() => MMMasterDataRepository.getKnittingRates());
   const [masterAopRates, setMasterAopRates] = useState<MMAopProcessRateRecord[]>(() => MMMasterDataRepository.getAopProcessRates());
 
@@ -2089,8 +2231,12 @@ export function PreCostingKnitManager({
         setMasterKnittingRates(MMMasterDataRepository.getKnittingRates());
       } else if (e.key === MM_MASTER_STORAGE_KEYS.DYEING_RATE) {
         setMasterDyeingRates(MMMasterDataRepository.getDyeingRates());
+      } else if (e.key === MM_MASTER_STORAGE_KEYS.YARN_DYEING_RATE) {
+        setMasterYarnDyeingRates(MMMasterDataRepository.getYarnDyeingRates());
       } else if (e.key === MM_MASTER_STORAGE_KEYS.AOP_PROCESS_RATE) {
         setMasterAopRates(MMMasterDataRepository.getAopProcessRates());
+      } else if (e.key === "mm_orders_master_v1" || e.key === "cripton_mm_orders_v1") {
+        setConfirmOrders(MMRepository.getOrders());
       }
     };
     window.addEventListener("storage", handleStorageUpdate);
@@ -2117,23 +2263,25 @@ export function PreCostingKnitManager({
     item: "",
   });
 
-  // Booking Tag Modal State
+  // Booking Tag / Yarn Stock & Procurement Allocation Modal State
   const [bookingTagModal, setBookingTagModal] = useState<{
     isOpen: boolean;
     yarnRowIndex: number | null;
     yarnRowId: string;
     finalQtyKg: number;
     yarnItemName: string;
-    selectedBookingNo: string;
-    selectedYarnItemId: string;
+    componentName: string;
+    allocations: YarnBookingAllocationRowState[];
+    existingProcurementRequestId?: string;
+    existingProcurementRequestNo?: string;
   }>({
     isOpen: false,
     yarnRowIndex: null,
     yarnRowId: "",
     finalQtyKg: 0,
     yarnItemName: "",
-    selectedBookingNo: "",
-    selectedYarnItemId: "",
+    componentName: "",
+    allocations: [],
   });
 
   // Fabric Entry Specifications Modal State
@@ -2238,7 +2386,7 @@ export function PreCostingKnitManager({
   const getSpinningTypeOptions = (currentVal?: string) => {
     const opts = [...spinningTypeOptions];
     if (currentVal && !opts.some((o) => o.value === currentVal)) {
-      opts.unshift({ value: currentVal, label: currentVal });
+      opts.unshift({ value: currentVal as any, label: currentVal as any });
     }
     return opts;
   };
@@ -2297,7 +2445,7 @@ export function PreCostingKnitManager({
   const getFabricSourceOptions = (currentVal?: string) => {
     const opts = [...fabricSourceOptions];
     if (currentVal && !opts.some((o) => o.value === currentVal)) {
-      opts.unshift({ value: currentVal, label: currentVal });
+      opts.unshift({ value: currentVal as any, label: currentVal as any });
     }
     return opts;
   };
@@ -2309,7 +2457,7 @@ export function PreCostingKnitManager({
   const getColorTypeOptions = (currentVal?: string) => {
     const opts = [...colorTypeOptions];
     if (currentVal && !opts.some((o) => o.value === currentVal)) {
-      opts.unshift({ value: currentVal, label: currentVal });
+      opts.unshift({ value: currentVal as any, label: currentVal as any });
     }
     return opts;
   };
@@ -2321,7 +2469,7 @@ export function PreCostingKnitManager({
   const getYdTypeOptions = (currentVal?: string) => {
     const opts = [...ydTypeOptions];
     if (currentVal && !opts.some((o) => o.value === currentVal)) {
-      opts.unshift({ value: currentVal, label: currentVal });
+      opts.unshift({ value: currentVal as any, label: currentVal as any });
     }
     return opts;
   };
@@ -2333,7 +2481,7 @@ export function PreCostingKnitManager({
   const getAopTypeOptions = (currentVal?: string) => {
     const opts = [...aopTypeOptions];
     if (currentVal && !opts.some((o) => o.value === currentVal)) {
-      opts.unshift({ value: currentVal, label: currentVal });
+      opts.unshift({ value: currentVal as any, label: currentVal as any });
     }
     return opts;
   };
@@ -2386,6 +2534,12 @@ export function PreCostingKnitManager({
       category: "Men",
       preCostDate: new Date().toISOString().split("T")[0],
       contractNo: "",
+      scLcNo: "",
+      salesContractNo: "",
+      linkedOrderId: undefined,
+      linkedOrderNo: undefined,
+      orderId: undefined,
+      orderNo: undefined,
       ourRef: "",
       acHolder: defaultBuyer?.accountHolder || "Md. Rashidul Islam",
       buyer: defaultBuyer?.name || "H&M Hennes & Mauritz",
@@ -2521,6 +2675,122 @@ export function PreCostingKnitManager({
     []
   );
 
+  // ── Sales Contract / LC Dropdown Options (Populated from Confirm Orders) ────
+  const scLcSelectOptions = useMemo(() => {
+    const map = new Map<string, { label: string; order?: MMMainOrder; buyer?: string; type?: string }>();
+
+    // 1. From Confirm Orders (mm-order-entry)
+    confirmOrders.forEach((ord) => {
+      // Check order top-level SC/LC
+      if (ord.scLcNo && ord.scLcNo.trim()) {
+        const key = ord.scLcNo.trim();
+        if (!map.has(key)) {
+          map.set(key, {
+            label: `${key} — ${ord.buyerName || "Buyer"} (Order: ${ord.orderNo})`,
+            order: ord,
+            buyer: ord.buyerName,
+          });
+        }
+      }
+      // Check order PO Details SC/LC
+      if (Array.isArray(ord.poDetails)) {
+        ord.poDetails.forEach((po) => {
+          if (po.scLcNo && po.scLcNo.trim()) {
+            const key = po.scLcNo.trim();
+            if (!map.has(key)) {
+              map.set(key, {
+                label: `${key} — ${ord.buyerName || "Buyer"} (PO: ${po.poNumber} • Order: ${ord.orderNo})`,
+                order: ord,
+                buyer: ord.buyerName,
+              });
+            }
+          }
+        });
+      }
+    });
+
+    // 2. From S.C / LC Master records library
+    scLcMasterList.forEach((master) => {
+      if (master.scLcNo && master.scLcNo.trim()) {
+        const key = master.scLcNo.trim();
+        if (!map.has(key)) {
+          const matchingOrder = confirmOrders.find(
+            (o) =>
+              o.scLcNo === key ||
+              o.poDetails?.some((p) => p.scLcNo === key) ||
+              (o.buyerName && master.buyer && o.buyerName.toLowerCase() === master.buyer.toLowerCase())
+          );
+          map.set(key, {
+            label: matchingOrder
+              ? `${key} — ${master.buyer} (${master.type} • Order: ${matchingOrder.orderNo})`
+              : `${key} — ${master.buyer} (${master.type})`,
+            order: matchingOrder,
+            buyer: master.buyer,
+            type: master.type,
+          });
+        }
+      }
+    });
+
+    // Current record value if not yet present
+    const currentVal = (formData.scLcNo || formData.contractNo || "").trim();
+    if (currentVal && !map.has(currentVal)) {
+      map.set(currentVal, {
+        label: `${currentVal}${formData.linkedOrderNo ? ` (Linked Order: ${formData.linkedOrderNo})` : " (Custom S.C/LC)"}`,
+      });
+    }
+
+    return Array.from(map.entries()).map(([val, info]) => ({
+      value: val,
+      label: info.label,
+    }));
+  }, [confirmOrders, scLcMasterList, formData.scLcNo, formData.contractNo, formData.linkedOrderNo]);
+
+  // Handler for selecting / updating Sales Contract / LC
+  const handleScLcChange = (val: string) => {
+    const trimmedVal = val?.trim() || "";
+    // Find matching Confirm Order
+    const matchedOrder = confirmOrders.find(
+      (o) =>
+        o.scLcNo === trimmedVal ||
+        o.poDetails?.some((p) => p.scLcNo === trimmedVal) ||
+        (trimmedVal && (o.styleNo === formData.style || o.preCostId === formData.preCostId))
+    );
+
+    setFormData((prev) => ({
+      ...prev,
+      contractNo: trimmedVal,
+      scLcNo: trimmedVal,
+      salesContractNo: trimmedVal,
+      linkedOrderId: matchedOrder?.id,
+      linkedOrderNo: matchedOrder?.orderNo,
+      orderId: matchedOrder?.id,
+      orderNo: matchedOrder?.orderNo,
+    }));
+
+    if (trimmedVal) {
+      if (matchedOrder) {
+        toast.success(`Linked S.C/LC '${trimmedVal}' to Confirm Order ${matchedOrder.orderNo}.`);
+      } else {
+        toast.info(`Selected S.C/LC: ${trimmedVal}`);
+      }
+    }
+  };
+
+  const handleClearScLc = () => {
+    setFormData((prev) => ({
+      ...prev,
+      contractNo: "",
+      scLcNo: "",
+      salesContractNo: "",
+      linkedOrderId: undefined,
+      linkedOrderNo: undefined,
+      orderId: undefined,
+      orderNo: undefined,
+    }));
+    toast.info("Cleared Sales Contract / LC selection.");
+  };
+
   // ── Available Yarn Item Dropdown Options ───────────────────────
   const availableYarnItemOptions = useMemo(() => {
     const itemSet = new Set<string>();
@@ -2643,12 +2913,42 @@ export function PreCostingKnitManager({
     return (formData.otherCostItems || []).reduce((acc, row) => acc + (Number(row.amount) || 0), 0);
   }, [formData.otherCostItems]);
 
+  const totalOverheadCost = useMemo(() => {
+    const comm =
+      formData.commissionValue !== undefined && formData.commissionValue !== null
+        ? Number(formData.commissionValue)
+        : Number(((totalPoValue * (formData.commissionPct || 0)) / 100).toFixed(2));
+    const fin =
+      formData.financialValue !== undefined && formData.financialValue !== null
+        ? Number(formData.financialValue)
+        : Number(((totalPoValue * (formData.financialPct || 0)) / 100).toFixed(2));
+    const samp =
+      formData.samplingValue !== undefined && formData.samplingValue !== null
+        ? Number(formData.samplingValue)
+        : Number(((totalPoValue * (formData.samplingPct || 0)) / 100).toFixed(2));
+    const comml =
+      formData.commercialValue !== undefined && formData.commercialValue !== null
+        ? Number(formData.commercialValue)
+        : Number(((totalPoValue * (formData.commercialPct || 0)) / 100).toFixed(2));
+    return Number((comm + fin + samp + comml).toFixed(2));
+  }, [
+    totalPoValue,
+    formData.commissionValue,
+    formData.commissionPct,
+    formData.financialValue,
+    formData.financialPct,
+    formData.samplingValue,
+    formData.samplingPct,
+    formData.commercialValue,
+    formData.commercialPct,
+  ]);
+
   // Calculate Total Cost & Surplus
   const totalCost = useMemo(() => {
-    const sum = totalFabricCost + totalAccessoriesCost + totalEmbellishmentCost + totalOthersCost;
+    const sum = totalFabricCost + totalAccessoriesCost + totalEmbellishmentCost + totalOthersCost + totalOverheadCost;
     if (sum > 0) return Number(sum.toFixed(2));
     return (formData.items || []).reduce((acc, item) => acc + (Number(item.amount) || 0), 0);
-  }, [totalFabricCost, totalAccessoriesCost, totalEmbellishmentCost, totalOthersCost, formData.items]);
+  }, [totalFabricCost, totalAccessoriesCost, totalEmbellishmentCost, totalOthersCost, totalOverheadCost, formData.items]);
 
   const totalSurplus = useMemo(() => {
     return totalPoValue - totalCost;
@@ -2821,6 +3121,29 @@ export function PreCostingKnitManager({
     setPoColorModal((prev) => ({ ...prev, isOpen: false }));
   };
 
+  // ── Overhead & Commercial Percentage Handlers ─────────────────
+  const handleOverheadPctChange = (
+    field: "commissionPct" | "financialPct" | "samplingPct" | "commercialPct",
+    pctVal: number
+  ) => {
+    if (formMode === "view") return;
+    const pct = isNaN(pctVal) ? 0 : Math.max(0, pctVal);
+    const val = Number(((totalPoValue * pct) / 100).toFixed(2));
+    const valField =
+      field === "commissionPct"
+        ? "commissionValue"
+        : field === "financialPct"
+        ? "financialValue"
+        : field === "samplingPct"
+        ? "samplingValue"
+        : "commercialValue";
+    setFormData((prev) => ({
+      ...prev,
+      [field]: pct,
+      [valField]: val,
+    }));
+  };
+
   // ── Purchase Order Row Handlers ────────────────────────────────
   const handleAddPoRow = () => {
     if (formMode === "view") return;
@@ -2832,6 +3155,7 @@ export function PreCostingKnitManager({
       poQuantity: 10000,
       rate: 4.15,
       value: 41500,
+      deliveryDate: "",
       remarks: "",
     };
     setFormData((prev) => {
@@ -2850,6 +3174,10 @@ export function PreCostingKnitManager({
       return {
         ...prev,
         poRows: updatedPo,
+        commissionValue: Number(((newPoVal * (prev.commissionPct || 0)) / 100).toFixed(2)),
+        financialValue: Number(((newPoVal * (prev.financialPct || 0)) / 100).toFixed(2)),
+        samplingValue: Number(((newPoVal * (prev.samplingPct || 0)) / 100).toFixed(2)),
+        commercialValue: Number(((newPoVal * (prev.commercialPct || 0)) / 100).toFixed(2)),
         otherCostItems: updatedOthers,
         items: syncedItems,
       };
@@ -2881,6 +3209,10 @@ export function PreCostingKnitManager({
       return {
         ...prev,
         poRows: copy,
+        commissionValue: Number(((newPoVal * (prev.commissionPct || 0)) / 100).toFixed(2)),
+        financialValue: Number(((newPoVal * (prev.financialPct || 0)) / 100).toFixed(2)),
+        samplingValue: Number(((newPoVal * (prev.samplingPct || 0)) / 100).toFixed(2)),
+        commercialValue: Number(((newPoVal * (prev.commercialPct || 0)) / 100).toFixed(2)),
         otherCostItems: updatedOthers,
         items: syncedItems,
       };
@@ -2906,6 +3238,10 @@ export function PreCostingKnitManager({
       return {
         ...prev,
         poRows: reindexed,
+        commissionValue: Number(((newPoVal * (prev.commissionPct || 0)) / 100).toFixed(2)),
+        financialValue: Number(((newPoVal * (prev.financialPct || 0)) / 100).toFixed(2)),
+        samplingValue: Number(((newPoVal * (prev.samplingPct || 0)) / 100).toFixed(2)),
+        commercialValue: Number(((newPoVal * (prev.commercialPct || 0)) / 100).toFixed(2)),
         otherCostItems: updatedOthers,
         items: syncedItems,
       };
@@ -3147,6 +3483,7 @@ export function PreCostingKnitManager({
       ratioPct: 100,
       finalQtyKg: 0,
       ratePerKg: defaultRate,
+      masterRatePerKg: defaultRate,
       yarnCost: 0,
       brand: suppliersMaster[0]?.name || "Square Textiles Ltd",
     };
@@ -3177,7 +3514,7 @@ export function PreCostingKnitManager({
       fabricSetupId: firstSetup?.id,
       fabricComposition: setupComp,
       fabricType: setupFType,
-      gsm: setupGsm,
+      gsm: setupGsm ? Number(setupGsm) : undefined,
       spinningType: firstSetup?.spinningType || "Ring",
       feederType: setupFeeder,
       washType: firstSetup?.washType || "Hydrophilic Softener Wash",
@@ -3193,14 +3530,18 @@ export function PreCostingKnitManager({
       dyeingMethod: "Reactive",
       dyeingProcessLossPct: matchedDye ? matchedDye.processLoss : 4.0,
       dyeingRate: matchedDye ? matchedDye.rate : 1.65,
+      masterDyeingRate: matchedDye ? matchedDye.rate : 1.65,
       knittingProcessLossPct: matchedKnit ? matchedKnit.processLossPct : 3.0,
       knittingRate: matchedKnit ? matchedKnit.knittingRate : 0.35,
+      masterKnittingRate: matchedKnit ? matchedKnit.knittingRate : 0.35,
       ydType: "Feeder Stripe",
       ydProcessLossPct: 3.0,
       ydRate: 0.75,
+      masterYdRate: 0.75,
       aopType: "Reactive",
       aopProcessLossPct: matchedAop ? matchedAop.processLoss : 4.0,
       aopRate: matchedAop ? matchedAop.rate : 0.95,
+      masterAopRate: matchedAop ? matchedAop.rate : 0.95,
       washingRate: 0,
       finishingRate: 0,
       yarnDetails: [defaultYarn],
@@ -3284,6 +3625,18 @@ export function PreCostingKnitManager({
         }
       }
 
+      // Auto-fill Yarn Dyeing rate/loss if Y/D Type, Color Shade, or Dyeing Method changed
+      if (field === "ydType" || field === "colorShade" || field === "dyeingMethod") {
+        const ydType = field === "ydType" ? value : (target.ydType || "Feeder Stripe");
+        const shade = field === "colorShade" ? value : (target.colorShade || "Medium");
+        const method = field === "dyeingMethod" ? value : (target.dyeingMethod || "Reactive");
+        const matchedYD = findMatchingYarnDyeingRate(masterYarnDyeingRates, ydType, shade, method);
+        if (matchedYD) {
+          target.ydRate = matchedYD.rate;
+          target.ydProcessLossPct = matchedYD.processLoss;
+        }
+      }
+
       // Auto-fill AOP rate/loss if AOP type changed
       if (field === "aopType") {
         const matchedAop = findMatchingAopRate(masterAopRates, value);
@@ -3349,6 +3702,13 @@ export function PreCostingKnitManager({
       row.dyeingMethod || "Reactive"
     );
 
+    const matchedYD = findMatchingYarnDyeingRate(
+      masterYarnDyeingRates,
+      row.ydType || "Feeder Stripe",
+      row.colorShade || "Medium",
+      row.dyeingMethod || "Reactive"
+    );
+
     const matchedAop = findMatchingAopRate(masterAopRates, row.aopType || "Reactive");
 
     const updatedRow: KnitFabricCostItemRow = {
@@ -3367,17 +3727,42 @@ export function PreCostingKnitManager({
 
     if (matchedKnit) {
       updatedRow.knittingProcessLossPct = matchedKnit.processLossPct;
-      updatedRow.knittingRate = matchedKnit.knittingRate;
+      if (updatedRow.knittingRate === undefined || updatedRow.knittingRate === null) {
+        updatedRow.knittingRate = matchedKnit.knittingRate;
+      }
+      if (updatedRow.masterKnittingRate === undefined) {
+        updatedRow.masterKnittingRate = matchedKnit.knittingRate;
+      }
     }
 
     if (matchedDye) {
       updatedRow.dyeingProcessLossPct = matchedDye.processLoss;
-      updatedRow.dyeingRate = matchedDye.rate;
+      if (updatedRow.dyeingRate === undefined || updatedRow.dyeingRate === null) {
+        updatedRow.dyeingRate = matchedDye.rate;
+      }
+      if (updatedRow.masterDyeingRate === undefined) {
+        updatedRow.masterDyeingRate = matchedDye.rate;
+      }
+    }
+
+    if (matchedYD) {
+      updatedRow.ydProcessLossPct = matchedYD.processLoss;
+      if (updatedRow.ydRate === undefined || updatedRow.ydRate === null) {
+        updatedRow.ydRate = matchedYD.rate;
+      }
+      if (updatedRow.masterYdRate === undefined) {
+        updatedRow.masterYdRate = matchedYD.rate;
+      }
     }
 
     if (matchedAop) {
       updatedRow.aopProcessLossPct = matchedAop.processLoss;
-      updatedRow.aopRate = matchedAop.rate;
+      if (updatedRow.aopRate === undefined || updatedRow.aopRate === null) {
+        updatedRow.aopRate = matchedAop.rate;
+      }
+      if (updatedRow.masterAopRate === undefined) {
+        updatedRow.masterAopRate = matchedAop.rate;
+      }
     }
 
     const recomputed = computeKnitFabricRow(updatedRow, formData.consumptionUnit || "DZ");
@@ -3410,6 +3795,41 @@ export function PreCostingKnitManager({
         if (matchedDye) {
           updated.dyeingProcessLossPct = matchedDye.processLoss;
           updated.dyeingRate = matchedDye.rate;
+          updated.masterDyeingRate = matchedDye.rate;
+        }
+      }
+
+      // User manually updating Dyeing Rate
+      if (field === "dyeingRate") {
+        if (updated.masterDyeingRate === undefined) {
+          const matchedDye = findMatchingDyeingRate(masterDyeingRates, updated.colorShade, updated.dyeingMethod);
+          updated.masterDyeingRate = matchedDye ? matchedDye.rate : 1.65;
+        }
+      }
+
+      // Automatically update Yarn Dyeing Rate when Y/D Type, Color Shade or Dyeing Method changes
+      if (field === "ydType" || field === "colorShade" || field === "dyeingMethod") {
+        const currentYdType = field === "ydType" ? value : (updated.ydType || "Feeder Stripe");
+        const currentShade = field === "colorShade" ? value : (updated.colorShade || "Medium");
+        const currentMethod = field === "dyeingMethod" ? value : (updated.dyeingMethod || "Reactive");
+        const matchedYD = findMatchingYarnDyeingRate(masterYarnDyeingRates, currentYdType, currentShade, currentMethod);
+        if (matchedYD) {
+          updated.ydProcessLossPct = matchedYD.processLoss;
+          updated.ydRate = matchedYD.rate;
+          updated.masterYdRate = matchedYD.rate;
+        }
+      }
+
+      // User manually updating Yarn Dyeing Rate
+      if (field === "ydRate") {
+        if (updated.masterYdRate === undefined) {
+          const matchedYD = findMatchingYarnDyeingRate(
+            masterYarnDyeingRates,
+            updated.ydType || "Feeder Stripe",
+            updated.colorShade || "Medium",
+            updated.dyeingMethod || "Reactive"
+          );
+          updated.masterYdRate = matchedYD ? matchedYD.rate : 0.75;
         }
       }
 
@@ -3419,6 +3839,29 @@ export function PreCostingKnitManager({
         if (matchedAop) {
           updated.aopProcessLossPct = matchedAop.processLoss;
           updated.aopRate = matchedAop.rate;
+          updated.masterAopRate = matchedAop.rate;
+        }
+      }
+
+      // User manually updating AOP Rate
+      if (field === "aopRate") {
+        if (updated.masterAopRate === undefined) {
+          const matchedAop = findMatchingAopRate(masterAopRates, updated.aopType || "Reactive");
+          updated.masterAopRate = matchedAop ? matchedAop.rate : 0.95;
+        }
+      }
+
+      // User manually updating Knitting Rate
+      if (field === "knittingRate") {
+        if (updated.masterKnittingRate === undefined) {
+          const matchedKnit = findMatchingKnittingRate(
+            masterKnittingRates,
+            masterFabricTypes,
+            updated.fabricType || "",
+            updated.colorType || "Solid",
+            updated.feederType || ""
+          );
+          updated.masterKnittingRate = matchedKnit ? matchedKnit.knittingRate : 0.35;
         }
       }
 
@@ -3462,7 +3905,8 @@ export function PreCostingKnitManager({
           const g = y.grade === "Grade B" ? "B" : y.grade === "B" ? "B" : "A";
           const savedTag = y.bookingTag || MMRepository.getYarnBookingTagByRowId(y.id);
           const computedItem = [c, comp].filter(Boolean).join(" ");
-          const rate = Number(y.ratePerKg) > 0 ? Number(y.ratePerKg) : (getLatestYarnRate(c, comp, g) ?? 3.45);
+          const masterRate = getLatestYarnRate(c, comp, g) ?? 3.45;
+          const rate = Number(y.ratePerKg) > 0 ? Number(y.ratePerKg) : masterRate;
           return {
             ...y,
             grade: g,
@@ -3472,6 +3916,7 @@ export function PreCostingKnitManager({
             colorType: col,
             yarnItem: y.yarnItem || computedItem,
             ratePerKg: rate,
+            masterRatePerKg: y.masterRatePerKg !== undefined ? y.masterRatePerKg : masterRate,
             brand: y.brand || suppliersMaster[0]?.name || "Square Textiles Ltd",
             bookingTag: savedTag,
           };
@@ -3494,6 +3939,7 @@ export function PreCostingKnitManager({
               ratioPct: 100,
               finalQtyKg: row.requiredYarnKg,
               ratePerKg: defaultRate,
+              masterRatePerKg: defaultRate,
               yarnCost: Number((row.requiredYarnKg * defaultRate).toFixed(2)),
               brand: suppliersMaster[0]?.name || "Square Textiles Ltd",
             };
@@ -3542,6 +3988,7 @@ export function PreCostingKnitManager({
       ratioPct: ratio,
       finalQtyKg: finalQty,
       ratePerKg: rate,
+      masterRatePerKg: rate,
       yarnCost: cost,
       brand: suppliersMaster[0]?.name || "Square Textiles Ltd",
     };
@@ -3573,6 +4020,7 @@ export function PreCostingKnitManager({
         const fetchedRate = getLatestYarnRate(c, comp, g);
         if (fetchedRate !== null) {
           target.ratePerKg = fetchedRate;
+          target.masterRatePerKg = fetchedRate;
         }
       }
 
@@ -3583,6 +4031,16 @@ export function PreCostingKnitManager({
         const fetchedRate = getLatestYarnRate(c, comp, g);
         if (fetchedRate !== null) {
           target.ratePerKg = fetchedRate;
+          target.masterRatePerKg = fetchedRate;
+        }
+      }
+
+      if (field === "ratePerKg") {
+        if (target.masterRatePerKg === undefined) {
+          const c = target.yarnCount || "";
+          const comp = target.yarnComposition || "";
+          const g = target.grade || "A";
+          target.masterRatePerKg = getLatestYarnRate(c, comp, g) ?? 3.45;
         }
       }
 
@@ -3636,25 +4094,90 @@ export function PreCostingKnitManager({
     toast.success("Yarn details saved and fabric costing updated.");
   };
 
-  // ── Booking Tag Modal Handlers & Dynamic Balance Calculations ──
+  // ── Yarn Stock & Procurement Allocation Handlers & Dynamic Calculations ──
   const handleOpenBookingTagModal = (yIdx: number, yRow: KnitYarnDetailRow) => {
     // Check if this yarn row already has a saved tag:
     const existingTag =
-      yRow.bookingTag && (yRow.bookingTag.blockBookingNo || yRow.bookingTag.blockBookingId)
+      yRow.bookingTag && (yRow.bookingTag.blockBookingNo || yRow.bookingTag.blockBookingId || (yRow.bookingTag.allocations && yRow.bookingTag.allocations.length > 0))
         ? yRow.bookingTag
         : MMRepository.getYarnBookingTagByRowId(yRow.id);
 
     const finalQty = Number(yRow.finalQtyKg) || 0;
 
-    let initBookingNo = "";
-    let initYarnItemId = "";
+    let initAllocations: YarnBookingAllocationRowState[] = [];
+    let initProcurementReqId = "";
+    let initProcurementReqNo = "";
 
-    // ONLY populate if there is an existing saved tag for this row (editing existing tag)
-    // Do NOT automatically select an arbitrary Block Booking Number or Yarn Item!
-    if (existingTag && (existingTag.blockBookingNo || existingTag.blockBookingId)) {
-      initBookingNo = existingTag.blockBookingNo || existingTag.blockBookingId || "";
-      initYarnItemId = existingTag.yarnItemId || "";
+    if (existingTag) {
+      initProcurementReqId = existingTag.procurementRequestId || "";
+      initProcurementReqNo = existingTag.procurementRequestNo || "";
+
+      if (Array.isArray(existingTag.allocations) && existingTag.allocations.length > 0) {
+        initAllocations = existingTag.allocations.map((a, idx) => {
+          const bal = MMRepository.getAvailableYarnBookingBalance(
+            a.blockBookingNo,
+            a.yarnItemId,
+            a.yarnItemName,
+            yRow.id
+          );
+          const tagQty = Number(a.tagQtyKg) || 0;
+          return {
+            id: a.id || `alloc-${Date.now()}-${idx}`,
+            blockBookingNo: a.blockBookingNo,
+            blockBookingId: a.blockBookingId || a.blockBookingNo,
+            yarnItemId: a.yarnItemId,
+            yarnItemName: a.yarnItemName,
+            supplierName: a.supplierName || "",
+            availableBalance: bal.availableKg,
+            tagQtyKg: tagQty,
+            remainingBalance: Number((bal.availableKg - tagQty).toFixed(2)),
+          };
+        });
+      } else if (existingTag.blockBookingNo || existingTag.blockBookingId) {
+        const bal = MMRepository.getAvailableYarnBookingBalance(
+          existingTag.blockBookingNo,
+          existingTag.yarnItemId,
+          existingTag.yarnItemName,
+          yRow.id
+        );
+        const tagQty = Number(existingTag.stockAllocatedQtyKg ?? existingTag.tagQtyKg ?? 0);
+        initAllocations = [
+          {
+            id: `alloc-${Date.now()}-0`,
+            blockBookingNo: existingTag.blockBookingNo,
+            blockBookingId: existingTag.blockBookingId || existingTag.blockBookingNo,
+            yarnItemId: existingTag.yarnItemId,
+            yarnItemName: existingTag.yarnItemName,
+            supplierName: existingTag.supplierName || "",
+            availableBalance: bal.availableKg,
+            tagQtyKg: tagQty,
+            remainingBalance: Number((bal.availableKg - tagQty).toFixed(2)),
+          },
+        ];
+      }
     }
+
+    if (initAllocations.length === 0) {
+      initAllocations = [
+        {
+          id: `alloc-${Date.now()}-0`,
+          blockBookingNo: "",
+          blockBookingId: "",
+          yarnItemId: "",
+          yarnItemName: "",
+          supplierName: "",
+          availableBalance: 0,
+          tagQtyKg: 0,
+          remainingBalance: 0,
+        },
+      ];
+    }
+
+    const currentFabric =
+      yarnModal.rowIndex !== null && formData.knitFabricItems
+        ? formData.knitFabricItems[yarnModal.rowIndex]
+        : undefined;
+    const componentName = currentFabric?.item || currentFabric?.fabricComposition || "Knit Fabric Component";
 
     setBookingTagModal({
       isOpen: true,
@@ -3662,63 +4185,12 @@ export function PreCostingKnitManager({
       yarnRowId: yRow.id,
       finalQtyKg: finalQty,
       yarnItemName: yRow.yarnItem || "",
-      selectedBookingNo: initBookingNo,
-      selectedYarnItemId: initYarnItemId,
+      componentName,
+      allocations: initAllocations,
+      existingProcurementRequestId: initProcurementReqId,
+      existingProcurementRequestNo: initProcurementReqNo,
     });
   };
-
-  const activeBooking = useMemo(() => {
-    if (!bookingTagModal.selectedBookingNo) return null;
-    const allBookings = MMRepository.getManualBookings();
-    return (
-      allBookings.find(
-        (b) =>
-          b.bookingNo === bookingTagModal.selectedBookingNo ||
-          b.id === bookingTagModal.selectedBookingNo
-      ) || null
-    );
-  }, [bookingTagModal.selectedBookingNo]);
-
-  const activeYarnItem = useMemo(() => {
-    if (!activeBooking || !activeBooking.items) return null;
-    return (
-      activeBooking.items.find(
-        (it) =>
-          it.bookingItemId === bookingTagModal.selectedYarnItemId ||
-          (it as any).id === bookingTagModal.selectedYarnItemId ||
-          it.itemDescription === bookingTagModal.selectedYarnItemId
-      ) || null
-    );
-  }, [activeBooking, bookingTagModal.selectedYarnItemId]);
-
-  const tagBalanceInfo = useMemo(() => {
-    if (!bookingTagModal.selectedBookingNo || !bookingTagModal.selectedYarnItemId) {
-      return { totalBookedKg: 0, consumedKg: 0, availableKg: 0, remainingKg: 0, isShortage: false };
-    }
-    const bal = MMRepository.getAvailableYarnBookingBalance(
-      bookingTagModal.selectedBookingNo,
-      bookingTagModal.selectedYarnItemId,
-      activeYarnItem?.itemDescription,
-      bookingTagModal.yarnRowId
-    );
-    const tagQty = Number(bookingTagModal.finalQtyKg) || 0;
-    const remainingKg = Number((bal.availableKg - tagQty).toFixed(2));
-    const isShortage = tagQty > bal.availableKg;
-
-    return {
-      totalBookedKg: bal.totalBookedKg,
-      consumedKg: bal.consumedKg,
-      availableKg: bal.availableKg,
-      remainingKg,
-      isShortage,
-    };
-  }, [
-    bookingTagModal.selectedBookingNo,
-    bookingTagModal.selectedYarnItemId,
-    bookingTagModal.yarnRowId,
-    bookingTagModal.finalQtyKg,
-    activeYarnItem,
-  ]);
 
   const blockBookingDropdownOptions = useMemo(() => {
     const allBookings = MMRepository.getManualBookings();
@@ -3739,11 +4211,14 @@ export function PreCostingKnitManager({
     });
   }, [bookingTagModal.yarnRowId]);
 
-  const yarnItemDropdownOptions = useMemo(() => {
-    if (!activeBooking || !activeBooking.items) return [];
-    return activeBooking.items.map((it) => {
+  const getYarnItemOptionsForBooking = (bNo: string) => {
+    if (!bNo) return [];
+    const allBookings = MMRepository.getManualBookings();
+    const booking = allBookings.find((b) => b.bookingNo === bNo || b.id === bNo);
+    if (!booking || !booking.items) return [];
+    return booking.items.map((it) => {
       const bal = MMRepository.getAvailableYarnBookingBalance(
-        activeBooking.bookingNo,
+        booking.bookingNo,
         it.bookingItemId,
         it.itemDescription,
         bookingTagModal.yarnRowId
@@ -3754,24 +4229,200 @@ export function PreCostingKnitManager({
         label: `${it.itemDescription} (Available: ${bal.availableKg.toLocaleString()} KG / Booked: ${bal.totalBookedKg.toLocaleString()} KG)`,
       };
     });
-  }, [activeBooking, bookingTagModal.yarnRowId]);
+  };
 
-  const handleSelectBookingNo = (bNo: string) => {
-    // When changing the Block Booking Number, reload Yarn Item options and keep Yarn Item unselected
+  const handleAddAllocationRow = () => {
     setBookingTagModal((prev) => ({
       ...prev,
-      selectedBookingNo: bNo,
-      selectedYarnItemId: "", // Reset yarn item so user explicitly picks one
+      allocations: [
+        ...prev.allocations,
+        {
+          id: `alloc-${Date.now()}-${prev.allocations.length}`,
+          blockBookingNo: "",
+          blockBookingId: "",
+          yarnItemId: "",
+          yarnItemName: "",
+          supplierName: "",
+          availableBalance: 0,
+          tagQtyKg: 0,
+          remainingBalance: 0,
+        },
+      ],
     }));
   };
 
+  const handleRemoveAllocationRow = (allocId: string) => {
+    setBookingTagModal((prev) => ({
+      ...prev,
+      allocations: prev.allocations.filter((a) => a.id !== allocId),
+    }));
+  };
+
+  const handleSelectBookingForRow = (allocId: string, bNo: string) => {
+    const allBookings = MMRepository.getManualBookings();
+    const booking = allBookings.find((b) => b.bookingNo === bNo || b.id === bNo);
+    setBookingTagModal((prev) => ({
+      ...prev,
+      allocations: prev.allocations.map((a) => {
+        if (a.id !== allocId) return a;
+        return {
+          ...a,
+          blockBookingNo: bNo,
+          blockBookingId: booking?.id || bNo,
+          supplierName: booking?.supplierName || "",
+          yarnItemId: "",
+          yarnItemName: "",
+          availableBalance: 0,
+          tagQtyKg: 0,
+          remainingBalance: 0,
+        };
+      }),
+    }));
+  };
+
+  const handleSelectYarnItemForRow = (allocId: string, itemId: string) => {
+    setBookingTagModal((prev) => {
+      const currentAlloc = prev.allocations.find((a) => a.id === allocId);
+      if (!currentAlloc || !currentAlloc.blockBookingNo) return prev;
+
+      const allBookings = MMRepository.getManualBookings();
+      const booking = allBookings.find(
+        (b) => b.bookingNo === currentAlloc.blockBookingNo || b.id === currentAlloc.blockBookingNo
+      );
+      const itemObj = booking?.items?.find(
+        (it) => it.bookingItemId === itemId || (it as any).id === itemId || it.itemDescription === itemId
+      );
+      const itemDesc = itemObj?.itemDescription || itemId;
+
+      const baseBal = MMRepository.getAvailableYarnBookingBalance(
+        currentAlloc.blockBookingNo,
+        itemId,
+        itemDesc,
+        prev.yarnRowId
+      );
+
+      // Subtract tag quantities from OTHER rows in this modal targeting the same booking and item
+      const otherRowsTaggedSameItem = prev.allocations
+        .filter((a) => a.id !== allocId && a.blockBookingNo === currentAlloc.blockBookingNo && a.yarnItemId === itemId)
+        .reduce((sum, a) => sum + (Number(a.tagQtyKg) || 0), 0);
+
+      const netAvailable = Math.max(0, Number((baseBal.availableKg - otherRowsTaggedSameItem).toFixed(2)));
+
+      // Default Tag Qty: min(availableBalance, remainingRequiredBeforeThisRow)
+      const stockAllocatedOthers = prev.allocations
+        .filter((a) => a.id !== allocId)
+        .reduce((sum, a) => sum + (Number(a.tagQtyKg) || 0), 0);
+      const remainingRequiredBefore = Math.max(0, Number((prev.finalQtyKg - stockAllocatedOthers).toFixed(2)));
+      const defaultTagQty = Number(Math.min(netAvailable, remainingRequiredBefore).toFixed(2));
+
+      return {
+        ...prev,
+        allocations: prev.allocations.map((a) => {
+          if (a.id !== allocId) return a;
+          return {
+            ...a,
+            yarnItemId: itemId,
+            yarnItemName: itemDesc,
+            availableBalance: netAvailable,
+            tagQtyKg: defaultTagQty,
+            remainingBalance: Number((netAvailable - defaultTagQty).toFixed(2)),
+          };
+        }),
+      };
+    });
+  };
+
+  const handleTagQtyChangeForRow = (allocId: string, valStr: string) => {
+    const val = parseFloat(valStr);
+    const num = isNaN(val) ? 0 : Math.max(0, val);
+    setBookingTagModal((prev) => ({
+      ...prev,
+      allocations: prev.allocations.map((a) => {
+        if (a.id !== allocId) return a;
+        return {
+          ...a,
+          tagQtyKg: num,
+          remainingBalance: Number((a.availableBalance - num).toFixed(2)),
+        };
+      }),
+    }));
+  };
+
+  // Dynamic Allocation Summary & Validations
+  const allocationSummary = useMemo(() => {
+    const totalRequired = Number(bookingTagModal.finalQtyKg) || 0;
+
+    const stockAllocated = Number(
+      bookingTagModal.allocations.reduce((sum, a) => sum + (Number(a.tagQtyKg) || 0), 0).toFixed(2)
+    );
+
+    // Procurement Required = Total Required - Total Stock Allocated
+    const procurementRequired = Number(Math.max(0, totalRequired - stockAllocated).toFixed(2));
+
+    // Total Allocated = Total Stock Allocated + Procurement Required
+    const totalAllocated = Number((stockAllocated + procurementRequired).toFixed(2));
+
+    // Remaining Required = Total Required - Total Allocated
+    const remainingRequired = Number(Math.max(0, totalRequired - totalAllocated).toFixed(2));
+
+    const hasAnyExceedingStock = bookingTagModal.allocations.some(
+      (a) => a.blockBookingNo && a.yarnItemId && a.tagQtyKg > a.availableBalance
+    );
+
+    const isOverAllocated = stockAllocated > totalRequired;
+    const hasNegative = bookingTagModal.allocations.some((a) => a.tagQtyKg < 0);
+    const hasIncompleteRow = bookingTagModal.allocations.some(
+      (a) => (a.blockBookingNo && !a.yarnItemId) || (!a.blockBookingNo && a.tagQtyKg > 0)
+    );
+
+    let allocationStatus: "Fully Allocated" | "Partially Allocated" | "Over Allocation" = "Partially Allocated";
+    if (isOverAllocated || hasAnyExceedingStock) {
+      allocationStatus = "Over Allocation";
+    } else if (remainingRequired === 0 && (stockAllocated > 0 || procurementRequired > 0)) {
+      allocationStatus = "Fully Allocated";
+    } else {
+      allocationStatus = "Partially Allocated";
+    }
+
+    const procurementStatusText =
+      procurementRequired > 0
+        ? "New Procurement Request Required"
+        : "No Procurement Needed (Covered by Stock)";
+
+    const validAllocationsCount = bookingTagModal.allocations.filter(
+      (a) => a.blockBookingNo && a.yarnItemId && a.tagQtyKg > 0
+    ).length;
+
+    const canSave =
+      !hasAnyExceedingStock &&
+      !isOverAllocated &&
+      !hasNegative &&
+      !hasIncompleteRow &&
+      allocationStatus !== "Over Allocation" &&
+      (validAllocationsCount > 0 || procurementRequired > 0);
+
+    return {
+      totalRequired,
+      stockAllocated,
+      procurementRequired,
+      totalAllocated,
+      remainingRequired,
+      allocationStatus,
+      procurementStatusText,
+      hasAnyExceedingStock,
+      isOverAllocated,
+      allocationsCount: bookingTagModal.allocations.filter((a) => a.blockBookingNo && a.yarnItemId).length,
+      canSave,
+    };
+  }, [bookingTagModal.finalQtyKg, bookingTagModal.allocations]);
+
   const handleSaveBookingTagModal = () => {
-    if (!bookingTagModal.selectedBookingNo || !bookingTagModal.selectedYarnItemId) {
-      toast.error("Please select a Block Booking No. and Yarn Item.");
+    if (allocationSummary.hasAnyExceedingStock) {
+      toast.error("One or more allocations exceed the available stock balance of the selected booking.");
       return;
     }
-    if (tagBalanceInfo.isShortage) {
-      toast.error("Tag QTY exceeds available booking balance.");
+    if (allocationSummary.isOverAllocated) {
+      toast.error(`Total stock allocated (${allocationSummary.stockAllocated.toFixed(2)} KG) cannot exceed Total Required Yarn Quantity (${allocationSummary.totalRequired.toFixed(2)} KG).`);
       return;
     }
     if (bookingTagModal.yarnRowIndex === null) return;
@@ -3787,30 +4438,185 @@ export function PreCostingKnitManager({
         ? yarnModal.rows[bookingTagModal.yarnRowIndex]
         : undefined;
 
+    const validAllocations = bookingTagModal.allocations.filter(
+      (a) => a.blockBookingNo && a.yarnItemId
+    );
+
+    const primaryAlloc = validAllocations[0];
     const resolvedYarnItemName =
-      activeYarnItem?.itemDescription ||
-      (activeBooking?.items &&
-        activeBooking.items.find(
-          (it) =>
-            it.bookingItemId === bookingTagModal.selectedYarnItemId ||
-            (it as any).id === bookingTagModal.selectedYarnItemId ||
-            it.itemDescription === bookingTagModal.selectedYarnItemId
-        )?.itemDescription) ||
-      "";
+      primaryAlloc?.yarnItemName ||
+      targetYarnRow?.yarnItem ||
+      bookingTagModal.yarnItemName ||
+      "Yarn Item";
+
+    const componentName = bookingTagModal.componentName || "Knit Fabric Component";
+
+    // ── Handle Procurement Requisition (proc_purchase_requisitions_v2) ──
+    let prId = bookingTagModal.existingProcurementRequestId;
+    let prNumber = bookingTagModal.existingProcurementRequestNo;
+
+    try {
+      const allPRs = getStoredPurchaseRequisitions();
+      const existingPRIndex = allPRs.findIndex(
+        (p) =>
+          (prId && p.id === prId) ||
+          p.items?.some((it) => it.issueId === bookingTagModal.yarnRowId || it.specification?.includes(bookingTagModal.yarnRowId))
+      );
+
+      if (allocationSummary.procurementRequired > 0) {
+        const yarnRate = Number(targetYarnRow?.ratePerKg) || 0;
+        const totalEst = Number((allocationSummary.procurementRequired * yarnRate).toFixed(2));
+        const reqDate =
+          (formData as any).deliveryDate ||
+          (formData as any).poDeliveryDate ||
+          new Date(Date.now() + 15 * 86400000).toISOString().split("T")[0];
+
+        if (existingPRIndex >= 0) {
+          // Update in-place to prevent duplicate requests
+          const targetPR = allPRs[existingPRIndex];
+          prId = targetPR.id;
+          prNumber = targetPR.prNumber;
+
+          targetPR.requiredDate = reqDate;
+          targetPR.requiredByDate = reqDate;
+          targetPR.totalItemQuantity = allocationSummary.procurementRequired;
+          targetPR.totalEstimatedCost = totalEst;
+          targetPR.totalEstimatedAmount = totalEst;
+          targetPR.items = [
+            {
+              id: targetPR.items?.[0]?.id || `pri-${Date.now()}`,
+              sl: 1,
+              itemId: `item-yarn-${bookingTagModal.yarnRowId}`,
+              itemCode: targetYarnRow?.yarnCount || "YARN-RAW",
+              itemName: resolvedYarnItemName,
+              specification: `Pre-Costing: ${preCostId} | Component: ${componentName} | Row: ${bookingTagModal.yarnRowId}`,
+              uom: "KG",
+              quantity: allocationSummary.procurementRequired,
+              requestedQuantity: allocationSummary.procurementRequired,
+              requiredQuantity: allocationSummary.procurementRequired,
+              estimatedUnitPrice: yarnRate,
+              estimatedAmount: totalEst,
+              totalEstimatedPrice: totalEst,
+              issueId: bookingTagModal.yarnRowId,
+              purpose: `Pre-Costing ${preCostId} Yarn Procurement`,
+            },
+          ];
+
+          targetPR.auditHistory = [
+            ...(targetPR.auditHistory || []),
+            {
+              action: "Updated from Pre-Costing Yarn Allocation",
+              date: new Date().toISOString().split("T")[0],
+              user: formData.merchandiser || "Merchandiser",
+              note: `Updated allocation: Required ${allocationSummary.totalRequired} KG, Stock Tagged ${allocationSummary.stockAllocated} KG, PR Qty ${allocationSummary.procurementRequired} KG across ${validAllocations.length} booking(s).`,
+            },
+          ];
+
+          setStoredPurchaseRequisitions(allPRs);
+        } else {
+          // Create new Purchase Requisition
+          const newPRId = `pr-yarn-${Date.now()}`;
+          const cleanJob = preCostId.replace(/[^a-zA-Z0-9]/g, "").slice(-6) || "PC";
+          const newPRNumber = `PR-YARN-${cleanJob}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+          prId = newPRId;
+          prNumber = newPRNumber;
+
+          const newPR: PurchaseRequisition = {
+            id: newPRId,
+            prNumber: newPRNumber,
+            prDate: new Date().toISOString().split("T")[0],
+            company: "Pakiza Knit Composite Ltd",
+            organization: "Pakiza Knit Composite Ltd",
+            department: "Marketing & Merchandising",
+            requestedBy: formData.merchandiser || "Merchandiser",
+            requesterName: formData.merchandiser || "Merchandiser",
+            designation: "Merchandiser",
+            requesterDesignation: "Merchandiser",
+            requiredDate: reqDate,
+            requiredByDate: reqDate,
+            priority: "Normal",
+            purpose: `Yarn procurement requisition automatically initiated from Pre-Costing ${preCostId} for component ${componentName} (${resolvedYarnItemName})`,
+            itemCategory: "Yarn",
+            storeWarehouse: "Central Yarn Warehouse",
+            warehouseName: "Central Yarn Warehouse",
+            currency: "USD",
+            requisitionType: "Budgeted",
+            status: "Submitted",
+            currentApprovalLevel: 1,
+            items: [
+              {
+                id: `pri-${Date.now()}`,
+                sl: 1,
+                itemId: `item-yarn-${bookingTagModal.yarnRowId}`,
+                itemCode: targetYarnRow?.yarnCount || "YARN-RAW",
+                itemName: resolvedYarnItemName,
+                specification: `Pre-Costing: ${preCostId} | Component: ${componentName} | Row: ${bookingTagModal.yarnRowId}`,
+                uom: "KG",
+                quantity: allocationSummary.procurementRequired,
+                requestedQuantity: allocationSummary.procurementRequired,
+                requiredQuantity: allocationSummary.procurementRequired,
+                estimatedUnitPrice: yarnRate,
+                estimatedAmount: totalEst,
+                totalEstimatedPrice: totalEst,
+                issueId: bookingTagModal.yarnRowId,
+                purpose: `Pre-Costing ${preCostId} Yarn Procurement`,
+              },
+            ],
+            totalItemQuantity: allocationSummary.procurementRequired,
+            totalEstimatedAmount: totalEst,
+            totalEstimatedCost: totalEst,
+            attachments: [],
+            approvalHistory: [
+              {
+                level: 1,
+                stageName: "Pre-Costing Yarn Allocation",
+                approverName: formData.merchandiser || "Merchandiser",
+                designation: "Merchandiser",
+                action: "Submitted",
+                dateTime: new Date().toISOString().replace("T", " ").slice(0, 16),
+                remarks: `Auto-generated from Pre-Costing ${preCostId} stock & procurement allocation.`,
+              },
+            ],
+            auditHistory: [
+              {
+                action: "Requisition Created from Pre-Costing Yarn Allocation",
+                date: new Date().toISOString().split("T")[0],
+                user: formData.merchandiser || "Merchandiser",
+                note: `Required: ${allocationSummary.totalRequired} KG, Stock Tagged: ${allocationSummary.stockAllocated} KG, PR Qty: ${allocationSummary.procurementRequired} KG across ${validAllocations.length} booking(s).`,
+              },
+            ],
+          };
+
+          allPRs.unshift(newPR);
+          setStoredPurchaseRequisitions(allPRs);
+        }
+      } else {
+        // procurementRequired === 0: clean up any previously created PR for this row
+        if (existingPRIndex >= 0) {
+          allPRs.splice(existingPRIndex, 1);
+          setStoredPurchaseRequisitions(allPRs);
+        }
+        prId = undefined;
+        prNumber = undefined;
+      }
+    } catch (err) {
+      console.warn("Failed to update procurement requisition storage:", err);
+    }
 
     const tagRecord: MMYarnBookingTagRecord = {
       id: `ytag-${preCostId}-${bookingTagModal.yarnRowId}`,
       preCostId: preCostId,
       preCostMasterId: formData.id,
       yarnRowId: bookingTagModal.yarnRowId,
-      blockBookingNo: bookingTagModal.selectedBookingNo,
-      blockBookingId: activeBooking?.id || bookingTagModal.selectedBookingNo,
-      yarnItemId: bookingTagModal.selectedYarnItemId,
-      yarnItemName: resolvedYarnItemName,
-      supplierName: activeBooking?.supplierName || "",
-      tagQtyKg: bookingTagModal.finalQtyKg,
-      availableBalanceAtTag: tagBalanceInfo.availableKg,
-      remainingBalanceAtTag: tagBalanceInfo.remainingKg,
+      blockBookingNo: primaryAlloc?.blockBookingNo || (validAllocations.length > 0 ? validAllocations.map((a) => a.blockBookingNo).join(", ") : "N/A"),
+      blockBookingId: primaryAlloc?.blockBookingId || primaryAlloc?.blockBookingNo || "",
+      yarnItemId: primaryAlloc?.yarnItemId || "",
+      yarnItemName: primaryAlloc?.yarnItemName || resolvedYarnItemName,
+      supplierName: primaryAlloc?.supplierName || (validAllocations.length > 0 ? validAllocations.map((a) => a.supplierName).filter(Boolean).join(", ") : ""),
+      tagQtyKg: allocationSummary.stockAllocated,
+      availableBalanceAtTag: primaryAlloc?.availableBalance || 0,
+      remainingBalanceAtTag: primaryAlloc?.remainingBalance || 0,
       taggedAt: new Date().toISOString(),
       buyer: formData.buyer || "",
       season: formData.season || "",
@@ -3822,6 +4628,28 @@ export function PreCostingKnitManager({
             targetYarnRow.yarnItem.split(" ")[0]
           : ""),
       price: Number(targetYarnRow?.ratePerKg) || 0,
+      // Multiple booking allocations list:
+      allocations: validAllocations.map((a) => ({
+        id: a.id,
+        blockBookingNo: a.blockBookingNo,
+        blockBookingId: a.blockBookingId || a.blockBookingNo,
+        yarnItemId: a.yarnItemId,
+        yarnItemName: a.yarnItemName,
+        supplierName: a.supplierName,
+        tagQtyKg: Number(a.tagQtyKg) || 0,
+        availableBalanceAtTag: Number(a.availableBalance) || 0,
+        remainingBalanceAtTag: Number(a.remainingBalance) || 0,
+      })),
+      totalRequiredQtyKg: allocationSummary.totalRequired,
+      stockAllocatedQtyKg: allocationSummary.stockAllocated,
+      procurementRequiredQtyKg: allocationSummary.procurementRequired,
+      totalAllocatedQtyKg: allocationSummary.totalAllocated,
+      remainingRequiredQtyKg: allocationSummary.remainingRequired,
+      allocationStatus: allocationSummary.allocationStatus,
+      procurementRequestId: prId,
+      procurementRequestNo: prNumber,
+      procurementStatus: allocationSummary.procurementStatusText,
+      updatedAt: new Date().toISOString(),
     };
 
     // 1. Save to dedicated persistent transaction ledger
@@ -3882,8 +4710,11 @@ export function PreCostingKnitManager({
       window.dispatchEvent(new Event("storage"));
     }
 
+    const bookingNames = validAllocations.map((a) => a.blockBookingNo).join(", ");
     toast.success(
-      `Yarn row tagged to Block Booking ${tagRecord.blockBookingNo} (${tagRecord.tagQtyKg.toLocaleString()} KG).`
+      allocationSummary.procurementRequired > 0
+        ? `Allocation saved: ${allocationSummary.stockAllocated.toFixed(2)} KG from stock (${bookingNames || "none"}), ${allocationSummary.procurementRequired.toFixed(2)} KG requested under ${prNumber}.`
+        : `Allocation saved: 100% covered by Stock Booking(s) ${bookingNames} (${allocationSummary.stockAllocated.toFixed(2)} KG).`
     );
     setBookingTagModal((prev) => ({ ...prev, isOpen: false }));
   };
@@ -3891,6 +4722,22 @@ export function PreCostingKnitManager({
   const handleRemoveBookingTagModal = () => {
     if (bookingTagModal.yarnRowId) {
       MMRepository.removeYarnBookingTag(bookingTagModal.yarnRowId, formData.preCostId || formData.id);
+
+      // Clean up linked PR if existing
+      try {
+        const allPRs = getStoredPurchaseRequisitions();
+        const prIdx = allPRs.findIndex(
+          (p) =>
+            (bookingTagModal.existingProcurementRequestId && p.id === bookingTagModal.existingProcurementRequestId) ||
+            p.items?.some((it) => it.issueId === bookingTagModal.yarnRowId || it.specification?.includes(bookingTagModal.yarnRowId))
+        );
+        if (prIdx >= 0) {
+          allPRs.splice(prIdx, 1);
+          setStoredPurchaseRequisitions(allPRs);
+        }
+      } catch (err) {
+        console.warn("Failed to remove linked PR:", err);
+      }
     }
     setYarnModal((prev) => {
       const copy = [...prev.rows];
@@ -3945,7 +4792,7 @@ export function PreCostingKnitManager({
       window.dispatchEvent(new Event("storage"));
     }
 
-    toast.success("Booking tag removed. Balance released back to block booking.");
+    toast.info("Yarn stock & procurement allocation removed.");
     setBookingTagModal((prev) => ({ ...prev, isOpen: false }));
   };
 
@@ -5167,6 +6014,8 @@ export function PreCostingKnitManager({
         (r.style || "").toLowerCase().includes(q) ||
         (r.buyer || "").toLowerCase().includes(q) ||
         Boolean(r.contractNo && r.contractNo.toLowerCase().includes(q)) ||
+        Boolean(r.scLcNo && r.scLcNo.toLowerCase().includes(q)) ||
+        Boolean(r.linkedOrderNo && r.linkedOrderNo.toLowerCase().includes(q)) ||
         (r.poRows || []).some((p) => (p?.poNumber || "").toLowerCase().includes(q));
 
       const matchBuyer = filterBuyer === "ALL" || r.buyer === filterBuyer;
@@ -5401,8 +6250,9 @@ export function PreCostingKnitManager({
                               <span className="font-bold block text-slate-900 dark:text-white">
                                 {r.style}
                               </span>
-                              <span className="text-[10px] text-slate-400 font-mono">
-                                {r.contractNo || "No Contract"}
+                              <span className="text-[10px] text-slate-400 font-mono block truncate" title={r.scLcNo || r.contractNo || "No Contract"}>
+                                {r.scLcNo || r.contractNo || "No Contract"}
+                                {r.linkedOrderNo ? ` • ${r.linkedOrderNo}` : ""}
                               </span>
                             </td>
 
@@ -5700,7 +6550,7 @@ export function PreCostingKnitManager({
                     </button>
                     <button
                       type="button"
-                      onClick={handleSubmitForApproval}
+                      onClick={() => handleSubmitForApproval()}
                       className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
                     >
                       <Send className="size-3.5" /> Submit for Approval
@@ -5720,304 +6570,435 @@ export function PreCostingKnitManager({
               </div>
             </div>
 
-            {/* SECTION 1: Pre Costing Identification & Order Basis */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
-                <span className="w-1.5 h-4 bg-indigo-600 rounded-full inline-block" />
-                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                  Pre Costing Identification & Order Basis
-                </h2>
+            {/* TOP ROW: Pre Costing Identification & Order Basis (Left) + Commercial & Overhead Cost (Right) */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
+              {/* SECTION 1: Pre Costing Identification & Order Basis (Left Side: 8 Cols) */}
+              <div className="xl:col-span-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                  <span className="w-1.5 h-4 bg-indigo-600 rounded-full inline-block" />
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                    Pre Costing Identification & Order Basis
+                  </h2>
+                </div>
+
+                {/* 4-column layout: 4 fields per row across 4 rows */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                  {/* Row 1 - Field 1: Job ID (Read-only) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Job ID (Read-only)
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={formData.preCostId}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-slate-600 dark:text-slate-400"
+                    />
+                  </div>
+
+                  {/* Row 1 - Field 2: Pre Costing No. (Read-only / Non-editable) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Pre Costing No. <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={formData.preCostNo}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-slate-600 dark:text-slate-400"
+                    />
+                  </div>
+
+                  {/* Row 1 - Field 3: GMT Item (Searchable dropdown) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      GMT Item <span className="text-rose-500">*</span>
+                    </label>
+                    <SearchableSelect
+                      options={gmtItemSelectOptions}
+                      value={formData.gmtItem || "Basic T-Shirt"}
+                      onChange={(val) => setFormData((prev) => ({ ...prev, gmtItem: val }))}
+                      placeholder="Select GMT Item..."
+                      disabled={formMode === "view"}
+                    />
+                  </div>
+
+                  {/* Row 1 - Field 4: Category (Searchable dropdown) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Category <span className="text-rose-500">*</span>
+                    </label>
+                    <SearchableSelect
+                      options={categorySelectOptions}
+                      value={formData.category || "Men"}
+                      onChange={(val) => setFormData((prev) => ({ ...prev, category: val }))}
+                      placeholder="Select Category..."
+                      disabled={formMode === "view"}
+                    />
+                  </div>
+
+                  {/* Row 2 - Field 5: Pre Costing Date */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Pre Costing Date <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      disabled={formMode === "view"}
+                      value={formData.preCostDate}
+                      onChange={(e) => setFormData({ ...formData, preCostDate: e.target.value })}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                    />
+                  </div>
+
+                  {/* Row 2 - Field 6: A/C Holder (Read-only, auto-populated from Buyer) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      A/C Holder (Read-only)
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={formData.acHolder}
+                      placeholder="Auto-linked to Buyer"
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-semibold text-slate-600 dark:text-slate-400"
+                    />
+                  </div>
+
+                  {/* Row 2 - Field 7: Buyer */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Buyer <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      disabled={formMode === "view"}
+                      value={formData.buyer}
+                      onChange={(e) => handleBuyerChange(e.target.value)}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold"
+                    >
+                      {MM_BUYERS_MASTER.map((b) => (
+                        <option key={b.id} value={b.name}>
+                          {b.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Row 2 - Field 8: Merchandiser (Required dropdown, defaults to logged-in user) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Merchandiser <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      disabled={formMode === "view"}
+                      value={formData.merchandiser}
+                      onChange={(e) => setFormData({ ...formData, merchandiser: e.target.value })}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold"
+                    >
+                      {MM_MERCHANTS_MASTER.map((m) => (
+                        <option key={m.id} value={m.name}>
+                          {m.name} ({m.designation})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Row 3 - Field 9: Style No. (Searchable dropdown, filtered by selected Buyer) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Style No. <span className="text-rose-500">*</span>
+                    </label>
+                    {(() => {
+                      const currentBuyerObj = MM_BUYERS_MASTER.find((b) => b.name === formData.buyer);
+                      const buyerStyles = currentBuyerObj?.styles || [];
+                      const styleOptions = buyerStyles.map((s) => ({
+                        value: s.styleNo,
+                        label: `${s.styleNo} — ${s.description}`,
+                      }));
+                      return (
+                        <SearchableSelect
+                          options={styleOptions}
+                          value={formData.style}
+                          onChange={handleStyleChange}
+                          placeholder={buyerStyles.length > 0 ? "Select Style..." : "No styles for buyer"}
+                          disabled={formMode === "view"}
+                        />
+                      );
+                    })()}
+                  </div>
+
+                  {/* Row 3 - Field 10: Season (Searchable dropdown from Season master) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Season <span className="text-rose-500">*</span>
+                    </label>
+                    {(() => {
+                      const seasonOptions = seasonsMaster.map((s) => ({
+                        value: s.seasonName,
+                        label: s.seasonName,
+                      }));
+                      return (
+                        <SearchableSelect
+                          options={seasonOptions}
+                          value={formData.season}
+                          onChange={(val) => setFormData({ ...formData, season: val })}
+                          placeholder="Select Season..."
+                          disabled={formMode === "view"}
+                        />
+                      );
+                    })()}
+                  </div>
+
+                  {/* Row 3 - Field 11: Total Order QTY (Read-only calculated summary from Section 2 PO rows) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Total Order QTY (Read-only)
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={`${consolidatedOrderQty.toLocaleString()} pcs`}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-indigo-600 dark:text-indigo-400 text-right"
+                    />
+                  </div>
+
+                  {/* Row 3 - Field 12: Total Order Value (Read-only calculated summary from Section 2 PO rows) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Total Order Value (Read-only)
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={`$${totalPoValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-indigo-600 dark:text-indigo-400 text-right"
+                    />
+                  </div>
+
+                  {/* Row 4 - Field 13: SMV */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      SMV (Standard Minute Value)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      disabled={formMode === "view"}
+                      value={formData.smv}
+                      onChange={(e) => {
+                        const smv = Number(e.target.value) || 0;
+                        const eff = formData.efficiencyPct || 65;
+                        const cpm = formData.cpm || 0.065;
+                        const autoCm = eff > 0 ? Number((((cpm * smv) / (eff / 100)) * 12).toFixed(2)) : 0;
+                        setFormData({ ...formData, smv, cmDz: autoCm });
+                      }}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold"
+                    />
+                  </div>
+
+                  {/* Row 4 - Field 14: Efficiency (%) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Efficiency (%) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="100"
+                      step="1"
+                      disabled={formMode === "view"}
+                      value={formData.efficiencyPct || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "") {
+                          setFormData((prev) => ({ ...prev, efficiencyPct: 0 }));
+                          return;
+                        }
+                        const num = Number(val);
+                        if (num > 100) return; // Reject values above 100%
+                        if (num < 0) return;
+                        const cpm = formData.cpm || 0.065;
+                        const smv = formData.smv || 0;
+                        const autoCm = num > 0 ? Number((((cpm * smv) / (num / 100)) * 12).toFixed(2)) : 0;
+                        setFormData((prev) => ({
+                          ...prev,
+                          efficiencyPct: num,
+                          cmDz: autoCm,
+                        }));
+                      }}
+                      onBlur={() => {
+                        if (formData.efficiencyPct < 1) {
+                          setFormData((prev) => ({ ...prev, efficiencyPct: 1 }));
+                        }
+                      }}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold"
+                      placeholder="1 - 100"
+                    />
+                  </div>
+
+                  {/* Row 4 - Field 15: CM (DZ) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      CM (DZ)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      disabled={formMode === "view"}
+                      value={
+                        formData.cmDz !== undefined
+                          ? formData.cmDz
+                          : smvCost * 12 > 0
+                          ? Number((smvCost * 12).toFixed(2))
+                          : 0
+                      }
+                      onChange={(e) => setFormData({ ...formData, cmDz: Number(e.target.value) || 0 })}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-indigo-600 dark:text-indigo-400"
+                      placeholder="0.00"
+                    />
+                  </div>
+
+                  {/* Row 4 - Field 16: Sales Contract / LC (Searchable Dropdown populated from Confirm Orders) */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase">
+                        Sales Contract / LC
+                      </label>
+                      {(formData.scLcNo || formData.contractNo) && formMode !== "view" && (
+                        <button
+                          type="button"
+                          onClick={handleClearScLc}
+                          className="text-[10px] text-rose-500 hover:text-rose-700 font-semibold underline"
+                          title="Clear Sales Contract / LC selection"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                    <SearchableSelect
+                      options={scLcSelectOptions}
+                      value={formData.scLcNo || formData.contractNo || ""}
+                      onChange={handleScLcChange}
+                      placeholder="Select S.C / LC No..."
+                      disabled={formMode === "view"}
+                      allowCustom={true}
+                    />
+                    {(formData.linkedOrderNo || formData.orderNo) && (
+                      <div
+                        className="mt-1 flex items-center gap-1 text-[10px] text-teal-600 dark:text-teal-400 font-semibold truncate"
+                        title={`Linked to Confirm Order: ${formData.linkedOrderNo || formData.orderNo}`}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+                        <span className="truncate">
+                          Linked Order: <span className="font-mono">{formData.linkedOrderNo || formData.orderNo}</span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Row 5 - Field 17: Note / Instructions (Full Width) */}
+                  <div className="col-span-1 sm:col-span-2 md:col-span-4">
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Note / Instructions
+                    </label>
+                    <input
+                      type="text"
+                      disabled={formMode === "view"}
+                      value={formData.note}
+                      onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                      placeholder="Optional remarks, buyer nominations..."
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3.5 text-xs">
-                {/* 1. Job ID (Read-only) */}
+              {/* SECTION 1B: Commercial & Overhead Cost (Right Side: 4 Cols) */}
+              <div className="xl:col-span-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs flex flex-col justify-between space-y-3.5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Job ID (Read-only)
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={formData.preCostId}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-slate-600 dark:text-slate-400"
-                  />
+                  <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800 mb-3.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-4 bg-amber-500 rounded-full inline-block" />
+                      <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                        Commercial & Overhead Cost
+                      </h2>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-500">
+                      Base FOB: <strong className="text-indigo-600 dark:text-indigo-400 font-bold">${totalPoValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase font-black text-slate-600 dark:text-slate-400">
+                        <tr>
+                          <th className="py-2.5 px-3">Name</th>
+                          <th className="py-2.5 px-3 text-right w-24">%</th>
+                          <th className="py-2.5 px-3 text-right w-28">Value ($)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                        {[
+                          { name: "Commission", key: "commissionPct" as const, valKey: "commissionValue" as const, pct: formData.commissionPct ?? 0 },
+                          { name: "Financial", key: "financialPct" as const, valKey: "financialValue" as const, pct: formData.financialPct ?? 0 },
+                          { name: "Sampling", key: "samplingPct" as const, valKey: "samplingValue" as const, pct: formData.samplingPct ?? 0 },
+                          { name: "Commercial", key: "commercialPct" as const, valKey: "commercialValue" as const, pct: formData.commercialPct ?? 0 },
+                        ].map((item) => {
+                          const calculatedVal = Number(((totalPoValue * item.pct) / 100).toFixed(2));
+                          return (
+                            <tr key={item.name} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                              <td className="py-2 px-3 font-bold text-slate-700 dark:text-slate-200">
+                                {item.name}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                <div className="flex items-center justify-end gap-1">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    disabled={formMode === "view"}
+                                    value={item.pct === 0 ? "" : item.pct}
+                                    onChange={(e) => handleOverheadPctChange(item.key, parseFloat(e.target.value) || 0)}
+                                    placeholder="0.00"
+                                    className="w-16 h-7 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                  />
+                                  <span className="text-slate-400 font-bold text-[11px]">%</span>
+                                </div>
+                              </td>
+                              <td className="py-2 px-3 text-right font-mono font-extrabold text-amber-700 dark:text-amber-300">
+                                ${calculatedVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                      <tfoot className="bg-amber-50/40 dark:bg-amber-950/20 border-t border-slate-200 dark:border-slate-800 font-bold text-xs">
+                        <tr>
+                          <td className="py-2 px-3 uppercase text-[10px] tracking-wider text-slate-600 dark:text-slate-400">
+                            Total Overheads
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono font-black text-slate-700 dark:text-slate-300">
+                            {((formData.commissionPct || 0) + (formData.financialPct || 0) + (formData.samplingPct || 0) + (formData.commercialPct || 0)).toFixed(2)}%
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono font-black text-amber-700 dark:text-amber-300">
+                            ${totalOverheadCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
                 </div>
 
-                {/* 2. Pre Costing No. (Read-only / Non-editable) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Pre Costing No. <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={formData.preCostNo}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-slate-600 dark:text-slate-400"
-                  />
-                </div>
-
-                {/* 3. GMT Item (Searchable dropdown) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    GMT Item <span className="text-rose-500">*</span>
-                  </label>
-                  <SearchableSelect
-                    options={gmtItemSelectOptions}
-                    value={formData.gmtItem || "Basic T-Shirt"}
-                    onChange={(val) => setFormData((prev) => ({ ...prev, gmtItem: val }))}
-                    placeholder="Select GMT Item..."
-                    disabled={formMode === "view"}
-                  />
-                </div>
-
-                {/* 4. Category (Searchable dropdown) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Category <span className="text-rose-500">*</span>
-                  </label>
-                  <SearchableSelect
-                    options={categorySelectOptions}
-                    value={formData.category || "Men"}
-                    onChange={(val) => setFormData((prev) => ({ ...prev, category: val }))}
-                    placeholder="Select Category..."
-                    disabled={formMode === "view"}
-                  />
-                </div>
-
-                {/* 5. Pre Costing Date */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Pre Costing Date <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    disabled={formMode === "view"}
-                    value={formData.preCostDate}
-                    onChange={(e) => setFormData({ ...formData, preCostDate: e.target.value })}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                  />
-                </div>
-
-                {/* 6. A/C Holder (Read-only, auto-populated from Buyer) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    A/C Holder (Read-only)
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={formData.acHolder}
-                    placeholder="Auto-linked to Buyer"
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-semibold text-slate-600 dark:text-slate-400"
-                  />
-                </div>
-
-                {/* 6. Buyer */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Buyer <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    disabled={formMode === "view"}
-                    value={formData.buyer}
-                    onChange={(e) => handleBuyerChange(e.target.value)}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold"
-                  >
-                    {MM_BUYERS_MASTER.map((b) => (
-                      <option key={b.id} value={b.name}>
-                        {b.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 7. Merchandiser (Required dropdown, defaults to logged-in user) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Merchandiser <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    disabled={formMode === "view"}
-                    value={formData.merchandiser}
-                    onChange={(e) => setFormData({ ...formData, merchandiser: e.target.value })}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold"
-                  >
-                    {MM_MERCHANTS_MASTER.map((m) => (
-                      <option key={m.id} value={m.name}>
-                        {m.name} ({m.designation})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 8. Style No. (Searchable dropdown, filtered by selected Buyer) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Style No. <span className="text-rose-500">*</span>
-                  </label>
-                  {(() => {
-                    const currentBuyerObj = MM_BUYERS_MASTER.find((b) => b.name === formData.buyer);
-                    const buyerStyles = currentBuyerObj?.styles || [];
-                    const styleOptions = buyerStyles.map((s) => ({
-                      value: s.styleNo,
-                      label: `${s.styleNo} — ${s.description}`,
-                    }));
-                    return (
-                      <SearchableSelect
-                        options={styleOptions}
-                        value={formData.style}
-                        onChange={handleStyleChange}
-                        placeholder={buyerStyles.length > 0 ? "Select Style..." : "No styles for buyer"}
-                        disabled={formMode === "view"}
-                      />
-                    );
-                  })()}
-                </div>
-
-                {/* 9. Season (Searchable dropdown from Season master) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Season <span className="text-rose-500">*</span>
-                  </label>
-                  {(() => {
-                    const seasonOptions = seasonsMaster.map((s) => ({
-                      value: s.seasonName,
-                      label: s.seasonName,
-                    }));
-                    return (
-                      <SearchableSelect
-                        options={seasonOptions}
-                        value={formData.season}
-                        onChange={(val) => setFormData({ ...formData, season: val })}
-                        placeholder="Select Season..."
-                        disabled={formMode === "view"}
-                      />
-                    );
-                  })()}
-                </div>
-
-                {/* 10. Total Order QTY (Read-only calculated summary from Section 2 PO rows) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Total Order QTY (Read-only)
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={`${consolidatedOrderQty.toLocaleString()} pcs`}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-indigo-600 dark:text-indigo-400 text-right"
-                  />
-                </div>
-
-                {/* 11. Total Order Value (Read-only calculated summary from Section 2 PO rows) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Total Order Value (Read-only)
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={`$${totalPoValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-indigo-600 dark:text-indigo-400 text-right"
-                  />
-                </div>
-
-                {/* SMV */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    SMV (Standard Minute Value)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    disabled={formMode === "view"}
-                    value={formData.smv}
-                    onChange={(e) => {
-                      const smv = Number(e.target.value) || 0;
-                      const eff = formData.efficiencyPct || 65;
-                      const cpm = formData.cpm || 0.065;
-                      const autoCm = eff > 0 ? Number((((cpm * smv) / (eff / 100)) * 12).toFixed(2)) : 0;
-                      setFormData({ ...formData, smv, cmDz: autoCm });
-                    }}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold"
-                  />
-                </div>
-
-                {/* Efficiency (%) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Efficiency (%) <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
-                    step="1"
-                    disabled={formMode === "view"}
-                    value={formData.efficiencyPct || ""}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === "") {
-                        setFormData((prev) => ({ ...prev, efficiencyPct: 0 }));
-                        return;
-                      }
-                      const num = Number(val);
-                      if (num > 100) return; // Reject values above 100%
-                      if (num < 0) return;
-                      const cpm = formData.cpm || 0.065;
-                      const smv = formData.smv || 0;
-                      const autoCm = num > 0 ? Number((((cpm * smv) / (num / 100)) * 12).toFixed(2)) : 0;
-                      setFormData((prev) => ({
-                        ...prev,
-                        efficiencyPct: num,
-                        cmDz: autoCm,
-                      }));
-                    }}
-                    onBlur={() => {
-                      if (formData.efficiencyPct < 1) {
-                        setFormData((prev) => ({ ...prev, efficiencyPct: 1 }));
-                      }
-                    }}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold"
-                    placeholder="1 - 100"
-                  />
-                </div>
-
-                {/* CM (DZ) - Left side of Note / Instructions */}
-                <div className="sm:col-span-1 md:col-span-1 lg:col-span-1">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    CM (DZ)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    disabled={formMode === "view"}
-                    value={
-                      formData.cmDz !== undefined
-                        ? formData.cmDz
-                        : smvCost * 12 > 0
-                        ? Number((smvCost * 12).toFixed(2))
-                        : 0
-                    }
-                    onChange={(e) => setFormData({ ...formData, cmDz: Number(e.target.value) || 0 })}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-indigo-600 dark:text-indigo-400"
-                    placeholder="0.00"
-                  />
-                </div>
-
-                {/* Note / Remarks - Spans remaining 3 cols on lg screens to complete exactly 6 columns */}
-                <div className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-3">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Note / Instructions
-                  </label>
-                  <input
-                    type="text"
-                    disabled={formMode === "view"}
-                    value={formData.note}
-                    onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                    placeholder="Optional costing remarks, wash instructions, or buyer nominations..."
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                  />
+                <div className="p-2.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/60 flex items-center justify-between text-xs">
+                  <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Total Overhead Share:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
+                      ${(consolidatedOrderQty > 0 ? (totalOverheadCost / consolidatedOrderQty) * 12 : 0).toFixed(2)} / dz
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 text-[10px] font-mono font-extrabold">
+                      {totalPoValue > 0 ? ((totalOverheadCost / totalPoValue) * 100).toFixed(2) : 0}% FOB
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -6051,6 +7032,7 @@ export function PreCostingKnitManager({
                       <th className="py-2.5 px-3.5 text-right w-44 min-w-[170px]">PO Quantity *</th>
                       <th className="py-2.5 px-3.5 text-right w-32">Rate ($/pc) *</th>
                       <th className="py-2.5 px-3.5 text-right w-36">Value ($)</th>
+                      <th className="py-2.5 px-3.5 w-36">Delivery Date</th>
                       <th className="py-2.5 px-3.5">Remarks</th>
                       {formMode !== "view" && (
                         <th className="py-2.5 px-3 text-center w-16">Action</th>
@@ -6060,7 +7042,7 @@ export function PreCostingKnitManager({
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {(formData.poRows || []).length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="py-6 text-center text-slate-400">
+                        <td colSpan={formMode !== "view" ? 8 : 7} className="py-6 text-center text-slate-400">
                           No Purchase Orders added. Click "Add PO" to enter purchase orders for this style.
                         </td>
                       </tr>
@@ -6122,6 +7104,15 @@ export function PreCostingKnitManager({
                           </td>
                           <td className="py-2 px-3.5">
                             <input
+                              type="date"
+                              disabled={formMode === "view"}
+                              value={po.deliveryDate || ""}
+                              onChange={(e) => handleUpdatePoRow(idx, "deliveryDate", e.target.value)}
+                              className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs"
+                            />
+                          </td>
+                          <td className="py-2 px-3.5">
+                            <input
                               type="text"
                               disabled={formMode === "view"}
                               value={po.remarks || ""}
@@ -6160,7 +7151,7 @@ export function PreCostingKnitManager({
                       <td className="py-3 px-3.5 text-right font-mono text-indigo-700 dark:text-indigo-300">
                         ${totalPoValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
-                      <td colSpan={formMode !== "view" ? 2 : 1} className="py-3 px-3.5 text-[11px] text-slate-500">
+                      <td colSpan={formMode !== "view" ? 3 : 2} className="py-3 px-3.5 text-[11px] text-slate-500">
                         Summed automatically across {(formData.poRows || []).length} purchase orders
                       </td>
                     </tr>
@@ -6591,12 +7582,12 @@ export function PreCostingKnitManager({
                           (formData.accessoriesItems || []).map((item, idx) => {
                             const isEffQtyInvalid = consolidatedOrderQty > 0 && (Number(item.effectedQty) || 0) > consolidatedOrderQty;
                             const isFinishingHead = item.head === "Finishing Trims" || (typeof item.head === "string" && item.head.toLowerCase().includes("finish"));
-                            const targetList = isFinishingHead ? FINISHING_TRIMS_ITEMS : SEWING_TRIMS_ITEMS;
-                            const itemOptions = targetList.map((name) => ({
+                            const targetList: string[] = isFinishingHead ? [...FINISHING_TRIMS_ITEMS] : [...SEWING_TRIMS_ITEMS];
+                            const itemOptions: { value: string; label: string }[] = targetList.map((name) => ({
                               value: name,
                               label: name,
                             }));
-                            if (item.item && !targetList.includes(item.item as any)) {
+                            if (item.item && !targetList.includes(item.item)) {
                               itemOptions.unshift({ value: item.item, label: item.item });
                             }
                             const rowSupplierOptions = getSupplierOptions(item.supplier);
@@ -7161,7 +8152,7 @@ export function PreCostingKnitManager({
                   CONSOLIDATED SECTION 3 BOTTOM SUMMARY CARD
                  ───────────────────────────────────────────────────────────── */}
               <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
                   <div className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
                     <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400 block">Total Fabric Cost</span>
                     <span className="text-base font-mono font-black text-slate-900 dark:text-white">
@@ -7193,12 +8184,22 @@ export function PreCostingKnitManager({
                   </div>
 
                   <div className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
-                    <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 block">Total Others Cost</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-600 dark:text-slate-400 block">Total Others Cost</span>
                     <span className="text-base font-mono font-black text-slate-900 dark:text-white">
                       ${totalOthersCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                     <span className="text-[10px] text-slate-400 block mt-0.5">
                       {totalCost > 0 ? ((totalOthersCost / totalCost) * 100).toFixed(1) : 0}% of material & service cost
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+                    <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 block">Total Overheads</span>
+                    <span className="text-base font-mono font-black text-slate-900 dark:text-white">
+                      ${totalOverheadCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                      {totalCost > 0 ? ((totalOverheadCost / totalCost) * 100).toFixed(1) : 0}% of material & service cost
                     </span>
                   </div>
 
@@ -7414,7 +8415,7 @@ export function PreCostingKnitManager({
                     </button>
                     <button
                       type="button"
-                      onClick={handleSubmitForApproval}
+                      onClick={() => handleSubmitForApproval()}
                       className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
                     >
                       <Send className="size-3.5" /> Submit for Approval
@@ -8310,6 +9311,13 @@ export function PreCostingKnitManager({
             tempRow.dyeingMethod || "Reactive"
           );
 
+          const matchedYD = findMatchingYarnDyeingRate(
+            masterYarnDyeingRates,
+            tempRow.ydType || "Feeder Stripe",
+            tempRow.colorShade || "Medium",
+            tempRow.dyeingMethod || "Reactive"
+          );
+
           const matchedAop = findMatchingAopRate(
             masterAopRates,
             tempRow.aopType || "Reactive"
@@ -8369,6 +9377,11 @@ export function PreCostingKnitManager({
                     onChange={(e) => handleUpdateFabricDetailsModalField("knittingRate", Number(e.target.value) || 0)}
                     className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
                   />
+                  {tempRow.masterKnittingRate !== undefined && Math.abs(Number(tempRow.knittingRate || 0) - Number(tempRow.masterKnittingRate)) > 0.0001 && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono mt-0.5 block text-right">
+                      Master: ${Number(tempRow.masterKnittingRate).toFixed(2)}/kg
+                    </span>
+                  )}
                 </div>
                 <div>
                   <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
@@ -8480,6 +9493,11 @@ export function PreCostingKnitManager({
                     onChange={(e) => handleUpdateFabricDetailsModalField("dyeingRate", Number(e.target.value) || 0)}
                     className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
                   />
+                  {tempRow.masterDyeingRate !== undefined && Math.abs(Number(tempRow.dyeingRate || 0) - Number(tempRow.masterDyeingRate)) > 0.0001 && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono mt-0.5 block text-right">
+                      Master: ${Number(tempRow.masterDyeingRate).toFixed(2)}/kg
+                    </span>
+                  )}
                 </div>
                 <div>
                   <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
@@ -8515,6 +9533,11 @@ export function PreCostingKnitManager({
                   <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                     Yarn Dyeing (Y/D) Process
                   </h4>
+                  {matchedYD ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                      ✓ Master: {matchedYD.code}
+                    </span>
+                  ) : null}
                 </div>
                 <span className="text-xs font-mono font-bold text-amber-700 dark:text-amber-300">
                   Y/D Cost: ${Number(tempRow.ydCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -8601,6 +9624,11 @@ export function PreCostingKnitManager({
                     onChange={(e) => handleUpdateFabricDetailsModalField("ydRate", Number(e.target.value) || 0)}
                     className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
                   />
+                  {tempRow.masterYdRate !== undefined && Math.abs(Number(tempRow.ydRate || 0) - Number(tempRow.masterYdRate)) > 0.0001 && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono mt-0.5 block text-right">
+                      Master: ${Number(tempRow.masterYdRate).toFixed(2)}/kg
+                    </span>
+                  )}
                 </div>
                 <div>
                   <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
@@ -8611,6 +9639,17 @@ export function PreCostingKnitManager({
                   </div>
                 </div>
               </div>
+              {!matchedYD && (
+                <div className="mt-3 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 flex items-start gap-2 text-amber-800 dark:text-amber-300 text-xs">
+                  <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                  <div>
+                    <p className="font-semibold text-[11px]">No Master Match</p>
+                    <p className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">
+                      No configured rate found for Y/D Type: <strong>&quot;{tempRow.ydType || 'Feeder Stripe'}&quot;</strong>, Color Shade: <strong>&quot;{tempRow.colorShade || 'Medium'}&quot;</strong> and Method: <strong>&quot;{tempRow.dyeingMethod || 'Reactive'}&quot;</strong>. Please configure it in Yarn Dyeing (Y/D) Rate Master.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           );
 
@@ -8685,6 +9724,11 @@ export function PreCostingKnitManager({
                     onChange={(e) => handleUpdateFabricDetailsModalField("aopRate", Number(e.target.value) || 0)}
                     className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
                   />
+                  {tempRow.masterAopRate !== undefined && Math.abs(Number(tempRow.aopRate || 0) - Number(tempRow.masterAopRate)) > 0.0001 && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono mt-0.5 block text-right">
+                      Master: ${Number(tempRow.masterAopRate).toFixed(2)}/kg
+                    </span>
+                  )}
                 </div>
                 <div>
                   <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
@@ -9035,7 +10079,7 @@ export function PreCostingKnitManager({
                               <th className="py-2.5 px-2 text-right w-24 min-w-[90px]">Rate ($/kg) *</th>
                               <th className="py-2.5 px-2.5 text-right w-28 min-w-[100px]">Yarn Cost ($)</th>
                               <th className="py-2.5 px-2.5 w-52 min-w-[170px]">Vendor *</th>
-                              <th className="py-2.5 px-2.5 text-center w-28 min-w-[100px]">Booking Tag</th>
+                              <th className="py-2.5 px-2.5 text-center w-36 min-w-[120px]">Stock & PR Allocation</th>
                               {formMode !== "view" && <th className="py-2.5 px-2 text-center w-12">Action</th>}
                             </tr>
                           </thead>
@@ -9146,6 +10190,11 @@ export function PreCostingKnitManager({
                                       onChange={(e) => handleUpdateYarnModalRow(yIdx, "ratePerKg", Number(e.target.value) || 0)}
                                       className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
                                     />
+                                    {yRow.masterRatePerKg !== undefined && Math.abs(Number(yRow.ratePerKg || 0) - Number(yRow.masterRatePerKg)) > 0.0001 && (
+                                      <span className="text-[9.5px] text-amber-600 dark:text-amber-400 font-mono block text-right mt-0.5">
+                                        Master: ${Number(yRow.masterRatePerKg).toFixed(2)}
+                                      </span>
+                                    )}
                                   </td>
 
                                   {/* 10. Yarn Cost ($) */}
@@ -9166,29 +10215,29 @@ export function PreCostingKnitManager({
                                     />
                                   </td>
 
-                                  {/* 12. Booking Tag Column */}
-                                  <td className="py-2 px-2 text-center w-28 min-w-[100px]">
+                                  {/* 12. Stock & PR Allocation Column */}
+                                  <td className="py-2 px-2 text-center w-36 min-w-[120px]">
                                     <button
                                       type="button"
                                       onClick={() => handleOpenBookingTagModal(yIdx, yRow)}
-                                      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer ${
+                                      className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer ${
                                         yRow.bookingTag
                                           ? "bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-700 ring-2 ring-emerald-300 dark:ring-emerald-900"
                                           : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600"
                                       }`}
                                       title={
                                         yRow.bookingTag
-                                          ? `Tagged: ${yRow.bookingTag.blockBookingNo} (${Number(yRow.bookingTag.tagQtyKg).toLocaleString()} KG) — Click to view/edit tag`
-                                          : "Click to Tag yarn against Block Yarn Booking"
+                                          ? `Stock: ${Number(yRow.bookingTag.stockAllocatedQtyKg ?? yRow.bookingTag.tagQtyKg).toLocaleString()} KG | PR: ${Number(yRow.bookingTag.procurementRequiredQtyKg || 0).toLocaleString()} KG — Click to edit allocation`
+                                          : "Click to allocate Yarn Stock & New Procurement"
                                       }
                                     >
-                                      <span className="font-black text-xs">B</span>
+                                      <Layers className="size-3.5" />
                                       {yRow.bookingTag ? (
                                         <span className="text-[9.5px] font-mono bg-emerald-800/50 px-1 py-0.5 rounded leading-none">
-                                          ✓ Tagged
+                                          ✓ Allocated
                                         </span>
                                       ) : (
-                                        <span className="text-[9px] text-slate-400 font-normal">Tag</span>
+                                        <span className="text-[9.5px] text-slate-500 dark:text-slate-400 font-semibold">Allocate</span>
                                       )}
                                     </button>
                                   </td>
@@ -9267,156 +10316,423 @@ export function PreCostingKnitManager({
         )}
 
         {/* ════════════════════════════════════════════════════════════
-            MODAL: BOOKING TAG MODAL (TAG YARN TO BLOCK YARN BOOKING)
+            MODAL: YARN STOCK & PROCUREMENT ALLOCATION
            ════════════════════════════════════════════════════════════ */}
         {bookingTagModal.isOpen && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-[1180px] border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-150 max-h-[92vh]">
               {/* Modal Header */}
-              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-amber-50/60 dark:bg-amber-950/30 flex items-center justify-between">
+              <div className="px-6 py-4 border-b border-amber-200/60 dark:border-amber-900/40 bg-amber-50/80 dark:bg-amber-950/30 flex items-center justify-between shrink-0">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Tag className="size-4 text-amber-600" />
-                    <span>Tag Yarn to Block Yarn Booking</span>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <Layers className="size-5 text-amber-600" />
+                    <span>Yarn Stock & Procurement Allocation</span>
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Component: <span className="font-semibold text-slate-800 dark:text-slate-200">{bookingTagModal.yarnItemName || "Yarn Breakdown Item"}</span>
-                    {" • "}
-                    Tag Qty: <span className="font-mono font-bold text-amber-700 dark:text-amber-400">{bookingTagModal.finalQtyKg.toLocaleString()} KG</span>
-                  </p>
+                  <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-600 dark:text-slate-400">
+                    <span>
+                      Yarn Item / Component:{" "}
+                      <strong className="text-slate-900 dark:text-slate-100">
+                        {bookingTagModal.yarnItemName || "Yarn"}
+                      </strong>
+                      {bookingTagModal.componentName && (
+                        <span className="text-slate-500 font-normal"> ({bookingTagModal.componentName})</span>
+                      )}
+                    </span>
+                    <span>•</span>
+                    <span>
+                      Total Required Yarn Quantity:{" "}
+                      <strong className="font-mono text-amber-700 dark:text-amber-400 font-bold text-sm">
+                        {allocationSummary.totalRequired.toFixed(2)} KG
+                      </strong>
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setBookingTagModal((prev) => ({ ...prev, isOpen: false }))}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg cursor-pointer"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg cursor-pointer"
                 >
                   <X className="size-5" />
                 </button>
               </div>
 
-              {/* Modal Body */}
-              <div className="p-6 space-y-4 overflow-y-auto max-h-[75vh]">
-                {/* 1. Block Booking No. Dropdown */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Block Booking No. <span className="text-rose-500">*</span>
-                  </label>
-                  <SearchableSelect
-                    options={blockBookingDropdownOptions}
-                    value={bookingTagModal.selectedBookingNo}
-                    onChange={handleSelectBookingNo}
-                    placeholder="Search and select Block Yarn Booking..."
-                    disabled={formMode === "view"}
-                    className="w-full text-xs font-semibold"
-                  />
-                  <p className="text-[11px] text-slate-400">
-                    Showing active Block Yarn Bookings with available balances.
-                  </p>
-                </div>
-
-                {/* 2. Yarn Item Dropdown */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Yarn Item <span className="text-rose-500">*</span>
-                  </label>
-                  <SearchableSelect
-                    options={yarnItemDropdownOptions}
-                    value={bookingTagModal.selectedYarnItemId}
-                    onChange={(val) => setBookingTagModal((prev) => ({ ...prev, selectedYarnItemId: val }))}
-                    placeholder={
-                      !bookingTagModal.selectedBookingNo
-                        ? "Select a Block Booking No. first..."
-                        : yarnItemDropdownOptions.length === 0
-                        ? "No yarn items found in this booking"
-                        : "Select Yarn Item in Booking..."
-                    }
-                    disabled={formMode === "view" || !bookingTagModal.selectedBookingNo}
-                    className="w-full text-xs font-semibold"
-                  />
-                  <p className="text-[11px] text-slate-400">
-                    Items sourced directly from selected Block Yarn Booking {bookingTagModal.selectedBookingNo || ""}.
-                  </p>
-                </div>
-
-                {/* 3. Real-Time Balance Cards (Available Balance, Tag QTY, Remaining Balance) */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                  {/* Available Balance */}
-                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40">
-                    <span className="text-[10.5px] uppercase font-bold text-slate-500 block mb-1">
-                      Available Balance
-                    </span>
-                    <div className="text-base font-mono font-black text-slate-900 dark:text-white">
-                      {tagBalanceInfo.availableKg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
-                      <span className="text-xs font-sans font-bold text-slate-500">KG</span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 block mt-1">
-                      {tagBalanceInfo.totalBookedKg > 0 ? (
-                        <>
-                          Booked: {(tagBalanceInfo.totalBookedKg / 1000).toFixed(2)} TON ({tagBalanceInfo.totalBookedKg.toLocaleString()} KG)
-                        </>
-                      ) : (
-                        "Select a yarn item"
+              {/* Modal Body - 2 Columns (Left: 60%, Right: 40%) */}
+              <div className="p-6 space-y-4 overflow-y-auto max-h-[78vh]">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                  {/* ── Left Column: Block Yarn Booking / Stock Allocation (60% / 7 cols) ── */}
+                  <div className="lg:col-span-7 space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+                      <div>
+                        <h4 className="text-xs uppercase font-black tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                          <Tag className="size-4 text-amber-600" />
+                          <span>1. Block Yarn Booking / Stock Allocation</span>
+                        </h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                          Reserve yarn from advance block booking(s). Multiple bookings supported.
+                        </p>
+                      </div>
+                      {formMode !== "view" && (
+                        <button
+                          type="button"
+                          onClick={handleAddAllocationRow}
+                          className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                        >
+                          <Plus className="size-3.5" />
+                          <span>Add Block Booking</span>
+                        </button>
                       )}
-                    </span>
+                    </div>
+
+                    {bookingTagModal.allocations.length === 0 ? (
+                      <div className="p-6 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-center bg-slate-50/50 dark:bg-slate-850/30">
+                        <Tag className="size-6 text-slate-400 mx-auto mb-2" />
+                        <p className="text-xs font-bold text-slate-700 dark:text-slate-300">No Block Bookings Allocated</p>
+                        <p className="text-[11px] text-slate-500 mt-1">
+                          Click "+ Add Block Booking" to allocate stock from existing block bookings, or proceed with 100% New Procurement on the right.
+                        </p>
+                        {formMode !== "view" && (
+                          <button
+                            type="button"
+                            onClick={handleAddAllocationRow}
+                            className="mt-3 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs cursor-pointer"
+                          >
+                            <Plus className="size-3.5" />
+                            <span>Add Block Booking</span>
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-3.5">
+                        {bookingTagModal.allocations.map((alloc, idx) => {
+                          const itemOptions = getYarnItemOptionsForBooking(alloc.blockBookingNo);
+                          const isExceeding = alloc.tagQtyKg > alloc.availableBalance;
+                          return (
+                            <div
+                              key={alloc.id}
+                              className={`p-4 rounded-xl border transition-all ${
+                                isExceeding
+                                  ? "border-rose-300 dark:border-rose-800 bg-rose-50/30 dark:bg-rose-950/20"
+                                  : "border-slate-200 dark:border-slate-750 bg-slate-50/60 dark:bg-slate-850/40"
+                              } space-y-3`}
+                            >
+                              {/* Card Header */}
+                              <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-700/60 pb-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="px-2 py-0.5 rounded text-[10.5px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">
+                                    Booking #{idx + 1}
+                                  </span>
+                                  {alloc.supplierName && (
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                                      Mill: <strong className="text-slate-700 dark:text-slate-300">{alloc.supplierName}</strong>
+                                    </span>
+                                  )}
+                                </div>
+                                {formMode !== "view" && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveAllocationRow(alloc.id)}
+                                    className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 rounded-md transition cursor-pointer"
+                                    title="Remove this booking allocation"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Block Booking No. & Yarn Item Selectors */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                                    Block Booking No. <span className="text-rose-500">*</span>
+                                  </label>
+                                  <SearchableSelect
+                                    options={blockBookingDropdownOptions}
+                                    value={alloc.blockBookingNo}
+                                    onChange={(val) => handleSelectBookingForRow(alloc.id, val)}
+                                    placeholder="Select Block Yarn Booking..."
+                                    disabled={formMode === "view"}
+                                    className="w-full text-xs font-semibold"
+                                  />
+                                </div>
+
+                                <div className="space-y-1">
+                                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                                    Yarn Item in Booking <span className="text-rose-500">*</span>
+                                  </label>
+                                  <SearchableSelect
+                                    options={itemOptions}
+                                    value={alloc.yarnItemId}
+                                    onChange={(val) => handleSelectYarnItemForRow(alloc.id, val)}
+                                    placeholder={
+                                      !alloc.blockBookingNo
+                                        ? "Select Block Booking first..."
+                                        : itemOptions.length === 0
+                                        ? "No yarn items in booking"
+                                        : "Select Yarn Item in Booking..."
+                                    }
+                                    disabled={formMode === "view" || !alloc.blockBookingNo}
+                                    className="w-full text-xs font-semibold"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Balances & Tag Qty Row */}
+                              <div className="grid grid-cols-3 gap-2.5 pt-1">
+                                {/* Available Balance (KG) */}
+                                <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                                  <span className="text-[9.5px] uppercase font-bold text-slate-500 block mb-0.5">
+                                    Available Balance
+                                  </span>
+                                  <div className="text-xs font-mono font-black text-slate-900 dark:text-white">
+                                    {alloc.availableBalance.toFixed(2)}{" "}
+                                    <span className="text-[10px] font-normal text-slate-500">KG</span>
+                                  </div>
+                                </div>
+
+                                {/* Tag Qty (KG) - Editable */}
+                                <div className="p-2.5 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/20">
+                                  <div className="flex items-center justify-between mb-0.5">
+                                    <span className="text-[9.5px] uppercase font-bold text-amber-800 dark:text-amber-400">
+                                      Tag Qty (KG) *
+                                    </span>
+                                    <span className="text-[8.5px] text-amber-600 dark:text-amber-400 font-semibold">
+                                      Editable
+                                    </span>
+                                  </div>
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    max={alloc.availableBalance}
+                                    disabled={formMode === "view" || !alloc.yarnItemId}
+                                    value={alloc.tagQtyKg || ""}
+                                    onChange={(e) => handleTagQtyChangeForRow(alloc.id, e.target.value)}
+                                    placeholder="0.00"
+                                    className={`w-full h-7 px-2 rounded border ${
+                                      isExceeding
+                                        ? "border-rose-500 bg-rose-50 text-rose-900 focus:ring-rose-500"
+                                        : "border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-900 text-amber-900 dark:text-amber-200 focus:ring-amber-500"
+                                    } font-mono font-bold text-xs text-right focus:outline-none focus:ring-1`}
+                                  />
+                                  <span className="text-[8.5px] text-amber-700 dark:text-amber-400 block mt-0.5">
+                                    Max: {alloc.availableBalance.toFixed(2)} KG
+                                  </span>
+                                </div>
+
+                                {/* Remaining Balance (KG) */}
+                                <div
+                                  className={`p-2.5 rounded-lg border ${
+                                    isExceeding
+                                      ? "border-rose-300 dark:border-rose-800 bg-rose-50/70 dark:bg-rose-950/30 text-rose-800 dark:text-rose-300"
+                                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                                  }`}
+                                >
+                                  <span className="text-[9.5px] uppercase font-bold block mb-0.5 opacity-80">
+                                    Remaining Balance
+                                  </span>
+                                  <div className="text-xs font-mono font-black">
+                                    {alloc.remainingBalance.toFixed(2)}{" "}
+                                    <span className="text-[10px] font-normal opacity-70">KG</span>
+                                  </div>
+                                  <span className="text-[8.5px] block mt-0.5 opacity-75">
+                                    {isExceeding ? "⚠️ Exceeds Available" : "Booking Remaining"}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {isExceeding && (
+                                <div className="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-800 flex items-center gap-1.5 text-rose-700 dark:text-rose-300 text-[11px]">
+                                  <AlertCircle className="size-3.5 shrink-0 text-rose-600" />
+                                  <span>
+                                    <strong>Exceeds Available Balance:</strong> Tag Qty ({alloc.tagQtyKg.toFixed(2)} KG) exceeds available balance ({alloc.availableBalance.toFixed(2)} KG).
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Total Stock Allocated Subtotal Chip */}
+                    <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-amber-900 dark:text-amber-200">Total Stock Allocated:</span>
+                        <span className="text-slate-500 dark:text-slate-400">
+                          ({allocationSummary.allocationsCount} booking{allocationSummary.allocationsCount !== 1 ? "s" : ""})
+                        </span>
+                      </div>
+                      <div className="font-mono font-black text-amber-800 dark:text-amber-300 text-sm">
+                        {allocationSummary.stockAllocated.toFixed(2)} KG
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Tag QTY */}
-                  <div className="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/20">
-                    <span className="text-[10.5px] uppercase font-bold text-amber-700 dark:text-amber-400 block mb-1">
-                      Tag QTY
-                    </span>
-                    <div className="text-base font-mono font-black text-amber-800 dark:text-amber-300">
-                      {Number(bookingTagModal.finalQtyKg).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
-                      <span className="text-xs font-sans font-bold text-amber-600 dark:text-amber-400">KG</span>
-                    </div>
-                    <span className="text-[10px] text-amber-600 dark:text-amber-400 block mt-1">
-                      Auto-populated from Final Qty (Kg)
-                    </span>
-                  </div>
+                  {/* ── Right Column: New Procurement Allocation & Summary (40% / 5 cols) ── */}
+                  <div className="lg:col-span-5 space-y-4">
+                    {/* Section 2: New Procurement Allocation */}
+                    <div className="p-4 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/20 space-y-3.5">
+                      <div className="flex items-center justify-between pb-2 border-b border-indigo-200/60 dark:border-indigo-800/60">
+                        <div>
+                          <h4 className="text-xs uppercase font-black tracking-wider text-indigo-950 dark:text-indigo-200 flex items-center gap-1.5">
+                            <Sparkles className="size-3.5 text-indigo-600" />
+                            <span>2. New Procurement Allocation</span>
+                          </h4>
+                          <span className="text-[10.5px] text-indigo-600 dark:text-indigo-400 font-medium">
+                            Auto-calculated: Total Required − Total Stock Allocated
+                          </span>
+                        </div>
+                      </div>
 
-                  {/* Remaining Balance */}
-                  <div
-                    className={`p-3.5 rounded-xl border ${
-                      tagBalanceInfo.isShortage
-                        ? "border-rose-300 dark:border-rose-900 bg-rose-50/80 dark:bg-rose-950/30 text-rose-800 dark:text-rose-300"
-                        : "border-emerald-300 dark:border-emerald-900 bg-emerald-50/80 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300"
-                    }`}
-                  >
-                    <span className="text-[10.5px] uppercase font-bold block mb-1">
-                      Remaining Balance
-                    </span>
-                    <div className="text-base font-mono font-black">
-                      {tagBalanceInfo.remainingKg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
-                      <span className="text-xs font-sans font-bold">KG</span>
+                      {/* Metric Cards */}
+                      <div className="space-y-2.5">
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div className="p-2.5 rounded-lg border border-indigo-150 dark:border-indigo-800 bg-white dark:bg-slate-800">
+                            <span className="text-[9.5px] uppercase font-bold text-slate-500 block">Total Required</span>
+                            <div className="text-xs font-mono font-black text-slate-900 dark:text-white mt-0.5">
+                              {allocationSummary.totalRequired.toFixed(2)} <span className="text-[10px] font-normal text-slate-500">KG</span>
+                            </div>
+                          </div>
+
+                          <div className="p-2.5 rounded-lg border border-indigo-150 dark:border-indigo-800 bg-white dark:bg-slate-800">
+                            <span className="text-[9.5px] uppercase font-bold text-amber-700 dark:text-amber-400 block">Total Stock Allocated</span>
+                            <div className="text-xs font-mono font-black text-amber-800 dark:text-amber-300 mt-0.5">
+                              {allocationSummary.stockAllocated.toFixed(2)} <span className="text-[10px] font-normal text-slate-500">KG</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* New Procurement Required Qty */}
+                        <div className="p-3 rounded-lg border border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-800 flex items-center justify-between shadow-xs">
+                          <div>
+                            <span className="text-[10px] uppercase font-black text-indigo-900 dark:text-indigo-300 block">
+                              New Procurement Required Qty
+                            </span>
+                            <span className="text-[9.5px] text-slate-400 font-mono">
+                              {allocationSummary.totalRequired.toFixed(2)} − {allocationSummary.stockAllocated.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="text-base font-mono font-black text-indigo-700 dark:text-indigo-400">
+                            {allocationSummary.procurementRequired.toFixed(2)}{" "}
+                            <span className="text-xs font-sans font-bold text-slate-500">KG</span>
+                          </div>
+                        </div>
+
+                        {/* Procurement Status Box */}
+                        <div className="p-3 rounded-lg border border-indigo-200 dark:border-indigo-800/80 bg-white/70 dark:bg-slate-800/60 space-y-1.5">
+                          <span className="text-[10px] uppercase font-bold text-slate-500 block">Procurement Status</span>
+                          <div>
+                            {allocationSummary.procurementRequired > 0 ? (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700">
+                                <Clock className="size-3.5 shrink-0 text-indigo-600" />
+                                <span>New Procurement Request Required</span>
+                              </div>
+                            ) : (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
+                                <CheckCircle className="size-3.5 shrink-0 text-emerald-600" />
+                                <span>No Procurement Needed (Covered by Stock)</span>
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                            {allocationSummary.procurementRequired > 0
+                              ? "A linked Purchase Requisition will be generated/updated in Procurement Module on save."
+                              : "100% of requirement is satisfied from block bookings. No external PR created."}
+                          </p>
+                          {bookingTagModal.existingProcurementRequestNo && (
+                            <div className="text-[10.5px] text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5 pt-1 border-t border-indigo-100 dark:border-indigo-800/40">
+                              <Link2 className="size-3.5 text-indigo-500" />
+                              <span>Currently linked PR: <strong className="font-mono">{bookingTagModal.existingProcurementRequestNo}</strong></span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <span className="text-[10px] block mt-1 opacity-80">
-                      {tagBalanceInfo.isShortage ? "⚠️ Insufficient Balance" : "✓ Available Balance - Tag QTY"}
-                    </span>
+
+                    {/* Section 3: Allocation Summary */}
+                    <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/70 dark:bg-slate-800/50 space-y-3">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
+                        <h4 className="text-xs uppercase font-black tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                          <BookmarkCheck className="size-3.5 text-slate-600" />
+                          <span>3. Allocation Summary</span>
+                        </h4>
+                        {/* Allocation Status Badge */}
+                        <div>
+                          {allocationSummary.allocationStatus === "Fully Allocated" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
+                              <CheckCircle className="size-3.5" /> Fully Allocated
+                            </span>
+                          )}
+                          {allocationSummary.allocationStatus === "Partially Allocated" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                              <Clock className="size-3.5" /> Partially Allocated
+                            </span>
+                          )}
+                          {allocationSummary.allocationStatus === "Over Allocation" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300 border border-rose-300 dark:border-rose-700">
+                              <AlertTriangle className="size-3.5" /> Over Allocation
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Metric Rows */}
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700">
+                          <span className="text-slate-600 dark:text-slate-400">Total Required Qty</span>
+                          <span className="font-mono font-bold text-slate-900 dark:text-white">
+                            {allocationSummary.totalRequired.toFixed(2)} KG
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700">
+                          <span className="text-amber-700 dark:text-amber-400 font-semibold">Total Stock Allocated</span>
+                          <span className="font-mono font-bold text-amber-800 dark:text-amber-300">
+                            {allocationSummary.stockAllocated.toFixed(2)} KG
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700">
+                          <span className="text-indigo-700 dark:text-indigo-400 font-semibold">New Procurement Qty</span>
+                          <span className="font-mono font-bold text-indigo-800 dark:text-indigo-300">
+                            {allocationSummary.procurementRequired.toFixed(2)} KG
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700">
+                          <span className="text-emerald-700 dark:text-emerald-400 font-bold">Total Allocated Qty</span>
+                          <span className="font-mono font-bold text-emerald-800 dark:text-emerald-300">
+                            {allocationSummary.totalAllocated.toFixed(2)} KG
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700">
+                          <span className="text-slate-600 dark:text-slate-400">Remaining Required Qty</span>
+                          <span
+                            className={`font-mono font-bold ${
+                              allocationSummary.remainingRequired > 0 ? "text-amber-600" : "text-emerald-600"
+                            }`}
+                          >
+                            {allocationSummary.remainingRequired.toFixed(2)} KG
+                          </span>
+                        </div>
+                      </div>
+
+                      {allocationSummary.isOverAllocated && (
+                        <div className="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-800 flex items-center gap-2 text-rose-700 dark:text-rose-300 text-xs">
+                          <AlertCircle className="size-4 shrink-0 text-rose-600" />
+                          <span>
+                            <strong>Stock over-allocated:</strong> Total Stock Allocated ({allocationSummary.stockAllocated.toFixed(2)} KG) exceeds Total Required Yarn Quantity ({allocationSummary.totalRequired.toFixed(2)} KG).
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-
-                {/* Validation Warnings / Confirmation Messages */}
-                {tagBalanceInfo.isShortage && (
-                  <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-800 flex items-start gap-2.5 text-rose-700 dark:text-rose-300 text-xs animate-in fade-in">
-                    <AlertCircle className="size-4 shrink-0 mt-0.5 text-rose-600" />
-                    <div>
-                      <span className="font-bold">Insufficient Booking Balance:</span> The Tag QTY ({bookingTagModal.finalQtyKg.toLocaleString()} KG) exceeds the available balance ({tagBalanceInfo.availableKg.toLocaleString()} KG) by {(bookingTagModal.finalQtyKg - tagBalanceInfo.availableKg).toLocaleString()} KG. Tagging cannot be saved against this yarn item.
-                    </div>
-                  </div>
-                )}
-
-                {!tagBalanceInfo.isShortage && bookingTagModal.selectedBookingNo && bookingTagModal.selectedYarnItemId && (
-                  <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 flex items-center gap-2.5 text-emerald-700 dark:text-emerald-300 text-xs animate-in fade-in">
-                    <CheckCircle className="size-4 shrink-0 text-emerald-600" />
-                    <div>
-                      <span className="font-bold">Booking Balance Verified:</span> {tagBalanceInfo.remainingKg.toLocaleString()} KG will remain available in Block Booking {bookingTagModal.selectedBookingNo} after confirming this tag.
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Modal Footer Actions */}
-              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between">
+              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between shrink-0">
                 <div>
                   {bookingTagModal.yarnRowIndex !== null &&
                     yarnModal.rows[bookingTagModal.yarnRowIndex]?.bookingTag &&
@@ -9442,15 +10758,11 @@ export function PreCostingKnitManager({
                   {formMode !== "view" && (
                     <button
                       type="button"
-                      disabled={
-                        !bookingTagModal.selectedBookingNo ||
-                        !bookingTagModal.selectedYarnItemId ||
-                        tagBalanceInfo.isShortage
-                      }
+                      disabled={!allocationSummary.canSave}
                       onClick={handleSaveBookingTagModal}
                       className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5 transition-all"
                     >
-                      <Check className="size-3.5" /> Confirm & Save Tag
+                      <Check className="size-3.5" /> Confirm & Save Allocation
                     </button>
                   )}
                 </div>

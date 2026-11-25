@@ -833,9 +833,81 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     description: "Pre-costing calculations, fabric/trims consumption, CM estimation, and margin analysis.",
     modificationPercent: 100,
     status: "Completed",
-    lastModified: "2026-11-17",
-    totalRevisions: 23,
+    lastModified: "2026-11-24",
+    totalRevisions: 32,
     changeHistory: [
+      {
+        id: "chg-1794960000000",
+        date: "2026-11-24 14:30",
+        type: "Feature",
+        description:
+          "Pre Costing Entry (Knit) Sales Contract / LC Integration: (1) Added searchable, filterable 'Sales Contract/LC' dropdown immediately after CM (DZ) field in Pre Costing Identification & Order Basis section using SearchableSelect with allowCustom option. (2) Populated dropdown dynamically from Confirm Orders (mm-order-entry / MMRepository.getOrders()) and S.C/LC Master library (MMSCLCMaster), displaying contract/LC number, buyer name, and associated order number. (3) Implemented automated two-way link to the corresponding Confirm Order record, displaying active linked order badge. (4) Re-flowed Note / Instructions to full width row beneath to maintain responsive 4-column grid. (5) Integrated Sales Contract / LC display and linked order reference into Pre-Cost Sheet Report Style & Order Information. (6) Ensured full persistence and restoration across Local Storage records (cripton_pre_costings_knit_master_v1).",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794959000000",
+        date: "2026-11-21 21:48",
+        type: "Feature",
+        description:
+          "Pre Costing (Knit) Master Rate Tracking & Report Display: (1) Added dual-rate tracking for all 5 auto-populated Master Data rates (Dyeing Rate, Yarn Dyeing Rate, Knitting Process Rate, AOP Process Rate, Yarn Rate) with dedicated master rate fields (masterDyeingRate, masterKnittingRate, masterYdRate, masterAopRate, masterRatePerKg). (2) Form editing: calculations continuously compute using user-modified rates, while preserving original Master Data rates across spec changes and LocalStorage persistence. Added master rate indicators below inputs when modified. (3) Pre-Cost Sheet Report: implemented renderReportRate logic in Detailed Cost Sheet (Category-Wise) displaying unchanged rates normally and user-updated rates as bold with the original Master Data rate in subtle secondary brackets (e.g. $4.00/kg ($3.45/kg)). (4) Synchronized functionality across Pre Costing (Knit) and Pre Costing (Woven) report engines.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794958000000",
+        date: "2026-11-21 21:15",
+        type: "UI Enhancement",
+        description:
+          "Pre Costing Menu & Report Updates: (1) Renamed 'Pre Costing Register' to 'Pre Costing Register (Woven)' and 'Pre Costing Entry' to 'Pre Costing Entry (Woven)' across sidebar navigation, route headers, and page titles. (2) In Pre-Cost Sheet Report -> Detailed Cost Sheet (Category-Wise) for both Pre Costing Register (Knit) and Pre Costing Register (Woven), removed '8. Commercial & Overhead Cost' category table and subtotal while preserving FOB-based overhead breakdown in the DZ Cost Sharing table and Style & Order Info.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794957000000",
+        date: "2026-11-21 21:00",
+        type: "Feature",
+        description:
+          "Copied Pre Costing (Knit) Module into standalone Pre Costing Module: (1) Created Pre Costing Entry form duplicating all features, 17-column item-wise calculations, multiple PO entry, yarn breakdown, and allocation functionality from Pre Costing Entry (Knit). (2) Created Pre Costing Register duplicating filters, multi-status workflows, version amendments, comparison, and actions. (3) Copied Pre-Cost Sheet Report (PreCostingReport) into the View section of the new Pre Costing Register. (4) Maintained independent Local Storage (cripton_pre_costings_general_master_v1, cripton_pre_costings_general_active_id_v1, dedicated general image/attachment stores) completely isolated from the Knit module. (5) Kept Pre Costing Entry (Knit) and Pre Costing Register (Knit) completely unchanged.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794956000000",
+        date: "2026-11-21 20:40",
+        type: "UI Enhancement",
+        description:
+          "Pre Costing Entry (Knit) - Yarn Stock & Procurement Allocation Modal Redesign: (1) Redesigned modal layout to wide 1180px format with two-column responsive split: Left 60% for Block Yarn Booking / Stock Allocation, Right 40% for New Procurement Allocation and Allocation Summary. (2) Added support for multiple Block Booking allocations via '+ Add Block Booking' with individual card displays, Block Booking No., Yarn Item, Available Balance (KG), editable Tag Qty (KG), Remaining Balance (KG), and delete action. (3) Multi-booking balance tracking: dynamically validates against each booking's available stock balance, prevents over-allocation, and recalculates total stock allocated across all cards in real time. (4) Right column displays Total Required Qty, Total Stock Allocated, New Procurement Required Qty (Total Required - Stock Allocated), and Procurement Status badge. (5) Allocation Summary table provides status breakdown ('Fully Allocated', 'Partially Allocated', 'Over Allocation'). (6) Save & LocalStorage: persists multiple block booking allocations in MMYarnBookingTagRecord.allocations, creates/updates linked Purchase Requisition in proc_purchase_requisitions_v2 when procurement is required (> 0), and synchronizes with master records on reload.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794955000000",
+        date: "2026-11-21 19:35",
+        type: "Feature",
+        description:
+          "Pre Costing Entry (Knit) - Yarn Stock & Procurement Allocation Enhancement: (1) Transformed 'Tag Yarn to Block Yarn Booking' modal into comprehensive 'Yarn Stock & Procurement Allocation' module displaying Yarn Item / Component name and Total Required Yarn Qty (KG). (2) Maintained Block Yarn Booking / Stock Allocation with dynamic balance calculations, editable Tag Qty (KG) defaulting to Math.min(available, required) with strict capacity bounds. (3) Added New Procurement Allocation section auto-calculating Procurement Required Qty (Total Required - Stock Allocated) and dynamic Procurement Status ('New Procurement Request Required' vs 'No Procurement Needed'). (4) Added 3-way Allocation Summary with status badges ('Fully Allocated', 'Partially Allocated', 'Over Allocation'). (5) Integrated with Procurement Module: saving allocation automatically generates or updates a dedicated Purchase Requisition (PR-YARN-XXXX) in proc_purchase_requisitions_v2 linked with Pre Costing No., Yarn Item, Component, and row ID, preventing duplicate PRs on re-edit, and cleaning up PR when covered 100% by stock. (6) Updated Yarn Breakdown table column header to 'Stock & PR Allocation' with live status badge.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794954000000",
+        date: "2026-11-21 18:20",
+        type: "UI Enhancement",
+        description:
+          "Pre Costing Entry (Knit) Layout Updates: (1) Renamed 'Commercial & Overhead Terms (% of GMT Garments Value)' section to 'Commercial & Overhead Cost'. (2) Repositioned Commercial & Overhead Cost section to the right side of Pre Costing Identification & Order Basis in a balanced side-by-side layout (8 cols left / 4 cols right on xl+). (3) Re-arranged Pre Costing Identification & Order Basis fields into a clean 4-column layout displaying exactly 4 fields per row across 4 neat rows.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794953000000",
+        date: "2026-11-21 08:45",
+        type: "Feature",
+        description:
+          "Pre Costing Entry (Knit) & Pre-Cost Sheet Report Updates: (1) Added a dedicated compact 3-column section in Pre Costing Identification & Order Basis for Commission, Financial, Sampling, and Commercial overheads. Automatically calculates dollar value based on total GMT Garments Value (PO Value). (2) Added optional Delivery Date column immediately after Value ($) in Purchase Order Details. (3) Removed Commission, Development, and Commercial Cost heads from Item-wise Pre Costing Details -> Others Cost tab, managing them exclusively through the overheads section. (4) Updated Pre-Cost Sheet Report to display Commission, Financial, Sampling, and Commercial percentages and values in Style & Order Info, PO Summary (with Delivery Date), and Category-wise Detailed Cost Sheet. (5) In Cost Breakdown / Cost Sharing (DZ-Based), added separate rows for Commission, Financial, Sampling, and Commercial with Rate (%), Share (%), and Value ($), strictly arranged in the required 9-item sequence: Fabrication & Yarn, Trims & Accessories, Embellishment, CM (DZ), Commission, Financial, Sampling, Commercial, Others Cost.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1794951000000",
+        date: "2026-11-21 08:15",
+        type: "Feature",
+        description:
+          "Yarn Dyeing (Y/D) Rate Master Integration: Created new Yarn Dyeing (Y/D) Rate master under Merchandising Master Data with multi-row entry modal (Y/D Type, Color Shade, Dyeing Method, Y/D Process Loss %, Y/D Rate $/kg), search, filtering, and local storage persistence. Automatically integrated master rates into Pre Costing Entry (Knit) and Buyer Costing Sheet under Fabric Cost -> Details (D Button) -> Fabric Processing & Costing Details -> Yarn Dyeing (Y/D) Process to dynamically populate Y/D Process Loss (%) and Y/D Rate ($/kg) based on matched Y/D Type, Color Shade, and Dyeing Method with master validation badges.",
+        percentDelta: 0,
+      },
       {
         id: "chg-1794863700000",
         date: "2026-11-17 13:15",
@@ -1038,17 +1110,52 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
     baseRoute: "/merchandising-cad",
     category: "Order Management",
     description: "Marker efficiency, CAD net/gross fabric consumption, and garment wastage confirmation.",
-    modificationPercent: 95,
-    status: "Modified",
-    lastModified: "2026-11-18",
-    totalRevisions: 1,
+    modificationPercent: 100,
+    status: "Completed",
+    lastModified: "2026-11-24",
+    totalRevisions: 6,
     changeHistory: [
+      {
+        id: "chg-1763955000000",
+        date: "2026-11-24 14:52",
+        type: "Bug Fix",
+        description: "Resolved Fabric Consumption (CAD) type definitions and model alignment: (1) Added and exported MMFabricConsumptionCadVersion model matching full version snapshot structure. (2) Extended MMFabricConsumptionCadRecord with version, amendmentCount, amendmentReason, amendedDate, amendedBy, and versions properties. (3) Added 'Amendment Requested' status to MMCadRequestStatus union type. (4) Added wash10, wash10Pct, finishYardsMeter, and finishYdsMeter fields to MMCadItemRow and calculateCadRow helper function. (5) Fixed type safety in FabricConsumptionPreviewModal snapshot props.",
+        percentDelta: 0,
+      },
       {
         id: "chg-1763444700000",
         date: "2026-11-18 11:45",
         type: "Logic Update",
         description: "Fabric Consumption (CAD) enhancements: (1) Fixed Law dynamic calculation logic so Finish/KG Consumption and Waste + 10%/KG recalculate automatically when Law is updated (e.g. 1550000). (2) Cleaned default APEROL CAD rows to match standard 1550000 Law calculation. (3) Made Section 3 (CAD Attachments) hidden when creating a new request and visible upon CAD response mode. (4) Swapped CAD Attachments layout placing CAD Image(s) on the left and GMT Image on the right. (5) In CAD Preview Modal, replaced Job No with dynamic Fabrication* field and enlarged visual layout images to full card width preserving aspect ratio.",
         percentDelta: 95,
+      },
+      {
+        id: "chg-1763729100000",
+        date: "2026-11-21 18:45",
+        type: "Feature",
+        description: "Implemented comprehensive Amendment & Resubmission facility for Fabric Consumption (CAD): (1) Enabled unlimited amendment and resubmission cycles between Merchant and CAD team. (2) Added Merchant 'Request Amendment' action after CAD submission with reason prompt and automated version incrementing. (3) Built document versioning and replacement ledger in MMFabricConsumptionAttachmentModal preserving all historical attachments and marker files with version tags and replacement status. (4) Added dynamic Resubmit to CAD (Rev X) workflow and revised CAD entry & submission lifecycle. (5) Added Section 5 (Revision & Workflow History Timeline) with interactive snapshot inspection of previous revisions and detailed audit trails. (6) Updated CAD & Merchant Registers with Rev X badges and Amendment Requested status filtering.",
+        percentDelta: 5,
+      },
+      {
+        id: "chg-1763734900000",
+        date: "2026-11-21 20:20",
+        type: "Bug Fix",
+        description: "Fixed syntax errors and corrupted JSX structure in FabricConsumptionCadForm: cleaned unclosed div wrappers around Section 1 & Section 2, restored pristine Section 3 CAD & GMT attachment grid upload layout, and corrected snapshot typing in FabricConsumptionPreviewModal.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1763866800000",
+        date: "2026-11-23 11:05",
+        type: "Feature",
+        description: "CAD Consumption Entry updates: (1) Moved WASH 10% column to the right side of DIA Make column, converted it into an individual editable manual input for each row, and removed automatic calculation. (2) Added new Finish Yads/Meter editable text column immediately after WASH 10% for individual entry per row. (3) Updated official CAD Report & Preview Modal to display entered Finish Yads/Meter and manual WASH 10% in corresponding table rows. (4) Preserved Local Storage persistence across all revisions.",
+        percentDelta: 0,
+      },
+      {
+        id: "chg-1763867600000",
+        date: "2026-11-23 11:15",
+        type: "UI Enhancement",
+        description: "CAD Preview Report Updates: (1) Reordered Visual Layouts section placing CAD Marker Layouts on the left (70% width) and GMT Reference Image on the right (30% width). (2) Formatted CAD Marker section to display up to 3 images in a single row with reduced, neatly fitted image dimensions (h-24/h-28). (3) Optimized overall report modal and component paddings so the entire report fits cleanly without vertical or horizontal scrollbars.",
+        percentDelta: 0,
       },
     ],
   },
@@ -1253,17 +1360,26 @@ export const DEFAULT_MERCHANDISING_PAGES: MerchandisingPageRecord[] = [
   {
     id: "fb-01",
     menu: "Fabric Booking",
-    subMenu: "Fabric Booking Sheet",
-    fullPath: "/merchandising-material-bookings?tab=fabric",
-    baseRoute: "/merchandising-material-bookings",
-    searchParams: { tab: "fabric" },
+    subMenu: "Fabric Booking Sheet / Block Fabric Booking",
+    fullPath: "/mm-block-fabric-booking-register",
+    baseRoute: "/mm-block-fabric-booking-register",
+    searchParams: {},
     category: "Materials & Sourcing",
-    description: "Main, rib, collar, and pocketing fabric booking generation for knitting and dyeing.",
-    modificationPercent: 0,
-    status: "Baseline (Unchanged)",
-    lastModified: "2026-10-13",
-    totalRevisions: 0,
-    changeHistory: [],
+    description: "Main, rib, collar, pocketing, and advance Block Fabric Booking module with Fabric Setup Master Data integration.",
+    modificationPercent: 100,
+    status: "Completed",
+    lastModified: "2026-11-24",
+    totalRevisions: 1,
+    changeHistory: [
+      {
+        id: "chg-1795000000000",
+        date: "2026-11-24 09:55",
+        type: "Feature",
+        description:
+          "Block Fabric Booking Module Creation: (1) Created Block Fabric Booking Register (/mm-block-fabric-booking-register) with status tabs, search & filters, Actions (View, Edit, PI, Delete), and 'Create Fabric Block Booking' button. (2) Created Create Fabric Block Booking form (/mm-block-fabric-booking) copying all fields, layouts, validations, attachments modal, and print preview, with complete Fabric terminology. (3) Sourced searchable suggestions for Item Name directly from Fabric Setup Master Data (MMMasterDataRepository.getFabricSetups()) with autocomplete and Fabric Setup Library modal picker. (4) Integrated with Proforma Invoice (PI) Form (/mm-proforma-invoice-create) allowing seamless forwarding and attaching of Block Fabric Bookings by Booking No. with automatic piReference synchronization. (5) Added Block Fabric Booking to sidebar navigation under Booking Information with independent dedicated localStorage persistence (cripton_mm_block_fabric_bookings_v1).",
+        percentDelta: 100,
+      },
+    ],
   },
 
   // ──────────────────────────────────────────────────────────────────────────

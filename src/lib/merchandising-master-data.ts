@@ -71,6 +71,41 @@ export interface MMDyeingRate {
   updatedAt: string;
 }
 
+export type YDTypeOption = "Feeder Stripe" | "Engineering Stripe";
+export const YD_TYPES_OPTIONS: YDTypeOption[] = ["Feeder Stripe", "Engineering Stripe"];
+
+export type YDColorShadeOption = "Medium" | "White" | "Light" | "Dark" | "Extra Dark";
+export const YD_COLOR_SHADES: YDColorShadeOption[] = ["Medium", "White", "Light", "Dark", "Extra Dark"];
+
+export type YDDyeingMethodOption =
+  | "Reactive"
+  | "Dispersed"
+  | "2 Part Dye"
+  | "Normal Wash"
+  | "White Wash"
+  | "N/A";
+export const YD_DYEING_METHODS_OPTIONS: YDDyeingMethodOption[] = [
+  "Reactive",
+  "Dispersed",
+  "2 Part Dye",
+  "Normal Wash",
+  "White Wash",
+  "N/A",
+];
+
+export interface MMYarnDyeingRate {
+  id: string;
+  code: string;
+  ydType: YDTypeOption;
+  colorShade: YDColorShadeOption;
+  dyeingMethod: YDDyeingMethodOption;
+  processLoss: number; // Y/D Process Loss (%)
+  rate: number; // USD / kg
+  status: "Active" | "Inactive";
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type FeederTypeOption = "" | "Half Feeder" | "Full Feeder";
 export const FEEDER_TYPES: FeederTypeOption[] = ["", "Half Feeder", "Full Feeder"];
 
@@ -695,6 +730,153 @@ export const INITIAL_DYEING_RATES: MMDyeingRate[] = [
     status: "Active",
     createdAt: "2026-10-12",
     updatedAt: "2026-10-12",
+  },
+];
+
+export const INITIAL_YARN_DYEING_RATES: MMYarnDyeingRate[] = [
+  {
+    id: "ydr-1",
+    code: "YDR-001",
+    ydType: "Feeder Stripe",
+    colorShade: "Medium",
+    dyeingMethod: "Reactive",
+    processLoss: 3.0,
+    rate: 0.75,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-2",
+    code: "YDR-002",
+    ydType: "Feeder Stripe",
+    colorShade: "White",
+    dyeingMethod: "White Wash",
+    processLoss: 2.0,
+    rate: 0.60,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-3",
+    code: "YDR-003",
+    ydType: "Feeder Stripe",
+    colorShade: "Light",
+    dyeingMethod: "Reactive",
+    processLoss: 2.8,
+    rate: 0.70,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-4",
+    code: "YDR-004",
+    ydType: "Feeder Stripe",
+    colorShade: "Dark",
+    dyeingMethod: "Reactive",
+    processLoss: 3.5,
+    rate: 0.85,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-5",
+    code: "YDR-005",
+    ydType: "Feeder Stripe",
+    colorShade: "Extra Dark",
+    dyeingMethod: "Reactive",
+    processLoss: 4.0,
+    rate: 0.95,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-6",
+    code: "YDR-006",
+    ydType: "Engineering Stripe",
+    colorShade: "Medium",
+    dyeingMethod: "Reactive",
+    processLoss: 3.5,
+    rate: 0.95,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-7",
+    code: "YDR-007",
+    ydType: "Engineering Stripe",
+    colorShade: "Light",
+    dyeingMethod: "Reactive",
+    processLoss: 3.2,
+    rate: 0.90,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-8",
+    code: "YDR-008",
+    ydType: "Engineering Stripe",
+    colorShade: "Dark",
+    dyeingMethod: "Reactive",
+    processLoss: 4.0,
+    rate: 1.10,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-9",
+    code: "YDR-009",
+    ydType: "Engineering Stripe",
+    colorShade: "Extra Dark",
+    dyeingMethod: "Reactive",
+    processLoss: 4.5,
+    rate: 1.25,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-10",
+    code: "YDR-010",
+    ydType: "Feeder Stripe",
+    colorShade: "Medium",
+    dyeingMethod: "Dispersed",
+    processLoss: 3.5,
+    rate: 0.90,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-11",
+    code: "YDR-011",
+    ydType: "Feeder Stripe",
+    colorShade: "Medium",
+    dyeingMethod: "2 Part Dye",
+    processLoss: 4.0,
+    rate: 1.15,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
+  },
+  {
+    id: "ydr-12",
+    code: "YDR-012",
+    ydType: "Feeder Stripe",
+    colorShade: "Medium",
+    dyeingMethod: "Normal Wash",
+    processLoss: 2.0,
+    rate: 0.50,
+    status: "Active",
+    createdAt: "2026-10-14",
+    updatedAt: "2026-10-14",
   },
 ];
 
@@ -1482,6 +1664,7 @@ export const MM_MASTER_STORAGE_KEYS = {
   FABRIC_TYPE: "cripton_mm_master_fabric_type_v1",
   SPINNING_TYPE: "cripton_mm_master_spinning_type_v1",
   DYEING_RATE: "cripton_mm_master_dyeing_rate_v1",
+  YARN_DYEING_RATE: "cripton_mm_yarn_dyeing_rates_v1",
   KNITTING_RATE: "cripton_mm_master_knitting_rate_v1",
   YARN_COUNT: "cripton_mm_master_yarn_count_v1",
   YARN_RATE: "cripton_mm_master_yarn_rate_v1",
@@ -1628,6 +1811,14 @@ export class MMMasterDataRepository {
     this.set(MM_MASTER_STORAGE_KEYS.DYEING_RATE, list);
   }
 
+  // 4.1 Yarn Dyeing (Y/D) Rate
+  static getYarnDyeingRates(): MMYarnDyeingRate[] {
+    return this.get(MM_MASTER_STORAGE_KEYS.YARN_DYEING_RATE, INITIAL_YARN_DYEING_RATES);
+  }
+  static saveYarnDyeingRates(list: MMYarnDyeingRate[]): void {
+    this.set(MM_MASTER_STORAGE_KEYS.YARN_DYEING_RATE, list);
+  }
+
   // 5. Knitting Rate
   static getKnittingRates(): MMKnittingRate[] {
     return this.get(MM_MASTER_STORAGE_KEYS.KNITTING_RATE, INITIAL_KNITTING_RATES);
@@ -1652,3 +1843,37 @@ export class MMMasterDataRepository {
     this.set(MM_MASTER_STORAGE_KEYS.YARN_RATE, list);
   }
 }
+
+/**
+ * Helper to find matching Yarn Dyeing (Y/D) rate from master records.
+ * Matches by Y/D Type, Color Shade, and Dyeing Method (case-insensitive, normalized).
+ */
+export function findMatchingYarnDyeingRate(
+  rates: MMYarnDyeingRate[],
+  ydType: string,
+  colorShade: string,
+  dyeingMethod: string
+): MMYarnDyeingRate | undefined {
+  if (!rates || rates.length === 0) return undefined;
+
+  const tNorm = (ydType || "").trim().toLowerCase();
+  const sNorm = (colorShade || "").trim().toLowerCase();
+  const mNorm = (dyeingMethod || "").trim().toLowerCase();
+
+  const normalizeMethod = (m: string) => {
+    const l = m.toLowerCase().trim();
+    if (l === "white dyeing") return "white wash";
+    return l;
+  };
+
+  const normMethodVal = normalizeMethod(mNorm);
+
+  return rates.find((r) => {
+    if (r.status !== "Active") return false;
+    const rType = r.ydType.trim().toLowerCase();
+    const rShade = r.colorShade.trim().toLowerCase();
+    const rMethod = normalizeMethod(r.dyeingMethod);
+    return rType === tNorm && rShade === sNorm && rMethod === normMethodVal;
+  });
+}
+

@@ -33,6 +33,8 @@ import {
   MMYarnCount,
   MMDyeingRate,
   MMKnittingRate,
+  MMYarnDyeingRate,
+  findMatchingYarnDyeingRate,
   MMFabricSetupRecord,
   MMAopProcessRateRecord,
   MM_MASTER_STORAGE_KEYS,
@@ -195,7 +197,7 @@ export const YD_DYEING_METHODS = [
   "Dispersed",
   "2 Part Dye",
   "Normal Wash",
-  "White Dyeing",
+  "White Wash",
   "N/A",
 ] as const;
 
@@ -2128,6 +2130,7 @@ export function BuyerQuotationManager({
   const [masterSpinningTypes, setMasterSpinningTypes] = useState<MMSpinningType[]>(() => MMMasterDataRepository.getSpinningTypes());
   const [masterYarnCounts, setMasterYarnCounts] = useState<MMYarnCount[]>(() => MMMasterDataRepository.getYarnCounts());
   const [masterDyeingRates, setMasterDyeingRates] = useState<MMDyeingRate[]>(() => MMMasterDataRepository.getDyeingRates());
+  const [masterYarnDyeingRates, setMasterYarnDyeingRates] = useState<MMYarnDyeingRate[]>(() => MMMasterDataRepository.getYarnDyeingRates());
   const [masterKnittingRates, setMasterKnittingRates] = useState<MMKnittingRate[]>(() => MMMasterDataRepository.getKnittingRates());
   const [masterAopRates, setMasterAopRates] = useState<MMAopProcessRateRecord[]>(() => MMMasterDataRepository.getAopProcessRates());
 
@@ -2144,6 +2147,8 @@ export function BuyerQuotationManager({
         setMasterKnittingRates(MMMasterDataRepository.getKnittingRates());
       } else if (e.key === MM_MASTER_STORAGE_KEYS.DYEING_RATE) {
         setMasterDyeingRates(MMMasterDataRepository.getDyeingRates());
+      } else if (e.key === MM_MASTER_STORAGE_KEYS.YARN_DYEING_RATE) {
+        setMasterYarnDyeingRates(MMMasterDataRepository.getYarnDyeingRates());
       } else if (e.key === MM_MASTER_STORAGE_KEYS.AOP_PROCESS_RATE) {
         setMasterAopRates(MMMasterDataRepository.getAopProcessRates());
       }
@@ -3288,6 +3293,18 @@ export function BuyerQuotationManager({
         }
       }
 
+      // Auto-fill Yarn Dyeing rate/loss if Y/D Type, Color Shade, or Dyeing Method changed
+      if (field === "ydType" || field === "colorShade" || field === "dyeingMethod") {
+        const ydType = field === "ydType" ? value : (target.ydType || "Feeder Stripe");
+        const shade = field === "colorShade" ? value : (target.colorShade || "Medium");
+        const method = field === "dyeingMethod" ? value : (target.dyeingMethod || "Reactive");
+        const matchedYD = findMatchingYarnDyeingRate(masterYarnDyeingRates, ydType, shade, method);
+        if (matchedYD) {
+          target.ydRate = matchedYD.rate;
+          target.ydProcessLossPct = matchedYD.processLoss;
+        }
+      }
+
       // Auto-fill AOP rate/loss if AOP type changed
       if (field === "aopType") {
         const matchedAop = findMatchingAopRate(masterAopRates, value);
@@ -3353,6 +3370,13 @@ export function BuyerQuotationManager({
       row.dyeingMethod || "Reactive"
     );
 
+    const matchedYD = findMatchingYarnDyeingRate(
+      masterYarnDyeingRates,
+      row.ydType || "Feeder Stripe",
+      row.colorShade || "Medium",
+      row.dyeingMethod || "Reactive"
+    );
+
     const matchedAop = findMatchingAopRate(masterAopRates, row.aopType || "Reactive");
 
     const updatedRow: KnitFabricCostItemRow = {
@@ -3377,6 +3401,11 @@ export function BuyerQuotationManager({
     if (matchedDye) {
       updatedRow.dyeingProcessLossPct = matchedDye.processLoss;
       updatedRow.dyeingRate = matchedDye.rate;
+    }
+
+    if (matchedYD) {
+      updatedRow.ydProcessLossPct = matchedYD.processLoss;
+      updatedRow.ydRate = matchedYD.rate;
     }
 
     if (matchedAop) {
@@ -3414,6 +3443,18 @@ export function BuyerQuotationManager({
         if (matchedDye) {
           updated.dyeingProcessLossPct = matchedDye.processLoss;
           updated.dyeingRate = matchedDye.rate;
+        }
+      }
+
+      // Automatically update Yarn Dyeing Rate when Y/D Type, Color Shade or Dyeing Method changes
+      if (field === "ydType" || field === "colorShade" || field === "dyeingMethod") {
+        const currentYdType = field === "ydType" ? value : (updated.ydType || "Feeder Stripe");
+        const currentShade = field === "colorShade" ? value : (updated.colorShade || "Medium");
+        const currentMethod = field === "dyeingMethod" ? value : (updated.dyeingMethod || "Reactive");
+        const matchedYD = findMatchingYarnDyeingRate(masterYarnDyeingRates, currentYdType, currentShade, currentMethod);
+        if (matchedYD) {
+          updated.ydProcessLossPct = matchedYD.processLoss;
+          updated.ydRate = matchedYD.rate;
         }
       }
 
@@ -6534,6 +6575,13 @@ export function BuyerQuotationManager({
             tempRow.dyeingMethod || "Reactive"
           );
 
+          const matchedYD = findMatchingYarnDyeingRate(
+            masterYarnDyeingRates,
+            tempRow.ydType || "Feeder Stripe",
+            tempRow.colorShade || "Medium",
+            tempRow.dyeingMethod || "Reactive"
+          );
+
           const matchedAop = findMatchingAopRate(
             masterAopRates,
             tempRow.aopType || "Reactive"
@@ -6739,6 +6787,11 @@ export function BuyerQuotationManager({
                   <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                     Yarn Dyeing (Y/D) Process
                   </h4>
+                  {matchedYD ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                      ✓ Master: {matchedYD.code}
+                    </span>
+                  ) : null}
                 </div>
                 <span className="text-xs font-mono font-bold text-amber-700 dark:text-amber-300">
                   Y/D Cost: ${Number(tempRow.ydCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -6835,6 +6888,17 @@ export function BuyerQuotationManager({
                   </div>
                 </div>
               </div>
+              {!matchedYD && (
+                <div className="mt-3 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 flex items-start gap-2 text-amber-800 dark:text-amber-300 text-xs">
+                  <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                  <div>
+                    <p className="font-semibold text-[11px]">No Master Match</p>
+                    <p className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">
+                      No configured rate found for Y/D Type: <strong>&quot;{tempRow.ydType || 'Feeder Stripe'}&quot;</strong>, Color Shade: <strong>&quot;{tempRow.colorShade || 'Medium'}&quot;</strong> and Method: <strong>&quot;{tempRow.dyeingMethod || 'Reactive'}&quot;</strong>. Please configure it in Yarn Dyeing (Y/D) Rate Master.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           );
 

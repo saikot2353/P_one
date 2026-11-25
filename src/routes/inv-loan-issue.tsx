@@ -31,6 +31,7 @@ import {
   getStoredStockLoanIssues,
   saveStockLoanIssue,
   getStoredStockLoanRequisitions,
+  getInventoryItemValuation,
 } from "@/lib/inventory-stock-loan-data";
 import {
   DEFAULT_WAREHOUSES,
@@ -193,7 +194,9 @@ function StockLoanIssueFormPage() {
         const cat = catalogItems.find((c) => c.itemCode === it.itemCode);
         const availStock = cat?.maximumStock || it.availableStock || 1000;
         const qty = it.approvedQty ?? it.requiredQty;
-        const rate = it.estimatedUnitPrice || 100;
+        // Section 4: Retrieve Inventory Average Cost / Weighted Average Cost snapshot
+        const val = getInventoryItemValuation(it.itemCode, fromStore, fromCompany);
+        const rate = val.isAvailable ? val.rate : (it.estimatedUnitPrice || 0);
         return {
           id: `ict-row-${Date.now()}-${idx}`,
           sl: idx + 1,
@@ -208,6 +211,11 @@ function StockLoanIssueFormPage() {
           loanQty: qty,
           unitPrice: rate,
           totalValue: qty * rate,
+          issueAvgCostRate: rate,
+          totalLoanValue: qty * rate,
+          hasValidValuation: val.isAvailable && rate > 0,
+          valuationSource: val.source,
+          valuationSnapshotDate: val.asOfDate,
           batchAllocations: [{ batchNumber: `BAT-${it.itemCode.slice(-4)}-01`, quantity: qty }],
           locationAllocations: [{ locationName: "General Bay 1", quantity: qty }],
           remarks: it.remarks || `Against LR #${loadedRequisition.requisitionNumber}`,
@@ -232,7 +240,9 @@ function StockLoanIssueFormPage() {
         const cat = catalogItems.find((c) => c.itemCode === it.itemCode);
         const availStock = cat?.maximumStock || it.availableStock || 1000;
         const qty = it.approvedQty ?? it.requiredQty;
-        const rate = it.estimatedUnitPrice || 100;
+        // Section 4: Retrieve Inventory Average Cost / Weighted Average Cost snapshot
+        const val = getInventoryItemValuation(it.itemCode, fromStore, fromCompany);
+        const rate = val.isAvailable ? val.rate : (it.estimatedUnitPrice || 0);
         return {
           id: `ict-row-${Date.now()}-${idx}`,
           sl: idx + 1,
@@ -247,6 +257,11 @@ function StockLoanIssueFormPage() {
           loanQty: qty,
           unitPrice: rate,
           totalValue: qty * rate,
+          issueAvgCostRate: rate,
+          totalLoanValue: qty * rate,
+          hasValidValuation: val.isAvailable && rate > 0,
+          valuationSource: val.source,
+          valuationSnapshotDate: val.asOfDate,
           batchAllocations: [{ batchNumber: `BAT-${it.itemCode.slice(-4)}-01`, quantity: qty }],
           locationAllocations: [{ locationName: "General Bay 1", quantity: qty }],
           remarks: it.remarks || `Against LR #${loadedRequisition.requisitionNumber}`,
@@ -356,10 +371,12 @@ function StockLoanIssueFormPage() {
         if (row.id !== id) return row;
         if (field === "loanQty") {
           const num = Number(val) || 0;
+          const rate = row.issueAvgCostRate || row.unitPrice || 0;
           return {
             ...row,
             loanQty: num,
-            totalValue: num * row.unitPrice,
+            totalValue: num * rate,
+            totalLoanValue: num * rate,
           };
         }
         return { ...row, [field]: val };
@@ -397,6 +414,16 @@ function StockLoanIssueFormPage() {
       }
     });
 
+    // Section 4.3: Missing Stock Valuation Mandatory Check
+    const missingValuationItems = items.filter(
+      (it) => !it.issueAvgCostRate || it.issueAvgCostRate <= 0
+    );
+    if (missingValuationItems.length > 0) {
+      errs.push(
+        `Loan Issue cannot be completed because the stock valuation is unavailable for one or more items (${missingValuationItems.map((m) => `${m.itemName} [${m.itemCode}]`).join(", ")}). Please ensure that valid Average Cost / Weighted Average Cost is available for all items before proceeding.`
+      );
+    }
+
     return errs;
   }, [loanReason, reasonDetails, items]);
 
@@ -408,7 +435,7 @@ function StockLoanIssueFormPage() {
     }
 
     const payload: StockLoanIssue = {
-      id: existingLoan?.id || `ict-${Date.now()}`,
+      id: existingLoan?.id || `sli-${Date.now()}`,
       loanIssueId,
       loanId: loanIssueId,
       issueDate: loanDate,
@@ -416,6 +443,8 @@ function StockLoanIssueFormPage() {
       loanType,
       loanRequisitionNumber: taggedReqNumber || undefined,
       loanRequisitionId: taggedReqId || undefined,
+      borrowerName: requestedBy,
+      department: "Central Inventory & Materials Supply",
       loanReason,
       reasonDetails: loanReason === "Other" ? reasonDetails : undefined,
       remarks,
@@ -429,8 +458,18 @@ function StockLoanIssueFormPage() {
       totalLoanQty,
       totalValue: totalLoanValue,
       totalLoanValue,
+      totalPhysicalReturnValue: existingLoan?.totalPhysicalReturnValue || 0,
+      totalMonetaryRecovery: existingLoan?.totalMonetaryRecovery || 0,
+      outstandingBalance: existingLoan?.outstandingBalance ?? totalLoanValue,
+      settlementStatus: existingLoan?.settlementStatus || "Pending",
       status,
-      items,
+      items: items.map((it) => ({
+        ...it,
+        issueAvgCostRate: it.issueAvgCostRate || it.unitPrice || 0,
+        totalLoanValue: it.loanQty * (it.issueAvgCostRate || it.unitPrice || 0),
+        hasValidValuation: Boolean((it.issueAvgCostRate || it.unitPrice) && (it.issueAvgCostRate || it.unitPrice) > 0),
+        valuationSnapshotDate: it.valuationSnapshotDate || new Date().toISOString().slice(0, 10),
+      })),
       createdAt: existingLoan?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -808,6 +847,22 @@ function StockLoanIssueFormPage() {
               </div>
             </div>
 
+            {/* Section 4.1 Valuation Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Total Issued Items</span>
+                <span className="text-xl font-black text-slate-800 font-mono mt-0.5 block">{items.length} items</span>
+              </div>
+              <div className="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-200">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">Total Issue Quantity</span>
+                <span className="text-xl font-black text-indigo-900 font-mono mt-0.5 block">{totalLoanQty.toLocaleString()} units</span>
+              </div>
+              <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 block">Total Loan Value (Issue Valuation)</span>
+                <span className="text-xl font-black text-emerald-900 font-mono mt-0.5 block">৳{totalLoanValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+            </div>
+
             <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto max-h-[460px]">
                 <table className="w-full text-left border-collapse text-xs">
@@ -823,6 +878,12 @@ function StockLoanIssueFormPage() {
                       <th className="py-3 px-3 text-right w-32 bg-indigo-50/50 text-indigo-900 font-black">
                         Loan Qty *
                       </th>
+                      <th className="py-3 px-3 text-right w-32 bg-emerald-50/50 text-emerald-900 font-bold">
+                        Avg Cost Rate
+                      </th>
+                      <th className="py-3 px-3 text-right w-36 bg-emerald-50/50 text-emerald-900 font-black">
+                        Total Loan Value
+                      </th>
                       <th className="py-3 px-3 text-center w-28">Tracking (B/L)</th>
                       {!isViewMode && <th className="py-3 px-2 text-center w-12">Action</th>}
                     </tr>
@@ -830,7 +891,7 @@ function StockLoanIssueFormPage() {
                   <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                     {items.length === 0 ? (
                       <tr>
-                        <td colSpan={10} className="py-8 text-center text-slate-400">
+                        <td colSpan={12} className="py-8 text-center text-slate-400">
                           No items loaded for this loan requisition.
                         </td>
                       </tr>
@@ -915,6 +976,32 @@ function StockLoanIssueFormPage() {
                               )}
                             </td>
 
+                            {/* Avg Cost Rate (Issue-time snapshot) */}
+                            <td className="py-3 px-3 text-right">
+                              {row.issueAvgCostRate && row.issueAvgCostRate > 0 ? (
+                                <div>
+                                  <span className="font-mono font-bold text-slate-800 block">
+                                    ৳{row.issueAvgCostRate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  </span>
+                                  <span className="text-[9px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 inline-block mt-0.5" title={row.valuationSource || "Inventory Weighted Average Cost"}>
+                                    Snapshot
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                                  <AlertTriangle className="size-3" />
+                                  Rate Missing
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Total Loan Value */}
+                            <td className="py-3 px-3 text-right bg-emerald-50/20">
+                              <span className="font-mono font-black text-xs text-emerald-800">
+                                ৳{(row.loanQty * (row.issueAvgCostRate || row.unitPrice || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            </td>
+
                             {/* Tracking Cell (B / L) */}
                             <td className="py-3 px-3 text-center">
                               <ItemTrackingCell
@@ -951,7 +1038,7 @@ function StockLoanIssueFormPage() {
             {/* Table Bottom Summary */}
             <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 gap-3">
               <span className="text-xs font-semibold text-slate-500">
-                Loan Dispatch Totals
+                Loan Dispatch & Valuation Summary
               </span>
               <div className="flex items-center gap-6 text-xs">
                 <div>
@@ -962,6 +1049,12 @@ function StockLoanIssueFormPage() {
                   <span className="text-slate-500 font-medium">Total Loan Qty: </span>
                   <span className="font-bold text-indigo-700 font-mono">
                     {totalLoanQty.toLocaleString()} units
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Total Valuation: </span>
+                  <span className="font-black text-emerald-700 font-mono">
+                    ৳{totalLoanValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>

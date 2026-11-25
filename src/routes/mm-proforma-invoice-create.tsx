@@ -295,8 +295,9 @@ function MMProformaInvoiceCreatePage() {
 
     const loadedAccBookings = MMRepository.getAccessoriesBookings();
     const loadedManualBookings = MMRepository.getManualBookings();
+    const loadedBlockFabricBookings = MMRepository.getBlockFabricBookings();
     setAccBookings(loadedAccBookings);
-    setBlockBookings(loadedManualBookings);
+    setBlockBookings([...loadedManualBookings, ...loadedBlockFabricBookings]);
 
     const loadedPis = MMRepository.getPIs();
     setAllPis(loadedPis);
@@ -335,17 +336,19 @@ function MMProformaInvoiceCreatePage() {
         searchItem?.toLowerCase() === "yarn" ||
         searchSource?.toLowerCase() === "block-booking" ||
         searchSource?.toLowerCase() === "manual-booking" ||
+        searchSource?.toLowerCase() === "block-fabric-booking" ||
         firstId.startsWith("byb-") ||
         firstId.startsWith("mb-") ||
+        firstId.startsWith("bfb-") ||
         blockBookings.some((bb) => effectiveBookingIds.includes(bb.id) || effectiveBookingIds.includes(bb.bookingNo));
 
       if (isBlockBooking) {
-        const repoBlocks = MMRepository.getManualBookings();
+        const repoBlocks = [...MMRepository.getManualBookings(), ...MMRepository.getBlockFabricBookings()];
         const selectedList = repoBlocks.filter(
           (b) => effectiveBookingIds.includes(b.id) || effectiveBookingIds.includes(b.bookingNo)
         );
         if (selectedList.length === 0) {
-          setValidationError(`Source Block Booking(s) "${effectiveBookingIds.join(", ")}" not found in persisted Block Yarn Bookings.`);
+          setValidationError(`Source Block Booking(s) "${effectiveBookingIds.join(", ")}" not found in persisted Block Bookings.`);
           return;
         }
 
@@ -617,7 +620,14 @@ function MMProformaInvoiceCreatePage() {
       minute: "2-digit",
     });
 
-    // Enforce: One Block Yarn Booking can have only one PI
+    const isFabricBlock =
+      booking.bookType === "Block Fabric Booking" ||
+      booking.id.startsWith("bfb-") ||
+      booking.bookingNo.startsWith("BFB-") ||
+      searchSource === "block-fabric-booking";
+    const bookingTypeName = isFabricBlock ? "Block Fabric Booking" : "Block Yarn Booking";
+
+    // Enforce: One Block Booking can have only one PI
     const allExistingPis = MMRepository.getPIs();
     const existingPi = allExistingPis.find(
       (p) =>
@@ -631,7 +641,7 @@ function MMProformaInvoiceCreatePage() {
     );
     if (existingPi) {
       toast.info(
-        `Block Yarn Booking ${booking.bookingNo} is already linked to PI ${existingPi.piNo}. Loading existing record.`
+        `${bookingTypeName} ${booking.bookingNo} is already linked to PI ${existingPi.piNo}. Loading existing record.`
       );
       populateFormFromPI(existingPi);
       return;
@@ -643,7 +653,7 @@ function MMProformaInvoiceCreatePage() {
     setPiNumber(nextPiNo);
     setSource("Nominated");
     setItemCategory("Block Booking");
-    setSupplierName(booking.supplierName || "Square Textiles Ltd");
+    setSupplierName(booking.supplierName || (isFabricBlock ? "Pakiza Knitting & Dyeing Ltd" : "Square Textiles Ltd"));
     setMerchant("Tanvir Ahmed - Key Account Manager");
     setStatus("Draft");
     setBusinessUnit(booking.bookingUnit || "Unit 2 - Garments");
@@ -660,7 +670,7 @@ function MMProformaInvoiceCreatePage() {
     setBdtRate(booking.convRate && booking.convRate > 1 ? booking.convRate : 121.5);
     setUsdRate(1.0);
     setBblcNo(booking.piReference || "");
-    setNotes(`Proforma Invoice created from Block Yarn Booking ${booking.bookingNo}.`);
+    setNotes(`Proforma Invoice created from ${bookingTypeName} ${booking.bookingNo}.`);
 
     const attached: MMPIAllocatedBooking = {
       bookingId: booking.id,
@@ -669,7 +679,7 @@ function MMProformaInvoiceCreatePage() {
       orderNo: "",
       styleNo: "",
       allocatedAmount: booking.totalBookedAmount || 0,
-      bookingDesc: booking.bookingDesc || `Block Yarn Booking ${booking.bookingNo}`,
+      bookingDesc: booking.bookingDesc || `${bookingTypeName} ${booking.bookingNo}`,
       bookingDate: booking.bookingDate || new Date().toISOString().split("T")[0],
       deliveryMode: (booking.delMode || booking.deliveryMode || "Road") as any,
       deliveryDate: booking.deliveryDate || "",
@@ -2403,13 +2413,19 @@ function MMProformaInvoiceCreatePage() {
 
     MMRepository.savePI(piRecordToSave);
 
-    // Update piReference on any attached Manual Booking
+    // Update piReference on any attached Manual / Block Fabric Booking
     const currentManualBookings = MMRepository.getManualBookings();
+    const currentBlockFabricBookings = MMRepository.getBlockFabricBookings();
     attachedBookings.forEach((ab) => {
       const mb = currentManualBookings.find((m) => m.id === ab.bookingId || m.bookingNo === ab.bookingNo);
       if (mb) {
         mb.piReference = piRecordToSave.piNo;
         MMRepository.saveManualBooking(mb);
+      }
+      const bfb = currentBlockFabricBookings.find((m) => m.id === ab.bookingId || m.bookingNo === ab.bookingNo);
+      if (bfb) {
+        bfb.piReference = piRecordToSave.piNo;
+        MMRepository.saveBlockFabricBooking(bfb);
       }
     });
 
@@ -2552,13 +2568,19 @@ function MMProformaInvoiceCreatePage() {
 
     MMRepository.savePI(piRecordToSave);
 
-    // Update piReference on any attached Manual Booking
+    // Update piReference on any attached Manual / Block Fabric Booking
     const currentManualBookings = MMRepository.getManualBookings();
+    const currentBlockFabricBookings = MMRepository.getBlockFabricBookings();
     attachedBookings.forEach((ab) => {
       const mb = currentManualBookings.find((m) => m.id === ab.bookingId || m.bookingNo === ab.bookingNo);
       if (mb) {
         mb.piReference = piRecordToSave.piNo;
         MMRepository.saveManualBooking(mb);
+      }
+      const bfb = currentBlockFabricBookings.find((m) => m.id === ab.bookingId || m.bookingNo === ab.bookingNo);
+      if (bfb) {
+        bfb.piReference = piRecordToSave.piNo;
+        MMRepository.saveBlockFabricBooking(bfb);
       }
     });
 
@@ -2605,33 +2627,41 @@ function MMProformaInvoiceCreatePage() {
     });
   }, [allPis, listSearch, listStatusFilter, listDateFrom, listDateTo]);
 
-  return (
-    <MarketingMerchandisingLayout
-      activePath={
-        itemCategory === "Block Booking"
-          ? "/mm-manual-booking-register"
-          : itemCategory === "Accessories"
-          ? "/mm-accessories-booking"
-          : "/mm-fabric-booking"
-      }
-      breadcrumbs={[
-        { label: "Marketing & Merchandising" },
-        {
-          label:
-            itemCategory === "Block Booking"
+    const isFabricBlockBooking =
+      searchSource === "block-fabric-booking" ||
+      attachedBookings.some((ab) => ab.bookingNo?.startsWith("BFB-") || ab.bookingId?.startsWith("bfb-"));
+
+    return (
+      <MarketingMerchandisingLayout
+        activePath={
+          isFabricBlockBooking
+            ? "/mm-block-fabric-booking-register"
+            : itemCategory === "Block Booking"
+            ? "/mm-manual-booking-register"
+            : itemCategory === "Accessories"
+            ? "/mm-accessories-booking"
+            : "/mm-fabric-booking"
+        }
+        breadcrumbs={[
+          { label: "Marketing & Merchandising" },
+          {
+            label: isFabricBlockBooking
+              ? "Block Fabric Booking"
+              : itemCategory === "Block Booking"
               ? "Block Yarn Booking"
               : itemCategory === "Accessories"
               ? "Accessories Booking"
               : "Fabric Booking",
-          to:
-            itemCategory === "Block Booking"
+            to: isFabricBlockBooking
+              ? "/mm-block-fabric-booking-register"
+              : itemCategory === "Block Booking"
               ? "/mm-manual-booking-register"
               : itemCategory === "Accessories"
               ? "/mm-accessories-booking"
               : "/mm-fabric-booking",
-        },
-        { label: "Proforma Invoice Entry Form" },
-      ]}
+          },
+          { label: "Proforma Invoice Entry Form" },
+        ]}
       title="Proforma Invoice Entry Form"
       actions={
         <div className="flex items-center gap-2">

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/mm-pre-costing")({
   }),
   head: () => ({
     meta: [
-      { title: "Style Pre-Costing Management — CriptonHRIS" },
+      { title: "Style Pre-Costing (Woven) — CriptonHRIS" },
       {
         name: "description",
         content:
@@ -46,30 +46,38 @@ function MMPreCostingPage() {
       ? "/mm-pre-costing?tab=compare"
       : "/mm-pre-costing";
 
+  const pageTitle =
+    activeTab === "create"
+      ? "Pre Costing Entry (Woven)"
+      : activeTab === "report"
+      ? "Pre-Cost Sheet Report"
+      : activeTab === "compare"
+      ? "Pre Costing Comparison"
+      : "Pre Costing Register (Woven)";
+
   return (
     <MarketingMerchandisingLayout
       activePath={activePath}
       breadcrumbs={[
         { label: "Marketing & Merchandising", to: "/mm-dashboard" },
         { label: "Style Pre-Costing", to: "/mm-pre-costing" },
-        {
-          label:
-            activeTab === "create"
-              ? "Pre Costing Entry"
-              : activeTab === "compare"
-              ? "Amendment & Comparison"
-              : "Pre-Costing Register",
-        },
+        { label: pageTitle },
       ]}
-      title="Style Pre-Costing Management"
+      title={pageTitle}
       subtitle="Style-wise item-level pre-costing, multiple PO entry, revision amendments, side-by-side version comparison & printable reports"
     >
       <PreCostingManager
         initialTab={activeTab}
-        onTabChange={(newTab) => {
+        initialRecordId={searchParams.id}
+        onTabChange={(newTab, recId) => {
           navigate({
             to: "/mm-pre-costing",
-            search: newTab === "register" ? {} : { tab: newTab },
+            search:
+              newTab === "register"
+                ? {}
+                : recId
+                ? { tab: newTab, id: recId }
+                : { tab: newTab },
           });
         }}
       />

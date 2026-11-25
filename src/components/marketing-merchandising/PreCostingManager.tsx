@@ -5,7 +5,9 @@ import {
   FileSpreadsheet, GitBranch, History, Check, ShieldCheck,
   Send, RotateCcw, AlertTriangle, Layers, Trash2, ArrowRight,
   Upload, Paperclip, File, Image as ImageIcon, Info, ExternalLink,
-  Scissors
+  Scissors, DollarSign, Percent, Sparkles, Disc, RefreshCw, Hash,
+  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Tag, BookmarkCheck, Link2,
+  Palette, Activity, Droplets, Sliders
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -13,6 +15,7 @@ import {
   MM_MERCHANTS_MASTER,
   MMRepository,
   MMPreCostPO,
+  MMPreCostPOColorRow,
   MMPreCostItem,
   MMPreCostVersionSnapshot,
   MMPreCostAuditEntry,
@@ -21,13 +24,39 @@ import {
   MMFabricMasterItem,
   MMAccessoriesMasterItem,
   ApprovalStatus,
+  MMYarnBookingTagRecord,
 } from "../../lib/marketing-merchandising-data";
+import {
+  PurchaseRequisition,
+  PRItem,
+  getStoredPurchaseRequisitions,
+  setStoredPurchaseRequisitions,
+} from "../../lib/procurement-requisition-data";
+import {
+  MMMasterDataRepository,
+  MMFabricComposition,
+  MMFabricType,
+  MMSpinningType,
+  MMYarnCount,
+  MMDyeingRate,
+  MMKnittingRate,
+  MMYarnDyeingRate,
+  findMatchingYarnDyeingRate,
+  MMFabricSetupRecord,
+  MMAopProcessRateRecord,
+  MM_MASTER_STORAGE_KEYS,
+  MMYarnRateWeeklyRecord,
+  PREDEFINED_YARN_COMPOSITIONS,
+} from "../../lib/merchandising-master-data";
 import { SearchableSelect } from "../ui/searchable-select";
+import { PreCostingReport } from "./PreCostingReport";
 
 export interface PreCostingManagerProps {
   initialTab?: "register" | "create" | "compare" | "report";
-  onTabChange?: (tab: "register" | "create" | "compare" | "report") => void;
+  initialRecordId?: string;
+  onTabChange?: (tab: "register" | "create" | "compare" | "report", recordId?: string) => void;
 }
+export type PreCostingKnitManagerProps = PreCostingManagerProps;
 
 // ── Models & Interfaces ──────────────────────────────────────────
 export interface PreCostingItemRow {
@@ -44,6 +73,7 @@ export interface PreCostingItemRow {
   supplier: string;
   effectedQty: number;
   consumption: number;
+  wastagePct?: number;
   unit: string;
   requiredQty: number;
   finalQty: number;
@@ -52,10 +82,280 @@ export interface PreCostingItemRow {
   preCostPct?: number;
 }
 
+// ── Knit Pre-Costing Specialized Models (from Knit Fabric Pre cost Excel) ─
+export interface KnitFabricEntryData {
+  fabricComposition: string;
+  composition?: string;
+  fabricType: string;
+  gsm: number | string;
+  spinningType: string;
+  feederType?: string;
+  washType?: string;
+  finishType?: string;
+  otherSpecs: string;
+  fabricCategory: string;
+}
+
+export interface KnitYarnDetailRow {
+  id: string;
+  sl?: number;
+  grade: "A" | "B" | "Grade A" | "Grade B" | string;
+  colorType?: "Solid" | "Y/D" | string;
+  yarnCount: string;
+  yarnComposition: string;
+  spinningType?: string;
+  yarnItem: string;
+  ratioPct: number;
+  finalQtyKg: number;
+  ratePerKg: number;
+  masterRatePerKg?: number;
+  yarnCost: number;
+  brand: string;
+  vendor?: string;
+  bookingTag?: MMYarnBookingTagRecord;
+}
+
+export interface YarnBookingAllocationRowState {
+  id: string;
+  blockBookingNo: string;
+  blockBookingId?: string;
+  yarnItemId: string;
+  yarnItemName: string;
+  supplierName?: string;
+  availableBalance: number;
+  tagQtyKg: number;
+  remainingBalance: number;
+}
+
+export interface KnitFabricCostItemRow {
+  id: string;
+  sl: number;
+  head: string;
+  item: string;
+  uom?: "KG" | "YDS" | string;
+  effectedQtyPcs: number;
+  effectedQtyDz?: number;
+  consumptionKgDz: number;
+  estimatedFinishQty: number;
+  rmgProcessLossPct: number;
+  requiredFinishedQty: number;
+  // Fabric Source & Color Type
+  fabricSource?: string;
+  colorType?: string;
+  // Fabric Master Specification references
+  fabricSetupId?: string;
+  fabricComposition?: string;
+  fabricType?: string;
+  gsm?: number;
+  spinningType?: string;
+  feederType?: string;
+  washType?: string;
+  finishType?: string;
+  otherSpecs?: string;
+  fabricCategory?: string;
+  // Dyeing
+  colorShade: string;
+  dyeingMethod: string;
+  dyeingProcessLossPct: number;
+  dyeingRate: number;
+  masterDyeingRate?: number;
+  dyeingCost: number;
+  requiredGreigeQty: number;
+  // Knitting
+  knittingProcessLossPct: number;
+  requiredYarnKg: number;
+  knittingRate: number;
+  masterKnittingRate?: number;
+  knittingCost: number;
+  // Yarn Dyeing
+  ydType?: string;
+  ydProcessLossPct?: number;
+  requiredDyedYarnKg?: number;
+  ydRate?: number;
+  masterYdRate?: number;
+  ydCost?: number;
+  // AOP
+  aopType?: string;
+  aopProcessLossPct?: number;
+  requiredDyedQty?: number;
+  aopRate?: number;
+  masterAopRate?: number;
+  aopCost?: number;
+  // Finishing
+  washingRate?: number;
+  washingCost?: number;
+  finishingRate?: number;
+  finishingCost?: number;
+  // Cost Totals
+  yarnCost: number;
+  totalYarnCost?: number;
+  totalAmount: number;
+  yarnDetails: KnitYarnDetailRow[];
+}
+
+export const KNIT_FABRIC_SOURCES = [
+  "Production",
+  "Grey Purchase",
+  "Finish Purchase",
+  "Buyer Supplied",
+  "Stock",
+] as const;
+
+export const KNIT_COLOR_TYPES = [
+  "Solid",
+  "AOP",
+  "Y/D",
+  "N/A",
+] as const;
+
+export const YD_TYPES = [
+  "Feeder Stripe",
+  "Engineering Stripe",
+] as const;
+
+export const YD_DYEING_METHODS = [
+  "Reactive",
+  "Dispersed",
+  "2 Part Dye",
+  "Normal Wash",
+  "White Wash",
+  "N/A",
+] as const;
+
+export const AOP_TYPES = [
+  "Reactive",
+  "Digital",
+  "Flock",
+  "Discharge",
+  "Pigment",
+  "Burn Out",
+  "Glitter",
+  "Foil",
+  "Puff Print",
+] as const;
+
+export interface KnitOtherCostRow {
+  id: string;
+  sl: number;
+  head?: string;
+  costHead?: string;
+  description: string;
+  supplier?: string;
+  quantity?: number;
+  currency?: string;
+  calcBasis: "Percentage of Order Value" | "Per Piece" | "Per Dozen" | "Fixed Lump Sum" | string;
+  basisValue: number;
+  rateOrPct?: number;
+  costPercent?: number;
+  gmtQty?: number;
+  qtyInDz?: number;
+  unitRateDz?: number;
+  amount: number;
+}
+
+export const FABRIC_CATEGORIES = [
+  "Knit Fabric",
+  "Woven Fabric",
+] as const;
+
+export const COLOR_SHADES = [
+  "Medium",
+  "White",
+  "Light",
+  "Dark",
+  "Extra Dark",
+] as const;
+
+export const DYEING_METHODS = [
+  "Reactive",
+  "Dispersed",
+  "2 Part Dye",
+  "Normal Wash",
+  "White Dyeing",
+  "N/A",
+] as const;
+
+export const YARN_GRADES = ["A", "B"] as const;
+export const YARN_COLOR_TYPES = ["Solid", "Y/D"] as const;
+
+export const OTHER_COST_HEADS = [
+  "Testing Cost",
+  "Courier Cost",
+  "Freight Cost",
+  "Inspection Cost",
+] as const;
+
+export const EMBELLISHMENT_COST_HEADS = [
+  "Print",
+  "Embroidery",
+  "GMT Wash",
+] as const;
+
+export const EMBELLISHMENT_SOURCES = [
+  "In-house",
+  "Sub-Contract",
+] as const;
+
+export const KNIT_SPINNING_TYPES = [
+  "Slub",
+  "N/A",
+  "Carded",
+  "Filament",
+  "Ring",
+  "Rotor",
+  "Vortex",
+  "Airjet",
+] as const;
+
+export const KNIT_FEEDER_TYPES = [
+  "Half Feeder",
+  "Full Feeder",
+  "",
+] as const;
+
+export const KNIT_WASH_TYPES = [
+  "Acid Wash",
+  "Stone Wash",
+  "Enzyme Wash",
+  "Panel Wash",
+  "Hydrophilic Softener Wash",
+] as const;
+
+export const KNIT_FINISH_TYPES = [
+  "Heatset Finish",
+  "Brush Finish",
+  "Peach Finish",
+  "Peach-Brush Finish",
+  "Shearing Finish",
+  "Moisture Wicking Finish",
+  "Teflon Finish",
+] as const;
+
+export interface KnitEmbellishmentCostRow {
+  id: string;
+  sl: number;
+  costHead: "Print" | "Embroidery" | "GMT Wash" | string;
+  description: string;
+  source: "In-house" | "Sub-Contract" | string;
+  gmtQty: number;
+  qtyInDz: number;
+  unitRateDz: number;
+  amount: number;
+}
+
+export const CALC_BASIS_OPTIONS = [
+  "Percentage of Order Value",
+  "Per Piece",
+  "Per Dozen",
+  "Fixed Lump Sum",
+] as const;
+
 export interface PreCostingRecord {
   id: string;
   preCostId: string; // e.g. JOB-2026-0001
   preCostNo: string; // e.g. 26918
+  gmtItem?: string;
+  category?: string;
   preCostDate: string;
   contractNo?: string;
   ourRef?: string;
@@ -66,14 +366,30 @@ export interface PreCostingRecord {
   styleDescription: string;
   season: string;
   currency: string;
+  consumptionUnit?: "PCS" | "DZ";
   smv: number;
   cpm: number;
   efficiencyPct: number;
+  cmDz?: number;
   note: string;
+  // Overheads & Commercial Basis (Section 1)
+  commissionPct?: number;
+  commissionValue?: number;
+  financialPct?: number;
+  financialValue?: number;
+  samplingPct?: number;
+  samplingValue?: number;
+  commercialPct?: number;
+  commercialValue?: number;
   // Multiple Purchase Orders
   poRows: MMPreCostPO[];
   // Item-wise costing details
   items: PreCostingItemRow[];
+  fabricEntry?: KnitFabricEntryData;
+  knitFabricItems?: KnitFabricCostItemRow[];
+  accessoriesItems?: PreCostingItemRow[];
+  embellishmentItems?: KnitEmbellishmentCostRow[];
+  otherCostItems?: KnitOtherCostRow[];
   // Attachments (Documents & Images)
   attachments?: MMPreCostAttachmentRecord[];
   // Status & Workflow
@@ -129,8 +445,50 @@ export const FABRIC_HEADS = [
 export const ACCESSORIES_HEADS = [
   "Sewing Trims",
   "Finishing Trims",
-  "Wash",
 ];
+export const ACCESSORY_HEADS = ACCESSORIES_HEADS;
+
+// Conditional item lists per Head
+export const SEWING_TRIMS_ITEMS = [
+  "Sewing Thread",
+  "Main Label",
+  "Size Label",
+  "Zipper",
+  "Button",
+  "Elastic",
+  "Drawstring",
+  "Fusing",
+  "Interlining",
+] as const;
+
+export const FINISHING_TRIMS_ITEMS = [
+  "Carton",
+  "Single Poly",
+  "Blister Poly",
+  "Hang Tag",
+  "Price Tag",
+  "Barcode Sticker",
+  "Tissue Paper",
+] as const;
+
+export const ACCESSORY_ITEM_DEFAULTS: Record<string, { unit: string; description: string; defaultRate: number }> = {
+  "Sewing Thread": { unit: "Cone", description: "100% Spun Polyester Sewing Thread", defaultRate: 0.15 },
+  "Main Label": { unit: "Pcs", description: "Woven Main Brand Neck Label", defaultRate: 0.045 },
+  "Size Label": { unit: "Pcs", description: "Woven / Printed Size Label", defaultRate: 0.02 },
+  "Zipper": { unit: "Pcs", description: "Nylon / Metal Zipper with Puller", defaultRate: 0.28 },
+  "Button": { unit: "Pcs", description: "4-Hole Pearl Garment Button", defaultRate: 0.015 },
+  "Elastic": { unit: "Yds", description: "Woven / Braided Elastic Tape", defaultRate: 0.18 },
+  "Drawstring": { unit: "Yds", description: "Braided Cotton Drawcord", defaultRate: 0.12 },
+  "Fusing": { unit: "Yds", description: "Collar & Placket Fusible Interlining", defaultRate: 0.35 },
+  "Interlining": { unit: "Yds", description: "Fusible Microdot Interlining", defaultRate: 0.45 },
+  "Carton": { unit: "Carton", description: "7-Ply Export Master Carton", defaultRate: 1.65 },
+  "Single Poly": { unit: "Pcs", description: "Self-Adhesive Transparent Poly Bag", defaultRate: 0.035 },
+  "Blister Poly": { unit: "Pcs", description: "Master Blister Pack Poly Bag", defaultRate: 0.075 },
+  "Hang Tag": { unit: "Pcs", description: "FSC Certified Recycled Hang Tag", defaultRate: 0.065 },
+  "Price Tag": { unit: "Pcs", description: "Barcode / Retail Price Ticket", defaultRate: 0.025 },
+  "Barcode Sticker": { unit: "Pcs", description: "Thermal Printed Barcode Sticker", defaultRate: 0.015 },
+  "Tissue Paper": { unit: "Pkt", description: "Acid-Free Interleaving Tissue Paper", defaultRate: 0.02 },
+};
 
 // Exact two selectable values for N. Status
 export const NOMINEE_STATUSES = [
@@ -138,7 +496,435 @@ export const NOMINEE_STATUSES = [
   "Own Source",
 ] as const;
 
+export const GMT_ITEM_OPTIONS = [
+  "Basic T-Shirt",
+  "T-Shirt",
+  "Polo Shirt",
+  "Shirt",
+  "Formal Shirt",
+  "Casual Shirt",
+  "Trouser",
+  "Denim Pant / Jeans",
+  "Shorts",
+  "Jogger",
+  "Sweatshirt",
+  "Hoodie",
+  "Jacket",
+  "Blazer",
+  "Waistcoat",
+  "Vest",
+  "Tank Top",
+  "Top",
+  "Tunic",
+  "Leggings",
+  "Skirt",
+  "Dress",
+  "Nightwear",
+  "Pajama Set",
+  "Baby Romper",
+  "Baby Bodysuit",
+  "Kids T-Shirt",
+  "Kids Shorts",
+  "Sportswear",
+  "Tracksuit",
+  "Activewear",
+] as const;
+
+export const GMT_CATEGORY_OPTIONS = [
+  "Men",
+  "Women",
+  "Kids",
+  "Boys",
+  "Girls",
+  "Baby",
+  "Infant",
+  "Unisex",
+  "Men's Plus Size",
+  "Women's Plus Size",
+  "Maternity",
+  "Newborn",
+] as const;
+
+// ── Persistent Storage Helpers & Compression for Images & Attachments ─
+export function isQuotaExceededError(err: unknown): boolean {
+  if (!err) return false;
+  if (err instanceof DOMException) {
+    return (
+      err.code === 22 ||
+      err.code === 1014 ||
+      err.name === "QuotaExceededError" ||
+      err.name === "NS_ERROR_DOM_QUOTA_REACHED"
+    );
+  }
+  const str = String(err).toLowerCase();
+  return str.includes("quota") || str.includes("storage");
+}
+
+export function formatByteSize(bytes: number): string {
+  if (bytes <= 0) return "0 KB";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+/**
+ * Compresses an image file client-side using HTML5 Canvas.
+ * Shrinks multi-megabyte photos down to lightweight ~30-60 KB data URLs
+ * preventing LocalStorage QuotaExceededError while keeping crisp display quality.
+ */
+export async function compressImageFile(
+  file: File,
+  maxWidth = 1024,
+  maxHeight = 1024,
+  quality = 0.72
+): Promise<{ dataUrl: string; sizeBytes: number; sizeFormatted: string }> {
+  return new Promise((resolve) => {
+    // If not an image or is SVG, read directly as data URL
+    if (!file.type.startsWith("image/") || file.type === "image/svg+xml") {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        resolve({
+          dataUrl,
+          sizeBytes: file.size,
+          sizeFormatted: formatByteSize(file.size),
+        });
+      };
+      reader.onerror = () => {
+        resolve({ dataUrl: "", sizeBytes: 0, sizeFormatted: "0 KB" });
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth || height > maxHeight) {
+        if (width / height > maxWidth / maxHeight) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        } else {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, width);
+      canvas.height = Math.max(1, height);
+      const ctx = canvas.getContext("2d");
+
+      if (!ctx) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          resolve({
+            dataUrl,
+            sizeBytes: file.size,
+            sizeFormatted: formatByteSize(file.size),
+          });
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      // Draw with white background for transparency handling in JPEG
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Export as JPEG with controlled quality
+      let dataUrl = canvas.toDataURL("image/jpeg", quality);
+      let sizeBytes = Math.round((dataUrl.length * 3) / 4);
+
+      // If still larger than 120 KB, do a second compression pass at 800px / 0.6 quality
+      if (sizeBytes > 120 * 1024) {
+        const canvas2 = document.createElement("canvas");
+        const scale = Math.min(1, 800 / Math.max(width, height));
+        const w2 = Math.max(1, Math.round(width * scale));
+        const h2 = Math.max(1, Math.round(height * scale));
+        canvas2.width = w2;
+        canvas2.height = h2;
+        const ctx2 = canvas2.getContext("2d");
+        if (ctx2) {
+          ctx2.fillStyle = "#FFFFFF";
+          ctx2.fillRect(0, 0, w2, h2);
+          ctx2.drawImage(canvas, 0, 0, w2, h2);
+          dataUrl = canvas2.toDataURL("image/jpeg", 0.6);
+          sizeBytes = Math.round((dataUrl.length * 3) / 4);
+        }
+      }
+
+      resolve({
+        dataUrl,
+        sizeBytes,
+        sizeFormatted: formatByteSize(sizeBytes),
+      });
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        resolve({
+          dataUrl,
+          sizeBytes: file.size,
+          sizeFormatted: formatByteSize(file.size),
+        });
+      };
+      reader.onerror = () => resolve({ dataUrl: "", sizeBytes: 0, sizeFormatted: "0 KB" });
+      reader.readAsDataURL(file);
+    };
+
+    img.src = objectUrl;
+  });
+}
+
+/**
+ * Safely persists the full master records list to Local Storage.
+ * If quota is constrained, prunes embedded dataUrls on older inactive records
+ * (which remain securely preserved in their own dedicated keys) to ensure zero write failure.
+ */
+export function safeSaveMasterRecords(list: PreCostingRecord[]): { success: boolean; error?: string } {
+  if (typeof window === "undefined") return { success: false };
+  try {
+    localStorage.setItem("cripton_pre_costings_general_master_v1", JSON.stringify(list));
+    return { success: true };
+  } catch (err: any) {
+    if (isQuotaExceededError(err)) {
+      console.warn("Storage quota exceeded on master list. Pruning duplicate embedded dataUrls from non-active records...");
+      try {
+        const pruned = list.map((rec, index) => {
+          if (index === 0) return rec; // keep active record intact
+          if (!Array.isArray(rec.attachments)) return rec;
+          return {
+            ...rec,
+            attachments: rec.attachments.map((att) => ({
+              ...att,
+              dataUrl: att.dataUrl ? att.dataUrl.substring(0, 80) + "..." : undefined,
+            })),
+          };
+        });
+        localStorage.setItem("cripton_pre_costings_general_master_v1", JSON.stringify(pruned));
+        return { success: true };
+      } catch (err2: any) {
+        return {
+          success: false,
+          error: "Browser Local Storage quota (5 MB) exceeded. Please delete unused drafts or style images.",
+        };
+      }
+    }
+    return { success: false, error: err?.message || "Storage error" };
+  }
+}
+
+export function getStoredAttachmentsForRecord(recordId?: string, preCostId?: string): MMPreCostAttachmentRecord[] {
+  if (typeof window === "undefined") return [];
+  const map = new Map<string, MMPreCostAttachmentRecord>();
+
+  const ingest = (item: MMPreCostAttachmentRecord) => {
+    if (!item || !item.id) return;
+    const existing = map.get(item.id);
+    if (!existing) {
+      map.set(item.id, item);
+    } else if (!existing.dataUrl && item.dataUrl) {
+      map.set(item.id, item);
+    }
+  };
+
+  try {
+    // 1. Dedicated storage by recordId
+    if (recordId) {
+      const byRec = localStorage.getItem(`cripton_pre_costing_general_images_${recordId}`);
+      if (byRec) {
+        const parsed = JSON.parse(byRec);
+        if (Array.isArray(parsed)) parsed.forEach(ingest);
+      }
+    }
+    // 2. Dedicated storage by preCostId
+    if (preCostId) {
+      const byJob = localStorage.getItem(`cripton_pre_costing_general_images_${preCostId}`);
+      if (byJob) {
+        const parsed = JSON.parse(byJob);
+        if (Array.isArray(parsed)) parsed.forEach(ingest);
+      }
+    }
+    // 3. Master records list
+    const stored = localStorage.getItem("cripton_pre_costings_general_master_v1");
+    if (stored) {
+      const list: PreCostingRecord[] = JSON.parse(stored);
+      if (Array.isArray(list)) {
+        const match = list.find((x) => (recordId && x.id === recordId) || (preCostId && x.preCostId === preCostId));
+        if (match && Array.isArray(match.attachments)) {
+          match.attachments.forEach(ingest);
+        }
+      }
+    }
+    // 4. MMRepository library
+    if (preCostId) {
+      const repoAtts = MMRepository.getPreCostingAttachments(preCostId);
+      if (Array.isArray(repoAtts)) repoAtts.forEach(ingest);
+    }
+  } catch (e) {
+    console.error("Failed to load stored attachments:", e);
+  }
+
+  return Array.from(map.values());
+}
+
+export function saveStoredAttachmentsForRecord(
+  recordId: string,
+  preCostId: string,
+  attachments: MMPreCostAttachmentRecord[]
+): { success: boolean; error?: string } {
+  if (typeof window === "undefined") return { success: false };
+
+  let quotaErrorOccurred = false;
+
+  // 1. Primary dedicated key by recordId
+  if (recordId) {
+    try {
+      localStorage.setItem(`cripton_pre_costing_general_images_${recordId}`, JSON.stringify(attachments));
+    } catch (e: any) {
+      if (isQuotaExceededError(e)) {
+        quotaErrorOccurred = true;
+      }
+    }
+  }
+
+  // 2. Secondary alias key by preCostId (only if different from recordId)
+  if (preCostId && preCostId !== recordId) {
+    try {
+      localStorage.setItem(`cripton_pre_costing_general_images_${preCostId}`, JSON.stringify(attachments));
+    } catch (e: any) {
+      if (isQuotaExceededError(e)) {
+        quotaErrorOccurred = true;
+      }
+    }
+  }
+
+  // 3. Keep index of image keys in localStorage
+  try {
+    const rawIdx = localStorage.getItem("cripton_pre_costing_general_image_index_v1");
+    const idxList: string[] = rawIdx ? JSON.parse(rawIdx) : [];
+    const set = new Set(idxList);
+    if (recordId) set.add(recordId);
+    if (preCostId) set.add(preCostId);
+    localStorage.setItem("cripton_pre_costing_general_image_index_v1", JSON.stringify(Array.from(set)));
+  } catch {}
+
+  // 4. Merge into MMRepository PreCosting Attachments library
+  try {
+    const currentRepo = MMRepository.getPreCostingAttachments();
+    const otherAtts = currentRepo.filter((a) => a.preCostId !== preCostId && a.preCostId !== recordId);
+    MMRepository.savePreCostingAttachments([...attachments, ...otherAtts]);
+  } catch (e: any) {
+    if (isQuotaExceededError(e)) {
+      quotaErrorOccurred = true;
+    }
+  }
+
+  if (quotaErrorOccurred) {
+    return {
+      success: false,
+      error: "Local Storage quota reached. Some image data could not be saved to browser storage. Please remove unused images or drafts.",
+    };
+  }
+
+  return { success: true };
+}
+
+export const FABRIC_UOM_OPTIONS = ["KG", "YDS"] as const;
+
+export const ACCESSORY_UOM_OPTIONS = [
+  "Pcs",
+  "Dzn",
+  "Gross",
+  "Cone",
+  "Yds",
+  "Mtr",
+  "Roll",
+  "Set",
+  "Thousand",
+  "Box",
+  "Pkt",
+  "Carton",
+  "Lbs",
+  "Kg",
+] as const;
+
+export const isFinishingTrimItem = (item: { itemName?: string; category?: string; description?: string }): boolean => {
+  const cat = (item.category || "").toLowerCase();
+  const name = (item.itemName || "").toLowerCase();
+  const desc = (item.description || "").toLowerCase();
+  const text = `${cat} ${name} ${desc}`;
+  if (cat.includes("finish")) return true;
+  return (
+    text.includes("carton") ||
+    text.includes("poly") ||
+    text.includes("blister") ||
+    text.includes("hang tag") ||
+    text.includes("hangtag") ||
+    text.includes("label") ||
+    text.includes("sticker") ||
+    text.includes("tissue") ||
+    text.includes("silica") ||
+    text.includes("desiccant") ||
+    text.includes("backboard") ||
+    text.includes("back board") ||
+    text.includes("collar stay") ||
+    text.includes("butterfly") ||
+    text.includes("gum tape") ||
+    text.includes("price ticket")
+  );
+};
+
 const UOM_OPTIONS = ["Kg", "Pcs", "Dzn", "Yards", "Mtr", "Cone", "Gross", "Set"];
+
+export const STANDARD_GARMENT_COLORS = [
+  "Black",
+  "White",
+  "Off White",
+  "Navy Blue",
+  "Heather Grey",
+  "Melange Grey",
+  "Royal Blue",
+  "Red",
+  "Burgundy",
+  "Maroon",
+  "Charcoal",
+  "Charcoal Grey",
+  "Olive Green",
+  "Bottle Green",
+  "Military Green",
+  "Forest Green",
+  "Khaki",
+  "Beige",
+  "Camel",
+  "Dusty Rose",
+  "Pink",
+  "Coral",
+  "Yellow",
+  "Mustard",
+  "Sky Blue",
+  "Teal",
+  "Turquoise",
+  "Lavender",
+  "Purple",
+  "Orange",
+  "Brown",
+  "Rust",
+  "Mint Green",
+  "Verdant Green",
+  "Dark Chocolate",
+  "Anthracite",
+];
 
 const DEFAULT_SUPPLIERS = [
   "Pakiza Knitting & Dyeing Ltd",
@@ -148,32 +934,878 @@ const DEFAULT_SUPPLIERS = [
   "Avery Dennison BD",
   "Coats Bangladesh Ltd",
   "YKK Bangladesh Ltd",
+  "Ha-Meem Textile Mills",
+  "Noman Weaving Mills",
+  "Square Textiles Ltd.",
+  "BEXIMCO Textiles Ltd.",
+  "Envoy Textiles Ltd.",
+  "KDS Accessories Ltd.",
+  "Montrims Ltd.",
+  "SGS Bangladesh Ltd.",
+  "Intertek Bangladesh",
+  "Bureau Veritas Bangladesh",
   "Local Sourced Vendor",
 ];
 
-// ── Reference Baseline Sample Data ───────────────────────────────
+// ── Master Rate Matching Utilities ──────────────────────────────
+export function findMatchingKnittingRate(
+  rates: MMKnittingRate[],
+  fabricTypes: MMFabricType[],
+  fabricType: string,
+  colorType: string,
+  feederType: string
+): MMKnittingRate | undefined {
+  if (!fabricType) return undefined;
+  const ftObj = fabricTypes.find(
+    (ft) =>
+      ft.name.toLowerCase() === fabricType.toLowerCase() ||
+      ft.id.toLowerCase() === fabricType.toLowerCase()
+  );
+
+  return rates.find((kr) => {
+    // 1. Match Fabric Type
+    const matchesFabric =
+      (kr.fabricTypeName && kr.fabricTypeName.toLowerCase() === fabricType.toLowerCase()) ||
+      (ftObj && kr.fabricTypeId === ftObj.id) ||
+      kr.fabricTypeId?.toLowerCase() === fabricType.toLowerCase();
+
+    // 2. Match Color Type (Solid or Y/D)
+    const normKrColor = (kr.colorType || "Solid").trim().toLowerCase();
+    const normTargetColor = (colorType || "Solid").trim().toLowerCase();
+    const matchesColor = normKrColor === normTargetColor;
+
+    // 3. Match Feeder Type
+    const krFeeder = (kr.feederType !== undefined ? kr.feederType : kr.fitterType || "").trim().toLowerCase();
+    const targetFeeder = (feederType || "").trim().toLowerCase();
+    const matchesFeeder = krFeeder === targetFeeder;
+
+    return matchesFabric && matchesColor && matchesFeeder;
+  });
+}
+
+export function findMatchingDyeingRate(
+  rates: MMDyeingRate[],
+  colorShade: string,
+  dyeingMethod: string
+): MMDyeingRate | undefined {
+  const shadeNorm = (colorShade || "Medium").trim().toLowerCase();
+  const methodNorm = (dyeingMethod || "Reactive").trim().toLowerCase();
+  return rates.find(
+    (dr) =>
+      dr.colorShade.trim().toLowerCase() === shadeNorm &&
+      dr.dyeingMethod.trim().toLowerCase() === methodNorm
+  );
+}
+
+export function findMatchingAopRate(
+  rates: MMAopProcessRateRecord[],
+  aopType: string
+): MMAopProcessRateRecord | undefined {
+  const typeNorm = (aopType || "Reactive").trim().toLowerCase();
+  return rates.find(
+    (ar) => ar.aopType.trim().toLowerCase() === typeNorm
+  );
+}
+
+// ── Calculation Utilities for Knit Pre Costing Tabs ──────────────
+export function computeKnitFabricRow(
+  row: Partial<KnitFabricCostItemRow>,
+  consumptionUnit: "PCS" | "DZ" = "DZ"
+): KnitFabricCostItemRow {
+  const effectedQtyPcs = Number(row.effectedQtyPcs) || 0;
+  const effectedQtyDz = Number((effectedQtyPcs / 12).toFixed(4));
+  const consumptionKgDz = Number(row.consumptionKgDz) || 0;
+  const baseQty = consumptionUnit === "PCS" ? effectedQtyPcs : effectedQtyDz;
+  const estimatedFinishQty = Number((baseQty * consumptionKgDz).toFixed(2));
+  const rmgProcessLossPct = Number(row.rmgProcessLossPct) || 0;
+  const requiredFinishedQty = Number((estimatedFinishQty * (1 + rmgProcessLossPct / 100)).toFixed(2));
+
+  const fabricSource = row.fabricSource || "Production";
+  const colorType = row.colorType || "Solid";
+
+  const dyeingProcessLossPct = Number(row.dyeingProcessLossPct) || 0;
+  const dyeingRate = Number(row.dyeingRate) || 0;
+  const knittingProcessLossPct = Number(row.knittingProcessLossPct) || 0;
+  const knittingRate = Number(row.knittingRate) || 0;
+
+  const ydType = row.ydType || "Feeder Stripe";
+  const ydProcessLossPct = Number(row.ydProcessLossPct) || 0;
+  const ydRate = Number(row.ydRate) || 0;
+
+  const aopType = row.aopType || "Reactive";
+  const aopProcessLossPct = Number(row.aopProcessLossPct) || 0;
+  const aopRate = Number(row.aopRate) || 0;
+
+  const washingRate = Number(row.washingRate) || 0;
+  const finishingRate = Number(row.finishingRate) || 0;
+
+  let requiredGreigeQty = 0;
+  let dyeingCost = 0;
+  let requiredYarnKg = 0;
+  let knittingCost = 0;
+  let requiredDyedYarnKg = 0;
+  let ydCost = 0;
+  let requiredDyedQty = 0;
+  let aopCost = 0;
+
+  if (fabricSource === "Finish Purchase" || colorType === "N/A") {
+    // Finish Purchase: No in-house processing costs
+    requiredGreigeQty = 0;
+    dyeingCost = 0;
+    requiredYarnKg = 0;
+    knittingCost = 0;
+    requiredDyedYarnKg = 0;
+    ydCost = 0;
+    requiredDyedQty = 0;
+    aopCost = 0;
+  } else if (fabricSource === "Production") {
+    if (colorType === "Y/D") {
+      // A. Production + Y/D:
+      // Knitting: Required Yarn (kg) = Previous Required QTY (Req. Finished) × (1 + Knitting Loss % / 100)
+      requiredYarnKg = Number((requiredFinishedQty * (1 + knittingProcessLossPct / 100)).toFixed(2));
+      knittingCost = Number((requiredYarnKg * knittingRate).toFixed(2));
+      // Yarn Dyeing: Req. Dyed Yarn QTY = Knitting Required Yarn × (1 + Y/D Loss % / 100)
+      requiredDyedYarnKg = Number((requiredYarnKg * (1 + ydProcessLossPct / 100)).toFixed(2));
+      ydCost = Number((requiredDyedYarnKg * ydRate).toFixed(2));
+      requiredGreigeQty = 0;
+      dyeingCost = 0;
+    } else if (colorType === "AOP") {
+      // C. Production + AOP:
+      // AOP: Req. Dyed QTY (AOP) = Req. Finished (Cuttable) QTY × (1 + AOP Loss % / 100)
+      requiredDyedQty = Number((requiredFinishedQty * (1 + aopProcessLossPct / 100)).toFixed(2));
+      aopCost = Number((requiredDyedQty * aopRate).toFixed(2));
+      // Dyeing: Required Greige QTY = Previous (Req. Dyed QTY) × (1 + Dyeing Loss % / 100)
+      requiredGreigeQty = Number((requiredDyedQty * (1 + dyeingProcessLossPct / 100)).toFixed(2));
+      dyeingCost = Number((requiredGreigeQty * dyeingRate).toFixed(2));
+      // Knitting: Required Yarn (kg) = Previous (Required Greige QTY) × (1 + Knitting Loss % / 100)
+      requiredYarnKg = Number((requiredGreigeQty * (1 + knittingProcessLossPct / 100)).toFixed(2));
+      knittingCost = Number((requiredYarnKg * knittingRate).toFixed(2));
+    } else {
+      // B. Production + Solid (default):
+      // Dyeing: Required Greige QTY = Previous (Req. Finished) × (1 + Dyeing Loss % / 100)
+      requiredGreigeQty = Number((requiredFinishedQty * (1 + dyeingProcessLossPct / 100)).toFixed(2));
+      dyeingCost = Number((requiredGreigeQty * dyeingRate).toFixed(2));
+      // Knitting: Required Yarn (kg) = Previous (Required Greige QTY) × (1 + Knitting Loss % / 100)
+      requiredYarnKg = Number((requiredGreigeQty * (1 + knittingProcessLossPct / 100)).toFixed(2));
+      knittingCost = Number((requiredYarnKg * knittingRate).toFixed(2));
+    }
+  } else {
+    // D & E: Grey Purchase / Buyer Supplied / Stock:
+    if (colorType === "AOP") {
+      // E. Grey Purchase / Buyer Supplied / Stock + AOP:
+      // AOP: Req. Dyed QTY = Req. Finished × (1 + AOP Loss % / 100)
+      requiredDyedQty = Number((requiredFinishedQty * (1 + aopProcessLossPct / 100)).toFixed(2));
+      aopCost = Number((requiredDyedQty * aopRate).toFixed(2));
+      // Dyeing: Required Greige QTY = Req. Dyed QTY × (1 + Dyeing Loss % / 100)
+      requiredGreigeQty = Number((requiredDyedQty * (1 + dyeingProcessLossPct / 100)).toFixed(2));
+      dyeingCost = Number((requiredGreigeQty * dyeingRate).toFixed(2));
+      requiredYarnKg = 0;
+      knittingCost = 0;
+    } else if (colorType === "Y/D") {
+      requiredDyedYarnKg = Number((requiredFinishedQty * (1 + ydProcessLossPct / 100)).toFixed(2));
+      ydCost = Number((requiredDyedYarnKg * ydRate).toFixed(2));
+      requiredGreigeQty = 0;
+      dyeingCost = 0;
+      requiredYarnKg = 0;
+      knittingCost = 0;
+    } else {
+      // D. Grey Purchase / Buyer Supplied / Stock + Solid:
+      // Dyeing: Required Greige QTY = Req. Finished × (1 + Dyeing Loss % / 100)
+      requiredGreigeQty = Number((requiredFinishedQty * (1 + dyeingProcessLossPct / 100)).toFixed(2));
+      dyeingCost = Number((requiredGreigeQty * dyeingRate).toFixed(2));
+      requiredYarnKg = 0;
+      knittingCost = 0;
+    }
+  }
+
+  // Finishing Costs:
+  // Washing Cost = Required Finished (Cuttable) QTY × Washing Rate
+  // Finishing Cost = Required Finished (Cuttable) QTY × Finishing Rate
+  const washingCost = Number((requiredFinishedQty * washingRate).toFixed(2));
+  const finishingCost = Number((requiredFinishedQty * finishingRate).toFixed(2));
+
+  // Yarn Breakdown update based on required yarn
+  const yarnBaseQty = (colorType === "Y/D" && requiredDyedYarnKg > 0) ? requiredDyedYarnKg : requiredYarnKg;
+  const rawYarn = Array.isArray(row.yarnDetails) ? row.yarnDetails : [];
+  const updatedYarn: KnitYarnDetailRow[] = rawYarn.map((yd) => {
+    const ratioPct = Number(yd.ratioPct) || 0;
+    const finalQtyKg = Number(((yarnBaseQty * ratioPct) / 100).toFixed(2));
+    const ratePerKg = Number(yd.ratePerKg) || 0;
+    const yarnCost = Number((finalQtyKg * ratePerKg).toFixed(2));
+    return {
+      ...yd,
+      ratioPct,
+      finalQtyKg,
+      ratePerKg,
+      yarnCost,
+    };
+  });
+
+  const yarnCost = Number(updatedYarn.reduce((s, y) => s + y.yarnCost, 0).toFixed(2));
+  const totalAmount = Number((
+    yarnCost +
+    dyeingCost +
+    knittingCost +
+    ydCost +
+    aopCost +
+    washingCost +
+    finishingCost
+  ).toFixed(2));
+
+  return {
+    id: row.id || `kfi-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    sl: row.sl || 1,
+    head: row.head || "Shell",
+    item: row.item || "100% Cotton 2x2 Rib Fabric 220 GSM",
+    effectedQtyPcs,
+    effectedQtyDz,
+    consumptionKgDz,
+    estimatedFinishQty,
+    rmgProcessLossPct,
+    requiredFinishedQty,
+    fabricSource,
+    colorType,
+    colorShade: row.colorShade || "Medium",
+    dyeingMethod: row.dyeingMethod || "Reactive",
+    dyeingProcessLossPct,
+    dyeingRate,
+    masterDyeingRate: row.masterDyeingRate !== undefined ? row.masterDyeingRate : (row as any)?.masterDyeingRate,
+    dyeingCost,
+    requiredGreigeQty,
+    knittingProcessLossPct,
+    requiredYarnKg,
+    knittingRate,
+    masterKnittingRate: row.masterKnittingRate !== undefined ? row.masterKnittingRate : (row as any)?.masterKnittingRate,
+    knittingCost,
+    ydType,
+    ydProcessLossPct,
+    requiredDyedYarnKg,
+    ydRate,
+    masterYdRate: row.masterYdRate !== undefined ? row.masterYdRate : (row as any)?.masterYdRate,
+    ydCost,
+    aopType,
+    aopProcessLossPct,
+    requiredDyedQty,
+    aopRate,
+    masterAopRate: row.masterAopRate !== undefined ? row.masterAopRate : (row as any)?.masterAopRate,
+    aopCost,
+    washingRate,
+    washingCost,
+    finishingRate,
+    finishingCost,
+    yarnCost,
+    totalYarnCost: yarnCost,
+    totalAmount,
+    uom: row.uom || "KG",
+    yarnDetails: updatedYarn,
+  };
+}
+
+export function computeOtherCostRow(
+  row: Partial<KnitOtherCostRow>,
+  orderValue: number = 0,
+  gmtOrderQty: number = 0
+): KnitOtherCostRow {
+  const costHead = row.costHead || row.head || "Testing Cost";
+  const isPercentage = costHead === "Commercial Cost" || costHead === "Commission";
+
+  const gmtQty =
+    row.gmtQty !== undefined && row.gmtQty !== null && row.gmtQty > 0
+      ? Number(row.gmtQty)
+      : gmtOrderQty > 0
+      ? gmtOrderQty
+      : 20000;
+  const qtyInDz = Number((gmtQty / 12).toFixed(2));
+
+  let amount = 0;
+  let unitRateDz = row.unitRateDz !== undefined ? Number(row.unitRateDz) : undefined;
+  let costPercent =
+    row.costPercent !== undefined
+      ? Number(row.costPercent)
+      : row.rateOrPct !== undefined
+      ? Number(row.rateOrPct)
+      : undefined;
+
+  if (isPercentage) {
+    const effectivePct = costPercent !== undefined ? costPercent : (costHead === "Commercial Cost" ? 1.25 : 1.5);
+    costPercent = effectivePct;
+    amount = Number(((orderValue * effectivePct) / 100).toFixed(2));
+    unitRateDz = qtyInDz > 0 ? Number((amount / qtyInDz).toFixed(4)) : 0;
+  } else {
+    if (unitRateDz !== undefined) {
+      amount = Number((qtyInDz * unitRateDz).toFixed(2));
+    } else if (Number(row.amount) > 0) {
+      amount = Number(row.amount);
+      unitRateDz = qtyInDz > 0 ? Number((amount / qtyInDz).toFixed(4)) : 0;
+    } else {
+      unitRateDz = 0.5;
+      amount = Number((qtyInDz * unitRateDz).toFixed(2));
+    }
+  }
+
+  const calcBasis = isPercentage ? "Percentage of Order Value" : (row.calcBasis || "Per Dozen");
+  const basisValue = isPercentage ? orderValue : (Number(row.basisValue) || qtyInDz);
+  const rateOrPct = isPercentage ? (costPercent ?? 0) : (unitRateDz ?? 0);
+
+  return {
+    id: row.id || `oc-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    sl: row.sl || 1,
+    head: costHead,
+    costHead,
+    description: row.description || "",
+    supplier: row.supplier || "",
+    calcBasis,
+    basisValue,
+    rateOrPct,
+    costPercent,
+    gmtQty,
+    qtyInDz,
+    unitRateDz: unitRateDz ?? 0,
+    amount,
+    quantity: gmtQty,
+    currency: row.currency || "USD",
+  };
+}
+
+export function computeEmbellishmentCostRow(
+  row: Partial<KnitEmbellishmentCostRow>,
+  gmtOrderQty: number = 0
+): KnitEmbellishmentCostRow {
+  const gmtQty =
+    row.gmtQty !== undefined && row.gmtQty !== null
+      ? Number(row.gmtQty)
+      : gmtOrderQty > 0
+      ? gmtOrderQty
+      : 20000;
+  const qtyInDz = Number((gmtQty / 12).toFixed(2));
+  const unitRateDz = Number(row.unitRateDz) || 0;
+  const amount = Number((qtyInDz * unitRateDz).toFixed(2));
+
+  return {
+    id: row.id || `emb-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    sl: row.sl || 1,
+    costHead: row.costHead || "Print",
+    description: row.description || "",
+    source: row.source || "In-house",
+    gmtQty,
+    qtyInDz,
+    unitRateDz,
+    amount,
+  };
+}
+
+export function syncAllCostingItems(
+  knitFabricItems: KnitFabricCostItemRow[] = [],
+  accessoriesItems: PreCostingItemRow[] = [],
+  otherCostItems: KnitOtherCostRow[] = [],
+  embellishmentItems: KnitEmbellishmentCostRow[] = []
+): PreCostingItemRow[] {
+  let sl = 1;
+  const fabricRows: PreCostingItemRow[] = knitFabricItems.map((f) => ({
+    id: f.id,
+    sl: sl++,
+    head: f.head,
+    item: f.item,
+    description: `Dyeing: $${f.dyeingCost.toFixed(2)} | Knitting: $${f.knittingCost.toFixed(2)} | Yarn: $${f.yarnCost.toFixed(2)}`,
+    nStatus: "Own Source",
+    supplier: "In-House Knit & Dyeing",
+    effectedQty: f.effectedQtyPcs,
+    consumption: f.consumptionKgDz,
+    unit: "Kg",
+    requiredQty: f.requiredFinishedQty,
+    finalQty: f.requiredYarnKg,
+    rate: f.requiredYarnKg > 0 ? Number((f.totalAmount / f.requiredYarnKg).toFixed(4)) : 0,
+    amount: f.totalAmount,
+    preCostPct: 0,
+  }));
+
+  const accRows: PreCostingItemRow[] = accessoriesItems.map((a) => ({
+    ...a,
+    sl: sl++,
+  }));
+
+  const embRows: PreCostingItemRow[] = embellishmentItems.map((e) => ({
+    id: e.id,
+    sl: sl++,
+    head: e.costHead || "Print",
+    item: e.costHead || "Print",
+    description: `${e.source}${e.description ? ` - ${e.description}` : ""}`,
+    nStatus: e.source === "In-house" ? "Own Source" : "Nominated",
+    supplier: e.source === "In-house" ? "In-House Unit" : "Sub-Contractor",
+    effectedQty: e.gmtQty,
+    consumption: 1,
+    unit: "DZ",
+    requiredQty: e.qtyInDz,
+    finalQty: e.qtyInDz,
+    rate: e.unitRateDz,
+    amount: e.amount,
+    preCostPct: 0,
+  }));
+
+  const otherRows: PreCostingItemRow[] = otherCostItems.map((o) => {
+    const isPct = o.costHead === "Commercial Cost" || o.costHead === "Commission";
+    return {
+      id: o.id,
+      sl: sl++,
+      head: o.costHead || o.head || "Commercial Cost",
+      item: o.description || o.costHead || o.head || "Other Cost",
+      description: isPct
+        ? `Cost (%): ${o.costPercent ?? o.rateOrPct ?? 0}%`
+        : `${o.calcBasis}: $${(Number(o.unitRateDz) || 0).toFixed(3)}/DZ`,
+      nStatus: "Nominated",
+      supplier: o.supplier || "Agency / Vendor",
+      effectedQty: isPct ? (o.basisValue || 1) : (o.gmtQty || 1),
+      consumption: 1,
+      unit: isPct ? "%" : "DZ",
+      requiredQty: isPct ? 1 : (o.qtyInDz || 1),
+      finalQty: isPct ? 1 : (o.qtyInDz || 1),
+      rate: isPct ? (o.costPercent ?? o.rateOrPct ?? 0) : (o.unitRateDz || 0),
+      amount: o.amount,
+      preCostPct: 0,
+    };
+  });
+
+  const combined = [...fabricRows, ...accRows, ...embRows, ...otherRows];
+  const grandTotal = combined.reduce((s, it) => s + (Number(it.amount) || 0), 0);
+  return combined.map((it) => ({
+    ...it,
+    preCostPct: grandTotal > 0 ? Number((((Number(it.amount) || 0) / grandTotal) * 100).toFixed(2)) : 0,
+  }));
+}
+
+export function getLatestYarnRate(
+  count: string,
+  composition: string,
+  grade: "A" | "B" | string = "A"
+): number | null {
+  if (!count || !composition) return null;
+  try {
+    const weeklyRecords = MMMasterDataRepository.getYarnRates();
+    if (!Array.isArray(weeklyRecords) || weeklyRecords.length === 0) return null;
+
+    // Sort by effectiveDate / createdAt descending to get the latest week first
+    const sorted = [...weeklyRecords].sort((a, b) => {
+      const dateA = a.effectiveDate || a.createdAt || "";
+      const dateB = b.effectiveDate || b.createdAt || "";
+      return dateB.localeCompare(dateA);
+    });
+
+    const normalizeCount = (c: string) =>
+      (c || "").trim().toLowerCase().replace(/[\/\s]/g, "").replace(/s$/i, "1");
+    const normalizeComp = (cp: string) =>
+      (cp || "").trim().toLowerCase().replace(/\s+/g, " ");
+
+    const targetCountNorm = normalizeCount(count);
+    const targetCompNorm = normalizeComp(composition);
+    const targetGradeNorm = (grade || "A").toUpperCase().replace("GRADE ", "");
+
+    for (const rec of sorted) {
+      if (rec.status === "Inactive") continue;
+
+      // 1. Exact match with Grade
+      const matchWithGrade = (rec.entries || []).find((e) => {
+        const eCountNorm = normalizeCount(e.count);
+        const eCompNorm = normalizeComp(e.composition);
+        const eGradeNorm = (e.grade || "A").toUpperCase();
+        return (
+          (eCountNorm === targetCountNorm || e.count.toLowerCase() === count.toLowerCase()) &&
+          (eCompNorm === targetCompNorm || e.composition.toLowerCase() === composition.toLowerCase()) &&
+          eGradeNorm === targetGradeNorm &&
+          Number(e.rate) > 0
+        );
+      });
+      if (matchWithGrade) return Number(matchWithGrade.rate);
+
+      // 2. Match without Grade restriction
+      const matchAnyGrade = (rec.entries || []).find((e) => {
+        const eCountNorm = normalizeCount(e.count);
+        const eCompNorm = normalizeComp(e.composition);
+        return (
+          (eCountNorm === targetCountNorm || e.count.toLowerCase() === count.toLowerCase()) &&
+          (eCompNorm === targetCompNorm || e.composition.toLowerCase() === composition.toLowerCase()) &&
+          Number(e.rate) > 0
+        );
+      });
+      if (matchAnyGrade) return Number(matchAnyGrade.rate);
+    }
+  } catch (err) {
+    console.error("Failed to fetch latest yarn rate:", err);
+  }
+  return null;
+}
+
+export function ensureKnitCostingStructure(r: any, totalPoVal: number = 0): PreCostingRecord {
+  const poRows = Array.isArray(r.poRows) ? r.poRows : [];
+  const totalOrderQty =
+    poRows.reduce((acc: number, p: any) => acc + (Number(p.poQuantity) || 0), 0) ||
+    (Number(r.orderQty) || 20000);
+  const effectivePoVal =
+    totalPoVal > 0
+      ? totalPoVal
+      : poRows.reduce((acc: number, p: any) => acc + (Number(p.value) || 0), 0);
+
+  const fabricEntry: KnitFabricEntryData = r.fabricEntry || {
+    fabricComposition: r.fabricEntry?.fabricComposition || r.fabricEntry?.composition || "100% Cotton",
+    composition: r.fabricEntry?.composition || "100% Cotton",
+    fabricType: r.fabricEntry?.fabricType || "2x2 Rib",
+    gsm: r.fabricEntry?.gsm || 220,
+    spinningType: r.fabricEntry?.spinningType || "Ring",
+    feederType: r.fabricEntry?.feederType || "Half Feeder",
+    washType: r.fabricEntry?.washType || "Enzyme Wash",
+    finishType: r.fabricEntry?.finishType || "Heatset Finish",
+    otherSpecs: r.fabricEntry?.otherSpecs || "Bio-washed combed cotton",
+    fabricCategory: r.fabricEntry?.fabricCategory === "Woven Fabric" ? "Woven Fabric" : "Knit Fabric",
+  };
+
+  const consumptionUnit: "PCS" | "DZ" = r.consumptionUnit || "DZ";
+  const hasExplicitFabric = Array.isArray(r.knitFabricItems);
+  const hasExplicitAcc = Array.isArray(r.accessoriesItems);
+  const hasExplicitOthers = Array.isArray(r.otherCostItems);
+
+  let knitFabricItems: KnitFabricCostItemRow[] = hasExplicitFabric
+    ? r.knitFabricItems.map((fi: any) =>
+        computeKnitFabricRow(
+          {
+            fabricSource: "Production",
+            colorType: "Solid",
+            uom: fi.uom || "KG",
+            ...fi,
+          },
+          consumptionUnit
+        )
+      )
+    : [];
+  let accessoriesItems: PreCostingItemRow[] = hasExplicitAcc
+    ? r.accessoriesItems.map((it: PreCostingItemRow) => {
+        const eff = Number(it.effectedQty || totalOrderQty);
+        const cons = Number(it.consumption || 1);
+        const wastage = it.wastagePct !== undefined ? Number(it.wastagePct) : 5;
+        const baseQty = consumptionUnit === "PCS" ? eff : eff / 12;
+        const req = Number((baseQty * cons * (1 + wastage / 100)).toFixed(2));
+        return {
+          ...it,
+          unit: it.unit || "Pcs",
+          wastagePct: wastage,
+          requiredQty: it.requiredQty !== undefined ? it.requiredQty : req,
+        };
+      })
+    : [];
+  let otherCostItems: KnitOtherCostRow[] = hasExplicitOthers
+    ? (r.otherCostItems || []).map((o: KnitOtherCostRow) => computeOtherCostRow(o, effectivePoVal, totalOrderQty))
+    : [];
+
+  if (!hasExplicitFabric && !hasExplicitAcc && Array.isArray(r.items) && r.items.length > 0) {
+    const rawItems: PreCostingItemRow[] = r.items;
+    const fabRows = rawItems.filter((it) => FABRIC_HEADS.includes(it.head) || it.head === "Fabric" || it.head === "Yarn");
+    const accRows = rawItems.filter((it) => ACCESSORIES_HEADS.includes(it.head) || it.head === "Accessories");
+    const otherRows = rawItems.filter((it) => !fabRows.includes(it) && !accRows.includes(it));
+
+    if (fabRows.length > 0) {
+      knitFabricItems = fabRows.map((it, idx) =>
+        computeKnitFabricRow({
+          id: it.id || `kfi-mig-${idx + 1}`,
+          sl: idx + 1,
+          head: it.head === "Fabric" ? "Shell" : it.head,
+          item: it.item,
+          effectedQtyPcs: it.effectedQty || 39024,
+          consumptionKgDz: it.consumption ? Number((it.consumption * 12).toFixed(4)) : 2.4,
+          rmgProcessLossPct: 4,
+          colorShade: "Medium",
+          dyeingMethod: "Reactive",
+          dyeingProcessLossPct: 4,
+          dyeingRate: 0.85,
+          masterDyeingRate: 0.85,
+          knittingProcessLossPct: 3,
+          knittingRate: 0.45,
+          masterKnittingRate: 0.45,
+          yarnDetails: [
+            {
+              id: `yd-mig-${idx + 1}-1`,
+              grade: "A",
+              colorType: "Solid",
+              yarnCount: "30/1",
+              yarnComposition: "100% Cotton",
+              yarnItem: "30/1 Combed Cotton",
+              ratioPct: 100,
+              finalQtyKg: it.finalQty || 5000,
+              ratePerKg: 3.45,
+              masterRatePerKg: 3.45,
+              yarnCost: Number(((it.finalQty || 5000) * 3.45).toFixed(2)),
+              brand: "Square Textiles",
+            },
+          ],
+        }),
+      );
+    }
+
+    if (accRows.length > 0) {
+      accessoriesItems = accRows.map((it, idx) => ({ ...it, sl: idx + 1 }));
+    }
+
+    if (otherRows.length > 0) {
+      otherCostItems = otherRows.map((it, idx) =>
+        computeOtherCostRow(
+          {
+            id: it.id || `oc-mig-${idx + 1}`,
+            sl: idx + 1,
+            head: it.head || "Commercial Cost",
+            description: it.description || it.item,
+            supplier: it.supplier,
+            calcBasis: "Percentage of Order Value",
+            basisValue: totalPoVal,
+            rateOrPct: 1.5,
+            amount: it.amount || 0,
+          },
+          totalPoVal,
+        ),
+      );
+    }
+  }
+
+  if (!hasExplicitFabric && knitFabricItems.length === 0) {
+    knitFabricItems = [
+      computeKnitFabricRow({
+        id: "kfi-def-1",
+        sl: 1,
+        head: "Shell",
+        item: "100% Cotton 2x2 Rib Fabric 220 GSM",
+        effectedQtyPcs: 20000,
+        consumptionKgDz: 2.4,
+        rmgProcessLossPct: 4,
+        colorShade: "Medium",
+        dyeingMethod: "Reactive",
+        dyeingProcessLossPct: 4,
+        dyeingRate: 0.85,
+        masterDyeingRate: 0.85,
+        knittingProcessLossPct: 3,
+        knittingRate: 0.45,
+        masterKnittingRate: 0.45,
+        yarnDetails: [
+          {
+            id: "yd-def-1",
+            grade: "A",
+            colorType: "Solid",
+            yarnCount: "30/1",
+            yarnComposition: "100% Cotton",
+            yarnItem: "100% Combed Cotton Ring Spun",
+            ratioPct: 100,
+            finalQtyKg: 4400,
+            ratePerKg: 3.45,
+            masterRatePerKg: 3.45,
+            yarnCost: 15180,
+            brand: "Square Textiles",
+          },
+        ],
+      }),
+    ];
+  }
+
+  if (!hasExplicitAcc && accessoriesItems.length === 0) {
+    accessoriesItems = [
+      {
+        id: "acc-def-1",
+        sl: 1,
+        preCostItemId: "PCIK-ACC-01",
+        head: "Sewing Trims",
+        item: "Sewing Thread 40/2 5000M",
+        description: "100% Spun Polyester matching thread",
+        nStatus: "Nominated",
+        supplier: "Coats Bangladesh Ltd",
+        effectedQty: 20000,
+        consumption: 1,
+        unit: "Cone",
+        requiredQty: 20000,
+        finalQty: 21000,
+        rate: 0.05,
+        amount: 1050,
+        preCostPct: 0,
+      },
+    ];
+  }
+
+  // Strip out Commercial Cost, Commission, Development from otherCostItems and migrate their values
+  const oldComm = (r.otherCostItems || []).find(
+    (o: any) => o.costHead === "Commission" || o.head === "Commission"
+  );
+  const oldCommercial = (r.otherCostItems || []).find(
+    (o: any) => o.costHead === "Commercial Cost" || o.head === "Commercial Cost"
+  );
+  const oldDev = (r.otherCostItems || []).find(
+    (o: any) => o.costHead === "Development" || o.head === "Development"
+  );
+
+  const commissionPct =
+    r.commissionPct !== undefined
+      ? Number(r.commissionPct) || 0
+      : (oldComm?.costPercent ?? oldComm?.rateOrPct ?? 0);
+  const financialPct = r.financialPct !== undefined ? Number(r.financialPct) || 0 : 0;
+  const samplingPct =
+    r.samplingPct !== undefined
+      ? Number(r.samplingPct) || 0
+      : (oldDev?.costPercent ?? oldDev?.rateOrPct ?? 0);
+  const commercialPct =
+    r.commercialPct !== undefined
+      ? Number(r.commercialPct) || 0
+      : (oldCommercial?.costPercent ?? oldCommercial?.rateOrPct ?? 0);
+
+  const commissionValue =
+    r.commissionValue !== undefined
+      ? Number(r.commissionValue) || 0
+      : Number(((effectivePoVal * (commissionPct || 0)) / 100).toFixed(2));
+  const financialValue =
+    r.financialValue !== undefined
+      ? Number(r.financialValue) || 0
+      : Number(((effectivePoVal * (financialPct || 0)) / 100).toFixed(2));
+  const samplingValue =
+    r.samplingValue !== undefined
+      ? Number(r.samplingValue) || 0
+      : Number(((effectivePoVal * (samplingPct || 0)) / 100).toFixed(2));
+  const commercialValue =
+    r.commercialValue !== undefined
+      ? Number(r.commercialValue) || 0
+      : Number(((effectivePoVal * (commercialPct || 0)) / 100).toFixed(2));
+
+  otherCostItems = (otherCostItems || []).filter(
+    (o) =>
+      o.costHead !== "Commercial Cost" &&
+      o.head !== "Commercial Cost" &&
+      o.costHead !== "Commission" &&
+      o.head !== "Commission" &&
+      o.costHead !== "Development" &&
+      o.head !== "Development"
+  );
+
+  if (otherCostItems.length === 0) {
+    otherCostItems = [
+      computeOtherCostRow(
+        {
+          id: "oc-def-1",
+          sl: 1,
+          head: "Testing Cost",
+          costHead: "Testing Cost",
+          description: "Lab testing, color fastness & shrinkage test",
+          supplier: "SGS / ITS",
+          calcBasis: "Fixed Lump Sum",
+          basisValue: 250,
+          rateOrPct: 250,
+          unitRateDz: 0.15,
+          amount: 250,
+        },
+        effectivePoVal,
+        totalOrderQty
+      ),
+    ];
+  }
+
+  // Embellishments
+  const hasExplicitEmb = Array.isArray(r.embellishmentItems);
+  let embellishmentItems: KnitEmbellishmentCostRow[] = hasExplicitEmb ? r.embellishmentItems : [];
+  if (!hasExplicitEmb && embellishmentItems.length === 0) {
+    embellishmentItems = [
+      computeEmbellishmentCostRow(
+        {
+          id: "emb-def-1",
+          sl: 1,
+          costHead: "Print",
+          description: "Placement chest graphic print",
+          source: "In-house",
+          gmtQty: 20000,
+          unitRateDz: 1.20,
+        },
+        20000
+      ),
+    ];
+  }
+
+  // Hydrate yarn booking tags on every yarn detail row
+  if (Array.isArray(knitFabricItems)) {
+    knitFabricItems = knitFabricItems.map((f) => ({
+      ...f,
+      yarnDetails: (f.yarnDetails || []).map((y) => ({
+        ...y,
+        bookingTag: y.bookingTag || MMRepository.getYarnBookingTagByRowId(y.id),
+      })),
+    }));
+  }
+
+  const smvVal = Number(r.smv) || 4.25;
+  const cpmVal = Number(r.cpm) || 0.065;
+  const effVal = Number(r.efficiencyPct) || 65;
+  const cmDzVal =
+    r.cmDz !== undefined
+      ? Number(r.cmDz)
+      : effVal > 0
+      ? Number((((cpmVal * smvVal) / (effVal / 100)) * 12).toFixed(2))
+      : 0;
+
+  const items = syncAllCostingItems(knitFabricItems, accessoriesItems, otherCostItems, embellishmentItems);
+
+  const attachments =
+    Array.isArray(r.attachments) && r.attachments.length > 0 && r.attachments.some((a: any) => Boolean(a.dataUrl))
+      ? r.attachments
+      : getStoredAttachmentsForRecord(r.id, r.preCostId);
+
+  return {
+    ...r,
+    gmtItem: r.gmtItem || "Basic T-Shirt",
+    category: r.category || "Men",
+    smv: smvVal,
+    cpm: cpmVal,
+    efficiencyPct: effVal,
+    cmDz: cmDzVal,
+    commissionPct,
+    commissionValue,
+    financialPct,
+    financialValue,
+    samplingPct,
+    samplingValue,
+    commercialPct,
+    commercialValue,
+    consumptionUnit,
+    fabricEntry,
+    knitFabricItems,
+    accessoriesItems,
+    embellishmentItems,
+    otherCostItems,
+    attachments,
+    items,
+  };
+}
+
+// ── Reference Baseline Sample Data (Knit) ────────────────────────
 const INITIAL_RECORDS: PreCostingRecord[] = [
   {
-    id: "pc-rec-1",
+    id: "pc-gen-rec-1",
     preCostId: "PC-2026-001",
-    preCostNo: "26918",
+    preCostNo: "PC-26918",
+    gmtItem: "T-Shirt",
+    category: "Women",
     preCostDate: "2026-09-15",
     contractNo: "CT-PKCL-2026-881",
     ourRef: "REF-99238",
     acHolder: "Md. Rashidul Islam",
     buyer: "H&M Hennes & Mauritz",
-    merchandiser: "Tanvir Ahmed",
-    style: "HM-KT-8841",
+    merchandiser: "Rashidul Islam",
+    style: "HM-8841",
     styleDescription: "Ladies Ribbed Henley Neck T-Shirt",
     season: "Autumn / Winter 2026",
     currency: "USD",
     smv: 4.62,
     cpm: 0.065,
     efficiencyPct: 65,
+    cmDz: 5.54,
+    commissionPct: 2.0,
+    commissionValue: 3238.99,
+    financialPct: 1.5,
+    financialValue: 2429.24,
+    samplingPct: 0.5,
+    samplingValue: 809.75,
+    commercialPct: 1.25,
+    commercialValue: 2024.37,
     note: "Style Pre Costing based on confirmed tech pack v2. Fabric production scheduled in Mirzapur unit.",
     poRows: [
-      { id: "po-1", sl: 1, poNumber: "PO-HM-99881-A", poQuantity: 25000, rate: 4.15, value: 103750, remarks: "Main Lot Delivery" },
-      { id: "po-2", sl: 2, poNumber: "PO-HM-99881-B", poQuantity: 14024, rate: 4.15, value: 58199.6, remarks: "Repeat Shipment Lot" },
+      { id: "po-gen-1", sl: 1, poNumber: "PO-HM-99881-A", poQuantity: 25000, rate: 4.15, value: 103750, deliveryDate: "2026-11-20", remarks: "Main Lot Delivery" },
+      { id: "po-gen-2", sl: 2, poNumber: "PO-HM-99881-B", poQuantity: 14024, rate: 4.15, value: 58199.6, deliveryDate: "2026-12-15", remarks: "Repeat Shipment Lot" },
     ],
     items: [
       {
@@ -360,6 +1992,8 @@ function createVersionSnapshot(r: PreCostingRecord): MMPreCostVersionSnapshot {
     header: {
       preCostId: r.preCostId || "JOB-2026-0001",
       preCostNo: r.preCostNo || "26918",
+      gmtItem: r.gmtItem || "T-Shirt",
+      category: r.category || "Men",
       preCostDate: r.preCostDate || new Date().toISOString().split("T")[0],
       contractNo: r.contractNo || "",
       ourRef: r.ourRef || "",
@@ -387,49 +2021,56 @@ function createVersionSnapshot(r: PreCostingRecord): MMPreCostVersionSnapshot {
       surplusPcs,
       smvCost,
     },
-  };
+    fabricEntry: r.fabricEntry,
+    knitFabricItems: r.knitFabricItems,
+    accessoriesItems: r.accessoriesItems,
+    otherCostItems: r.otherCostItems,
+  } as any;
 }
 
-// ── Main Pre Costing Component ───────────────────────────────────
-export function PreCostingManager({ initialTab = "register", onTabChange }: PreCostingManagerProps) {
+// ── Main Pre Costing Component ────────────────────────────
+export function PreCostingManager({
+  initialTab = "register",
+  initialRecordId,
+  onTabChange,
+}: PreCostingManagerProps) {
   const [records, setRecords] = useState<PreCostingRecord[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const stored = localStorage.getItem("cripton_pre_costings_master_v1");
+        const stored = localStorage.getItem("cripton_pre_costings_general_master_v1");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
             return parsed.map((r) => {
-              const poRows = Array.isArray(r.poRows) ? r.poRows : [];
-              const items = Array.isArray(r.items) ? r.items : [];
-              const normalized: PreCostingRecord = {
-                ...r,
-                preCostId: r.preCostId || "JOB-2026-0001",
-                preCostNo: r.preCostNo || "26920",
-                buyer: r.buyer || "H&M Hennes & Mauritz",
-                style: r.style || "HM-KT-8841",
-                merchandiser: r.merchandiser || "Tanvir Ahmed",
-                status: r.status || "Draft",
-                version: r.version || 1,
-                poRows,
-                items,
-                attachments: Array.isArray(r.attachments) ? r.attachments : [],
-                versions: Array.isArray(r.versions) && r.versions.length > 0 ? r.versions : [],
-                auditHistory: Array.isArray(r.auditHistory) ? r.auditHistory : [],
-              };
-              if (normalized.versions.length === 0) {
-                normalized.versions = [createVersionSnapshot(normalized)];
+              const poVal = (r.poRows || []).reduce(
+                (acc: number, p: any) => acc + (Number(p.value) || 0),
+                0
+              );
+              const atts =
+                Array.isArray(r.attachments) && r.attachments.length > 0 && r.attachments.some((a: any) => Boolean(a.dataUrl))
+                  ? r.attachments
+                  : getStoredAttachmentsForRecord(r.id, r.preCostId);
+              const structured = ensureKnitCostingStructure({ ...r, attachments: atts }, poVal);
+              if (!structured.versions || structured.versions.length === 0) {
+                structured.versions = [createVersionSnapshot(structured)];
               }
-              return normalized;
+              return structured;
             });
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Failed to load pre-costings from localStorage", e);
+      }
     }
     // Initialize version snapshot for initial record
     const base = INITIAL_RECORDS.map((r) => {
-      const snap = createVersionSnapshot(r);
-      return { ...r, versions: [snap] };
+      const poVal = (r.poRows || []).reduce(
+        (acc: number, p: any) => acc + (Number(p.value) || 0),
+        0
+      );
+      const structured = ensureKnitCostingStructure(r, poVal);
+      const snap = createVersionSnapshot(structured);
+      return { ...structured, versions: [snap] };
     });
     return base;
   });
@@ -437,8 +2078,10 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
   // Save to localStorage whenever records change
   useEffect(() => {
     try {
-      localStorage.setItem("cripton_pre_costings_master_v1", JSON.stringify(records));
-    } catch (e) {}
+      safeSaveMasterRecords(records);
+    } catch (e) {
+      console.error("Failed to persist pre-costings to localStorage", e);
+    }
   }, [records]);
 
   // View state: list | form | history | compare | report
@@ -491,11 +2134,30 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     }
   }, [view, compareRecord, records]);
 
-  // Synchronize view with initialTab changes
+  const lastLoadedInitialRecordIdRef = useRef<string | null>(null);
+
+  // Synchronize view with initialTab and initialRecordId changes
   useEffect(() => {
     if (initialTab === "create") {
       setView("form");
-      setFormMode("create");
+      if (initialRecordId && lastLoadedInitialRecordIdRef.current !== initialRecordId) {
+        lastLoadedInitialRecordIdRef.current = initialRecordId;
+        const found = records.find((r) => r.id === initialRecordId || r.preCostId === initialRecordId);
+        if (found) {
+          const poVal = (found.poRows || []).reduce((acc, p) => acc + (Number(p.value) || 0), 0);
+          const atts =
+            Array.isArray(found.attachments) && found.attachments.length > 0 && found.attachments.some((a: any) => Boolean(a.dataUrl))
+              ? found.attachments
+              : getStoredAttachmentsForRecord(found.id, found.preCostId);
+          setFormData(ensureKnitCostingStructure({ ...found, attachments: atts }, poVal));
+          setFormMode("edit");
+          try {
+            localStorage.setItem("cripton_pre_costings_general_active_id_v1", found.id);
+          } catch {}
+        } else {
+          setFormMode("create");
+        }
+      }
     } else if (initialTab === "compare") {
       setView("compare");
     } else if (initialTab === "report") {
@@ -503,13 +2165,303 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     } else if (initialTab === "register") {
       setView("list");
     }
-  }, [initialTab]);
+  }, [initialTab, initialRecordId]);
 
   // Master Data sources from MMRepository
   const [seasonsMaster] = useState<MMSeasonMasterItem[]>(() => MMRepository.getSeasons());
   const [fabricMasterItems] = useState<MMFabricMasterItem[]>(() => MMRepository.getFabricMaster());
+  const [fabricSetups, setFabricSetups] = useState<MMFabricSetupRecord[]>(() =>
+    MMMasterDataRepository.getFabricSetups()
+  );
   const [accessoriesMasterItems] = useState<MMAccessoriesMasterItem[]>(() => MMRepository.getAccessoriesMaster());
   const [suppliersMaster] = useState<any[]>(() => MMRepository.getSuppliers());
+
+  // Merchandising Master Data sources for Knit Fabric & Yarn
+  const [masterFabricCompositions, setMasterFabricCompositions] = useState<MMFabricComposition[]>(() => MMMasterDataRepository.getFabricCompositions());
+  const [masterFabricTypes, setMasterFabricTypes] = useState<MMFabricType[]>(() => MMMasterDataRepository.getFabricTypes());
+  const [masterSpinningTypes, setMasterSpinningTypes] = useState<MMSpinningType[]>(() => MMMasterDataRepository.getSpinningTypes());
+  const [masterYarnCounts, setMasterYarnCounts] = useState<MMYarnCount[]>(() => MMMasterDataRepository.getYarnCounts());
+  const [masterDyeingRates, setMasterDyeingRates] = useState<MMDyeingRate[]>(() => MMMasterDataRepository.getDyeingRates());
+  const [masterYarnDyeingRates, setMasterYarnDyeingRates] = useState<MMYarnDyeingRate[]>(() => MMMasterDataRepository.getYarnDyeingRates());
+  const [masterKnittingRates, setMasterKnittingRates] = useState<MMKnittingRate[]>(() => MMMasterDataRepository.getKnittingRates());
+  const [masterAopRates, setMasterAopRates] = useState<MMAopProcessRateRecord[]>(() => MMMasterDataRepository.getAopProcessRates());
+
+  // Real-time synchronization with Local Storage when any Master Data changes
+  useEffect(() => {
+    const handleStorageUpdate = (e: StorageEvent) => {
+      if (e.key === MM_MASTER_STORAGE_KEYS.FABRIC_SETUP) {
+        setFabricSetups(MMMasterDataRepository.getFabricSetups());
+      } else if (e.key === MM_MASTER_STORAGE_KEYS.FABRIC_COMPOSITION) {
+        setMasterFabricCompositions(MMMasterDataRepository.getFabricCompositions());
+      } else if (e.key === MM_MASTER_STORAGE_KEYS.FABRIC_TYPE) {
+        setMasterFabricTypes(MMMasterDataRepository.getFabricTypes());
+      } else if (e.key === MM_MASTER_STORAGE_KEYS.KNITTING_RATE) {
+        setMasterKnittingRates(MMMasterDataRepository.getKnittingRates());
+      } else if (e.key === MM_MASTER_STORAGE_KEYS.DYEING_RATE) {
+        setMasterDyeingRates(MMMasterDataRepository.getDyeingRates());
+      } else if (e.key === MM_MASTER_STORAGE_KEYS.YARN_DYEING_RATE) {
+        setMasterYarnDyeingRates(MMMasterDataRepository.getYarnDyeingRates());
+      } else if (e.key === MM_MASTER_STORAGE_KEYS.AOP_PROCESS_RATE) {
+        setMasterAopRates(MMMasterDataRepository.getAopProcessRates());
+      }
+    };
+    window.addEventListener("storage", handleStorageUpdate);
+    return () => window.removeEventListener("storage", handleStorageUpdate);
+  }, []);
+
+  // 4 Sub-tabs under Item-wise Pre Costing Details
+  const [activeCostingTab, setActiveCostingTab] = useState<"fabric" | "accessories" | "embellishment" | "others">("fabric");
+
+  // Yarn Details Modal State
+  const [yarnModal, setYarnModal] = useState<{
+    isOpen: boolean;
+    rowIndex: number | null;
+    requiredYarnKg: number;
+    rows: KnitYarnDetailRow[];
+    head: string;
+    item: string;
+  }>({
+    isOpen: false,
+    rowIndex: null,
+    requiredYarnKg: 0,
+    rows: [],
+    head: "",
+    item: "",
+  });
+
+  // Booking Tag / Yarn Stock & Procurement Allocation Modal State
+  const [bookingTagModal, setBookingTagModal] = useState<{
+    isOpen: boolean;
+    yarnRowIndex: number | null;
+    yarnRowId: string;
+    finalQtyKg: number;
+    yarnItemName: string;
+    componentName: string;
+    allocations: YarnBookingAllocationRowState[];
+    existingProcurementRequestId?: string;
+    existingProcurementRequestNo?: string;
+  }>({
+    isOpen: false,
+    yarnRowIndex: null,
+    yarnRowId: "",
+    finalQtyKg: 0,
+    yarnItemName: "",
+    componentName: "",
+    allocations: [],
+  });
+
+  // Fabric Entry Specifications Modal State
+  const [showFabricEntryModal, setShowFabricEntryModal] = useState<boolean>(false);
+  const [tempFabricEntry, setTempFabricEntry] = useState<KnitFabricEntryData>({
+    fabricComposition: "100% Combed Cotton",
+    fabricType: "Single Jersey",
+    gsm: 180,
+    spinningType: "Ring",
+    feederType: "Half Feeder",
+    washType: "Enzyme Wash",
+    finishType: "Heatset Finish",
+    otherSpecs: "",
+    fabricCategory: "Knit Fabric",
+  });
+
+  // Options for Dropdowns
+  const fabricCompositionOptions = useMemo(() => {
+    return masterFabricCompositions
+      .filter((fc) => fc.status === "Active")
+      .map((fc) => ({
+        value: fc.name,
+        label: fc.name,
+      }));
+  }, [masterFabricCompositions]);
+
+  // Dynamic Item Name options populated directly from Fabric Setup Master Register
+  const fabricItemOptions = useMemo(() => {
+    return fabricSetups.map((f) => ({
+      value: f.fabricName,
+      label: f.fabricName,
+    }));
+  }, [fabricSetups]);
+
+  const getFabricItemOptions = (currentVal?: string) => {
+    const opts = [...fabricItemOptions];
+    if (currentVal && !opts.some((o) => o.value === currentVal)) {
+      opts.unshift({ value: currentVal, label: currentVal });
+    }
+    return opts;
+  };
+
+  const yarnCountOptions = useMemo(() => {
+    const counts = masterYarnCounts.length > 0
+      ? masterYarnCounts.filter((yc) => yc.status !== "Inactive").map((yc) => yc.yarnCount)
+      : ["10/1", "20/1", "20/S", "24/1", "26/1", "30/1", "30/S", "34/1", "40/1", "20/2", "30/2", "40/2"];
+    const set = new Set<string>(counts);
+    return Array.from(set).map((c) => ({
+      value: c,
+      label: c,
+    }));
+  }, [masterYarnCounts]);
+
+  const getYarnCountOptions = (currentVal?: string) => {
+    const opts = [...yarnCountOptions];
+    if (currentVal && !opts.some((o) => o.value === currentVal)) {
+      opts.unshift({ value: currentVal, label: currentVal });
+    }
+    return opts;
+  };
+
+  const yarnCompositionOptions = useMemo(() => {
+    const compSet = new Set<string>();
+    try {
+      const weeklyRates = MMMasterDataRepository.getYarnRates();
+      weeklyRates.forEach((rec) => {
+        (rec.entries || []).forEach((e) => {
+          if (e.composition && e.composition.trim()) {
+            compSet.add(e.composition.trim());
+          }
+        });
+      });
+    } catch (e) {
+      console.error("Failed to load yarn rates:", e);
+    }
+    PREDEFINED_YARN_COMPOSITIONS.forEach((c) => compSet.add(c));
+    masterFabricCompositions.forEach((fc) => {
+      if (fc.name && fc.status !== "Inactive") compSet.add(fc.name);
+    });
+
+    return Array.from(compSet).map((c) => ({
+      value: c,
+      label: c,
+    }));
+  }, [masterFabricCompositions]);
+
+  const getYarnCompositionOptions = (currentVal?: string) => {
+    const opts = [...yarnCompositionOptions];
+    if (currentVal && !opts.some((o) => o.value === currentVal)) {
+      opts.unshift({ value: currentVal, label: currentVal });
+    }
+    return opts;
+  };
+
+  const spinningTypeOptions = useMemo(() => {
+    return KNIT_SPINNING_TYPES.map((st) => ({
+      value: st,
+      label: st,
+    }));
+  }, []);
+
+  const getSpinningTypeOptions = (currentVal?: string) => {
+    const opts = [...spinningTypeOptions];
+    if (currentVal && !opts.some((o) => o.value === currentVal)) {
+      opts.unshift({ value: currentVal as any, label: currentVal as any });
+    }
+    return opts;
+  };
+
+  const supplierOptions = useMemo(() => {
+    const list: { value: string; label: string }[] = [];
+    const seen = new Set<string>();
+
+    const addSupplier = (name?: string, categoryOrCountry?: string) => {
+      const trimmed = (name || "").trim();
+      if (!trimmed || seen.has(trimmed.toLowerCase())) return;
+      seen.add(trimmed.toLowerCase());
+      list.push({
+        value: trimmed,
+        label: categoryOrCountry ? `${trimmed} (${categoryOrCountry})` : trimmed,
+      });
+    };
+
+    // 1. Master Suppliers from MMRepository (supports supplierName and name)
+    if (Array.isArray(suppliersMaster)) {
+      suppliersMaster.forEach((s) => {
+        const sName = s.supplierName || s.name;
+        const extra = s.category || s.country;
+        addSupplier(sName, extra);
+      });
+    }
+
+    // 2. Default Merchandising suppliers
+    DEFAULT_SUPPLIERS.forEach((name) => {
+      addSupplier(name);
+    });
+
+    return list.sort((a, b) => a.value.localeCompare(b.value));
+  }, [suppliersMaster]);
+
+  const getSupplierOptions = (currentVal?: string) => {
+    const opts = [...supplierOptions];
+    if (currentVal && !opts.some((o) => o.value.toLowerCase() === currentVal.trim().toLowerCase())) {
+      opts.unshift({ value: currentVal, label: currentVal });
+    }
+    return opts;
+  };
+
+  const vendorOptions = useMemo(() => {
+    return supplierOptions;
+  }, [supplierOptions]);
+
+  const getVendorOptions = (currentVal?: string) => {
+    return getSupplierOptions(currentVal);
+  };
+
+  const fabricSourceOptions = useMemo(() => {
+    return KNIT_FABRIC_SOURCES.map((s) => ({ value: s, label: s }));
+  }, []);
+
+  const getFabricSourceOptions = (currentVal?: string) => {
+    const opts = [...fabricSourceOptions];
+    if (currentVal && !opts.some((o) => o.value === currentVal)) {
+      opts.unshift({ value: currentVal as any, label: currentVal as any });
+    }
+    return opts;
+  };
+
+  const colorTypeOptions = useMemo(() => {
+    return KNIT_COLOR_TYPES.map((c) => ({ value: c, label: c }));
+  }, []);
+
+  const getColorTypeOptions = (currentVal?: string) => {
+    const opts = [...colorTypeOptions];
+    if (currentVal && !opts.some((o) => o.value === currentVal)) {
+      opts.unshift({ value: currentVal as any, label: currentVal as any });
+    }
+    return opts;
+  };
+
+  const ydTypeOptions = useMemo(() => {
+    return YD_TYPES.map((t) => ({ value: t, label: t }));
+  }, []);
+
+  const getYdTypeOptions = (currentVal?: string) => {
+    const opts = [...ydTypeOptions];
+    if (currentVal && !opts.some((o) => o.value === currentVal)) {
+      opts.unshift({ value: currentVal as any, label: currentVal as any });
+    }
+    return opts;
+  };
+
+  const aopTypeOptions = useMemo(() => {
+    return AOP_TYPES.map((t) => ({ value: t, label: t }));
+  }, []);
+
+  const getAopTypeOptions = (currentVal?: string) => {
+    const opts = [...aopTypeOptions];
+    if (currentVal && !opts.some((o) => o.value === currentVal)) {
+      opts.unshift({ value: currentVal as any, label: currentVal as any });
+    }
+    return opts;
+  };
+
+  // Fabric Process & Costing Details Modal State
+  const [fabricDetailsModal, setFabricDetailsModal] = useState<{
+    isOpen: boolean;
+    rowIndex: number | null;
+    tempRow: KnitFabricCostItemRow | null;
+  }>({
+    isOpen: false,
+    rowIndex: null,
+    tempRow: null,
+  });
 
   // Helper to get currently logged-in user or default to first valid merchandiser
   const getLoggedInUserMerchant = (): string => {
@@ -520,7 +2472,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
         if (u.name) return u.name;
       }
     } catch {}
-    return MM_MERCHANTS_MASTER[0]?.name || "Tanvir Ahmed";
+    return MM_MERCHANTS_MASTER[0]?.name || "Rashidul Islam";
   };
 
   // Attachment Modal & Lightbox Preview States
@@ -540,47 +2492,31 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     const defaultSeason = seasonsMaster[0]?.seasonName || "Autumn / Winter 2026";
     const loggedInUser = getLoggedInUserMerchant();
 
-    return {
-      id: `pc-${Date.now()}`,
+    const rawRecord: PreCostingRecord = {
+      id: `pc-gen-${Date.now()}`,
       preCostId: `JOB-2026-${String(nextSl).padStart(4, "0")}`,
-      preCostNo: `${26920 + nextSl}`,
+      preCostNo: `PC-${26920 + nextSl}`,
+      gmtItem: "T-Shirt",
+      category: "Men",
       preCostDate: new Date().toISOString().split("T")[0],
       contractNo: "",
       ourRef: "",
       acHolder: defaultBuyer?.accountHolder || "Md. Rashidul Islam",
       buyer: defaultBuyer?.name || "H&M Hennes & Mauritz",
       merchandiser: loggedInUser,
-      style: defaultStyle?.styleNo || "HM-KT-8841",
+      style: defaultStyle?.styleNo || "HM-8841",
       styleDescription: defaultStyle?.description || "Ladies Ribbed Henley Neck T-Shirt",
       season: defaultSeason,
       currency: "USD",
+      consumptionUnit: "DZ",
       smv: 4.25,
       cpm: 0.065,
       efficiencyPct: 65,
       note: "Initial style pre-costing estimation.",
       poRows: [
-        { id: `po-new-${Date.now()}-1`, sl: 1, poNumber: `PO-${defaultStyle?.styleNo || "STYLE"}-001`, poQuantity: 20000, rate: 4.25, value: 85000, remarks: "Main Lot Delivery" },
+        { id: `po-gen-new-${Date.now()}-1`, sl: 1, poNumber: `PO-${defaultStyle?.styleNo || "STYLE"}-001`, poQuantity: 20000, rate: 4.25, value: 85000, remarks: "Main Lot Delivery" },
       ],
-      items: [
-        {
-          id: `item-new-${Date.now()}-1`,
-          sl: 1,
-          preCostItemId: "PCI-1-01",
-          head: "Shell",
-          item: fabricMasterItems[0]?.fabricDescription || "100% Combed Cotton 2x2 Rib Fabric 220 GSM",
-          description: fabricMasterItems[0] ? `${fabricMasterItems[0].composition || ""}, ${fabricMasterItems[0].gsm || ""} GSM` : "100% Cotton combed",
-          nStatus: "Nominated",
-          supplier: suppliersMaster[0]?.name || DEFAULT_SUPPLIERS[0],
-          effectedQty: 20000,
-          consumption: 0.28,
-          unit: "Kg",
-          requiredQty: 5600,
-          finalQty: 5880,
-          rate: 4.20,
-          amount: 24696,
-          preCostPct: 100,
-        },
-      ],
+      items: [],
       attachments: [],
       status: "Draft",
       version: 1,
@@ -590,6 +2526,8 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
       versions: [],
       auditHistory: [],
     };
+
+    return ensureKnitCostingStructure(rawRecord, 85000);
   };
 
   const handleTabClick = (tabKey: "register" | "create" | "compare") => {
@@ -597,10 +2535,14 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
       setView("list");
       onTabChange?.("register");
     } else if (tabKey === "create") {
-      setFormData(createNewFormData());
+      const newRec = createNewFormData();
+      setFormData(newRec);
       setFormMode("create");
       setView("form");
-      onTabChange?.("create");
+      try {
+        localStorage.setItem("cripton_pre_costings_general_active_id_v1", newRec.id);
+      } catch {}
+      onTabChange?.("create", newRec.id);
     } else if (tabKey === "compare") {
       if (!compareRecord && records.length > 0) {
         setCompareRecord(records[0]);
@@ -610,8 +2552,180 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     }
   };
 
-  // ── Form State ─────────────────────────────────────────────────
-  const [formData, setFormData] = useState<PreCostingRecord>(() => createNewFormData());
+  // ── Form State (Restores saved record or active draft on mount/refresh) ─────
+  const [formData, setFormData] = useState<PreCostingRecord>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("cripton_pre_costings_general_master_v1");
+        const list: PreCostingRecord[] = stored ? JSON.parse(stored) : [];
+        if (Array.isArray(list) && list.length > 0) {
+          // 1. Explicit ID in search params or prop
+          const urlParams = new URLSearchParams(window.location.search);
+          const targetId = initialRecordId || urlParams.get("id");
+          if (targetId) {
+            const found = list.find((r) => r.id === targetId || r.preCostId === targetId);
+            if (found) {
+              const poVal = (found.poRows || []).reduce(
+                (acc, p) => acc + (Number(p.value) || 0),
+                0
+              );
+              const atts =
+                Array.isArray(found.attachments) && found.attachments.length > 0 && found.attachments.some((a) => Boolean(a.dataUrl))
+                  ? found.attachments
+                  : getStoredAttachmentsForRecord(found.id, found.preCostId);
+              return ensureKnitCostingStructure({ ...found, attachments: atts }, poVal);
+            }
+          }
+
+          // 2. Active editing draft ID in localStorage
+          const activeId = localStorage.getItem("cripton_pre_costings_general_active_id_v1");
+          if (activeId && initialTab === "create") {
+            const found = list.find((r) => r.id === activeId);
+            if (found) {
+              const poVal = (found.poRows || []).reduce(
+                (acc, p) => acc + (Number(p.value) || 0),
+                0
+              );
+              const atts =
+                Array.isArray(found.attachments) && found.attachments.length > 0 && found.attachments.some((a) => Boolean(a.dataUrl))
+                  ? found.attachments
+                  : getStoredAttachmentsForRecord(found.id, found.preCostId);
+              return ensureKnitCostingStructure({ ...found, attachments: atts }, poVal);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to restore initial formData from localStorage:", e);
+      }
+    }
+    return createNewFormData();
+  });
+
+  // Automatically persist formData to records & localStorage whenever formData changes in form view
+  useEffect(() => {
+    if (view !== "form") return;
+    if (!formData || !formData.id) return;
+
+    setRecords((prev) => {
+      const idx = prev.findIndex((r) => r.id === formData.id);
+      if (idx >= 0) {
+        const existing = prev[idx];
+        if (existing === formData) return prev;
+        const copy = [...prev];
+        copy[idx] = formData;
+        return copy;
+      } else {
+        return [formData, ...prev];
+      }
+    });
+
+    try {
+      localStorage.setItem("cripton_pre_costings_general_active_id_v1", formData.id);
+    } catch {}
+  }, [formData, view]);
+
+  // ── Pre Costing Identification Dropdown Options ────────────────
+  const gmtItemSelectOptions = useMemo(
+    () => GMT_ITEM_OPTIONS.map((item) => ({ value: item, label: item })),
+    []
+  );
+
+  const categorySelectOptions = useMemo(
+    () => GMT_CATEGORY_OPTIONS.map((cat) => ({ value: cat, label: cat })),
+    []
+  );
+
+  // ── Available Yarn Item Dropdown Options ───────────────────────
+  const availableYarnItemOptions = useMemo(() => {
+    const itemSet = new Set<string>();
+
+    // 1. From Block Yarn Bookings
+    try {
+      const bookings = MMRepository.getManualBookings();
+      if (Array.isArray(bookings)) {
+        bookings.forEach((b) => {
+          if (Array.isArray(b.items)) {
+            b.items.forEach((it) => {
+              const name = (it.itemDescription || (it as any).itemName || "").trim();
+              if (name && name !== "Yarn Item") itemSet.add(name);
+            });
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("Could not load booking items for yarn dropdown:", e);
+    }
+
+    // 2. From Master Yarn Rates
+    try {
+      const rates = MMMasterDataRepository.getYarnRates();
+      if (Array.isArray(rates)) {
+        rates.forEach((r) => {
+          if (Array.isArray(r.entries)) {
+            r.entries.forEach((e) => {
+              const count = (e.count || "").trim();
+              const comp = (e.composition || "").trim();
+              if (count && comp) itemSet.add(`${count} ${comp}`);
+              else if (count) itemSet.add(count);
+            });
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("Could not load yarn rates for yarn dropdown:", e);
+    }
+
+    // 3. Default standard knit yarn items
+    const defaultKnitYarnItems = [
+      "100% Combed Cotton Yarn Ne 30/1",
+      "100% Combed Cotton Yarn Ne 26/1",
+      "100% Combed Cotton Yarn Ne 20/1",
+      "100% Carded Cotton Yarn Ne 24/1",
+      "100% Combed Cotton Yarn Ne 34/1",
+      "100% Combed Cotton Yarn Ne 40/1",
+      "100% Cotton Grey Melange Yarn Ne 30/1",
+      "60% Cotton 40% Polyester (CVC) Yarn Ne 26/1",
+      "60% Cotton 40% Polyester (CVC) Yarn Ne 30/1",
+      "65% Polyester 35% Cotton (PC) Yarn Ne 30/1",
+      "95% Cotton 5% Spandex Yarn Ne 30/1",
+      "100% Combed Cotton Ring Spun",
+      "30/1 Combed Cotton",
+      "26/1 Combed Cotton",
+      "20/1 Combed Cotton",
+      "24/1 Carded Cotton",
+      "34/1 Combed Cotton",
+      "40/1 Combed Cotton",
+      "30/1 CVC 60/40",
+      "26/1 CVC 60/40",
+      "30/1 Grey Melange",
+      "40D Spandex",
+      "70D Spandex",
+    ];
+    defaultKnitYarnItems.forEach((it) => itemSet.add(it));
+
+    // 4. Fabric composition + master yarn counts combinations
+    const currentComp = formData?.fabricEntry?.fabricComposition;
+    if (currentComp && Array.isArray(masterYarnCounts)) {
+      masterYarnCounts.forEach((yc) => {
+        if (yc.yarnCount) {
+          itemSet.add(`${yc.yarnCount} ${currentComp}`);
+        }
+      });
+    }
+
+    return Array.from(itemSet).map((name) => ({
+      value: name,
+      label: name,
+    }));
+  }, [formData?.fabricEntry?.fabricComposition, masterYarnCounts]);
+
+  const getYarnItemOptions = (currentVal?: string) => {
+    const opts = [...availableYarnItemOptions];
+    if (currentVal && !opts.some((o) => o.value === currentVal)) {
+      opts.unshift({ value: currentVal, label: currentVal });
+    }
+    return opts;
+  };
 
   // Calculate Consolidated Order Qty & Total PO Value
   const consolidatedOrderQty = useMemo(() => {
@@ -626,10 +2740,59 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     return consolidatedOrderQty > 0 ? totalPoValue / consolidatedOrderQty : 0;
   }, [consolidatedOrderQty, totalPoValue]);
 
+  // Calculate Section 3 Sub-Totals & Overall Total
+  const totalFabricCost = useMemo(() => {
+    return (formData.knitFabricItems || []).reduce((acc, row) => acc + (Number(row.totalAmount) || 0), 0);
+  }, [formData.knitFabricItems]);
+
+  const totalAccessoriesCost = useMemo(() => {
+    return (formData.accessoriesItems || []).reduce((acc, row) => acc + (Number(row.amount) || 0), 0);
+  }, [formData.accessoriesItems]);
+
+  const totalEmbellishmentCost = useMemo(() => {
+    return (formData.embellishmentItems || []).reduce((acc, row) => acc + (Number(row.amount) || 0), 0);
+  }, [formData.embellishmentItems]);
+
+  const totalOthersCost = useMemo(() => {
+    return (formData.otherCostItems || []).reduce((acc, row) => acc + (Number(row.amount) || 0), 0);
+  }, [formData.otherCostItems]);
+
+  const totalOverheadCost = useMemo(() => {
+    const comm =
+      formData.commissionValue !== undefined && formData.commissionValue !== null
+        ? Number(formData.commissionValue)
+        : Number(((totalPoValue * (formData.commissionPct || 0)) / 100).toFixed(2));
+    const fin =
+      formData.financialValue !== undefined && formData.financialValue !== null
+        ? Number(formData.financialValue)
+        : Number(((totalPoValue * (formData.financialPct || 0)) / 100).toFixed(2));
+    const samp =
+      formData.samplingValue !== undefined && formData.samplingValue !== null
+        ? Number(formData.samplingValue)
+        : Number(((totalPoValue * (formData.samplingPct || 0)) / 100).toFixed(2));
+    const comml =
+      formData.commercialValue !== undefined && formData.commercialValue !== null
+        ? Number(formData.commercialValue)
+        : Number(((totalPoValue * (formData.commercialPct || 0)) / 100).toFixed(2));
+    return Number((comm + fin + samp + comml).toFixed(2));
+  }, [
+    totalPoValue,
+    formData.commissionValue,
+    formData.commissionPct,
+    formData.financialValue,
+    formData.financialPct,
+    formData.samplingValue,
+    formData.samplingPct,
+    formData.commercialValue,
+    formData.commercialPct,
+  ]);
+
   // Calculate Total Cost & Surplus
   const totalCost = useMemo(() => {
+    const sum = totalFabricCost + totalAccessoriesCost + totalEmbellishmentCost + totalOthersCost + totalOverheadCost;
+    if (sum > 0) return Number(sum.toFixed(2));
     return (formData.items || []).reduce((acc, item) => acc + (Number(item.amount) || 0), 0);
-  }, [formData.items]);
+  }, [totalFabricCost, totalAccessoriesCost, totalEmbellishmentCost, totalOthersCost, totalOverheadCost, formData.items]);
 
   const totalSurplus = useMemo(() => {
     return totalPoValue - totalCost;
@@ -673,6 +2836,158 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     }));
   };
 
+    // PO-wise Color Quantity Modal State
+  const [poColorModal, setPoColorModal] = useState<{
+    isOpen: boolean;
+    poIndex: number;
+    poNumber: string;
+    poQuantity: number;
+    rows: MMPreCostPOColorRow[];
+  }>({
+    isOpen: false,
+    poIndex: -1,
+    poNumber: "",
+    poQuantity: 0,
+    rows: [],
+  });
+
+  const colorOptions = useMemo(() => {
+    return STANDARD_GARMENT_COLORS.map((c) => ({ value: c, label: c }));
+  }, []);
+
+  const getColorOptions = (currentVal?: string) => {
+    const opts = [...colorOptions];
+    if (currentVal && !opts.some((o) => o.value.toLowerCase() === currentVal.trim().toLowerCase())) {
+      opts.unshift({ value: currentVal, label: currentVal });
+    }
+    return opts;
+  };
+
+  const handleOpenPoColorModal = (poIndex: number) => {
+    const targetPo = formData.poRows?.[poIndex];
+    if (!targetPo) return;
+    const existingBreakdown: MMPreCostPOColorRow[] =
+      Array.isArray(targetPo.colorBreakdown) && targetPo.colorBreakdown.length > 0
+        ? targetPo.colorBreakdown.map((c) => ({ ...c }))
+        : [
+            {
+              id: `col-${Date.now()}-1`,
+              color: STANDARD_GARMENT_COLORS[0],
+              quantity: targetPo.poQuantity || 0,
+            },
+          ];
+
+    setPoColorModal({
+      isOpen: true,
+      poIndex,
+      poNumber: targetPo.poNumber || `PO #${poIndex + 1}`,
+      poQuantity: Number(targetPo.poQuantity) || 0,
+      rows: existingBreakdown,
+    });
+  };
+
+  const handleAddPoColorRow = () => {
+    if (formMode === "view") return;
+    const currentSum = poColorModal.rows.reduce((s, r) => s + (Number(r.quantity) || 0), 0);
+    const remaining = Math.max(0, poColorModal.poQuantity - currentSum);
+    const usedColors = new Set(poColorModal.rows.map((r) => r.color.toLowerCase()));
+    const nextColor = STANDARD_GARMENT_COLORS.find((c) => !usedColors.has(c.toLowerCase())) || "Custom Color";
+
+    setPoColorModal((prev) => ({
+      ...prev,
+      rows: [
+        ...prev.rows,
+        {
+          id: `col-${Date.now()}-${prev.rows.length + 1}`,
+          color: nextColor,
+          quantity: remaining,
+        },
+      ],
+    }));
+  };
+
+  const handleUpdatePoColorRow = (rowIdx: number, field: keyof MMPreCostPOColorRow, value: any) => {
+    if (formMode === "view") return;
+    setPoColorModal((prev) => {
+      const copy = [...prev.rows];
+      copy[rowIdx] = { ...copy[rowIdx], [field]: value };
+      return { ...prev, rows: copy };
+    });
+  };
+
+  const handleRemovePoColorRow = (rowIdx: number) => {
+    if (formMode === "view") return;
+    setPoColorModal((prev) => {
+      const copy = prev.rows.filter((_, i) => i !== rowIdx);
+      return { ...prev, rows: copy };
+    });
+  };
+
+  const handleSavePoColorModal = () => {
+    if (formMode === "view") {
+      setPoColorModal((prev) => ({ ...prev, isOpen: false }));
+      return;
+    }
+    const totalColorQty = poColorModal.rows.reduce((s, r) => s + (Number(r.quantity) || 0), 0);
+    if (totalColorQty > poColorModal.poQuantity) {
+      toast.error(
+        `Total color quantity (${totalColorQty.toLocaleString()} pcs) exceeds PO Quantity (${poColorModal.poQuantity.toLocaleString()} pcs). Total quantity cannot exceed the PO Quantity.`
+      );
+      return;
+    }
+
+    for (let i = 0; i < poColorModal.rows.length; i++) {
+      const r = poColorModal.rows[i];
+      if (!r.color || !r.color.trim()) {
+        toast.error(`Please select or enter a Color for row #${i + 1}.`);
+        return;
+      }
+      if (Number(r.quantity) < 0) {
+        toast.error(`Quantity cannot be negative for row #${i + 1}.`);
+        return;
+      }
+    }
+
+    setFormData((prev) => {
+      const copy = [...(prev.poRows || [])];
+      if (copy[poColorModal.poIndex]) {
+        copy[poColorModal.poIndex] = {
+          ...copy[poColorModal.poIndex],
+          colorBreakdown: poColorModal.rows,
+        };
+      }
+      return { ...prev, poRows: copy };
+    });
+
+    toast.success(
+      `Color quantities saved for ${poColorModal.poNumber} (${totalColorQty.toLocaleString()} pcs across ${poColorModal.rows.length} colors).`
+    );
+    setPoColorModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  // ── Overhead & Commercial Percentage Handlers ─────────────────
+  const handleOverheadPctChange = (
+    field: "commissionPct" | "financialPct" | "samplingPct" | "commercialPct",
+    pctVal: number
+  ) => {
+    if (formMode === "view") return;
+    const pct = isNaN(pctVal) ? 0 : Math.max(0, pctVal);
+    const val = Number(((totalPoValue * pct) / 100).toFixed(2));
+    const valField =
+      field === "commissionPct"
+        ? "commissionValue"
+        : field === "financialPct"
+        ? "financialValue"
+        : field === "samplingPct"
+        ? "samplingValue"
+        : "commercialValue";
+    setFormData((prev) => ({
+      ...prev,
+      [field]: pct,
+      [valField]: val,
+    }));
+  };
+
   // ── Purchase Order Row Handlers ────────────────────────────────
   const handleAddPoRow = () => {
     if (formMode === "view") return;
@@ -684,12 +2999,33 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
       poQuantity: 10000,
       rate: 4.15,
       value: 41500,
+      deliveryDate: "",
       remarks: "",
     };
-    setFormData((prev) => ({
-      ...prev,
-      poRows: [...(prev.poRows || []), newPo],
-    }));
+    setFormData((prev) => {
+      const updatedPo = [...(prev.poRows || []), newPo];
+      const newPoVal = updatedPo.reduce((acc, p) => acc + (Number(p.value) || 0), 0);
+      const newPoQty = updatedPo.reduce((acc, p) => acc + (Number(p.poQuantity) || 0), 0);
+      const updatedOthers = (prev.otherCostItems || []).map((row) =>
+        computeOtherCostRow(row, newPoVal, newPoQty)
+      );
+      const syncedItems = syncAllCostingItems(
+        prev.knitFabricItems || [],
+        prev.accessoriesItems || [],
+        updatedOthers,
+        prev.embellishmentItems || []
+      );
+      return {
+        ...prev,
+        poRows: updatedPo,
+        commissionValue: Number(((newPoVal * (prev.commissionPct || 0)) / 100).toFixed(2)),
+        financialValue: Number(((newPoVal * (prev.financialPct || 0)) / 100).toFixed(2)),
+        samplingValue: Number(((newPoVal * (prev.samplingPct || 0)) / 100).toFixed(2)),
+        commercialValue: Number(((newPoVal * (prev.commercialPct || 0)) / 100).toFixed(2)),
+        otherCostItems: updatedOthers,
+        items: syncedItems,
+      };
+    });
   };
 
   const handleUpdatePoRow = (index: number, field: keyof MMPreCostPO, value: any) => {
@@ -703,7 +3039,27 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
         target.value = Number((qty * rate).toFixed(2));
       }
       copy[index] = target;
-      return { ...prev, poRows: copy };
+      const newPoVal = copy.reduce((acc, p) => acc + (Number(p.value) || 0), 0);
+      const newPoQty = copy.reduce((acc, p) => acc + (Number(p.poQuantity) || 0), 0);
+      const updatedOthers = (prev.otherCostItems || []).map((row) =>
+        computeOtherCostRow(row, newPoVal, newPoQty)
+      );
+      const syncedItems = syncAllCostingItems(
+        prev.knitFabricItems || [],
+        prev.accessoriesItems || [],
+        updatedOthers,
+        prev.embellishmentItems || []
+      );
+      return {
+        ...prev,
+        poRows: copy,
+        commissionValue: Number(((newPoVal * (prev.commissionPct || 0)) / 100).toFixed(2)),
+        financialValue: Number(((newPoVal * (prev.financialPct || 0)) / 100).toFixed(2)),
+        samplingValue: Number(((newPoVal * (prev.samplingPct || 0)) / 100).toFixed(2)),
+        commercialValue: Number(((newPoVal * (prev.commercialPct || 0)) / 100).toFixed(2)),
+        otherCostItems: updatedOthers,
+        items: syncedItems,
+      };
     });
   };
 
@@ -712,7 +3068,27 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     setFormData((prev) => {
       const filtered = prev.poRows.filter((_, i) => i !== index);
       const reindexed = filtered.map((p, i) => ({ ...p, sl: i + 1 }));
-      return { ...prev, poRows: reindexed };
+      const newPoVal = reindexed.reduce((acc, p) => acc + (Number(p.value) || 0), 0);
+      const newPoQty = reindexed.reduce((acc, p) => acc + (Number(p.poQuantity) || 0), 0);
+      const updatedOthers = (prev.otherCostItems || []).map((row) =>
+        computeOtherCostRow(row, newPoVal, newPoQty)
+      );
+      const syncedItems = syncAllCostingItems(
+        prev.knitFabricItems || [],
+        prev.accessoriesItems || [],
+        updatedOthers,
+        prev.embellishmentItems || []
+      );
+      return {
+        ...prev,
+        poRows: reindexed,
+        commissionValue: Number(((newPoVal * (prev.commissionPct || 0)) / 100).toFixed(2)),
+        financialValue: Number(((newPoVal * (prev.financialPct || 0)) / 100).toFixed(2)),
+        samplingValue: Number(((newPoVal * (prev.samplingPct || 0)) / 100).toFixed(2)),
+        commercialValue: Number(((newPoVal * (prev.commercialPct || 0)) / 100).toFixed(2)),
+        otherCostItems: updatedOthers,
+        items: syncedItems,
+      };
     });
   };
 
@@ -875,6 +3251,1751 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     });
   };
 
+  // ── Knit Fabric Cost Handlers ──────────────────────────────────
+  const handleOpenFabricEntryModal = () => {
+    setTempFabricEntry(
+      formData.fabricEntry || {
+        fabricComposition: "100% Combed Cotton",
+        fabricType: "Single Jersey",
+        gsm: 180,
+        spinningType: "Ring",
+        feederType: "Half Feeder",
+        washType: "Hydrophilic Softener Wash",
+        finishType: "Heatset Finish",
+        otherSpecs: "",
+        fabricCategory: "Knit Fabric",
+      }
+    );
+    setShowFabricEntryModal(true);
+  };
+
+  const handleSaveFabricEntryModal = () => {
+    if (formMode === "view") {
+      setShowFabricEntryModal(false);
+      return;
+    }
+    setFormData((prev) => ({
+      ...prev,
+      fabricEntry: { ...tempFabricEntry },
+    }));
+    setShowFabricEntryModal(false);
+    toast.success("Fabric Entry Specifications saved.");
+  };
+
+  const handleFabricEntryChange = (field: keyof KnitFabricEntryData, value: any) => {
+    if (formMode === "view") return;
+    setFormData((prev) => ({
+      ...prev,
+      fabricEntry: {
+        ...(prev.fabricEntry || {
+          fabricComposition: "100% Combed Cotton",
+          fabricType: "Single Jersey",
+          gsm: 180,
+          spinningType: "Ring",
+          feederType: "Half Feeder",
+          washType: "Hydrophilic Softener Wash",
+          finishType: "Heatset Finish",
+          otherSpecs: "Bio-washed combed cotton",
+          fabricCategory: "Knit Fabric",
+        }),
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleAddFabricItem = () => {
+    if (formMode === "view") return;
+    const nextSl = (formData.knitFabricItems || []).length + 1;
+    const orderPcs = consolidatedOrderQty > 0 ? consolidatedOrderQty : 10000;
+    const comp = formData.fabricEntry?.fabricComposition || "100% Combed Cotton";
+    const fType = formData.fabricEntry?.fabricType || "Single Jersey";
+    const gsm = formData.fabricEntry?.gsm || 180;
+    const defaultCount = masterYarnCounts[0]?.yarnCount || "30/1";
+    const defaultSpin = formData.fabricEntry?.spinningType || "Ring";
+    const defaultColor = "Solid";
+    const defaultRate = getLatestYarnRate(defaultCount, comp, "A") ?? 3.45;
+
+    const defaultYarn: KnitYarnDetailRow = {
+      id: `yd-${Date.now()}-1`,
+      sl: 1,
+      grade: "A",
+      colorType: defaultColor,
+      yarnCount: defaultCount,
+      yarnComposition: comp,
+      spinningType: defaultSpin,
+      yarnItem: `${defaultCount} ${comp}`,
+      ratioPct: 100,
+      finalQtyKg: 0,
+      ratePerKg: defaultRate,
+      masterRatePerKg: defaultRate,
+      yarnCost: 0,
+      brand: suppliersMaster[0]?.name || "Square Textiles Ltd",
+    };
+
+    const firstSetup = fabricSetups[0];
+    const setupComp = firstSetup?.fabricComposition || formData.fabricEntry?.fabricComposition || "100% Cotton";
+    const setupFType = firstSetup?.fabricType || formData.fabricEntry?.fabricType || "Single Jersey";
+    const setupGsm = firstSetup?.gsm || formData.fabricEntry?.gsm || 180;
+    const itemName = firstSetup?.fabricName || `${setupComp} ${setupFType} ${setupGsm} GSM`;
+    const setupColor = firstSetup?.colorType || "Solid";
+    const setupFeeder = firstSetup?.feederType || "";
+
+    const matchedKnit = findMatchingKnittingRate(
+      masterKnittingRates,
+      masterFabricTypes,
+      setupFType,
+      setupColor,
+      setupFeeder
+    );
+    const matchedDye = findMatchingDyeingRate(masterDyeingRates, "Medium", "Reactive");
+    const matchedAop = findMatchingAopRate(masterAopRates, "Reactive");
+
+    const newRow = computeKnitFabricRow({
+      id: `kfi-${Date.now()}-${nextSl}`,
+      sl: nextSl,
+      head: nextSl === 1 ? "Shell" : nextSl === 2 ? "Rib / Trims" : "Shell",
+      item: itemName,
+      fabricSetupId: firstSetup?.id,
+      fabricComposition: setupComp,
+      fabricType: setupFType,
+      gsm: setupGsm ? Number(setupGsm) : undefined,
+      spinningType: firstSetup?.spinningType || "Ring",
+      feederType: setupFeeder,
+      washType: firstSetup?.washType || "Hydrophilic Softener Wash",
+      finishType: firstSetup?.finishType || "Heatset Finish",
+      otherSpecs: firstSetup?.otherSpecs || "",
+      fabricCategory: firstSetup?.fabricCategory || "Knit Fabric",
+      effectedQtyPcs: orderPcs,
+      consumptionKgDz: 2.45,
+      rmgProcessLossPct: 3.0,
+      fabricSource: "Production",
+      colorType: setupColor,
+      colorShade: "Medium",
+      dyeingMethod: "Reactive",
+      dyeingProcessLossPct: matchedDye ? matchedDye.processLoss : 4.0,
+      dyeingRate: matchedDye ? matchedDye.rate : 1.65,
+      masterDyeingRate: matchedDye ? matchedDye.rate : 1.65,
+      knittingProcessLossPct: matchedKnit ? matchedKnit.processLossPct : 3.0,
+      knittingRate: matchedKnit ? matchedKnit.knittingRate : 0.35,
+      masterKnittingRate: matchedKnit ? matchedKnit.knittingRate : 0.35,
+      ydType: "Feeder Stripe",
+      ydProcessLossPct: 3.0,
+      ydRate: 0.75,
+      masterYdRate: 0.75,
+      aopType: "Reactive",
+      aopProcessLossPct: matchedAop ? matchedAop.processLoss : 4.0,
+      aopRate: matchedAop ? matchedAop.rate : 0.95,
+      masterAopRate: matchedAop ? matchedAop.rate : 0.95,
+      washingRate: 0,
+      finishingRate: 0,
+      yarnDetails: [defaultYarn],
+    }, formData.consumptionUnit || "DZ");
+
+    setFormData((prev) => {
+      const updatedFabric = [...(prev.knitFabricItems || []), newRow];
+      const syncedItems = syncAllCostingItems(updatedFabric, prev.accessoriesItems || [], prev.otherCostItems || [], prev.embellishmentItems || []);
+      return {
+        ...prev,
+        knitFabricItems: updatedFabric,
+        items: syncedItems,
+      };
+    });
+  };
+
+  const handleUpdateFabricItem = (index: number, field: keyof KnitFabricCostItemRow, value: any) => {
+    if (formMode === "view") return;
+    setFormData((prev) => {
+      const copy = [...(prev.knitFabricItems || [])];
+      const target = { ...copy[index], [field]: value };
+
+      if (field === "fabricSource" && value === "Finish Purchase" && !target.colorType) {
+        target.colorType = "N/A";
+      }
+
+      // Auto-populate all associated specifications and matching rates when selecting a Fabric Item
+      if (field === "item") {
+        const found = fabricSetups.find((f) => f.fabricName === value || f.id === value);
+        if (found) {
+          target.item = found.fabricName;
+          target.fabricSetupId = found.id;
+          target.fabricComposition = found.fabricComposition;
+          target.fabricType = found.fabricType;
+          target.gsm = found.gsm;
+          target.spinningType = found.spinningType;
+          target.feederType = found.feederType;
+          target.washType = found.washType;
+          target.finishType = found.finishType;
+          target.otherSpecs = found.otherSpecs;
+          target.fabricCategory = found.fabricCategory;
+          target.colorType = found.colorType || target.colorType || "Solid";
+
+          const matchedKnit = findMatchingKnittingRate(
+            masterKnittingRates,
+            masterFabricTypes,
+            found.fabricType,
+            target.colorType || found.colorType || "Solid",
+            found.feederType || ""
+          );
+          if (matchedKnit) {
+            target.knittingRate = matchedKnit.knittingRate;
+            target.knittingProcessLossPct = matchedKnit.processLossPct;
+          }
+        }
+      }
+
+      // Re-evaluate knitting rate if colorType changes
+      if (field === "colorType") {
+        const matchedKnit = findMatchingKnittingRate(
+          masterKnittingRates,
+          masterFabricTypes,
+          target.fabricType || "",
+          value,
+          target.feederType || ""
+        );
+        if (matchedKnit) {
+          target.knittingRate = matchedKnit.knittingRate;
+          target.knittingProcessLossPct = matchedKnit.processLossPct;
+        }
+      }
+
+      // Auto-fill dyeing rate/loss if shade or method changed
+      if (field === "colorShade" || field === "dyeingMethod") {
+        const shade = field === "colorShade" ? value : target.colorShade;
+        const method = field === "dyeingMethod" ? value : target.dyeingMethod;
+        const matchedDye = findMatchingDyeingRate(masterDyeingRates, shade, method);
+        if (matchedDye) {
+          target.dyeingRate = matchedDye.rate;
+          target.dyeingProcessLossPct = matchedDye.processLoss;
+        }
+      }
+
+      // Auto-fill Yarn Dyeing rate/loss if Y/D Type, Color Shade, or Dyeing Method changed
+      if (field === "ydType" || field === "colorShade" || field === "dyeingMethod") {
+        const ydType = field === "ydType" ? value : (target.ydType || "Feeder Stripe");
+        const shade = field === "colorShade" ? value : (target.colorShade || "Medium");
+        const method = field === "dyeingMethod" ? value : (target.dyeingMethod || "Reactive");
+        const matchedYD = findMatchingYarnDyeingRate(masterYarnDyeingRates, ydType, shade, method);
+        if (matchedYD) {
+          target.ydRate = matchedYD.rate;
+          target.ydProcessLossPct = matchedYD.processLoss;
+        }
+      }
+
+      // Auto-fill AOP rate/loss if AOP type changed
+      if (field === "aopType") {
+        const matchedAop = findMatchingAopRate(masterAopRates, value);
+        if (matchedAop) {
+          target.aopRate = matchedAop.rate;
+          target.aopProcessLossPct = matchedAop.processLoss;
+        }
+      }
+
+      copy[index] = computeKnitFabricRow(target, prev.consumptionUnit || "DZ");
+      const syncedItems = syncAllCostingItems(copy, prev.accessoriesItems || [], prev.otherCostItems || [], prev.embellishmentItems || []);
+      return {
+        ...prev,
+        knitFabricItems: copy,
+        items: syncedItems,
+      };
+    });
+  };
+
+  const handleRemoveFabricItem = (index: number) => {
+    if (formMode === "view") return;
+    setFormData((prev) => {
+      const filtered = (prev.knitFabricItems || []).filter((_, i) => i !== index);
+      const reindexed = filtered.map((row, i) => ({ ...row, sl: i + 1 }));
+      const syncedItems = syncAllCostingItems(reindexed, prev.accessoriesItems || [], prev.otherCostItems || [], prev.embellishmentItems || []);
+      return {
+        ...prev,
+        knitFabricItems: reindexed,
+        items: syncedItems,
+      };
+    });
+  };
+
+  // ── Fabric Processing & Costing Details Modal Handlers ─────────
+  const handleOpenFabricDetailsModal = (idx: number) => {
+    const row = (formData.knitFabricItems || [])[idx];
+    if (!row) return;
+
+    // Retrieve fabric setup from Fabric Register to guarantee live specifications
+    const matchedSetup = fabricSetups.find(
+      (s) => (row.fabricSetupId && s.id === row.fabricSetupId) || s.fabricName === row.item
+    );
+
+    const fabricType = row.fabricType || matchedSetup?.fabricType || formData.fabricEntry?.fabricType || "";
+    const fabricColorType = matchedSetup?.colorType || (row.colorType === "Y/D" ? "Y/D" : "Solid");
+    const feederType = row.feederType !== undefined
+      ? row.feederType
+      : (matchedSetup?.feederType !== undefined
+          ? matchedSetup.feederType
+          : (formData.fabricEntry?.feederType || ""));
+
+    const matchedKnit = findMatchingKnittingRate(
+      masterKnittingRates,
+      masterFabricTypes,
+      fabricType,
+      fabricColorType,
+      feederType
+    );
+
+    const matchedDye = findMatchingDyeingRate(
+      masterDyeingRates,
+      row.colorShade || "Medium",
+      row.dyeingMethod || "Reactive"
+    );
+
+    const matchedYD = findMatchingYarnDyeingRate(
+      masterYarnDyeingRates,
+      row.ydType || "Feeder Stripe",
+      row.colorShade || "Medium",
+      row.dyeingMethod || "Reactive"
+    );
+
+    const matchedAop = findMatchingAopRate(masterAopRates, row.aopType || "Reactive");
+
+    const updatedRow: KnitFabricCostItemRow = {
+      ...row,
+      fabricSetupId: row.fabricSetupId || matchedSetup?.id,
+      fabricComposition: row.fabricComposition || matchedSetup?.fabricComposition,
+      fabricType,
+      feederType,
+      gsm: row.gsm || matchedSetup?.gsm,
+      spinningType: row.spinningType || matchedSetup?.spinningType,
+      washType: row.washType || matchedSetup?.washType,
+      finishType: row.finishType || matchedSetup?.finishType,
+      otherSpecs: row.otherSpecs || matchedSetup?.otherSpecs,
+      fabricCategory: row.fabricCategory || matchedSetup?.fabricCategory,
+    };
+
+    if (matchedKnit) {
+      updatedRow.knittingProcessLossPct = matchedKnit.processLossPct;
+      if (updatedRow.knittingRate === undefined || updatedRow.knittingRate === null) {
+        updatedRow.knittingRate = matchedKnit.knittingRate;
+      }
+      if (updatedRow.masterKnittingRate === undefined) {
+        updatedRow.masterKnittingRate = matchedKnit.knittingRate;
+      }
+    }
+
+    if (matchedDye) {
+      updatedRow.dyeingProcessLossPct = matchedDye.processLoss;
+      if (updatedRow.dyeingRate === undefined || updatedRow.dyeingRate === null) {
+        updatedRow.dyeingRate = matchedDye.rate;
+      }
+      if (updatedRow.masterDyeingRate === undefined) {
+        updatedRow.masterDyeingRate = matchedDye.rate;
+      }
+    }
+
+    if (matchedYD) {
+      updatedRow.ydProcessLossPct = matchedYD.processLoss;
+      if (updatedRow.ydRate === undefined || updatedRow.ydRate === null) {
+        updatedRow.ydRate = matchedYD.rate;
+      }
+      if (updatedRow.masterYdRate === undefined) {
+        updatedRow.masterYdRate = matchedYD.rate;
+      }
+    }
+
+    if (matchedAop) {
+      updatedRow.aopProcessLossPct = matchedAop.processLoss;
+      if (updatedRow.aopRate === undefined || updatedRow.aopRate === null) {
+        updatedRow.aopRate = matchedAop.rate;
+      }
+      if (updatedRow.masterAopRate === undefined) {
+        updatedRow.masterAopRate = matchedAop.rate;
+      }
+    }
+
+    const recomputed = computeKnitFabricRow(updatedRow, formData.consumptionUnit || "DZ");
+
+    setFabricDetailsModal({
+      isOpen: true,
+      rowIndex: idx,
+      tempRow: recomputed,
+    });
+  };
+
+  const handleCloseFabricDetailsModal = () => {
+    setFabricDetailsModal({
+      isOpen: false,
+      rowIndex: null,
+      tempRow: null,
+    });
+  };
+
+  const handleUpdateFabricDetailsModalField = (field: keyof KnitFabricCostItemRow, value: any) => {
+    setFabricDetailsModal((prev) => {
+      if (!prev.tempRow) return prev;
+      const updated = { ...prev.tempRow, [field]: value };
+
+      // Automatically update Dyeing Rate when Color Shade or Dyeing Method changes
+      if (field === "colorShade" || field === "dyeingMethod") {
+        const shade = field === "colorShade" ? value : updated.colorShade;
+        const method = field === "dyeingMethod" ? value : updated.dyeingMethod;
+        const matchedDye = findMatchingDyeingRate(masterDyeingRates, shade, method);
+        if (matchedDye) {
+          updated.dyeingProcessLossPct = matchedDye.processLoss;
+          updated.dyeingRate = matchedDye.rate;
+          updated.masterDyeingRate = matchedDye.rate;
+        }
+      }
+
+      // User manually updating Dyeing Rate
+      if (field === "dyeingRate") {
+        if (updated.masterDyeingRate === undefined) {
+          const matchedDye = findMatchingDyeingRate(masterDyeingRates, updated.colorShade, updated.dyeingMethod);
+          updated.masterDyeingRate = matchedDye ? matchedDye.rate : 1.65;
+        }
+      }
+
+      // Automatically update Yarn Dyeing Rate when Y/D Type, Color Shade or Dyeing Method changes
+      if (field === "ydType" || field === "colorShade" || field === "dyeingMethod") {
+        const currentYdType = field === "ydType" ? value : (updated.ydType || "Feeder Stripe");
+        const currentShade = field === "colorShade" ? value : (updated.colorShade || "Medium");
+        const currentMethod = field === "dyeingMethod" ? value : (updated.dyeingMethod || "Reactive");
+        const matchedYD = findMatchingYarnDyeingRate(masterYarnDyeingRates, currentYdType, currentShade, currentMethod);
+        if (matchedYD) {
+          updated.ydProcessLossPct = matchedYD.processLoss;
+          updated.ydRate = matchedYD.rate;
+          updated.masterYdRate = matchedYD.rate;
+        }
+      }
+
+      // User manually updating Yarn Dyeing Rate
+      if (field === "ydRate") {
+        if (updated.masterYdRate === undefined) {
+          const matchedYD = findMatchingYarnDyeingRate(
+            masterYarnDyeingRates,
+            updated.ydType || "Feeder Stripe",
+            updated.colorShade || "Medium",
+            updated.dyeingMethod || "Reactive"
+          );
+          updated.masterYdRate = matchedYD ? matchedYD.rate : 0.75;
+        }
+      }
+
+      // Automatically update AOP Rate when AOP Type changes
+      if (field === "aopType") {
+        const matchedAop = findMatchingAopRate(masterAopRates, value);
+        if (matchedAop) {
+          updated.aopProcessLossPct = matchedAop.processLoss;
+          updated.aopRate = matchedAop.rate;
+          updated.masterAopRate = matchedAop.rate;
+        }
+      }
+
+      // User manually updating AOP Rate
+      if (field === "aopRate") {
+        if (updated.masterAopRate === undefined) {
+          const matchedAop = findMatchingAopRate(masterAopRates, updated.aopType || "Reactive");
+          updated.masterAopRate = matchedAop ? matchedAop.rate : 0.95;
+        }
+      }
+
+      // User manually updating Knitting Rate
+      if (field === "knittingRate") {
+        if (updated.masterKnittingRate === undefined) {
+          const matchedKnit = findMatchingKnittingRate(
+            masterKnittingRates,
+            masterFabricTypes,
+            updated.fabricType || "",
+            updated.colorType || "Solid",
+            updated.feederType || ""
+          );
+          updated.masterKnittingRate = matchedKnit ? matchedKnit.knittingRate : 0.35;
+        }
+      }
+
+      const recomputed = computeKnitFabricRow(updated, formData.consumptionUnit || "DZ");
+      return {
+        ...prev,
+        tempRow: recomputed,
+      };
+    });
+  };
+
+  const handleSaveFabricDetailsModal = () => {
+    if (fabricDetailsModal.rowIndex === null || !fabricDetailsModal.tempRow) return;
+    const idx = fabricDetailsModal.rowIndex;
+    const finalRow = fabricDetailsModal.tempRow;
+    setFormData((prev) => {
+      const copy = [...(prev.knitFabricItems || [])];
+      copy[idx] = finalRow;
+      const syncedItems = syncAllCostingItems(copy, prev.accessoriesItems || [], prev.otherCostItems || [], prev.embellishmentItems || []);
+      return {
+        ...prev,
+        knitFabricItems: copy,
+        items: syncedItems,
+      };
+    });
+    handleCloseFabricDetailsModal();
+    toast.success("Fabric process details saved and costing updated.");
+  };
+
+  // ── Yarn Details Modal Handlers ────────────────────────────────
+  const handleOpenYarnModal = (rowIndex: number) => {
+    const row = (formData.knitFabricItems || [])[rowIndex];
+    if (!row) return;
+
+    const initialRows = (row.yarnDetails && row.yarnDetails.length > 0)
+      ? row.yarnDetails.map((y) => {
+          const c = y.yarnCount || masterYarnCounts[0]?.yarnCount || "30/1";
+          const comp = y.yarnComposition || formData.fabricEntry?.fabricComposition || "100% Combed Cotton";
+          const spin = y.spinningType || formData.fabricEntry?.spinningType || "Ring";
+          const col = y.colorType || "Solid";
+          const g = y.grade === "Grade B" ? "B" : y.grade === "B" ? "B" : "A";
+          const savedTag = y.bookingTag || MMRepository.getYarnBookingTagByRowId(y.id);
+          const computedItem = [c, comp].filter(Boolean).join(" ");
+          const masterRate = getLatestYarnRate(c, comp, g) ?? 3.45;
+          const rate = Number(y.ratePerKg) > 0 ? Number(y.ratePerKg) : masterRate;
+          return {
+            ...y,
+            grade: g,
+            yarnCount: c,
+            yarnComposition: comp,
+            spinningType: spin,
+            colorType: col,
+            yarnItem: y.yarnItem || computedItem,
+            ratePerKg: rate,
+            masterRatePerKg: y.masterRatePerKg !== undefined ? y.masterRatePerKg : masterRate,
+            brand: y.brand || suppliersMaster[0]?.name || "Square Textiles Ltd",
+            bookingTag: savedTag,
+          };
+        })
+      : [
+          (() => {
+            const defaultCount = masterYarnCounts[0]?.yarnCount || "30/1";
+            const defaultComp = formData.fabricEntry?.fabricComposition || "100% Combed Cotton";
+            const defaultSpin = formData.fabricEntry?.spinningType || "Ring";
+            const defaultRate = getLatestYarnRate(defaultCount, defaultComp, "A") ?? 3.45;
+            return {
+              id: `yd-${Date.now()}-1`,
+              sl: 1,
+              grade: "A" as const,
+              colorType: "Solid",
+              yarnCount: defaultCount,
+              yarnComposition: defaultComp,
+              spinningType: defaultSpin,
+              yarnItem: `${defaultCount} ${defaultComp}`,
+              ratioPct: 100,
+              finalQtyKg: row.requiredYarnKg,
+              ratePerKg: defaultRate,
+              masterRatePerKg: defaultRate,
+              yarnCost: Number((row.requiredYarnKg * defaultRate).toFixed(2)),
+              brand: suppliersMaster[0]?.name || "Square Textiles Ltd",
+            };
+          })(),
+        ];
+
+    const recalculatedRows = initialRows.map((y, idx) => {
+      const finalQty = Number((row.requiredYarnKg * ((Number(y.ratioPct) || 0) / 100)).toFixed(2));
+      const yarnCost = Number((finalQty * (Number(y.ratePerKg) || 0)).toFixed(2));
+      return { ...y, sl: idx + 1, finalQtyKg: finalQty, yarnCost };
+    });
+
+    setYarnModal({
+      isOpen: true,
+      rowIndex,
+      requiredYarnKg: row.requiredYarnKg,
+      rows: recalculatedRows,
+      head: row.head,
+      item: row.item,
+    });
+  };
+
+  const handleAddYarnModalRow = () => {
+    const nextSl = yarnModal.rows.length + 1;
+    const currentSum = yarnModal.rows.reduce((s, y) => s + (Number(y.ratioPct) || 0), 0);
+    const rem = Math.max(0, 100 - currentSum);
+    const ratio = rem > 0 ? rem : 10;
+    const finalQty = Number((yarnModal.requiredYarnKg * (ratio / 100)).toFixed(2));
+    const defaultCount = masterYarnCounts[0]?.yarnCount || "30/1";
+    const defaultComp = formData.fabricEntry?.fabricComposition || "100% Combed Cotton";
+    const defaultSpin = formData.fabricEntry?.spinningType || "Ring";
+    const fetchedRate = getLatestYarnRate(defaultCount, defaultComp, "A");
+    const rate = fetchedRate !== null ? fetchedRate : 3.45;
+    const cost = Number((finalQty * rate).toFixed(2));
+    const generatedItem = `${defaultCount} ${defaultComp}`;
+
+    const newRow: KnitYarnDetailRow = {
+      id: `yd-m-${Date.now()}-${nextSl}`,
+      sl: nextSl,
+      grade: "A",
+      colorType: "Solid",
+      yarnCount: defaultCount,
+      yarnComposition: defaultComp,
+      spinningType: defaultSpin,
+      yarnItem: generatedItem,
+      ratioPct: ratio,
+      finalQtyKg: finalQty,
+      ratePerKg: rate,
+      masterRatePerKg: rate,
+      yarnCost: cost,
+      brand: suppliersMaster[0]?.name || "Square Textiles Ltd",
+    };
+
+    setYarnModal((prev) => ({
+      ...prev,
+      rows: [...prev.rows, newRow],
+    }));
+  };
+
+  const handleUpdateYarnModalRow = (idx: number, field: keyof KnitYarnDetailRow, value: any) => {
+    setYarnModal((prev) => {
+      const copy = [...prev.rows];
+      const target = { ...copy[idx], [field]: value };
+
+      // When Yarn Count or Yarn Composition changes:
+      // 1. Automatically update Yarn Item* (read-only combination of Yarn Count and Yarn Composition)
+      // 2. Automatically fetch latest updated rate from Weekly Yarn Rate Master based on Yarn Count & Composition
+      // 3. Recalculate Yarn Cost
+      if (field === "yarnCount" || field === "yarnComposition") {
+        const c = field === "yarnCount" ? String(value || "") : (target.yarnCount || "");
+        const comp = field === "yarnComposition" ? String(value || "") : (target.yarnComposition || "");
+        const g = target.grade || "A";
+
+        // Generate Yarn Item read-only value
+        target.yarnItem = [c, comp].filter(Boolean).join(" ");
+
+        // Auto fetch latest rate
+        const fetchedRate = getLatestYarnRate(c, comp, g);
+        if (fetchedRate !== null) {
+          target.ratePerKg = fetchedRate;
+          target.masterRatePerKg = fetchedRate;
+        }
+      }
+
+      if (field === "grade") {
+        const g = String(value || "A");
+        const c = target.yarnCount || "";
+        const comp = target.yarnComposition || "";
+        const fetchedRate = getLatestYarnRate(c, comp, g);
+        if (fetchedRate !== null) {
+          target.ratePerKg = fetchedRate;
+          target.masterRatePerKg = fetchedRate;
+        }
+      }
+
+      if (field === "ratePerKg") {
+        if (target.masterRatePerKg === undefined) {
+          const c = target.yarnCount || "";
+          const comp = target.yarnComposition || "";
+          const g = target.grade || "A";
+          target.masterRatePerKg = getLatestYarnRate(c, comp, g) ?? 3.45;
+        }
+      }
+
+      const ratio = Number(target.ratioPct) || 0;
+      const rate = Number(target.ratePerKg) || 0;
+      target.finalQtyKg = Number((prev.requiredYarnKg * (ratio / 100)).toFixed(2));
+      target.yarnCost = Number((target.finalQtyKg * rate).toFixed(2));
+
+      copy[idx] = target;
+      return { ...prev, rows: copy };
+    });
+  };
+
+  const handleRemoveYarnModalRow = (idx: number) => {
+    setYarnModal((prev) => {
+      const rowToRemove = prev.rows[idx];
+      if (rowToRemove?.id) {
+        MMRepository.removeYarnBookingTag(rowToRemove.id, formData.preCostId || formData.id);
+      }
+      const filtered = prev.rows.filter((_, i) => i !== idx);
+      const reindexed = filtered.map((r, i) => ({ ...r, sl: i + 1 }));
+      return { ...prev, rows: reindexed };
+    });
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("storage"));
+    }
+  };
+
+  const handleSaveYarnModal = () => {
+    if (yarnModal.rowIndex === null) return;
+    const idx = yarnModal.rowIndex;
+    const totalRatio = yarnModal.rows.reduce((s, y) => s + (Number(y.ratioPct) || 0), 0);
+    if (Math.abs(totalRatio - 100) > 0.5) {
+      toast.warning(`Total Yarn Ratio is ${totalRatio.toFixed(1)}%. Note: Expected ratio total is 100%.`);
+    }
+
+    setFormData((prev) => {
+      const copy = [...(prev.knitFabricItems || [])];
+      if (!copy[idx]) return prev;
+      const target = { ...copy[idx], yarnDetails: yarnModal.rows };
+      copy[idx] = computeKnitFabricRow(target, prev.consumptionUnit || "DZ");
+      const syncedItems = syncAllCostingItems(copy, prev.accessoriesItems || [], prev.otherCostItems || [], prev.embellishmentItems || []);
+      return {
+        ...prev,
+        knitFabricItems: copy,
+        items: syncedItems,
+      };
+    });
+
+    setYarnModal((prev) => ({ ...prev, isOpen: false, rowIndex: null }));
+    toast.success("Yarn details saved and fabric costing updated.");
+  };
+
+  // ── Yarn Stock & Procurement Allocation Handlers & Dynamic Calculations ──
+  const handleOpenBookingTagModal = (yIdx: number, yRow: KnitYarnDetailRow) => {
+    // Check if this yarn row already has a saved tag:
+    const existingTag =
+      yRow.bookingTag && (yRow.bookingTag.blockBookingNo || yRow.bookingTag.blockBookingId || (yRow.bookingTag.allocations && yRow.bookingTag.allocations.length > 0))
+        ? yRow.bookingTag
+        : MMRepository.getYarnBookingTagByRowId(yRow.id);
+
+    const finalQty = Number(yRow.finalQtyKg) || 0;
+
+    let initAllocations: YarnBookingAllocationRowState[] = [];
+    let initProcurementReqId = "";
+    let initProcurementReqNo = "";
+
+    if (existingTag) {
+      initProcurementReqId = existingTag.procurementRequestId || "";
+      initProcurementReqNo = existingTag.procurementRequestNo || "";
+
+      if (Array.isArray(existingTag.allocations) && existingTag.allocations.length > 0) {
+        initAllocations = existingTag.allocations.map((a, idx) => {
+          const bal = MMRepository.getAvailableYarnBookingBalance(
+            a.blockBookingNo,
+            a.yarnItemId,
+            a.yarnItemName,
+            yRow.id
+          );
+          const tagQty = Number(a.tagQtyKg) || 0;
+          return {
+            id: a.id || `alloc-${Date.now()}-${idx}`,
+            blockBookingNo: a.blockBookingNo,
+            blockBookingId: a.blockBookingId || a.blockBookingNo,
+            yarnItemId: a.yarnItemId,
+            yarnItemName: a.yarnItemName,
+            supplierName: a.supplierName || "",
+            availableBalance: bal.availableKg,
+            tagQtyKg: tagQty,
+            remainingBalance: Number((bal.availableKg - tagQty).toFixed(2)),
+          };
+        });
+      } else if (existingTag.blockBookingNo || existingTag.blockBookingId) {
+        const bal = MMRepository.getAvailableYarnBookingBalance(
+          existingTag.blockBookingNo,
+          existingTag.yarnItemId,
+          existingTag.yarnItemName,
+          yRow.id
+        );
+        const tagQty = Number(existingTag.stockAllocatedQtyKg ?? existingTag.tagQtyKg ?? 0);
+        initAllocations = [
+          {
+            id: `alloc-${Date.now()}-0`,
+            blockBookingNo: existingTag.blockBookingNo,
+            blockBookingId: existingTag.blockBookingId || existingTag.blockBookingNo,
+            yarnItemId: existingTag.yarnItemId,
+            yarnItemName: existingTag.yarnItemName,
+            supplierName: existingTag.supplierName || "",
+            availableBalance: bal.availableKg,
+            tagQtyKg: tagQty,
+            remainingBalance: Number((bal.availableKg - tagQty).toFixed(2)),
+          },
+        ];
+      }
+    }
+
+    if (initAllocations.length === 0) {
+      initAllocations = [
+        {
+          id: `alloc-${Date.now()}-0`,
+          blockBookingNo: "",
+          blockBookingId: "",
+          yarnItemId: "",
+          yarnItemName: "",
+          supplierName: "",
+          availableBalance: 0,
+          tagQtyKg: 0,
+          remainingBalance: 0,
+        },
+      ];
+    }
+
+    const currentFabric =
+      yarnModal.rowIndex !== null && formData.knitFabricItems
+        ? formData.knitFabricItems[yarnModal.rowIndex]
+        : undefined;
+    const componentName = currentFabric?.item || currentFabric?.fabricComposition || "Knit Fabric Component";
+
+    setBookingTagModal({
+      isOpen: true,
+      yarnRowIndex: yIdx,
+      yarnRowId: yRow.id,
+      finalQtyKg: finalQty,
+      yarnItemName: yRow.yarnItem || "",
+      componentName,
+      allocations: initAllocations,
+      existingProcurementRequestId: initProcurementReqId,
+      existingProcurementRequestNo: initProcurementReqNo,
+    });
+  };
+
+  const blockBookingDropdownOptions = useMemo(() => {
+    const allBookings = MMRepository.getManualBookings();
+    return allBookings.map((b) => {
+      const totalAvail = (b.items || []).reduce((sum, it) => {
+        const bal = MMRepository.getAvailableYarnBookingBalance(
+          b.bookingNo,
+          it.bookingItemId,
+          it.itemDescription,
+          bookingTagModal.yarnRowId
+        );
+        return sum + bal.availableKg;
+      }, 0);
+      return {
+        value: b.bookingNo,
+        label: `${b.bookingNo} — ${b.supplierName || "Mill"} (Available: ${totalAvail.toLocaleString()} KG)`,
+      };
+    });
+  }, [bookingTagModal.yarnRowId]);
+
+  const getYarnItemOptionsForBooking = (bNo: string) => {
+    if (!bNo) return [];
+    const allBookings = MMRepository.getManualBookings();
+    const booking = allBookings.find((b) => b.bookingNo === bNo || b.id === bNo);
+    if (!booking || !booking.items) return [];
+    return booking.items.map((it) => {
+      const bal = MMRepository.getAvailableYarnBookingBalance(
+        booking.bookingNo,
+        it.bookingItemId,
+        it.itemDescription,
+        bookingTagModal.yarnRowId
+      );
+      const idVal = it.bookingItemId || (it as any).id || it.itemDescription;
+      return {
+        value: idVal,
+        label: `${it.itemDescription} (Available: ${bal.availableKg.toLocaleString()} KG / Booked: ${bal.totalBookedKg.toLocaleString()} KG)`,
+      };
+    });
+  };
+
+  const handleAddAllocationRow = () => {
+    setBookingTagModal((prev) => ({
+      ...prev,
+      allocations: [
+        ...prev.allocations,
+        {
+          id: `alloc-${Date.now()}-${prev.allocations.length}`,
+          blockBookingNo: "",
+          blockBookingId: "",
+          yarnItemId: "",
+          yarnItemName: "",
+          supplierName: "",
+          availableBalance: 0,
+          tagQtyKg: 0,
+          remainingBalance: 0,
+        },
+      ],
+    }));
+  };
+
+  const handleRemoveAllocationRow = (allocId: string) => {
+    setBookingTagModal((prev) => ({
+      ...prev,
+      allocations: prev.allocations.filter((a) => a.id !== allocId),
+    }));
+  };
+
+  const handleSelectBookingForRow = (allocId: string, bNo: string) => {
+    const allBookings = MMRepository.getManualBookings();
+    const booking = allBookings.find((b) => b.bookingNo === bNo || b.id === bNo);
+    setBookingTagModal((prev) => ({
+      ...prev,
+      allocations: prev.allocations.map((a) => {
+        if (a.id !== allocId) return a;
+        return {
+          ...a,
+          blockBookingNo: bNo,
+          blockBookingId: booking?.id || bNo,
+          supplierName: booking?.supplierName || "",
+          yarnItemId: "",
+          yarnItemName: "",
+          availableBalance: 0,
+          tagQtyKg: 0,
+          remainingBalance: 0,
+        };
+      }),
+    }));
+  };
+
+  const handleSelectYarnItemForRow = (allocId: string, itemId: string) => {
+    setBookingTagModal((prev) => {
+      const currentAlloc = prev.allocations.find((a) => a.id === allocId);
+      if (!currentAlloc || !currentAlloc.blockBookingNo) return prev;
+
+      const allBookings = MMRepository.getManualBookings();
+      const booking = allBookings.find(
+        (b) => b.bookingNo === currentAlloc.blockBookingNo || b.id === currentAlloc.blockBookingNo
+      );
+      const itemObj = booking?.items?.find(
+        (it) => it.bookingItemId === itemId || (it as any).id === itemId || it.itemDescription === itemId
+      );
+      const itemDesc = itemObj?.itemDescription || itemId;
+
+      const baseBal = MMRepository.getAvailableYarnBookingBalance(
+        currentAlloc.blockBookingNo,
+        itemId,
+        itemDesc,
+        prev.yarnRowId
+      );
+
+      // Subtract tag quantities from OTHER rows in this modal targeting the same booking and item
+      const otherRowsTaggedSameItem = prev.allocations
+        .filter((a) => a.id !== allocId && a.blockBookingNo === currentAlloc.blockBookingNo && a.yarnItemId === itemId)
+        .reduce((sum, a) => sum + (Number(a.tagQtyKg) || 0), 0);
+
+      const netAvailable = Math.max(0, Number((baseBal.availableKg - otherRowsTaggedSameItem).toFixed(2)));
+
+      // Default Tag Qty: min(availableBalance, remainingRequiredBeforeThisRow)
+      const stockAllocatedOthers = prev.allocations
+        .filter((a) => a.id !== allocId)
+        .reduce((sum, a) => sum + (Number(a.tagQtyKg) || 0), 0);
+      const remainingRequiredBefore = Math.max(0, Number((prev.finalQtyKg - stockAllocatedOthers).toFixed(2)));
+      const defaultTagQty = Number(Math.min(netAvailable, remainingRequiredBefore).toFixed(2));
+
+      return {
+        ...prev,
+        allocations: prev.allocations.map((a) => {
+          if (a.id !== allocId) return a;
+          return {
+            ...a,
+            yarnItemId: itemId,
+            yarnItemName: itemDesc,
+            availableBalance: netAvailable,
+            tagQtyKg: defaultTagQty,
+            remainingBalance: Number((netAvailable - defaultTagQty).toFixed(2)),
+          };
+        }),
+      };
+    });
+  };
+
+  const handleTagQtyChangeForRow = (allocId: string, valStr: string) => {
+    const val = parseFloat(valStr);
+    const num = isNaN(val) ? 0 : Math.max(0, val);
+    setBookingTagModal((prev) => ({
+      ...prev,
+      allocations: prev.allocations.map((a) => {
+        if (a.id !== allocId) return a;
+        return {
+          ...a,
+          tagQtyKg: num,
+          remainingBalance: Number((a.availableBalance - num).toFixed(2)),
+        };
+      }),
+    }));
+  };
+
+  // Dynamic Allocation Summary & Validations
+  const allocationSummary = useMemo(() => {
+    const totalRequired = Number(bookingTagModal.finalQtyKg) || 0;
+
+    const stockAllocated = Number(
+      bookingTagModal.allocations.reduce((sum, a) => sum + (Number(a.tagQtyKg) || 0), 0).toFixed(2)
+    );
+
+    // Procurement Required = Total Required - Total Stock Allocated
+    const procurementRequired = Number(Math.max(0, totalRequired - stockAllocated).toFixed(2));
+
+    // Total Allocated = Total Stock Allocated + Procurement Required
+    const totalAllocated = Number((stockAllocated + procurementRequired).toFixed(2));
+
+    // Remaining Required = Total Required - Total Allocated
+    const remainingRequired = Number(Math.max(0, totalRequired - totalAllocated).toFixed(2));
+
+    const hasAnyExceedingStock = bookingTagModal.allocations.some(
+      (a) => a.blockBookingNo && a.yarnItemId && a.tagQtyKg > a.availableBalance
+    );
+
+    const isOverAllocated = stockAllocated > totalRequired;
+    const hasNegative = bookingTagModal.allocations.some((a) => a.tagQtyKg < 0);
+    const hasIncompleteRow = bookingTagModal.allocations.some(
+      (a) => (a.blockBookingNo && !a.yarnItemId) || (!a.blockBookingNo && a.tagQtyKg > 0)
+    );
+
+    let allocationStatus: "Fully Allocated" | "Partially Allocated" | "Over Allocation" = "Partially Allocated";
+    if (isOverAllocated || hasAnyExceedingStock) {
+      allocationStatus = "Over Allocation";
+    } else if (remainingRequired === 0 && (stockAllocated > 0 || procurementRequired > 0)) {
+      allocationStatus = "Fully Allocated";
+    } else {
+      allocationStatus = "Partially Allocated";
+    }
+
+    const procurementStatusText =
+      procurementRequired > 0
+        ? "New Procurement Request Required"
+        : "No Procurement Needed (Covered by Stock)";
+
+    const validAllocationsCount = bookingTagModal.allocations.filter(
+      (a) => a.blockBookingNo && a.yarnItemId && a.tagQtyKg > 0
+    ).length;
+
+    const canSave =
+      !hasAnyExceedingStock &&
+      !isOverAllocated &&
+      !hasNegative &&
+      !hasIncompleteRow &&
+      allocationStatus !== "Over Allocation" &&
+      (validAllocationsCount > 0 || procurementRequired > 0);
+
+    return {
+      totalRequired,
+      stockAllocated,
+      procurementRequired,
+      totalAllocated,
+      remainingRequired,
+      allocationStatus,
+      procurementStatusText,
+      hasAnyExceedingStock,
+      isOverAllocated,
+      allocationsCount: bookingTagModal.allocations.filter((a) => a.blockBookingNo && a.yarnItemId).length,
+      canSave,
+    };
+  }, [bookingTagModal.finalQtyKg, bookingTagModal.allocations]);
+
+  const handleSaveBookingTagModal = () => {
+    if (allocationSummary.hasAnyExceedingStock) {
+      toast.error("One or more allocations exceed the available stock balance of the selected booking.");
+      return;
+    }
+    if (allocationSummary.isOverAllocated) {
+      toast.error(`Total stock allocated (${allocationSummary.stockAllocated.toFixed(2)} KG) cannot exceed Total Required Yarn Quantity (${allocationSummary.totalRequired.toFixed(2)} KG).`);
+      return;
+    }
+    if (bookingTagModal.yarnRowIndex === null) return;
+
+    const preCostId =
+      formData.preCostId ||
+      (formData as any).header?.preCostId ||
+      formData.id ||
+      "PC-2026-0001";
+
+    const targetYarnRow =
+      bookingTagModal.yarnRowIndex !== null && yarnModal.rows[bookingTagModal.yarnRowIndex]
+        ? yarnModal.rows[bookingTagModal.yarnRowIndex]
+        : undefined;
+
+    const validAllocations = bookingTagModal.allocations.filter(
+      (a) => a.blockBookingNo && a.yarnItemId
+    );
+
+    const primaryAlloc = validAllocations[0];
+    const resolvedYarnItemName =
+      primaryAlloc?.yarnItemName ||
+      targetYarnRow?.yarnItem ||
+      bookingTagModal.yarnItemName ||
+      "Yarn Item";
+
+    const componentName = bookingTagModal.componentName || "Knit Fabric Component";
+
+    // ── Handle Procurement Requisition (proc_purchase_requisitions_v2) ──
+    let prId = bookingTagModal.existingProcurementRequestId;
+    let prNumber = bookingTagModal.existingProcurementRequestNo;
+
+    try {
+      const allPRs = getStoredPurchaseRequisitions();
+      const existingPRIndex = allPRs.findIndex(
+        (p) =>
+          (prId && p.id === prId) ||
+          p.items?.some((it) => it.issueId === bookingTagModal.yarnRowId || it.specification?.includes(bookingTagModal.yarnRowId))
+      );
+
+      if (allocationSummary.procurementRequired > 0) {
+        const yarnRate = Number(targetYarnRow?.ratePerKg) || 0;
+        const totalEst = Number((allocationSummary.procurementRequired * yarnRate).toFixed(2));
+        const reqDate =
+          (formData as any).deliveryDate ||
+          (formData as any).poDeliveryDate ||
+          new Date(Date.now() + 15 * 86400000).toISOString().split("T")[0];
+
+        if (existingPRIndex >= 0) {
+          // Update in-place to prevent duplicate requests
+          const targetPR = allPRs[existingPRIndex];
+          prId = targetPR.id;
+          prNumber = targetPR.prNumber;
+
+          targetPR.requiredDate = reqDate;
+          targetPR.requiredByDate = reqDate;
+          targetPR.totalItemQuantity = allocationSummary.procurementRequired;
+          targetPR.totalEstimatedCost = totalEst;
+          targetPR.totalEstimatedAmount = totalEst;
+          targetPR.items = [
+            {
+              id: targetPR.items?.[0]?.id || `pri-${Date.now()}`,
+              sl: 1,
+              itemId: `item-yarn-${bookingTagModal.yarnRowId}`,
+              itemCode: targetYarnRow?.yarnCount || "YARN-RAW",
+              itemName: resolvedYarnItemName,
+              specification: `Pre-Costing: ${preCostId} | Component: ${componentName} | Row: ${bookingTagModal.yarnRowId}`,
+              uom: "KG",
+              quantity: allocationSummary.procurementRequired,
+              requestedQuantity: allocationSummary.procurementRequired,
+              requiredQuantity: allocationSummary.procurementRequired,
+              estimatedUnitPrice: yarnRate,
+              estimatedAmount: totalEst,
+              totalEstimatedPrice: totalEst,
+              issueId: bookingTagModal.yarnRowId,
+              purpose: `Pre-Costing ${preCostId} Yarn Procurement`,
+            },
+          ];
+
+          targetPR.auditHistory = [
+            ...(targetPR.auditHistory || []),
+            {
+              action: "Updated from Pre-Costing Yarn Allocation",
+              date: new Date().toISOString().split("T")[0],
+              user: formData.merchandiser || "Merchandiser",
+              note: `Updated allocation: Required ${allocationSummary.totalRequired} KG, Stock Tagged ${allocationSummary.stockAllocated} KG, PR Qty ${allocationSummary.procurementRequired} KG across ${validAllocations.length} booking(s).`,
+            },
+          ];
+
+          setStoredPurchaseRequisitions(allPRs);
+        } else {
+          // Create new Purchase Requisition
+          const newPRId = `pr-yarn-${Date.now()}`;
+          const cleanJob = preCostId.replace(/[^a-zA-Z0-9]/g, "").slice(-6) || "PC";
+          const newPRNumber = `PR-YARN-${cleanJob}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+          prId = newPRId;
+          prNumber = newPRNumber;
+
+          const newPR: PurchaseRequisition = {
+            id: newPRId,
+            prNumber: newPRNumber,
+            prDate: new Date().toISOString().split("T")[0],
+            company: "Pakiza Knit Composite Ltd",
+            organization: "Pakiza Knit Composite Ltd",
+            department: "Marketing & Merchandising",
+            requestedBy: formData.merchandiser || "Merchandiser",
+            requesterName: formData.merchandiser || "Merchandiser",
+            designation: "Merchandiser",
+            requesterDesignation: "Merchandiser",
+            requiredDate: reqDate,
+            requiredByDate: reqDate,
+            priority: "Normal",
+            purpose: `Yarn procurement requisition automatically initiated from Pre-Costing ${preCostId} for component ${componentName} (${resolvedYarnItemName})`,
+            itemCategory: "Yarn",
+            storeWarehouse: "Central Yarn Warehouse",
+            warehouseName: "Central Yarn Warehouse",
+            currency: "USD",
+            requisitionType: "Budgeted",
+            status: "Submitted",
+            currentApprovalLevel: 1,
+            items: [
+              {
+                id: `pri-${Date.now()}`,
+                sl: 1,
+                itemId: `item-yarn-${bookingTagModal.yarnRowId}`,
+                itemCode: targetYarnRow?.yarnCount || "YARN-RAW",
+                itemName: resolvedYarnItemName,
+                specification: `Pre-Costing: ${preCostId} | Component: ${componentName} | Row: ${bookingTagModal.yarnRowId}`,
+                uom: "KG",
+                quantity: allocationSummary.procurementRequired,
+                requestedQuantity: allocationSummary.procurementRequired,
+                requiredQuantity: allocationSummary.procurementRequired,
+                estimatedUnitPrice: yarnRate,
+                estimatedAmount: totalEst,
+                totalEstimatedPrice: totalEst,
+                issueId: bookingTagModal.yarnRowId,
+                purpose: `Pre-Costing ${preCostId} Yarn Procurement`,
+              },
+            ],
+            totalItemQuantity: allocationSummary.procurementRequired,
+            totalEstimatedAmount: totalEst,
+            totalEstimatedCost: totalEst,
+            attachments: [],
+            approvalHistory: [
+              {
+                level: 1,
+                stageName: "Pre-Costing Yarn Allocation",
+                approverName: formData.merchandiser || "Merchandiser",
+                designation: "Merchandiser",
+                action: "Submitted",
+                dateTime: new Date().toISOString().replace("T", " ").slice(0, 16),
+                remarks: `Auto-generated from Pre-Costing ${preCostId} stock & procurement allocation.`,
+              },
+            ],
+            auditHistory: [
+              {
+                action: "Requisition Created from Pre-Costing Yarn Allocation",
+                date: new Date().toISOString().split("T")[0],
+                user: formData.merchandiser || "Merchandiser",
+                note: `Required: ${allocationSummary.totalRequired} KG, Stock Tagged: ${allocationSummary.stockAllocated} KG, PR Qty: ${allocationSummary.procurementRequired} KG across ${validAllocations.length} booking(s).`,
+              },
+            ],
+          };
+
+          allPRs.unshift(newPR);
+          setStoredPurchaseRequisitions(allPRs);
+        }
+      } else {
+        // procurementRequired === 0: clean up any previously created PR for this row
+        if (existingPRIndex >= 0) {
+          allPRs.splice(existingPRIndex, 1);
+          setStoredPurchaseRequisitions(allPRs);
+        }
+        prId = undefined;
+        prNumber = undefined;
+      }
+    } catch (err) {
+      console.warn("Failed to update procurement requisition storage:", err);
+    }
+
+    const tagRecord: MMYarnBookingTagRecord = {
+      id: `ytag-${preCostId}-${bookingTagModal.yarnRowId}`,
+      preCostId: preCostId,
+      preCostMasterId: formData.id,
+      yarnRowId: bookingTagModal.yarnRowId,
+      blockBookingNo: primaryAlloc?.blockBookingNo || (validAllocations.length > 0 ? validAllocations.map((a) => a.blockBookingNo).join(", ") : "N/A"),
+      blockBookingId: primaryAlloc?.blockBookingId || primaryAlloc?.blockBookingNo || "",
+      yarnItemId: primaryAlloc?.yarnItemId || "",
+      yarnItemName: primaryAlloc?.yarnItemName || resolvedYarnItemName,
+      supplierName: primaryAlloc?.supplierName || (validAllocations.length > 0 ? validAllocations.map((a) => a.supplierName).filter(Boolean).join(", ") : ""),
+      tagQtyKg: allocationSummary.stockAllocated,
+      availableBalanceAtTag: primaryAlloc?.availableBalance || 0,
+      remainingBalanceAtTag: primaryAlloc?.remainingBalance || 0,
+      taggedAt: new Date().toISOString(),
+      buyer: formData.buyer || "",
+      season: formData.season || "",
+      job: preCostId,
+      yarnCount:
+        targetYarnRow?.yarnCount ||
+        (targetYarnRow?.yarnItem
+          ? targetYarnRow.yarnItem.match(/\b(\d+[\/s]\d+|\d+D|\d+s)\b/i)?.[0] ||
+            targetYarnRow.yarnItem.split(" ")[0]
+          : ""),
+      price: Number(targetYarnRow?.ratePerKg) || 0,
+      // Multiple booking allocations list:
+      allocations: validAllocations.map((a) => ({
+        id: a.id,
+        blockBookingNo: a.blockBookingNo,
+        blockBookingId: a.blockBookingId || a.blockBookingNo,
+        yarnItemId: a.yarnItemId,
+        yarnItemName: a.yarnItemName,
+        supplierName: a.supplierName,
+        tagQtyKg: Number(a.tagQtyKg) || 0,
+        availableBalanceAtTag: Number(a.availableBalance) || 0,
+        remainingBalanceAtTag: Number(a.remainingBalance) || 0,
+      })),
+      totalRequiredQtyKg: allocationSummary.totalRequired,
+      stockAllocatedQtyKg: allocationSummary.stockAllocated,
+      procurementRequiredQtyKg: allocationSummary.procurementRequired,
+      totalAllocatedQtyKg: allocationSummary.totalAllocated,
+      remainingRequiredQtyKg: allocationSummary.remainingRequired,
+      allocationStatus: allocationSummary.allocationStatus,
+      procurementRequestId: prId,
+      procurementRequestNo: prNumber,
+      procurementStatus: allocationSummary.procurementStatusText,
+      updatedAt: new Date().toISOString(),
+    };
+
+    // 1. Save to dedicated persistent transaction ledger
+    MMRepository.saveYarnBookingTag(tagRecord);
+
+    // 2. Update yarn modal rows state
+    setYarnModal((prev) => {
+      const copy = [...prev.rows];
+      if (bookingTagModal.yarnRowIndex !== null && copy[bookingTagModal.yarnRowIndex]) {
+        copy[bookingTagModal.yarnRowIndex] = {
+          ...copy[bookingTagModal.yarnRowIndex],
+          bookingTag: tagRecord,
+        };
+      }
+      return { ...prev, rows: copy };
+    });
+
+    // 3. Immediately update formData and persist to localStorage
+    if (yarnModal.rowIndex !== null) {
+      const fIdx = yarnModal.rowIndex;
+      setFormData((prev) => {
+        const copyFabric = [...(prev.knitFabricItems || [])];
+        if (!copyFabric[fIdx]) return prev;
+        const copyYarn = [...(copyFabric[fIdx].yarnDetails || [])];
+        if (bookingTagModal.yarnRowIndex !== null && copyYarn[bookingTagModal.yarnRowIndex]) {
+          copyYarn[bookingTagModal.yarnRowIndex] = {
+            ...copyYarn[bookingTagModal.yarnRowIndex],
+            bookingTag: tagRecord,
+          };
+          copyFabric[fIdx] = {
+            ...copyFabric[fIdx],
+            yarnDetails: copyYarn,
+          };
+        }
+        const updated = {
+          ...prev,
+          knitFabricItems: copyFabric,
+        };
+
+        try {
+          const currentStored = localStorage.getItem("cripton_pre_costings_general_master_v1");
+          const list: PreCostingRecord[] = currentStored ? JSON.parse(currentStored) : [];
+          const idx = list.findIndex((r) => r.id === updated.id);
+          if (idx >= 0) {
+            list[idx] = updated;
+          } else {
+            list.unshift(updated);
+          }
+          localStorage.setItem("cripton_pre_costings_general_master_v1", JSON.stringify(list));
+        } catch {}
+
+        return updated;
+      });
+    }
+
+    // 4. Trigger storage event for live multi-tab & route synchronization
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("storage"));
+    }
+
+    const bookingNames = validAllocations.map((a) => a.blockBookingNo).join(", ");
+    toast.success(
+      allocationSummary.procurementRequired > 0
+        ? `Allocation saved: ${allocationSummary.stockAllocated.toFixed(2)} KG from stock (${bookingNames || "none"}), ${allocationSummary.procurementRequired.toFixed(2)} KG requested under ${prNumber}.`
+        : `Allocation saved: 100% covered by Stock Booking(s) ${bookingNames} (${allocationSummary.stockAllocated.toFixed(2)} KG).`
+    );
+    setBookingTagModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const handleRemoveBookingTagModal = () => {
+    if (bookingTagModal.yarnRowId) {
+      MMRepository.removeYarnBookingTag(bookingTagModal.yarnRowId, formData.preCostId || formData.id);
+
+      // Clean up linked PR if existing
+      try {
+        const allPRs = getStoredPurchaseRequisitions();
+        const prIdx = allPRs.findIndex(
+          (p) =>
+            (bookingTagModal.existingProcurementRequestId && p.id === bookingTagModal.existingProcurementRequestId) ||
+            p.items?.some((it) => it.issueId === bookingTagModal.yarnRowId || it.specification?.includes(bookingTagModal.yarnRowId))
+        );
+        if (prIdx >= 0) {
+          allPRs.splice(prIdx, 1);
+          setStoredPurchaseRequisitions(allPRs);
+        }
+      } catch (err) {
+        console.warn("Failed to remove linked PR:", err);
+      }
+    }
+    setYarnModal((prev) => {
+      const copy = [...prev.rows];
+      if (bookingTagModal.yarnRowIndex !== null && copy[bookingTagModal.yarnRowIndex]) {
+        copy[bookingTagModal.yarnRowIndex] = {
+          ...copy[bookingTagModal.yarnRowIndex],
+          bookingTag: undefined,
+        };
+      }
+      return { ...prev, rows: copy };
+    });
+
+    // Also immediately update formData.knitFabricItems
+    if (yarnModal.rowIndex !== null) {
+      const fIdx = yarnModal.rowIndex;
+      setFormData((prev) => {
+        const copyFabric = [...(prev.knitFabricItems || [])];
+        if (!copyFabric[fIdx]) return prev;
+        const copyYarn = [...(copyFabric[fIdx].yarnDetails || [])];
+        if (bookingTagModal.yarnRowIndex !== null && copyYarn[bookingTagModal.yarnRowIndex]) {
+          copyYarn[bookingTagModal.yarnRowIndex] = {
+            ...copyYarn[bookingTagModal.yarnRowIndex],
+            bookingTag: undefined,
+          };
+          copyFabric[fIdx] = {
+            ...copyFabric[fIdx],
+            yarnDetails: copyYarn,
+          };
+        }
+        const updated = {
+          ...prev,
+          knitFabricItems: copyFabric,
+        };
+
+        try {
+          const currentStored = localStorage.getItem("cripton_pre_costings_general_master_v1");
+          const list: PreCostingRecord[] = currentStored ? JSON.parse(currentStored) : [];
+          const idx = list.findIndex((r) => r.id === updated.id);
+          if (idx >= 0) {
+            list[idx] = updated;
+          } else {
+            list.unshift(updated);
+          }
+          localStorage.setItem("cripton_pre_costings_general_master_v1", JSON.stringify(list));
+        } catch {}
+
+        return updated;
+      });
+    }
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("storage"));
+    }
+
+    toast.info("Yarn stock & procurement allocation removed.");
+    setBookingTagModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  // ── Accessories Cost Handlers ──────────────────────────────────
+  const handleAddAccessoryRow = () => {
+    if (formMode === "view") return;
+    const nextSl = (formData.accessoriesItems || []).length + 1;
+    const defaultEffQty = consolidatedOrderQty > 0 ? consolidatedOrderQty : 20000;
+    const unit = formData.consumptionUnit || "DZ";
+    const baseQty = unit === "PCS" ? defaultEffQty : defaultEffQty / 12;
+    const wastage = 5;
+    const reqQty = Number((baseQty * 1.0 * (1 + wastage / 100)).toFixed(2));
+    const defaultHead = "Sewing Trims";
+    const defaultItem = SEWING_TRIMS_ITEMS[0]; // "Sewing Thread"
+    const def = ACCESSORY_ITEM_DEFAULTS[defaultItem];
+
+    const newItem: PreCostingItemRow = {
+      id: `acc-${Date.now()}-${nextSl}`,
+      sl: nextSl,
+      preCostItemId: `PCI-ACC-${formData.version}-${nextSl}`,
+      head: defaultHead,
+      item: defaultItem,
+      description: def?.description || "100% Spun Polyester Sewing Thread",
+      nStatus: "Nominated",
+      supplier: suppliersMaster[0]?.name || DEFAULT_SUPPLIERS[0],
+      effectedQty: defaultEffQty,
+      consumption: 1.0,
+      wastagePct: wastage,
+      unit: def?.unit || "Cone",
+      requiredQty: reqQty,
+      finalQty: reqQty,
+      rate: def?.defaultRate || 0.15,
+      amount: Number((reqQty * (def?.defaultRate || 0.15)).toFixed(2)),
+      preCostPct: 0,
+    };
+
+    setFormData((prev) => {
+      const updatedAcc = [...(prev.accessoriesItems || []), newItem];
+      const syncedItems = syncAllCostingItems(prev.knitFabricItems || [], updatedAcc, prev.otherCostItems || [], prev.embellishmentItems || []);
+      return {
+        ...prev,
+        accessoriesItems: updatedAcc,
+        items: syncedItems,
+      };
+    });
+  };
+
+  const handleUpdateAccessoryRow = (index: number, field: keyof PreCostingItemRow, value: any) => {
+    if (formMode === "view") return;
+    setFormData((prev) => {
+      const copy = [...(prev.accessoriesItems || [])];
+      const target = { ...copy[index], [field]: value };
+      if (field === "head") {
+        if (value === "Finishing Trims") {
+          if (!FINISHING_TRIMS_ITEMS.includes(target.item as any)) {
+            const firstFin = FINISHING_TRIMS_ITEMS[0];
+            target.item = firstFin;
+            const def = ACCESSORY_ITEM_DEFAULTS[firstFin];
+            if (def) {
+              target.description = def.description;
+              target.unit = def.unit;
+              target.rate = def.defaultRate;
+            }
+          }
+        } else {
+          // Sewing Trims
+          if (!SEWING_TRIMS_ITEMS.includes(target.item as any)) {
+            const firstSew = SEWING_TRIMS_ITEMS[0];
+            target.item = firstSew;
+            const def = ACCESSORY_ITEM_DEFAULTS[firstSew];
+            if (def) {
+              target.description = def.description;
+              target.unit = def.unit;
+              target.rate = def.defaultRate;
+            }
+          }
+        }
+      }
+      if (field === "item") {
+        const itemDef = ACCESSORY_ITEM_DEFAULTS[value];
+        if (itemDef) {
+          target.description = itemDef.description;
+          target.unit = itemDef.unit;
+          if (itemDef.defaultRate) target.rate = itemDef.defaultRate;
+        } else {
+          const found = accessoriesMasterItems.find((a) => a.itemName === value || a.itemName.toLowerCase().includes(String(value).toLowerCase()));
+          if (found) {
+            target.description = `${found.category} - ${found.description}`;
+            target.unit = found.unit || target.unit || "Pcs";
+            if (found.defaultRate) {
+              target.rate = found.defaultRate;
+            }
+          }
+        }
+      }
+      if (
+        field === "effectedQty" ||
+        field === "consumption" ||
+        field === "wastagePct" ||
+        field === "finalQty" ||
+        field === "rate" ||
+        field === "item" ||
+        field === "head"
+      ) {
+        const eff = field === "effectedQty" ? Number(value) || 0 : Number(target.effectedQty) || 0;
+        const cons = field === "consumption" ? Number(value) || 0 : Number(target.consumption) || 0;
+        const wastage = field === "wastagePct" ? Number(value) || 0 : Number(target.wastagePct ?? 5);
+        target.wastagePct = wastage;
+        const unit = prev.consumptionUnit || "DZ";
+        const baseQty = unit === "PCS" ? eff : eff / 12;
+        // Automatically calculate Required Qty based on Consumption and Wastage (%)
+        target.requiredQty = Number((baseQty * cons * (1 + wastage / 100)).toFixed(2));
+        if (field !== "finalQty") {
+          target.finalQty = target.requiredQty;
+        }
+        const fin = Number(target.finalQty) || 0;
+        const r = Number(target.rate) || 0;
+        target.amount = Number((fin * r).toFixed(2));
+      }
+      copy[index] = target;
+      const syncedItems = syncAllCostingItems(prev.knitFabricItems || [], copy, prev.otherCostItems || [], prev.embellishmentItems || []);
+      return {
+        ...prev,
+        accessoriesItems: copy,
+        items: syncedItems,
+      };
+    });
+  };
+
+  const handleRemoveAccessoryRow = (index: number) => {
+    if (formMode === "view") return;
+    setFormData((prev) => {
+      const filtered = (prev.accessoriesItems || []).filter((_, i) => i !== index);
+      const reindexed = filtered.map((r, i) => ({ ...r, sl: i + 1 }));
+      const syncedItems = syncAllCostingItems(prev.knitFabricItems || [], reindexed, prev.otherCostItems || [], prev.embellishmentItems || []);
+      return {
+        ...prev,
+        accessoriesItems: reindexed,
+        items: syncedItems,
+      };
+    });
+  };
+
+  // ── Embellishment Cost Handlers ───────────────────────────────
+  const handleAddEmbellishmentRow = () => {
+    if (formMode === "view") return;
+    const nextSl = (formData.embellishmentItems || []).length + 1;
+    const defaultQty = consolidatedOrderQty > 0 ? consolidatedOrderQty : 20000;
+    const newRow = computeEmbellishmentCostRow(
+      {
+        id: `emb-${Date.now()}-${nextSl}`,
+        sl: nextSl,
+        costHead: "Print",
+        description: "",
+        source: "In-house",
+        gmtQty: defaultQty,
+        unitRateDz: 1.20,
+      },
+      defaultQty
+    );
+
+    setFormData((prev) => {
+      const updatedEmb = [...(prev.embellishmentItems || []), newRow];
+      const syncedItems = syncAllCostingItems(
+        prev.knitFabricItems || [],
+        prev.accessoriesItems || [],
+        prev.otherCostItems || [],
+        updatedEmb
+      );
+      return {
+        ...prev,
+        embellishmentItems: updatedEmb,
+        items: syncedItems,
+      };
+    });
+  };
+
+  const handleUpdateEmbellishmentRow = (
+    index: number,
+    field: keyof KnitEmbellishmentCostRow,
+    value: any
+  ) => {
+    if (formMode === "view") return;
+    setFormData((prev) => {
+      const copy = [...(prev.embellishmentItems || [])];
+      const target = { ...copy[index], [field]: value };
+      copy[index] = computeEmbellishmentCostRow(target, consolidatedOrderQty);
+      const syncedItems = syncAllCostingItems(
+        prev.knitFabricItems || [],
+        prev.accessoriesItems || [],
+        prev.otherCostItems || [],
+        copy
+      );
+      return {
+        ...prev,
+        embellishmentItems: copy,
+        items: syncedItems,
+      };
+    });
+  };
+
+  const handleRemoveEmbellishmentRow = (index: number) => {
+    if (formMode === "view") return;
+    setFormData((prev) => {
+      const filtered = (prev.embellishmentItems || []).filter((_, i) => i !== index);
+      const reindexed = filtered.map((r, i) => ({ ...r, sl: i + 1 }));
+      const syncedItems = syncAllCostingItems(
+        prev.knitFabricItems || [],
+        prev.accessoriesItems || [],
+        prev.otherCostItems || [],
+        reindexed
+      );
+      return {
+        ...prev,
+        embellishmentItems: reindexed,
+        items: syncedItems,
+      };
+    });
+  };
+
+  // ── Others Cost Handlers ───────────────────────────────────────
+  const handleAddOtherCostRow = () => {
+    if (formMode === "view") return;
+    const nextSl = (formData.otherCostItems || []).length + 1;
+    const gmtQty = consolidatedOrderQty > 0 ? consolidatedOrderQty : 20000;
+    const qtyInDz = Number((gmtQty / 12).toFixed(2));
+    const unitRateDz = 0.5;
+    const newRow = computeOtherCostRow(
+      {
+        id: `oth-${Date.now()}-${nextSl}`,
+        sl: nextSl,
+        costHead: "Testing Cost",
+        description: "",
+        calcBasis: "Per Dozen",
+        gmtQty,
+        qtyInDz,
+        unitRateDz,
+        amount: Number((qtyInDz * unitRateDz).toFixed(2)),
+        currency: "USD",
+      },
+      totalPoValue,
+      gmtQty
+    );
+
+    setFormData((prev) => {
+      const updatedOthers = [...(prev.otherCostItems || []), newRow];
+      const syncedItems = syncAllCostingItems(
+        prev.knitFabricItems || [],
+        prev.accessoriesItems || [],
+        updatedOthers,
+        prev.embellishmentItems || []
+      );
+      return {
+        ...prev,
+        otherCostItems: updatedOthers,
+        items: syncedItems,
+      };
+    });
+  };
+
+  const handleUpdateOtherCostRow = (index: number, field: keyof KnitOtherCostRow, value: any) => {
+    if (formMode === "view") return;
+    setFormData((prev) => {
+      const copy = [...(prev.otherCostItems || [])];
+      const target = { ...copy[index], [field]: value };
+      if (field === "costHead") {
+        if (value === "Commercial Cost" || value === "Commission") {
+          target.calcBasis = "Percentage of Order Value";
+          if (target.costPercent === undefined || target.costPercent === 0) {
+            target.costPercent =
+              target.rateOrPct && target.rateOrPct > 0
+                ? target.rateOrPct
+                : value === "Commercial Cost"
+                ? 1.25
+                : 1.5;
+          }
+        } else {
+          target.calcBasis = "Per Dozen";
+          if (!target.unitRateDz || target.unitRateDz === 0) {
+            target.unitRateDz = 0.5;
+          }
+        }
+      }
+      copy[index] = computeOtherCostRow(target, totalPoValue, consolidatedOrderQty);
+      const syncedItems = syncAllCostingItems(
+        prev.knitFabricItems || [],
+        prev.accessoriesItems || [],
+        copy,
+        prev.embellishmentItems || []
+      );
+      return {
+        ...prev,
+        otherCostItems: copy,
+        items: syncedItems,
+      };
+    });
+  };
+
+  const handleRemoveOtherCostRow = (index: number) => {
+    if (formMode === "view") return;
+    setFormData((prev) => {
+      const filtered = (prev.otherCostItems || []).filter((_, i) => i !== index);
+      const reindexed = filtered.map((r, i) => ({ ...r, sl: i + 1 }));
+      const syncedItems = syncAllCostingItems(
+        prev.knitFabricItems || [],
+        prev.accessoriesItems || [],
+        reindexed,
+        prev.embellishmentItems || []
+      );
+      return {
+        ...prev,
+        otherCostItems: reindexed,
+        items: syncedItems,
+      };
+    });
+  };
+
+  // ── Consumption Unit Toggle Handler ───────────────────────────
+  const handleConsumptionUnitChange = (newUnit: "PCS" | "DZ") => {
+    if (formMode === "view" || formData.consumptionUnit === newUnit) return;
+    setFormData((prev) => {
+      const updatedFabric = (prev.knitFabricItems || []).map((row) =>
+        computeKnitFabricRow(row, newUnit)
+      );
+      const updatedAccessories = (prev.accessoriesItems || []).map((row) => {
+        const eff = Number(row.effectedQty) || 0;
+        const cons = Number(row.consumption) || 0;
+        const baseQty = newUnit === "PCS" ? eff : eff / 12;
+        const requiredQty = Number((baseQty * cons).toFixed(2));
+        const finalQty = Number((requiredQty * 1.05).toFixed(2));
+        const rate = Number(row.rate) || 0;
+        const amount = Number((finalQty * rate).toFixed(2));
+        return {
+          ...row,
+          requiredQty,
+          finalQty,
+          amount,
+        };
+      });
+      const updatedOthers = (prev.otherCostItems || []).map((row) =>
+        computeOtherCostRow(row, totalPoValue, consolidatedOrderQty)
+      );
+      const syncedItems = syncAllCostingItems(
+        updatedFabric,
+        updatedAccessories,
+        updatedOthers,
+        prev.embellishmentItems || []
+      );
+      return {
+        ...prev,
+        consumptionUnit: newUnit,
+        knitFabricItems: updatedFabric,
+        accessoriesItems: updatedAccessories,
+        otherCostItems: updatedOthers,
+        items: syncedItems,
+      };
+    });
+  };
+
   // ── Attachment Handlers (Reusing PI Entry Form Pattern) ────────
   const currentRecordAttachments: MMPreCostAttachmentRecord[] = useMemo(() => {
     return formData.attachments || [];
@@ -901,7 +5022,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     }
   };
 
-  const handleUploadAttachment = () => {
+  const handleUploadAttachment = async () => {
     setUploadError(null);
     if (!selectedUploadFile) {
       setUploadError("Please select a file to upload.");
@@ -912,10 +5033,27 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
+    try {
       const isImg = selectedUploadFile.type.startsWith("image/") || /\.(png|jpe?g|gif|webp|svg)$/i.test(selectedUploadFile.name);
+      let dataUrl = "";
+      let fileSize = "";
+      let fileSizeBytes = selectedUploadFile.size;
+
+      if (isImg) {
+        const compressed = await compressImageFile(selectedUploadFile, 1024, 1024, 0.72);
+        dataUrl = compressed.dataUrl;
+        fileSize = compressed.sizeFormatted;
+        fileSizeBytes = compressed.sizeBytes;
+      } else {
+        const reader = new FileReader();
+        dataUrl = await new Promise((res, rej) => {
+          reader.onload = () => res(reader.result as string);
+          reader.onerror = () => rej(new Error("Failed to read file"));
+          reader.readAsDataURL(selectedUploadFile);
+        });
+        fileSize = formatByteSize(selectedUploadFile.size);
+      }
+
       const newRecord: MMPreCostAttachmentRecord = {
         id: `att-pc-${Date.now()}`,
         preCostId: formData.preCostId || "JOB-2026-0001",
@@ -923,11 +5061,8 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
         fileName: selectedUploadFile.name,
         title: uploadTitle.trim(),
         note: uploadNote.trim(),
-        fileSize:
-          selectedUploadFile.size < 1024 * 1024
-            ? `${(selectedUploadFile.size / 1024).toFixed(1)} KB`
-            : `${(selectedUploadFile.size / (1024 * 1024)).toFixed(2)} MB`,
-        fileSizeBytes: selectedUploadFile.size,
+        fileSize: fileSize,
+        fileSizeBytes: fileSizeBytes,
         uploadedBy: formData.merchandiser || getLoggedInUserMerchant(),
         uploadTime: new Date().toISOString().replace("T", " ").substring(0, 16),
         storageType: isImg ? "image" : "file",
@@ -936,30 +5071,77 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
 
       setFormData((prev) => {
         const nextAtts = [newRecord, ...(prev.attachments || [])];
-        MMRepository.savePreCostingAttachments(nextAtts);
-        return { ...prev, attachments: nextAtts };
+        const saveRes = saveStoredAttachmentsForRecord(prev.id, prev.preCostId, nextAtts);
+        if (!saveRes.success && saveRes.error) {
+          toast.error(saveRes.error);
+        }
+
+        const updated = { ...prev, attachments: nextAtts };
+        try {
+          const currentStored = localStorage.getItem("cripton_pre_costings_general_master_v1");
+          const list: PreCostingRecord[] = currentStored ? JSON.parse(currentStored) : [];
+          const idx = list.findIndex((x) => x.id === updated.id || x.preCostId === updated.preCostId);
+          if (idx >= 0) {
+            list[idx] = updated;
+          } else {
+            list.unshift(updated);
+          }
+          safeSaveMasterRecords(list);
+          localStorage.setItem("cripton_pre_costings_general_active_id_v1", updated.id);
+        } catch (e) {
+          console.error("Failed to persist attachment to localStorage:", e);
+        }
+
+        setRecords((recList) => {
+          const idx = recList.findIndex((r) => r.id === updated.id || r.preCostId === updated.preCostId);
+          if (idx >= 0) {
+            const copy = [...recList];
+            copy[idx] = updated;
+            return copy;
+          }
+          return [updated, ...recList];
+        });
+
+        return updated;
       });
 
       setSelectedUploadFile(null);
       setUploadTitle("");
       setUploadNote("");
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast.success(`Attachment "${newRecord.title}" uploaded successfully.`);
-    };
-
-    reader.onerror = () => {
-      setUploadError("Failed to read file for upload.");
-    };
-
-    reader.readAsDataURL(selectedUploadFile);
+      toast.success(`Attachment "${newRecord.title}" uploaded and saved.`);
+    } catch (err: any) {
+      setUploadError(err?.message || "Failed to upload file.");
+    }
   };
 
   const handleDeleteAttachment = (id: string) => {
     if (formMode === "view") return;
     setFormData((prev) => {
       const nextAtts = (prev.attachments || []).filter((a) => a.id !== id);
-      MMRepository.savePreCostingAttachments(nextAtts);
-      return { ...prev, attachments: nextAtts };
+      saveStoredAttachmentsForRecord(prev.id, prev.preCostId, nextAtts);
+      const updated = { ...prev, attachments: nextAtts };
+      try {
+        const currentStored = localStorage.getItem("cripton_pre_costings_general_master_v1");
+        const list: PreCostingRecord[] = currentStored ? JSON.parse(currentStored) : [];
+        const idx = list.findIndex((x) => x.id === updated.id || x.preCostId === updated.preCostId);
+        if (idx >= 0) {
+          list[idx] = updated;
+          safeSaveMasterRecords(list);
+        }
+      } catch (e) {}
+
+      setRecords((recList) => {
+        const idx = recList.findIndex((r) => r.id === updated.id || r.preCostId === updated.preCostId);
+        if (idx >= 0) {
+          const copy = [...recList];
+          copy[idx] = updated;
+          return copy;
+        }
+        return recList;
+      });
+
+      return updated;
     });
     toast.success("Attachment removed.");
   };
@@ -994,24 +5176,22 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     }
   };
 
-  // Direct image file picker handler for Section 5
-  const handleImageFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Direct image file picker handler for Section 5 (Style & Pre Costing Images)
+  const handleImageFilesSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (formMode === "view") return;
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const MAX_SIZE = 3 * 1024 * 1024;
     const fileList = Array.from(files);
+    e.target.value = "";
 
-    fileList.forEach((file) => {
-      if (file.size > MAX_SIZE) {
-        toast.error(`Image "${file.name}" exceeds 3 MB limit and was skipped.`);
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result as string;
+    const compressPromises = fileList.map(async (file) => {
+      try {
+        const compressed = await compressImageFile(file, 1024, 1024, 0.72);
+        if (!compressed.dataUrl) {
+          toast.error(`Could not process image "${file.name}".`);
+          return null;
+        }
         const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf(".")) || file.name;
         const newRecord: MMPreCostAttachmentRecord = {
           id: `att-img-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
@@ -1020,28 +5200,61 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
           fileName: file.name,
           title: nameWithoutExt,
           note: "Style Pre Costing Image",
-          fileSize:
-            file.size < 1024 * 1024
-              ? `${(file.size / 1024).toFixed(1)} KB`
-              : `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
-          fileSizeBytes: file.size,
+          fileSize: compressed.sizeFormatted,
+          fileSizeBytes: compressed.sizeBytes,
           uploadedBy: formData.merchandiser || getLoggedInUserMerchant(),
           uploadTime: new Date().toISOString().replace("T", " ").substring(0, 16),
           storageType: "image",
-          dataUrl: dataUrl,
+          dataUrl: compressed.dataUrl,
         };
-
-        setFormData((prev) => {
-          const nextAtts = [newRecord, ...(prev.attachments || [])];
-          MMRepository.savePreCostingAttachments(nextAtts);
-          return { ...prev, attachments: nextAtts };
-        });
-      };
-      reader.readAsDataURL(file);
+        return newRecord;
+      } catch (err) {
+        toast.error(`Failed to process image "${file.name}".`);
+        return null;
+      }
     });
 
-    e.target.value = "";
-    toast.success("Image(s) attached successfully.");
+    const results = await Promise.all(compressPromises);
+    const validNewAtts = results.filter((a): a is MMPreCostAttachmentRecord => a !== null && Boolean(a.dataUrl));
+    if (validNewAtts.length === 0) return;
+
+    setFormData((prev) => {
+      const nextAtts = [...validNewAtts, ...(prev.attachments || [])];
+      const saveRes = saveStoredAttachmentsForRecord(prev.id, prev.preCostId, nextAtts);
+      if (!saveRes.success && saveRes.error) {
+        toast.error(saveRes.error);
+      } else {
+        toast.success(`${validNewAtts.length} image(s) attached and saved to Local Storage.`);
+      }
+
+      const updated = { ...prev, attachments: nextAtts };
+      try {
+        const currentStored = localStorage.getItem("cripton_pre_costings_general_master_v1");
+        const list: PreCostingRecord[] = currentStored ? JSON.parse(currentStored) : [];
+        const idx = list.findIndex((x) => x.id === updated.id || x.preCostId === updated.preCostId);
+        if (idx >= 0) {
+          list[idx] = updated;
+        } else {
+          list.unshift(updated);
+        }
+        safeSaveMasterRecords(list);
+        localStorage.setItem("cripton_pre_costings_general_active_id_v1", updated.id);
+      } catch (err) {
+        console.error("Failed to persist images to localStorage:", err);
+      }
+
+      setRecords((recList) => {
+        const idx = recList.findIndex((r) => r.id === updated.id || r.preCostId === updated.preCostId);
+        if (idx >= 0) {
+          const copy = [...recList];
+          copy[idx] = updated;
+          return copy;
+        }
+        return [updated, ...recList];
+      });
+
+      return updated;
+    });
   };
 
   // ── Validation Rules ───────────────────────────────────────────
@@ -1052,6 +5265,10 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     }
     if (!formData.buyer?.trim()) {
       toast.error("Buyer selection is required.");
+      return false;
+    }
+    if (formData.efficiencyPct < 1 || formData.efficiencyPct > 100) {
+      toast.error("Efficiency (%) must be between 1% and 100%.");
       return false;
     }
     if (!formData.poRows || formData.poRows.length === 0) {
@@ -1122,6 +5339,19 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
       return;
     }
 
+        // Validate PO-wise color breakdown quantities
+    const invalidColorPo = (formData.poRows || []).find((po) => {
+      if (!Array.isArray(po.colorBreakdown) || po.colorBreakdown.length === 0) return false;
+      const cSum = po.colorBreakdown.reduce((s, c) => s + (Number(c.quantity) || 0), 0);
+      return cSum > (Number(po.poQuantity) || 0);
+    });
+    if (invalidColorPo) {
+      toast.error(
+        `Total color quantity in PO ${invalidColorPo.poNumber} exceeds its PO Quantity (${invalidColorPo.poQuantity.toLocaleString()} pcs). Please adjust before saving.`
+      );
+      return;
+    }
+
     // Effected Qty check in Draft save
     const invalidRow = (formData.items || []).find(
       (it) => consolidatedOrderQty > 0 && (Number(it.effectedQty) || 0) > consolidatedOrderQty
@@ -1133,13 +5363,20 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
       return;
     }
 
+    const attachmentsToSave =
+      Array.isArray(formData.attachments) && formData.attachments.length > 0
+        ? formData.attachments
+        : getStoredAttachmentsForRecord(formData.id, formData.preCostId);
+
     const currentSnapshot = createVersionSnapshot({
       ...formData,
+      attachments: attachmentsToSave,
       status: "Draft",
     });
 
     const updatedRecord: PreCostingRecord = {
       ...formData,
+      attachments: attachmentsToSave,
       status: "Draft",
       isCurrentActive: false,
       versions: [
@@ -1157,6 +5394,8 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
       ],
     };
 
+    setFormData(updatedRecord);
+
     setRecords((prev) => {
       const idx = prev.findIndex((r) => r.id === updatedRecord.id);
       if (idx >= 0) {
@@ -1167,37 +5406,114 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
       return [updatedRecord, ...prev];
     });
 
+    // Synchronous immediate LocalStorage persistence
+    const saveAttsResult = saveStoredAttachmentsForRecord(updatedRecord.id, updatedRecord.preCostId, attachmentsToSave);
+    if (!saveAttsResult.success && saveAttsResult.error) {
+      toast.warning(saveAttsResult.error);
+    }
+
+    try {
+      const currentStored = localStorage.getItem("cripton_pre_costings_general_master_v1");
+      const list: PreCostingRecord[] = currentStored ? JSON.parse(currentStored) : [];
+      const idx = list.findIndex((r) => r.id === updatedRecord.id);
+      if (idx >= 0) {
+        list[idx] = updatedRecord;
+      } else {
+        list.unshift(updatedRecord);
+      }
+      const masterSaveRes = safeSaveMasterRecords(list);
+      if (!masterSaveRes.success && masterSaveRes.error) {
+        toast.error(masterSaveRes.error);
+      }
+      localStorage.setItem("cripton_pre_costings_general_active_id_v1", updatedRecord.id);
+
+      // Synchronize yarn booking tags with latest pre-costing data
+      if (Array.isArray(updatedRecord.knitFabricItems)) {
+        const activeYarnRowIds = new Set<string>();
+        updatedRecord.knitFabricItems.forEach((kfi) => {
+          if (Array.isArray(kfi.yarnDetails)) {
+            kfi.yarnDetails.forEach((yd) => {
+              if (yd.bookingTag && (yd.bookingTag.blockBookingNo || yd.bookingTag.blockBookingId)) {
+                const yRowId = yd.id || yd.bookingTag.yarnRowId;
+                activeYarnRowIds.add(yRowId);
+                const tagId = yd.bookingTag.id || `ytag-${updatedRecord.preCostId || updatedRecord.id}-${yRowId}`;
+                MMRepository.saveYarnBookingTag({
+                  ...yd.bookingTag,
+                  id: tagId,
+                  yarnRowId: yRowId,
+                  preCostId: updatedRecord.preCostId || updatedRecord.id,
+                  preCostMasterId: updatedRecord.id,
+                  buyer: updatedRecord.buyer || yd.bookingTag.buyer,
+                  season: updatedRecord.season || yd.bookingTag.season,
+                  job: updatedRecord.preCostId || updatedRecord.ourRef || updatedRecord.id,
+                  yarnCount: yd.yarnCount || yd.bookingTag.yarnCount,
+                  price: Number(yd.ratePerKg) !== undefined ? Number(yd.ratePerKg) : yd.bookingTag.price || 0,
+                  tagQtyKg: Number(yd.finalQtyKg) || Number(yd.bookingTag.tagQtyKg) || 0,
+                });
+              }
+            });
+          }
+        });
+
+        // Clean up any removed tags for this preCosting
+        const allTags = MMRepository.getYarnBookingTags();
+        const thisPcTags = allTags.filter(
+          (t) => t.preCostId === (updatedRecord.preCostId || updatedRecord.id) || t.preCostMasterId === updatedRecord.id
+        );
+        thisPcTags.forEach((t) => {
+          if (!activeYarnRowIds.has(t.yarnRowId)) {
+            MMRepository.removeYarnBookingTag(t.yarnRowId, updatedRecord.preCostId || updatedRecord.id);
+          }
+        });
+      }
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("storage"));
+      }
+    } catch (e) {
+      console.error("Failed to save draft to localStorage:", e);
+    }
+
     toast.success(`Pre Costing ${updatedRecord.preCostId} saved as Draft.`);
     setView("list");
+    onTabChange?.("register");
   };
 
   // 2. Submit for Approval
-  const handleSubmitForApproval = () => {
-    if (!validateForm()) return;
+  const handleSubmitForApproval = (recordToSubmit?: PreCostingRecord) => {
+    const target = recordToSubmit || formData;
+    if (!recordToSubmit && !validateForm()) return;
+
+    const attachmentsToSave =
+      Array.isArray(target.attachments) && target.attachments.length > 0
+        ? target.attachments
+        : getStoredAttachmentsForRecord(target.id, target.preCostId);
 
     const currentSnapshot = createVersionSnapshot({
-      ...formData,
+      ...target,
+      attachments: attachmentsToSave,
       status: "Pending Approval",
       submittedBy: "Tanvir Ahmed (Merchandiser)",
       submittedDate: new Date().toISOString().replace("T", " ").substring(0, 16),
     });
 
     const updatedRecord: PreCostingRecord = {
-      ...formData,
+      ...target,
+      attachments: attachmentsToSave,
       status: "Pending Approval",
       isCurrentActive: false,
       submittedBy: "Tanvir Ahmed (Merchandiser)",
       submittedDate: new Date().toISOString().replace("T", " ").substring(0, 16),
       versions: [
-        ...(formData.versions || []).filter((v) => v.versionNumber !== formData.version),
+        ...(target.versions || []).filter((v) => v.versionNumber !== target.version),
         currentSnapshot,
       ],
       auditHistory: [
-        ...(formData.auditHistory || []),
+        ...(target.auditHistory || []),
         {
-          versionNumber: formData.version,
-          createdBy: formData.createdBy,
-          createdDate: formData.createdDate,
+          versionNumber: target.version,
+          createdBy: target.createdBy,
+          createdDate: target.createdDate,
           submittedBy: "Tanvir Ahmed (Merchandiser)",
           submittedDate: new Date().toISOString().replace("T", " ").substring(0, 16),
           status: "Pending Approval",
@@ -1215,8 +5531,77 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
       return [updatedRecord, ...prev];
     });
 
+    // Synchronous immediate LocalStorage persistence
+    const saveAttsResult = saveStoredAttachmentsForRecord(updatedRecord.id, updatedRecord.preCostId, attachmentsToSave);
+    if (!saveAttsResult.success && saveAttsResult.error) {
+      toast.warning(saveAttsResult.error);
+    }
+
+    try {
+      const currentStored = localStorage.getItem("cripton_pre_costings_general_master_v1");
+      const list: PreCostingRecord[] = currentStored ? JSON.parse(currentStored) : [];
+      const idx = list.findIndex((r) => r.id === updatedRecord.id);
+      if (idx >= 0) {
+        list[idx] = updatedRecord;
+      } else {
+        list.unshift(updatedRecord);
+      }
+      const masterSaveRes = safeSaveMasterRecords(list);
+      if (!masterSaveRes.success && masterSaveRes.error) {
+        toast.error(masterSaveRes.error);
+      }
+      localStorage.setItem("cripton_pre_costings_general_active_id_v1", updatedRecord.id);
+
+      // Synchronize yarn booking tags with latest pre-costing data
+      if (Array.isArray(updatedRecord.knitFabricItems)) {
+        const activeYarnRowIds = new Set<string>();
+        updatedRecord.knitFabricItems.forEach((kfi) => {
+          if (Array.isArray(kfi.yarnDetails)) {
+            kfi.yarnDetails.forEach((yd) => {
+              if (yd.bookingTag && (yd.bookingTag.blockBookingNo || yd.bookingTag.blockBookingId)) {
+                const yRowId = yd.id || yd.bookingTag.yarnRowId;
+                activeYarnRowIds.add(yRowId);
+                const tagId = yd.bookingTag.id || `ytag-${updatedRecord.preCostId || updatedRecord.id}-${yRowId}`;
+                MMRepository.saveYarnBookingTag({
+                  ...yd.bookingTag,
+                  id: tagId,
+                  yarnRowId: yRowId,
+                  preCostId: updatedRecord.preCostId || updatedRecord.id,
+                  preCostMasterId: updatedRecord.id,
+                  buyer: updatedRecord.buyer || yd.bookingTag.buyer,
+                  season: updatedRecord.season || yd.bookingTag.season,
+                  job: updatedRecord.preCostId || updatedRecord.ourRef || updatedRecord.id,
+                  yarnCount: yd.yarnCount || yd.bookingTag.yarnCount,
+                  price: Number(yd.ratePerKg) !== undefined ? Number(yd.ratePerKg) : yd.bookingTag.price || 0,
+                  tagQtyKg: Number(yd.finalQtyKg) || Number(yd.bookingTag.tagQtyKg) || 0,
+                });
+              }
+            });
+          }
+        });
+
+        // Clean up any removed tags for this preCosting
+        const allTags = MMRepository.getYarnBookingTags();
+        const thisPcTags = allTags.filter(
+          (t) => t.preCostId === (updatedRecord.preCostId || updatedRecord.id) || t.preCostMasterId === updatedRecord.id
+        );
+        thisPcTags.forEach((t) => {
+          if (!activeYarnRowIds.has(t.yarnRowId)) {
+            MMRepository.removeYarnBookingTag(t.yarnRowId, updatedRecord.preCostId || updatedRecord.id);
+          }
+        });
+      }
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("storage"));
+      }
+    } catch (e) {
+      console.error("Failed to submit to localStorage:", e);
+    }
+
     toast.success(`Pre Costing ${updatedRecord.preCostId} v${updatedRecord.version} submitted for approval.`);
     setView("list");
+    onTabChange?.("register");
   };
 
   // 3. Approve Record
@@ -1353,6 +5738,20 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
         id: `item-${Date.now()}-${it.sl}`,
         preCostItemId: `PCI-${newVersionNumber}-${it.sl}`,
       })),
+      fabricEntry: targetAmendRecord.fabricEntry ? { ...targetAmendRecord.fabricEntry } : undefined,
+      knitFabricItems: (targetAmendRecord.knitFabricItems || []).map((f) => ({
+        ...f,
+        id: `kfi-${Date.now()}-${f.sl}`,
+        yarnDetails: (f.yarnDetails || []).map((y) => ({ ...y, id: `yd-${Date.now()}-${y.sl}` })),
+      })),
+      accessoriesItems: (targetAmendRecord.accessoriesItems || []).map((a) => ({
+        ...a,
+        id: `acc-${Date.now()}-${a.sl}`,
+      })),
+      otherCostItems: (targetAmendRecord.otherCostItems || []).map((o) => ({
+        ...o,
+        id: `oth-${Date.now()}-${o.sl}`,
+      })),
       attachments: (targetAmendRecord.attachments || []).map((a) => ({ ...a, version: newVersionNumber })),
       versions: [...targetAmendRecord.versions],
       auditHistory: [
@@ -1381,29 +5780,46 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     setFormData(amendedRecord);
     setFormMode("edit");
     setView("form");
+    try {
+      localStorage.setItem("cripton_pre_costings_general_active_id_v1", amendedRecord.id);
+    } catch {}
+    onTabChange?.("create", amendedRecord.id);
     toast.success(`Amendment Version v${newVersionNumber} initiated! Modify fields and submit for approval.`);
   };
 
   // Open Edit for Draft
   const handleOpenEdit = (rec: PreCostingRecord) => {
-    const atts = rec.attachments || MMRepository.getPreCostingAttachments().filter((a) => a.preCostId === rec.preCostId);
-    setFormData({ ...rec, attachments: atts });
+    const atts =
+      Array.isArray(rec.attachments) && rec.attachments.length > 0 && rec.attachments.some((a) => Boolean(a.dataUrl))
+        ? rec.attachments
+        : getStoredAttachmentsForRecord(rec.id, rec.preCostId);
+    const poVal = (rec.poRows || []).reduce((acc, r) => acc + (Number(r.value) || 0), 0);
+    const structured = ensureKnitCostingStructure({ ...rec, attachments: atts }, poVal);
+    setFormData({ ...structured, attachments: atts });
     setFormMode("edit");
     setView("form");
+    try {
+      localStorage.setItem("cripton_pre_costings_general_active_id_v1", rec.id);
+    } catch {}
+    onTabChange?.("create", rec.id);
   };
 
-  // Open Read-Only View
+  // Open Read-Only View -> Opens Complete Pre-Cost Sheet Report per specification
   const handleOpenView = (rec: PreCostingRecord) => {
-    const atts = rec.attachments || MMRepository.getPreCostingAttachments().filter((a) => a.preCostId === rec.preCostId);
-    setFormData({ ...rec, attachments: atts });
-    setFormMode("view");
-    setView("form");
+    const atts =
+      Array.isArray(rec.attachments) && rec.attachments.length > 0 && rec.attachments.some((a) => Boolean(a.dataUrl))
+        ? rec.attachments
+        : getStoredAttachmentsForRecord(rec.id, rec.preCostId);
+    const poVal = (rec.poRows || []).reduce((acc, r) => acc + (Number(r.value) || 0), 0);
+    const structured = ensureKnitCostingStructure({ ...rec, attachments: atts }, poVal);
+    setActiveRecord({ ...structured, attachments: atts });
+    setView("report");
+    onTabChange?.("report", rec.id);
   };
 
   // Open Report View
   const handleOpenReport = (rec: PreCostingRecord) => {
-    setActiveRecord(rec);
-    setView("report");
+    handleOpenView(rec);
   };
 
   // Open Version History
@@ -1454,84 +5870,22 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
     });
   }, [records, searchQuery, filterBuyer, filterStatus, fromDate, toDate]);
 
+  // Pagination for Register View
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterBuyer, filterStatus, fromDate, toDate]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredRecords.length / pageSize));
+  const paginatedRecords = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredRecords.slice(start, start + pageSize);
+  }, [filteredRecords, currentPage, pageSize]);
+
   return (
     <div className="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-200">
-      {/* ── Top Master Menu Navigation Strip ───────────────────────── */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20 px-4 md:px-6 py-2.5">
-        <div className="max-w-[1700px] mx-auto flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <button
-              type="button"
-              onClick={() => handleTabClick("register")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                view === "list"
-                  ? "bg-teal-600 text-white shadow-xs"
-                  : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-              }`}
-            >
-              <FileText className="size-3.5" />
-              <span>Pre Costing Register</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
-                  view === "list"
-                    ? "bg-white/20 text-white"
-                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                }`}
-              >
-                {records.length}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleTabClick("create")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                view === "form" && formMode === "create"
-                  ? "bg-teal-600 text-white shadow-xs"
-                  : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-              }`}
-            >
-              <Plus className="size-3.5" />
-              <span>Pre Costing Entry</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleTabClick("compare")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                view === "compare"
-                  ? "bg-teal-600 text-white shadow-xs"
-                  : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-              }`}
-            >
-              <GitBranch className="size-3.5" />
-              <span>Amendment & Comparison</span>
-            </button>
-
-            <a
-              href="/mm-fabric-consumption-cad"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
-            >
-              <Scissors className="size-3.5 text-teal-600" />
-              <span>Fabric Consumption (CAD)</span>
-            </a>
-
-            <a
-              href="/mm-fabric-consumption-register"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
-            >
-              <FileSpreadsheet className="size-3.5 text-indigo-600" />
-              <span>Fabric Consumption Register</span>
-            </a>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-2 text-[11px] text-slate-500 font-medium">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Style Pre Costing Engine Active</span>
-          </div>
-        </div>
-      </div>
-
       {/* ════════════════════════════════════════════════════════════
           VIEW 1: PRE COSTING REGISTER
          ════════════════════════════════════════════════════════════ */}
@@ -1545,7 +5899,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                 </div>
                 <div>
                   <h1 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                    Style Pre Costing Register
+                    Style Pre Costing Register (Woven)
                     <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 font-bold text-slate-600 dark:text-slate-400">
                       {records.length} records
                     </span>
@@ -1559,13 +5913,18 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    setFormData(createNewFormData());
+                    const newRec = createNewFormData();
+                    setFormData(newRec);
                     setFormMode("create");
                     setView("form");
+                    try {
+                      localStorage.setItem("cripton_pre_costings_general_active_id_v1", newRec.id);
+                    } catch {}
+                    onTabChange?.("create", newRec.id);
                   }}
                   className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-xs cursor-pointer transition"
                 >
-                  <Plus className="size-3.5" /> New Style Pre Costing
+                  <Plus className="size-3.5" /> New Pre Costing Entry (Woven)
                 </button>
               </div>
             </div>
@@ -1687,7 +6046,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                         </td>
                       </tr>
                     ) : (
-                      filteredRecords.map((r) => {
+                      paginatedRecords.map((r) => {
                         const orderQty = (r.poRows || []).reduce((s, p) => s + (Number(p?.poQuantity) || 0), 0);
                         const poVal = (r.poRows || [])?.reduce((s, p) => s + (Number(p?.value) || 0), 0);
                         const cost = (r.items || []).reduce((s, it) => s + (Number(it?.amount) || 0), 0);
@@ -1817,7 +6176,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                                   <button
                                     onClick={() => {
                                       setFormData(r);
-                                      handleSubmitForApproval();
+                                      handleSubmitForApproval(r);
                                     }}
                                     className="px-2 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold border border-indigo-200 cursor-pointer flex items-center gap-1"
                                     title="Submit for Approval"
@@ -1878,6 +6237,82 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                   </tbody>
                 </table>
               </div>
+
+              {/* Pagination Controls */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400">
+                <div className="flex items-center gap-2">
+                  <span>
+                    Showing{" "}
+                    <strong>
+                      {filteredRecords.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}
+                    </strong>{" "}
+                    to{" "}
+                    <strong>
+                      {Math.min(currentPage * pageSize, filteredRecords.length)}
+                    </strong>{" "}
+                    of <strong>{filteredRecords.length}</strong> records
+                  </span>
+                  <span className="hidden sm:inline text-slate-300 dark:text-slate-700">|</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px]">Rows per page:</span>
+                    <select
+                      value={pageSize}
+                      onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold cursor-pointer"
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                    title="First page"
+                  >
+                    <ChevronsLeft className="size-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                    title="Previous page"
+                  >
+                    <ChevronLeft className="size-3.5" />
+                  </button>
+                  <span className="px-3 py-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                    title="Next page"
+                  >
+                    <ChevronRight className="size-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                    title="Last page"
+                  >
+                    <ChevronsRight className="size-3.5" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -1898,23 +6333,41 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                 >
                   <ArrowLeft className="size-4" />
                 </button>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-slate-500">
-                      Marketing & Merchandising / Style Pre Costing
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800">
+                    v{formData.version} — {formData.status}
+                  </span>
+
+                  {/* Consumption Unit Selector */}
+                  <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 px-1.5 uppercase tracking-wider">
+                      Consumption Unit:
                     </span>
-                    <span className="text-slate-300 dark:text-slate-700">•</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
-                      v{formData.version} — {formData.status}
-                    </span>
+                    <button
+                      type="button"
+                      disabled={formMode === "view"}
+                      onClick={() => handleConsumptionUnitChange("PCS")}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                        formData.consumptionUnit === "PCS"
+                          ? "bg-teal-600 text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 hover:bg-slate-200/60 dark:hover:bg-slate-700"
+                      }`}
+                    >
+                      PCS
+                    </button>
+                    <button
+                      type="button"
+                      disabled={formMode === "view"}
+                      onClick={() => handleConsumptionUnitChange("DZ")}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                        (formData.consumptionUnit || "DZ") === "DZ"
+                          ? "bg-teal-600 text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 hover:bg-slate-200/60 dark:hover:bg-slate-700"
+                      }`}
+                    >
+                      DZ
+                    </button>
                   </div>
-                  <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-                    {formMode === "create"
-                      ? "New Style Pre Costing"
-                      : formMode === "edit"
-                      ? `Edit Pre Costing — ${formData.preCostId} (v${formData.version})`
-                      : `Pre Costing Details — ${formData.preCostId} (v${formData.version})`}
-                  </h1>
                 </div>
               </div>
 
@@ -1938,7 +6391,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                     </button>
                     <button
                       type="button"
-                      onClick={handleSubmitForApproval}
+                      onClick={() => handleSubmitForApproval()}
                       className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
                     >
                       <Send className="size-3.5" /> Submit for Approval
@@ -1958,208 +6411,397 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
               </div>
             </div>
 
-            {/* SECTION 1: Pre Costing Identification & Order Basis */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
-                <span className="w-1.5 h-4 bg-indigo-600 rounded-full inline-block" />
-                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                  1. Pre Costing Identification & Order Basis
-                </h2>
+            {/* TOP ROW: Pre Costing Identification & Order Basis (Left) + Commercial & Overhead Cost (Right) */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
+              {/* SECTION 1: Pre Costing Identification & Order Basis (Left Side: 8 Cols) */}
+              <div className="xl:col-span-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                  <span className="w-1.5 h-4 bg-indigo-600 rounded-full inline-block" />
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                    Pre Costing Identification & Order Basis
+                  </h2>
+                </div>
+
+                {/* 4-column layout: 4 fields per row across 4 rows */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                  {/* Row 1 - Field 1: Job ID (Read-only) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Job ID (Read-only)
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={formData.preCostId}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-slate-600 dark:text-slate-400"
+                    />
+                  </div>
+
+                  {/* Row 1 - Field 2: Pre Costing No. (Read-only / Non-editable) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Pre Costing No. <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={formData.preCostNo}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-slate-600 dark:text-slate-400"
+                    />
+                  </div>
+
+                  {/* Row 1 - Field 3: GMT Item (Searchable dropdown) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      GMT Item <span className="text-rose-500">*</span>
+                    </label>
+                    <SearchableSelect
+                      options={gmtItemSelectOptions}
+                      value={formData.gmtItem || "Basic T-Shirt"}
+                      onChange={(val) => setFormData((prev) => ({ ...prev, gmtItem: val }))}
+                      placeholder="Select GMT Item..."
+                      disabled={formMode === "view"}
+                    />
+                  </div>
+
+                  {/* Row 1 - Field 4: Category (Searchable dropdown) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Category <span className="text-rose-500">*</span>
+                    </label>
+                    <SearchableSelect
+                      options={categorySelectOptions}
+                      value={formData.category || "Men"}
+                      onChange={(val) => setFormData((prev) => ({ ...prev, category: val }))}
+                      placeholder="Select Category..."
+                      disabled={formMode === "view"}
+                    />
+                  </div>
+
+                  {/* Row 2 - Field 5: Pre Costing Date */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Pre Costing Date <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      disabled={formMode === "view"}
+                      value={formData.preCostDate}
+                      onChange={(e) => setFormData({ ...formData, preCostDate: e.target.value })}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                    />
+                  </div>
+
+                  {/* Row 2 - Field 6: A/C Holder (Read-only, auto-populated from Buyer) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      A/C Holder (Read-only)
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={formData.acHolder}
+                      placeholder="Auto-linked to Buyer"
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-semibold text-slate-600 dark:text-slate-400"
+                    />
+                  </div>
+
+                  {/* Row 2 - Field 7: Buyer */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Buyer <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      disabled={formMode === "view"}
+                      value={formData.buyer}
+                      onChange={(e) => handleBuyerChange(e.target.value)}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold"
+                    >
+                      {MM_BUYERS_MASTER.map((b) => (
+                        <option key={b.id} value={b.name}>
+                          {b.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Row 2 - Field 8: Merchandiser (Required dropdown, defaults to logged-in user) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Merchandiser <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      disabled={formMode === "view"}
+                      value={formData.merchandiser}
+                      onChange={(e) => setFormData({ ...formData, merchandiser: e.target.value })}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold"
+                    >
+                      {MM_MERCHANTS_MASTER.map((m) => (
+                        <option key={m.id} value={m.name}>
+                          {m.name} ({m.designation})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Row 3 - Field 9: Style No. (Searchable dropdown, filtered by selected Buyer) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Style No. <span className="text-rose-500">*</span>
+                    </label>
+                    {(() => {
+                      const currentBuyerObj = MM_BUYERS_MASTER.find((b) => b.name === formData.buyer);
+                      const buyerStyles = currentBuyerObj?.styles || [];
+                      const styleOptions = buyerStyles.map((s) => ({
+                        value: s.styleNo,
+                        label: `${s.styleNo} — ${s.description}`,
+                      }));
+                      return (
+                        <SearchableSelect
+                          options={styleOptions}
+                          value={formData.style}
+                          onChange={handleStyleChange}
+                          placeholder={buyerStyles.length > 0 ? "Select Style..." : "No styles for buyer"}
+                          disabled={formMode === "view"}
+                        />
+                      );
+                    })()}
+                  </div>
+
+                  {/* Row 3 - Field 10: Season (Searchable dropdown from Season master) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Season <span className="text-rose-500">*</span>
+                    </label>
+                    {(() => {
+                      const seasonOptions = seasonsMaster.map((s) => ({
+                        value: s.seasonName,
+                        label: s.seasonName,
+                      }));
+                      return (
+                        <SearchableSelect
+                          options={seasonOptions}
+                          value={formData.season}
+                          onChange={(val) => setFormData({ ...formData, season: val })}
+                          placeholder="Select Season..."
+                          disabled={formMode === "view"}
+                        />
+                      );
+                    })()}
+                  </div>
+
+                  {/* Row 3 - Field 11: Total Order QTY (Read-only calculated summary from Section 2 PO rows) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Total Order QTY (Read-only)
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={`${consolidatedOrderQty.toLocaleString()} pcs`}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-indigo-600 dark:text-indigo-400 text-right"
+                    />
+                  </div>
+
+                  {/* Row 3 - Field 12: Total Order Value (Read-only calculated summary from Section 2 PO rows) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Total Order Value (Read-only)
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={`$${totalPoValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-indigo-600 dark:text-indigo-400 text-right"
+                    />
+                  </div>
+
+                  {/* Row 4 - Field 13: SMV */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      SMV (Standard Minute Value)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      disabled={formMode === "view"}
+                      value={formData.smv}
+                      onChange={(e) => {
+                        const smv = Number(e.target.value) || 0;
+                        const eff = formData.efficiencyPct || 65;
+                        const cpm = formData.cpm || 0.065;
+                        const autoCm = eff > 0 ? Number((((cpm * smv) / (eff / 100)) * 12).toFixed(2)) : 0;
+                        setFormData({ ...formData, smv, cmDz: autoCm });
+                      }}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold"
+                    />
+                  </div>
+
+                  {/* Row 4 - Field 14: Efficiency (%) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Efficiency (%) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="100"
+                      step="1"
+                      disabled={formMode === "view"}
+                      value={formData.efficiencyPct || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "") {
+                          setFormData((prev) => ({ ...prev, efficiencyPct: 0 }));
+                          return;
+                        }
+                        const num = Number(val);
+                        if (num > 100) return; // Reject values above 100%
+                        if (num < 0) return;
+                        const cpm = formData.cpm || 0.065;
+                        const smv = formData.smv || 0;
+                        const autoCm = num > 0 ? Number((((cpm * smv) / (num / 100)) * 12).toFixed(2)) : 0;
+                        setFormData((prev) => ({
+                          ...prev,
+                          efficiencyPct: num,
+                          cmDz: autoCm,
+                        }));
+                      }}
+                      onBlur={() => {
+                        if (formData.efficiencyPct < 1) {
+                          setFormData((prev) => ({ ...prev, efficiencyPct: 1 }));
+                        }
+                      }}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold"
+                      placeholder="1 - 100"
+                    />
+                  </div>
+
+                  {/* Row 4 - Field 15: CM (DZ) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      CM (DZ)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      disabled={formMode === "view"}
+                      value={
+                        formData.cmDz !== undefined
+                          ? formData.cmDz
+                          : smvCost * 12 > 0
+                          ? Number((smvCost * 12).toFixed(2))
+                          : 0
+                      }
+                      onChange={(e) => setFormData({ ...formData, cmDz: Number(e.target.value) || 0 })}
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-indigo-600 dark:text-indigo-400"
+                      placeholder="0.00"
+                    />
+                  </div>
+
+                  {/* Row 4 - Field 16: Note / Instructions */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Note / Instructions
+                    </label>
+                    <input
+                      type="text"
+                      disabled={formMode === "view"}
+                      value={formData.note}
+                      onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                      placeholder="Optional remarks, buyer nominations..."
+                      className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3.5 text-xs">
-                {/* 1. Job ID (Read-only) */}
+              {/* SECTION 1B: Commercial & Overhead Cost (Right Side: 4 Cols) */}
+              <div className="xl:col-span-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs flex flex-col justify-between space-y-3.5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Job ID (Read-only)
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={formData.preCostId}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-slate-600 dark:text-slate-400"
-                  />
+                  <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800 mb-3.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-4 bg-amber-500 rounded-full inline-block" />
+                      <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                        Commercial & Overhead Cost
+                      </h2>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-500">
+                      Base FOB: <strong className="text-indigo-600 dark:text-indigo-400 font-bold">${totalPoValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase font-black text-slate-600 dark:text-slate-400">
+                        <tr>
+                          <th className="py-2.5 px-3">Name</th>
+                          <th className="py-2.5 px-3 text-right w-24">%</th>
+                          <th className="py-2.5 px-3 text-right w-28">Value ($)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                        {[
+                          { name: "Commission", key: "commissionPct" as const, valKey: "commissionValue" as const, pct: formData.commissionPct ?? 0 },
+                          { name: "Financial", key: "financialPct" as const, valKey: "financialValue" as const, pct: formData.financialPct ?? 0 },
+                          { name: "Sampling", key: "samplingPct" as const, valKey: "samplingValue" as const, pct: formData.samplingPct ?? 0 },
+                          { name: "Commercial", key: "commercialPct" as const, valKey: "commercialValue" as const, pct: formData.commercialPct ?? 0 },
+                        ].map((item) => {
+                          const calculatedVal = Number(((totalPoValue * item.pct) / 100).toFixed(2));
+                          return (
+                            <tr key={item.name} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                              <td className="py-2 px-3 font-bold text-slate-700 dark:text-slate-200">
+                                {item.name}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                <div className="flex items-center justify-end gap-1">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    disabled={formMode === "view"}
+                                    value={item.pct === 0 ? "" : item.pct}
+                                    onChange={(e) => handleOverheadPctChange(item.key, parseFloat(e.target.value) || 0)}
+                                    placeholder="0.00"
+                                    className="w-16 h-7 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                  />
+                                  <span className="text-slate-400 font-bold text-[11px]">%</span>
+                                </div>
+                              </td>
+                              <td className="py-2 px-3 text-right font-mono font-extrabold text-amber-700 dark:text-amber-300">
+                                ${calculatedVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                      <tfoot className="bg-amber-50/40 dark:bg-amber-950/20 border-t border-slate-200 dark:border-slate-800 font-bold text-xs">
+                        <tr>
+                          <td className="py-2 px-3 uppercase text-[10px] tracking-wider text-slate-600 dark:text-slate-400">
+                            Total Overheads
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono font-black text-slate-700 dark:text-slate-300">
+                            {((formData.commissionPct || 0) + (formData.financialPct || 0) + (formData.samplingPct || 0) + (formData.commercialPct || 0)).toFixed(2)}%
+                          </td>
+                          <td className="py-2 px-3 text-right font-mono font-black text-amber-700 dark:text-amber-300">
+                            ${totalOverheadCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
                 </div>
 
-                {/* 2. Pre Costing No. (Read-only / Non-editable) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Pre Costing No. <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={formData.preCostNo}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-slate-600 dark:text-slate-400"
-                  />
-                </div>
-
-                {/* Pre Costing Date */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Pre Costing Date <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    disabled={formMode === "view"}
-                    value={formData.preCostDate}
-                    onChange={(e) => setFormData({ ...formData, preCostDate: e.target.value })}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                  />
-                </div>
-
-                {/* 5. A/C Holder (Read-only, auto-populated from Buyer) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    A/C Holder (Read-only)
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={formData.acHolder}
-                    placeholder="Auto-linked to Buyer"
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-semibold text-slate-600 dark:text-slate-400"
-                  />
-                </div>
-
-                {/* 6. Buyer */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Buyer <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    disabled={formMode === "view"}
-                    value={formData.buyer}
-                    onChange={(e) => handleBuyerChange(e.target.value)}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold"
-                  >
-                    {MM_BUYERS_MASTER.map((b) => (
-                      <option key={b.id} value={b.name}>
-                        {b.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 7. Merchandiser (Required dropdown, defaults to logged-in user) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Merchandiser <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    disabled={formMode === "view"}
-                    value={formData.merchandiser}
-                    onChange={(e) => setFormData({ ...formData, merchandiser: e.target.value })}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold"
-                  >
-                    {MM_MERCHANTS_MASTER.map((m) => (
-                      <option key={m.id} value={m.name}>
-                        {m.name} ({m.designation})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 8. Style No. (Searchable dropdown, filtered by selected Buyer) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Style No. <span className="text-rose-500">*</span>
-                  </label>
-                  {(() => {
-                    const currentBuyerObj = MM_BUYERS_MASTER.find((b) => b.name === formData.buyer);
-                    const buyerStyles = currentBuyerObj?.styles || [];
-                    const styleOptions = buyerStyles.map((s) => ({
-                      value: s.styleNo,
-                      label: `${s.styleNo} — ${s.description}`,
-                    }));
-                    return (
-                      <SearchableSelect
-                        options={styleOptions}
-                        value={formData.style}
-                        onChange={handleStyleChange}
-                        placeholder={buyerStyles.length > 0 ? "Select Style..." : "No styles for buyer"}
-                        disabled={formMode === "view"}
-                      />
-                    );
-                  })()}
-                </div>
-
-                {/* 9. Season (Searchable dropdown from Season master) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Season <span className="text-rose-500">*</span>
-                  </label>
-                  {(() => {
-                    const seasonOptions = seasonsMaster.map((s) => ({
-                      value: s.seasonName,
-                      label: s.seasonName,
-                    }));
-                    return (
-                      <SearchableSelect
-                        options={seasonOptions}
-                        value={formData.season}
-                        onChange={(val) => setFormData({ ...formData, season: val })}
-                        placeholder="Select Season..."
-                        disabled={formMode === "view"}
-                      />
-                    );
-                  })()}
-                </div>
-
-                {/* 10. Total Order QTY (Read-only calculated summary from Section 2 PO rows) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Total Order QTY (Read-only)
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={`${consolidatedOrderQty.toLocaleString()} pcs`}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-indigo-600 dark:text-indigo-400 text-right"
-                  />
-                </div>
-
-                {/* 11. Total Order Value (Read-only calculated summary from Section 2 PO rows) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Total Order Value (Read-only)
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={`$${totalPoValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 font-mono font-bold text-indigo-600 dark:text-indigo-400 text-right"
-                  />
-                </div>
-
-                {/* SMV */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    SMV (Standard Minute Value)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    disabled={formMode === "view"}
-                    value={formData.smv}
-                    onChange={(e) => setFormData({ ...formData, smv: Number(e.target.value) || 0 })}
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold"
-                  />
-                </div>
-
-                {/* Note / Remarks */}
-                <div className="sm:col-span-2 md:col-span-4 lg:col-span-6">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                    Note / Instructions
-                  </label>
-                  <input
-                    type="text"
-                    disabled={formMode === "view"}
-                    value={formData.note}
-                    onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                    placeholder="Optional costing remarks, wash instructions, or buyer nominations..."
-                    className="w-full h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                  />
+                <div className="p-2.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/60 flex items-center justify-between text-xs">
+                  <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Total Overhead Share:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
+                      ${(consolidatedOrderQty > 0 ? (totalOverheadCost / consolidatedOrderQty) * 12 : 0).toFixed(2)} / dz
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 text-[10px] font-mono font-extrabold">
+                      {totalPoValue > 0 ? ((totalOverheadCost / totalPoValue) * 100).toFixed(2) : 0}% FOB
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2170,7 +6812,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-4 bg-indigo-600 rounded-full inline-block" />
                   <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                    2. Purchase Order Details
+                    Purchase Order Details
                   </h2>
                 </div>
                 {formMode !== "view" && (
@@ -2190,9 +6832,10 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                     <tr>
                       <th className="py-2.5 px-3 w-10 text-center">SL</th>
                       <th className="py-2.5 px-3.5">PO Number *</th>
-                      <th className="py-2.5 px-3.5 text-right w-36">PO Quantity *</th>
+                      <th className="py-2.5 px-3.5 text-right w-44 min-w-[170px]">PO Quantity *</th>
                       <th className="py-2.5 px-3.5 text-right w-32">Rate ($/pc) *</th>
                       <th className="py-2.5 px-3.5 text-right w-36">Value ($)</th>
+                      <th className="py-2.5 px-3.5 w-36">Delivery Date</th>
                       <th className="py-2.5 px-3.5">Remarks</th>
                       {formMode !== "view" && (
                         <th className="py-2.5 px-3 text-center w-16">Action</th>
@@ -2202,7 +6845,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {(formData.poRows || []).length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="py-6 text-center text-slate-400">
+                        <td colSpan={formMode !== "view" ? 8 : 7} className="py-6 text-center text-slate-400">
                           No Purchase Orders added. Click "Add PO" to enter purchase orders for this style.
                         </td>
                       </tr>
@@ -2223,13 +6866,31 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                             />
                           </td>
                           <td className="py-2 px-3.5">
-                            <input
-                              type="number"
-                              disabled={formMode === "view"}
-                              value={po.poQuantity}
-                              onChange={(e) => handleUpdatePoRow(idx, "poQuantity", Number(e.target.value) || 0)}
-                              className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
-                            />
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                type="number"
+                                disabled={formMode === "view"}
+                                value={po.poQuantity}
+                                onChange={(e) => handleUpdatePoRow(idx, "poQuantity", Number(e.target.value) || 0)}
+                                className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleOpenPoColorModal(idx)}
+                                className={`size-8 shrink-0 rounded-lg flex items-center justify-center font-black text-xs transition-all cursor-pointer border ${
+                                  (po.colorBreakdown || []).length > 0
+                                    ? "bg-teal-600 hover:bg-teal-700 text-white border-teal-600 shadow-xs"
+                                    : "bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800"
+                                }`}
+                                title={
+                                  (po.colorBreakdown || []).length > 0
+                                    ? `PO-wise Color Quantities (${(po.colorBreakdown || []).length} colors entered)`
+                                    : "Enter PO-wise Color Quantities (D)"
+                                }
+                              >
+                                D
+                              </button>
+                            </div>
                           </td>
                           <td className="py-2 px-3.5">
                             <input
@@ -2243,6 +6904,15 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                           </td>
                           <td className="py-2 px-3.5 text-right font-mono font-extrabold text-indigo-600 dark:text-indigo-400">
                             ${Number(po.value || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          </td>
+                          <td className="py-2 px-3.5">
+                            <input
+                              type="date"
+                              disabled={formMode === "view"}
+                              value={po.deliveryDate || ""}
+                              onChange={(e) => handleUpdatePoRow(idx, "deliveryDate", e.target.value)}
+                              className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs"
+                            />
                           </td>
                           <td className="py-2 px-3.5">
                             <input
@@ -2284,7 +6954,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                       <td className="py-3 px-3.5 text-right font-mono text-indigo-700 dark:text-indigo-300">
                         ${totalPoValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
-                      <td colSpan={formMode !== "view" ? 2 : 1} className="py-3 px-3.5 text-[11px] text-slate-500">
+                      <td colSpan={formMode !== "view" ? 3 : 2} className="py-3 px-3.5 text-[11px] text-slate-500">
                         Summed automatically across {(formData.poRows || []).length} purchase orders
                       </td>
                     </tr>
@@ -2293,265 +6963,1059 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
               </div>
             </div>
 
-            {/* SECTION 3: Item-wise Pre Costing Details */}
+            {/* SECTION 3: Item-wise Pre Costing Details (Fabric Cost, Accessories Cost, Others Cost) */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-4 bg-indigo-600 rounded-full inline-block" />
-                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                    3. Item-wise Pre Costing Details
-                  </h2>
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2 mr-1">
+                    <span className="w-1.5 h-4 bg-indigo-600 rounded-full inline-block" />
+                    <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                      Item-wise Pre Costing Details
+                    </h2>
+                  </div>
+                  {/* Three Sub-Tabs */}
+                  <div className="flex items-center bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl gap-1 border border-slate-200/60 dark:border-slate-700/60">
+                    <button
+                      type="button"
+                      onClick={() => setActiveCostingTab("fabric")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        activeCostingTab === "fabric"
+                          ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      <Layers className="size-3.5" />
+                      <span>Fabric Cost</span>
+                      <span className="ml-1 px-1.5 py-0.5 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 rounded text-[10px] font-mono font-bold">
+                        ${totalFabricCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveCostingTab("accessories")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        activeCostingTab === "accessories"
+                          ? "bg-white dark:bg-slate-700 text-teal-600 dark:text-teal-300 shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      <Sparkles className="size-3.5" />
+                      <span>Accessories Cost</span>
+                      <span className="ml-1 px-1.5 py-0.5 bg-teal-50 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 rounded text-[10px] font-mono font-bold">
+                        ${totalAccessoriesCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveCostingTab("embellishment")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        activeCostingTab === "embellishment"
+                          ? "bg-white dark:bg-slate-700 text-purple-600 dark:text-purple-300 shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      <Palette className="size-3.5" />
+                      <span>Embellishment</span>
+                      <span className="ml-1 px-1.5 py-0.5 bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 rounded text-[10px] font-mono font-bold">
+                        ${totalEmbellishmentCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveCostingTab("others")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        activeCostingTab === "others"
+                          ? "bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-300 shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      <DollarSign className="size-3.5" />
+                      <span>Others Cost</span>
+                      <span className="ml-1 px-1.5 py-0.5 bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 rounded text-[10px] font-mono font-bold">
+                        ${totalOthersCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </button>
+                  </div>
                 </div>
+
                 {formMode !== "view" && (
-                  <button
-                    type="button"
-                    onClick={handleAddItemRow}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 font-bold text-xs border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 cursor-pointer"
-                  >
-                    <Plus className="size-3.5" /> Add Costing Item
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {activeCostingTab === "fabric" && (
+                      <button
+                        type="button"
+                        onClick={handleAddFabricItem}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 font-bold text-xs border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 cursor-pointer"
+                      >
+                        <Plus className="size-3.5" /> Add Fabric Item
+                      </button>
+                    )}
+                    {activeCostingTab === "accessories" && (
+                      <button
+                        type="button"
+                        onClick={handleAddAccessoryRow}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 font-bold text-xs border border-teal-200 dark:border-teal-800 hover:bg-teal-100 cursor-pointer"
+                      >
+                        <Plus className="size-3.5" /> Add Accessory Item
+                      </button>
+                    )}
+                    {activeCostingTab === "embellishment" && (
+                      <button
+                        type="button"
+                        onClick={handleAddEmbellishmentRow}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-400 font-bold text-xs border border-purple-200 dark:border-purple-800 hover:bg-purple-100 cursor-pointer"
+                      >
+                        <Plus className="size-3.5" /> Add Embellishment Item
+                      </button>
+                    )}
+                    {activeCostingTab === "others" && (
+                      <button
+                        type="button"
+                        onClick={handleAddOtherCostRow}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 font-bold text-xs border border-amber-200 dark:border-amber-800 hover:bg-amber-100 cursor-pointer"
+                      >
+                        <Plus className="size-3.5" /> Add Other Cost Head
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
 
-              <div className="overflow-x-auto pb-2">
-                <table className="w-full text-xs text-left whitespace-nowrap min-w-[1250px]">
-                  <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[9.5px] uppercase font-black text-slate-500">
-                    <tr>
-                      <th className="py-2.5 px-2 text-center w-8">SL</th>
-                      <th className="py-2.5 px-2 w-32">Head *</th>
-                      <th className="py-2.5 px-2.5 w-64">Item Name *</th>
-                      <th className="py-2.5 px-2 w-44">Description</th>
-                      <th className="py-2.5 px-2 w-32">N. Status *</th>
-                      <th className="py-2.5 px-2.5 w-52">Supplier *</th>
-                      <th className="py-2.5 px-2 text-right w-32">Effected Qty *</th>
-                      <th className="py-2.5 px-2 text-right w-20">Consump.</th>
-                      <th className="py-2.5 px-2 text-center w-16">Unit</th>
-                      <th className="py-2.5 px-2 text-right w-24">Required Qty</th>
-                      <th className="py-2.5 px-2 text-right w-24">Final Qty</th>
-                      <th className="py-2.5 px-2 text-right w-20">Rate ($)</th>
-                      <th className="py-2.5 px-2.5 text-right w-28">Amount ($)</th>
-                      {formMode !== "view" && <th className="py-2.5 px-2 text-center w-12">Action</th>}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {(formData.items || []).length === 0 ? (
-                      <tr>
-                        <td colSpan={14} className="py-8 text-center text-slate-400">
-                          No costing items entered. Click "Add Costing Item" to add fabric or accessories items.
-                        </td>
-                      </tr>
-                    ) : (
-                      (formData.items || []).map((item, idx) => {
-                        const isFabric = FABRIC_HEADS.includes(item.head);
-                        const isEffQtyInvalid = consolidatedOrderQty > 0 && (Number(item.effectedQty) || 0) > consolidatedOrderQty;
+              {/* ─────────────────────────────────────────────────────────────
+                  TAB 1: FABRIC COST (EXCEL MODEL STRUCTURE)
+                 ───────────────────────────────────────────────────────────── */}
+              {activeCostingTab === "fabric" && (
+                <div className="space-y-4">
+                  {/* Fabric Entry Section Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-xl bg-slate-50/90 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={handleOpenFabricEntryModal}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs cursor-pointer transition-colors"
+                    >
+                      <Plus className="size-3.5" />
+                      <span>Fabric Create</span>
+                    </button>
+                  </div>
 
-                        // Item options based on Head
-                        const itemOptions = isFabric
-                          ? fabricMasterItems.map((f) => ({
-                              value: f.fabricDescription || f.fabricCode,
-                              label: `${f.fabricCode} — ${f.fabricDescription} (${f.composition || ""}${f.gsm ? `, ${f.gsm} GSM` : ""})`,
-                            }))
-                          : accessoriesMasterItems.map((a) => ({
-                              value: a.itemName,
-                              label: `${a.itemCode} — ${a.itemName} (${a.category})`,
-                            }));
-
-                        // Supplier options from master
-                        const supplierOptions = suppliersMaster.map((s) => ({
-                          value: s.name,
-                          label: s.country ? `${s.name} (${s.country})` : s.name,
-                        }));
-
-                        return (
-                          <tr
-                            key={item.id || idx}
-                            className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${
-                              isEffQtyInvalid ? "bg-rose-50/20 dark:bg-rose-950/20" : ""
-                            }`}
-                          >
-                            {/* 1. SL */}
-                            <td className="py-2 px-2 text-center font-mono font-bold text-slate-400">
-                              {idx + 1}
+                  {/* Costing Item Entry Table (Replicated Model) */}
+                  <div className="overflow-x-auto pb-2">
+                    <table className="w-full text-xs text-left whitespace-nowrap min-w-[1500px]">
+                      <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[9.5px] uppercase font-black text-slate-500">
+                        <tr>
+                          <th className="py-2.5 px-2 text-center w-8">Sl.</th>
+                          <th className="py-2.5 px-2 w-44 min-w-[175px]">Head *</th>
+                          <th className="py-2.5 px-2.5 w-64 min-w-[250px]">Item Name *</th>
+                          <th className="py-2.5 px-2 w-32 min-w-[120px]">UoM</th>
+                          <th className="py-2.5 px-2 text-center w-28 bg-amber-50/50 dark:bg-amber-950/20">Yarn *</th>
+                          <th className="py-2.5 px-2 text-right w-24">Effected Qty (pcs) *</th>
+                          <th className="py-2.5 px-2 text-right w-24">Consumption (kg/{(formData.consumptionUnit || "DZ").toLowerCase()}) *</th>
+                          <th className="py-2.5 px-2 text-right w-24">Estimated Finish Qty</th>
+                          <th className="py-2.5 px-2 text-right w-20">RMG Loss (%)</th>
+                          <th className="py-2.5 px-2 text-right w-28">Req. Finished (Cuttable)</th>
+                          <th className="py-2.5 px-2 w-40 min-w-[150px]">Fabric Source *</th>
+                          <th className="py-2.5 px-2 w-32 min-w-[120px]">Color Type *</th>
+                          <th className="py-2.5 px-2 text-center w-20">Details</th>
+                          <th className="py-2.5 px-2.5 text-right w-28 bg-indigo-50/40 dark:bg-indigo-950/20 font-black text-indigo-700 dark:text-indigo-300">Total Amount ($)</th>
+                          {formMode !== "view" && <th className="py-2.5 px-2 text-center w-12">Action</th>}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {(formData.knitFabricItems || []).length === 0 ? (
+                          <tr>
+                            <td colSpan={formMode !== "view" ? 15 : 14} className="py-8 text-center text-slate-400">
+                              No knit fabric costing items added yet. Click "+ Add Fabric Item" to enter rows.
                             </td>
-
-                            {/* 2. Head (12 standard options) */}
-                            <td className="py-2 px-2">
-                              <select
-                                disabled={formMode === "view"}
-                                value={item.head}
-                                onChange={(e) => handleHeadChange(idx, e.target.value)}
-                                className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-[11px]"
-                              >
-                                {PRE_COSTING_HEADS.map((h) => (
-                                  <option key={h} value={h}>
-                                    {h}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-
-                            {/* 3. Item Name (Searchable, conditionally filtered by Head) */}
-                            <td className="py-2 px-2.5">
-                              <SearchableSelect
-                                options={itemOptions}
-                                value={item.item}
-                                onChange={(val) => handleItemSelect(idx, val)}
-                                placeholder={isFabric ? "Search Fabric..." : "Search Trims/Accessories..."}
-                                disabled={formMode === "view"}
-                              />
-                            </td>
-
-                            {/* 4. Description */}
-                            <td className="py-2 px-2">
-                              <input
-                                type="text"
-                                disabled={formMode === "view"}
-                                value={item.description}
-                                onChange={(e) => handleUpdateItemRow(idx, "description", e.target.value)}
-                                placeholder="Specification..."
-                                className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
-                              />
-                            </td>
-
-                            {/* 5. N. Status (Nominated | Own Source) */}
-                            <td className="py-2 px-2">
-                              <select
-                                disabled={formMode === "view"}
-                                value={item.nStatus}
-                                onChange={(e) => handleUpdateItemRow(idx, "nStatus", e.target.value)}
-                                className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold text-[11px]"
-                              >
-                                {NOMINEE_STATUSES.map((ns) => (
-                                  <option key={ns} value={ns}>
-                                    {ns}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-
-                            {/* 6. Supplier (Searchable from Supplier Master) */}
-                            <td className="py-2 px-2.5">
-                              <SearchableSelect
-                                options={supplierOptions}
-                                value={item.supplier}
-                                onChange={(val) => handleUpdateItemRow(idx, "supplier", val)}
-                                placeholder="Search Supplier..."
-                                disabled={formMode === "view"}
-                              />
-                            </td>
-
-                            {/* 7. Effected Qty (Validation: Effected Qty <= Total Order QTY) */}
-                            <td className="py-2 px-2">
-                              <input
-                                type="number"
-                                disabled={formMode === "view"}
-                                value={item.effectedQty}
-                                onChange={(e) => handleUpdateItemRow(idx, "effectedQty", Number(e.target.value) || 0)}
-                                className={`w-full h-8 px-2 rounded-lg border text-right font-mono text-[11px] font-bold ${
-                                  isEffQtyInvalid
-                                    ? "border-rose-500 bg-rose-50/50 text-rose-700 focus:ring-rose-500 focus:border-rose-500"
-                                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                                }`}
-                              />
-                              {isEffQtyInvalid && (
-                                <span className="block text-[9.5px] font-bold text-rose-600 mt-0.5 leading-tight">
-                                  Exceeds Total ({consolidatedOrderQty.toLocaleString()})
-                                </span>
-                              )}
-                            </td>
-
-                            {/* 8. Consumption */}
-                            <td className="py-2 px-2">
-                              <input
-                                type="number"
-                                step="0.0001"
-                                disabled={formMode === "view"}
-                                value={item.consumption}
-                                onChange={(e) => handleUpdateItemRow(idx, "consumption", Number(e.target.value) || 0)}
-                                className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono text-[11px]"
-                              />
-                            </td>
-
-                            {/* 9. Unit */}
-                            <td className="py-2 px-2">
-                              <select
-                                disabled={formMode === "view"}
-                                value={item.unit}
-                                onChange={(e) => handleUpdateItemRow(idx, "unit", e.target.value)}
-                                className="w-full h-8 px-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-center font-bold text-[11px]"
-                              >
-                                {UOM_OPTIONS.map((u) => (
-                                  <option key={u} value={u}>
-                                    {u}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-
-                            {/* 10. Required Qty (Read-only: Effected Qty * Consump) */}
-                            <td className="py-2 px-2 text-right font-mono font-bold text-slate-700 dark:text-slate-300">
-                              {Number(item.requiredQty || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                            </td>
-
-                            {/* 11. Final Qty */}
-                            <td className="py-2 px-2">
-                              <input
-                                type="number"
-                                step="0.01"
-                                disabled={formMode === "view"}
-                                value={item.finalQty}
-                                onChange={(e) => handleUpdateItemRow(idx, "finalQty", Number(e.target.value) || 0)}
-                                className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-[11px]"
-                              />
-                            </td>
-
-                            {/* 12. Rate */}
-                            <td className="py-2 px-2">
-                              <input
-                                type="number"
-                                step="0.001"
-                                disabled={formMode === "view"}
-                                value={item.rate}
-                                onChange={(e) => handleUpdateItemRow(idx, "rate", Number(e.target.value) || 0)}
-                                className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-[11px]"
-                              />
-                            </td>
-
-                            {/* 13. Amount */}
-                            <td className="py-2 px-2.5 text-right font-mono font-bold text-slate-900 dark:text-white">
-                              ${Number(item.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                            </td>
-
-                            {/* Action */}
-                            {formMode !== "view" && (
-                              <td className="py-2 px-2 text-center">
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoveItemRow(idx)}
-                                  className="p-1 rounded hover:bg-rose-50 text-rose-500 cursor-pointer"
-                                  title="Remove item"
-                                >
-                                  <Trash2 className="size-3.5" />
-                                </button>
-                              </td>
-                            )}
                           </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                  <tfoot>
-                    <tr className="bg-slate-100 dark:bg-slate-800 font-black border-t border-slate-200 dark:border-slate-700">
-                      <td colSpan={12} className="py-3 px-3 text-right uppercase text-[10px] tracking-wider">
-                        Total Pre Costing Material & Manufacturing Cost:
-                      </td>
-                      <td className="py-3 px-2.5 text-right font-mono text-indigo-700 dark:text-indigo-300 text-sm">
-                        ${totalCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </td>
-                      {formMode !== "view" && <td />}
-                    </tr>
-                  </tfoot>
-                </table>
+                        ) : (
+                          (formData.knitFabricItems || []).map((row, idx) => {
+                            const yarnCount = row.yarnDetails?.length || 0;
+                            return (
+                              <tr key={row.id || idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                                {/* 1. Sl. */}
+                                <td className="py-2 px-2 text-center font-mono font-bold text-slate-400">
+                                  {idx + 1}
+                                </td>
+
+                                {/* 2. Head */}
+                                <td className="py-2 px-2 w-44 min-w-[175px]">
+                                  <select
+                                    disabled={formMode === "view"}
+                                    value={row.head}
+                                    onChange={(e) => handleUpdateFabricItem(idx, "head", e.target.value)}
+                                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                                  >
+                                    <option value="Shell">Shell</option>
+                                    <option value="Rib / Trims">Rib / Trims</option>
+                                    <option value="Collar / Cuff">Collar / Cuff</option>
+                                    <option value="Contrast Fabric">Contrast Fabric</option>
+                                    <option value="Pocketing Fabric">Pocketing Fabric</option>
+                                    <option value="Lining">Lining</option>
+                                    <option value="Interlining">Interlining</option>
+                                  </select>
+                                </td>
+
+                                {/* 3. Item Name */}
+                                <td className="py-2 px-2.5 w-64 min-w-[250px]">
+                                  <SearchableSelect
+                                    options={getFabricItemOptions(row.item)}
+                                    value={row.item}
+                                    onChange={(val) => handleUpdateFabricItem(idx, "item", val)}
+                                    placeholder="Select Fabric..."
+                                    disabled={formMode === "view"}
+                                    className="text-xs h-8 px-2"
+                                    allowCustom
+                                  />
+                                </td>
+
+                                {/* 3b. UoM (KG / YDS) */}
+                                <td className="py-2 px-2 w-32 min-w-[120px]">
+                                  <select
+                                    disabled={formMode === "view"}
+                                    value={row.uom || "KG"}
+                                    onChange={(e) => handleUpdateFabricItem(idx, "uom", e.target.value)}
+                                    className="w-full h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300"
+                                  >
+                                    <option value="KG">KG</option>
+                                    <option value="YDS">YDS</option>
+                                  </select>
+                                </td>
+
+                                {/* 4. Yarn Details Trigger Button */}
+                                <td className="py-2 px-2 text-center bg-amber-50/30 dark:bg-amber-950/10">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenYarnModal(idx)}
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-100/80 dark:bg-amber-900/40 hover:bg-amber-200 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700 text-[11px] font-bold shadow-xs cursor-pointer transition-colors"
+                                  >
+                                    <Disc className="size-3" />
+                                    <span>Yarn ({yarnCount})</span>
+                                  </button>
+                                </td>
+
+                                {/* 5. Effected Qty (pcs) */}
+                                <td className="py-2 px-2">
+                                  <input
+                                    type="number"
+                                    disabled={formMode === "view"}
+                                    value={row.effectedQtyPcs}
+                                    onChange={(e) => handleUpdateFabricItem(idx, "effectedQtyPcs", Number(e.target.value) || 0)}
+                                    className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono text-xs font-semibold"
+                                  />
+                                </td>
+
+                                {/* Consumption (kg/dz) */}
+                                <td className="py-2 px-2">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    disabled={formMode === "view"}
+                                    value={row.consumptionKgDz}
+                                    onChange={(e) => handleUpdateFabricItem(idx, "consumptionKgDz", Number(e.target.value) || 0)}
+                                    className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono text-xs font-semibold"
+                                  />
+                                </td>
+
+                                {/* 8. Estimated Finish Qty */}
+                                <td className="py-2 px-2 text-right font-mono font-medium text-slate-700 dark:text-slate-300">
+                                  {Number(row.estimatedFinishQty || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </td>
+
+                                {/* 9. RMG Process Loss (%) */}
+                                <td className="py-2 px-2">
+                                  <input
+                                    type="number"
+                                    step="0.1"
+                                    disabled={formMode === "view"}
+                                    value={row.rmgProcessLossPct}
+                                    onChange={(e) => handleUpdateFabricItem(idx, "rmgProcessLossPct", Number(e.target.value) || 0)}
+                                    className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono text-xs font-semibold"
+                                  />
+                                </td>
+
+                                {/* 10. Required Finished (Cuttable) Qty */}
+                                <td className="py-2 px-2 text-right font-mono font-bold text-slate-900 dark:text-white">
+                                  {Number(row.requiredFinishedQty || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </td>
+
+                                {/* Fabric Source (Searchable dropdown) */}
+                                <td className="py-2 px-2 w-40 min-w-[150px]">
+                                  <SearchableSelect
+                                    options={getFabricSourceOptions(row.fabricSource)}
+                                    value={row.fabricSource || "Production"}
+                                    onChange={(val) => handleUpdateFabricItem(idx, "fabricSource", val)}
+                                    placeholder="Select Source..."
+                                    disabled={formMode === "view"}
+                                    className="text-xs h-8 px-2 font-semibold"
+                                  />
+                                </td>
+
+                                {/* Color Type (Searchable dropdown) */}
+                                <td className="py-2 px-2 w-32 min-w-[120px]">
+                                  <SearchableSelect
+                                    options={getColorTypeOptions(row.colorType)}
+                                    value={row.colorType || "Solid"}
+                                    onChange={(val) => handleUpdateFabricItem(idx, "colorType", val)}
+                                    placeholder="Select Color..."
+                                    disabled={formMode === "view"}
+                                    className="text-xs h-8 px-2 font-semibold"
+                                  />
+                                </td>
+
+                                {/* Details (D Button) */}
+                                <td className="py-2 px-2 text-center w-20">
+                                  {(() => {
+                                    const source = row.fabricSource || "Production";
+                                    const cType = row.colorType || "Solid";
+                                    const isDetailsDisabled =
+                                      (source === "Finish Purchase" && cType === "N/A") ||
+                                      cType === "N/A" ||
+                                      source === "Finish Purchase";
+                                    return (
+                                      <button
+                                        type="button"
+                                        disabled={isDetailsDisabled}
+                                        onClick={() => handleOpenFabricDetailsModal(idx)}
+                                        className={`size-7 rounded-lg font-black text-xs inline-flex items-center justify-center transition-all shadow-xs ${
+                                          isDetailsDisabled
+                                            ? "bg-slate-100 text-slate-300 dark:bg-slate-800 dark:text-slate-600 cursor-not-allowed border border-slate-200 dark:border-slate-700"
+                                            : "bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer ring-2 ring-indigo-200 dark:ring-indigo-900 active:scale-95"
+                                        }`}
+                                        title={
+                                          isDetailsDisabled
+                                            ? "Process Details disabled for Finish Purchase / N/A"
+                                            : "Open Fabric Process & Costing Details (D)"
+                                        }
+                                      >
+                                        D
+                                      </button>
+                                    );
+                                  })()}
+                                </td>
+
+                                {/* Total Amount ($) */}
+                                <td className="py-2 px-2.5 text-right font-mono font-black text-indigo-700 dark:text-indigo-300 bg-indigo-50/30 dark:bg-indigo-950/10 text-[13px]">
+                                  ${Number(row.totalAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </td>
+
+                                {/* Action */}
+                                {formMode !== "view" && (
+                                  <td className="py-2 px-2 text-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveFabricItem(idx)}
+                                      className="p-1 rounded hover:bg-rose-50 text-rose-500 cursor-pointer"
+                                      title="Remove fabric row"
+                                    >
+                                      <Trash2 className="size-3.5" />
+                                    </button>
+                                  </td>
+                                )}
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-slate-100/80 dark:bg-slate-800 font-black border-t border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200">
+                          <td colSpan={5} className="py-3 px-3 uppercase text-[10px] tracking-wider text-right">
+                            Fabric Totals:
+                          </td>
+                          <td className="py-3 px-2 text-right font-mono">
+                            {(formData.knitFabricItems || []).reduce((s, r) => s + (Number(r.effectedQtyPcs) || 0), 0).toLocaleString()}
+                          </td>
+                          <td />
+                          <td className="py-3 px-2 text-right font-mono">
+                            {(formData.knitFabricItems || []).reduce((s, r) => s + (Number(r.estimatedFinishQty) || 0), 0).toFixed(2)}
+                          </td>
+                          <td />
+                          <td className="py-3 px-2 text-right font-mono">
+                            {(formData.knitFabricItems || []).reduce((s, r) => s + (Number(r.requiredFinishedQty) || 0), 0).toFixed(2)}
+                          </td>
+                          <td />
+                          <td />
+                          <td />
+                          <td className="py-3 px-2.5 text-right font-mono text-indigo-700 dark:text-indigo-300 text-sm">
+                            ${totalFabricCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                          {formMode !== "view" && <td />}
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* ─────────────────────────────────────────────────────────────
+                  TAB 2: ACCESSORIES COST (PRESERVED FUNCTIONALITY & COLUMNS)
+                 ───────────────────────────────────────────────────────────── */}
+              {activeCostingTab === "accessories" && (
+                <div className="space-y-4">
+                  <div className="overflow-x-auto pb-2">
+                    <table className="w-full text-xs text-left whitespace-nowrap min-w-[1250px]">
+                      <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[9.5px] uppercase font-black text-slate-500">
+                        <tr>
+                          <th className="py-2.5 px-2 text-center w-8">SL</th>
+                          <th className="py-2.5 px-2 w-44 min-w-[175px]">Head *</th>
+                          <th className="py-2.5 px-2.5 w-64">Item Name *</th>
+                          <th className="py-2.5 px-2 w-36 min-w-[140px]">UoM *</th>
+                          <th className="py-2.5 px-2 w-44">Description</th>
+                          <th className="py-2.5 px-2 w-32">N. Status *</th>
+                          <th className="py-2.5 px-2.5 w-52">Supplier *</th>
+                          <th className="py-2.5 px-2 text-right w-32">Effected Qty *</th>
+                          <th className="py-2.5 px-2 text-right w-20">Consump.</th>
+                          <th className="py-2.5 px-2 text-right w-24">Wastage (%)</th>
+                          <th className="py-2.5 px-2 text-right w-24">Required Qty</th>
+                          <th className="py-2.5 px-2 text-right w-32 min-w-[120px]">Final Qty</th>
+                          <th className="py-2.5 px-2 text-right w-28 min-w-[105px]">Rate ($)</th>
+                          <th className="py-2.5 px-2.5 text-right w-28">Amount ($)</th>
+                          {formMode !== "view" && <th className="py-2.5 px-2 text-center w-12">Action</th>}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {(formData.accessoriesItems || []).length === 0 ? (
+                          <tr>
+                            <td colSpan={formMode !== "view" ? 15 : 14} className="py-8 text-center text-slate-400">
+                              No accessories items entered. Click "+ Add Accessory Item" to add sewing thread, buttons, zippers, trims, etc.
+                            </td>
+                          </tr>
+                        ) : (
+                          (formData.accessoriesItems || []).map((item, idx) => {
+                            const isEffQtyInvalid = consolidatedOrderQty > 0 && (Number(item.effectedQty) || 0) > consolidatedOrderQty;
+                            const isFinishingHead = item.head === "Finishing Trims" || (typeof item.head === "string" && item.head.toLowerCase().includes("finish"));
+                            const targetList: string[] = isFinishingHead ? [...FINISHING_TRIMS_ITEMS] : [...SEWING_TRIMS_ITEMS];
+                            const itemOptions: { value: string; label: string }[] = targetList.map((name) => ({
+                              value: name,
+                              label: name,
+                            }));
+                            if (item.item && !targetList.includes(item.item)) {
+                              itemOptions.unshift({ value: item.item, label: item.item });
+                            }
+                            const rowSupplierOptions = getSupplierOptions(item.supplier);
+
+                            return (
+                              <tr
+                                key={item.id || idx}
+                                className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${
+                                  isEffQtyInvalid ? "bg-rose-50/20 dark:bg-rose-950/20" : ""
+                                }`}
+                              >
+                                {/* 1. SL */}
+                                <td className="py-2 px-2 text-center font-mono font-bold text-slate-400">
+                                  {idx + 1}
+                                </td>
+
+                                {/* 2. Head */}
+                                <td className="py-2 px-2 w-44 min-w-[175px]">
+                                  <select
+                                    disabled={formMode === "view"}
+                                    value={item.head}
+                                    onChange={(e) => handleUpdateAccessoryRow(idx, "head", e.target.value)}
+                                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                                  >
+                                    {ACCESSORIES_HEADS.map((h: string) => (
+                                       <option key={h} value={h}>
+                                        {h}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </td>
+
+                                {/* 3. Item Name */}
+                                <td className="py-2 px-2.5">
+                                  <SearchableSelect
+                                    options={itemOptions}
+                                    value={item.item}
+                                    onChange={(val) => handleUpdateAccessoryRow(idx, "item", val)}
+                                    placeholder="Select Accessory Item..."
+                                    disabled={formMode === "view"}
+                                    className="text-xs"
+                                  />
+                                </td>
+
+                                {/* 3b. UoM */}
+                                <td className="py-2 px-2 w-36 min-w-[140px]">
+                                  <select
+                                    disabled={formMode === "view"}
+                                    value={item.unit || "Pcs"}
+                                    onChange={(e) => handleUpdateAccessoryRow(idx, "unit", e.target.value)}
+                                    className="w-full h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                                  >
+                                    {ACCESSORY_UOM_OPTIONS.map((u) => (
+                                      <option key={u} value={u}>
+                                        {u}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </td>
+
+                                {/* 4. Description */}
+                                <td className="py-2 px-2">
+                                  <input
+                                    type="text"
+                                    disabled={formMode === "view"}
+                                    value={item.description || ""}
+                                    onChange={(e) => handleUpdateAccessoryRow(idx, "description", e.target.value)}
+                                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                                    placeholder="Specifications..."
+                                  />
+                                </td>
+
+                                {/* 5. N. Status */}
+                                <td className="py-2 px-2">
+                                  <select
+                                    disabled={formMode === "view"}
+                                    value={item.nStatus}
+                                    onChange={(e) => handleUpdateAccessoryRow(idx, "nStatus", e.target.value)}
+                                    className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                                  >
+                                    <option value="Nominated">Nominated</option>
+                                    <option value="Non-Nominated">Non-Nominated</option>
+                                  </select>
+                                </td>
+
+                                {/* 6. Supplier */}
+                                <td className="py-2 px-2.5">
+                                  <SearchableSelect
+                                    options={rowSupplierOptions}
+                                    value={item.supplier}
+                                    onChange={(val) => handleUpdateAccessoryRow(idx, "supplier", val)}
+                                    placeholder="Select Supplier..."
+                                    disabled={formMode === "view"}
+                                    className="text-xs"
+                                  />
+                                </td>
+
+                                {/* 7. Effected Qty */}
+                                <td className="py-2 px-2">
+                                  <input
+                                    type="number"
+                                    disabled={formMode === "view"}
+                                    value={item.effectedQty}
+                                    onChange={(e) => handleUpdateAccessoryRow(idx, "effectedQty", Number(e.target.value) || 0)}
+                                    className={`w-full h-8 px-1.5 rounded-lg border text-right font-mono font-bold text-xs ${
+                                      isEffQtyInvalid
+                                        ? "border-rose-400 bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300"
+                                        : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                                    }`}
+                                  />
+                                </td>
+
+                                {/* 8. Consumption */}
+                                <td className="py-2 px-2">
+                                  <input
+                                    type="number"
+                                    step="0.001"
+                                    disabled={formMode === "view"}
+                                    value={item.consumption}
+                                    onChange={(e) => handleUpdateAccessoryRow(idx, "consumption", Number(e.target.value) || 0)}
+                                    className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono text-xs font-semibold"
+                                  />
+                                </td>
+
+                                {/* 8b. Wastage (%) */}
+                                <td className="py-2 px-2">
+                                  <input
+                                    type="number"
+                                    step="0.1"
+                                    disabled={formMode === "view"}
+                                    value={item.wastagePct ?? 5}
+                                    onChange={(e) => handleUpdateAccessoryRow(idx, "wastagePct", Number(e.target.value) || 0)}
+                                    className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono text-xs font-semibold"
+                                  />
+                                </td>
+
+                                {/* 9. Required Qty */}
+                                <td className="py-2 px-2 text-right font-mono font-bold text-slate-700 dark:text-slate-300">
+                                  {Number(item.requiredQty || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </td>
+
+                                {/* 10. Final Qty */}
+                                <td className="py-2 px-2 w-32 min-w-[120px]">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    disabled={formMode === "view"}
+                                    value={item.finalQty}
+                                    onChange={(e) => handleUpdateAccessoryRow(idx, "finalQty", Number(e.target.value) || 0)}
+                                    className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                  />
+                                </td>
+
+                                {/* 11. Rate ($) */}
+                                <td className="py-2 px-2 w-28 min-w-[105px]">
+                                  <input
+                                    type="number"
+                                    step="0.001"
+                                    disabled={formMode === "view"}
+                                    value={item.rate}
+                                    onChange={(e) => handleUpdateAccessoryRow(idx, "rate", Number(e.target.value) || 0)}
+                                    className="w-full h-8 px-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                  />
+                                </td>
+
+                                {/* 12. Amount ($) */}
+                                <td className="py-2 px-2.5 text-right font-mono font-bold text-slate-900 dark:text-white">
+                                  ${Number(item.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </td>
+
+                                {/* Action */}
+                                {formMode !== "view" && (
+                                  <td className="py-2 px-2 text-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveAccessoryRow(idx)}
+                                      className="p-1 rounded hover:bg-rose-50 text-rose-500 cursor-pointer"
+                                      title="Remove accessory item"
+                                    >
+                                      <Trash2 className="size-3.5" />
+                                    </button>
+                                  </td>
+                                )}
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-slate-100 dark:bg-slate-800 font-black border-t border-slate-200 dark:border-slate-700">
+                          <td colSpan={13} className="py-3 px-3 text-right uppercase text-[10px] tracking-wider">
+                            Total Accessories Cost:
+                          </td>
+                          <td className="py-3 px-2.5 text-right font-mono text-teal-700 dark:text-teal-300 text-sm">
+                            ${totalAccessoriesCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          </td>
+                          {formMode !== "view" && <td />}
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* ─────────────────────────────────────────────────────────────
+                  TAB 3: EMBELLISHMENT COST (NEW)
+                 ───────────────────────────────────────────────────────────── */}
+              {activeCostingTab === "embellishment" && (
+                <div className="space-y-4">
+                  <div className="overflow-x-auto pb-2">
+                    <table className="w-full text-xs text-left whitespace-nowrap min-w-[1000px]">
+                      <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[9.5px] uppercase font-black text-slate-500">
+                        <tr>
+                          <th className="py-2.5 px-2 text-center w-8">SL.</th>
+                          <th className="py-2.5 px-3 w-52">Cost Head *</th>
+                          <th className="py-2.5 px-3 w-72">Description</th>
+                          <th className="py-2.5 px-3 w-36">Source</th>
+                          <th className="py-2.5 px-2.5 text-right w-28 min-w-[100px]">GMT Qty</th>
+                          <th className="py-2.5 px-2.5 text-right w-28 min-w-[100px]">QTY in DZ</th>
+                          <th className="py-2.5 px-2.5 text-right w-32 min-w-[110px]">Unit Rate (DZ) *</th>
+                          <th className="py-2.5 px-3 text-right w-36">Amount ($)</th>
+                          {formMode !== "view" && <th className="py-2.5 px-2 text-center w-12">Action</th>}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {(formData.embellishmentItems || []).length === 0 ? (
+                          <tr>
+                            <td colSpan={formMode !== "view" ? 9 : 8} className="py-8 text-center text-slate-400">
+                              No embellishment entries added. Click "+ Add Embellishment Item" to add printing, embroidery, or garment wash.
+                            </td>
+                          </tr>
+                        ) : (
+                          (formData.embellishmentItems || []).map((row, idx) => (
+                            <tr key={row.id || idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                              {/* 1. SL */}
+                              <td className="py-2 px-2 text-center font-mono font-bold text-slate-400">
+                                {idx + 1}
+                              </td>
+
+                              {/* 2. Cost Head (Searchable Dropdown) */}
+                              <td className="py-2 px-3 w-52">
+                                <SearchableSelect
+                                  options={EMBELLISHMENT_COST_HEADS.map((h) => ({ value: h, label: h }))}
+                                  value={row.costHead}
+                                  onChange={(val) => handleUpdateEmbellishmentRow(idx, "costHead", val)}
+                                  placeholder="Select Cost Head..."
+                                  disabled={formMode === "view"}
+                                  className="text-xs h-8 px-2"
+                                />
+                              </td>
+
+                              {/* 3. Description (Manual text entry) */}
+                              <td className="py-2 px-3">
+                                <input
+                                  type="text"
+                                  disabled={formMode === "view"}
+                                  value={row.description}
+                                  onChange={(e) => handleUpdateEmbellishmentRow(idx, "description", e.target.value)}
+                                  placeholder="e.g. Chest placement print or enzyme wash..."
+                                  className="w-full h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                                />
+                              </td>
+
+                              {/* 4. Source (Dropdown: In-house / Sub-Contract) */}
+                              <td className="py-2 px-3 w-36">
+                                <select
+                                  disabled={formMode === "view"}
+                                  value={row.source}
+                                  onChange={(e) => handleUpdateEmbellishmentRow(idx, "source", e.target.value)}
+                                  className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                                >
+                                  {EMBELLISHMENT_SOURCES.map((s) => (
+                                    <option key={s} value={s}>
+                                      {s}
+                                    </option>
+                                  ))}
+                                </select>
+                              </td>
+
+                              {/* 5. GMT Qty (Quantity entry) */}
+                              <td className="py-2 px-2.5 w-28 min-w-[100px]">
+                                <input
+                                  type="number"
+                                  disabled={formMode === "view"}
+                                  value={row.gmtQty ?? (consolidatedOrderQty || 20000)}
+                                  onChange={(e) => handleUpdateEmbellishmentRow(idx, "gmtQty", Number(e.target.value) || 0)}
+                                  className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                  placeholder="0"
+                                />
+                              </td>
+
+                              {/* 6. QTY in DZ (Automatically calculated: GMT Qty ÷ 12) */}
+                              <td className="py-2 px-2.5 text-right font-mono font-bold text-slate-700 dark:text-slate-300">
+                                {(row.qtyInDz ?? Number(((row.gmtQty ?? (consolidatedOrderQty || 20000)) / 12).toFixed(2))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </td>
+
+                              {/* 7. Unit Rate (DZ) * (Rate per dozen) */}
+                              <td className="py-2 px-2.5 w-32 min-w-[110px]">
+                                <input
+                                  type="number"
+                                  step="0.001"
+                                  disabled={formMode === "view"}
+                                  value={row.unitRateDz ?? 0}
+                                  onChange={(e) => handleUpdateEmbellishmentRow(idx, "unitRateDz", Number(e.target.value) || 0)}
+                                  className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                  placeholder="0.00"
+                                />
+                              </td>
+
+                              {/* 8. Amount ($) (Automatically calculated) */}
+                              <td className="py-2 px-3 text-right font-mono font-bold text-purple-700 dark:text-purple-300">
+                                ${Number(row.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </td>
+
+                              {/* Action */}
+                              {formMode !== "view" && (
+                                <td className="py-2 px-2 text-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveEmbellishmentRow(idx)}
+                                    className="p-1 rounded hover:bg-rose-50 text-rose-500 cursor-pointer"
+                                    title="Remove row"
+                                  >
+                                    <Trash2 className="size-3.5" />
+                                  </button>
+                                </td>
+                              )}
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-slate-100 dark:bg-slate-800 font-black border-t border-slate-200 dark:border-slate-700">
+                          <td colSpan={7} className="py-3 px-3 text-right uppercase text-[10px] tracking-wider">
+                            Total Embellishment Cost:
+                          </td>
+                          <td className="py-3 px-3 text-right font-mono text-purple-700 dark:text-purple-300 text-sm">
+                            ${totalEmbellishmentCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                          {formMode !== "view" && <td />}
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* ─────────────────────────────────────────────────────────────
+                  TAB 4: OTHERS COST (PRESERVED FUNCTIONALITY & COLUMNS)
+                 ───────────────────────────────────────────────────────────── */}
+              {activeCostingTab === "others" && (() => {
+                const otherItems = formData.otherCostItems || [];
+                const allPercentage =
+                  otherItems.length > 0 &&
+                  otherItems.every(
+                    (r) => r.costHead === "Commercial Cost" || r.costHead === "Commission"
+                  );
+
+                return (
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto pb-2">
+                      <table className="w-full text-xs text-left whitespace-nowrap min-w-[1000px]">
+                        <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[9.5px] uppercase font-black text-slate-500">
+                          {allPercentage ? (
+                            <tr>
+                              <th className="py-2.5 px-2 text-center w-8">SL</th>
+                              <th className="py-2.5 px-3 w-56">Cost Head *</th>
+                              <th className="py-2.5 px-3 min-w-[280px]">Description</th>
+                              <th className="py-2.5 px-3 text-right w-48">Cost (%) *</th>
+                              <th className="py-2.5 px-3 text-right w-36">Amount ($)</th>
+                              {formMode !== "view" && <th className="py-2.5 px-2 text-center w-12">Action</th>}
+                            </tr>
+                          ) : (
+                            <tr>
+                              <th className="py-2.5 px-2 text-center w-8">SL</th>
+                              <th className="py-2.5 px-3 w-52">Cost Head *</th>
+                              <th className="py-2.5 px-3 w-72">Description</th>
+                              <th className="py-2.5 px-2.5 text-right w-28 min-w-[100px]">GMT Qty</th>
+                              <th className="py-2.5 px-2.5 text-right w-28 min-w-[100px]">QTY in DZ</th>
+                              <th className="py-2.5 px-2.5 text-right w-32 min-w-[110px]">Unit Rate (DZ) *</th>
+                              <th className="py-2.5 px-3 text-right w-36">Amount ($)</th>
+                              {formMode !== "view" && <th className="py-2.5 px-2 text-center w-12">Action</th>}
+                            </tr>
+                          )}
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {otherItems.length === 0 ? (
+                            <tr>
+                              <td
+                                colSpan={formMode !== "view" ? (allPercentage ? 6 : 8) : (allPercentage ? 5 : 7)}
+                                className="py-8 text-center text-slate-400"
+                              >
+                                No other costing heads entered. Click "+ Add Other Cost Head" to add freight, testing, banking, commission, etc.
+                              </td>
+                            </tr>
+                          ) : (
+                            otherItems.map((row, idx) => {
+                              const isPercentage =
+                                row.costHead === "Commercial Cost" || row.costHead === "Commission";
+
+                              return (
+                                <tr key={row.id || idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                                  {/* 1. SL */}
+                                  <td className="py-2 px-2 text-center font-mono font-bold text-slate-400">
+                                    {idx + 1}
+                                  </td>
+
+                                  {/* 2. Cost Head */}
+                                  <td className="py-2 px-3">
+                                    <select
+                                      disabled={formMode === "view"}
+                                      value={row.costHead}
+                                      onChange={(e) => handleUpdateOtherCostRow(idx, "costHead", e.target.value)}
+                                      className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                                    >
+                                      {OTHER_COST_HEADS.map((h) => (
+                                        <option key={h} value={h}>
+                                          {h}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </td>
+
+                                  {/* 3. Description */}
+                                  <td className="py-2 px-3">
+                                    <input
+                                      type="text"
+                                      disabled={formMode === "view"}
+                                      value={row.description}
+                                      onChange={(e) => handleUpdateOtherCostRow(idx, "description", e.target.value)}
+                                      placeholder="Terms or notes..."
+                                      className="w-full h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                                    />
+                                  </td>
+
+                                  {/* When Cost Head is Commercial Cost or Commission */}
+                                  {isPercentage ? (
+                                    allPercentage ? (
+                                      <td className="py-2 px-3 text-right">
+                                        <div className="relative w-36 ml-auto">
+                                          <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            max="100"
+                                            disabled={formMode === "view"}
+                                            value={row.costPercent ?? row.rateOrPct ?? 0}
+                                            onChange={(e) =>
+                                              handleUpdateOtherCostRow(idx, "costPercent", Number(e.target.value) || 0)
+                                            }
+                                            className="w-full h-8 pl-3 pr-7 rounded-lg border border-amber-300 dark:border-amber-600 bg-amber-50/40 dark:bg-amber-950/20 text-right font-mono font-bold text-xs focus:ring-1 focus:ring-amber-500"
+                                            placeholder="0.00"
+                                          />
+                                          <span className="absolute right-2.5 top-2 text-xs font-bold text-slate-400">%</span>
+                                        </div>
+                                      </td>
+                                    ) : (
+                                      /* Mixed table: Hide GMT Qty, QTY in DZ, Unit Rate (DZ)* and display Cost (%)* column instead spanning the 3 columns */
+                                      <td colSpan={3} className="py-2 px-3 text-right">
+                                        <div className="flex items-center justify-end gap-2.5">
+                                          <span className="text-[10.5px] uppercase font-bold text-amber-700 dark:text-amber-400">
+                                            Cost (%) *:
+                                          </span>
+                                          <div className="relative w-36">
+                                            <input
+                                              type="number"
+                                              step="0.01"
+                                              min="0"
+                                              max="100"
+                                              disabled={formMode === "view"}
+                                              value={row.costPercent ?? row.rateOrPct ?? 0}
+                                              onChange={(e) =>
+                                                handleUpdateOtherCostRow(idx, "costPercent", Number(e.target.value) || 0)
+                                              }
+                                              className="w-full h-8 pl-3 pr-7 rounded-lg border border-amber-300 dark:border-amber-600 bg-amber-50/40 dark:bg-amber-950/20 text-right font-mono font-bold text-xs focus:ring-1 focus:ring-amber-500"
+                                              placeholder="0.00"
+                                            />
+                                            <span className="absolute right-2.5 top-2 text-xs font-bold text-slate-400">%</span>
+                                          </div>
+                                          <span className="text-[10px] text-slate-400 font-normal hidden xl:inline">
+                                            (of ${totalPoValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                          </span>
+                                        </div>
+                                      </td>
+                                    )
+                                  ) : (
+                                    /* For all other Cost Head options, keep existing columns and behavior */
+                                    <>
+                                      {/* 4. GMT Qty (Editable) */}
+                                      <td className="py-2 px-2.5 w-28 min-w-[100px]">
+                                        <input
+                                          type="number"
+                                          disabled={formMode === "view"}
+                                          value={row.gmtQty ?? (consolidatedOrderQty || 20000)}
+                                          onChange={(e) => handleUpdateOtherCostRow(idx, "gmtQty", Number(e.target.value) || 0)}
+                                          className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                          placeholder="0"
+                                        />
+                                      </td>
+
+                                      {/* 5. QTY in DZ (Automatically calculated: GMT Qty ÷ 12) */}
+                                      <td className="py-2 px-2.5 text-right font-mono font-bold text-slate-700 dark:text-slate-300">
+                                        {(row.qtyInDz ?? Number(((row.gmtQty ?? (consolidatedOrderQty || 20000)) / 12).toFixed(2))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                      </td>
+
+                                      {/* 6. Unit Rate (DZ) */}
+                                      <td className="py-2 px-2.5 w-32 min-w-[110px]">
+                                        <input
+                                          type="number"
+                                          step="0.001"
+                                          disabled={formMode === "view"}
+                                          value={row.unitRateDz ?? 0}
+                                          onChange={(e) => handleUpdateOtherCostRow(idx, "unitRateDz", Number(e.target.value) || 0)}
+                                          className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                          placeholder="0.00"
+                                        />
+                                      </td>
+                                    </>
+                                  )}
+
+                                  {/* Amount ($) */}
+                                  <td className="py-2 px-3 text-right font-mono font-bold text-amber-700 dark:text-amber-300">
+                                    ${Number(row.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  </td>
+
+                                  {/* Action */}
+                                  {formMode !== "view" && (
+                                    <td className="py-2 px-2 text-center">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveOtherCostRow(idx)}
+                                        className="p-1 rounded hover:bg-rose-50 text-rose-500 cursor-pointer"
+                                        title="Remove row"
+                                      >
+                                        <Trash2 className="size-3.5" />
+                                      </button>
+                                    </td>
+                                  )}
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                        <tfoot>
+                          <tr className="bg-slate-100 dark:bg-slate-800 font-black border-t border-slate-200 dark:border-slate-700">
+                            <td colSpan={allPercentage ? 4 : 6} className="py-3 px-3 text-right uppercase text-[10px] tracking-wider">
+                              Total Others Cost:
+                            </td>
+                            <td className="py-3 px-3 text-right font-mono text-amber-700 dark:text-amber-300 text-sm">
+                              ${totalOthersCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </td>
+                            {formMode !== "view" && <td />}
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ─────────────────────────────────────────────────────────────
+                  CONSOLIDATED SECTION 3 BOTTOM SUMMARY CARD
+                 ───────────────────────────────────────────────────────────── */}
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+                    <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400 block">Total Fabric Cost</span>
+                    <span className="text-base font-mono font-black text-slate-900 dark:text-white">
+                      ${totalFabricCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                      {totalCost > 0 ? ((totalFabricCost / totalCost) * 100).toFixed(1) : 0}% of material & service cost
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+                    <span className="text-[10px] uppercase font-bold text-teal-600 dark:text-teal-400 block">Total Accessories Cost</span>
+                    <span className="text-base font-mono font-black text-slate-900 dark:text-white">
+                      ${totalAccessoriesCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                      {totalCost > 0 ? ((totalAccessoriesCost / totalCost) * 100).toFixed(1) : 0}% of material & service cost
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+                    <span className="text-[10px] uppercase font-bold text-purple-600 dark:text-purple-400 block">Total Embellishment</span>
+                    <span className="text-base font-mono font-black text-slate-900 dark:text-white">
+                      ${totalEmbellishmentCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                      {totalCost > 0 ? ((totalEmbellishmentCost / totalCost) * 100).toFixed(1) : 0}% of material & service cost
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+                    <span className="text-[10px] uppercase font-bold text-slate-600 dark:text-slate-400 block">Total Others Cost</span>
+                    <span className="text-base font-mono font-black text-slate-900 dark:text-white">
+                      ${totalOthersCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                      {totalCost > 0 ? ((totalOthersCost / totalCost) * 100).toFixed(1) : 0}% of material & service cost
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+                    <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 block">Total Overheads</span>
+                    <span className="text-base font-mono font-black text-slate-900 dark:text-white">
+                      ${totalOverheadCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                      {totalCost > 0 ? ((totalOverheadCost / totalCost) * 100).toFixed(1) : 0}% of material & service cost
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
+                    <span className="text-[10px] uppercase font-bold text-indigo-700 dark:text-indigo-300 block">Grand Total Pre Costing</span>
+                    <span className="text-base font-mono font-black text-indigo-700 dark:text-indigo-300">
+                      ${totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[10px] font-mono text-indigo-600/80 dark:text-indigo-400/80 block mt-0.5">
+                      ${(consolidatedOrderQty > 0 ? totalCost / consolidatedOrderQty : 0).toFixed(4)} / pc • ${(consolidatedOrderQty > 0 ? (totalCost / consolidatedOrderQty) * 12 : 0).toFixed(2)} / dz
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2560,7 +8024,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
               <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
                 <span className="w-1.5 h-4 bg-indigo-600 rounded-full inline-block" />
                 <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                  4. Order and Costing Summary
+                  Order and Costing Summary
                 </h2>
               </div>
 
@@ -2616,7 +8080,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                   <span className="w-1.5 h-4 bg-indigo-600 rounded-full inline-block" />
                   <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
                     <ImageIcon className="size-4 text-indigo-600" />
-                    <span>5. Style & Pre Costing Images</span>
+                    <span>Style & Pre Costing Images</span>
                   </h2>
                 </div>
 
@@ -2754,7 +8218,7 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
                     </button>
                     <button
                       type="button"
-                      onClick={handleSubmitForApproval}
+                      onClick={() => handleSubmitForApproval()}
                       className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
                     >
                       <Send className="size-3.5" /> Submit for Approval
@@ -3240,286 +8704,17 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
             VIEW 5: PRINTABLE PRE COSTING REPORT (MATCHES REFERENCE LAYOUT)
            ════════════════════════════════════════════════════════════ */}
         {view === "report" && (
-          !activeRecord ? (
-            <div className="p-8 text-center text-slate-500 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-lg mx-auto my-12 shadow-xs">
-              <FileText className="size-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <p className="font-bold text-sm text-slate-800 dark:text-slate-200">No Pre Costing record selected for report</p>
-              <p className="text-xs text-slate-400 mt-1">Please select a record from the register to generate the formal pre costing report.</p>
-              <button
-                onClick={() => setView("list")}
-                className="mt-4 px-4 py-2 bg-teal-600 text-white rounded-xl text-xs font-bold hover:bg-teal-700 cursor-pointer"
-              >
-                Back to Pre Costing Register
-              </button>
-            </div>
-          ) : (
-            <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6">
-            {/* Top Toolbar (Hidden on Print) */}
-            <div className="print:hidden flex items-center justify-between pb-4 border-b border-slate-200">
-              <button
-                onClick={() => setView("list")}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border bg-white text-xs font-bold hover:bg-slate-100 cursor-pointer"
-              >
-                <ArrowLeft className="size-3.5" /> Back to Register
-              </button>
-
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-medium">
-                  Report Version: <strong>v{activeRecord.version}</strong> ({activeRecord.status})
-                </span>
-                <button
-                  onClick={() => window.print()}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs cursor-pointer"
-                >
-                  <Printer className="size-3.5" /> Print Pre Costing Report
-                </button>
-              </div>
-            </div>
-
-            {/* The Formal Document */}
-            <div className="bg-white p-8 md:p-10 rounded-2xl border border-slate-200 shadow-sm space-y-6 text-slate-900 print:border-none print:shadow-none print:p-0">
-              {/* Company Header */}
-              <div className="text-center pb-4 border-b-2 border-slate-800 space-y-1">
-                <h1 className="text-xl font-black uppercase tracking-wider">
-                  Pakiza Knit Composite Ltd.
-                </h1>
-                <p className="text-xs text-slate-600 font-medium">
-                  Gorai, Mirzapur, Tangail, Bangladesh • Email: merchandising@pakizagroup.com
-                </p>
-                <div className="pt-2">
-                  <span className="inline-block px-4 py-1 rounded bg-slate-100 text-xs font-black uppercase tracking-widest border border-slate-300">
-                    Style-wise Pre Costing Report
-                  </span>
-                </div>
-              </div>
-
-              {/* Identification Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs border border-slate-300 rounded-lg p-3.5 bg-slate-50/50">
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Pre Costing No</span>
-                  <span className="font-mono font-black text-indigo-700">{activeRecord.preCostNo}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Pre Costing ID</span>
-                  <span className="font-mono font-bold">{activeRecord.preCostId}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Pre Costing Date</span>
-                  <span className="font-bold">{activeRecord.preCostDate}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Version / Status</span>
-                  <span className="font-bold">v{activeRecord.version} ({activeRecord.status})</span>
-                </div>
-
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Buyer</span>
-                  <span className="font-black">{activeRecord.buyer}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Style No</span>
-                  <span className="font-black text-slate-900">{activeRecord.style}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Contract No</span>
-                  <span className="font-mono font-bold">{activeRecord.contractNo || "—"}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Our Ref / A/C</span>
-                  <span className="font-bold">{activeRecord.ourRef || "—"} ({activeRecord.acHolder})</span>
-                </div>
-
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Merchandiser</span>
-                  <span className="font-bold">{activeRecord.merchandiser}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">SMV Value</span>
-                  <span className="font-mono font-bold">{activeRecord.smv} min</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Season</span>
-                  <span className="font-bold">{activeRecord.season}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Currency</span>
-                  <span className="font-bold font-mono">{activeRecord.currency}</span>
-                </div>
-              </div>
-
-              {/* Purchase Order Summary Table */}
-              <div className="space-y-2">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
-                  Purchase Order (PO) Details
-                </h3>
-                <div className="border border-slate-300 rounded-lg overflow-hidden">
-                  <table className="w-full text-xs text-left">
-                    <thead className="bg-slate-100 border-b border-slate-300 text-[9.5px] uppercase font-black text-slate-600">
-                      <tr>
-                        <th className="py-1.5 px-3 w-10 text-center">SL</th>
-                        <th className="py-1.5 px-3">PO Number</th>
-                        <th className="py-1.5 px-3 text-right">PO Quantity</th>
-                        <th className="py-1.5 px-3 text-right">Rate ($)</th>
-                        <th className="py-1.5 px-3 text-right">Value ($)</th>
-                        <th className="py-1.5 px-3">Remarks</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {(activeRecord.poRows || []).map((po, idx) => (
-                        <tr key={po.id || idx}>
-                          <td className="py-1.5 px-3 text-center font-mono">{idx + 1}</td>
-                          <td className="py-1.5 px-3 font-mono font-bold">{po.poNumber}</td>
-                          <td className="py-1.5 px-3 text-right font-mono font-bold">{(Number(po.poQuantity) || 0).toLocaleString()}</td>
-                          <td className="py-1.5 px-3 text-right font-mono">${(Number(po.rate) || 0).toFixed(4)}</td>
-                          <td className="py-1.5 px-3 text-right font-mono font-bold">${(Number(po.value) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                          <td className="py-1.5 px-3 text-slate-500">{po.remarks || "—"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      {(() => {
-                        const totalQty = (activeRecord.poRows || []).reduce((s, p) => s + (Number(p.poQuantity) || 0), 0);
-                        const totalVal = (activeRecord.poRows || []).reduce((s, p) => s + (Number(p.value) || 0), 0);
-                        return (
-                          <tr className="bg-slate-100 font-black border-t border-slate-300">
-                            <td colSpan={2} className="py-2 px-3 text-right uppercase text-[10px]">Total Order Qty:</td>
-                            <td className="py-2 px-3 text-right font-mono">{totalQty.toLocaleString()} pcs</td>
-                            <td className="py-2 px-3 text-right font-mono text-[10px]">Avg: ${(totalQty > 0 ? totalVal / totalQty : 0).toFixed(4)}</td>
-                            <td className="py-2 px-3 text-right font-mono text-indigo-700">${totalVal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                            <td />
-                          </tr>
-                        );
-                      })()}
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-
-              {/* Item-wise Costing Table */}
-              <div className="space-y-2">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
-                  Item-wise Pre Costing Specification & Consumption
-                </h3>
-                <div className="border border-slate-300 rounded-lg overflow-hidden">
-                  <table className="w-full text-[11px] text-left">
-                    <thead className="bg-slate-100 border-b border-slate-300 text-[9px] uppercase font-black text-slate-600">
-                      <tr>
-                        <th className="py-2 px-2 text-center w-8">SL</th>
-                        <th className="py-2 px-2">Head</th>
-                        <th className="py-2 px-2">Item Description</th>
-                        <th className="py-2 px-2">Used Place</th>
-                        <th className="py-2 px-2">Color</th>
-                        <th className="py-2 px-2">Supplier</th>
-                        <th className="py-2 px-2 text-right">Consump.</th>
-                        <th className="py-2 px-2 text-center">Unit</th>
-                        <th className="py-2 px-2 text-right">Final Qty</th>
-                        <th className="py-2 px-2 text-right">Rate ($)</th>
-                        <th className="py-2 px-2.5 text-right">Amount ($)</th>
-                        <th className="py-2 px-2 text-right">Cost %</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {(activeRecord.items || []).map((it, idx) => (
-                        <tr key={it.id || idx}>
-                          <td className="py-1.5 px-2 text-center font-mono">{idx + 1}</td>
-                          <td className="py-1.5 px-2 font-bold">{it.head}</td>
-                          <td className="py-1.5 px-2">
-                            <span className="font-semibold block">{it.item}</span>
-                            <span className="text-[9.5px] text-slate-500">{it.description}</span>
-                          </td>
-                          <td className="py-1.5 px-2 text-slate-600">{it.usedPlace}</td>
-                          <td className="py-1.5 px-2">{it.color}</td>
-                          <td className="py-1.5 px-2 text-slate-600">{it.supplier}</td>
-                          <td className="py-1.5 px-2 text-right font-mono">{it.consumption}</td>
-                          <td className="py-1.5 px-2 text-center font-bold">{it.unit}</td>
-                          <td className="py-1.5 px-2 text-right font-mono font-semibold">{(Number(it.finalQty) || 0).toLocaleString()}</td>
-                          <td className="py-1.5 px-2 text-right font-mono">${(Number(it.rate) || 0).toFixed(3)}</td>
-                          <td className="py-1.5 px-2.5 text-right font-mono font-bold">${(Number(it.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                          <td className="py-1.5 px-2 text-right font-mono font-semibold text-indigo-700">{it.preCostPct}%</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      {(() => {
-                        const totalCost = (activeRecord.items || []).reduce((s, it) => s + (Number(it.amount) || 0), 0);
-                        const totalVal = (activeRecord.poRows || []).reduce((s, p) => s + (Number(p.value) || 0), 0);
-                        const totalQty = (activeRecord.poRows || []).reduce((s, p) => s + (Number(p.poQuantity) || 0), 0);
-                        const surplus = totalVal - totalCost;
-                        return (
-                          <tr className="bg-slate-100 font-black border-t-2 border-slate-400">
-                            <td colSpan={10} className="py-2.5 px-3 text-right uppercase text-[10px]">
-                              Total Pre Costing Value:
-                            </td>
-                            <td className="py-2.5 px-2.5 text-right font-mono text-indigo-700 text-xs">
-                              ${totalCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                            </td>
-                            <td className="py-2.5 px-2 text-right font-mono">100.00%</td>
-                          </tr>
-                        );
-                      })()}
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-
-              {/* Order & Costing Summary Box */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs border border-slate-300 rounded-lg p-3 bg-slate-50">
-                {(() => {
-                  const totalQty = (activeRecord.poRows || []).reduce((s, p) => s + (Number(p.poQuantity) || 0), 0);
-                  const totalVal = (activeRecord.poRows || []).reduce((s, p) => s + (Number(p.value) || 0), 0);
-                  const totalCost = (activeRecord.items || []).reduce((s, it) => s + (Number(it.amount) || 0), 0);
-                  const surplus = totalVal - totalCost;
-                  const surplusPcs = totalQty > 0 ? surplus / totalQty : 0;
-                  return (
-                    <>
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-500 block">Total GMT Qty</span>
-                        <span className="font-mono font-bold text-sm">{totalQty.toLocaleString()} pcs</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-500 block">Total GMT Value</span>
-                        <span className="font-mono font-bold text-sm text-indigo-700">${totalVal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-500 block">Total Pre Costing Cost</span>
-                        <span className="font-mono font-bold text-sm text-slate-800">${totalCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-500 block">Surplus Value / (Pcs)</span>
-                        <span className={`font-mono font-black text-sm ${surplus >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
-                          ${surplus.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${surplusPcs.toFixed(4)}/pc)
-                        </span>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-
-              {/* Formal Signature Blocks */}
-              <div className="pt-12 grid grid-cols-4 gap-6 text-center text-xs text-slate-600">
-                <div className="border-t border-slate-400 pt-1.5">
-                  <p className="font-bold text-slate-800">{activeRecord.createdBy}</p>
-                  <p className="text-[10px] text-slate-500">Prepared By</p>
-                </div>
-                <div className="border-t border-slate-400 pt-1.5">
-                  <p className="font-bold text-slate-800">{activeRecord.merchandiser}</p>
-                  <p className="text-[10px] text-slate-500">Merchandiser</p>
-                </div>
-                <div className="border-t border-slate-400 pt-1.5">
-                  <p className="font-bold text-slate-800">Costing Dept.</p>
-                  <p className="text-[10px] text-slate-500">Checked By</p>
-                </div>
-                <div className="border-t border-slate-400 pt-1.5">
-                  <p className="font-bold text-slate-800">
-                    {activeRecord.approvedBy || "Pending Authorization"}
-                  </p>
-                  <p className="text-[10px] text-slate-500">Authorized Signature</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-      )}
+          <PreCostingReport
+            record={activeRecord}
+            onBack={() => {
+              setView("list");
+              onTabChange?.("register");
+            }}
+            onEdit={(rec) => {
+              handleOpenEdit(rec);
+            }}
+          />
+        )}
 
         {/* ════════════════════════════════════════════════════════════
             MODAL: MANDATORY AMENDMENT REASON
@@ -3629,6 +8824,1756 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
             </div>
           </div>
         )}
+        {/* ════════════════════════════════════════════════════════════
+            MODAL: FABRIC ENTRY SPECIFICATIONS
+           ════════════════════════════════════════════════════════════ */}
+        {showFabricEntryModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-4xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden">
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                    <Layers className="size-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">Fabric Entry Specifications</h3>
+                    <p className="text-[11px] text-slate-500">Applied to Knit Fabric Cost Items</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowFabricEntryModal(false)}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              {/* Modal Body: 3 fields per row */}
+              <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* 1. Fabric Composition */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                    Fabric Composition <span className="text-rose-500">*</span>
+                  </label>
+                  <SearchableSelect
+                    options={getYarnCompositionOptions(tempFabricEntry.fabricComposition)}
+                    value={tempFabricEntry.fabricComposition}
+                    onChange={(val) => setTempFabricEntry((prev) => ({ ...prev, fabricComposition: val }))}
+                    placeholder="Select Fabric Composition..."
+                    disabled={formMode === "view"}
+                    className="h-9 text-xs"
+                    allowCustom
+                  />
+                </div>
+
+                {/* 2. Fabric Type */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                    Fabric Type <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempFabricEntry.fabricType}
+                    onChange={(e) => setTempFabricEntry((prev) => ({ ...prev, fabricType: e.target.value }))}
+                    className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {masterFabricTypes.length > 0 ? (
+                      masterFabricTypes.map((ft) => (
+                        <option key={ft.id} value={ft.name}>
+                          {ft.name}
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="Single Jersey">Single Jersey</option>
+                        <option value="1x1 Rib">1x1 Rib</option>
+                        <option value="2x2 Rib">2x2 Rib</option>
+                        <option value="French Terry">French Terry</option>
+                        <option value="Fleece">Fleece</option>
+                        <option value="Interlock">Interlock</option>
+                        <option value="Pique">Pique</option>
+                        <option value="Lacoste">Lacoste</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+
+                {/* 3. GSM */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                    GSM <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    disabled={formMode === "view"}
+                    value={tempFabricEntry.gsm}
+                    onChange={(e) => setTempFabricEntry((prev) => ({ ...prev, gsm: Number(e.target.value) || 0 }))}
+                    placeholder="e.g. 180"
+                    className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold font-mono"
+                  />
+                </div>
+
+                {/* 4. Spinning Type (Searchable dropdown) */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                    Spinning Type <span className="text-rose-500">*</span>
+                  </label>
+                  <SearchableSelect
+                    options={getSpinningTypeOptions(tempFabricEntry.spinningType)}
+                    value={tempFabricEntry.spinningType || "Ring"}
+                    onChange={(val) => setTempFabricEntry((prev) => ({ ...prev, spinningType: val }))}
+                    placeholder="Select Spinning Type..."
+                    disabled={formMode === "view"}
+                    className="h-9 text-xs"
+                    allowCustom
+                  />
+                </div>
+
+                {/* 5. Feeder Type (Dropdown: Half Feeder, Full Feeder, Blank) */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                    Feeder Type <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempFabricEntry.feederType ?? ""}
+                    onChange={(e) => setTempFabricEntry((prev) => ({ ...prev, feederType: e.target.value }))}
+                    className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {KNIT_FEEDER_TYPES.map((ft) => (
+                      <option key={ft} value={ft}>
+                        {ft}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 6. Wash Type (Dropdown: Acid Wash, Stone Wash, Enzyme Wash, Panel Wash, Hydrophilic Softener Wash) */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                    Wash Type <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempFabricEntry.washType || "Hydrophilic Softener Wash"}
+                    onChange={(e) => setTempFabricEntry((prev) => ({ ...prev, washType: e.target.value }))}
+                    className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {KNIT_WASH_TYPES.map((wt) => (
+                      <option key={wt} value={wt}>
+                        {wt}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 7. Finish Type (Dropdown: Heatset Finish, Brush Finish, Peach Finish, Peach-Brush Finish, Shearing Finish, Moisture Wicking Finish, Teflon Finish) */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                    Finish Type <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempFabricEntry.finishType || "Heatset Finish"}
+                    onChange={(e) => setTempFabricEntry((prev) => ({ ...prev, finishType: e.target.value }))}
+                    className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {KNIT_FINISH_TYPES.map((ft) => (
+                      <option key={ft} value={ft}>
+                        {ft}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 8. Other Specifications */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                    Other Specifications
+                  </label>
+                  <input
+                    type="text"
+                    disabled={formMode === "view"}
+                    value={tempFabricEntry.otherSpecs || ""}
+                    onChange={(e) => setTempFabricEntry((prev) => ({ ...prev, otherSpecs: e.target.value }))}
+                    placeholder="e.g. Bio-washed, Peach finish"
+                    className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  />
+                </div>
+
+                {/* 9. Fabric Category */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                    Fabric Category <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempFabricEntry.fabricCategory}
+                    onChange={(e) => setTempFabricEntry((prev) => ({ ...prev, fabricCategory: e.target.value }))}
+                    className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {FABRIC_CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowFabricEntryModal(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                {formMode !== "view" && (
+                  <button
+                    type="button"
+                    onClick={handleSaveFabricEntryModal}
+                    className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Save className="size-3.5" /> Save Specifications
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════════════════════
+            MODAL: FABRIC PROCESSING & COSTING DETAILS (D BUTTON)
+           ════════════════════════════════════════════════════════════ */}
+        {fabricDetailsModal.isOpen && fabricDetailsModal.tempRow && (() => {
+          const tempRow = fabricDetailsModal.tempRow;
+          const source = tempRow.fabricSource || "Production";
+          const color = tempRow.colorType || "Solid";
+
+          const isProd = source === "Production";
+          const isGreyOrSuppliedOrStock = ["Grey Purchase", "Buyer Supplied", "Stock"].includes(source);
+
+          let modalCase = "CASE_B";
+          let caseBadge = "Production + Solid";
+          if (isProd && color === "Y/D") {
+            modalCase = "CASE_A";
+            caseBadge = "Case A: Production + Y/D (Knitting, Yarn Dyeing, Finishing)";
+          } else if (isProd && color === "AOP") {
+            modalCase = "CASE_C";
+            caseBadge = "Case C: Production + AOP (AOP, Dyeing, Knitting, Finishing)";
+          } else if (isProd) {
+            modalCase = "CASE_B";
+            caseBadge = "Case B: Production + Solid (Dyeing, Knitting, Finishing)";
+          } else if (isGreyOrSuppliedOrStock && color === "AOP") {
+            modalCase = "CASE_E";
+            caseBadge = "Case E: " + source + " + AOP (AOP, Dyeing, Finishing)";
+          } else if (isGreyOrSuppliedOrStock && color === "Y/D") {
+            modalCase = "CASE_A";
+            caseBadge = source + " + Y/D (Yarn Dyeing, Finishing)";
+          } else {
+            modalCase = "CASE_D";
+            caseBadge = "Case D: " + source + " + Solid (Dyeing, Finishing)";
+          }
+
+          const totalProcessCost = Number((
+            (tempRow.knittingCost || 0) +
+            (tempRow.dyeingCost || 0) +
+            (tempRow.ydCost || 0) +
+            (tempRow.aopCost || 0) +
+            (tempRow.washingCost || 0) +
+            (tempRow.finishingCost || 0)
+          ).toFixed(2));
+
+          // Retrieve active Fabric Master specifications and look up matching Master Data records
+          const matchedSetup = fabricSetups.find(
+            (s) => (tempRow.fabricSetupId && s.id === tempRow.fabricSetupId) || s.fabricName === tempRow.item
+          );
+          const currentFabricType = tempRow.fabricType || matchedSetup?.fabricType || formData.fabricEntry?.fabricType || "";
+          const currentFabricColor = matchedSetup?.colorType || (tempRow.colorType === "Y/D" ? "Y/D" : "Solid");
+          const currentFeeder = tempRow.feederType !== undefined
+            ? tempRow.feederType
+            : (matchedSetup?.feederType !== undefined
+                ? matchedSetup.feederType
+                : (formData.fabricEntry?.feederType || ""));
+
+          const matchedKnit = findMatchingKnittingRate(
+            masterKnittingRates,
+            masterFabricTypes,
+            currentFabricType,
+            currentFabricColor,
+            currentFeeder
+          );
+
+          const matchedDye = findMatchingDyeingRate(
+            masterDyeingRates,
+            tempRow.colorShade || "Medium",
+            tempRow.dyeingMethod || "Reactive"
+          );
+
+          const matchedYD = findMatchingYarnDyeingRate(
+            masterYarnDyeingRates,
+            tempRow.ydType || "Feeder Stripe",
+            tempRow.colorShade || "Medium",
+            tempRow.dyeingMethod || "Reactive"
+          );
+
+          const matchedAop = findMatchingAopRate(
+            masterAopRates,
+            tempRow.aopType || "Reactive"
+          );
+
+          const renderKnittingCard = () => (
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-900/40">
+              <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="p-1 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
+                    <Activity className="size-3.5" />
+                  </span>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                    Knitting Process
+                  </h4>
+                  {matchedKnit ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                      ✓ Master: {matchedKnit.code}
+                    </span>
+                  ) : null}
+                </div>
+                <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
+                  Knitting Cost: ${Number(tempRow.knittingCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Knitting Process Loss (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    disabled={formMode === "view"}
+                    value={tempRow.knittingProcessLossPct ?? 3}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("knittingProcessLossPct", Number(e.target.value) || 0)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Required Yarn (kg)
+                  </label>
+                  <div className="w-full h-8 px-2 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-xs font-mono font-bold text-amber-700 dark:text-amber-300 flex items-center justify-end select-all cursor-not-allowed" title="Calculated automatically per process loss formula">
+                    {Number(tempRow.requiredYarnKg || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Knitting Rate ($/kg)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    disabled={formMode === "view"}
+                    value={tempRow.knittingRate ?? 0.35}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("knittingRate", Number(e.target.value) || 0)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
+                  />
+                  {tempRow.masterKnittingRate !== undefined && Math.abs(Number(tempRow.knittingRate || 0) - Number(tempRow.masterKnittingRate)) > 0.0001 && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono mt-0.5 block text-right">
+                      Master: ${Number(tempRow.masterKnittingRate).toFixed(2)}/kg
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Knitting Cost ($)
+                  </label>
+                  <div className="w-full h-8 px-2 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center justify-end select-all cursor-not-allowed">
+                    ${Number(tempRow.knittingCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+              </div>
+
+              {!matchedKnit && (
+                <div className="mt-3 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                  <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                  <div>
+                    <span className="font-bold">No Matching Record in Knitting Process Rate Master:</span>
+                    <p className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">
+                      No configured rate found for Fabric Type: <strong>&quot;{currentFabricType || 'Single Jersey'}&quot;</strong>, Color: <strong>&quot;{currentFabricColor}&quot;</strong>, Feeder: <strong>&quot;{currentFeeder || 'Blank'}&quot;</strong>. Please configure it in Knitting Process Rate Master.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+
+          const renderDyeingCard = () => (
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-900/40">
+              <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="p-1 rounded-md bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300">
+                    <Droplets className="size-3.5" />
+                  </span>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                    Fabric Dyeing Process
+                  </h4>
+                  {matchedDye ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                      ✓ Master: {matchedDye.code}
+                    </span>
+                  ) : null}
+                </div>
+                <span className="text-xs font-mono font-bold text-blue-700 dark:text-blue-300">
+                  Dyeing Cost: ${Number(tempRow.dyeingCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3">
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Color Shade
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempRow.colorShade || "Medium"}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("colorShade", e.target.value)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {COLOR_SHADES.map((cs) => (
+                      <option key={cs} value={cs}>{cs}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Dyeing Method
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempRow.dyeingMethod || "Reactive"}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("dyeingMethod", e.target.value)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {DYEING_METHODS.map((dm) => (
+                      <option key={dm} value={dm}>{dm}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Dyeing Process Loss (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    disabled={formMode === "view"}
+                    value={tempRow.dyeingProcessLossPct ?? 4}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("dyeingProcessLossPct", Number(e.target.value) || 0)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Required Greige QTY (kg)
+                  </label>
+                  <div className="w-full h-8 px-2 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center justify-end select-all cursor-not-allowed" title="Previous Required QTY × (1 + Dyeing Loss %)">
+                    {Number(tempRow.requiredGreigeQty || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Dyeing Rate ($/kg)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    disabled={formMode === "view"}
+                    value={tempRow.dyeingRate ?? 0.85}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("dyeingRate", Number(e.target.value) || 0)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
+                  />
+                  {tempRow.masterDyeingRate !== undefined && Math.abs(Number(tempRow.dyeingRate || 0) - Number(tempRow.masterDyeingRate)) > 0.0001 && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono mt-0.5 block text-right">
+                      Master: ${Number(tempRow.masterDyeingRate).toFixed(2)}/kg
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Dyeing Cost ($)
+                  </label>
+                  <div className="w-full h-8 px-2 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center justify-end select-all cursor-not-allowed">
+                    ${Number(tempRow.dyeingCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+              </div>
+
+              {!matchedDye && (
+                <div className="mt-3 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                  <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                  <div>
+                    <span className="font-bold">No Matching Record in Dyeing Rate Master:</span>
+                    <p className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">
+                      No configured rate found for Color Shade: <strong>&quot;{tempRow.colorShade || 'Medium'}&quot;</strong> and Method: <strong>&quot;{tempRow.dyeingMethod || 'Reactive'}&quot;</strong>. Please configure it in Dyeing Rate Master.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+
+          const renderYarnDyeingCard = () => (
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-900/40">
+              <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="p-1 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300">
+                    <Sparkles className="size-3.5" />
+                  </span>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                    Yarn Dyeing (Y/D) Process
+                  </h4>
+                  {matchedYD ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                      ✓ Master: {matchedYD.code}
+                    </span>
+                  ) : null}
+                </div>
+                <span className="text-xs font-mono font-bold text-amber-700 dark:text-amber-300">
+                  Y/D Cost: ${Number(tempRow.ydCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3">
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Y/D Type
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempRow.ydType || "Feeder Stripe"}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("ydType", e.target.value)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {YD_TYPES.map((yt) => (
+                      <option key={yt} value={yt}>{yt}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Color Shade
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempRow.colorShade || "Medium"}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("colorShade", e.target.value)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {COLOR_SHADES.map((cs) => (
+                      <option key={cs} value={cs}>{cs}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Dyeing Method
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempRow.dyeingMethod || "Reactive"}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("dyeingMethod", e.target.value)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {YD_DYEING_METHODS.map((dm) => (
+                      <option key={dm} value={dm}>{dm}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Y/D Process Loss (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    disabled={formMode === "view"}
+                    value={tempRow.ydProcessLossPct ?? 3}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("ydProcessLossPct", Number(e.target.value) || 0)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Req. Dyed Yarn QTY (kg)
+                  </label>
+                  <div className="w-full h-8 px-2 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center justify-end select-all cursor-not-allowed" title="Knitting Required Yarn × (1 + Y/D Loss %)">
+                    {Number(tempRow.requiredDyedYarnKg || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Y/D Rate ($/kg)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    disabled={formMode === "view"}
+                    value={tempRow.ydRate ?? 0.75}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("ydRate", Number(e.target.value) || 0)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
+                  />
+                  {tempRow.masterYdRate !== undefined && Math.abs(Number(tempRow.ydRate || 0) - Number(tempRow.masterYdRate)) > 0.0001 && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono mt-0.5 block text-right">
+                      Master: ${Number(tempRow.masterYdRate).toFixed(2)}/kg
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Y/D Cost ($)
+                  </label>
+                  <div className="w-full h-8 px-2 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center justify-end select-all cursor-not-allowed">
+                    ${Number(tempRow.ydCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+              </div>
+              {!matchedYD && (
+                <div className="mt-3 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 flex items-start gap-2 text-amber-800 dark:text-amber-300 text-xs">
+                  <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                  <div>
+                    <p className="font-semibold text-[11px]">No Master Match</p>
+                    <p className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">
+                      No configured rate found for Y/D Type: <strong>&quot;{tempRow.ydType || 'Feeder Stripe'}&quot;</strong>, Color Shade: <strong>&quot;{tempRow.colorShade || 'Medium'}&quot;</strong> and Method: <strong>&quot;{tempRow.dyeingMethod || 'Reactive'}&quot;</strong>. Please configure it in Yarn Dyeing (Y/D) Rate Master.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+
+          const renderAOPCard = () => (
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-900/40">
+              <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="p-1 rounded-md bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300">
+                    <Palette className="size-3.5" />
+                  </span>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                    All Over Print (AOP) Process
+                  </h4>
+                  {matchedAop ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-purple-100 dark:bg-purple-950/70 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                      ✓ Master: {matchedAop.code}
+                    </span>
+                  ) : null}
+                </div>
+                <span className="text-xs font-mono font-bold text-purple-700 dark:text-purple-300">
+                  AOP Cost: ${Number(tempRow.aopCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    AOP Type
+                  </label>
+                  <select
+                    disabled={formMode === "view"}
+                    value={tempRow.aopType || "Reactive"}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("aopType", e.target.value)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                  >
+                    {AOP_TYPES.map((at) => (
+                      <option key={at} value={at}>{at}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    AOP Process Loss (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    disabled={formMode === "view"}
+                    value={tempRow.aopProcessLossPct ?? 4}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("aopProcessLossPct", Number(e.target.value) || 0)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Req. Dyed QTY (kg)
+                  </label>
+                  <div className="w-full h-8 px-2 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center justify-end select-all cursor-not-allowed" title="Req. Finished (Cuttable) QTY × (1 + AOP Loss %)">
+                    {Number(tempRow.requiredDyedQty || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    AOP Rate ($/kg)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    disabled={formMode === "view"}
+                    value={tempRow.aopRate ?? 0.95}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("aopRate", Number(e.target.value) || 0)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
+                  />
+                  {tempRow.masterAopRate !== undefined && Math.abs(Number(tempRow.aopRate || 0) - Number(tempRow.masterAopRate)) > 0.0001 && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono mt-0.5 block text-right">
+                      Master: ${Number(tempRow.masterAopRate).toFixed(2)}/kg
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    AOP Cost ($)
+                  </label>
+                  <div className="w-full h-8 px-2 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center justify-end select-all cursor-not-allowed">
+                    ${Number(tempRow.aopCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+              </div>
+
+              {!matchedAop && (
+                <div className="mt-3 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                  <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                  <div>
+                    <span className="font-bold">No Matching Record in AOP Process Rate Master:</span>
+                    <p className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">
+                      No configured rate found for AOP Type: <strong>&quot;{tempRow.aopType || 'Reactive'}&quot;</strong>. Please configure it in AOP Process Rate Master.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+
+          const renderFinishingCard = () => (
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-900/40">
+              <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="p-1 rounded-md bg-teal-100 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300">
+                    <Sliders className="size-3.5" />
+                  </span>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                    Finishing & Washing
+                  </h4>
+                </div>
+                <span className="text-xs font-mono font-bold text-teal-700 dark:text-teal-300">
+                  Finishing Cost: ${((Number(tempRow.washingCost) || 0) + (Number(tempRow.finishingCost) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Washing Rate ($/kg)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    disabled={formMode === "view"}
+                    value={tempRow.washingRate ?? 0}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("washingRate", Number(e.target.value) || 0)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Washing Cost ($)
+                  </label>
+                  <div className="w-full h-8 px-2 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center justify-end select-all cursor-not-allowed">
+                    ${Number(tempRow.washingCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Finishing Rate ($/kg)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    disabled={formMode === "view"}
+                    value={tempRow.finishingRate ?? 0}
+                    onChange={(e) => handleUpdateFabricDetailsModalField("finishingRate", Number(e.target.value) || 0)}
+                    className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono font-bold text-right"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">
+                    Finishing Cost ($)
+                  </label>
+                  <div className="w-full h-8 px-2 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center justify-end select-all cursor-not-allowed">
+                    ${Number(tempRow.finishingCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-4xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+                {/* Modal Header */}
+                <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-indigo-50/60 dark:bg-indigo-950/30 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="size-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-sm shadow-xs">
+                      D
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>Fabric Processing & Costing Details</span>
+                        <span className="text-[10.5px] px-2 py-0.5 rounded-full font-mono font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                          {source} • {color}
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Item: <span className="font-semibold text-slate-800 dark:text-slate-200">{tempRow.head} — {tempRow.item}</span> | Required Finished (Cuttable):{" "}
+                        <span className="font-mono font-bold text-indigo-700 dark:text-indigo-300">
+                          {Number(tempRow.requiredFinishedQty || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kg
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCloseFabricDetailsModal}
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg cursor-pointer"
+                  >
+                    <X className="size-5" />
+                  </button>
+                </div>
+
+                {/* Sub-bar: Fabric Source & Color Type Switcher */}
+                <div className="px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase">Fabric Source:</span>
+                      <select
+                        disabled={formMode === "view"}
+                        value={tempRow.fabricSource || "Production"}
+                        onChange={(e) => handleUpdateFabricDetailsModalField("fabricSource", e.target.value)}
+                        className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer"
+                      >
+                        {KNIT_FABRIC_SOURCES.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase">Color Type:</span>
+                      <select
+                        disabled={formMode === "view"}
+                        value={tempRow.colorType || "Solid"}
+                        onChange={(e) => handleUpdateFabricDetailsModalField("colorType", e.target.value)}
+                        className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer"
+                      >
+                        {KNIT_COLOR_TYPES.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                    {caseBadge}
+                  </div>
+                </div>
+
+                {/* Modal Body: Sections arranged per requirement */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                  {/* Fabric Master Specifications Reference Card */}
+                  <div className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2">
+                      <Layers className="size-4 text-indigo-600 dark:text-indigo-400" />
+                      <span className="font-bold text-slate-800 dark:text-slate-200">Fabric Item:</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">{tempRow.item}</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                        Type: <strong className="text-slate-900 dark:text-white">{currentFabricType || "Single Jersey"}</strong>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                        Color: <strong className="text-slate-900 dark:text-white">{currentFabricColor}</strong>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                        Feeder: <strong className="text-slate-900 dark:text-white">{currentFeeder || "Blank"}</strong>
+                      </span>
+                      {tempRow.gsm ? (
+                        <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-mono">
+                          GSM: <strong className="text-slate-900 dark:text-white">{tempRow.gsm}</strong>
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* Case A: Production + Y/D -> Knitting, Yarn Dyeing, Finishing */}
+                  {modalCase === "CASE_A" && (
+                    <>
+                      {renderKnittingCard()}
+                      {renderYarnDyeingCard()}
+                      {renderFinishingCard()}
+                    </>
+                  )}
+
+                  {/* Case B: Production + Solid -> Dyeing, Knitting, Finishing */}
+                  {modalCase === "CASE_B" && (
+                    <>
+                      {renderDyeingCard()}
+                      {renderKnittingCard()}
+                      {renderFinishingCard()}
+                    </>
+                  )}
+
+                  {/* Case C: Production + AOP -> AOP, Dyeing, Knitting, Finishing */}
+                  {modalCase === "CASE_C" && (
+                    <>
+                      {renderAOPCard()}
+                      {renderDyeingCard()}
+                      {renderKnittingCard()}
+                      {renderFinishingCard()}
+                    </>
+                  )}
+
+                  {/* Case D: Grey Purchase / Buyer Supplied / Stock + Solid -> Dyeing, Finishing */}
+                  {modalCase === "CASE_D" && (
+                    <>
+                      {renderDyeingCard()}
+                      {renderFinishingCard()}
+                    </>
+                  )}
+
+                  {/* Case E: Grey Purchase / Buyer Supplied / Stock + AOP -> AOP, Dyeing, Finishing */}
+                  {modalCase === "CASE_E" && (
+                    <>
+                      {renderAOPCard()}
+                      {renderDyeingCard()}
+                      {renderFinishingCard()}
+                    </>
+                  )}
+                </div>
+
+                {/* Modal Footer */}
+                <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="text-xs text-slate-500 font-semibold">Total Process Cost:</span>
+                    <span className="px-3 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-mono font-bold text-xs border border-indigo-200 dark:border-indigo-800">
+                      ${totalProcessCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-xs text-slate-500 font-semibold ml-2">Total Fabric Row Amount:</span>
+                    <span className="px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-xs border border-emerald-200 dark:border-emerald-800">
+                      ${Number(tempRow.totalAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleCloseFabricDetailsModal}
+                      className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    {formMode !== "view" && (
+                      <button
+                        type="button"
+                        onClick={handleSaveFabricDetailsModal}
+                        className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
+                      >
+                        <Save className="size-3.5" /> Save & Apply Details
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* ════════════════════════════════════════════════════════════
+            MODAL: YARN DETAILS BREAKDOWN (EXCEL MODEL REPLICATION)
+           ════════════════════════════════════════════════════════════ */}
+        {yarnModal.isOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-7xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-amber-50/60 dark:bg-amber-950/30 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Disc className="size-4 text-amber-600" />
+                    <span>Yarn Breakdown & Costing Details</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Item: <span className="font-semibold text-slate-800 dark:text-slate-200">{yarnModal.head} — {yarnModal.item}</span> | Required Total Yarn:{" "}
+                    <span className="font-mono font-bold text-amber-700 dark:text-amber-400">
+                      {yarnModal.requiredYarnKg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kg
+                    </span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setYarnModal((prev) => ({ ...prev, isOpen: false, rowIndex: null }))}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              {/* Sub-bar with Add Button & Ratio Tracker */}
+              {(() => {
+                const totalRatio = yarnModal.rows.reduce((s, y) => s + (Number(y.ratioPct) || 0), 0);
+                const totalFinalQty = yarnModal.rows.reduce((s, y) => s + (Number(y.finalQtyKg) || 0), 0);
+                const totalCostVal = yarnModal.rows.reduce((s, y) => s + (Number(y.yarnCost) || 0), 0);
+                const avgRateVal = totalFinalQty > 0 ? totalCostVal / totalFinalQty : 0;
+                const isRatioBalanced = Math.abs(totalRatio - 100) < 0.01;
+
+                return (
+                  <>
+                    <div className="px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        {formMode !== "view" && (
+                          <button
+                            type="button"
+                            onClick={handleAddYarnModalRow}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs cursor-pointer"
+                          >
+                            <Plus className="size-3.5" /> Add Yarn Row
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-slate-500">Total Ratio:</span>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-black border ${
+                            isRatioBalanced
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300"
+                              : "bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300"
+                          }`}
+                        >
+                          {totalRatio.toFixed(1)}% {isRatioBalanced ? "✓ Balanced" : "⚠️ Must = 100%"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Table of Yarn rows */}
+                    <div className="flex-1 overflow-y-auto p-6">
+                      <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl">
+                        <table className="w-full text-xs text-left whitespace-nowrap min-w-[1450px]">
+                          <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[9.5px] uppercase font-black text-slate-500">
+                            <tr>
+                              <th className="py-2.5 px-2 text-center w-8">Sl.</th>
+                              <th className="py-2.5 px-2 w-20 min-w-[70px]">Grade *</th>
+                              <th className="py-2.5 px-2 w-36 min-w-[130px]">Yarn Count *</th>
+                              <th className="py-2.5 px-2 w-52 min-w-[180px]">Yarn Composition *</th>
+                              <th className="py-2.5 px-2 w-36 min-w-[130px]">Spinning Type</th>
+                              <th className="py-2.5 px-2 w-56 min-w-[200px]">Yarn Item *</th>
+                              <th className="py-2.5 px-2 text-right w-24 min-w-[90px]">Ratio (%) *</th>
+                              <th className="py-2.5 px-2 text-right w-28 min-w-[100px]">Final Qty (Kg)</th>
+                              <th className="py-2.5 px-2 text-right w-24 min-w-[90px]">Rate ($/kg) *</th>
+                              <th className="py-2.5 px-2.5 text-right w-28 min-w-[100px]">Yarn Cost ($)</th>
+                              <th className="py-2.5 px-2.5 w-52 min-w-[170px]">Vendor *</th>
+                              <th className="py-2.5 px-2.5 text-center w-36 min-w-[120px]">Stock & PR Allocation</th>
+                              {formMode !== "view" && <th className="py-2.5 px-2 text-center w-12">Action</th>}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {yarnModal.rows.length === 0 ? (
+                              <tr>
+                                <td colSpan={formMode !== "view" ? 13 : 12} className="py-8 text-center text-slate-400">
+                                  No yarn details entered. Click "Add Yarn Row" to define yarn components.
+                                </td>
+                              </tr>
+                            ) : (
+                              yarnModal.rows.map((yRow, yIdx) => {
+                                const currentYarnItem = yRow.yarnItem || [yRow.yarnCount, yRow.yarnComposition].filter(Boolean).join(" ");
+                                return (
+                                <tr key={yRow.id || yIdx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                                  {/* 1. Sl. */}
+                                  <td className="py-2 px-2 text-center font-mono font-bold text-slate-400">
+                                    {yIdx + 1}
+                                  </td>
+
+                                  {/* 2. Grade */}
+                                  <td className="py-2 px-2 w-20 min-w-[70px]">
+                                    <select
+                                      disabled={formMode === "view"}
+                                      value={yRow.grade === "Grade A" ? "A" : yRow.grade === "Grade B" ? "B" : yRow.grade || "A"}
+                                      onChange={(e) => handleUpdateYarnModalRow(yIdx, "grade", e.target.value)}
+                                      className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold"
+                                    >
+                                      <option value="A">A</option>
+                                      <option value="B">B</option>
+                                    </select>
+                                  </td>
+
+                                  {/* 3. Yarn Count (Searchable Dropdown populated from Yarn Count Master) */}
+                                  <td className="py-2 px-2 w-36 min-w-[130px]">
+                                    <SearchableSelect
+                                      options={getYarnCountOptions(yRow.yarnCount)}
+                                      value={yRow.yarnCount || ""}
+                                      onChange={(val) => handleUpdateYarnModalRow(yIdx, "yarnCount", val)}
+                                      placeholder="Select Count..."
+                                      disabled={formMode === "view"}
+                                      className="text-xs h-8 px-2"
+                                      allowCustom
+                                    />
+                                  </td>
+
+                                  {/* 4. Yarn Composition (Searchable Dropdown populated from Weekly Yarn Rate Master) */}
+                                  <td className="py-2 px-2 w-52 min-w-[180px]">
+                                    <SearchableSelect
+                                      options={getYarnCompositionOptions(yRow.yarnComposition)}
+                                      value={yRow.yarnComposition || ""}
+                                      onChange={(val) => handleUpdateYarnModalRow(yIdx, "yarnComposition", val)}
+                                      placeholder="Select Composition..."
+                                      disabled={formMode === "view"}
+                                      className="text-xs h-8 px-2"
+                                      allowCustom
+                                    />
+                                  </td>
+
+                                  {/* 5. Spinning Type (Searchable Dropdown) */}
+                                  <td className="py-2 px-2 w-36 min-w-[130px]">
+                                    <SearchableSelect
+                                      options={getSpinningTypeOptions(yRow.spinningType)}
+                                      value={yRow.spinningType || ""}
+                                      onChange={(val) => handleUpdateYarnModalRow(yIdx, "spinningType", val)}
+                                      placeholder="Select Spinning..."
+                                      disabled={formMode === "view"}
+                                      className="text-xs h-8 px-2"
+                                      allowCustom
+                                    />
+                                  </td>
+
+                                  {/* 6. Yarn Item (Read-only field, automatically generated by combining Yarn Count and Yarn Composition) */}
+                                  <td className="py-2 px-2 w-56 min-w-[200px]">
+                                    <input
+                                      type="text"
+                                      readOnly
+                                      value={currentYarnItem}
+                                      className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-not-allowed select-all"
+                                      title={currentYarnItem}
+                                    />
+                                  </td>
+
+                                  {/* 7. Ratio (%) */}
+                                  <td className="py-2 px-2">
+                                    <input
+                                      type="number"
+                                      step="0.1"
+                                      disabled={formMode === "view"}
+                                      value={yRow.ratioPct}
+                                      onChange={(e) => handleUpdateYarnModalRow(yIdx, "ratioPct", Number(e.target.value) || 0)}
+                                      className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                    />
+                                  </td>
+
+                                  {/* 8. Final Qty (Kg) */}
+                                  <td className="py-2 px-2 text-right font-mono font-bold text-slate-800 dark:text-slate-200">
+                                    {Number(yRow.finalQtyKg || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  </td>
+
+                                  {/* 9. Rate ($/kg) */}
+                                  <td className="py-2 px-2">
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      disabled={formMode === "view"}
+                                      value={yRow.ratePerKg}
+                                      onChange={(e) => handleUpdateYarnModalRow(yIdx, "ratePerKg", Number(e.target.value) || 0)}
+                                      className="w-full h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                    />
+                                    {yRow.masterRatePerKg !== undefined && Math.abs(Number(yRow.ratePerKg || 0) - Number(yRow.masterRatePerKg)) > 0.0001 && (
+                                      <span className="text-[9.5px] text-amber-600 dark:text-amber-400 font-mono block text-right mt-0.5">
+                                        Master: ${Number(yRow.masterRatePerKg).toFixed(2)}
+                                      </span>
+                                    )}
+                                  </td>
+
+                                  {/* 10. Yarn Cost ($) */}
+                                  <td className="py-2 px-2.5 text-right font-mono font-bold text-amber-700 dark:text-amber-400">
+                                    ${Number(yRow.yarnCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  </td>
+
+                                  {/* 11. Vendor (Searchable Dropdown) */}
+                                  <td className="py-2 px-2 w-52 min-w-[170px]">
+                                    <SearchableSelect
+                                      options={getVendorOptions(yRow.brand)}
+                                      value={yRow.brand || ""}
+                                      onChange={(val) => handleUpdateYarnModalRow(yIdx, "brand", val)}
+                                      placeholder="Select Vendor..."
+                                      disabled={formMode === "view"}
+                                      className="text-xs h-8 px-2"
+                                      allowCustom
+                                    />
+                                  </td>
+
+                                  {/* 12. Stock & PR Allocation Column */}
+                                  <td className="py-2 px-2 text-center w-36 min-w-[120px]">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenBookingTagModal(yIdx, yRow)}
+                                      className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer ${
+                                        yRow.bookingTag
+                                          ? "bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-700 ring-2 ring-emerald-300 dark:ring-emerald-900"
+                                          : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600"
+                                      }`}
+                                      title={
+                                        yRow.bookingTag
+                                          ? `Stock: ${Number(yRow.bookingTag.stockAllocatedQtyKg ?? yRow.bookingTag.tagQtyKg).toLocaleString()} KG | PR: ${Number(yRow.bookingTag.procurementRequiredQtyKg || 0).toLocaleString()} KG — Click to edit allocation`
+                                          : "Click to allocate Yarn Stock & New Procurement"
+                                      }
+                                    >
+                                      <Layers className="size-3.5" />
+                                      {yRow.bookingTag ? (
+                                        <span className="text-[9.5px] font-mono bg-emerald-800/50 px-1 py-0.5 rounded leading-none">
+                                          ✓ Allocated
+                                        </span>
+                                      ) : (
+                                        <span className="text-[9.5px] text-slate-500 dark:text-slate-400 font-semibold">Allocate</span>
+                                      )}
+                                    </button>
+                                  </td>
+
+                                  {/* 13. Action */}
+                                  {formMode !== "view" && (
+                                    <td className="py-2 px-2 text-center">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveYarnModalRow(yIdx)}
+                                        className="p-1 rounded hover:bg-rose-50 text-rose-500 cursor-pointer"
+                                        title="Remove yarn row"
+                                      >
+                                        <Trash2 className="size-3.5" />
+                                      </button>
+                                    </td>
+                                  )}
+                                </tr>
+                              );
+                              })
+                            )}
+                          </tbody>
+                          <tfoot>
+                            <tr className="bg-slate-100 dark:bg-slate-800 font-black border-t border-slate-200 dark:border-slate-700">
+                              <td colSpan={6} className="py-3 px-3 uppercase text-[10px] tracking-wider text-right">
+                                Yarn Breakdown Totals:
+                              </td>
+                              <td className="py-3 px-2 text-right font-mono">
+                                {totalRatio.toFixed(1)}%
+                              </td>
+                              <td className="py-3 px-2 text-right font-mono text-amber-700 dark:text-amber-400">
+                                {totalFinalQty.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kg
+                              </td>
+                              <td className="py-3 px-2 text-right font-mono text-slate-500 text-[11px]">
+                                avg ${avgRateVal.toFixed(3)}
+                              </td>
+                              <td className="py-3 px-2.5 text-right font-mono text-amber-700 dark:text-amber-300 text-sm">
+                                ${totalCostVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </td>
+                              <td colSpan={formMode !== "view" ? 3 : 2} />
+                            </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Modal Footer Actions */}
+                    <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between">
+                      <div className="text-xs text-slate-500">
+                        {yarnModal.rows.length} yarn component{yarnModal.rows.length === 1 ? "" : "s"} configured
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setYarnModal((prev) => ({ ...prev, isOpen: false, rowIndex: null }))}
+                          className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        {formMode !== "view" && (
+                          <button
+                            type="button"
+                            onClick={handleSaveYarnModal}
+                            className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
+                          >
+                            <Save className="size-3.5" /> Save & Apply Yarn Details
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════════════════════
+            MODAL: YARN STOCK & PROCUREMENT ALLOCATION
+           ════════════════════════════════════════════════════════════ */}
+        {bookingTagModal.isOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-[1180px] border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-150 max-h-[92vh]">
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b border-amber-200/60 dark:border-amber-900/40 bg-amber-50/80 dark:bg-amber-950/30 flex items-center justify-between shrink-0">
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <Layers className="size-5 text-amber-600" />
+                    <span>Yarn Stock & Procurement Allocation</span>
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-600 dark:text-slate-400">
+                    <span>
+                      Yarn Item / Component:{" "}
+                      <strong className="text-slate-900 dark:text-slate-100">
+                        {bookingTagModal.yarnItemName || "Yarn"}
+                      </strong>
+                      {bookingTagModal.componentName && (
+                        <span className="text-slate-500 font-normal"> ({bookingTagModal.componentName})</span>
+                      )}
+                    </span>
+                    <span>•</span>
+                    <span>
+                      Total Required Yarn Quantity:{" "}
+                      <strong className="font-mono text-amber-700 dark:text-amber-400 font-bold text-sm">
+                        {allocationSummary.totalRequired.toFixed(2)} KG
+                      </strong>
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setBookingTagModal((prev) => ({ ...prev, isOpen: false }))}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              {/* Modal Body - 2 Columns (Left: 60%, Right: 40%) */}
+              <div className="p-6 space-y-4 overflow-y-auto max-h-[78vh]">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                  {/* ── Left Column: Block Yarn Booking / Stock Allocation (60% / 7 cols) ── */}
+                  <div className="lg:col-span-7 space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+                      <div>
+                        <h4 className="text-xs uppercase font-black tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                          <Tag className="size-4 text-amber-600" />
+                          <span>1. Block Yarn Booking / Stock Allocation</span>
+                        </h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                          Reserve yarn from advance block booking(s). Multiple bookings supported.
+                        </p>
+                      </div>
+                      {formMode !== "view" && (
+                        <button
+                          type="button"
+                          onClick={handleAddAllocationRow}
+                          className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                        >
+                          <Plus className="size-3.5" />
+                          <span>Add Block Booking</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {bookingTagModal.allocations.length === 0 ? (
+                      <div className="p-6 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-center bg-slate-50/50 dark:bg-slate-850/30">
+                        <Tag className="size-6 text-slate-400 mx-auto mb-2" />
+                        <p className="text-xs font-bold text-slate-700 dark:text-slate-300">No Block Bookings Allocated</p>
+                        <p className="text-[11px] text-slate-500 mt-1">
+                          Click "+ Add Block Booking" to allocate stock from existing block bookings, or proceed with 100% New Procurement on the right.
+                        </p>
+                        {formMode !== "view" && (
+                          <button
+                            type="button"
+                            onClick={handleAddAllocationRow}
+                            className="mt-3 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs cursor-pointer"
+                          >
+                            <Plus className="size-3.5" />
+                            <span>Add Block Booking</span>
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-3.5">
+                        {bookingTagModal.allocations.map((alloc, idx) => {
+                          const itemOptions = getYarnItemOptionsForBooking(alloc.blockBookingNo);
+                          const isExceeding = alloc.tagQtyKg > alloc.availableBalance;
+                          return (
+                            <div
+                              key={alloc.id}
+                              className={`p-4 rounded-xl border transition-all ${
+                                isExceeding
+                                  ? "border-rose-300 dark:border-rose-800 bg-rose-50/30 dark:bg-rose-950/20"
+                                  : "border-slate-200 dark:border-slate-750 bg-slate-50/60 dark:bg-slate-850/40"
+                              } space-y-3`}
+                            >
+                              {/* Card Header */}
+                              <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-700/60 pb-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="px-2 py-0.5 rounded text-[10.5px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">
+                                    Booking #{idx + 1}
+                                  </span>
+                                  {alloc.supplierName && (
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                                      Mill: <strong className="text-slate-700 dark:text-slate-300">{alloc.supplierName}</strong>
+                                    </span>
+                                  )}
+                                </div>
+                                {formMode !== "view" && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveAllocationRow(alloc.id)}
+                                    className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 rounded-md transition cursor-pointer"
+                                    title="Remove this booking allocation"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Block Booking No. & Yarn Item Selectors */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                                    Block Booking No. <span className="text-rose-500">*</span>
+                                  </label>
+                                  <SearchableSelect
+                                    options={blockBookingDropdownOptions}
+                                    value={alloc.blockBookingNo}
+                                    onChange={(val) => handleSelectBookingForRow(alloc.id, val)}
+                                    placeholder="Select Block Yarn Booking..."
+                                    disabled={formMode === "view"}
+                                    className="w-full text-xs font-semibold"
+                                  />
+                                </div>
+
+                                <div className="space-y-1">
+                                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                                    Yarn Item in Booking <span className="text-rose-500">*</span>
+                                  </label>
+                                  <SearchableSelect
+                                    options={itemOptions}
+                                    value={alloc.yarnItemId}
+                                    onChange={(val) => handleSelectYarnItemForRow(alloc.id, val)}
+                                    placeholder={
+                                      !alloc.blockBookingNo
+                                        ? "Select Block Booking first..."
+                                        : itemOptions.length === 0
+                                        ? "No yarn items in booking"
+                                        : "Select Yarn Item in Booking..."
+                                    }
+                                    disabled={formMode === "view" || !alloc.blockBookingNo}
+                                    className="w-full text-xs font-semibold"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Balances & Tag Qty Row */}
+                              <div className="grid grid-cols-3 gap-2.5 pt-1">
+                                {/* Available Balance (KG) */}
+                                <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                                  <span className="text-[9.5px] uppercase font-bold text-slate-500 block mb-0.5">
+                                    Available Balance
+                                  </span>
+                                  <div className="text-xs font-mono font-black text-slate-900 dark:text-white">
+                                    {alloc.availableBalance.toFixed(2)}{" "}
+                                    <span className="text-[10px] font-normal text-slate-500">KG</span>
+                                  </div>
+                                </div>
+
+                                {/* Tag Qty (KG) - Editable */}
+                                <div className="p-2.5 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/20">
+                                  <div className="flex items-center justify-between mb-0.5">
+                                    <span className="text-[9.5px] uppercase font-bold text-amber-800 dark:text-amber-400">
+                                      Tag Qty (KG) *
+                                    </span>
+                                    <span className="text-[8.5px] text-amber-600 dark:text-amber-400 font-semibold">
+                                      Editable
+                                    </span>
+                                  </div>
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    max={alloc.availableBalance}
+                                    disabled={formMode === "view" || !alloc.yarnItemId}
+                                    value={alloc.tagQtyKg || ""}
+                                    onChange={(e) => handleTagQtyChangeForRow(alloc.id, e.target.value)}
+                                    placeholder="0.00"
+                                    className={`w-full h-7 px-2 rounded border ${
+                                      isExceeding
+                                        ? "border-rose-500 bg-rose-50 text-rose-900 focus:ring-rose-500"
+                                        : "border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-900 text-amber-900 dark:text-amber-200 focus:ring-amber-500"
+                                    } font-mono font-bold text-xs text-right focus:outline-none focus:ring-1`}
+                                  />
+                                  <span className="text-[8.5px] text-amber-700 dark:text-amber-400 block mt-0.5">
+                                    Max: {alloc.availableBalance.toFixed(2)} KG
+                                  </span>
+                                </div>
+
+                                {/* Remaining Balance (KG) */}
+                                <div
+                                  className={`p-2.5 rounded-lg border ${
+                                    isExceeding
+                                      ? "border-rose-300 dark:border-rose-800 bg-rose-50/70 dark:bg-rose-950/30 text-rose-800 dark:text-rose-300"
+                                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                                  }`}
+                                >
+                                  <span className="text-[9.5px] uppercase font-bold block mb-0.5 opacity-80">
+                                    Remaining Balance
+                                  </span>
+                                  <div className="text-xs font-mono font-black">
+                                    {alloc.remainingBalance.toFixed(2)}{" "}
+                                    <span className="text-[10px] font-normal opacity-70">KG</span>
+                                  </div>
+                                  <span className="text-[8.5px] block mt-0.5 opacity-75">
+                                    {isExceeding ? "⚠️ Exceeds Available" : "Booking Remaining"}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {isExceeding && (
+                                <div className="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-800 flex items-center gap-1.5 text-rose-700 dark:text-rose-300 text-[11px]">
+                                  <AlertCircle className="size-3.5 shrink-0 text-rose-600" />
+                                  <span>
+                                    <strong>Exceeds Available Balance:</strong> Tag Qty ({alloc.tagQtyKg.toFixed(2)} KG) exceeds available balance ({alloc.availableBalance.toFixed(2)} KG).
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Total Stock Allocated Subtotal Chip */}
+                    <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-amber-900 dark:text-amber-200">Total Stock Allocated:</span>
+                        <span className="text-slate-500 dark:text-slate-400">
+                          ({allocationSummary.allocationsCount} booking{allocationSummary.allocationsCount !== 1 ? "s" : ""})
+                        </span>
+                      </div>
+                      <div className="font-mono font-black text-amber-800 dark:text-amber-300 text-sm">
+                        {allocationSummary.stockAllocated.toFixed(2)} KG
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── Right Column: New Procurement Allocation & Summary (40% / 5 cols) ── */}
+                  <div className="lg:col-span-5 space-y-4">
+                    {/* Section 2: New Procurement Allocation */}
+                    <div className="p-4 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/20 space-y-3.5">
+                      <div className="flex items-center justify-between pb-2 border-b border-indigo-200/60 dark:border-indigo-800/60">
+                        <div>
+                          <h4 className="text-xs uppercase font-black tracking-wider text-indigo-950 dark:text-indigo-200 flex items-center gap-1.5">
+                            <Sparkles className="size-3.5 text-indigo-600" />
+                            <span>2. New Procurement Allocation</span>
+                          </h4>
+                          <span className="text-[10.5px] text-indigo-600 dark:text-indigo-400 font-medium">
+                            Auto-calculated: Total Required − Total Stock Allocated
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Metric Cards */}
+                      <div className="space-y-2.5">
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div className="p-2.5 rounded-lg border border-indigo-150 dark:border-indigo-800 bg-white dark:bg-slate-800">
+                            <span className="text-[9.5px] uppercase font-bold text-slate-500 block">Total Required</span>
+                            <div className="text-xs font-mono font-black text-slate-900 dark:text-white mt-0.5">
+                              {allocationSummary.totalRequired.toFixed(2)} <span className="text-[10px] font-normal text-slate-500">KG</span>
+                            </div>
+                          </div>
+
+                          <div className="p-2.5 rounded-lg border border-indigo-150 dark:border-indigo-800 bg-white dark:bg-slate-800">
+                            <span className="text-[9.5px] uppercase font-bold text-amber-700 dark:text-amber-400 block">Total Stock Allocated</span>
+                            <div className="text-xs font-mono font-black text-amber-800 dark:text-amber-300 mt-0.5">
+                              {allocationSummary.stockAllocated.toFixed(2)} <span className="text-[10px] font-normal text-slate-500">KG</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* New Procurement Required Qty */}
+                        <div className="p-3 rounded-lg border border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-800 flex items-center justify-between shadow-xs">
+                          <div>
+                            <span className="text-[10px] uppercase font-black text-indigo-900 dark:text-indigo-300 block">
+                              New Procurement Required Qty
+                            </span>
+                            <span className="text-[9.5px] text-slate-400 font-mono">
+                              {allocationSummary.totalRequired.toFixed(2)} − {allocationSummary.stockAllocated.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="text-base font-mono font-black text-indigo-700 dark:text-indigo-400">
+                            {allocationSummary.procurementRequired.toFixed(2)}{" "}
+                            <span className="text-xs font-sans font-bold text-slate-500">KG</span>
+                          </div>
+                        </div>
+
+                        {/* Procurement Status Box */}
+                        <div className="p-3 rounded-lg border border-indigo-200 dark:border-indigo-800/80 bg-white/70 dark:bg-slate-800/60 space-y-1.5">
+                          <span className="text-[10px] uppercase font-bold text-slate-500 block">Procurement Status</span>
+                          <div>
+                            {allocationSummary.procurementRequired > 0 ? (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700">
+                                <Clock className="size-3.5 shrink-0 text-indigo-600" />
+                                <span>New Procurement Request Required</span>
+                              </div>
+                            ) : (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
+                                <CheckCircle className="size-3.5 shrink-0 text-emerald-600" />
+                                <span>No Procurement Needed (Covered by Stock)</span>
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                            {allocationSummary.procurementRequired > 0
+                              ? "A linked Purchase Requisition will be generated/updated in Procurement Module on save."
+                              : "100% of requirement is satisfied from block bookings. No external PR created."}
+                          </p>
+                          {bookingTagModal.existingProcurementRequestNo && (
+                            <div className="text-[10.5px] text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5 pt-1 border-t border-indigo-100 dark:border-indigo-800/40">
+                              <Link2 className="size-3.5 text-indigo-500" />
+                              <span>Currently linked PR: <strong className="font-mono">{bookingTagModal.existingProcurementRequestNo}</strong></span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section 3: Allocation Summary */}
+                    <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/70 dark:bg-slate-800/50 space-y-3">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
+                        <h4 className="text-xs uppercase font-black tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                          <BookmarkCheck className="size-3.5 text-slate-600" />
+                          <span>3. Allocation Summary</span>
+                        </h4>
+                        {/* Allocation Status Badge */}
+                        <div>
+                          {allocationSummary.allocationStatus === "Fully Allocated" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
+                              <CheckCircle className="size-3.5" /> Fully Allocated
+                            </span>
+                          )}
+                          {allocationSummary.allocationStatus === "Partially Allocated" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                              <Clock className="size-3.5" /> Partially Allocated
+                            </span>
+                          )}
+                          {allocationSummary.allocationStatus === "Over Allocation" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300 border border-rose-300 dark:border-rose-700">
+                              <AlertTriangle className="size-3.5" /> Over Allocation
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Metric Rows */}
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700">
+                          <span className="text-slate-600 dark:text-slate-400">Total Required Qty</span>
+                          <span className="font-mono font-bold text-slate-900 dark:text-white">
+                            {allocationSummary.totalRequired.toFixed(2)} KG
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700">
+                          <span className="text-amber-700 dark:text-amber-400 font-semibold">Total Stock Allocated</span>
+                          <span className="font-mono font-bold text-amber-800 dark:text-amber-300">
+                            {allocationSummary.stockAllocated.toFixed(2)} KG
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700">
+                          <span className="text-indigo-700 dark:text-indigo-400 font-semibold">New Procurement Qty</span>
+                          <span className="font-mono font-bold text-indigo-800 dark:text-indigo-300">
+                            {allocationSummary.procurementRequired.toFixed(2)} KG
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700">
+                          <span className="text-emerald-700 dark:text-emerald-400 font-bold">Total Allocated Qty</span>
+                          <span className="font-mono font-bold text-emerald-800 dark:text-emerald-300">
+                            {allocationSummary.totalAllocated.toFixed(2)} KG
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700">
+                          <span className="text-slate-600 dark:text-slate-400">Remaining Required Qty</span>
+                          <span
+                            className={`font-mono font-bold ${
+                              allocationSummary.remainingRequired > 0 ? "text-amber-600" : "text-emerald-600"
+                            }`}
+                          >
+                            {allocationSummary.remainingRequired.toFixed(2)} KG
+                          </span>
+                        </div>
+                      </div>
+
+                      {allocationSummary.isOverAllocated && (
+                        <div className="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-800 flex items-center gap-2 text-rose-700 dark:text-rose-300 text-xs">
+                          <AlertCircle className="size-4 shrink-0 text-rose-600" />
+                          <span>
+                            <strong>Stock over-allocated:</strong> Total Stock Allocated ({allocationSummary.stockAllocated.toFixed(2)} KG) exceeds Total Required Yarn Quantity ({allocationSummary.totalRequired.toFixed(2)} KG).
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between shrink-0">
+                <div>
+                  {bookingTagModal.yarnRowIndex !== null &&
+                    yarnModal.rows[bookingTagModal.yarnRowIndex]?.bookingTag &&
+                    formMode !== "view" && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveBookingTagModal}
+                        className="px-3.5 py-2 rounded-xl border border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                      >
+                        <Trash2 className="size-3.5" /> Remove Tag & Release Balance
+                      </button>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBookingTagModal((prev) => ({ ...prev, isOpen: false }))}
+                    className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  {formMode !== "view" && (
+                    <button
+                      type="button"
+                      disabled={!allocationSummary.canSave}
+                      onClick={handleSaveBookingTagModal}
+                      className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5 transition-all"
+                    >
+                      <Check className="size-3.5" /> Confirm & Save Allocation
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ════════════════════════════════════════════════════════════
             MODAL: DOCUMENT STORAGE ATTACHMENTS (PI ENTRY FORM REUSE)
            ════════════════════════════════════════════════════════════ */}
@@ -3871,6 +10816,228 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
         )}
 
         {/* ════════════════════════════════════════════════════════════
+            MODAL: PO-WISE COLOR QUANTITY BREAKDOWN
+           ════════════════════════════════════════════════════════════ */}
+        {poColorModal.isOpen && (() => {
+          const totalColorQty = poColorModal.rows.reduce(
+            (sum, r) => sum + (Number(r.quantity) || 0),
+            0
+          );
+          const isExceeded = totalColorQty > poColorModal.poQuantity;
+          const diff = Math.abs(poColorModal.poQuantity - totalColorQty);
+
+          return (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setPoColorModal((prev) => ({ ...prev, isOpen: false }));
+                }
+              }}
+            >
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95">
+                {/* Modal Header */}
+                <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/40">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl border border-indigo-100 dark:border-indigo-900">
+                      <Palette className="size-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        PO-wise Color Quantity
+                        <span className="font-mono text-xs px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                          {poColorModal.poNumber}
+                        </span>
+                      </h3>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Target PO Quantity: <strong className="font-mono text-slate-800 dark:text-slate-200">{poColorModal.poQuantity.toLocaleString()} pcs</strong>
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPoColorModal((prev) => ({ ...prev, isOpen: false }))}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+
+                {/* Modal Body */}
+                <div className="p-5 overflow-y-auto space-y-4 text-xs">
+                  {/* Summary Bar */}
+                  <div className="grid grid-cols-3 gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block">Target PO QTY</span>
+                      <span className="font-mono font-bold text-sm text-slate-800 dark:text-slate-200">
+                        {poColorModal.poQuantity.toLocaleString()} pcs
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block">Total Color QTY</span>
+                      <span
+                        className={`font-mono font-bold text-sm ${
+                          isExceeded
+                            ? "text-rose-600 dark:text-rose-400"
+                            : totalColorQty === poColorModal.poQuantity
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-indigo-600 dark:text-indigo-400"
+                        }`}
+                      >
+                        {totalColorQty.toLocaleString()} pcs
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block">
+                        {isExceeded ? "Exceeded By" : "Remaining"}
+                      </span>
+                      <span
+                        className={`font-mono font-bold text-sm ${
+                          isExceeded
+                            ? "text-rose-600 dark:text-rose-400"
+                            : totalColorQty === poColorModal.poQuantity
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-amber-600 dark:text-amber-400"
+                        }`}
+                      >
+                        {isExceeded
+                          ? `+${diff.toLocaleString()} pcs`
+                          : totalColorQty === poColorModal.poQuantity
+                          ? "✓ 0 pcs (Matched)"
+                          : `${diff.toLocaleString()} pcs`}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Real-time Exceeded Warning Alert */}
+                  {isExceeded && (
+                    <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 flex items-start gap-2 text-rose-700 dark:text-rose-300 text-xs">
+                      <AlertTriangle className="size-4 shrink-0 mt-0.5" />
+                      <div>
+                        <strong>Quantity Exceeded:</strong> Total color quantity across all rows (
+                        {totalColorQty.toLocaleString()} pcs) exceeds the PO Quantity (
+                        {poColorModal.poQuantity.toLocaleString()} pcs) by{" "}
+                        <strong>{diff.toLocaleString()} pcs</strong>. Total quantity must not exceed the PO Quantity.
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Color Rows Table */}
+                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-[10px] font-black uppercase text-slate-500">
+                        <tr>
+                          <th className="py-2 px-3 w-10 text-center">SL</th>
+                          <th className="py-2 px-3">Color *</th>
+                          <th className="py-2 px-3 text-right w-44">QTY *</th>
+                          {formMode !== "view" && <th className="py-2 px-3 text-center w-12">Action</th>}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {poColorModal.rows.length === 0 ? (
+                          <tr>
+                            <td colSpan={formMode !== "view" ? 4 : 3} className="py-8 text-center text-slate-400">
+                              No colors added yet. Click &quot;Add Color&quot; below to add color breakdown.
+                            </td>
+                          </tr>
+                        ) : (
+                          poColorModal.rows.map((row, rIdx) => {
+                            const rowColorOpts = getColorOptions(row.color);
+                            return (
+                              <tr key={row.id || rIdx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                <td className="py-2 px-3 text-center font-mono font-bold text-slate-400">
+                                  {rIdx + 1}
+                                </td>
+                                <td className="py-2 px-3">
+                                  <SearchableSelect
+                                    options={rowColorOpts}
+                                    value={row.color}
+                                    onChange={(val) => handleUpdatePoColorRow(rIdx, "color", val)}
+                                    placeholder="Select or search color..."
+                                    disabled={formMode === "view"}
+                                    className="text-xs"
+                                  />
+                                </td>
+                                <td className="py-2 px-3">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    disabled={formMode === "view"}
+                                    value={row.quantity}
+                                    onChange={(e) =>
+                                      handleUpdatePoColorRow(rIdx, "quantity", Number(e.target.value) || 0)
+                                    }
+                                    className="w-full h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-right font-mono font-bold text-xs"
+                                    placeholder="0"
+                                  />
+                                </td>
+                                {formMode !== "view" && (
+                                  <td className="py-2 px-3 text-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemovePoColorRow(rIdx)}
+                                      className="p-1 rounded hover:bg-rose-50 text-rose-500 cursor-pointer transition-colors"
+                                      title="Remove color row"
+                                    >
+                                      <Trash2 className="size-3.5" />
+                                    </button>
+                                  </td>
+                                )}
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {formMode !== "view" && (
+                    <button
+                      type="button"
+                      onClick={handleAddPoColorRow}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 cursor-pointer"
+                    >
+                      <Plus className="size-3.5" /> Add Color
+                    </button>
+                  )}
+                </div>
+
+                {/* Modal Footer */}
+                <div className="px-5 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500">
+                    Colors entered: <strong>{poColorModal.rows.length}</strong>
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPoColorModal((prev) => ({ ...prev, isOpen: false }))}
+                      className="px-4 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-slate-700 dark:text-slate-200"
+                    >
+                      Cancel
+                    </button>
+                    {formMode !== "view" && (
+                      <button
+                        type="button"
+                        onClick={handleSavePoColorModal}
+                        disabled={isExceeded}
+                        className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-white text-xs font-bold shadow-xs transition-all ${
+                          isExceeded
+                            ? "bg-slate-400 cursor-not-allowed opacity-60"
+                            : "bg-teal-600 hover:bg-teal-700 cursor-pointer"
+                        }`}
+                      >
+                        <Save className="size-3.5" /> Save Color Quantities
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* ════════════════════════════════════════════════════════════
             MODAL: IMAGE LIGHTBOX PREVIEW
            ════════════════════════════════════════════════════════════ */}
         {previewImageModal && (
@@ -3902,4 +11069,5 @@ export function PreCostingManager({ initialTab = "register", onTabChange }: PreC
   );
 }
 
+export const PreCostingKnitManager = PreCostingManager;
 export default PreCostingManager;

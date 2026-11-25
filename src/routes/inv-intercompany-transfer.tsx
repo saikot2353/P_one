@@ -21,6 +21,7 @@ import {
   FileCheck2,
   Tag,
   ShieldCheck,
+  Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -33,6 +34,7 @@ import {
   getStoredInterCompanyTransfers,
   saveInterCompanyTransfer,
   getStoredTransferRequisitions,
+  getLoggedInUserCompany,
 } from "@/lib/inventory-stock-management-data";
 import {
   DEFAULT_WAREHOUSES,
@@ -41,13 +43,13 @@ import {
   getStoredData,
 } from "@/lib/procurement-master-data";
 import { getItemTrackingMode } from "@/lib/item-tracking-utils";
+import { ItemTrackingCell } from "@/components/inventory/ItemBatchLocationModals";
 import {
-  LocationAllocationModal,
-  BatchAllocationModal,
-  ItemTrackingCell,
-  LocationEntry,
-  BatchEntry,
-} from "@/components/inventory/ItemBatchLocationModals";
+  TransferLocationAllocationModal,
+  TransferBatchAllocationModal,
+  TransferLocationEntry,
+  TransferBatchEntry,
+} from "@/components/inventory/TransferBatchLocationModals";
 import {
   StandardPreviewReportModal,
   StandardReportData,
@@ -79,19 +81,41 @@ function InterCompanyTransferFormPage() {
   const isViewMode = searchParams.mode === "view";
   const editingTransferId = searchParams.transferId;
 
-  const warehouses = getStoredData("proc_warehouses_v2", DEFAULT_WAREHOUSES);
+  const rawWarehouses = getStoredData("proc_warehouses_v2", DEFAULT_WAREHOUSES);
+  const warehouses = useMemo(() => {
+    const list = [...rawWarehouses];
+    DEFAULT_WAREHOUSES.forEach((dw) => {
+      const dwName = dw.storeName || dw.name || "";
+      if (!list.some((w) => (w.storeName || w.name) === dwName || w.id === dw.id)) {
+        list.push(dw);
+      }
+    });
+    return list;
+  }, [rawWarehouses]);
   const catalogItems = getStoredData<ItemProductMaster[]>("proc_items_v2", DEFAULT_ITEMS);
 
-  // Load existing transfer if in edit/view mode
+  // Load existing transfer if in edit/view mode or restore active draft
+  const draftKey = editingTransferId ? `cripton_transfer_draft_${editingTransferId}` : "cripton_transfer_active_draft";
   const existingTransfer = useMemo(() => {
-    if (!editingTransferId) return null;
-    const all = getStoredInterCompanyTransfers();
-    return all.find((t) => t.id === editingTransferId || t.transferId === editingTransferId) || null;
-  }, [editingTransferId]);
+    if (editingTransferId) {
+      const all = getStoredInterCompanyTransfers();
+      const found = all.find((t) => t.id === editingTransferId || t.transferId === editingTransferId);
+      if (found) return found;
+    }
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem(draftKey);
+        if (raw) return JSON.parse(raw);
+      } catch {
+        // ignore
+      }
+    }
+    return null;
+  }, [editingTransferId, draftKey]);
 
   // Header State
   const [transferId] = useState<string>(() => {
-    if (existingTransfer) return existingTransfer.transferId;
+    if (existingTransfer?.transferId) return existingTransfer.transferId;
     return `ICT-2026-${String(Math.floor(100 + Math.random() * 900))}`;
   });
 
@@ -111,9 +135,23 @@ function InterCompanyTransferFormPage() {
     return existingTransfer?.remarks || "";
   });
 
+  // Logged-in user's company (Section 2: Fixed and auto-populated)
+  const loggedInCompany = useMemo(() => getLoggedInUserCompany(), []);
+
+  // Transfer Type (Multi-Company vs Intra-Company)
+  const [transferType, setTransferType] = useState<TransferType>(() => {
+    if (searchParams.type === "intra") return "Intra-Company";
+    return existingTransfer?.transferType || "Inter-Company";
+  });
+
+  const isIntraCompany = transferType === "Intra-Company";
+
   // Source & Destination State
   const [fromCompany, setFromCompany] = useState<string>(() => {
-    return existingTransfer?.fromCompany || "Pakiza Knit Composite Ltd";
+    if (searchParams.type === "intra" || existingTransfer?.transferType === "Intra-Company") {
+      return loggedInCompany;
+    }
+    return existingTransfer?.fromCompany || loggedInCompany;
   });
 
   const [fromStore, setFromStore] = useState<string>(() => {
@@ -121,18 +159,53 @@ function InterCompanyTransferFormPage() {
   });
 
   const [toCompany, setToCompany] = useState<string>(() => {
+    if (searchParams.type === "intra" || existingTransfer?.transferType === "Intra-Company") {
+      return loggedInCompany;
+    }
     return existingTransfer?.toCompany || "Pakiza Spinning Mills Ltd";
   });
 
   const [toStore, setToStore] = useState<string>(() => {
-    return existingTransfer?.toStore || "Spinning Spare Parts & Consumables Store";
+    if (existingTransfer?.toStore) return existingTransfer.toStore;
+    if (searchParams.type === "intra" || existingTransfer?.transferType === "Intra-Company") {
+      return "Dyeing & Finishing Auxiliary Chemical Store";
+    }
+    return "Spinning Spare Parts & Consumables Store";
   });
 
-  // Transfer Type (Multi-Company vs Intra-Company)
-  const [transferType, setTransferType] = useState<TransferType>(() => {
-    if (searchParams.type === "intra") return "Intra-Company";
-    return existingTransfer?.transferType || "Inter-Company";
-  });
+  // Handler to switch transfer type
+  const handleSwitchTransferType = (type: TransferType) => {
+    if (isViewMode) return;
+    setTransferType(type);
+    if (type === "Intra-Company") {
+      setTaggedReqNumber("");
+      setTaggedReqId("");
+      setFromCompany(loggedInCompany);
+      setToCompany(loggedInCompany);
+
+      const sameCompanyStores = warehouses.filter(
+        (w) => (w.organization === loggedInCompany || !w.organization) && w.status === "Active"
+      );
+      const storeList = sameCompanyStores.length > 0 ? sameCompanyStores : DEFAULT_WAREHOUSES;
+      const s1 = storeList[0]?.storeName || storeList[0]?.name || "Central Store";
+      const s2 =
+        storeList.find((s) => (s.storeName || s.name) !== s1)?.storeName ||
+        storeList.find((s) => (s.storeName || s.name) !== s1)?.name ||
+        storeList[1]?.storeName ||
+        storeList[0]?.storeName ||
+        s1;
+
+      setFromStore(s1);
+      setToStore(s2);
+      toast.info(`Switched to Intra-Company Transfer. Organizations locked to logged-in company (${loggedInCompany}).`);
+    } else {
+      setFromCompany(loggedInCompany);
+      const otherComp =
+        MASTER_COMPANIES.find((c) => c.name !== loggedInCompany)?.name || "Pakiza Spinning Mills Ltd";
+      setToCompany(otherComp);
+      toast.info("Switched to Multi-Company (Inter-Company) Transfer.");
+    }
+  };
 
   // Tagged Approved Transfer Requisition State
   const [taggedReqNumber, setTaggedReqNumber] = useState<string>(() => {
@@ -228,7 +301,7 @@ function InterCompanyTransferFormPage() {
 
   // Transfer Items State
   const [items, setItems] = useState<InterCompanyTransferItem[]>(() => {
-    if (existingTransfer) return existingTransfer.items;
+    if (existingTransfer?.items && existingTransfer.items.length > 0) return existingTransfer.items;
     return [
       {
         id: `ict-row-1`,
@@ -243,7 +316,14 @@ function InterCompanyTransferFormPage() {
         transferQty: 100,
         unitPrice: 420,
         totalValue: 42000,
-        batchAllocations: [{ batchNumber: "BATCH-COT-2026-01", quantity: 100 }],
+        batchAllocations: [
+          {
+            batchNumber: "BATCH-COT-2026-01",
+            quantity: 100,
+            toWarehouse: "Spinning Spare Parts & Consumables Store",
+            toStore: "Spinning Spare Parts & Consumables Store",
+          },
+        ],
         remarks: "Production batch allocation",
       },
     ];
@@ -269,7 +349,7 @@ function InterCompanyTransferFormPage() {
     }
   };
 
-  const handleSaveLocationAllocations = (allocations: LocationEntry[]) => {
+  const handleSaveLocationAllocations = (allocations: TransferLocationEntry[]) => {
     if (!activeTrackingItemId) return;
     setItems((prev) =>
       prev.map((it) =>
@@ -277,8 +357,14 @@ function InterCompanyTransferFormPage() {
           ? {
               ...it,
               locationAllocations: allocations.map((a) => ({
-                locationName: a.locationName,
+                sourceLocationName: a.sourceLocationName,
+                destinationLocationName: a.destinationLocationName,
+                locationName: a.destinationLocationName || a.locationName,
                 quantity: a.quantity,
+                fromWarehouse: a.fromWarehouse,
+                fromStore: a.fromStore,
+                toWarehouse: a.toWarehouse,
+                toStore: a.toStore,
               })),
             }
           : it
@@ -288,7 +374,7 @@ function InterCompanyTransferFormPage() {
     toast.success("Location allocations confirmed.");
   };
 
-  const handleSaveBatchAllocations = (allocations: BatchEntry[]) => {
+  const handleSaveBatchAllocations = (allocations: TransferBatchEntry[]) => {
     if (!activeTrackingItemId) return;
     setItems((prev) =>
       prev.map((it) =>
@@ -296,8 +382,15 @@ function InterCompanyTransferFormPage() {
           ? {
               ...it,
               batchAllocations: allocations.map((b) => ({
-                batchNumber: b.batchNumber,
+                sourceBatchNumber: b.sourceBatchNumber,
+                destinationBatchNumber: b.destinationBatchNumber,
+                batchNumber: b.destinationBatchNumber || b.batchNumber,
                 quantity: b.quantity,
+                fromWarehouse: b.fromWarehouse,
+                fromStore: b.fromStore,
+                toWarehouse: b.toWarehouse,
+                toStore: b.toStore,
+                expiryDate: b.expiryDate,
               })),
             }
           : it
@@ -458,6 +551,9 @@ function InterCompanyTransferFormPage() {
     if (transferType === "Inter-Company" && !taggedReqNumber) {
       errs.push("Tagging an approved Transfer Requisition is required.");
     }
+    if (transferType === "Intra-Company" && fromStore && toStore && fromStore === toStore) {
+      errs.push("Source Store and Destination Store must be different for intra-company transfer.");
+    }
     if (transferReason === "Other" && !reasonDetails.trim()) {
       errs.push("Reason Details is mandatory when Transfer Reason is 'Other'.");
     }
@@ -512,6 +608,15 @@ function InterCompanyTransferFormPage() {
 
     saveInterCompanyTransfer(payload);
 
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem(`cripton_transfer_draft_${transferId}`);
+        localStorage.removeItem("cripton_transfer_active_draft");
+      } catch {
+        // ignore
+      }
+    }
+
     toast.success(
       status === "Draft"
         ? `Transfer draft ${transferId} saved successfully!`
@@ -520,6 +625,52 @@ function InterCompanyTransferFormPage() {
 
     navigate({ to: "/inv-intercompany-transfer-list" });
   };
+
+  // Section 4: Auto-persist active draft so refreshing browser preserves in-progress input
+  useEffect(() => {
+    if (isViewMode) return;
+    if (typeof window !== "undefined") {
+      try {
+        const draft = {
+          transferId,
+          transferDate,
+          transferType,
+          transferReason,
+          reasonDetails,
+          remarks,
+          fromCompany,
+          fromStore,
+          toCompany,
+          toStore,
+          requestedBy,
+          taggedReqNumber,
+          taggedReqId,
+          items,
+        };
+        const key = editingTransferId ? `cripton_transfer_draft_${editingTransferId}` : "cripton_transfer_active_draft";
+        localStorage.setItem(key, JSON.stringify(draft));
+      } catch {
+        // ignore
+      }
+    }
+  }, [
+    isViewMode,
+    editingTransferId,
+    transferId,
+    transferDate,
+    transferType,
+    transferReason,
+    reasonDetails,
+    remarks,
+    fromCompany,
+    fromStore,
+    toCompany,
+    toStore,
+    requestedBy,
+    taggedReqNumber,
+    taggedReqId,
+    items,
+  ]);
 
   // Preview Report State
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
@@ -691,9 +842,7 @@ function InterCompanyTransferFormPage() {
                     <button
                       type="button"
                       disabled={isViewMode}
-                      onClick={() => {
-                        setTransferType("Inter-Company");
-                      }}
+                      onClick={() => handleSwitchTransferType("Inter-Company")}
                       className={`px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer ${
                         transferType === "Inter-Company"
                           ? "bg-purple-600 text-white shadow-xs"
@@ -705,19 +854,7 @@ function InterCompanyTransferFormPage() {
                     <button
                       type="button"
                       disabled={isViewMode}
-                      onClick={() => {
-                        setTransferType("Intra-Company");
-                        setToCompany(fromCompany);
-                        const sameCompanyStores = warehouses.filter(
-                          (w) => w.organization === fromCompany && w.status === "Active"
-                        );
-                        const otherStore =
-                          sameCompanyStores.find((s) => (s.storeName || s.name) !== fromStore) ||
-                          sameCompanyStores[0];
-                        if (otherStore) {
-                          setToStore(otherStore.storeName || otherStore.name || "");
-                        }
-                      }}
+                      onClick={() => handleSwitchTransferType("Intra-Company")}
                       className={`px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer ${
                         transferType === "Intra-Company"
                           ? "bg-blue-600 text-white shadow-xs"
@@ -729,7 +866,7 @@ function InterCompanyTransferFormPage() {
                   </div>
                 </div>
 
-                {!isViewMode && (
+                {!isViewMode && transferType === "Inter-Company" && (
                   <button
                     type="button"
                     onClick={() => setReqModalOpen(true)}
@@ -817,7 +954,7 @@ function InterCompanyTransferFormPage() {
               {/* Requested / Dispatched By */}
               <div>
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                  Requested By (Authorized)
+                  Requested By
                 </label>
                 <input
                   type="text"
@@ -846,27 +983,43 @@ function InterCompanyTransferFormPage() {
 
               {/* SOURCE (FROM) SECTION */}
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3 sm:col-span-2">
-                <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="size-2 rounded-full bg-blue-500 inline-block" />
-                  Source (From) Organization & Store
+                <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-blue-500 inline-block" />
+                    Source (From) Organization & Store
+                  </span>
                 </div>
                 <div className="space-y-2">
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                       From Company / Organization *
                     </label>
-                    <select
-                      disabled={isViewMode}
-                      value={fromCompany}
-                      onChange={(e) => setFromCompany(e.target.value)}
-                      className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-slate-100"
-                    >
-                      {MASTER_COMPANIES.map((c) => (
-                        <option key={c.id} value={c.name}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
+                    {isIntraCompany ? (
+                      <div className="relative">
+                        <input
+                          type="text"
+                          readOnly
+                          value={fromCompany}
+                          className="w-full h-9 rounded-lg border border-slate-200 bg-slate-100/90 px-3 text-xs font-bold text-slate-800 outline-none cursor-not-allowed select-all"
+                        />
+                        <div className="absolute right-2.5 top-2.5">
+                          <Lock className="size-3.5 text-slate-400" />
+                        </div>
+                      </div>
+                    ) : (
+                      <select
+                        disabled={isViewMode}
+                        value={fromCompany}
+                        onChange={(e) => setFromCompany(e.target.value)}
+                        className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-slate-100"
+                      >
+                        {MASTER_COMPANIES.map((c) => (
+                          <option key={c.id} value={c.name}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
@@ -882,7 +1035,7 @@ function InterCompanyTransferFormPage() {
                         const sName = w.storeName || w.name;
                         return (
                           <option key={w.id} value={sName}>
-                            {sName} ({w.storeCode || w.id})
+                            {sName}
                           </option>
                         );
                       })}
@@ -893,27 +1046,43 @@ function InterCompanyTransferFormPage() {
 
               {/* DESTINATION (TO) SECTION */}
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3 sm:col-span-2">
-                <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="size-2 rounded-full bg-emerald-500 inline-block" />
-                  Destination (To) Organization & Store
+                <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-emerald-500 inline-block" />
+                    Destination (To) Organization & Store
+                  </span>
                 </div>
                 <div className="space-y-2">
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                       To Company / Organization *
                     </label>
-                    <select
-                      disabled={isViewMode}
-                      value={toCompany}
-                      onChange={(e) => setToCompany(e.target.value)}
-                      className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-slate-100"
-                    >
-                      {MASTER_COMPANIES.map((c) => (
-                        <option key={c.id} value={c.name}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
+                    {isIntraCompany ? (
+                      <div className="relative">
+                        <input
+                          type="text"
+                          readOnly
+                          value={toCompany}
+                          className="w-full h-9 rounded-lg border border-slate-200 bg-slate-100/90 px-3 text-xs font-bold text-slate-800 outline-none cursor-not-allowed select-all"
+                        />
+                        <div className="absolute right-2.5 top-2.5">
+                          <Lock className="size-3.5 text-slate-400" />
+                        </div>
+                      </div>
+                    ) : (
+                      <select
+                        disabled={isViewMode}
+                        value={toCompany}
+                        onChange={(e) => setToCompany(e.target.value)}
+                        className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-slate-100"
+                      >
+                        {MASTER_COMPANIES.map((c) => (
+                          <option key={c.id} value={c.name}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
@@ -929,7 +1098,7 @@ function InterCompanyTransferFormPage() {
                         const sName = w.storeName || w.name;
                         return (
                           <option key={w.id} value={sName}>
-                            {sName} ({w.storeCode || w.id})
+                            {sName}
                           </option>
                         );
                       })}
@@ -1154,31 +1323,41 @@ function InterCompanyTransferFormPage() {
 
         {/* Location Allocation Modal */}
         {locationModalOpen && activeTrackingItem && (
-          <LocationAllocationModal
+          <TransferLocationAllocationModal
             isOpen={true}
             onClose={() => setLocationModalOpen(false)}
             itemName={activeTrackingItem.itemName}
             itemCode={activeTrackingItem.itemCode}
             transactionQty={activeTrackingItem.transferQty}
             uom={activeTrackingItem.uom}
-            currentStore={fromStore}
+            transferType={transferType}
+            sourceStore={fromStore}
+            availableSourceStores={availableFromStores}
+            defaultDestinationStore={toStore}
+            availableDestinationStores={availableToStores}
             initialEntries={activeTrackingItem.locationAllocations}
             onSave={handleSaveLocationAllocations}
+            readOnly={isViewMode}
           />
         )}
 
         {/* Batch Allocation Modal */}
         {batchModalOpen && activeTrackingItem && (
-          <BatchAllocationModal
+          <TransferBatchAllocationModal
             isOpen={true}
             onClose={() => setBatchModalOpen(false)}
             itemName={activeTrackingItem.itemName}
             itemCode={activeTrackingItem.itemCode}
             transactionQty={activeTrackingItem.transferQty}
             uom={activeTrackingItem.uom}
-            currentStore={fromStore}
+            transferType={transferType}
+            sourceStore={fromStore}
+            availableSourceStores={availableFromStores}
+            defaultDestinationStore={toStore}
+            availableDestinationStores={availableToStores}
             initialEntries={activeTrackingItem.batchAllocations}
             onSave={handleSaveBatchAllocations}
+            readOnly={isViewMode}
           />
         )}
 

@@ -380,6 +380,7 @@ export function FabricConsumptionRegisterView({
               <option value="Pending CAD">Pending CAD</option>
               <option value="In Progress">In Progress</option>
               <option value="CAD Submitted">CAD Submitted</option>
+              <option value="Amendment Requested">Amendment Requested</option>
             </select>
           </div>
 
@@ -533,22 +534,33 @@ export function FabricConsumptionRegisterView({
 
                       {/* Request No. */}
                       <td className="py-3 px-3">
-                        <button
-                          type="button"
-                          onClick={() => onOpenRequest?.(rec.id, "view")}
-                          className="font-mono font-bold text-teal-700 dark:text-teal-400 hover:underline cursor-pointer flex items-center gap-1.5"
-                        >
-                          <span>{rec.requestNo}</span>
-                          {rec.attachments && rec.attachments.length > 0 && (
-                            <span
-                              className="inline-flex items-center text-[10px] text-slate-400 font-sans"
-                              title={`${rec.attachments.length} document(s) attached`}
-                            >
-                              <Paperclip className="size-3 text-teal-600" />
-                              <span>({rec.attachments.length})</span>
-                            </span>
-                          )}
-                        </button>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => onOpenRequest?.(rec.id, "view")}
+                            className="font-mono font-bold text-teal-700 dark:text-teal-400 hover:underline cursor-pointer flex items-center gap-1.5"
+                          >
+                            <span>{rec.requestNo}</span>
+                            {rec.attachments && rec.attachments.length > 0 && (
+                              <span
+                                className="inline-flex items-center text-[10px] text-slate-400 font-sans"
+                                title={`${rec.attachments.length} document(s) attached`}
+                              >
+                                <Paperclip className="size-3 text-teal-600" />
+                                <span>({rec.attachments.length})</span>
+                              </span>
+                            )}
+                          </button>
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-black border ${
+                              (rec.version || 1) > 1
+                                ? "bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800"
+                                : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700"
+                            }`}
+                          >
+                            Rev {rec.version || 1}
+                          </span>
+                        </div>
                       </td>
 
                       {/* Request Date */}
@@ -593,7 +605,9 @@ export function FabricConsumptionRegisterView({
                       <td className="py-3 px-3">
                         <span
                           className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
-                            rec.status === "CAD Submitted"
+                            rec.status === "Amendment Requested"
+                              ? "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-700"
+                              : rec.status === "CAD Submitted"
                               ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
                               : rec.status === "Pending CAD"
                               ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
@@ -602,6 +616,7 @@ export function FabricConsumptionRegisterView({
                               : "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
                           }`}
                         >
+                          {rec.status === "Amendment Requested" && <RotateCcw className="size-3" />}
                           {rec.status === "CAD Submitted" && <CheckCircle2 className="size-3" />}
                           {rec.status === "Pending CAD" && <Clock className="size-3" />}
                           {rec.status === "In Progress" && <Clock className="size-3" />}
@@ -611,7 +626,7 @@ export function FabricConsumptionRegisterView({
 
                       {/* Actions */}
                       <td className="py-3 px-3 text-right sticky right-0 bg-slate-50/90 dark:bg-slate-900/90 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">
-                        <div className="flex items-center justify-end gap-1.5">
+                        <div className="flex items-center justify-end gap-1.5 flex-wrap">
                           {/* View details */}
                           <button
                             type="button"
@@ -644,15 +659,39 @@ export function FabricConsumptionRegisterView({
                             </>
                           )}
 
-                          {/* CAD Team actions (Shown ONLY in CAD register for pending/in-progress items) */}
-                          {isCadView && (rec.status === "Pending CAD" || rec.status === "In Progress") && (
+                          {/* Merchant Amendment In-Progress */}
+                          {!isCadView && rec.status === "Amendment Requested" && (
+                            <button
+                              type="button"
+                              onClick={() => onOpenRequest?.(rec.id, "edit")}
+                              className="px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 text-[11px] font-bold border border-amber-300 cursor-pointer flex items-center gap-1 shadow-xs"
+                              title="Continue Editing Amendment Request"
+                            >
+                              <RotateCcw className="size-3" /> Continue Amend
+                            </button>
+                          )}
+
+                          {/* Merchant Request Amendment on CAD Submitted */}
+                          {!isCadView && rec.status === "CAD Submitted" && (
+                            <button
+                              type="button"
+                              onClick={() => onOpenRequest?.(rec.id, "view")}
+                              className="px-2 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 text-[11px] font-bold border border-purple-200 cursor-pointer flex items-center gap-1"
+                              title="Request CAD Amendment & Resubmit"
+                            >
+                              <RotateCcw className="size-3" /> Amend
+                            </button>
+                          )}
+
+                          {/* CAD Team actions (Shown in CAD register for pending/in-progress/amendment items) */}
+                          {isCadView && (rec.status === "Pending CAD" || rec.status === "In Progress" || rec.status === "Amendment Requested") && (
                             <button
                               type="button"
                               onClick={() => onOpenRequest?.(rec.id, "cad-response")}
                               className="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 text-[11px] font-bold border border-indigo-300 dark:border-indigo-800 cursor-pointer flex items-center gap-1 shadow-xs"
                               title="Enter / Calculate CAD Fabric Consumption"
                             >
-                              <Scissors className="size-3" /> Enter CAD Data
+                              <Scissors className="size-3" /> Enter CAD Data {(rec.version || 1) > 1 ? `(Rev ${rec.version})` : ""}
                             </button>
                           )}
 
