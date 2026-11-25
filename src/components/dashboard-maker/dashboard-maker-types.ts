@@ -9,14 +9,23 @@ export type DashboardModule =
 export type WidgetColSpan = 1 | 2 | 3 | 4 | 6 | 12;
 
 export interface WidgetSettings {
-  scope?: "personal" | "managed_depts" | "team" | "department" | "company"; // My Personal, Head of Dept (My Managed Depts), Team, Department, Company-wide
-  managedDepartments?: string[]; // e.g. ["Sewing Floor", "Cutting Unit"]
-  department?: string; // e.g. "All Departments", "Sewing Floor", "Cutting Unit", "Finishing", "Quality", "Admin"
-  buyer?: string; // e.g. "All Buyers", "H&M Group", "Zara / Inditex", "Target USA", "Next UK", "C&A Europe"
-  buyers?: string[]; // Multi-selected buyers list (e.g. ["H&M Group", "Zara / Inditex"])
-  warehouse?: string; // e.g. "All Warehouses", "Central Raw Material Store", "Trims Warehouse", "Chemical Store"
+  scope?: "personal" | "area" | "managed_depts" | "team" | "department" | "company"; // Self, Area, Department (multi-select), All Company
+  areas?: string[]; // Multi-selected areas/regions (e.g. ["Gazipur Zone", "Ashulia Zone"])
+  departments?: string[]; // Multi-selected departments (e.g. ["Sewing Floor", "Cutting Unit"])
+  managedDepartments?: string[]; // Legacy alias for multi-selected departments
+  department?: string; // Legacy single department fallback
+  buyer?: string;
+  buyers?: string[]; // Multi-selected buyers list
+  warehouse?: string;
   period?: "today" | "week" | "month" | "year";
   employeeCategory?: "all" | "worker" | "staff" | "management";
+  enabledChips?: string[]; // Custom list of visible metric chip IDs for cards supporting chips
+}
+
+export interface DashboardChipDefinition {
+  id: string;
+  label: string;
+  defaultEnabled?: boolean;
 }
 
 export interface DashboardComponentDefinition {
@@ -30,9 +39,23 @@ export interface DashboardComponentDefinition {
   defaultColSpan: WidgetColSpan;
   minColSpan?: WidgetColSpan;
   badge?: string;
-  supportedScopes?: Array<"personal" | "managed_depts" | "department" | "company">;
+  supportedScopes?: Array<"personal" | "area" | "managed_depts" | "department" | "company">;
   hasBuyerFilter?: boolean;
   hasWarehouseFilter?: boolean;
+  availableChips?: DashboardChipDefinition[];
+}
+
+export function getEffectiveEnabledChips(
+  def?: DashboardComponentDefinition | null,
+  settings?: WidgetSettings
+): string[] {
+  if (!def?.availableChips || def.availableChips.length === 0) return [];
+  if (settings?.enabledChips && settings.enabledChips.length > 0) {
+    const validIds = new Set(def.availableChips.map((c) => c.id));
+    const filtered = settings.enabledChips.filter((id) => validIds.has(id));
+    if (filtered.length > 0) return filtered;
+  }
+  return def.availableChips.filter((c) => c.defaultEnabled !== false).map((c) => c.id);
 }
 
 export interface DashboardWidgetConfig {
@@ -71,6 +94,16 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     minColSpan: 6,
     badge: "Multi-Scope",
     supportedScopes: ["personal", "managed_depts", "department", "company"],
+    availableChips: [
+      { id: "total_workforce", label: "Total Workforce", defaultEnabled: true },
+      { id: "present_today", label: "Present Today", defaultEnabled: true },
+      { id: "absent", label: "Absent", defaultEnabled: true },
+      { id: "late_punch", label: "Late Punch", defaultEnabled: true },
+      { id: "on_leave", label: "On Leave", defaultEnabled: true },
+      { id: "ot_active", label: "Active on OT", defaultEnabled: false },
+      { id: "new_joiners", label: "New Joiners (MTD)", defaultEnabled: false },
+      { id: "early_leave", label: "Early Departure", defaultEnabled: false },
+    ],
   },
   {
     id: "hr_ot_requisition_vs_consumption",
@@ -84,6 +117,11 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     minColSpan: 4,
     badge: "OT Analysis",
     supportedScopes: ["personal", "managed_depts", "department", "company"],
+    availableChips: [
+      { id: "ot_requisition", label: "Requisition", defaultEnabled: true },
+      { id: "ot_consumed", label: "Actual Consumed", defaultEnabled: true },
+      { id: "ot_variance", label: "Budget Variance", defaultEnabled: true },
+    ],
   },
   {
     id: "hr_ot_requisition_vs_utilization",
@@ -97,6 +135,63 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     minColSpan: 4,
     badge: "OT Utilization",
     supportedScopes: ["personal", "managed_depts", "department", "company"],
+    availableChips: [
+      { id: "req_hours", label: "Requisitioned", defaultEnabled: true },
+      { id: "util_hours", label: "Floor Utilized", defaultEnabled: true },
+      { id: "util_rate", label: "Utilization Rate", defaultEnabled: true },
+      { id: "idle_hours", label: "Idle / Unutilized", defaultEnabled: true },
+    ],
+  },
+  {
+    id: "hr_total_manpower_chart",
+    name: "Total Manpower Breakdown",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "Department-wise total manpower bar chart (6,437 staff across 19 departments & production units).",
+    iconName: "Users",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "Total Manpower",
+    supportedScopes: ["company", "managed_depts", "department"],
+  },
+  {
+    id: "hr_ot_budget_comparison",
+    name: "OT Budget Comparison",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "OT Budget vs Actual OT Amt vs Request OT Amt with Budget-Actual & Budget-Request variance.",
+    iconName: "Banknote",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "OT Budget",
+    supportedScopes: ["company", "area", "department"],
+    availableChips: [
+      { id: "budget_amt", label: "Budget Amt", defaultEnabled: true },
+      { id: "actual_ot", label: "Actual OT Amt", defaultEnabled: true },
+      { id: "request_ot", label: "Request OT Amt", defaultEnabled: true },
+      { id: "diff_actual", label: "Diff (Budget-Actual)", defaultEnabled: true },
+      { id: "diff_request", label: "Diff (Budget-Request)", defaultEnabled: true },
+    ],
+  },
+  {
+    id: "hr_ot_request_vs_actual",
+    name: "OT Request Vs OT Actual",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "Actual vs Requested comparison across Manpower (MP), OT Hours, and OT Amount with variance.",
+    iconName: "Timer",
+    defaultColSpan: 12,
+    minColSpan: 6,
+    badge: "OT Req vs Actual",
+    supportedScopes: ["company", "area", "department"],
+    availableChips: [
+      { id: "mp_summary", label: "Manpower (MP)", defaultEnabled: true },
+      { id: "hr_summary", label: "OT Hours", defaultEnabled: true },
+      { id: "amt_summary", label: "OT Amount (৳)", defaultEnabled: true },
+    ],
   },
   {
     id: "hr_attendance_pie",
@@ -104,10 +199,16 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     module: "hris",
     moduleLabel: "HRIS & Workforce",
     category: "Chart & Analytics",
-    description: "Attendance split: Personal monthly attendance, Managed depts, Department presence, or Full company ratio.",
+    description: "Attendance split: Personal monthly attendance, Area, Department presence, or All Company ratio.",
     iconName: "PieChart",
     defaultColSpan: 4,
-    supportedScopes: ["personal", "managed_depts", "department", "company"],
+    supportedScopes: ["personal", "area", "department", "company"],
+    availableChips: [
+      { id: "present", label: "Present", defaultEnabled: true },
+      { id: "absent", label: "Absent", defaultEnabled: true },
+      { id: "late", label: "Late Entry", defaultEnabled: true },
+      { id: "leave", label: "On Leave", defaultEnabled: true },
+    ],
   },
   {
     id: "hr_late_absent_pie",
@@ -187,6 +288,12 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     minColSpan: 6,
     badge: "Buyer Filter",
     hasBuyerFilter: true,
+    availableChips: [
+      { id: "order_volume", label: "Total Order Volume", defaultEnabled: true },
+      { id: "fob_value", label: "Total FOB Value", defaultEnabled: true },
+      { id: "on_time_perf", label: "On-Time Performance", defaultEnabled: true },
+      { id: "capacity_util", label: "Capacity Utilization", defaultEnabled: true },
+    ],
   },
   {
     id: "mm_buyer_distribution",
@@ -212,6 +319,12 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     minColSpan: 4,
     badge: "Buyer Filter",
     hasBuyerFilter: true,
+    availableChips: [
+      { id: "order_volume", label: "Total Order Volume", defaultEnabled: true },
+      { id: "fob_value", label: "Total FOB Value", defaultEnabled: true },
+      { id: "on_time_perf", label: "On-Time Performance", defaultEnabled: true },
+      { id: "capacity_util", label: "Capacity Utilization", defaultEnabled: true },
+    ],
   },
   {
     id: "mm_line_efficiency",
@@ -248,6 +361,12 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     minColSpan: 6,
     badge: "Warehouse Filter",
     hasWarehouseFilter: true,
+    availableChips: [
+      { id: "total_stock", label: "Total Stock Value", defaultEnabled: true },
+      { id: "in_transit", label: "In-Transit POs", defaultEnabled: true },
+      { id: "low_stock", label: "Low Stock Alerts", defaultEnabled: true },
+      { id: "monthly_issue", label: "Monthly Issue", defaultEnabled: true },
+    ],
   },
   {
     id: "inv_low_stock_alerts",
@@ -260,6 +379,12 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     defaultColSpan: 6,
     badge: "Warehouse Filter",
     hasWarehouseFilter: true,
+    availableChips: [
+      { id: "total_stock", label: "Total Stock Value", defaultEnabled: true },
+      { id: "in_transit", label: "In-Transit POs", defaultEnabled: true },
+      { id: "low_stock", label: "Low Stock Alerts", defaultEnabled: true },
+      { id: "monthly_issue", label: "Monthly Issue", defaultEnabled: true },
+    ],
   },
   {
     id: "inv_movement_bar",
@@ -295,6 +420,12 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     minColSpan: 6,
     badge: "Multi-Scope",
     supportedScopes: ["personal", "managed_depts", "department", "company"],
+    availableChips: [
+      { id: "gross_payroll", label: "Gross Payroll", defaultEnabled: true },
+      { id: "ot_payout", label: "OT Allowance", defaultEnabled: true },
+      { id: "net_disbursed", label: "Net Disbursed", defaultEnabled: true },
+      { id: "pending_bank", label: "Pending Bank", defaultEnabled: true },
+    ],
   },
   {
     id: "acc_department_cost",
@@ -382,6 +513,9 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
       { id: "w_hr_4", componentId: "hr_ot_bar_chart", colSpan: 4 },
       { id: "w_hr_9", componentId: "hr_ot_requisition_vs_consumption", colSpan: 6 },
       { id: "w_hr_10", componentId: "hr_ot_requisition_vs_utilization", colSpan: 6 },
+      { id: "w_hr_11", componentId: "hr_total_manpower_chart", colSpan: 6 },
+      { id: "w_hr_12", componentId: "hr_ot_budget_comparison", colSpan: 6 },
+      { id: "w_hr_13", componentId: "hr_ot_request_vs_actual", colSpan: 12 },
       { id: "w_hr_5", componentId: "hr_headcount_trend", colSpan: 6 },
       { id: "w_hr_6", componentId: "hr_department_split", colSpan: 6 },
       { id: "w_hr_7", componentId: "hr_leave_approvals", colSpan: 6 },
@@ -449,8 +583,8 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
   },
 ];
 
-const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v4";
-const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v4";
+const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v5";
+const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v5";
 
 export function loadDashboardTemplates(): DashboardTemplate[] {
   if (typeof window === "undefined") return DEFAULT_DASHBOARD_TEMPLATES;

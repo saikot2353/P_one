@@ -4,9 +4,8 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { componentTagger } from "lovable-tagger";
 import path from "path";
-import { nitro } from "nitro/vite";
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   return {
     server: {
       port: 3000,
@@ -45,37 +44,44 @@ export default defineConfig(({ command, mode }) => {
       noExternal: ["tslib", "react-remove-scroll", "react-remove-scroll-bar"],
     },
 
+    environments: {
+      client: {
+        build: {
+          rollupOptions: {
+            output: {
+              manualChunks(id) {
+                if (id.includes("node_modules")) {
+                  if (id.includes("react-dom") || id.includes("/react/") || id.includes("scheduler")) return "vendor-react";
+                  if (id.includes("xlsx")) return "vendor-xlsx";
+                  if (id.includes("recharts") || id.includes("d3-")) return "vendor-charts";
+                  if (id.includes("jodit")) return "vendor-editor";
+                  if (id.includes("@svg-maps")) return "vendor-maps";
+                  if (id.includes("lucide-react")) return "vendor-lucide";
+                  if (id.includes("@radix-ui")) return "vendor-radix";
+                  if (id.includes("date-fns")) return "vendor-date";
+                  if (id.includes("lodash")) return "vendor-lodash";
+                }
+              },
+            },
+          },
+        },
+      },
+    },
+
     build: {
       target: "es2022",
       reportCompressedSize: false,
       chunkSizeWarningLimit: 3000,
       sourcemap: false,
       cssCodeSplit: true,
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            if (id.includes("node_modules")) {
-              if (id.includes("xlsx")) return "vendor-xlsx";
-              if (id.includes("recharts") || id.includes("d3-")) return "vendor-charts";
-              if (id.includes("jodit")) return "vendor-editor";
-              if (id.includes("@svg-maps")) return "vendor-maps";
-              if (id.includes("lucide-react")) return "vendor-lucide";
-              if (id.includes("@radix-ui")) return "vendor-radix";
-              if (id.includes("date-fns")) return "vendor-date";
-              if (id.includes("lodash")) return "vendor-lodash";
-            }
-          },
-        },
-      },
     },
 
     plugins: [
-      tanstackStart(),
-
-      command === "build" &&
-        nitro({
-          preset: "vercel",
-        }),
+      tanstackStart({
+        spa: {
+          enabled: true,
+        },
+      }),
 
       react(),
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Users,
   UserCheck,
@@ -32,6 +32,7 @@ import {
   User,
   Timer,
   Crown,
+  Maximize2,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -47,13 +48,16 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  LabelList,
 } from "recharts";
 import {
   DashboardWidgetConfig,
   DASHBOARD_COMPONENTS_CATALOG,
+  getEffectiveEnabledChips,
   WidgetSettings,
   WidgetColSpan,
 } from "./dashboard-maker-types";
+import { HierarchyDrillDownModal } from "./HierarchyDrillDownModal";
 
 interface WidgetRendererProps {
   widget: DashboardWidgetConfig;
@@ -66,12 +70,18 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
   isCompact = false,
   onUpdateSettings,
 }) => {
+  const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
   const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === widget.componentId);
   const displayTitle = widget.customTitle || def?.name || "Dashboard Widget";
   const settings = widget.settings;
 
   return (
-    <div className="h-full bg-card rounded-2xl border border-border/60 shadow-xs p-4 sm:p-5 flex flex-col justify-between transition-all hover:border-border hover:shadow-sm">
+    <>
+      <div
+        onClick={() => setIsDrillDownOpen(true)}
+        className="h-full bg-card rounded-2xl border border-border/60 shadow-xs p-4 sm:p-5 flex flex-col justify-between transition-all hover:border-primary/40 hover:shadow-md cursor-pointer group/card"
+        title="Click to open Hierarchy Drill-Down (Company → Region → Dept → Section → Unit → Line)"
+      >
       {/* Widget Header */}
       <div className="flex items-center justify-between pb-3 border-b border-border/40 gap-2 mb-3">
         <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -99,41 +109,29 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
         {/* Dynamic Scope / Filter Badge (Compact, non-intrusive) */}
         <div className="flex items-center gap-1.5 shrink-0">
           {settings?.scope === "personal" && (
-            <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1 shrink-0"
-              title="Scope: My Self (Personal)"
-            >
-              <User className="size-3" /> {(widget.colSpan || 12) > 3 ? "My Self" : ""}
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shrink-0">
+              Self
             </span>
           )}
 
-          {settings?.scope === "managed_depts" && (
-            <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex items-center gap-1 shrink-0"
-              title={`Scope: Head of Dept (${settings.managedDepartments?.join(", ") || "Sewing & Cutting"})`}
-            >
-              <Crown className="size-3 text-amber-500" />
-              {(widget.colSpan || 12) > 3 ? (
-                <span>Head: {settings.managedDepartments && settings.managedDepartments.length > 0 ? settings.managedDepartments.map((d) => d.split(" ")[0]).join("&") : "My Depts"}</span>
-              ) : ""}
+          {settings?.scope === "area" && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shrink-0">
+              {(settings.areas?.length || 0) > 1 ? `Area (${settings.areas?.length})` : settings.areas?.[0]?.split(" ")[0] || "Area"}
             </span>
           )}
 
-          {settings?.scope === "department" && (
-            <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 flex items-center gap-1 shrink-0"
-              title={`Scope: ${settings.department || "Department"}`}
-            >
-              <Building2 className="size-3" /> {(widget.colSpan || 12) > 3 ? (settings.department ? settings.department.split(" ")[0] : "Dept") : ""}
+          {(settings?.scope === "managed_depts" || settings?.scope === "department") && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shrink-0">
+              {(() => {
+                const depts = settings.departments || settings.managedDepartments || (settings.department ? [settings.department] : []);
+                return depts.length > 1 ? `Dept (${depts.length})` : depts[0]?.split(" ")[0] || "Dept";
+              })()}
             </span>
           )}
 
           {(!settings?.scope || settings?.scope === "company") && def?.supportedScopes && (
-            <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1 shrink-0"
-              title="Scope: Entire Company"
-            >
-              🏢 {(widget.colSpan || 12) > 3 ? "Company" : ""}
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">
+              All Company
             </span>
           )}
 
@@ -178,6 +176,20 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
               {(widget.colSpan || 12) > 3 ? def.badge : "★"}
             </span>
           )}
+
+          {/* Drill-Down Indicator Button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDrillDownOpen(true);
+            }}
+            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 hover:bg-primary hover:text-primary-foreground text-primary border border-primary/20 flex items-center gap-1 shrink-0 transition-colors cursor-pointer"
+            title="Drill Down: Company → Region → Department → Section → Unit → Line"
+          >
+            <Maximize2 className="size-2.5" />
+            {(widget.colSpan || 12) > 3 && <span>Drill Down</span>}
+          </button>
         </div>
       </div>
 
@@ -186,6 +198,13 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
         {renderWidgetContent(widget.componentId, isCompact, settings, widget.colSpan || 12)}
       </div>
     </div>
+
+    <HierarchyDrillDownModal
+      isOpen={isDrillDownOpen}
+      onClose={() => setIsDrillDownOpen(false)}
+      widget={widget}
+    />
+  </>
   );
 };
 
@@ -241,6 +260,7 @@ function getWidgetIcon(name: string) {
 }
 
 function getMetricGridClass(colSpan: WidgetColSpan = 12, count: number = 4): string {
+  if (count <= 1) return "grid grid-cols-1 gap-2.5 py-1";
   if (colSpan <= 3) {
     // 25% card (colSpan 3): 1 column vertical stack, clean & readable!
     return "grid grid-cols-1 gap-2 py-1";
@@ -251,10 +271,16 @@ function getMetricGridClass(colSpan: WidgetColSpan = 12, count: number = 4): str
   }
   if (colSpan <= 6) {
     // 50% card
+    if (count === 2) return "grid grid-cols-2 gap-2.5 py-1";
+    if (count === 3) return "grid grid-cols-1 sm:grid-cols-3 gap-2.5 py-1";
     return count >= 5 ? "grid grid-cols-2 sm:grid-cols-3 gap-2.5 py-1" : "grid grid-cols-2 gap-2.5 py-1";
   }
   // 100% full width
-  return count >= 5 ? "grid grid-cols-2 sm:grid-cols-5 gap-2.5 py-1" : "grid grid-cols-2 sm:grid-cols-4 gap-2.5 py-1";
+  if (count === 2) return "grid grid-cols-1 sm:grid-cols-2 gap-2.5 py-1";
+  if (count === 3) return "grid grid-cols-1 sm:grid-cols-3 gap-2.5 py-1";
+  if (count === 4) return "grid grid-cols-2 sm:grid-cols-4 gap-2.5 py-1";
+  if (count === 5) return "grid grid-cols-2 sm:grid-cols-5 gap-2.5 py-1";
+  return "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 py-1";
 }
 
 function renderWidgetContent(
@@ -264,265 +290,502 @@ function renderWidgetContent(
   colSpan: WidgetColSpan = 12
 ) {
   const scope = settings?.scope || "company";
+  const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === componentId);
+  const enabledChips = getEffectiveEnabledChips(def, settings);
+  const isChipVisible = (chipId: string) => enabledChips.length === 0 || enabledChips.includes(chipId);
 
   switch (componentId) {
     // ----------------------------------------------------
     // HRIS Components (Dynamic Scope: Personal vs Dept vs Company)
     // ----------------------------------------------------
-    case "hr_quick_stats":
+    case "hr_quick_stats": {
+      type StatChip = {
+        id: string;
+        label: string;
+        value: string;
+        unit?: string;
+        pct?: string;
+        note: string;
+        boxClass: string;
+        labelClass: string;
+        valueClass: string;
+        noteClass: string;
+      };
+
+      let chips: StatChip[] = [];
+
       if (scope === "personal") {
-        return (
-          <div className={getMetricGridClass(colSpan, 5)}>
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
-                Today's Status
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-lg sm:text-xl font-black text-emerald-700 dark:text-emerald-300">
-                  Present
-                </span>
-              </div>
-              <div className="text-[10px] text-emerald-600/80 font-medium mt-1 flex items-center gap-1">
-                <CheckCircle2 className="size-3" /> In: 08:48 AM
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <span className="text-[10.5px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
-                Monthly Working
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">21 / 22</span>
-                <span className="text-[10px] text-blue-600 font-bold">95.5%</span>
-              </div>
-              <div className="text-[10px] text-muted-foreground mt-1">1 Day Weekend Duty</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
-                My Late Punches
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-amber-700 dark:text-amber-300">1 Time</span>
-              </div>
-              <div className="text-[10px] text-amber-600/80 font-medium mt-1">12 min grace OK</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider block">
-                Leaves Taken
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 dark:text-purple-300">2 Days</span>
-              </div>
-              <div className="text-[10px] text-purple-600/80 font-medium mt-1">Remaining: 12 Days</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-              <span className="text-[10.5px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider block">
-                My Overtime
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-cyan-700 dark:text-cyan-300">16.5h</span>
-              </div>
-              <div className="text-[10px] text-cyan-600/80 font-medium mt-1">Est OT: ৳4,120</div>
-            </div>
-          </div>
-        );
-      }
-
-      if (scope === "managed_depts") {
+        chips = [
+          {
+            id: "total_workforce",
+            label: "Today's Status",
+            value: "Present",
+            note: "In: 08:48 AM",
+            boxClass: "bg-emerald-500/10 border-emerald-500/20",
+            labelClass: "text-emerald-600 dark:text-emerald-400",
+            valueClass: "text-emerald-700 dark:text-emerald-300",
+            noteClass: "text-emerald-600/80",
+          },
+          {
+            id: "present_today",
+            label: "Monthly Working",
+            value: "21 / 22",
+            pct: "95.5%",
+            note: "1 Day Weekend Duty",
+            boxClass: "bg-blue-500/10 border-blue-500/20",
+            labelClass: "text-blue-600 dark:text-blue-400",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+          {
+            id: "absent",
+            label: "Leaves Taken",
+            value: "2 Days",
+            note: "Remaining: 12 Days",
+            boxClass: "bg-purple-500/10 border-purple-500/20",
+            labelClass: "text-purple-600 dark:text-purple-400",
+            valueClass: "text-purple-700 dark:text-purple-300",
+            noteClass: "text-purple-600/80",
+          },
+          {
+            id: "late_punch",
+            label: "My Late Punches",
+            value: "1 Time",
+            note: "12 min grace OK",
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-600 dark:text-amber-400",
+            valueClass: "text-amber-700 dark:text-amber-300",
+            noteClass: "text-amber-600/80",
+          },
+          {
+            id: "on_leave",
+            label: "My Overtime",
+            value: "16.5h",
+            note: "Est OT: ৳4,120",
+            boxClass: "bg-cyan-500/10 border-cyan-500/20",
+            labelClass: "text-cyan-600 dark:text-cyan-400",
+            valueClass: "text-cyan-700 dark:text-cyan-300",
+            noteClass: "text-cyan-600/80",
+          },
+          {
+            id: "ot_active",
+            label: "Shift Schedule",
+            value: "General",
+            note: "08:00 AM – 05:00 PM",
+            boxClass: "bg-indigo-500/10 border-indigo-500/20",
+            labelClass: "text-indigo-600 dark:text-indigo-400",
+            valueClass: "text-indigo-700 dark:text-indigo-300",
+            noteClass: "text-indigo-600/80",
+          },
+          {
+            id: "new_joiners",
+            label: "Attendance Bonus",
+            value: "Eligible",
+            note: "Zero Uninformed Abs",
+            boxClass: "bg-teal-500/10 border-teal-500/20",
+            labelClass: "text-teal-600 dark:text-teal-400",
+            valueClass: "text-teal-700 dark:text-teal-300",
+            noteClass: "text-teal-600/80",
+          },
+          {
+            id: "early_leave",
+            label: "Early Departure",
+            value: "0",
+            note: "This Month",
+            boxClass: "bg-slate-500/10 border-slate-500/20",
+            labelClass: "text-slate-600 dark:text-slate-400",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+        ];
+      } else if (scope === "area") {
+        const areasList = settings?.areas || ["Dhaka North / Gazipur"];
+        const factor = Math.min(1, Math.max(0.28, areasList.length / 3));
+        const areaLabel = areasList.length > 1 ? `${areasList.length} Areas` : areasList[0].split(" ")[0];
+        const total = Math.round(1248 * factor);
+        const pres = Math.round(1196 * factor);
+        const abs = Math.round(42 * factor);
+        const late = Math.round(73 * factor);
+        const leave = Math.round(10 * factor);
+        chips = [
+          {
+            id: "total_workforce",
+            label: `${areaLabel} Staff`,
+            value: total.toLocaleString(),
+            unit: "Staff",
+            note: `${areasList.length} Area(s)`,
+            boxClass: "bg-indigo-500/10 border-indigo-500/20",
+            labelClass: "text-indigo-600 dark:text-indigo-400",
+            valueClass: "text-foreground",
+            noteClass: "text-indigo-600/80",
+          },
+          {
+            id: "present_today",
+            label: "Present Today",
+            value: pres.toLocaleString(),
+            pct: `${((pres / total) * 100).toFixed(1)}%`,
+            note: "Area On-Duty",
+            boxClass: "bg-emerald-500/10 border-emerald-500/20",
+            labelClass: "text-emerald-600 dark:text-emerald-400",
+            valueClass: "text-emerald-700 dark:text-emerald-300",
+            noteClass: "text-emerald-600/80",
+          },
+          {
+            id: "absent",
+            label: "Absent",
+            value: abs.toString(),
+            pct: `${((abs / total) * 100).toFixed(1)}%`,
+            note: "Area Absentees",
+            boxClass: "bg-rose-500/10 border-rose-500/20",
+            labelClass: "text-rose-600 dark:text-rose-400",
+            valueClass: "text-rose-700 dark:text-rose-300",
+            noteClass: "text-rose-600/80",
+          },
+          {
+            id: "late_punch",
+            label: "Late Punch",
+            value: late.toString(),
+            pct: `${((late / total) * 100).toFixed(1)}%`,
+            note: "Grace applied",
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-600 dark:text-amber-400",
+            valueClass: "text-amber-700 dark:text-amber-300",
+            noteClass: "text-amber-600/80",
+          },
+          {
+            id: "on_leave",
+            label: "On Leave",
+            value: leave.toString(),
+            pct: `${((leave / total) * 100).toFixed(1)}%`,
+            note: "Approved Leave",
+            boxClass: "bg-purple-500/10 border-purple-500/20",
+            labelClass: "text-purple-600 dark:text-purple-400",
+            valueClass: "text-purple-700 dark:text-purple-300",
+            noteClass: "text-purple-600/80",
+          },
+          {
+            id: "ot_active",
+            label: "Active on OT",
+            value: Math.round(618 * factor).toString(),
+            pct: "51.7%",
+            note: "Night shift active",
+            boxClass: "bg-cyan-500/10 border-cyan-500/20",
+            labelClass: "text-cyan-600 dark:text-cyan-400",
+            valueClass: "text-cyan-700 dark:text-cyan-300",
+            noteClass: "text-cyan-600/80",
+          },
+          {
+            id: "new_joiners",
+            label: "New Joiners (MTD)",
+            value: `+${Math.max(1, Math.round(14 * factor))}`,
+            note: "In selected area",
+            boxClass: "bg-teal-500/10 border-teal-500/20",
+            labelClass: "text-teal-600 dark:text-teal-400",
+            valueClass: "text-teal-700 dark:text-teal-300",
+            noteClass: "text-teal-600/80",
+          },
+          {
+            id: "early_leave",
+            label: "Early Departure",
+            value: Math.max(1, Math.round(7 * factor)).toString(),
+            note: "Approved gate pass",
+            boxClass: "bg-slate-500/10 border-slate-500/20",
+            labelClass: "text-slate-600 dark:text-slate-400",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+        ];
+      } else if (scope === "managed_depts") {
         const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
         const label = managed.map((m) => m.split(" ")[0]).join(" + ");
-        return (
-          <div className={getMetricGridClass(colSpan, 5)}>
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wider block truncate">
-                {label} (Head)
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">820</span>
-                <span className="text-[10px] text-muted-foreground">Workers</span>
-              </div>
-              <div className="text-[10px] text-amber-600/90 font-medium mt-1 truncate">
-                {managed.length} Managed Departments
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
-                Present on Duty
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">
-                  785
-                </span>
-                <span className="text-[10px] text-emerald-600 font-bold">95.7%</span>
-              </div>
-              <div className="text-[10px] text-emerald-600/80 font-medium mt-1 flex items-center gap-1">
-                <CheckCircle2 className="size-3" /> Across Managed Lines
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-              <span className="text-[10.5px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">
-                Absentees
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-rose-700 dark:text-rose-300">21</span>
-                <span className="text-[10px] text-rose-600 font-bold">2.6%</span>
-              </div>
-              <div className="text-[10px] text-rose-600/80 font-medium mt-1">Uninformed delay</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
-                Late Punches
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-amber-700 dark:text-amber-300">14</span>
-              </div>
-              <div className="text-[10px] text-amber-600/80 font-medium mt-1">Under 15m grace</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider block">
-                On Approved Leave
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 dark:text-purple-300">14</span>
-              </div>
-              <div className="text-[10px] text-purple-600/80 font-medium mt-1">Approved by Me</div>
-            </div>
-          </div>
-        );
-      }
-
-      if (scope === "department") {
+        chips = [
+          {
+            id: "total_workforce",
+            label: `${label} (Head)`,
+            value: "820",
+            unit: "Workers",
+            note: `${managed.length} Managed Departments`,
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-700 dark:text-amber-300",
+            valueClass: "text-foreground",
+            noteClass: "text-amber-600/90",
+          },
+          {
+            id: "present_today",
+            label: "Present on Duty",
+            value: "785",
+            pct: "95.7%",
+            note: "Across Managed Lines",
+            boxClass: "bg-emerald-500/10 border-emerald-500/20",
+            labelClass: "text-emerald-600 dark:text-emerald-400",
+            valueClass: "text-emerald-700 dark:text-emerald-300",
+            noteClass: "text-emerald-600/80",
+          },
+          {
+            id: "absent",
+            label: "Absentees",
+            value: "21",
+            pct: "2.6%",
+            note: "Uninformed delay",
+            boxClass: "bg-rose-500/10 border-rose-500/20",
+            labelClass: "text-rose-600 dark:text-rose-400",
+            valueClass: "text-rose-700 dark:text-rose-300",
+            noteClass: "text-rose-600/80",
+          },
+          {
+            id: "late_punch",
+            label: "Late Punches",
+            value: "14",
+            note: "Under 15m grace",
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-600 dark:text-amber-400",
+            valueClass: "text-amber-700 dark:text-amber-300",
+            noteClass: "text-amber-600/80",
+          },
+          {
+            id: "on_leave",
+            label: "On Approved Leave",
+            value: "14",
+            note: "Approved by Me",
+            boxClass: "bg-purple-500/10 border-purple-500/20",
+            labelClass: "text-purple-600 dark:text-purple-400",
+            valueClass: "text-purple-700 dark:text-purple-300",
+            noteClass: "text-purple-600/80",
+          },
+          {
+            id: "ot_active",
+            label: "Active on OT",
+            value: "412",
+            pct: "52.5%",
+            note: "Night shift scheduled",
+            boxClass: "bg-indigo-500/10 border-indigo-500/20",
+            labelClass: "text-indigo-600 dark:text-indigo-400",
+            valueClass: "text-indigo-700 dark:text-indigo-300",
+            noteClass: "text-indigo-600/80",
+          },
+          {
+            id: "new_joiners",
+            label: "New Joiners (MTD)",
+            value: "+9",
+            note: "Line onboarding",
+            boxClass: "bg-teal-500/10 border-teal-500/20",
+            labelClass: "text-teal-600 dark:text-teal-400",
+            valueClass: "text-teal-700 dark:text-teal-300",
+            noteClass: "text-teal-600/80",
+          },
+          {
+            id: "early_leave",
+            label: "Early Departure",
+            value: "4",
+            note: "Gate pass logged",
+            boxClass: "bg-slate-500/10 border-slate-500/20",
+            labelClass: "text-slate-600 dark:text-slate-400",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+        ];
+      } else if (scope === "department") {
         const deptName = settings?.department || "Sewing Floor";
-        return (
-          <div className={getMetricGridClass(colSpan, 5)}>
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block truncate">
-                {deptName} Staff
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">680</span>
-                <span className="text-[10px] text-muted-foreground">Operators</span>
-              </div>
-              <div className="text-[10px] text-blue-600/80 font-medium mt-1">Total in Department</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">
-                Present on Floor
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">652</span>
-                <span className="text-[10px] text-emerald-600 font-bold">95.9%</span>
-              </div>
-              <div className="text-[10px] text-emerald-600/80 font-medium mt-1">Active on sewing lines</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-              <span className="text-[10.5px] font-bold text-rose-600 uppercase tracking-wider block">
-                Floor Absentees
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-rose-700 dark:text-rose-300">18</span>
-                <span className="text-[10px] text-rose-600 font-bold">2.6%</span>
-              </div>
-              <div className="text-[10px] text-rose-600/80 font-medium mt-1">Uninformed delay</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-600 uppercase tracking-wider block">
-                Late Punches
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-amber-700 dark:text-amber-300">24</span>
-              </div>
-              <div className="text-[10px] text-amber-600/80 font-medium mt-1">Shift-1 late arrivals</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">
-                On Approved Leave
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 dark:text-purple-300">10</span>
-              </div>
-              <div className="text-[10px] text-purple-600/80 font-medium mt-1">Medical & Casual</div>
-            </div>
-          </div>
-        );
+        chips = [
+          {
+            id: "total_workforce",
+            label: `${deptName} Staff`,
+            value: "680",
+            unit: "Operators",
+            note: "Total in Department",
+            boxClass: "bg-blue-500/10 border-blue-500/20",
+            labelClass: "text-blue-600",
+            valueClass: "text-foreground",
+            noteClass: "text-blue-600/80",
+          },
+          {
+            id: "present_today",
+            label: "Present on Floor",
+            value: "652",
+            pct: "95.9%",
+            note: "Active on sewing lines",
+            boxClass: "bg-emerald-500/10 border-emerald-500/20",
+            labelClass: "text-emerald-600",
+            valueClass: "text-emerald-700 dark:text-emerald-300",
+            noteClass: "text-emerald-600/80",
+          },
+          {
+            id: "absent",
+            label: "Floor Absentees",
+            value: "18",
+            pct: "2.6%",
+            note: "Uninformed delay",
+            boxClass: "bg-rose-500/10 border-rose-500/20",
+            labelClass: "text-rose-600",
+            valueClass: "text-rose-700 dark:text-rose-300",
+            noteClass: "text-rose-600/80",
+          },
+          {
+            id: "late_punch",
+            label: "Late Punches",
+            value: "24",
+            note: "Shift-1 late arrivals",
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-600",
+            valueClass: "text-amber-700 dark:text-amber-300",
+            noteClass: "text-amber-600/80",
+          },
+          {
+            id: "on_leave",
+            label: "On Approved Leave",
+            value: "10",
+            note: "Medical & Casual",
+            boxClass: "bg-purple-500/10 border-purple-500/20",
+            labelClass: "text-purple-600",
+            valueClass: "text-purple-700 dark:text-purple-300",
+            noteClass: "text-purple-600/80",
+          },
+          {
+            id: "ot_active",
+            label: "Active on OT",
+            value: "340",
+            pct: "52.1%",
+            note: "OT Requisitioned",
+            boxClass: "bg-indigo-500/10 border-indigo-500/20",
+            labelClass: "text-indigo-600",
+            valueClass: "text-indigo-700 dark:text-indigo-300",
+            noteClass: "text-indigo-600/80",
+          },
+          {
+            id: "new_joiners",
+            label: "New Joiners (MTD)",
+            value: "+6",
+            note: "This month",
+            boxClass: "bg-teal-500/10 border-teal-500/20",
+            labelClass: "text-teal-600",
+            valueClass: "text-teal-700 dark:text-teal-300",
+            noteClass: "text-teal-600/80",
+          },
+          {
+            id: "early_leave",
+            label: "Early Departure",
+            value: "3",
+            note: "Gate pass logged",
+            boxClass: "bg-slate-500/10 border-slate-500/20",
+            labelClass: "text-slate-600",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+        ];
+      } else {
+        chips = [
+          {
+            id: "total_workforce",
+            label: "Total Workforce",
+            value: "1,248",
+            unit: "Staff",
+            note: "+14 this month",
+            boxClass: "bg-blue-500/10 border-blue-500/20",
+            labelClass: "text-blue-600 dark:text-blue-400",
+            valueClass: "text-foreground",
+            noteClass: "text-blue-600/80",
+          },
+          {
+            id: "present_today",
+            label: "Present Today",
+            value: "1,196",
+            pct: "95.8%",
+            note: "Floor On-Duty",
+            boxClass: "bg-emerald-500/10 border-emerald-500/20",
+            labelClass: "text-emerald-600 dark:text-emerald-400",
+            valueClass: "text-emerald-700 dark:text-emerald-300",
+            noteClass: "text-emerald-600/80",
+          },
+          {
+            id: "absent",
+            label: "Absent",
+            value: "42",
+            pct: "3.4%",
+            note: "18 Uninformed",
+            boxClass: "bg-rose-500/10 border-rose-500/20",
+            labelClass: "text-rose-600 dark:text-rose-400",
+            valueClass: "text-rose-700 dark:text-rose-300",
+            noteClass: "text-rose-600/80",
+          },
+          {
+            id: "late_punch",
+            label: "Late Punch",
+            value: "73",
+            pct: "5.8%",
+            note: "Grace period applied",
+            boxClass: "bg-amber-500/10 border-amber-500/20",
+            labelClass: "text-amber-600 dark:text-amber-400",
+            valueClass: "text-amber-700 dark:text-amber-300",
+            noteClass: "text-amber-600/80",
+          },
+          {
+            id: "on_leave",
+            label: "On Leave",
+            value: "10",
+            pct: "0.8%",
+            note: "Approved & Logged",
+            boxClass: "bg-purple-500/10 border-purple-500/20",
+            labelClass: "text-purple-600 dark:text-purple-400",
+            valueClass: "text-purple-700 dark:text-purple-300",
+            noteClass: "text-purple-600/80",
+          },
+          {
+            id: "ot_active",
+            label: "Active on OT",
+            value: "618",
+            pct: "51.7%",
+            note: "Night shift active",
+            boxClass: "bg-indigo-500/10 border-indigo-500/20",
+            labelClass: "text-indigo-600 dark:text-indigo-400",
+            valueClass: "text-indigo-700 dark:text-indigo-300",
+            noteClass: "text-indigo-600/80",
+          },
+          {
+            id: "new_joiners",
+            label: "New Joiners (MTD)",
+            value: "+14",
+            note: "Across 6 units",
+            boxClass: "bg-teal-500/10 border-teal-500/20",
+            labelClass: "text-teal-600 dark:text-teal-400",
+            valueClass: "text-teal-700 dark:text-teal-300",
+            noteClass: "text-teal-600/80",
+          },
+          {
+            id: "early_leave",
+            label: "Early Departure",
+            value: "7",
+            pct: "0.6%",
+            note: "Approved gate pass",
+            boxClass: "bg-slate-500/10 border-slate-500/20",
+            labelClass: "text-slate-600 dark:text-slate-400",
+            valueClass: "text-foreground",
+            noteClass: "text-muted-foreground",
+          },
+        ];
       }
 
-      // Default: Company Wide
+      const visibleChips = chips.filter((c) => isChipVisible(c.id));
+
       return (
-        <div className={getMetricGridClass(colSpan, 5)}>
-          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <span className="text-[10.5px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
-              Total Workforce
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-foreground">1,248</span>
-              <span className="text-[10px] text-muted-foreground">Staff</span>
-            </div>
-            <div className="text-[10px] text-blue-600/80 font-medium mt-1 flex items-center gap-1">
-              <ArrowUpRight className="size-3" /> +14 this month
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
-              Present Today
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">
-                1,196
+        <div className={getMetricGridClass(colSpan, visibleChips.length)}>
+          {visibleChips.map((chip) => (
+            <div key={chip.id} className={`p-3 rounded-xl border ${chip.boxClass}`}>
+              <span className={`text-[10.5px] font-bold uppercase tracking-wider block truncate ${chip.labelClass}`}>
+                {chip.label}
               </span>
-              <span className="text-[10px] text-emerald-600 font-bold">95.8%</span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className={`text-xl sm:text-2xl font-black font-mono ${chip.valueClass}`}>
+                  {chip.value}
+                </span>
+                {chip.unit && <span className="text-[10px] text-muted-foreground">{chip.unit}</span>}
+                {chip.pct && <span className={`text-[10px] font-bold ${chip.labelClass}`}>{chip.pct}</span>}
+              </div>
+              <div className={`text-[10px] font-medium mt-1 truncate ${chip.noteClass}`}>{chip.note}</div>
             </div>
-            <div className="text-[10px] text-emerald-600/80 font-medium mt-1 flex items-center gap-1">
-              <CheckCircle2 className="size-3" /> Floor On-Duty
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-            <span className="text-[10.5px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">
-              Absent
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-rose-700 dark:text-rose-300">42</span>
-              <span className="text-[10px] text-rose-600 font-bold">3.4%</span>
-            </div>
-            <div className="text-[10px] text-rose-600/80 font-medium mt-1">18 Uninformed</div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <span className="text-[10.5px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
-              Late Punch
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-amber-700 dark:text-amber-300">73</span>
-              <span className="text-[10px] text-amber-600 font-bold">5.8%</span>
-            </div>
-            <div className="text-[10px] text-amber-600/80 font-medium mt-1">Grace period applied</div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-            <span className="text-[10.5px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider block">
-              On Leave
-            </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 dark:text-purple-300">10</span>
-              <span className="text-[10px] text-purple-600 font-bold">0.8%</span>
-            </div>
-            <div className="text-[10px] text-purple-600/80 font-medium mt-1">Approved & Logged</div>
-          </div>
+          ))}
         </div>
       );
+    }
 
     case "hr_ot_requisition_vs_consumption": {
       // OT Requisition vs Actual Consumption (Biometric Punch)
@@ -557,6 +820,21 @@ function renderWidgetContent(
           { name: "Wed", requisition: 4.0, consumed: 3.5, variance: -0.5 },
           { name: "Thu", requisition: 3.0, consumed: 3.0, variance: 0 },
         ];
+      } else if (scope === "area") {
+        const areasList = settings?.areas || ["Dhaka North / Gazipur"];
+        const factor = Math.min(1, Math.max(0.3, areasList.length / 3));
+        otReq = Math.round(14800 * factor);
+        otCons = Math.round(13920 * factor);
+        otCostBud = `৳${(37.0 * factor).toFixed(1)}L`;
+        otCostAct = `৳${(34.8 * factor).toFixed(1)}L`;
+        otSavedCost = `৳${(2.2 * factor).toFixed(2)}L`;
+        otTitle = areasList.length > 1 ? `${areasList.length} Selected Areas` : areasList[0];
+        otReqData = otReqData.map((d) => ({
+          ...d,
+          requisition: Math.round(d.requisition * factor),
+          consumed: Math.round(d.consumed * factor),
+          variance: Math.round(d.variance * factor),
+        }));
       } else if (scope === "managed_depts") {
         const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
         otReq = 8400;
@@ -776,6 +1054,21 @@ function renderWidgetContent(
           { name: "Wed", requisition: 4.0, utilized: 3.5, unutilized: 0.5, rate: 87.5 },
           { name: "Thu", requisition: 3.0, utilized: 3.0, unutilized: 0, rate: 100 },
         ];
+      } else if (scope === "area") {
+        const areasList = settings?.areas || ["Dhaka North / Gazipur"];
+        const factor = Math.min(1, Math.max(0.3, areasList.length / 3));
+        reqHours = Math.round(14800 * factor);
+        utilHours = Math.round(13920 * factor);
+        unutilHours = Math.max(0, reqHours - utilHours);
+        utilRate = 94.1;
+        otOutputPcs = `${Math.round(256120 * factor).toLocaleString()} Pcs`;
+        otTitle = areasList.length > 1 ? `${areasList.length} Selected Areas` : areasList[0];
+        utilData = utilData.map((d) => ({
+          ...d,
+          requisition: Math.round(d.requisition * factor),
+          utilized: Math.round(d.utilized * factor),
+          unutilized: Math.round(d.unutilized * factor),
+        }));
       } else if (scope === "managed_depts") {
         const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
         reqHours = 8400;
@@ -812,66 +1105,79 @@ function renderWidgetContent(
       return (
         <div className="space-y-3">
           {/* Top KPI Summary Grid */}
-          <div className={`grid ${colSpan <= 3 ? "grid-cols-2" : "grid-cols-4"} gap-2`}>
-            {/* Requisitioned Hours */}
-            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Requisitioned</span>
-                <Clock className="w-3.5 h-3.5 text-blue-500" />
-              </div>
-              <div className="mt-1">
-                <span className="text-base sm:text-lg font-black text-foreground">
-                  {reqHours.toLocaleString()}
-                  <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
-                </span>
-                <div className="text-[10px] text-muted-foreground truncate">Approved Floor Budget</div>
-              </div>
-            </div>
+          {(() => {
+            const visibleCount = ["req_hours", "util_hours", "util_rate", "idle_hours"].filter((id) => isChipVisible(id)).length;
+            return (
+              <div className={getMetricGridClass(colSpan, Math.max(1, visibleCount))}>
+                {/* Requisitioned Hours */}
+                {isChipVisible("req_hours") && (
+                  <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Requisitioned</span>
+                      <Clock className="w-3.5 h-3.5 text-blue-500" />
+                    </div>
+                    <div className="mt-1">
+                      <span className="text-base sm:text-lg font-black text-foreground">
+                        {reqHours.toLocaleString()}
+                        <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
+                      </span>
+                      <div className="text-[10px] text-muted-foreground truncate">Approved Floor Budget</div>
+                    </div>
+                  </div>
+                )}
 
-            {/* Utilized Hours */}
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Floor Utilized</span>
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-              </div>
-              <div className="mt-1">
-                <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">
-                  {utilHours.toLocaleString()}
-                  <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
-                </span>
-                <div className="text-[10px] text-emerald-600/80 font-medium truncate">Productive Output Time</div>
-              </div>
-            </div>
+                {/* Utilized Hours */}
+                {isChipVisible("util_hours") && (
+                  <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Floor Utilized</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                    </div>
+                    <div className="mt-1">
+                      <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">
+                        {utilHours.toLocaleString()}
+                        <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
+                      </span>
+                      <div className="text-[10px] text-emerald-600/80 font-medium truncate">Productive Output Time</div>
+                    </div>
+                  </div>
+                )}
 
-            {/* Utilization Rate */}
-            <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">Utilization Rate</span>
-                <Percent className="w-3.5 h-3.5 text-indigo-500" />
-              </div>
-              <div className="mt-1">
-                <span className="text-base sm:text-lg font-black text-indigo-600 dark:text-indigo-400">
-                  {utilRate}%
-                </span>
-                <div className="text-[10px] text-indigo-600/80 font-medium truncate">Target: ≥92.0%</div>
-              </div>
-            </div>
+                {/* Utilization Rate */}
+                {isChipVisible("util_rate") && (
+                  <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">Utilization Rate</span>
+                      <Percent className="w-3.5 h-3.5 text-indigo-500" />
+                    </div>
+                    <div className="mt-1">
+                      <span className="text-base sm:text-lg font-black text-indigo-600 dark:text-indigo-400">
+                        {utilRate}%
+                      </span>
+                      <div className="text-[10px] text-indigo-600/80 font-medium truncate">Target: ≥92.0%</div>
+                    </div>
+                  </div>
+                )}
 
-            {/* Idle / Saved Hours */}
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Idle / Unutilized</span>
-                <Timer className="w-3.5 h-3.5 text-amber-500" />
+                {/* Idle / Saved Hours */}
+                {isChipVisible("idle_hours") && (
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Idle / Unutilized</span>
+                      <Timer className="w-3.5 h-3.5 text-amber-500" />
+                    </div>
+                    <div className="mt-1">
+                      <span className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400">
+                        {unutilHours.toLocaleString()}
+                        <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
+                      </span>
+                      <div className="text-[10px] text-amber-600/80 font-medium truncate">Prevented Leakage</div>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="mt-1">
-                <span className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400">
-                  {unutilHours.toLocaleString()}
-                  <span className="text-xs font-semibold text-muted-foreground ml-0.5">hrs</span>
-                </span>
-                <div className="text-[10px] text-amber-600/80 font-medium truncate">Prevented Leakage</div>
-              </div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* Scope Header & Production Rate Banner */}
           <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-muted/40 border border-border/50 text-xs">
@@ -974,182 +1280,455 @@ function renderWidgetContent(
       );
     }
 
-    case "hr_attendance_pie":
+    case "hr_total_manpower_chart": {
+      const fullDepts = [
+        { dept: "Cutting", short: "CUT", count: 383, color: "#ef4444" },
+        { dept: "R&D Pattern", short: "R&D", count: 1, color: "#64748b" },
+        { dept: "Finishing", short: "FIN", count: 639, color: "#22c55e" },
+        { dept: "Quality Control", short: "QC", count: 760, color: "#ea580c" },
+        { dept: "Sample Room", short: "SMP", count: 17, color: "#ec4899" },
+        { dept: "CAD & Marker", short: "CAD", count: 6, color: "#6366f1" },
+        { dept: "Store & Fabric", short: "STR", count: 118, color: "#9f1239" },
+        { dept: "IE & Planning", short: "IE", count: 61, color: "#0284c7" },
+        { dept: "HR & Compliance", short: "HR", count: 43, color: "#2dd4bf" },
+        { dept: "Maintenance", short: "MNT", count: 83, color: "#0f172a" },
+        { dept: "Merchandising Supply Chain", short: "MSC", count: 12, color: "#e11d48" },
+        { dept: "Accounts & Audit", short: "ACC", count: 55, color: "#f59e0b" },
+        { dept: "IT & ERP", short: "IT", count: 5, color: "#94a3b8" },
+        { dept: "Commercial", short: "COM", count: 47, color: "#c2410c" },
+        { dept: "Admin & Security", short: "ADM", count: 73, color: "#f472b6" },
+        { dept: "Wash & Dyeing", short: "WSH", count: 638, color: "#9333ea" },
+        { dept: "Sewing Production", short: "SEW", count: 3287, color: "#9f1239" },
+        { dept: "Procurement", short: "PRC", count: 12, color: "#3b82f6" },
+        { dept: "Packing & Dispatch", short: "PCK", count: 197, color: "#5eead4" },
+      ];
+
+      let scopedDepts = fullDepts;
+      let scopeCaption = "All Factory Departments (19 Units)";
+      if (scope === "managed_depts") {
+        scopedDepts = fullDepts.filter((d) => ["Cutting", "Finishing", "Sewing Production", "Quality Control"].includes(d.dept));
+        scopeCaption = "Head of Assigned Departments";
+      } else if (scope === "department") {
+        const deptName = (settings?.department || "Sewing").split(" ")[0].toLowerCase();
+        const match = fullDepts.filter((d) => d.dept.toLowerCase().includes(deptName));
+        scopedDepts = match.length > 0 ? match : fullDepts.slice(0, 6);
+        scopeCaption = `${settings?.department || "Department"} Focus`;
+      }
+
+      const totalMp = scopedDepts.reduce((sum, d) => sum + d.count, 0);
+
+      return (
+        <div className="space-y-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-2.5 py-2 rounded-xl bg-muted/40 border border-border/50">
+            <div>
+              <div className="text-xs font-black text-foreground">
+                Total Manpower : <span className="text-primary">{totalMp.toLocaleString()}</span>
+              </div>
+              <div className="text-[10px] text-muted-foreground">{scopeCaption}</div>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 self-start sm:self-center">
+              {scopedDepts.length} Departments
+            </span>
+          </div>
+
+          {colSpan <= 3 ? (
+            <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+              {[...scopedDepts]
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 8)
+                .map((d) => (
+                  <div key={d.dept} className="text-xs">
+                    <div className="flex justify-between mb-0.5">
+                      <span className="font-semibold text-foreground truncate">{d.dept}</span>
+                      <span className="font-bold text-primary">{d.count.toLocaleString()}</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${Math.max(4, (d.count / Math.max(...scopedDepts.map((x) => x.count))) * 100)}%`,
+                          backgroundColor: d.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className="h-52 w-full pt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={scopedDepts} margin={{ top: 18, right: 8, left: -12, bottom: 2 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                  <XAxis dataKey="short" tick={{ fontSize: 9 }} interval={0} />
+                  <YAxis tick={{ fontSize: 9.5 }} />
+                  <Tooltip
+                    formatter={(val: any) => [`${Number(val).toLocaleString()} Staff`, "Manpower"]}
+                    labelFormatter={(_, payload) => payload?.[0]?.payload?.dept || ""}
+                    contentStyle={{
+                      backgroundColor: "#1e293b",
+                      borderColor: "#ef4444",
+                      borderRadius: "8px",
+                      fontSize: "11px",
+                      color: "#fff",
+                    }}
+                  />
+                  <Bar dataKey="count" radius={[3, 3, 0, 0]} maxBarSize={26}>
+                    <LabelList
+                      dataKey="count"
+                      position="top"
+                      style={{ fontSize: "9.5px", fontWeight: 700, fill: "#2563eb" }}
+                    />
+                    {scopedDepts.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    case "hr_ot_budget_comparison": {
+      let budgetAmt = 85000;
+      let actualOtAmt = 68400;
+      let requestOtAmt = 74571;
+
+      if (scope === "managed_depts") {
+        budgetAmt = 52000;
+        actualOtAmt = 44800;
+        requestOtAmt = 48950;
+      } else if (scope === "department") {
+        budgetAmt = 34000;
+        actualOtAmt = 29100;
+        requestOtAmt = 31400;
+      }
+
+      const diffBudgetActual = budgetAmt - actualOtAmt;
+      const diffBudgetRequest = budgetAmt - requestOtAmt;
+
+      const budgetChartData = [
+        { name: "Budget Amt", amount: budgetAmt, displayVal: budgetAmt, color: "#16a34a" },
+        { name: "Actual OT Amt", amount: actualOtAmt, displayVal: actualOtAmt, color: "#f97316" },
+        { name: "Request OT Amt", amount: requestOtAmt, displayVal: requestOtAmt, color: "#0284c7" },
+        { name: "Diff(Budget-Actual)", amount: Math.abs(diffBudgetActual), displayVal: diffBudgetActual, color: "#dc2626" },
+        { name: "Diff(Budget-Request)", amount: Math.abs(diffBudgetRequest), displayVal: diffBudgetRequest, color: "#ef4444" },
+      ];
+
+      return (
+        <div className="space-y-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-2.5 py-2 rounded-xl bg-muted/40 border border-border/50">
+            <div>
+              <div className="text-xs font-bold text-foreground">OT Budget Vs OT Actual Vs OT Request</div>
+              <div className="text-[10px] text-muted-foreground">Data Upto: 25/11/2026 10:25:00</div>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 self-start sm:self-center">
+              Under Budget: ৳{diffBudgetActual.toLocaleString()}
+            </span>
+          </div>
+
+          {(() => {
+            const budgetChips = [
+              isChipVisible("budget_amt") && (
+                <div key="budget_amt" className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="text-[10px] font-bold text-emerald-600 uppercase">Budget Amt</div>
+                  <div className="text-sm font-black text-foreground">৳{budgetAmt.toLocaleString()}</div>
+                </div>
+              ),
+              isChipVisible("actual_ot") && (
+                <div key="actual_ot" className="p-2 rounded-xl bg-orange-500/10 border border-orange-500/20">
+                  <div className="text-[10px] font-bold text-orange-600 uppercase">Actual OT</div>
+                  <div className="text-sm font-black text-foreground">৳{actualOtAmt.toLocaleString()}</div>
+                </div>
+              ),
+              isChipVisible("request_ot") && (
+                <div key="request_ot" className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                  <div className="text-[10px] font-bold text-blue-600 uppercase">Request OT</div>
+                  <div className="text-sm font-black text-foreground">৳{requestOtAmt.toLocaleString()}</div>
+                </div>
+              ),
+              isChipVisible("diff_actual") && (
+                <div key="diff_actual" className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                  <div className="text-[10px] font-bold text-rose-600 uppercase">Diff (Bud-Act)</div>
+                  <div className="text-sm font-black text-foreground">৳{diffBudgetActual.toLocaleString()}</div>
+                </div>
+              ),
+              isChipVisible("diff_request") && (
+                <div key="diff_request" className="p-2 rounded-xl bg-red-500/10 border border-red-500/20">
+                  <div className="text-[10px] font-bold text-red-600 uppercase">Diff (Bud-Req)</div>
+                  <div className="text-sm font-black text-foreground">৳{diffBudgetRequest.toLocaleString()}</div>
+                </div>
+              ),
+            ].filter(Boolean);
+            return <div className={getMetricGridClass(colSpan, Math.max(1, budgetChips.length))}>{budgetChips}</div>;
+          })()}
+
+          <div className="h-48 w-full pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={budgetChartData} margin={{ top: 18, right: 10, left: -8, bottom: 2 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 8.5 }} interval={0} />
+                <YAxis tick={{ fontSize: 9.5 }} />
+                <Tooltip
+                  formatter={(_, __, item) => [`৳${Number(item?.payload?.displayVal ?? 0).toLocaleString()}`, item?.payload?.name]}
+                  contentStyle={{
+                    backgroundColor: "#1e293b",
+                    borderColor: "#ef4444",
+                    borderRadius: "8px",
+                    fontSize: "11px",
+                    color: "#fff",
+                  }}
+                />
+                <Bar dataKey="amount" radius={[4, 4, 0, 0]} maxBarSize={42}>
+                  <LabelList
+                    dataKey="displayVal"
+                    position="top"
+                    formatter={(val: any) => Number(val).toLocaleString()}
+                    style={{ fontSize: "10px", fontWeight: 700, fill: "currentColor" }}
+                  />
+                  {budgetChartData.map((entry, idx) => (
+                    <Cell key={`budget-cell-${idx}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      );
+    }
+
+    case "hr_ot_request_vs_actual": {
+      const areasCount = settings?.areas?.length || 1;
+      const deptsList = settings?.departments || settings?.managedDepartments || (settings?.department ? [settings.department] : ["Sewing Floor", "Cutting Unit"]);
+      const deptFactor = Math.min(1, Math.max(0.25, deptsList.length / 6));
+      const areaFactor = Math.min(1, Math.max(0.3, areasCount / 3));
+
+      let actualMp = 284;
+      let reqMp = 310;
+      let actualHr = 1920;
+      let reqHr = 2069;
+      let actualAmt = 147800;
+      let reqAmt = 159298;
+
+      if (scope === "area") {
+        actualMp = Math.round(284 * areaFactor);
+        reqMp = Math.round(310 * areaFactor);
+        actualHr = Math.round(1920 * areaFactor);
+        reqHr = Math.round(2069 * areaFactor);
+        actualAmt = Math.round(147800 * areaFactor);
+        reqAmt = Math.round(159298 * areaFactor);
+      } else if (scope === "managed_depts" || scope === "department") {
+        actualMp = Math.round(284 * deptFactor);
+        reqMp = Math.round(310 * deptFactor);
+        actualHr = Math.round(1920 * deptFactor);
+        reqHr = Math.round(2069 * deptFactor);
+        actualAmt = Math.round(147800 * deptFactor);
+        reqAmt = Math.round(159298 * deptFactor);
+      }
+
+      const diffMp = actualMp - reqMp;
+      const diffHr = actualHr - reqHr;
+      const diffAmt = actualAmt - reqAmt;
+
+      const reqActualData = [
+        ...(isChipVisible("mp_summary")
+          ? [
+              { name: "Actual MP", value: actualMp, displayVal: actualMp, color: "#16a34a", unit: "MP" },
+              { name: "Requested MP", value: reqMp, displayVal: reqMp, color: "#22c55e", unit: "MP" },
+              { name: "Diff MP", value: Math.abs(diffMp), displayVal: diffMp, color: "#dc2626", unit: "MP" },
+            ]
+          : []),
+        ...(isChipVisible("hr_summary")
+          ? [
+              { name: "Actual OT Hr", value: actualHr, displayVal: actualHr, color: "#ea580c", unit: "Hrs" },
+              { name: "Requested OT Hr", value: reqHr, displayVal: reqHr, color: "#f97316", unit: "Hrs" },
+              { name: "Diff OT Hr", value: Math.abs(diffHr), displayVal: diffHr, color: "#dc2626", unit: "Hrs" },
+            ]
+          : []),
+        ...(isChipVisible("amt_summary")
+          ? [
+              { name: "Actual OT Amt", value: actualAmt, displayVal: actualAmt, color: "#0284c7", unit: "৳" },
+              { name: "Requested OT Amt", value: reqAmt, displayVal: reqAmt, color: "#0ea5e9", unit: "৳" },
+              { name: "Diff OT Amt", value: Math.abs(diffAmt), displayVal: diffAmt, color: "#dc2626", unit: "৳" },
+            ]
+          : []),
+      ];
+
+      const otReqActualCards = [
+        isChipVisible("mp_summary") && (
+          <div key="mp_summary" className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+            <div className="text-[10px] font-bold text-emerald-600 uppercase">Manpower (MP)</div>
+            <div className="text-xs font-black text-foreground mt-0.5">
+              Actual: {actualMp} <span className="text-muted-foreground font-semibold">/ Req: {reqMp}</span>
+            </div>
+            <div className="text-[10px] font-bold text-rose-600">Diff MP: {diffMp}</div>
+          </div>
+        ),
+        isChipVisible("hr_summary") && (
+          <div key="hr_summary" className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20">
+            <div className="text-[10px] font-bold text-orange-600 uppercase">OT Hours</div>
+            <div className="text-xs font-black text-foreground mt-0.5">
+              Actual: {actualHr.toLocaleString()} <span className="text-muted-foreground font-semibold">/ Req: {reqHr.toLocaleString()}</span>
+            </div>
+            <div className="text-[10px] font-bold text-rose-600">Diff Hr: {diffHr.toLocaleString()}</div>
+          </div>
+        ),
+        isChipVisible("amt_summary") && (
+          <div key="amt_summary" className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
+            <div className="text-[10px] font-bold text-blue-600 uppercase">OT Amount (৳)</div>
+            <div className="text-xs font-black text-foreground mt-0.5">
+              Actual: ৳{actualAmt.toLocaleString()} <span className="text-muted-foreground font-semibold">/ Req: ৳{reqAmt.toLocaleString()}</span>
+            </div>
+            <div className="text-[10px] font-bold text-rose-600">Diff Amt: ৳{diffAmt.toLocaleString()}</div>
+          </div>
+        ),
+      ].filter(Boolean);
+
+      return (
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-2.5 py-2 rounded-xl bg-muted/40 border border-border/50">
+            <div>
+              <div className="text-xs font-bold text-foreground">OT Request Vs OT Actual (Manpower, Hours & Amount)</div>
+              <div className="text-[10px] text-muted-foreground">Data Upto: 25/11/2026 10:25:00</div>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 self-start sm:self-center">
+              Saved: ৳{Math.abs(diffAmt).toLocaleString()}
+            </span>
+          </div>
+
+          <div className={getMetricGridClass(colSpan, Math.max(1, otReqActualCards.length))}>
+            {otReqActualCards}
+          </div>
+
+          <div className="h-52 w-full pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={reqActualData} margin={{ top: 18, right: 10, left: -5, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 8.5 }} interval={0} />
+                <YAxis tick={{ fontSize: 9.5 }} />
+                <Tooltip
+                  formatter={(_, __, item) => {
+                    const p = item?.payload;
+                    return [`${Number(p?.displayVal ?? 0).toLocaleString()} ${p?.unit || ""}`, p?.name];
+                  }}
+                  contentStyle={{
+                    backgroundColor: "#1e293b",
+                    borderColor: "#334155",
+                    borderRadius: "8px",
+                    fontSize: "11px",
+                    color: "#fff",
+                  }}
+                />
+                <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={36}>
+                  <LabelList
+                    dataKey="displayVal"
+                    position="top"
+                    formatter={(val: any) => Number(val).toLocaleString()}
+                    style={{ fontSize: "9.5px", fontWeight: 700, fill: "currentColor" }}
+                  />
+                  {reqActualData.map((entry, idx) => (
+                    <Cell key={`req-act-cell-${idx}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      );
+    }
+
+    case "hr_attendance_pie": {
       const pieLayoutClass =
         colSpan <= 3 ? "flex flex-col items-center gap-2.5" : "flex flex-col sm:flex-row items-center gap-3";
       const pieChartClass = colSpan <= 3 ? "w-full h-36" : "w-full sm:w-1/2 h-44";
       const pieLegendClass = colSpan <= 3 ? "w-full space-y-1 text-xs" : "w-full sm:w-1/2 space-y-1.5 text-xs";
 
+      const areasList = settings?.areas || ["Dhaka North / Gazipur"];
+      const deptsList = settings?.departments || settings?.managedDepartments || (settings?.department ? [settings.department] : ["Sewing Floor", "Cutting Unit"]);
+
+      let rawPie: Array<{ chipId: string; name: string; value: number; color: string; unit?: string }> = [];
+      let pieSubTitle = "";
+
       if (scope === "personal") {
-        const myData = [
-          { name: "My Present Days", value: 21, color: "#10b981" },
-          { name: "Weekends / Off", value: 8, color: "#3b82f6" },
-          { name: "Approved Leave", value: 1, color: "#8b5cf6" },
-          { name: "Late Entry", value: 1, color: "#f59e0b" },
+        rawPie = [
+          { chipId: "present", name: "My Present Days", value: 21, color: "#10b981", unit: "Days" },
+          { chipId: "absent", name: "Weekends / Off", value: 8, color: "#3b82f6", unit: "Days" },
+          { chipId: "leave", name: "Approved Leave", value: 1, color: "#8b5cf6", unit: "Days" },
+          { chipId: "late", name: "Late Entry", value: 1, color: "#f59e0b", unit: "Days" },
         ];
-        return (
-          <div className={pieLayoutClass}>
-            <div className={pieChartClass}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={myData} innerRadius={colSpan <= 3 ? 34 : 42} outerRadius={colSpan <= 3 ? 54 : 65} paddingAngle={4} dataKey="value">
-                    {myData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className={pieLegendClass}>
-              {myData.map((d) => (
-                <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-1.5">
-                    <div className="size-2 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="text-muted-foreground font-medium text-[11px] truncate">{d.name}</span>
-                  </div>
-                  <span className="font-mono font-bold text-foreground text-[11px]">{d.value} Days</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
+      } else if (scope === "area") {
+        const factor = Math.min(1, Math.max(0.28, areasList.length / 3));
+        pieSubTitle = areasList.length > 1 ? `${areasList.length} Areas` : areasList[0];
+        rawPie = [
+          { chipId: "present", name: "Present", value: Math.round(1196 * factor), color: "#10b981" },
+          { chipId: "absent", name: "Absent", value: Math.round(42 * factor), color: "#f43f5e" },
+          { chipId: "late", name: "Late Entry", value: Math.round(73 * factor), color: "#f59e0b" },
+          { chipId: "leave", name: "Leave", value: Math.round(10 * factor), color: "#8b5cf6" },
+        ];
+      } else if (scope === "managed_depts" || scope === "department") {
+        const factor = Math.min(1, Math.max(0.22, deptsList.length / 6));
+        pieSubTitle = deptsList.length > 1 ? `${deptsList.length} Departments` : deptsList[0];
+        rawPie = [
+          { chipId: "present", name: "Present", value: Math.round(1196 * factor), color: "#10b981" },
+          { chipId: "absent", name: "Absent", value: Math.round(42 * factor), color: "#f43f5e" },
+          { chipId: "late", name: "Late Entry", value: Math.round(73 * factor), color: "#f59e0b" },
+          { chipId: "leave", name: "Leave", value: Math.round(10 * factor), color: "#8b5cf6" },
+        ];
+      } else {
+        rawPie = [
+          { chipId: "present", name: "Present", value: 1196, color: "#10b981" },
+          { chipId: "absent", name: "Absent", value: 42, color: "#f43f5e" },
+          { chipId: "late", name: "Late Entry", value: 73, color: "#f59e0b" },
+          { chipId: "leave", name: "Leave", value: 10, color: "#8b5cf6" },
+        ];
       }
 
-      if (scope === "managed_depts") {
-        const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
-        const deptTitle = `Head: ${managed.map((m) => m.split(" ")[0]).join(" & ")}`;
-        const mData = [
-          { name: "Present", value: 785, color: "#10b981" },
-          { name: "Absent", value: 21, color: "#f43f5e" },
-          { name: "Late Entry", value: 14, color: "#f59e0b" },
-          { name: "On Leave", value: 14, color: "#8b5cf6" },
-        ];
-        return (
-          <div className={pieLayoutClass}>
-            <div className={pieChartClass}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={mData}
-                    innerRadius={colSpan <= 3 ? 34 : 42}
-                    outerRadius={colSpan <= 3 ? 54 : 65}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {mData.map((entry, index) => (
-                      <Cell key={`cell-mdept-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(val: any) => [`${val} staff`, deptTitle]}
-                    contentStyle={{
-                      backgroundColor: "#1e293b",
-                      borderColor: "#334155",
-                      borderRadius: "8px",
-                      fontSize: "11px",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className={pieLegendClass}>
-              <div className="text-[10.5px] font-bold text-amber-600 mb-1 flex items-center gap-1 truncate">
-                <Crown className="size-3 text-amber-500" /> {deptTitle} (820 Staff)
-              </div>
-              {mData.map((d) => (
-                <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-1.5">
-                    <div className="size-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="text-muted-foreground font-medium text-[11px]">{d.name}</span>
-                  </div>
-                  <span className="font-mono font-bold text-foreground text-[11px]">{d.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      }
+      const filteredPie = rawPie.filter((d) => isChipVisible(d.chipId));
+      const pieData = filteredPie.length > 0 ? filteredPie : rawPie;
 
-      if (scope === "department") {
-        const deptName = settings?.department || "Sewing Floor";
-        const deptData = [
-          { name: "Present", value: 652, color: "#10b981" },
-          { name: "Absent", value: 18, color: "#f43f5e" },
-          { name: "Late Entry", value: 24, color: "#f59e0b" },
-          { name: "On Leave", value: 10, color: "#8b5cf6" },
-        ];
-        return (
-          <div className={pieLayoutClass}>
-            <div className={pieChartClass}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={deptData} innerRadius={colSpan <= 3 ? 34 : 42} outerRadius={colSpan <= 3 ? 54 : 65} paddingAngle={4} dataKey="value">
-                    {deptData.map((entry, index) => (
-                      <Cell key={`cell-dept-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(val: any) => [`${val} staff`, deptName]}
-                    contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className={pieLegendClass}>
-              <div className="text-[10.5px] font-bold text-purple-600 mb-1 flex items-center gap-1 truncate">
-                <Building2 className="size-3" /> {deptName}
-              </div>
-              {deptData.map((d) => (
-                <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-1.5">
-                    <div className="size-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="text-muted-foreground font-medium text-[11px]">{d.name}</span>
-                  </div>
-                  <span className="font-mono font-bold text-foreground text-[11px]">{d.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      }
-
-      const attData = [
-        { name: "Present", value: 1196, color: "#10b981" },
-        { name: "Absent", value: 42, color: "#f43f5e" },
-        { name: "Late Entry", value: 73, color: "#f59e0b" },
-        { name: "Leave", value: 10, color: "#8b5cf6" },
-      ];
       return (
         <div className={pieLayoutClass}>
           <div className={pieChartClass}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={attData} innerRadius={colSpan <= 3 ? 34 : 42} outerRadius={colSpan <= 3 ? 54 : 65} paddingAngle={4} dataKey="value">
-                  {attData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                <Pie
+                  data={pieData}
+                  innerRadius={colSpan <= 3 ? 34 : 42}
+                  outerRadius={colSpan <= 3 ? 54 : 65}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${entry.chipId}-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(val: any) => [`${val} employees`, "Count"]}
+                  formatter={(val: any, name: any) => [`${val}`, name]}
                   contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
           <div className={pieLegendClass}>
-            {attData.map((d) => (
-              <div key={d.name} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
+            {pieSubTitle && (
+              <div className="text-[10.5px] font-bold text-primary mb-1 truncate">{pieSubTitle}</div>
+            )}
+            {pieData.map((d) => (
+              <div key={d.chipId} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
                 <div className="flex items-center gap-1.5">
                   <div className="size-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                  <span className="text-muted-foreground font-medium">{d.name}</span>
+                  <span className="text-muted-foreground font-medium text-[11px]">{d.name}</span>
                 </div>
-                <span className="font-mono font-bold text-foreground">{d.value.toLocaleString()}</span>
+                <span className="font-mono font-bold text-foreground text-[11px]">
+                  {d.value.toLocaleString()}{d.unit ? ` ${d.unit}` : ""}
+                </span>
               </div>
             ))}
           </div>
         </div>
       );
+    }
 
     case "hr_late_absent_pie":
       const latePieLayoutClass =
@@ -1704,9 +2283,9 @@ function renderWidgetContent(
             : `${totStyles} Styles across ${activeBuyers.length} Buyers`;
       }
 
-      return (
-        <div className={getMetricGridClass(colSpan, 4)}>
-          <div className="p-3 rounded-xl bg-teal-500/10 border border-teal-500/20">
+      const mmChips = [
+        isChipVisible("order_volume") && (
+          <div key="order_volume" className="p-3 rounded-xl bg-teal-500/10 border border-teal-500/20">
             <span className="text-[10.5px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider block">
               Total Order Volume
             </span>
@@ -1716,8 +2295,9 @@ function renderWidgetContent(
             </div>
             <div className="text-[10px] text-teal-600/80 font-medium mt-1 truncate">{note}</div>
           </div>
-
-          <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20">
+        ),
+        isChipVisible("fob_value") && (
+          <div key="fob_value" className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20">
             <span className="text-[10.5px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider block">
               Total FOB Value
             </span>
@@ -1726,8 +2306,9 @@ function renderWidgetContent(
             </div>
             <div className="text-[10px] text-sky-600/80 font-medium mt-1">Export FOB Value</div>
           </div>
-
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+        ),
+        isChipVisible("on_time_perf") && (
+          <div key="on_time_perf" className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
             <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
               On-Time Performance
             </span>
@@ -1738,8 +2319,9 @@ function renderWidgetContent(
             </div>
             <div className="text-[10px] text-emerald-600/80 font-medium mt-1">Inspection 1st pass: 98%</div>
           </div>
-
-          <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+        ),
+        isChipVisible("capacity_util") && (
+          <div key="capacity_util" className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
             <span className="text-[10.5px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block">
               Capacity Utilization
             </span>
@@ -1750,8 +2332,10 @@ function renderWidgetContent(
             </div>
             <div className="text-[10px] text-indigo-600/80 font-medium mt-1">Booked thru March 2027</div>
           </div>
-        </div>
-      );
+        ),
+      ].filter(Boolean);
+
+      return <div className={getMetricGridClass(colSpan, mmChips.length)}>{mmChips}</div>;
     }
 
     case "mm_buyer_distribution": {
@@ -1821,15 +2405,15 @@ function renderWidgetContent(
       );
     }
 
-    case "mm_tna_critical_path":
+    case "mm_tna_critical_path": {
       const milestones = [
-        { title: "Lab Dip Approval", status: "Completed", pct: 100, color: "bg-emerald-500" },
-        { title: "Yarn In-House", status: "Completed", pct: 100, color: "bg-emerald-500" },
-        { title: "PP Sample Submission", status: "Approved", pct: 100, color: "bg-emerald-500" },
-        { title: "Bulk Fabric Knitting", status: "On-Track", pct: 85, color: "bg-blue-500" },
-        { title: "Sewing Floor Input", status: "Running", pct: 60, color: "bg-purple-500" },
-        { title: "Ex-Factory Shipment", status: "Pending", pct: 15, color: "bg-amber-500" },
-      ];
+        { id: "lab_dip", title: "Lab Dip Approval", status: "Completed", pct: 100, color: "bg-emerald-500" },
+        { id: "yarn_inhouse", title: "Yarn In-House", status: "Completed", pct: 100, color: "bg-emerald-500" },
+        { id: "pp_sample", title: "PP Sample Submission", status: "Approved", pct: 100, color: "bg-emerald-500" },
+        { id: "bulk_knitting", title: "Bulk Fabric Knitting", status: "On-Track", pct: 85, color: "bg-blue-500" },
+        { id: "sewing_input", title: "Sewing Floor Input", status: "Running", pct: 60, color: "bg-purple-500" },
+        { id: "ex_factory", title: "Ex-Factory Shipment", status: "Pending", pct: 15, color: "bg-amber-500" },
+      ].filter((m) => isChipVisible(m.id));
       return (
         <div className="space-y-2 py-1">
           {milestones.map((m) => (
@@ -1845,6 +2429,7 @@ function renderWidgetContent(
           ))}
         </div>
       );
+    }
 
     case "mm_line_efficiency":
       const lines = [
@@ -1946,30 +2531,38 @@ function renderWidgetContent(
         alertCount = "3 Items";
       }
 
-      return (
-        <div className={getMetricGridClass(colSpan, 4)}>
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+      const invChips = [
+        isChipVisible("total_stock") && (
+          <div key="total_stock" className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
             <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Stock Valuation</span>
             <span className="text-xl font-black font-mono text-foreground mt-1 block">{val}</span>
             <span className="text-[10px] text-muted-foreground truncate">{wh || "All Stores"}</span>
           </div>
-          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+        ),
+        isChipVisible("in_transit") && (
+          <div key="in_transit" className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
             <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">Active Stock Items</span>
             <span className="text-xl font-black font-mono text-foreground mt-1 block">{skus}</span>
             <span className="text-[10px] text-muted-foreground">Distinct SKUs</span>
           </div>
-          <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+        ),
+        isChipVisible("monthly_issue") && (
+          <div key="monthly_issue" className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
             <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">Inventory Turnover</span>
             <span className="text-xl font-black font-mono text-foreground mt-1 block">{turnover}</span>
             <span className="text-[10px] text-muted-foreground">Days of supply</span>
           </div>
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+        ),
+        isChipVisible("low_stock") && (
+          <div key="low_stock" className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
             <span className="text-[10.5px] font-bold text-rose-600 uppercase tracking-wider block">Safety Alert</span>
             <span className="text-xl font-black font-mono text-rose-600 mt-1 block">{alertCount}</span>
             <span className="text-[10px] text-muted-foreground">Below threshold</span>
           </div>
-        </div>
-      );
+        ),
+      ].filter(Boolean);
+
+      return <div className={getMetricGridClass(colSpan, invChips.length)}>{invChips}</div>;
 
     case "inv_low_stock_alerts":
       const lowStockItems = [
@@ -2045,144 +2638,60 @@ function renderWidgetContent(
     // ----------------------------------------------------
     // Accounts & Finance Components
     // ----------------------------------------------------
-    case "acc_payroll_payout":
+    case "acc_payroll_payout": {
+      const areasList = settings?.areas || ["Dhaka North / Gazipur"];
+      const deptsList = settings?.departments || settings?.managedDepartments || (settings?.department ? [settings.department] : ["Sewing Floor", "Cutting Unit"]);
+
+      let payChips: Array<{ id: string; label: string; value: string; sub: string; cls: string; titleCls: string; valCls: string }> = [];
+
       if (scope === "personal") {
-        return (
-          <div className={getMetricGridClass(colSpan, 4)}>
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">
-                My Net Payable
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-foreground">৳38,500</span>
-              </div>
-              <div className="text-[10px] text-blue-600/80 font-medium mt-1">Salary: Nov 2026</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">
-                Gross Earnings
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">
-                  ৳42,000
-                </span>
-              </div>
-              <div className="text-[10px] text-emerald-600/80 font-medium mt-1">Basic + Allowances</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">
-                Disbursement Mode
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-sm sm:text-base font-black font-mono text-purple-700 dark:text-purple-300 truncate">
-                  Bank Asia
-                </span>
-              </div>
-              <div className="text-[10px] text-purple-600/80 font-medium mt-1">A/C: ***892 (BEFTN)</div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-              <span className="text-[10.5px] font-bold text-rose-600 uppercase tracking-wider block">
-                Total Deductions
-              </span>
-              <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-xl sm:text-2xl font-black font-mono text-rose-700 dark:text-rose-300">
-                  ৳3,500
-                </span>
-              </div>
-              <div className="text-[10px] text-rose-600/80 font-medium mt-1">Tax ৳2K • PF ৳1.5K</div>
-            </div>
-          </div>
-        );
+        payChips = [
+          { id: "gross_payroll", label: "Gross Earnings", value: "৳42,000", sub: "Basic + Allowances", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
+          { id: "ot_payout", label: "OT Allowance", value: "৳4,120", sub: "16.5 hrs approved", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
+          { id: "net_disbursed", label: "My Net Payable", value: "৳38,500", sub: "Bank Asia ***892", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
+          { id: "pending_bank", label: "Deductions", value: "৳3,500", sub: "Tax ৳2K • PF ৳1.5K", cls: "bg-rose-500/10 border-rose-500/20", titleCls: "text-rose-600", valCls: "text-rose-700 dark:text-rose-300" },
+        ];
+      } else if (scope === "area") {
+        const factor = Math.min(1, Math.max(0.3, areasList.length / 3));
+        payChips = [
+          { id: "gross_payroll", label: "Area Wage Bill", value: `৳${(3.28 * factor).toFixed(2)} Cr`, sub: `${areasList.length} Area(s)`, cls: "bg-indigo-500/10 border-indigo-500/20", titleCls: "text-indigo-600", valCls: "text-foreground" },
+          { id: "ot_payout", label: "OT Allowance", value: `৳${(38.4 * factor).toFixed(1)} Lac`, sub: "Overtime payout", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
+          { id: "net_disbursed", label: "Bank Transfer", value: `৳${(2.89 * factor).toFixed(2)} Cr`, sub: "BEFTN / EFT", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
+          { id: "pending_bank", label: "Pending / Cash", value: `৳${(39.2 * factor).toFixed(1)} Lac`, sub: "Floor cash & MFS", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-700 dark:text-amber-300" },
+        ];
+      } else if (scope === "managed_depts" || scope === "department") {
+        const factor = Math.min(1, Math.max(0.25, deptsList.length / 6));
+        const label = deptsList.length > 1 ? `${deptsList.length} Depts` : deptsList[0];
+        payChips = [
+          { id: "gross_payroll", label: `${label} Wage Bill`, value: `৳${(3.28 * factor).toFixed(2)} Cr`, sub: "Selected Depts", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
+          { id: "ot_payout", label: "OT Allowance", value: `৳${(38.4 * factor).toFixed(1)} Lac`, sub: "Approved OT", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
+          { id: "net_disbursed", label: "Bank Transfer", value: `৳${(2.89 * factor).toFixed(2)} Cr`, sub: "88% of wage bill", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
+          { id: "pending_bank", label: "Cash / MFS", value: `৳${(39.2 * factor).toFixed(1)} Lac`, sub: "Floor worker cash", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-700 dark:text-amber-300" },
+        ];
+      } else {
+        payChips = [
+          { id: "gross_payroll", label: "Net Payroll Payable", value: "৳3.28 Cr", sub: "For Month: Nov 2026", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
+          { id: "ot_payout", label: "OT Allowance", value: "৳38.4 Lac", sub: "Approved OT payout", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
+          { id: "net_disbursed", label: "Bank Transfer (88%)", value: "৳2.89 Cr", sub: "BEFTN / EFT Routing", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
+          { id: "pending_bank", label: "Pending / Cash (12%)", value: "৳39.2 Lac", sub: "Floor worker cash", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-700 dark:text-amber-300" },
+        ];
       }
 
-      if (scope === "managed_depts") {
-        const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
-        const title = `Head: ${managed.map((m) => m.split(" ")[0]).join(" & ")}`;
-        return (
-          <div className={getMetricGridClass(colSpan, 4)}>
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wider block truncate">
-                {title} Wage Bill
-              </span>
-              <span className="text-xl font-black font-mono text-foreground mt-1 block">৳2.04 Cr</span>
-              <span className="text-[10px] text-muted-foreground">{managed.length} Managed Depts</span>
-            </div>
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Bank Transfer</span>
-              <span className="text-xl font-black font-mono text-emerald-700 dark:text-emerald-300 mt-1 block">৳1.78 Cr</span>
-              <span className="text-[10px] text-muted-foreground">87.2% of wage bill</span>
-            </div>
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">Cash / MFS</span>
-              <span className="text-xl font-black font-mono text-blue-700 dark:text-blue-300 mt-1 block">৳26.0 Lac</span>
-              <span className="text-[10px] text-muted-foreground">Floor worker cash</span>
-            </div>
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">Deductions</span>
-              <span className="text-xl font-black font-mono text-purple-700 dark:text-purple-300 mt-1 block">৳15.2 Lac</span>
-              <span className="text-[10px] text-muted-foreground">Tax & PF deductions</span>
-            </div>
-          </div>
-        );
-      }
-
-      if (scope === "department") {
-        const deptName = settings?.department || "Sewing Floor";
-        return (
-          <div className={getMetricGridClass(colSpan, 4)}>
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block truncate">
-                {deptName} Wage Bill
-              </span>
-              <span className="text-xl font-black font-mono text-foreground mt-1 block">৳1.68 Cr</span>
-              <span className="text-[10px] text-muted-foreground">Department Total</span>
-            </div>
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Bank Transfer</span>
-              <span className="text-xl font-black font-mono text-emerald-700 dark:text-emerald-300 mt-1 block">৳1.45 Cr</span>
-              <span className="text-[10px] text-muted-foreground">86.3% of department</span>
-            </div>
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">Cash / MFS</span>
-              <span className="text-xl font-black font-mono text-blue-700 dark:text-blue-300 mt-1 block">৳23.0 Lac</span>
-              <span className="text-[10px] text-muted-foreground">Floor worker cash</span>
-            </div>
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10.5px] font-bold text-amber-600 uppercase tracking-wider block">Deductions</span>
-              <span className="text-xl font-black font-mono text-amber-700 dark:text-amber-300 mt-1 block">৳12.8 Lac</span>
-              <span className="text-[10px] text-muted-foreground">Department Deductions</span>
-            </div>
-          </div>
-        );
-      }
-
+      const visiblePayChips = payChips.filter((c) => isChipVisible(c.id));
       return (
-        <div className={getMetricGridClass(colSpan, 4)}>
-          <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-            <span className="text-[10.5px] font-bold text-purple-600 uppercase tracking-wider block">Net Payroll Payable</span>
-            <span className="text-xl font-black font-mono text-foreground mt-1 block">৳3.28 Cr</span>
-            <span className="text-[10px] text-muted-foreground">For Month: Nov 2026</span>
-          </div>
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <span className="text-[10.5px] font-bold text-emerald-600 uppercase tracking-wider block">Bank Transfer (88%)</span>
-            <span className="text-xl font-black font-mono text-emerald-700 dark:text-emerald-300 mt-1 block">৳2.89 Cr</span>
-            <span className="text-[10px] text-muted-foreground">BEFTN / EFT Routing</span>
-          </div>
-          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <span className="text-[10.5px] font-bold text-blue-600 uppercase tracking-wider block">Cash / MFS (12%)</span>
-            <span className="text-xl font-black font-mono text-blue-700 dark:text-blue-300 mt-1 block">৳39.2 Lac</span>
-            <span className="text-[10px] text-muted-foreground">Floor worker cash</span>
-          </div>
-          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <span className="text-[10.5px] font-bold text-amber-600 uppercase tracking-wider block">Total Deductions</span>
-            <span className="text-xl font-black font-mono text-amber-700 dark:text-amber-300 mt-1 block">৳24.6 Lac</span>
-            <span className="text-[10px] text-muted-foreground">Tax, Advance & Stamp</span>
-          </div>
+        <div className={getMetricGridClass(colSpan, Math.max(1, visiblePayChips.length))}>
+          {visiblePayChips.map((c) => (
+            <div key={c.id} className={`p-3 rounded-xl border ${c.cls}`}>
+              <span className={`text-[10.5px] font-bold uppercase tracking-wider block truncate ${c.titleCls}`}>
+                {c.label}
+              </span>
+              <span className={`text-xl font-black font-mono mt-1 block ${c.valCls}`}>{c.value}</span>
+              <span className="text-[10px] text-muted-foreground">{c.sub}</span>
+            </div>
+          ))}
         </div>
       );
+    }
 
     case "acc_department_cost":
       const costData = [
