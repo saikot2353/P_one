@@ -58,10 +58,18 @@ import {
 export const Route = createFileRoute("/inv-intercompany-transfer")({
   validateSearch: (
     search: Record<string, unknown>
-  ): { transferId?: string; mode?: "view" | "edit"; type?: string } => ({
+  ): {
+    transferId?: string;
+    mode?: "view" | "edit";
+    type?: string;
+    requisitionId?: string;
+    requisitionNumber?: string;
+  } => ({
     transferId: search.transferId as string | undefined,
     mode: search.mode as "view" | "edit" | undefined,
     type: search.type as string | undefined,
+    requisitionId: (search.requisitionId || search.reqId) as string | undefined,
+    requisitionNumber: search.requisitionNumber as string | undefined,
   }),
   head: () => ({
     meta: [
@@ -94,6 +102,22 @@ function InterCompanyTransferFormPage() {
   }, [rawWarehouses]);
   const catalogItems = getStoredData<ItemProductMaster[]>("proc_items_v2", DEFAULT_ITEMS);
 
+  // Identify if a Transfer Requisition was passed via search query
+  const passedReqId = searchParams.requisitionId;
+  const passedReqNumber = searchParams.requisitionNumber;
+
+  const initialPassedReq = useMemo(() => {
+    if (!passedReqId && !passedReqNumber) return null;
+    const allReqs = getStoredTransferRequisitions();
+    return (
+      allReqs.find(
+        (r) =>
+          (passedReqId && (r.id === passedReqId || r.requisitionNumber === passedReqId)) ||
+          (passedReqNumber && (r.requisitionNumber === passedReqNumber || r.id === passedReqNumber))
+      ) || null
+    );
+  }, [passedReqId, passedReqNumber]);
+
   // Load existing transfer if in edit/view mode or restore active draft
   const draftKey = editingTransferId ? `cripton_transfer_draft_${editingTransferId}` : "cripton_transfer_active_draft";
   const existingTransfer = useMemo(() => {
@@ -101,6 +125,9 @@ function InterCompanyTransferFormPage() {
       const all = getStoredInterCompanyTransfers();
       const found = all.find((t) => t.id === editingTransferId || t.transferId === editingTransferId);
       if (found) return found;
+    }
+    if (passedReqId || passedReqNumber) {
+      return null;
     }
     if (typeof window !== "undefined") {
       try {
@@ -111,7 +138,7 @@ function InterCompanyTransferFormPage() {
       }
     }
     return null;
-  }, [editingTransferId, draftKey]);
+  }, [editingTransferId, draftKey, passedReqId, passedReqNumber]);
 
   // Header State
   const [transferId] = useState<string>(() => {
@@ -140,7 +167,9 @@ function InterCompanyTransferFormPage() {
 
   // Transfer Type (Multi-Company vs Intra-Company)
   const [transferType, setTransferType] = useState<TransferType>(() => {
+    if (initialPassedReq) return "Inter-Company";
     if (searchParams.type === "intra") return "Intra-Company";
+    if (searchParams.type === "multi" || searchParams.type === "Inter-Company") return "Inter-Company";
     return existingTransfer?.transferType || "Inter-Company";
   });
 
@@ -148,6 +177,7 @@ function InterCompanyTransferFormPage() {
 
   // Source & Destination State
   const [fromCompany, setFromCompany] = useState<string>(() => {
+    if (initialPassedReq) return initialPassedReq.requestedFromCompany;
     if (searchParams.type === "intra" || existingTransfer?.transferType === "Intra-Company") {
       return loggedInCompany;
     }
@@ -155,10 +185,12 @@ function InterCompanyTransferFormPage() {
   });
 
   const [fromStore, setFromStore] = useState<string>(() => {
+    if (initialPassedReq) return initialPassedReq.requestedFromStore;
     return existingTransfer?.fromStore || "PKCL Central Raw Material Warehouse";
   });
 
   const [toCompany, setToCompany] = useState<string>(() => {
+    if (initialPassedReq) return initialPassedReq.requisitioningCompany;
     if (searchParams.type === "intra" || existingTransfer?.transferType === "Intra-Company") {
       return loggedInCompany;
     }
@@ -166,6 +198,7 @@ function InterCompanyTransferFormPage() {
   });
 
   const [toStore, setToStore] = useState<string>(() => {
+    if (initialPassedReq) return initialPassedReq.requisitioningStore;
     if (existingTransfer?.toStore) return existingTransfer.toStore;
     if (searchParams.type === "intra" || existingTransfer?.transferType === "Intra-Company") {
       return "Dyeing & Finishing Auxiliary Chemical Store";
@@ -209,10 +242,12 @@ function InterCompanyTransferFormPage() {
 
   // Tagged Approved Transfer Requisition State
   const [taggedReqNumber, setTaggedReqNumber] = useState<string>(() => {
+    if (initialPassedReq) return initialPassedReq.requisitionNumber;
     return existingTransfer?.transferRequisitionNumber || "";
   });
 
   const [taggedReqId, setTaggedReqId] = useState<string>(() => {
+    if (initialPassedReq) return initialPassedReq.id;
     return existingTransfer?.transferRequisitionId || "";
   });
 
@@ -301,6 +336,38 @@ function InterCompanyTransferFormPage() {
 
   // Transfer Items State
   const [items, setItems] = useState<InterCompanyTransferItem[]>(() => {
+    if (initialPassedReq && initialPassedReq.items && initialPassedReq.items.length > 0) {
+      return initialPassedReq.items.map((it, idx) => {
+        const cat = catalogItems.find((c) => c.itemCode === it.itemCode);
+        const availStock = cat?.maximumStock || it.availableStock || 1000;
+        const qty = it.requiredQty;
+        const rate = it.estimatedUnitPrice || 100;
+        return {
+          id: `ict-row-${Date.now()}-${idx}`,
+          sl: idx + 1,
+          itemCode: it.itemCode,
+          itemName: it.itemName,
+          specification: it.specification || "-",
+          brand: it.brand || "Standard",
+          origin: it.origin || "Bangladesh",
+          uom: it.uom,
+          availableStock: availStock,
+          trRequisitionQty: qty,
+          transferQty: qty,
+          unitPrice: rate,
+          totalValue: qty * rate,
+          batchAllocations: [
+            {
+              batchNumber: `BATCH-${it.itemCode.slice(-4)}-01`,
+              quantity: qty,
+              toWarehouse: initialPassedReq.requisitioningStore,
+              toStore: initialPassedReq.requisitioningStore,
+            },
+          ],
+          remarks: it.remarks || `Against TR #${initialPassedReq.requisitionNumber}`,
+        };
+      });
+    }
     if (existingTransfer?.items && existingTransfer.items.length > 0) return existingTransfer.items;
     return [
       {
@@ -548,9 +615,6 @@ function InterCompanyTransferFormPage() {
   // Validations
   const validationErrors = useMemo(() => {
     const errs: string[] = [];
-    if (transferType === "Inter-Company" && !taggedReqNumber) {
-      errs.push("Tagging an approved Transfer Requisition is required.");
-    }
     if (transferType === "Intra-Company" && fromStore && toStore && fromStore === toStore) {
       errs.push("Source Store and Destination Store must be different for intra-company transfer.");
     }
@@ -1133,7 +1197,7 @@ function InterCompanyTransferFormPage() {
                   Transfer Items & Batch / Location Matrix
                 </h3>
               </div>
-              {!isViewMode && (
+              {!isViewMode && transferType === "Intra-Company" && (
                 <button
                   type="button"
                   onClick={handleAddItem}

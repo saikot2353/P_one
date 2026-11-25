@@ -223,7 +223,19 @@ export interface MaterialReceive {
   grandTotal?: number;
   // Status & Attachments
   receiveStatus: ReceiveStatus;
-  attachments?: { name: string; url?: string; size?: string }[];
+  attachments?: Array<{
+    name?: string;
+    fileName?: string;
+    title?: string;
+    note?: string;
+    fileSize?: string;
+    size?: string;
+    url?: string;
+    uploadedBy?: string;
+    uploadTime?: string;
+    dataUrl?: string;
+    [key: string]: any;
+  }>;
   remarks?: string;
 }
 
@@ -1810,6 +1822,16 @@ export function setStoredMaterialReceipts(receipts: MaterialReceive[]): void {
   setStoredData(STORAGE_KEYS.MATERIAL_RECEIPTS, receipts);
 }
 
+export function deleteMaterialReceipt(receiveNumberOrId: string): MaterialReceive[] {
+  const current = getStoredMaterialReceipts();
+  const filtered = current.filter(
+    (r) => r.id !== receiveNumberOrId && r.receiveNumber !== receiveNumberOrId
+  );
+  setStoredMaterialReceipts(filtered);
+  syncReceiveListWithOrders();
+  return filtered;
+}
+
 export function syncReceiveListWithOrders(): MaterialReceiveListItem[] {
   const existingList = getStoredData(STORAGE_KEYS.RECEIVE_LIST, DEFAULT_RECEIVE_LIST) as MaterialReceiveListItem[];
   const allOrders = getStoredPurchaseOrders();
@@ -1991,6 +2013,20 @@ export interface DirectMRRRecord {
     acceptedQuantity: number;
     rejectedQuantity: number;
     remarks?: string;
+    warranties?: ItemWarrantyDetail[];
+  }>;
+  attachments?: Array<{
+    name?: string;
+    fileName?: string;
+    title?: string;
+    note?: string;
+    fileSize?: string;
+    size?: string;
+    url?: string;
+    uploadedBy?: string;
+    uploadTime?: string;
+    dataUrl?: string;
+    [key: string]: any;
   }>;
 }
 

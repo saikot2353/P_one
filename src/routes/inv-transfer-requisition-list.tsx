@@ -17,19 +17,20 @@ import {
   X,
   Eye,
   Edit,
+  Trash2,
   Send,
   Ban,
   CheckCircle2,
   Clock,
   Truck,
   RotateCcw,
-  FileCheck2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   TransferRequisition,
   getStoredTransferRequisitions,
   saveStoredTransferRequisitions,
+  deleteTransferRequisition,
   MASTER_COMPANIES,
 } from "@/lib/inventory-stock-management-data";
 import {
@@ -71,6 +72,21 @@ function TransferRequisitionListPage() {
   // Report Modal
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState<TransferRequisition | null>(null);
+
+  // Delete Confirmation Modal State
+  const [deleteConfirmTarget, setDeleteConfirmTarget] = useState<TransferRequisition | null>(null);
+
+  const handleConfirmDelete = () => {
+    if (!deleteConfirmTarget) return;
+    deleteTransferRequisition(deleteConfirmTarget.id);
+    setRequisitions((prev) =>
+      prev.filter(
+        (r) => r.id !== deleteConfirmTarget.id && r.requisitionNumber !== deleteConfirmTarget.requisitionNumber
+      )
+    );
+    toast.success(`Transfer Requisition "${deleteConfirmTarget.requisitionNumber}" has been permanently deleted.`);
+    setDeleteConfirmTarget(null);
+  };
 
   // Filter Logic
   const filteredRequisitions = useMemo(() => {
@@ -195,14 +211,6 @@ function TransferRequisitionListPage() {
             </div>
 
             <div className="flex items-center gap-2.5">
-              <Link
-                to="/inv-transfer-requisition-approval"
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition cursor-pointer"
-              >
-                <FileCheck2 className="size-3.5" />
-                <span>Approval Desk</span>
-              </Link>
-
               <Link
                 to="/inv-transfer-requisition"
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-sm cursor-pointer"
@@ -329,7 +337,6 @@ function TransferRequisitionListPage() {
                     <th className="py-2.5 px-3 w-10 text-center">#</th>
                     <th className="py-2.5 px-3 min-w-[120px]">Requisition No</th>
                     <th className="py-2.5 px-3 w-24">Date</th>
-                    <th className="py-2.5 px-3 w-28">Type</th>
                     <th className="py-2.5 px-3 min-w-[220px]">Requisitioning Store</th>
                     <th className="py-2.5 px-3 min-w-[220px]">Requested From (Source)</th>
                     <th className="py-2.5 px-3 w-32 text-center">Status</th>
@@ -339,7 +346,7 @@ function TransferRequisitionListPage() {
                 <tbody className="divide-y divide-slate-100">
                   {filteredRequisitions.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="py-12 text-center text-slate-400">
+                      <td colSpan={7} className="py-12 text-center text-slate-400">
                         No transfer requisitions match the current criteria.
                       </td>
                     </tr>
@@ -360,17 +367,6 @@ function TransferRequisitionListPage() {
                           <div className="text-[10px] text-slate-400">By {req.requestedBy.split("(")[0]}</div>
                         </td>
                         <td className="py-3 px-3 text-slate-600">{req.requisitionDate}</td>
-                        <td className="py-3 px-3">
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                              req.transferType === "Inter-Company"
-                                ? "bg-purple-50 text-purple-700 border-purple-200"
-                                : "bg-blue-50 text-blue-700 border-blue-200"
-                            }`}
-                          >
-                            {req.transferType}
-                          </span>
-                        </td>
                         <td className="py-3 px-3">
                           <div className="font-semibold text-slate-900 truncate max-w-[210px]">{req.requisitioningStore}</div>
                           <div className="text-[10px] text-slate-500 truncate max-w-[210px]">{req.requisitioningCompany}</div>
@@ -409,6 +405,15 @@ function TransferRequisitionListPage() {
                               <Eye className="size-3.5" />
                             </Link>
 
+                            <Link
+                              to="/inv-transfer-requisition"
+                              search={{ id: req.id, mode: "edit" }}
+                              className="p-1 rounded text-slate-500 hover:text-amber-600 hover:bg-slate-100 transition cursor-pointer"
+                              title="Edit Requisition"
+                            >
+                              <Edit className="size-3.5" />
+                            </Link>
+
                             <button
                               type="button"
                               onClick={() => {
@@ -421,26 +426,14 @@ function TransferRequisitionListPage() {
                               <Printer className="size-3.5" />
                             </button>
 
-                            {req.status === "Approved" && (
-                              <Link
-                                to="/inv-intercompany-transfer"
-                                search={{ transferId: undefined }}
-                                className="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] transition cursor-pointer"
-                                title="Issue requested goods via Transfer Issue"
-                              >
-                                Issue Goods
-                              </Link>
-                            )}
-
-                            {req.status === "Approval Pending" && (
-                              <Link
-                                to="/inv-transfer-requisition-approval"
-                                className="px-2 py-0.5 rounded bg-amber-500 hover:bg-amber-600 text-white font-bold text-[10px] transition cursor-pointer"
-                                title="Review in Approval Desk"
-                              >
-                                Review
-                              </Link>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => setDeleteConfirmTarget(req)}
+                              className="p-1 rounded text-slate-500 hover:text-rose-600 hover:bg-slate-100 transition cursor-pointer"
+                              title="Delete Requisition"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -459,6 +452,67 @@ function TransferRequisitionListPage() {
           onOpenChange={setPreviewReportOpen}
           reportData={reportData}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="size-11 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                  <Trash2 className="size-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-bold text-slate-900">
+                    Delete Transfer Requisition
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Are you sure you want to delete requisition{" "}
+                    <span className="font-semibold text-slate-800 font-mono">
+                      {deleteConfirmTarget.requisitionNumber}
+                    </span>
+                    ? This transaction will be permanently removed from Local Storage and the register list.
+                  </p>
+                  <div className="mt-3 p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-[11px] text-slate-600 space-y-1">
+                    <div>
+                      <span className="text-slate-400">Requester:</span>{" "}
+                      <span className="font-medium text-slate-700">{deleteConfirmTarget.requisitioningCompany}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400">Source:</span>{" "}
+                      <span className="font-medium text-slate-700">{deleteConfirmTarget.requestedFromCompany}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400">Items / Value:</span>{" "}
+                      <span className="font-medium text-slate-700">
+                        {deleteConfirmTarget.totalItems} item(s) • ৳{deleteConfirmTarget.totalEstimatedValue.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setDeleteConfirmTarget(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                >
+                  <Trash2 className="size-3.5" />
+                  <span>Delete Requisition</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

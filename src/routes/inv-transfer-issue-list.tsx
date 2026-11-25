@@ -259,7 +259,7 @@ function TransferIssueListPage() {
                 </span>
               </div>
               <h1 className="text-xl font-black text-slate-900 tracking-tight mt-0.5">
-                Transfer Issue Register & Fulfillment Desk
+                Transfer Issue Register
               </h1>
             </div>
 
@@ -486,7 +486,12 @@ function TransferIssueListPage() {
                             <td className="py-3 px-3 text-center">
                               <Link
                                 to="/inv-intercompany-transfer"
-                                search={{ transferId: undefined, type: item.req.transferType }}
+                                search={{
+                                  transferId: undefined,
+                                  type: "multi",
+                                  requisitionId: item.req.id,
+                                  requisitionNumber: item.req.requisitionNumber,
+                                }}
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs cursor-pointer"
                                 title="Process transfer issue for this requisition"
                               >

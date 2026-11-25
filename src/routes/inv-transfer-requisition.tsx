@@ -18,7 +18,6 @@ import {
   Send,
   Eye,
   X,
-  FileCheck2,
   Info,
   XCircle,
   RotateCcw,
@@ -124,7 +123,12 @@ function TransferRequisitionFormPage() {
 
   // Requested From Entity (To / Source Supplier)
   const [requestedFromCompany, setRequestedFromCompany] = useState<string>(() => {
-    return existingReq?.requestedFromCompany || "Pakiza Spinning Mills Ltd";
+    const reqComp = existingReq?.requisitioningCompany || "Pakiza Knit Composite Ltd";
+    if (existingReq?.requestedFromCompany && existingReq.requestedFromCompany !== reqComp) {
+      return existingReq.requestedFromCompany;
+    }
+    const alt = MASTER_COMPANIES.find((c) => c.name !== reqComp);
+    return alt?.name || "Pakiza Spinning Mills Ltd";
   });
 
   const [requestedFromStore, setRequestedFromStore] = useState<string>(() => {
@@ -258,6 +262,9 @@ function TransferRequisitionFormPage() {
     if (!requisitioningStore) errs.push("Requisitioning Store is required.");
     if (!requestedFromCompany) errs.push("Requested From Company is required.");
     if (!requestedFromStore) errs.push("Requested From Store is required.");
+    if (requisitioningCompany === requestedFromCompany) {
+      errs.push("Requested From Entity (Source) and Requisitioning Entity (Recipient) must belong to different companies.");
+    }
     if (items.length === 0) errs.push("At least one required item must be added.");
     items.forEach((it) => {
       if (it.requiredQty <= 0) {
@@ -268,13 +275,16 @@ function TransferRequisitionFormPage() {
   }, [requisitionNumber, requisitioningCompany, requisitioningStore, requestedFromCompany, requestedFromStore, items]);
 
   // Save / Submit Handlers
-  const handleSaveRequisition = (targetStatus: "Draft" | "Approval Pending") => {
+  const handleSaveRequisition = (targetStatus?: TransferRequisition["status"]) => {
     if (validationErrors.length > 0) {
       toast.error(validationErrors[0]);
       return;
     }
 
+    const finalStatus = targetStatus || existingReq?.status || "Draft";
+
     const payload: TransferRequisition = {
+      ...(existingReq || {}),
       id: existingReq?.id || `tr-${Date.now()}`,
       requisitionNumber,
       requisitionDate,
@@ -288,7 +298,7 @@ function TransferRequisitionFormPage() {
       totalItems: items.length,
       totalRequiredQty,
       totalEstimatedValue,
-      status: targetStatus,
+      status: finalStatus,
       items,
       createdAt: existingReq?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -296,7 +306,9 @@ function TransferRequisitionFormPage() {
 
     saveTransferRequisition(payload);
 
-    if (targetStatus === "Approval Pending") {
+    if (existingReq) {
+      toast.success(`Transfer Requisition "${requisitionNumber}" updated successfully!`);
+    } else if (finalStatus === "Approval Pending") {
       if (transferType === "Inter-Company") {
         toast.success(
           `Inter-Company Requisition "${requisitionNumber}" submitted! It now appears in the Approval Pending list for "${requestedFromCompany}".`
@@ -494,16 +506,6 @@ function TransferRequisitionFormPage() {
                 <span>Preview Report</span>
               </button>
 
-              {!isApprovalMode && (
-                <Link
-                  to="/inv-transfer-requisition-approval"
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition cursor-pointer"
-                >
-                  <FileCheck2 className="size-3.5" />
-                  <span>Approval Desk</span>
-                </Link>
-              )}
-
               {isApprovalMode && existingReq && (
                 <div className="flex items-center gap-2">
                   <button
@@ -544,23 +546,49 @@ function TransferRequisitionFormPage() {
 
               {!isViewMode && (
                 <>
-                  <button
-                    type="button"
-                    onClick={() => handleSaveRequisition("Draft")}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition shadow-xs cursor-pointer"
-                  >
-                    <Save className="size-3.5" />
-                    <span>Save Draft</span>
-                  </button>
+                  {existingReq ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleSaveRequisition(existingReq.status)}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-sm cursor-pointer"
+                      >
+                        <Save className="size-3.5" />
+                        <span>Save Changes</span>
+                      </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleSaveRequisition("Approval Pending")}
-                    className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-sm cursor-pointer"
-                  >
-                    <Send className="size-3.5" />
-                    <span>Submit Requisition</span>
-                  </button>
+                      {(existingReq.status === "Draft" || existingReq.status === "Returned for Correction") && (
+                        <button
+                          type="button"
+                          onClick={() => handleSaveRequisition("Approval Pending")}
+                          className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm cursor-pointer"
+                        >
+                          <Send className="size-3.5" />
+                          <span>Submit Requisition</span>
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleSaveRequisition("Draft")}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition shadow-xs cursor-pointer"
+                      >
+                        <Save className="size-3.5" />
+                        <span>Save Draft</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSaveRequisition("Approval Pending")}
+                        className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-sm cursor-pointer"
+                      >
+                        <Send className="size-3.5" />
+                        <span>Submit Requisition</span>
+                      </button>
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -612,7 +640,7 @@ function TransferRequisitionFormPage() {
                       }}
                       className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
                     >
-                      {MASTER_COMPANIES.map((mc) => (
+                      {MASTER_COMPANIES.filter((mc) => mc.name !== requisitioningCompany).map((mc) => (
                         <option key={mc.id} value={mc.name}>
                           {mc.name} ({mc.code})
                         </option>
@@ -661,7 +689,7 @@ function TransferRequisitionFormPage() {
                       }}
                       className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium focus:border-blue-500 outline-none disabled:bg-slate-50"
                     >
-                      {MASTER_COMPANIES.map((mc) => (
+                      {MASTER_COMPANIES.filter((mc) => mc.name !== requestedFromCompany).map((mc) => (
                         <option key={mc.id} value={mc.name}>
                           {mc.name} ({mc.code})
                         </option>
@@ -793,7 +821,6 @@ function TransferRequisitionFormPage() {
                         <span className="font-bold text-blue-900">
                           {(getAvailableStockForItem(requestedFromStore, it.itemCode) || it.availableStock || 0).toLocaleString()}
                         </span>
-                        <span className="text-[10px] text-slate-400 block font-normal">at source depot</span>
                       </td>
                       <td className="py-2.5 px-3 text-right">
                         {isViewMode ? (

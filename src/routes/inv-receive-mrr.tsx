@@ -41,6 +41,7 @@ import {
   ItemWarrantyDetail,
   getStoredMaterialReceipts,
   setStoredMaterialReceipts,
+  deleteMaterialReceipt,
   getStoredPurchaseOrders,
   getStoredPoItems,
   getStoredWoItems,
@@ -125,6 +126,8 @@ export function MaterialReceiveMRRPage() {
   const currentPo = useMemo(() => {
     return purchaseOrders.find((p) => p.orderNumber === selectedPoNumber) || purchaseOrders[0];
   }, [purchaseOrders, selectedPoNumber]);
+
+  const supplierName = currentPo?.supplierName || targetReceipt?.supplierName || "Default Supplier";
 
   // Warehouse auto-populated from receipt / PO / selected store, cannot be changed
   const selectedStore =
@@ -800,6 +803,25 @@ export function MaterialReceiveMRRPage() {
     }
   };
 
+  // ── Entire MRR Deletion State & Handler ──────────────────────────
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
+  const handleDeleteEntireMRR = () => {
+    const all = getStoredMaterialReceipts();
+    const filtered = all.filter((r) => {
+      if (r.id === receiveNumber || r.receiveNumber === receiveNumber) return false;
+      if (targetReceipt && (r.id === targetReceipt.id || r.receiveNumber === targetReceipt.receiveNumber)) return false;
+      return true;
+    });
+    setStoredMaterialReceipts(filtered);
+    setMaterialReceipts(filtered);
+    syncReceiveListWithOrders();
+
+    toast.success(`Material Receive transaction "${receiveNumber}" and all attachments were deleted successfully.`);
+    setDeleteConfirmOpen(false);
+    navigate({ to: "/procurement-material-receive-list" });
+  };
+
   // ── Warranty Details State & Handlers ───────────────────────────
   const [activeWarrantyItemId, setActiveWarrantyItemId] = useState<string | null>(null);
   const [isAddingWarranty, setIsAddingWarranty] = useState(false);
@@ -1047,6 +1069,15 @@ export function MaterialReceiveMRRPage() {
               >
                 <Paperclip className="size-3.5 text-teal-600" />
                 <span>Attachment ({attachments.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmOpen(true)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50/70 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 text-xs font-semibold transition-colors cursor-pointer"
+                title="Delete Entire MRR Transaction"
+              >
+                <Trash2 className="size-3.5 text-rose-600" />
+                <span>Delete</span>
               </button>
               <button
                 type="button"
@@ -1452,6 +1483,15 @@ export function MaterialReceiveMRRPage() {
               >
                 <Paperclip className="size-3.5 text-teal-600" />
                 <span>Attachment ({attachments.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmOpen(true)}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50/70 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 text-xs font-semibold transition-colors cursor-pointer"
+                title="Delete Entire MRR Transaction"
+              >
+                <Trash2 className="size-3.5 text-rose-600" />
+                <span>Delete</span>
               </button>
               {isViewMode ? (
                 <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-muted text-muted-foreground border border-border">
@@ -2045,6 +2085,77 @@ export function MaterialReceiveMRRPage() {
                   >
                     Close
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Delete MRR Transaction Confirmation Modal */}
+          {deleteConfirmOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+              <div className="bg-card w-full max-w-md rounded-2xl border border-border shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="size-11 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-200 dark:border-rose-900">
+                      <Trash2 className="size-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-bold text-foreground">
+                        Delete Material Receive (MRR)
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        Are you sure you want to delete transaction{" "}
+                        <span className="font-semibold text-foreground font-mono">
+                          {receiveNumber}
+                        </span>
+                        ? This will permanently delete the entire MRR transaction, including all {mrrItems.length} received item lines, warranty details, and {attachments.length} attachment(s) from Local Storage and the register.
+                      </p>
+                      <div className="mt-3 p-3 rounded-xl bg-muted/40 border border-border text-[11px] text-muted-foreground space-y-1.5">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Reference:</span>
+                          <span className="font-semibold text-foreground font-mono">{selectedPoNumber}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Supplier:</span>
+                          <span className="font-medium text-foreground truncate max-w-[200px]">{supplierName}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Store:</span>
+                          <span className="font-medium text-foreground truncate max-w-[200px]">{selectedStore}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Received Qty:</span>
+                          <span className="font-semibold text-foreground">{totalReceived} Units</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Total Value:</span>
+                          <span className="font-semibold text-foreground">৳{totalAmount.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Attachments:</span>
+                          <span className="font-semibold text-teal-600">{attachments.length} document(s)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex items-center justify-end gap-2.5 pt-4 border-t border-border">
+                    <button
+                      type="button"
+                      onClick={() => setDeleteConfirmOpen(false)}
+                      className="px-4 py-2 rounded-xl border border-border text-foreground hover:bg-muted text-xs font-semibold transition cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDeleteEntireMRR}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                    >
+                      <Trash2 className="size-3.5" />
+                      <span>Delete Transaction</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

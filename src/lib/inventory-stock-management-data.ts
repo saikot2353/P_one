@@ -1083,6 +1083,12 @@ export function saveTransferRequisition(req: TransferRequisition): void {
   saveStoredTransferRequisitions(current);
 }
 
+export function deleteTransferRequisition(id: string): void {
+  const current = getStoredTransferRequisitions();
+  const filtered = current.filter((r) => r.id !== id && r.requisitionNumber !== id);
+  saveStoredTransferRequisitions(filtered);
+}
+
 // ---------------------------------------------------------------------------
 // Helper Methods: Stock Transfers
 // ---------------------------------------------------------------------------
