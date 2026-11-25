@@ -3,9 +3,6 @@
   "buildCommand": "NODE_OPTIONS=\"--max-old-space-size=6144\" npm run build",
   "outputDirectory": "dist/client",
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/_shell.html"
-    }
+    { "source": "/(.*)", "destination": "/_shell.html" }
   ]
 }
