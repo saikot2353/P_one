@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ChevronRight,
   ArrowLeft,
@@ -415,6 +415,15 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
   const [trail, setTrail] = useState<Array<{ level: HierarchyLevel; node: HierarchyNode }>>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   const managedDepts = widget.settings?.managedDepartments || [
     "Sewing Floor",
     "Cutting Unit",
@@ -479,37 +488,37 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] flex items-center justify-center p-3 sm:p-5"
+      className="fixed inset-0 z-50 bg-black/55 backdrop-blur-[2px] flex items-center justify-center p-4 sm:p-6"
       onClick={onClose}
     >
       <div
-        className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-4xl max-h-[88vh] flex flex-col overflow-hidden"
+        className="bg-card border border-border rounded-2xl shadow-2xl w-[95vw] max-w-6xl min-h-[72vh] max-h-[90vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Minimal Header */}
-        <div className="px-5 py-3.5 border-b border-border flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <h3 className="text-sm sm:text-base font-bold text-foreground truncate">{displayTitle}</h3>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-border flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <h3 className="text-base sm:text-lg font-bold text-foreground truncate">{displayTitle}</h3>
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-muted text-muted-foreground shrink-0">
               {LEVEL_LABELS[currentLevel]}
             </span>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="inline-flex rounded-lg border border-border bg-muted/30 p-0.5 text-[11px]">
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="inline-flex rounded-lg border border-border bg-muted/30 p-1 text-xs">
               <button
                 type="button"
                 onClick={() => {
                   setAccessMode("management");
                   setTrail([]);
                 }}
-                className={`px-2.5 py-1 rounded-md font-semibold flex items-center gap-1 cursor-pointer transition-colors ${
+                className={`px-3 py-1.5 rounded-md font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
                   accessMode === "management"
                     ? "bg-background text-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <ShieldCheck className="size-3" />
+                <ShieldCheck className="size-3.5" />
                 Management
               </button>
               <button
@@ -518,13 +527,13 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
                   setAccessMode("head_3_depts");
                   setTrail([]);
                 }}
-                className={`px-2.5 py-1 rounded-md font-semibold flex items-center gap-1 cursor-pointer transition-colors ${
+                className={`px-3 py-1.5 rounded-md font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
                   accessMode === "head_3_depts"
                     ? "bg-background text-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Crown className="size-3 text-amber-500" />
+                <Crown className="size-3.5 text-amber-500" />
                 Head (3 Depts)
               </button>
             </div>
@@ -532,30 +541,32 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
             <button
               type="button"
               onClick={onClose}
-              className="size-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+              className="size-9 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              title="Close (Esc)"
             >
-              <X className="size-4" />
+              <X className="size-5" />
             </button>
           </div>
         </div>
 
-        {/* Clean Breadcrumb & Search Bar */}
-        <div className="px-5 py-2.5 border-b border-border/60 bg-muted/20 flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-1 flex-wrap text-xs">
+        {/* Breadcrumb & Search Bar */}
+        <div className="px-6 py-3 border-b border-border/60 bg-muted/20 flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap text-xs sm:text-sm">
             {trail.length > 0 && (
               <button
                 type="button"
                 onClick={handleGoBack}
-                className="mr-1 px-2 py-1 rounded border border-border bg-background hover:bg-muted text-foreground font-medium flex items-center gap-1 cursor-pointer"
+                className="mr-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-background hover:bg-muted text-foreground font-medium flex items-center gap-1.5 cursor-pointer transition-colors"
               >
-                <ArrowLeft className="size-3" />
+                <ArrowLeft className="size-3.5" />
+                <span>Back</span>
               </button>
             )}
 
             <button
               type="button"
               onClick={() => handleJumpToTrail(-1)}
-              className={`px-2 py-1 rounded font-semibold cursor-pointer ${
+              className={`px-2.5 py-1.5 rounded-lg font-semibold cursor-pointer transition-colors ${
                 trail.length === 0 ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
@@ -564,11 +575,11 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
 
             {trail.map((step, idx) => (
               <React.Fragment key={`${step.level}-${step.node.id}`}>
-                <ChevronRight className="size-3.5 text-muted-foreground/50 shrink-0" />
+                <ChevronRight className="size-4 text-muted-foreground/50 shrink-0" />
                 <button
                   type="button"
                   onClick={() => handleJumpToTrail(idx)}
-                  className={`px-2 py-1 rounded font-semibold cursor-pointer truncate max-w-[150px] ${
+                  className={`px-2.5 py-1.5 rounded-lg font-semibold cursor-pointer truncate max-w-[180px] transition-colors ${
                     idx === trail.length - 1
                       ? "bg-primary/10 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -581,8 +592,8 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
 
             {trail.length > 0 && currentLevel !== "line_detail" && (
               <>
-                <ChevronRight className="size-3.5 text-muted-foreground/50 shrink-0" />
-                <span className="px-2 py-1 rounded bg-primary text-primary-foreground font-semibold">
+                <ChevronRight className="size-4 text-muted-foreground/50 shrink-0" />
+                <span className="px-2.5 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold">
                   {LEVEL_LABELS[currentLevel]}s
                 </span>
               </>
@@ -590,116 +601,119 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
           </div>
 
           {currentLevel !== "line_detail" && (
-            <div className="relative w-full sm:w-52">
-              <Search className="size-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <div className="relative w-full sm:w-64">
+              <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search..."
-                className="w-full h-7 pl-8 pr-2.5 rounded-md border border-border bg-background text-xs outline-none focus:border-primary"
+                placeholder={`Search ${LEVEL_LABELS[currentLevel].toLowerCase()}...`}
+                className="w-full h-9 pl-9 pr-3 rounded-lg border border-border bg-background text-sm outline-none focus:border-primary"
               />
             </div>
           )}
         </div>
 
-        {/* Clean Summary Strip */}
-        <div className="px-5 py-3 border-b border-border/60 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-background text-xs">
+        {/* Summary Strip */}
+        <div className="px-6 py-4 border-b border-border/60 grid grid-cols-2 sm:grid-cols-4 gap-4 bg-background">
           {domain === "ot" ? (
             <>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Requisition</span>
-                <div className="text-sm font-bold text-foreground">{summary.otReqHrs.toLocaleString()} hrs</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Requisition</span>
+                <div className="text-xl font-bold text-foreground mt-0.5">{summary.otReqHrs.toLocaleString()} hrs</div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Utilized</span>
-                <div className="text-sm font-bold text-emerald-600">{summary.otUtilHrs.toLocaleString()} hrs</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Utilized</span>
+                <div className="text-xl font-bold text-emerald-600 mt-0.5">{summary.otUtilHrs.toLocaleString()} hrs</div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Rate</span>
-                <div className="text-sm font-bold text-foreground">
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Rate</span>
+                <div className="text-xl font-bold text-foreground mt-0.5">
                   {summary.otReqHrs > 0 ? ((summary.otUtilHrs / summary.otReqHrs) * 100).toFixed(1) : summary.efficiency}%
                 </div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Idle / Saved</span>
-                <div className="text-sm font-bold text-amber-600">{Math.max(0, summary.otReqHrs - summary.otUtilHrs).toLocaleString()} hrs</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Idle / Saved</span>
+                <div className="text-xl font-bold text-amber-600 mt-0.5">{Math.max(0, summary.otReqHrs - summary.otUtilHrs).toLocaleString()} hrs</div>
               </div>
             </>
           ) : domain === "merchandising" ? (
             <>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Order Volume</span>
-                <div className="text-sm font-bold text-foreground">{summary.orderPcs.toLocaleString()}K Pcs</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Order Volume</span>
+                <div className="text-xl font-bold text-foreground mt-0.5">{summary.orderPcs.toLocaleString()}K Pcs</div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">FOB Value</span>
-                <div className="text-sm font-bold text-blue-600">${(summary.fobValue / 1000).toFixed(2)}M</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">FOB Value</span>
+                <div className="text-xl font-bold text-blue-600 mt-0.5">${(summary.fobValue / 1000).toFixed(2)}M</div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">On-Time T&A</span>
-                <div className="text-sm font-bold text-emerald-600">{summary.efficiency}%</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">On-Time T&A</span>
+                <div className="text-xl font-bold text-emerald-600 mt-0.5">{summary.efficiency}%</div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Manpower</span>
-                <div className="text-sm font-bold text-foreground">{summary.manpower.toLocaleString()}</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Manpower</span>
+                <div className="text-xl font-bold text-foreground mt-0.5">{summary.manpower.toLocaleString()}</div>
               </div>
             </>
           ) : domain === "inventory" ? (
             <>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Stock Value</span>
-                <div className="text-sm font-bold text-foreground">৳{summary.stockValue.toLocaleString()}L</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Stock Value</span>
+                <div className="text-xl font-bold text-foreground mt-0.5">৳{summary.stockValue.toLocaleString()}L</div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">In-House Ready</span>
-                <div className="text-sm font-bold text-emerald-600">{summary.efficiency}%</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">In-House Ready</span>
+                <div className="text-xl font-bold text-emerald-600 mt-0.5">{summary.efficiency}%</div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Orders</span>
-                <div className="text-sm font-bold text-foreground">{summary.orderPcs.toLocaleString()}K</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Orders</span>
+                <div className="text-xl font-bold text-foreground mt-0.5">{summary.orderPcs.toLocaleString()}K</div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Low Stock</span>
-                <div className="text-sm font-bold text-rose-600">{Math.max(2, Math.round(summary.absent / 5))} SKUs</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Low Stock</span>
+                <div className="text-xl font-bold text-rose-600 mt-0.5">{Math.max(2, Math.round(summary.absent / 5))} SKUs</div>
               </div>
             </>
           ) : (
             <>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Total Manpower</span>
-                <div className="text-sm font-bold text-foreground">{summary.manpower.toLocaleString()}</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Total Manpower</span>
+                <div className="text-xl font-bold text-foreground mt-0.5">{summary.manpower.toLocaleString()}</div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Present</span>
-                <div className="text-sm font-bold text-emerald-600">
-                  {summary.present.toLocaleString()} ({summary.manpower > 0 ? ((summary.present / summary.manpower) * 100).toFixed(1) : 0}%)
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Present</span>
+                <div className="text-xl font-bold text-emerald-600 mt-0.5">
+                  {summary.present.toLocaleString()}{" "}
+                  <span className="text-sm font-semibold">
+                    ({summary.manpower > 0 ? ((summary.present / summary.manpower) * 100).toFixed(1) : 0}%)
+                  </span>
                 </div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Absent</span>
-                <div className="text-sm font-bold text-rose-600">{summary.absent.toLocaleString()}</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Absent</span>
+                <div className="text-xl font-bold text-rose-600 mt-0.5">{summary.absent.toLocaleString()}</div>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">Late / Eff</span>
-                <div className="text-sm font-bold text-amber-600">{summary.late} • {summary.efficiency}%</div>
+                <span className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wide">Late / Efficiency</span>
+                <div className="text-xl font-bold text-amber-600 mt-0.5">{summary.late} • {summary.efficiency}%</div>
               </div>
             </>
           )}
         </div>
 
-        {/* Clean Table Body */}
+        {/* Spacious Table Body */}
         <div className="overflow-y-auto flex-1">
           {currentLevel === "line_detail" && currentParent ? (
-            <table className="w-full text-left border-collapse text-xs">
-              <thead className="bg-muted/40 sticky top-0 border-b border-border text-[11px] text-muted-foreground uppercase">
+            <table className="w-full text-left border-collapse text-sm">
+              <thead className="bg-muted/40 sticky top-0 border-b border-border text-xs text-muted-foreground uppercase">
                 <tr>
-                  <th className="py-2.5 px-4 font-semibold">ID</th>
-                  <th className="py-2.5 px-4 font-semibold">Employee</th>
-                  <th className="py-2.5 px-4 font-semibold">Designation</th>
-                  <th className="py-2.5 px-4 font-semibold text-right">In Time</th>
-                  <th className="py-2.5 px-4 font-semibold text-right">OT</th>
-                  <th className="py-2.5 px-4 font-semibold text-right">Status</th>
+                  <th className="py-3.5 px-6 font-semibold">ID</th>
+                  <th className="py-3.5 px-6 font-semibold">Employee</th>
+                  <th className="py-3.5 px-6 font-semibold">Designation</th>
+                  <th className="py-3.5 px-6 font-semibold text-right">In Time</th>
+                  <th className="py-3.5 px-6 font-semibold text-right">OT</th>
+                  <th className="py-3.5 px-6 font-semibold text-right">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -710,20 +724,20 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
                   { id: "OP-1129", name: "Jashim Uddin", role: "Quality Checker", inTime: "—", ot: "0.0h", status: "Absent" },
                   { id: "OP-1152", name: "Taslima Begum", role: "Helper", inTime: "07:51 AM", ot: "2.0h", status: "Present" },
                 ].map((op) => (
-                  <tr key={op.id} className="hover:bg-muted/30">
-                    <td className="py-2.5 px-4 font-mono text-[11px] text-muted-foreground">{op.id}</td>
-                    <td className="py-2.5 px-4 font-semibold text-foreground">{op.name}</td>
-                    <td className="py-2.5 px-4 text-muted-foreground">{op.role}</td>
-                    <td className="py-2.5 px-4 text-right font-medium">{op.inTime}</td>
-                    <td className="py-2.5 px-4 text-right font-medium">{op.ot}</td>
-                    <td className="py-2.5 px-4 text-right">
+                  <tr key={op.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="py-3.5 px-6 font-mono text-xs text-muted-foreground">{op.id}</td>
+                    <td className="py-3.5 px-6 font-semibold text-foreground">{op.name}</td>
+                    <td className="py-3.5 px-6 text-muted-foreground">{op.role}</td>
+                    <td className="py-3.5 px-6 text-right font-medium">{op.inTime}</td>
+                    <td className="py-3.5 px-6 text-right font-medium">{op.ot}</td>
+                    <td className="py-3.5 px-6 text-right">
                       <span
-                        className={`text-[11px] font-semibold ${
+                        className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                           op.status === "Present"
-                            ? "text-emerald-600"
+                            ? "bg-emerald-500/10 text-emerald-600"
                             : op.status === "Late"
-                            ? "text-amber-600"
-                            : "text-rose-600"
+                            ? "bg-amber-500/10 text-amber-600"
+                            : "bg-rose-500/10 text-rose-600"
                         }`}
                       >
                         {op.status}
@@ -734,44 +748,44 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
               </tbody>
             </table>
           ) : (
-            <table className="w-full text-left border-collapse text-xs">
-              <thead className="bg-muted/40 sticky top-0 border-b border-border text-[11px] text-muted-foreground uppercase">
+            <table className="w-full text-left border-collapse text-sm">
+              <thead className="bg-muted/40 sticky top-0 border-b border-border text-xs text-muted-foreground uppercase">
                 <tr>
-                  <th className="py-2.5 px-4 font-semibold">{LEVEL_LABELS[currentLevel]}</th>
-                  <th className="py-2.5 px-4 font-semibold hidden sm:table-cell">Code</th>
-                  <th className="py-2.5 px-4 font-semibold hidden md:table-cell">Lead</th>
+                  <th className="py-3.5 px-6 font-semibold">{LEVEL_LABELS[currentLevel]}</th>
+                  <th className="py-3.5 px-6 font-semibold hidden sm:table-cell">Code</th>
+                  <th className="py-3.5 px-6 font-semibold hidden md:table-cell">Lead</th>
                   {domain === "ot" ? (
                     <>
-                      <th className="py-2.5 px-4 font-semibold text-right">Requisition</th>
-                      <th className="py-2.5 px-4 font-semibold text-right">Utilized</th>
-                      <th className="py-2.5 px-4 font-semibold text-right">Rate</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">Requisition</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">Utilized</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">Rate</th>
                     </>
                   ) : domain === "merchandising" ? (
                     <>
-                      <th className="py-2.5 px-4 font-semibold text-right">Orders</th>
-                      <th className="py-2.5 px-4 font-semibold text-right">FOB</th>
-                      <th className="py-2.5 px-4 font-semibold text-right">On-Time</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">Orders</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">FOB</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">On-Time</th>
                     </>
                   ) : domain === "inventory" ? (
                     <>
-                      <th className="py-2.5 px-4 font-semibold text-right">Stock</th>
-                      <th className="py-2.5 px-4 font-semibold text-right">Ready</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">Stock</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">Ready</th>
                     </>
                   ) : (
                     <>
-                      <th className="py-2.5 px-4 font-semibold text-right">Manpower</th>
-                      <th className="py-2.5 px-4 font-semibold text-right">Present</th>
-                      <th className="py-2.5 px-4 font-semibold text-right">Absent</th>
-                      <th className="py-2.5 px-4 font-semibold text-right">Rate</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">Manpower</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">Present</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">Absent</th>
+                      <th className="py-3.5 px-6 font-semibold text-right">Rate</th>
                     </>
                   )}
-                  <th className="py-2.5 px-3 w-8"></th>
+                  <th className="py-3.5 px-6 w-24"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
                 {nodes.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-8 text-center text-muted-foreground">
+                    <td colSpan={8} className="py-12 text-center text-muted-foreground">
                       No records found.
                     </td>
                   </tr>
@@ -786,44 +800,47 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
                         onClick={() => handleDrillInto(node)}
                         className="hover:bg-muted/40 cursor-pointer transition-colors group"
                       >
-                        <td className="py-2.5 px-4 font-semibold text-foreground group-hover:text-primary">
+                        <td className="py-4 px-6 font-semibold text-foreground group-hover:text-primary">
                           {node.name}
                         </td>
-                        <td className="py-2.5 px-4 font-mono text-[11px] text-muted-foreground hidden sm:table-cell">
+                        <td className="py-4 px-6 font-mono text-xs text-muted-foreground hidden sm:table-cell">
                           {node.code}
                         </td>
-                        <td className="py-2.5 px-4 text-muted-foreground hidden md:table-cell">
+                        <td className="py-4 px-6 text-muted-foreground hidden md:table-cell">
                           {node.headName}
                         </td>
 
                         {domain === "ot" ? (
                           <>
-                            <td className="py-2.5 px-4 text-right font-medium">{node.otReqHrs.toLocaleString()}h</td>
-                            <td className="py-2.5 px-4 text-right font-semibold text-emerald-600">{node.otUtilHrs.toLocaleString()}h</td>
-                            <td className="py-2.5 px-4 text-right font-bold">{otPct.toFixed(1)}%</td>
+                            <td className="py-4 px-6 text-right font-medium">{node.otReqHrs.toLocaleString()}h</td>
+                            <td className="py-4 px-6 text-right font-semibold text-emerald-600">{node.otUtilHrs.toLocaleString()}h</td>
+                            <td className="py-4 px-6 text-right font-bold">{otPct.toFixed(1)}%</td>
                           </>
                         ) : domain === "merchandising" ? (
                           <>
-                            <td className="py-2.5 px-4 text-right font-medium">{node.orderPcs}K</td>
-                            <td className="py-2.5 px-4 text-right font-semibold text-blue-600">${(node.fobValue / 1000).toFixed(2)}M</td>
-                            <td className="py-2.5 px-4 text-right font-bold">{node.efficiency}%</td>
+                            <td className="py-4 px-6 text-right font-medium">{node.orderPcs}K</td>
+                            <td className="py-4 px-6 text-right font-semibold text-blue-600">${(node.fobValue / 1000).toFixed(2)}M</td>
+                            <td className="py-4 px-6 text-right font-bold">{node.efficiency}%</td>
                           </>
                         ) : domain === "inventory" ? (
                           <>
-                            <td className="py-2.5 px-4 text-right font-semibold">৳{node.stockValue}L</td>
-                            <td className="py-2.5 px-4 text-right font-bold text-emerald-600">{node.efficiency}%</td>
+                            <td className="py-4 px-6 text-right font-semibold">৳{node.stockValue}L</td>
+                            <td className="py-4 px-6 text-right font-bold text-emerald-600">{node.efficiency}%</td>
                           </>
                         ) : (
                           <>
-                            <td className="py-2.5 px-4 text-right font-medium">{node.manpower.toLocaleString()}</td>
-                            <td className="py-2.5 px-4 text-right font-semibold text-emerald-600">{node.present.toLocaleString()}</td>
-                            <td className="py-2.5 px-4 text-right font-semibold text-rose-600">{node.absent.toLocaleString()}</td>
-                            <td className="py-2.5 px-4 text-right font-bold">{attPct.toFixed(1)}%</td>
+                            <td className="py-4 px-6 text-right font-medium">{node.manpower.toLocaleString()}</td>
+                            <td className="py-4 px-6 text-right font-semibold text-emerald-600">{node.present.toLocaleString()}</td>
+                            <td className="py-4 px-6 text-right font-semibold text-rose-600">{node.absent.toLocaleString()}</td>
+                            <td className="py-4 px-6 text-right font-bold">{attPct.toFixed(1)}%</td>
                           </>
                         )}
 
-                        <td className="py-2.5 px-3 text-right text-muted-foreground group-hover:text-primary">
-                          <ChevronRight className="size-4 inline" />
+                        <td className="py-4 px-6 text-right">
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">
+                            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Open</span>
+                            <ChevronRight className="size-4" />
+                          </span>
                         </td>
                       </tr>
                     );
@@ -832,6 +849,31 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
               </tbody>
             </table>
           )}
+        </div>
+
+        {/* Clean Footer */}
+        <div className="px-6 py-3 border-t border-border bg-muted/20 flex items-center justify-between text-xs text-muted-foreground">
+          <span>
+            {currentLevel === "line_detail" ? "5 Operators" : `${nodes.length} ${LEVEL_LABELS[currentLevel]}${nodes.length === 1 ? "" : "s"}`}
+          </span>
+          <div className="flex items-center gap-2">
+            {trail.length > 0 && (
+              <button
+                type="button"
+                onClick={handleGoBack}
+                className="px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted text-foreground font-semibold cursor-pointer transition-colors"
+              >
+                Back
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-3.5 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 cursor-pointer transition-colors"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
