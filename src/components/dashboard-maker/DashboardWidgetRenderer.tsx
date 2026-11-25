@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Users,
   UserCheck,
@@ -32,6 +32,7 @@ import {
   User,
   Timer,
   Crown,
+  Maximize2,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -47,6 +48,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  LabelList,
 } from "recharts";
 import {
   DashboardWidgetConfig,
@@ -54,6 +56,7 @@ import {
   WidgetSettings,
   WidgetColSpan,
 } from "./dashboard-maker-types";
+import { HierarchyDrillDownModal } from "./HierarchyDrillDownModal";
 
 interface WidgetRendererProps {
   widget: DashboardWidgetConfig;
@@ -66,12 +69,18 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
   isCompact = false,
   onUpdateSettings,
 }) => {
+  const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
   const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === widget.componentId);
   const displayTitle = widget.customTitle || def?.name || "Dashboard Widget";
   const settings = widget.settings;
 
   return (
-    <div className="h-full bg-card rounded-2xl border border-border/60 shadow-xs p-4 sm:p-5 flex flex-col justify-between transition-all hover:border-border hover:shadow-sm">
+    <>
+      <div
+        onClick={() => setIsDrillDownOpen(true)}
+        className="h-full bg-card rounded-2xl border border-border/60 shadow-xs p-4 sm:p-5 flex flex-col justify-between transition-all hover:border-primary/40 hover:shadow-md cursor-pointer group/card"
+        title="Click to open Hierarchy Drill-Down (Company → Region → Dept → Section → Unit → Line)"
+      >
       {/* Widget Header */}
       <div className="flex items-center justify-between pb-3 border-b border-border/40 gap-2 mb-3">
         <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -178,6 +187,20 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
               {(widget.colSpan || 12) > 3 ? def.badge : "★"}
             </span>
           )}
+
+          {/* Drill-Down Indicator Button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDrillDownOpen(true);
+            }}
+            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 hover:bg-primary hover:text-primary-foreground text-primary border border-primary/20 flex items-center gap-1 shrink-0 transition-colors cursor-pointer"
+            title="Drill Down: Company → Region → Department → Section → Unit → Line"
+          >
+            <Maximize2 className="size-2.5" />
+            {(widget.colSpan || 12) > 3 && <span>Drill Down</span>}
+          </button>
         </div>
       </div>
 
@@ -186,6 +209,13 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
         {renderWidgetContent(widget.componentId, isCompact, settings, widget.colSpan || 12)}
       </div>
     </div>
+
+    <HierarchyDrillDownModal
+      isOpen={isDrillDownOpen}
+      onClose={() => setIsDrillDownOpen(false)}
+      widget={widget}
+    />
+  </>
   );
 };
 
@@ -970,6 +1000,316 @@ function renderWidgetContent(
               </ResponsiveContainer>
             </div>
           )}
+        </div>
+      );
+    }
+
+    case "hr_total_manpower_chart": {
+      const fullDepts = [
+        { dept: "Cutting", short: "CUT", count: 383, color: "#ef4444" },
+        { dept: "R&D Pattern", short: "R&D", count: 1, color: "#64748b" },
+        { dept: "Finishing", short: "FIN", count: 639, color: "#22c55e" },
+        { dept: "Quality Control", short: "QC", count: 760, color: "#ea580c" },
+        { dept: "Sample Room", short: "SMP", count: 17, color: "#ec4899" },
+        { dept: "CAD & Marker", short: "CAD", count: 6, color: "#6366f1" },
+        { dept: "Store & Fabric", short: "STR", count: 118, color: "#9f1239" },
+        { dept: "IE & Planning", short: "IE", count: 61, color: "#0284c7" },
+        { dept: "HR & Compliance", short: "HR", count: 43, color: "#2dd4bf" },
+        { dept: "Maintenance", short: "MNT", count: 83, color: "#0f172a" },
+        { dept: "Merchandising Supply Chain", short: "MSC", count: 12, color: "#e11d48" },
+        { dept: "Accounts & Audit", short: "ACC", count: 55, color: "#f59e0b" },
+        { dept: "IT & ERP", short: "IT", count: 5, color: "#94a3b8" },
+        { dept: "Commercial", short: "COM", count: 47, color: "#c2410c" },
+        { dept: "Admin & Security", short: "ADM", count: 73, color: "#f472b6" },
+        { dept: "Wash & Dyeing", short: "WSH", count: 638, color: "#9333ea" },
+        { dept: "Sewing Production", short: "SEW", count: 3287, color: "#9f1239" },
+        { dept: "Procurement", short: "PRC", count: 12, color: "#3b82f6" },
+        { dept: "Packing & Dispatch", short: "PCK", count: 197, color: "#5eead4" },
+      ];
+
+      let scopedDepts = fullDepts;
+      let scopeCaption = "All Factory Departments (19 Units)";
+      if (scope === "managed_depts") {
+        scopedDepts = fullDepts.filter((d) => ["Cutting", "Finishing", "Sewing Production", "Quality Control"].includes(d.dept));
+        scopeCaption = "Head of Assigned Departments";
+      } else if (scope === "department") {
+        const deptName = (settings?.department || "Sewing").split(" ")[0].toLowerCase();
+        const match = fullDepts.filter((d) => d.dept.toLowerCase().includes(deptName));
+        scopedDepts = match.length > 0 ? match : fullDepts.slice(0, 6);
+        scopeCaption = `${settings?.department || "Department"} Focus`;
+      }
+
+      const totalMp = scopedDepts.reduce((sum, d) => sum + d.count, 0);
+
+      return (
+        <div className="space-y-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-2.5 py-2 rounded-xl bg-muted/40 border border-border/50">
+            <div>
+              <div className="text-xs font-black text-foreground">
+                Total Manpower : <span className="text-primary">{totalMp.toLocaleString()}</span>
+              </div>
+              <div className="text-[10px] text-muted-foreground">{scopeCaption}</div>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 self-start sm:self-center">
+              {scopedDepts.length} Departments
+            </span>
+          </div>
+
+          {colSpan <= 3 ? (
+            <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+              {[...scopedDepts]
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 8)
+                .map((d) => (
+                  <div key={d.dept} className="text-xs">
+                    <div className="flex justify-between mb-0.5">
+                      <span className="font-semibold text-foreground truncate">{d.dept}</span>
+                      <span className="font-bold text-primary">{d.count.toLocaleString()}</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${Math.max(4, (d.count / Math.max(...scopedDepts.map((x) => x.count))) * 100)}%`,
+                          backgroundColor: d.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className="h-52 w-full pt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={scopedDepts} margin={{ top: 18, right: 8, left: -12, bottom: 2 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                  <XAxis dataKey="short" tick={{ fontSize: 9 }} interval={0} />
+                  <YAxis tick={{ fontSize: 9.5 }} />
+                  <Tooltip
+                    formatter={(val: any) => [`${Number(val).toLocaleString()} Staff`, "Manpower"]}
+                    labelFormatter={(_, payload) => payload?.[0]?.payload?.dept || ""}
+                    contentStyle={{
+                      backgroundColor: "#1e293b",
+                      borderColor: "#ef4444",
+                      borderRadius: "8px",
+                      fontSize: "11px",
+                      color: "#fff",
+                    }}
+                  />
+                  <Bar dataKey="count" radius={[3, 3, 0, 0]} maxBarSize={26}>
+                    <LabelList
+                      dataKey="count"
+                      position="top"
+                      style={{ fontSize: "9.5px", fontWeight: 700, fill: "#2563eb" }}
+                    />
+                    {scopedDepts.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    case "hr_ot_budget_comparison": {
+      let budgetAmt = 85000;
+      let actualOtAmt = 68400;
+      let requestOtAmt = 74571;
+
+      if (scope === "managed_depts") {
+        budgetAmt = 52000;
+        actualOtAmt = 44800;
+        requestOtAmt = 48950;
+      } else if (scope === "department") {
+        budgetAmt = 34000;
+        actualOtAmt = 29100;
+        requestOtAmt = 31400;
+      }
+
+      const diffBudgetActual = budgetAmt - actualOtAmt;
+      const diffBudgetRequest = budgetAmt - requestOtAmt;
+
+      const budgetChartData = [
+        { name: "Budget Amt", amount: budgetAmt, displayVal: budgetAmt, color: "#16a34a" },
+        { name: "Actual OT Amt", amount: actualOtAmt, displayVal: actualOtAmt, color: "#f97316" },
+        { name: "Request OT Amt", amount: requestOtAmt, displayVal: requestOtAmt, color: "#0284c7" },
+        { name: "Diff(Budget-Actual)", amount: Math.abs(diffBudgetActual), displayVal: diffBudgetActual, color: "#dc2626" },
+        { name: "Diff(Budget-Request)", amount: Math.abs(diffBudgetRequest), displayVal: diffBudgetRequest, color: "#ef4444" },
+      ];
+
+      return (
+        <div className="space-y-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-2.5 py-2 rounded-xl bg-muted/40 border border-border/50">
+            <div>
+              <div className="text-xs font-bold text-foreground">OT Budget Vs OT Actual Vs OT Request</div>
+              <div className="text-[10px] text-muted-foreground">Data Upto: 25/11/2026 10:25:00</div>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 self-start sm:self-center">
+              Under Budget: ৳{diffBudgetActual.toLocaleString()}
+            </span>
+          </div>
+
+          <div className={`grid ${colSpan <= 3 ? "grid-cols-2" : "grid-cols-3"} gap-2`}>
+            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <div className="text-[10px] font-bold text-emerald-600 uppercase">Budget Amt</div>
+              <div className="text-sm font-black text-foreground">৳{budgetAmt.toLocaleString()}</div>
+            </div>
+            <div className="p-2 rounded-xl bg-orange-500/10 border border-orange-500/20">
+              <div className="text-[10px] font-bold text-orange-600 uppercase">Actual OT</div>
+              <div className="text-sm font-black text-foreground">৳{actualOtAmt.toLocaleString()}</div>
+            </div>
+            <div className={`p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 ${colSpan <= 3 ? "col-span-2" : ""}`}>
+              <div className="text-[10px] font-bold text-blue-600 uppercase">Request OT</div>
+              <div className="text-sm font-black text-foreground">৳{requestOtAmt.toLocaleString()}</div>
+            </div>
+          </div>
+
+          <div className="h-48 w-full pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={budgetChartData} margin={{ top: 18, right: 10, left: -8, bottom: 2 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 8.5 }} interval={0} />
+                <YAxis tick={{ fontSize: 9.5 }} />
+                <Tooltip
+                  formatter={(_, __, item) => [`৳${Number(item?.payload?.displayVal ?? 0).toLocaleString()}`, item?.payload?.name]}
+                  contentStyle={{
+                    backgroundColor: "#1e293b",
+                    borderColor: "#ef4444",
+                    borderRadius: "8px",
+                    fontSize: "11px",
+                    color: "#fff",
+                  }}
+                />
+                <Bar dataKey="amount" radius={[4, 4, 0, 0]} maxBarSize={42}>
+                  <LabelList
+                    dataKey="displayVal"
+                    position="top"
+                    formatter={(val: any) => Number(val).toLocaleString()}
+                    style={{ fontSize: "10px", fontWeight: 700, fill: "currentColor" }}
+                  />
+                  {budgetChartData.map((entry, idx) => (
+                    <Cell key={`budget-cell-${idx}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      );
+    }
+
+    case "hr_ot_request_vs_actual": {
+      let actualMp = 284;
+      let reqMp = 310;
+      let actualHr = 1920;
+      let reqHr = 2069;
+      let actualAmt = 147800;
+      let reqAmt = 159298;
+
+      if (scope === "managed_depts") {
+        actualMp = 172;
+        reqMp = 190;
+        actualHr = 1140;
+        reqHr = 1250;
+        actualAmt = 89400;
+        reqAmt = 98200;
+      } else if (scope === "department") {
+        actualMp = 98;
+        reqMp = 110;
+        actualHr = 640;
+        reqHr = 720;
+        actualAmt = 49600;
+        reqAmt = 55800;
+      }
+
+      const diffMp = actualMp - reqMp;
+      const diffHr = actualHr - reqHr;
+      const diffAmt = actualAmt - reqAmt;
+
+      const reqActualData = [
+        { name: "Actual MP", value: actualMp, displayVal: actualMp, color: "#16a34a", unit: "MP" },
+        { name: "Requested MP", value: reqMp, displayVal: reqMp, color: "#22c55e", unit: "MP" },
+        { name: "Diff MP", value: Math.abs(diffMp), displayVal: diffMp, color: "#dc2626", unit: "MP" },
+        { name: "Actual OT Hr", value: actualHr, displayVal: actualHr, color: "#ea580c", unit: "Hrs" },
+        { name: "Requested OT Hr", value: reqHr, displayVal: reqHr, color: "#f97316", unit: "Hrs" },
+        { name: "Diff OT Hr", value: Math.abs(diffHr), displayVal: diffHr, color: "#dc2626", unit: "Hrs" },
+        { name: "Actual OT Amt", value: actualAmt, displayVal: actualAmt, color: "#0284c7", unit: "৳" },
+        { name: "Requested OT Amt", value: reqAmt, displayVal: reqAmt, color: "#0ea5e9", unit: "৳" },
+        { name: "Diff OT Amt", value: Math.abs(diffAmt), displayVal: diffAmt, color: "#dc2626", unit: "৳" },
+      ];
+
+      return (
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-2.5 py-2 rounded-xl bg-muted/40 border border-border/50">
+            <div>
+              <div className="text-xs font-bold text-foreground">OT Request Vs OT Actual (Manpower, Hours & Amount)</div>
+              <div className="text-[10px] text-muted-foreground">Data Upto: 25/11/2026 10:25:00</div>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 self-start sm:self-center">
+              Saved: ৳{Math.abs(diffAmt).toLocaleString()}
+            </span>
+          </div>
+
+          <div className={`grid ${colSpan <= 3 ? "grid-cols-1" : "grid-cols-3"} gap-2`}>
+            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <div className="text-[10px] font-bold text-emerald-600 uppercase">Manpower (MP)</div>
+              <div className="text-xs font-black text-foreground mt-0.5">
+                Actual: {actualMp} <span className="text-muted-foreground font-semibold">/ Req: {reqMp}</span>
+              </div>
+              <div className="text-[10px] font-bold text-rose-600">Diff MP: {diffMp}</div>
+            </div>
+            <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20">
+              <div className="text-[10px] font-bold text-orange-600 uppercase">OT Hours</div>
+              <div className="text-xs font-black text-foreground mt-0.5">
+                Actual: {actualHr.toLocaleString()} <span className="text-muted-foreground font-semibold">/ Req: {reqHr.toLocaleString()}</span>
+              </div>
+              <div className="text-[10px] font-bold text-rose-600">Diff Hr: {diffHr.toLocaleString()}</div>
+            </div>
+            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
+              <div className="text-[10px] font-bold text-blue-600 uppercase">OT Amount (৳)</div>
+              <div className="text-xs font-black text-foreground mt-0.5">
+                Actual: ৳{actualAmt.toLocaleString()} <span className="text-muted-foreground font-semibold">/ Req: ৳{reqAmt.toLocaleString()}</span>
+              </div>
+              <div className="text-[10px] font-bold text-rose-600">Diff Amt: ৳{diffAmt.toLocaleString()}</div>
+            </div>
+          </div>
+
+          <div className="h-52 w-full pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={reqActualData} margin={{ top: 18, right: 10, left: -5, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 8.5 }} interval={0} />
+                <YAxis tick={{ fontSize: 9.5 }} />
+                <Tooltip
+                  formatter={(_, __, item) => {
+                    const p = item?.payload;
+                    return [`${Number(p?.displayVal ?? 0).toLocaleString()} ${p?.unit || ""}`, p?.name];
+                  }}
+                  contentStyle={{
+                    backgroundColor: "#1e293b",
+                    borderColor: "#334155",
+                    borderRadius: "8px",
+                    fontSize: "11px",
+                    color: "#fff",
+                  }}
+                />
+                <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={36}>
+                  <LabelList
+                    dataKey="displayVal"
+                    position="top"
+                    formatter={(val: any) => Number(val).toLocaleString()}
+                    style={{ fontSize: "9.5px", fontWeight: 700, fill: "currentColor" }}
+                  />
+                  {reqActualData.map((entry, idx) => (
+                    <Cell key={`req-act-cell-${idx}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       );
     }

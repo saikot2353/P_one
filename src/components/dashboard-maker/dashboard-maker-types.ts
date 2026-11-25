@@ -99,6 +99,45 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     supportedScopes: ["personal", "managed_depts", "department", "company"],
   },
   {
+    id: "hr_total_manpower_chart",
+    name: "Total Manpower Breakdown",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "Department-wise total manpower bar chart (6,437 staff across 19 departments & production units).",
+    iconName: "Users",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "Total Manpower",
+    supportedScopes: ["company", "managed_depts", "department"],
+  },
+  {
+    id: "hr_ot_budget_comparison",
+    name: "OT Budget Comparison",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "OT Budget vs Actual OT Amt vs Request OT Amt with Budget-Actual & Budget-Request variance.",
+    iconName: "Banknote",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "OT Budget",
+    supportedScopes: ["company", "managed_depts", "department"],
+  },
+  {
+    id: "hr_ot_request_vs_actual",
+    name: "OT Request Vs OT Actual",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "Actual vs Requested comparison across Manpower (MP), OT Hours, and OT Amount with variance.",
+    iconName: "Timer",
+    defaultColSpan: 12,
+    minColSpan: 6,
+    badge: "OT Req vs Actual",
+    supportedScopes: ["company", "managed_depts", "department"],
+  },
+  {
     id: "hr_attendance_pie",
     name: "Attendance Distribution Chart",
     module: "hris",
@@ -382,6 +421,9 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
       { id: "w_hr_4", componentId: "hr_ot_bar_chart", colSpan: 4 },
       { id: "w_hr_9", componentId: "hr_ot_requisition_vs_consumption", colSpan: 6 },
       { id: "w_hr_10", componentId: "hr_ot_requisition_vs_utilization", colSpan: 6 },
+      { id: "w_hr_11", componentId: "hr_total_manpower_chart", colSpan: 6 },
+      { id: "w_hr_12", componentId: "hr_ot_budget_comparison", colSpan: 6 },
+      { id: "w_hr_13", componentId: "hr_ot_request_vs_actual", colSpan: 12 },
       { id: "w_hr_5", componentId: "hr_headcount_trend", colSpan: 6 },
       { id: "w_hr_6", componentId: "hr_department_split", colSpan: 6 },
       { id: "w_hr_7", componentId: "hr_leave_approvals", colSpan: 6 },
@@ -449,8 +491,8 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
   },
 ];
 
-const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v4";
-const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v4";
+const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v5";
+const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v5";
 
 export function loadDashboardTemplates(): DashboardTemplate[] {
   if (typeof window === "undefined") return DEFAULT_DASHBOARD_TEMPLATES;
