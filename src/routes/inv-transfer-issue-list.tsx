@@ -61,13 +61,28 @@ function TransferIssueListPage() {
   const [transfers, setTransfers] = useState<InterCompanyTransfer[]>(() =>
     getStoredInterCompanyTransfers()
   );
-  const [requisitions] = useState<TransferRequisition[]>(() =>
+  const [requisitions, setRequisitions] = useState<TransferRequisition[]>(() =>
     getStoredTransferRequisitions()
   );
+
+  // State for Requisition-wise Transfer Issue History Modal ("D" button)
+  const [selectedReqForModal, setSelectedReqForModal] = useState<TransferRequisition | null>(null);
+  const [isTransferHistoryModalOpen, setIsTransferHistoryModalOpen] = useState(false);
 
   useEffect(() => {
     saveStoredInterCompanyTransfers(transfers);
   }, [transfers]);
+
+  // Sync state with local storage on mount, window focus, or modal open
+  useEffect(() => {
+    const syncData = () => {
+      setTransfers(getStoredInterCompanyTransfers());
+      setRequisitions(getStoredTransferRequisitions());
+    };
+    syncData();
+    window.addEventListener("focus", syncData);
+    return () => window.removeEventListener("focus", syncData);
+  }, [isTransferHistoryModalOpen]);
 
   // Tab filter: Pending Issues, Partial Issue, Processed Transfers, All Records
   const [activeTab, setActiveTab] = useState<"pending" | "partial" | "processed" | "all">("pending");
@@ -79,10 +94,6 @@ function TransferIssueListPage() {
   // Report Modal
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
   const [reportTargetTransfer, setReportTargetTransfer] = useState<InterCompanyTransfer | null>(null);
-
-  // State for Requisition-wise Transfer Issue History Modal ("D" button)
-  const [selectedReqForModal, setSelectedReqForModal] = useState<TransferRequisition | null>(null);
-  const [isTransferHistoryModalOpen, setIsTransferHistoryModalOpen] = useState(false);
 
   // Transfer history matching selected requisition
   const reqMatchingTransfers = useMemo(() => {
@@ -142,16 +153,18 @@ function TransferIssueListPage() {
   const pendingRequisitions = useMemo(() => {
     return requisitionsWithTransferStats.filter((r) => {
       if (r.req.status !== "Approved" && r.req.status !== "Approval Pending") return false;
-      if (!r.isPending) return false;
+      if (r.isPartial || r.isFullyIssued || !r.isPending) return false;
       return matchesSearchAndCompany(r.req);
     });
   }, [requisitionsWithTransferStats, fromCompanyFilter, searchQuery]);
 
-  // Partial Issue Requisitions (Transfers issued, but remaining > 0)
+  // Partial Issue Requisitions (Transfers issued, but remaining > 0, or status is Partially Issued)
   const partialRequisitions = useMemo(() => {
     return requisitionsWithTransferStats.filter((r) => {
-      if (r.req.status !== "Approved" && r.req.status !== "Partially Issued") return false;
-      if (!r.isPartial) return false;
+      if (r.req.status === "Draft" || r.req.status === "Rejected" || r.req.status === "Returned for Correction") return false;
+      if (r.req.status === "Fully Issued" || (r.isFullyIssued && r.totalIssued >= r.req.totalRequiredQty)) return false;
+      const isPart = r.isPartial || r.req.status === "Partially Issued";
+      if (!isPart) return false;
       return matchesSearchAndCompany(r.req);
     });
   }, [requisitionsWithTransferStats, fromCompanyFilter, searchQuery]);
@@ -475,12 +488,12 @@ function TransferIssueListPage() {
                             <td className="py-3 px-3 text-center">
                               <span
                                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                                  item.isPartial
+                                  item.isPartial || item.req.status === "Partially Issued"
                                     ? "bg-amber-50 text-amber-700 border-amber-200"
                                     : "bg-emerald-50 text-emerald-700 border-emerald-200"
                                 }`}
                               >
-                                {item.isPartial ? "Partially Issued" : item.req.status}
+                                {item.isPartial || item.req.status === "Partially Issued" ? "Partial Issue" : item.req.status}
                               </span>
                             </td>
                             <td className="py-3 px-3 text-center">
@@ -647,7 +660,7 @@ function TransferIssueListPage() {
                     </div>
                     <div>
                       <h3 className="text-base font-bold text-slate-800">
-                        Transfer Issue History
+                        Issue Details
                       </h3>
                       <p className="text-xs text-slate-500">
                         Requisition No:{" "}
@@ -676,18 +689,14 @@ function TransferIssueListPage() {
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-200">
-                          <th className="py-2.5 px-3 w-10 text-center font-bold">SL</th>
-                          <th className="py-2.5 px-4 font-bold">Transfer Issue ID</th>
-                          <th className="py-2.5 px-4 font-bold">Issue Date</th>
-                          <th className="py-2.5 px-3 text-center font-bold w-20">Action</th>
+                          <th className="py-2.5 px-4 font-bold">TR Issue No.</th>
+                          <th className="py-2.5 px-4 font-bold">Date</th>
+                          <th className="py-2.5 px-3 text-center font-bold w-24">Action</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {reqMatchingTransfers.map((t, rIdx) => (
                           <tr key={t.id || rIdx} className="hover:bg-slate-50 transition-colors">
-                            <td className="py-2.5 px-3 text-center text-slate-400 font-bold">
-                              {rIdx + 1}
-                            </td>
                             <td className="py-2.5 px-4">
                               <button
                                 type="button"
@@ -739,7 +748,7 @@ function TransferIssueListPage() {
                   <div className="p-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
                     <ArrowLeftRight className="size-8 text-slate-300 mx-auto mb-2 stroke-[1.5]" />
                     <p className="text-xs font-semibold text-slate-600">
-                      No Transfer Issue transactions found
+                      No Transfer Issue records found
                     </p>
                     <p className="text-[10px] text-slate-400 mt-0.5">
                       No transfer issues have been processed yet for Requisition{" "}

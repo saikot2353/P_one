@@ -406,7 +406,6 @@ function InterCompanyTransferFormPage() {
   }, [items, activeTrackingItemId]);
 
   const openTrackingModal = (item: InterCompanyTransferItem) => {
-    if (isViewMode) return;
     const mode = getItemTrackingMode(item.itemCode, catalogItems);
     setActiveTrackingItemId(item.id);
     if (mode === "Batch") {
@@ -687,7 +686,7 @@ function InterCompanyTransferFormPage() {
         : `Transfer ${transferId} submitted successfully for warehouse dispatch!`
     );
 
-    navigate({ to: "/inv-intercompany-transfer-list" });
+    navigate({ to: "/inv-transfer-issue-list" });
   };
 
   // Section 4: Auto-persist active draft so refreshing browser preserves in-progress input
@@ -808,9 +807,9 @@ function InterCompanyTransferFormPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
             <div className="flex items-center gap-3">
               <Link
-                to="/inv-intercompany-transfer-list"
+                to="/inv-transfer-issue-list"
                 className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-                title="Back to Transfers List"
+                title="Back to Transfer Issue Register"
               >
                 <ArrowLeft className="size-5" />
               </Link>
@@ -1339,7 +1338,6 @@ function InterCompanyTransferFormPage() {
                                 batchAllocations={row.batchAllocations}
                                 locationAllocations={row.locationAllocations}
                                 onOpenModal={() => openTrackingModal(row)}
-                                disabled={isViewMode}
                               />
                             </td>
 

@@ -1111,15 +1111,29 @@ export function saveInterCompanyTransfer(transfer: InterCompanyTransfer): void {
   saveStoredInterCompanyTransfers(current);
 
   // If this transfer is issued against a Transfer Requisition, update the requisition status
-  if (transfer.transferRequisitionNumber) {
+  if (transfer.transferRequisitionNumber || transfer.transferRequisitionId) {
     const requisitions = getStoredTransferRequisitions();
     const trIndex = requisitions.findIndex(
       (r) =>
-        r.requisitionNumber === transfer.transferRequisitionNumber ||
-        r.id === transfer.transferRequisitionId
+        (transfer.transferRequisitionNumber && r.requisitionNumber === transfer.transferRequisitionNumber) ||
+        (transfer.transferRequisitionId && r.id === transfer.transferRequisitionId)
     );
     if (trIndex >= 0) {
-      requisitions[trIndex].status = "Fully Issued";
+      const targetReq = requisitions[trIndex];
+      const matchingTransfers = current.filter(
+        (t) =>
+          t.transferRequisitionNumber === targetReq.requisitionNumber ||
+          t.transferRequisitionId === targetReq.id
+      );
+      const totalIssued = matchingTransfers.reduce(
+        (sum, t) => sum + (Number(t.totalTransferQty) || 0),
+        0
+      );
+      if (totalIssued >= targetReq.totalRequiredQty && totalIssued > 0) {
+        requisitions[trIndex].status = "Fully Issued";
+      } else if (totalIssued > 0) {
+        requisitions[trIndex].status = "Partially Issued";
+      }
       requisitions[trIndex].updatedAt = new Date().toISOString();
       saveStoredTransferRequisitions(requisitions);
     }
