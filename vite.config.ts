@@ -53,7 +53,8 @@ export default defineConfig(({ command, mode }) => {
       cssCodeSplit: true,
       rollupOptions: {
         output: {
-          manualChunks(id) {
+          manualChunks(id, meta) {
+            // Only split vendor chunks for client build; avoid interfering with SSR/Nitro server bundle
             if (id.includes("node_modules")) {
               if (id.includes("xlsx")) return "vendor-xlsx";
               if (id.includes("recharts") || id.includes("d3-")) return "vendor-charts";
@@ -63,9 +64,6 @@ export default defineConfig(({ command, mode }) => {
               if (id.includes("@radix-ui")) return "vendor-radix";
               if (id.includes("date-fns")) return "vendor-date";
               if (id.includes("lodash")) return "vendor-lodash";
-              if (id.includes("@tanstack/react-router") || id.includes("@tanstack/router-core")) return "vendor-router";
-              if (id.includes("@tanstack/react-query") || id.includes("@tanstack/query-core")) return "vendor-query";
-              if (id.includes("zod") || id.includes("react-hook-form") || id.includes("@hookform")) return "vendor-forms";
             }
           },
         },
