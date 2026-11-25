@@ -258,6 +258,30 @@ export const nav: NavItem[] = [
         to: "/inv-loan-receive",
       },
       {
+        label: "Loan Return Register",
+        to: "/inv-loan-return-list",
+      },
+      {
+        label: "New Loan Return",
+        to: "/inv-loan-return",
+      },
+      {
+        label: "Loan Recovery Register",
+        to: "/inv-loan-recovery-list",
+      },
+      {
+        label: "New Loan Recovery",
+        to: "/inv-loan-recovery",
+      },
+      {
+        label: "Loan Settlement Register",
+        to: "/inv-loan-settlement-list",
+      },
+      {
+        label: "Loan Outstanding Register",
+        to: "/inv-loan-outstanding-list",
+      },
+      {
         label: "Loan Issue Against Receive",
         to: "/inv-loan-issue-against-receive-list",
       },

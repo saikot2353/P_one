@@ -26,6 +26,9 @@ import {
   Paperclip,
   Upload,
   X,
+  History,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -41,6 +44,7 @@ import {
   MM_MERCHANTS_MASTER,
   MMSeasonMasterItem,
   MMFabricConsumptionAttachment,
+  MMFabricConsumptionCadVersion,
 } from "../../lib/marketing-merchandising-data";
 import { SearchableSelect } from "../ui/searchable-select";
 import { MMMasterDataRepository } from "../../lib/merchandising-master-data";
@@ -202,6 +206,17 @@ export function FabricConsumptionCadForm({
   const [requestRemarks, setRequestRemarks] = useState("");
   const [submittedDate, setSubmittedDate] = useState<string | undefined>(undefined);
 
+  // Revision & Amendment State
+  const [version, setVersion] = useState<number>(1);
+  const [amendmentCount, setAmendmentCount] = useState<number>(0);
+  const [amendmentReason, setAmendmentReason] = useState<string>("");
+  const [amendedDate, setAmendedDate] = useState<string | undefined>(undefined);
+  const [amendedBy, setAmendedBy] = useState<string | undefined>(undefined);
+  const [versions, setVersions] = useState<MMFabricConsumptionCadVersion[]>([]);
+  const [showAmendmentModal, setShowAmendmentModal] = useState<boolean>(false);
+  const [amendmentReasonInput, setAmendmentReasonInput] = useState<string>("");
+  const [selectedVersionView, setSelectedVersionView] = useState<number | "current">("current");
+
   // CAD fields
   const [cadAssignedTo, setCadAssignedTo] = useState("Kazi Mofizul (CAD In-Charge)");
   const [cadResponseDate, setCadResponseDate] = useState<string | undefined>(undefined);
@@ -213,10 +228,25 @@ export function FabricConsumptionCadForm({
   const [comments, setComments] = useState("ONE BODY ONE WAY CUTTING.");
   const [history, setHistory] = useState<MMFabricConsumptionCadRecord["history"]>([]);
 
+  // Historical snapshot helper: when a user selects a previous revision, display that snapshot's data
+  const activeSnapshot = useMemo(() => {
+    if (selectedVersionView === "current") return null;
+    return versions.find((v) => v.version === selectedVersionView) || null;
+  }, [selectedVersionView, versions]);
+
   // Calculation summaries
   const totals = useMemo(() => {
+    if (activeSnapshot) {
+      return {
+        totalFinishKg: activeSnapshot.totalFinishKg,
+        totalWaste10Kg: activeSnapshot.totalWaste10Kg,
+        wash10Pct: activeSnapshot.wash10Pct,
+        totalDiaCut: 0,
+        avgConsumptionRatio: 0,
+      };
+    }
     return calculateCadTable(rows);
-  }, [rows]);
+  }, [rows, activeSnapshot]);
 
   // Load masters and record on mount
   useEffect(() => {
@@ -264,6 +294,13 @@ export function FabricConsumptionCadForm({
     setSeason("Autumn / Winter 2026");
     setMerchandiser(getLoggedInUser());
     setRequestRemarks("");
+    setVersion(1);
+    setAmendmentCount(0);
+    setAmendmentReason("");
+    setAmendedDate(undefined);
+    setAmendedBy(undefined);
+    setVersions([]);
+    setSelectedVersionView("current");
     setStatus("Draft");
     setCadResponseStatus("Not Received");
     setAttachments([]);
@@ -292,6 +329,13 @@ export function FabricConsumptionCadForm({
     setMerchandiser(rec.merchandiser);
     setRequestRemarks(rec.requestRemarks || "");
     setSubmittedDate(rec.submittedDate);
+    setVersion(rec.version || 1);
+    setAmendmentCount(rec.amendmentCount || 0);
+    setAmendmentReason(rec.amendmentReason || "");
+    setAmendedDate(rec.amendedDate);
+    setAmendedBy(rec.amendedBy);
+    setVersions(rec.versions || []);
+    setSelectedVersionView("current");
     setCadAssignedTo(rec.cadAssignedTo || "Kazi Mofizul (CAD In-Charge)");
     setCadResponseDate(rec.cadResponseDate);
     setCadSubmittedBy(rec.cadSubmittedBy);
@@ -397,7 +441,7 @@ export function FabricConsumptionCadForm({
 
   // ── Attachment Handlers ──────────────────────────────────────
   const handleAddAttachment = (newAtt: MMFabricConsumptionAttachment) => {
-    const updated = [...attachments, newAtt];
+    const updated = [...attachments, { ...newAtt, version: version }];
     setAttachments(updated);
 
     // If an active record already exists, persist attachments immediately
@@ -412,9 +456,46 @@ export function FabricConsumptionCadForm({
             {
               timestamp: new Date().toISOString().replace("T", " ").substring(0, 16),
               user: getLoggedInUser(),
-              action: "Attachment Added",
+              action: `Attachment Added (Rev ${version})`,
               status: currentRec.status,
               notes: `Document "${newAtt.title}" (${newAtt.fileName}) attached by ${newAtt.uploadedRole || "User"}.`,
+            },
+          ],
+        };
+        MMRepository.saveFabricConsumptionCadRecord(updatedRec);
+        setHistory(updatedRec.history || []);
+      }
+    }
+  };
+
+  const handleReplaceAttachment = (oldId: string, newRecord: MMFabricConsumptionAttachment) => {
+    const updated = attachments.map((att) =>
+      att.id === oldId
+        ? {
+          ...att,
+          isReplaced: true,
+          replacedByTitle: newRecord.title,
+          amendmentReason: amendmentReason || "Replaced during revision cycle",
+        }
+        : att
+    );
+    const finalUpdated = [...updated, { ...newRecord, version: version }];
+    setAttachments(finalUpdated);
+
+    if (recordId) {
+      const currentRec = MMRepository.getFabricConsumptionCadById(recordId);
+      if (currentRec) {
+        const updatedRec: MMFabricConsumptionCadRecord = {
+          ...currentRec,
+          attachments: finalUpdated,
+          history: [
+            ...(currentRec.history || []),
+            {
+              timestamp: new Date().toISOString().replace("T", " ").substring(0, 16),
+              user: getLoggedInUser(),
+              action: `Document Replaced (Rev ${version})`,
+              status: currentRec.status,
+              notes: `Document "${newRecord.title}" replaced previous version. Historical copy permanently preserved.`,
             },
           ],
         };
@@ -439,6 +520,93 @@ export function FabricConsumptionCadForm({
       }
     }
     toast.success("Attachment removed.");
+  };
+
+  // ── Amendment Confirmation Handler ───────────────────────────
+  const handleConfirmAmendment = () => {
+    const reason = amendmentReasonInput.trim();
+    if (!reason) {
+      toast.error("Please specify a reason for requesting amendment.");
+      return;
+    }
+    if (!recordId) {
+      toast.error("No active request to amend.");
+      return;
+    }
+
+    const currentRec = MMRepository.getFabricConsumptionCadById(recordId);
+    if (!currentRec) return;
+
+    const now = new Date().toISOString().replace("T", " ").substring(0, 16);
+    const user = getLoggedInUser();
+
+    // Preserve snapshot of current revision
+    const snapshot: MMFabricConsumptionCadVersion = {
+      version: version,
+      amendmentReason: reason,
+      amendedBy: user,
+      amendedDate: now,
+      submittedDate: submittedDate,
+      cadResponseDate: cadResponseDate,
+      cadSubmittedBy: cadSubmittedBy,
+      buyer,
+      styleOrder,
+      efficiency,
+      sizeRange,
+      fabrication,
+      season,
+      requestRemarks,
+      rows: JSON.parse(JSON.stringify(rows)),
+      totalFinishKg: totals.totalFinishKg,
+      totalWaste10Kg: totals.totalWaste10Kg,
+      wash10Pct: totals.wash10Pct,
+      notes,
+      comments,
+      attachments: JSON.parse(JSON.stringify(attachments)),
+      gmtImage: gmtImage || undefined,
+      cadImages: JSON.parse(JSON.stringify(cadImages)),
+    };
+
+    const nextVersion = version + 1;
+    const nextAmendmentCount = amendmentCount + 1;
+    const updatedVersions = [...versions, snapshot];
+
+    const updatedRec: MMFabricConsumptionCadRecord = {
+      ...currentRec,
+      version: nextVersion,
+      amendmentCount: nextAmendmentCount,
+      amendmentReason: reason,
+      amendedDate: now,
+      amendedBy: user,
+      versions: updatedVersions,
+      status: "Amendment Requested",
+      cadResponseStatus: "Not Received", // Clear response status so CAD knows revised data is needed
+      history: [
+        ...(currentRec.history || []),
+        {
+          timestamp: now,
+          user,
+          action: `Amendment Requested (Rev ${nextVersion})`,
+          status: "Amendment Requested",
+          notes: `Reason: ${reason}`,
+        },
+      ],
+    };
+
+    MMRepository.saveFabricConsumptionCadRecord(updatedRec);
+    setVersion(nextVersion);
+    setAmendmentCount(nextAmendmentCount);
+    setAmendmentReason(reason);
+    setAmendedDate(now);
+    setAmendedBy(user);
+    setVersions(updatedVersions);
+    setStatus("Amendment Requested");
+    setCadResponseStatus("Not Received");
+    setHistory(updatedRec.history || []);
+    setMode("edit"); // Switch to edit mode so merchant can amend parameters and attachments
+    setShowAmendmentModal(false);
+    setSelectedVersionView("current");
+    toast.success(`Amendment cycle Rev ${nextVersion} initiated! You may now edit details, replace attachments, and resubmit to CAD.`);
   };
 
   // ── Body Part Catalog Modal Handlers ─────────────────────────
@@ -488,11 +656,13 @@ export function FabricConsumptionCadForm({
 
     const now = new Date().toISOString().replace("T", " ").substring(0, 16);
     const id = recordId || `fcad-${Date.now()}`;
+    const isUnderAmendment = status === "Amendment Requested" || version > 1;
+    const currentRec = recordId ? MMRepository.getFabricConsumptionCadById(recordId) : null;
     const record: MMFabricConsumptionCadRecord = {
       id,
       requestNo: requestNo || `FCAD-2026-${Date.now().toString().slice(-4)}`,
       requestDate,
-      jobId: `JOB-2026-${Date.now().toString().slice(-4)}`,
+      jobId: currentRec?.jobId || `JOB-2026-${Date.now().toString().slice(-4)}`,
       buyer,
       styleOrder,
       efficiency,
@@ -501,7 +671,13 @@ export function FabricConsumptionCadForm({
       season,
       merchandiser,
       requestRemarks,
-      status: "Draft",
+      version,
+      amendmentCount,
+      amendmentReason,
+      amendedDate,
+      amendedBy,
+      versions,
+      status: status === "Amendment Requested" ? "Amendment Requested" : "Draft",
       cadResponseStatus: "Not Received",
       attachments,
       gmtImage: gmtImage || undefined,
@@ -517,9 +693,11 @@ export function FabricConsumptionCadForm({
         {
           timestamp: now,
           user: merchandiser,
-          action: recordId ? "Draft Updated" : "Draft Created",
-          status: "Draft",
-          notes: requestRemarks || "Merchant draft updated",
+          action: isUnderAmendment ? `Amendment Draft Saved (Rev ${version})` : recordId ? "Draft Updated" : "Draft Created",
+          status: status === "Amendment Requested" ? "Amendment Requested" : "Draft",
+          notes: isUnderAmendment
+            ? `Amendment draft saved for Rev ${version}. Remarks: ${requestRemarks || "Pending resubmission to CAD."}`
+            : requestRemarks || "Merchant draft updated",
         },
       ],
     };
@@ -527,7 +705,7 @@ export function FabricConsumptionCadForm({
     MMRepository.saveFabricConsumptionCadRecord(record);
     setRecordId(id);
     setHistory(record.history || []);
-    toast.success(`Draft request ${record.requestNo} saved successfully.`);
+    toast.success(isUnderAmendment ? `Amendment draft for Rev ${version} saved successfully.` : `Draft request ${record.requestNo} saved successfully.`);
   };
 
   const handleSubmitToCad = () => {
@@ -538,11 +716,13 @@ export function FabricConsumptionCadForm({
 
     const now = new Date().toISOString().replace("T", " ").substring(0, 16);
     const id = recordId || `fcad-${Date.now()}`;
+    const isResubmit = version > 1 || status === "Amendment Requested";
+    const currentRec = recordId ? MMRepository.getFabricConsumptionCadById(recordId) : null;
     const record: MMFabricConsumptionCadRecord = {
       id,
       requestNo: requestNo || `FCAD-2026-${Date.now().toString().slice(-4)}`,
       requestDate,
-      jobId: `JOB-2026-${Date.now().toString().slice(-4)}`,
+      jobId: currentRec?.jobId || `JOB-2026-${Date.now().toString().slice(-4)}`,
       buyer,
       styleOrder,
       efficiency,
@@ -552,6 +732,12 @@ export function FabricConsumptionCadForm({
       merchandiser,
       requestRemarks,
       submittedDate: now,
+      version,
+      amendmentCount,
+      amendmentReason,
+      amendedDate,
+      amendedBy,
+      versions,
       cadAssignedTo,
       status: "Pending CAD",
       cadResponseStatus: "Not Received",
@@ -569,9 +755,11 @@ export function FabricConsumptionCadForm({
         {
           timestamp: now,
           user: merchandiser,
-          action: "Submitted to CAD",
+          action: isResubmit ? `Resubmitted to CAD (Rev ${version})` : "Submitted to CAD",
           status: "Pending CAD",
-          notes: `Request submitted to CAD queue. Remarks: ${requestRemarks || "Standard marker estimation requested."}`,
+          notes: isResubmit
+            ? `Amendment Rev ${version} resubmitted to CAD queue. Reason: ${amendmentReason || "Revised specifications/attachments."}`
+            : `Request submitted to CAD queue. Remarks: ${requestRemarks || "Standard marker estimation requested."}`,
         },
       ],
     };
@@ -582,7 +770,11 @@ export function FabricConsumptionCadForm({
     setSubmittedDate(now);
     setHistory(record.history || []);
     setMode("view");
-    toast.success(`Request ${record.requestNo} submitted to CAD team queue successfully!`);
+    toast.success(
+      isResubmit
+        ? `Request ${record.requestNo} (Rev ${version}) resubmitted to CAD team queue successfully!`
+        : `Request ${record.requestNo} submitted to CAD team queue successfully!`
+    );
   };
 
   // ── CAD Team Actions ──────────────────────────────────────────
@@ -595,6 +787,17 @@ export function FabricConsumptionCadForm({
         val = value === "" ? "" : Number(value);
       }
       const target = { ...copy[index], [field]: val };
+
+      if (field === "wash10") {
+        target.wash10Pct = val;
+      } else if (field === "wash10Pct") {
+        target.wash10 = val;
+      }
+      if (field === "finishYardsMeter") {
+        target.finishYdsMeter = val;
+      } else if (field === "finishYdsMeter") {
+        target.finishYardsMeter = val;
+      }
 
       // Condumption conversion helper
       let condVal = 12;
@@ -676,6 +879,10 @@ export function FabricConsumptionCadForm({
       finishKgConsumption: 0,
       waste10Consumption: 0,
       diaMake: "OPEN",
+      wash10: "",
+      wash10Pct: "",
+      finishYardsMeter: "",
+      finishYdsMeter: "",
       law: 1550000,
       condumption: 12,
       cuttableFinish: 2,
@@ -712,6 +919,12 @@ export function FabricConsumptionCadForm({
       ...currentRec,
       efficiency, // Persist CAD edited Efficiency
       fabrication, // Persist CAD edited Fabrication
+      version,
+      amendmentCount,
+      amendmentReason,
+      amendedDate,
+      amendedBy,
+      versions,
       status: "In Progress",
       cadResponseStatus: "In Progress",
       cadAssignedTo,
@@ -729,7 +942,7 @@ export function FabricConsumptionCadForm({
         {
           timestamp: now,
           user: getLoggedInUser(),
-          action: "CAD Draft Saved",
+          action: version > 1 ? `CAD Draft Saved (Rev ${version})` : "CAD Draft Saved",
           status: "In Progress",
           notes:
             changedFields.length > 0
@@ -765,10 +978,17 @@ export function FabricConsumptionCadForm({
     if (!currentRec) return;
 
     const loggedIn = getLoggedInUser();
+    const isRevisedCad = version > 1;
     const updatedRecord: MMFabricConsumptionCadRecord = {
       ...currentRec,
       efficiency, // Persist CAD edited Efficiency
       fabrication, // Persist CAD edited Fabrication
+      version,
+      amendmentCount,
+      amendmentReason,
+      amendedDate,
+      amendedBy,
+      versions,
       status: "CAD Submitted",
       cadResponseStatus: "Received", // Formally mark as Received for Merchandiser
       cadAssignedTo,
@@ -789,9 +1009,11 @@ export function FabricConsumptionCadForm({
         {
           timestamp: now,
           user: loggedIn,
-          action: "CAD Response Submitted",
+          action: isRevisedCad ? `CAD Response Submitted (Rev ${version})` : "CAD Response Submitted",
           status: "CAD Submitted",
-          notes: `Completed fabric consumption calculations (${totals.totalFinishKg} Finish Kg, ${totals.totalWaste10Kg} Waste+10% Kg). Marked as Received for Merchandiser.`,
+          notes: isRevisedCad
+            ? `Completed revised CAD calculations for Rev ${version} (${totals.totalFinishKg} Finish Kg, ${totals.totalWaste10Kg} Waste+10% Kg). Marked as Received for Merchandiser.`
+            : `Completed fabric consumption calculations (${totals.totalFinishKg} Finish Kg, ${totals.totalWaste10Kg} Waste+10% Kg). Marked as Received for Merchandiser.`,
         },
       ],
     };
@@ -803,7 +1025,11 @@ export function FabricConsumptionCadForm({
     setCadSubmittedBy(loggedIn);
     setHistory(updatedRecord.history || []);
     setMode("view");
-    toast.success("CAD Response submitted successfully! Consumption Received by Merchant.");
+    toast.success(
+      isRevisedCad
+        ? `Revised CAD Response (Rev ${version}) submitted successfully! Consumption Received by Merchant.`
+        : "CAD Response submitted successfully! Consumption Received by Merchant."
+    );
   };
 
   return (
@@ -820,15 +1046,22 @@ export function FabricConsumptionCadForm({
             <ArrowLeft className="size-4" />
           </button>
           <div>
-            <h1 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <h1 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
               <span>
                 {mode === "create"
                   ? "New Fabric Consumption Request (Merchant)"
                   : mode === "cad-response"
-                  ? `CAD Consumption Entry — ${requestNo}`
-                  : `Fabric Consumption Details — ${requestNo}`}
+                    ? `CAD Consumption Entry — ${requestNo}`
+                    : `Fabric Consumption Details — ${requestNo}`}
               </span>
-              {cadResponseStatus === "Received" ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                Rev {version}
+              </span>
+              {status === "Amendment Requested" ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                  <RotateCcw className="size-3.5" /> Amendment Requested
+                </span>
+              ) : cadResponseStatus === "Received" ? (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                   <CheckCircle2 className="size-3.5" /> Consumption Received
                 </span>
@@ -851,6 +1084,31 @@ export function FabricConsumptionCadForm({
 
         {/* Mode Switcher / Action Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Version Switcher (When previous revisions exist) */}
+          {versions.length > 0 && (
+            <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs shadow-xs">
+              <span className="text-slate-500 font-bold flex items-center gap-1">
+                <History className="size-3.5 text-purple-600" />
+                <span>Version:</span>
+              </span>
+              <select
+                value={selectedVersionView}
+                onChange={(e) => {
+                  const val = e.target.value === "current" ? "current" : Number(e.target.value);
+                  setSelectedVersionView(val);
+                }}
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-0.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:ring-1 focus:ring-purple-500"
+              >
+                <option value="current">Rev {version} (Current Active)</option>
+                {versions.map((v) => (
+                  <option key={v.version} value={v.version}>
+                    Rev {v.version} ({v.amendedDate?.substring(0, 10) || "Archived"})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Clearly Visible Dedicated Preview Report Button */}
           <button
             type="button"
@@ -861,6 +1119,7 @@ export function FabricConsumptionCadForm({
             <FileText className="size-3.5 text-teal-600" />
             <span>Preview Report</span>
           </button>
+
           {mode === "view" && (
             <>
               {status === "Draft" && (
@@ -872,23 +1131,45 @@ export function FabricConsumptionCadForm({
                   Edit Request
                 </button>
               )}
+              {status === "Amendment Requested" && (
+                <button
+                  type="button"
+                  onClick={() => setMode("edit")}
+                  className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
+                >
+                  <RotateCcw className="size-3.5" /> Continue Amendment
+                </button>
+              )}
               {(status === "Pending CAD" || status === "In Progress") && (
                 <button
                   type="button"
                   onClick={() => setMode("cad-response")}
                   className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
                 >
-                  <Scissors className="size-3.5" /> Enter CAD Calculations
+                  <Scissors className="size-3.5" /> Enter CAD Calculations (Rev {version})
                 </button>
               )}
               {status === "CAD Submitted" && (
-                <button
-                  type="button"
-                  onClick={() => setMode("cad-response")}
-                  className="px-4 py-2 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold hover:bg-indigo-100 cursor-pointer flex items-center gap-1.5"
-                >
-                  <Calculator className="size-3.5" /> Re-open CAD Data
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAmendmentReasonInput("");
+                      setShowAmendmentModal(true);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
+                    title="Request amendment & resubmit revised specifications to CAD"
+                  >
+                    <RotateCcw className="size-3.5" /> Request Amendment
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("cad-response")}
+                    className="px-4 py-2 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold hover:bg-indigo-100 cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Calculator className="size-3.5" /> Re-open CAD Data
+                  </button>
+                </>
               )}
               <button
                 type="button"
@@ -907,14 +1188,14 @@ export function FabricConsumptionCadForm({
                 onClick={handleSaveMerchantDraft}
                 className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-100 cursor-pointer flex items-center gap-1.5 shadow-xs"
               >
-                <Save className="size-3.5" /> Save Draft
+                <Save className="size-3.5" /> {status === "Amendment Requested" ? "Save Amendment Draft" : "Save Draft"}
               </button>
               <button
                 type="button"
                 onClick={handleSubmitToCad}
                 className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
               >
-                <Send className="size-3.5" /> Submit to CAD
+                <Send className="size-3.5" /> {version > 1 || status === "Amendment Requested" ? `Resubmit to CAD (Rev ${version})` : "Submit to CAD"}
               </button>
             </>
           ) : mode === "cad-response" ? (
@@ -931,12 +1212,130 @@ export function FabricConsumptionCadForm({
                 onClick={handleSubmitCadResponse}
                 className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
               >
-                <CheckCircle2 className="size-3.5" /> Submit Response to Merchant
+                <CheckCircle2 className="size-3.5" /> {version > 1 ? `Submit Revised Response (Rev ${version})` : "Submit Response to Merchant"}
               </button>
             </>
           ) : null}
         </div>
       </div>
+
+      {/* ── REVISION & AMENDMENT ALERT BANNERS ──────────────────────── */}
+      {/* 1. Historical Snapshot Banner (When viewing past revision) */}
+      {activeSnapshot && (
+        <div className="bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs animate-in fade-in">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300">
+              <History className="size-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2 py-0.5 rounded-full text-xs font-black bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200">
+                  Viewing Historical Snapshot: Rev {activeSnapshot.version}
+                </span>
+                <span className="text-xs text-purple-600 dark:text-purple-400 font-semibold">
+                  Archived on {activeSnapshot.amendedDate || "Past Cycle"} by {activeSnapshot.amendedBy || "Merchant"}
+                </span>
+              </div>
+              {activeSnapshot.amendmentReason && (
+                <p className="text-xs text-purple-900 dark:text-purple-200 font-medium mt-1">
+                  <strong>Amendment Scope:</strong> {activeSnapshot.amendmentReason}
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSelectedVersionView("current")}
+            className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5 whitespace-nowrap self-start sm:self-auto"
+          >
+            <ArrowLeft className="size-3.5" /> Return to Current Rev {version}
+          </button>
+        </div>
+      )}
+
+      {/* 2. Revision Under Amendment Banner (Merchant currently editing amendment) */}
+      {!activeSnapshot && status === "Amendment Requested" && (
+        <div className="bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-300 dark:border-amber-700/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300">
+              <AlertTriangle className="size-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2 py-0.5 rounded-full text-xs font-black bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100">
+                  Revision {version} Under Amendment
+                </span>
+                <span className="text-xs text-amber-700 dark:text-amber-300 font-semibold">
+                  Requested by {amendedBy || merchandiser} on {amendedDate || "Recently"}
+                </span>
+              </div>
+              <p className="text-xs text-amber-900 dark:text-amber-200 font-medium mt-1">
+                <strong>Amendment Reason:</strong> {amendmentReason || "Specifications / attachments revision requested."}
+              </p>
+              <p className="text-[11px] text-amber-700 dark:text-amber-400 mt-0.5">
+                Update request fields or replace tech packs in the Attachments modal, then click <strong>"Resubmit to CAD (Rev {version})"</strong>.
+              </p>
+            </div>
+          </div>
+          {mode === "view" && (
+            <button
+              type="button"
+              onClick={() => setMode("edit")}
+              className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5 whitespace-nowrap self-start sm:self-auto"
+            >
+              <RotateCcw className="size-3.5" /> Continue Amendment
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* 3. Revision Resubmitted to CAD Queue Banner */}
+      {!activeSnapshot && version > 1 && status === "Pending CAD" && (
+        <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
+              <RefreshCw className="size-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2 py-0.5 rounded-full text-xs font-black bg-blue-200 dark:bg-blue-800 text-blue-900 dark:text-blue-100">
+                  Revision {version} Resubmitted to CAD
+                </span>
+                <span className="text-xs text-blue-700 dark:text-blue-300 font-semibold">
+                  Awaiting CAD Team Recalculations
+                </span>
+              </div>
+              <p className="text-xs text-blue-800 dark:text-blue-200 font-medium mt-1">
+                <strong>Amendment Scope:</strong> {amendmentReason || "Revised specifications resubmitted to CAD."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. Revision CAD Response Received Banner */}
+      {!activeSnapshot && version > 1 && status === "CAD Submitted" && (
+        <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+              <CheckCircle2 className="size-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2 py-0.5 rounded-full text-xs font-black bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100">
+                  Revision {version} CAD Response Received
+                </span>
+                <span className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold">
+                  Submitted by {cadSubmittedBy || "CAD In-Charge"} on {cadResponseDate || "Recently"}
+                </span>
+              </div>
+              <p className="text-xs text-emerald-800 dark:text-emerald-200 font-medium mt-1">
+                Revised consumption ready: <strong>{totals.totalFinishKg.toFixed(3)} Kg Finish</strong> | <strong>{totals.totalWaste10Kg.toFixed(3)} Kg Waste+10%</strong>. Merchandiser may review or request further amendments if needed.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── SECTION 1: REQUEST HEADER INFORMATION ─────────────────── */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
@@ -1030,11 +1429,10 @@ export function FabricConsumptionCadForm({
               value={efficiency}
               onChange={(e) => setEfficiency(e.target.value)}
               placeholder="e.g. 85%"
-              className={`w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 font-bold text-xs transition-all ${
-                mode === "view"
-                  ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                  : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-teal-500 border-indigo-200 dark:border-indigo-800"
-              }`}
+              className={`w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 font-bold text-xs transition-all ${mode === "view"
+                ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-teal-500 border-indigo-200 dark:border-indigo-800"
+                }`}
             />
           </div>
 
@@ -1151,11 +1549,10 @@ export function FabricConsumptionCadForm({
               readOnly={mode === "view" || mode === "cad-response"}
               value={requestDate}
               onChange={(e) => setRequestDate(e.target.value)}
-              className={`w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 font-semibold text-xs ${
-                mode === "view" || mode === "cad-response"
-                  ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                  : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-teal-500"
-              }`}
+              className={`w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 font-semibold text-xs ${mode === "view" || mode === "cad-response"
+                ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-teal-500"
+                }`}
             />
           </div>
 
@@ -1171,11 +1568,10 @@ export function FabricConsumptionCadForm({
                 value={requestRemarks}
                 onChange={(e) => setRequestRemarks(e.target.value)}
                 placeholder="Provide any specific cutting or marker requirements, shrinkage observations, or pattern instructions..."
-                className={`w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-normal ${
-                  mode === "view" || mode === "cad-response"
-                    ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                    : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-teal-500"
-                }`}
+                className={`w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-normal ${mode === "view" || mode === "cad-response"
+                  ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-teal-500"
+                  }`}
               />
             </div>
 
@@ -1252,14 +1648,18 @@ export function FabricConsumptionCadForm({
                     Waste+10%/KG
                   </th>
                   <th className="py-2.5 px-2 text-center min-w-[95px]">DIA make</th>
+                  {/* WASH 10% Column — Moved to right side of DIA Make */}
+                  <th className="py-2.5 px-2 text-center min-w-[95px] bg-indigo-50/50 dark:bg-indigo-950/20 font-black text-indigo-700 dark:text-indigo-400">
+                    WASH 10%
+                  </th>
+                  {/* Finish Yads/Meter Column — Added immediately after WASH 10% */}
+                  <th className="py-2.5 px-2 text-center min-w-[120px] bg-sky-50/50 dark:bg-sky-950/20 font-bold text-sky-800 dark:text-sky-300">
+                    Finish Yads/Meter
+                  </th>
                   {/* Law column aligned to LEFT */}
                   <th className="py-2.5 px-2 text-left min-w-[75px] text-rose-600 font-bold">Law</th>
                   <th className="py-2.5 px-2 text-center min-w-[80px] text-rose-600 font-bold">Consumption</th>
                   <th className="py-2.5 px-2 text-right min-w-[80px] text-rose-600 font-bold">Cuttable finish</th>
-                  {/* Replaced Ratio (%) with WASH 10% */}
-                  <th className="py-2.5 px-3 text-right min-w-[100px] bg-indigo-50/40 dark:bg-indigo-950/20 font-black text-indigo-700 dark:text-indigo-400">
-                    WASH 10%
-                  </th>
                   {mode === "cad-response" && <th className="py-2.5 px-2 text-center w-10">Action</th>}
                 </tr>
               </thead>
@@ -1270,9 +1670,8 @@ export function FabricConsumptionCadForm({
                   return (
                     <tr
                       key={row.id || idx}
-                      className={`hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors ${
-                        isManual ? "bg-amber-50/20 dark:bg-amber-950/10" : ""
-                      }`}
+                      className={`hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors ${isManual ? "bg-amber-50/20 dark:bg-amber-950/10" : ""
+                        }`}
                     >
                       {/* SL */}
                       <td className="py-2 px-3 text-center text-slate-400 font-mono font-bold">
@@ -1372,22 +1771,20 @@ export function FabricConsumptionCadForm({
                             onChange={(e) =>
                               handleUpdateCadRow(idx, "calculationMode", e.target.value as MMCadCalculationMode)
                             }
-                            className={`h-8 px-2 rounded-lg border text-xs font-bold cursor-pointer ${
-                              isManual
-                                ? "bg-amber-100 text-amber-900 border-amber-300"
-                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-400"
-                            }`}
+                            className={`h-8 px-2 rounded-lg border text-xs font-bold cursor-pointer ${isManual
+                              ? "bg-amber-100 text-amber-900 border-amber-300"
+                              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-400"
+                              }`}
                           >
                             <option value="Auto">Auto</option>
                             <option value="Manual">Manual</option>
                           </select>
                         ) : (
                           <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              isManual
-                                ? "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
-                                : "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300"
-                            }`}
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold ${isManual
+                              ? "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+                              : "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300"
+                              }`}
                           >
                             {row.calculationMode}
                           </span>
@@ -1396,11 +1793,10 @@ export function FabricConsumptionCadForm({
 
                       {/* Finish/KG Consumption — Allows manual entry in Manual mode */}
                       <td
-                        className={`py-1.5 px-3 text-right font-mono font-black ${
-                          isManual
-                            ? "bg-amber-100/60 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200"
-                            : "bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400"
-                        }`}
+                        className={`py-1.5 px-3 text-right font-mono font-black ${isManual
+                          ? "bg-amber-100/60 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200"
+                          : "bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400"
+                          }`}
                       >
                         {mode === "cad-response" && isManual ? (
                           <input
@@ -1420,11 +1816,10 @@ export function FabricConsumptionCadForm({
 
                       {/* Waste+10%/KG Consumption — Allows manual entry in Manual mode */}
                       <td
-                        className={`py-1.5 px-3 text-right font-mono font-black ${
-                          isManual
-                            ? "bg-amber-100/60 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200"
-                            : "bg-teal-50/40 dark:bg-teal-950/10 text-teal-700 dark:text-teal-400"
-                        }`}
+                        className={`py-1.5 px-3 text-right font-mono font-black ${isManual
+                          ? "bg-amber-100/60 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200"
+                          : "bg-teal-50/40 dark:bg-teal-950/10 text-teal-700 dark:text-teal-400"
+                          }`}
                       >
                         {mode === "cad-response" && isManual ? (
                           <input
@@ -1455,6 +1850,46 @@ export function FabricConsumptionCadForm({
                         ) : (
                           <span className="font-semibold text-slate-700 dark:text-slate-300">
                             {row.diaMake}
+                          </span>
+                        )}
+                      </td>
+
+                      {/* WASH 10% — Editable text/number input, manual entry, no auto calculation */}
+                      <td className="py-1.5 px-2 text-center bg-indigo-50/20 dark:bg-indigo-950/10">
+                        {mode === "cad-response" ? (
+                          <input
+                            type="text"
+                            value={row.wash10 ?? row.wash10Pct ?? ""}
+                            onChange={(e) => {
+                              handleUpdateCadRow(idx, "wash10", e.target.value);
+                              handleUpdateCadRow(idx, "wash10Pct", e.target.value);
+                            }}
+                            placeholder="Enter..."
+                            className="w-full h-8 px-2 text-center rounded-lg border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-900 font-mono font-bold text-indigo-700 dark:text-indigo-400 text-xs"
+                          />
+                        ) : (
+                          <span className="font-mono font-bold text-indigo-700 dark:text-indigo-400">
+                            {row.wash10 ?? row.wash10Pct ?? "—"}
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Finish Yads/Meter — Editable text field for each row */}
+                      <td className="py-1.5 px-2 text-center bg-sky-50/20 dark:bg-sky-950/10">
+                        {mode === "cad-response" ? (
+                          <input
+                            type="text"
+                            value={row.finishYardsMeter ?? row.finishYdsMeter ?? ""}
+                            onChange={(e) => {
+                              handleUpdateCadRow(idx, "finishYardsMeter", e.target.value);
+                              handleUpdateCadRow(idx, "finishYdsMeter", e.target.value);
+                            }}
+                            placeholder="e.g. 1.85 Yds"
+                            className="w-full h-8 px-2 text-center rounded-lg border border-sky-200 dark:border-sky-800 bg-white dark:bg-slate-900 font-mono font-semibold text-sky-800 dark:text-sky-300 text-xs"
+                          />
+                        ) : (
+                          <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
+                            {row.finishYardsMeter ?? row.finishYdsMeter ?? "—"}
                           </span>
                         )}
                       </td>
@@ -1513,12 +1948,6 @@ export function FabricConsumptionCadForm({
                         )}
                       </td>
 
-                      {/* WASH 10% Column (Replaced Ratio (%))
-                          Displayed in only ONE designated row (row index 0), all other rows blank */}
-                      <td className="py-2 px-3 text-right font-mono font-black text-indigo-700 dark:text-indigo-400 bg-indigo-50/30 dark:bg-indigo-950/15">
-                        {idx === 0 ? totals.wash10Pct.toFixed(3) : ""}
-                      </td>
-
                       {/* Action */}
                       {mode === "cad-response" && (
                         <td className="py-1.5 px-2 text-center">
@@ -1555,15 +1984,9 @@ export function FabricConsumptionCadForm({
                     {totals.totalWaste10Kg.toFixed(3)}
                   </td>
                   <td
-                    colSpan={4}
+                    colSpan={mode === "cad-response" ? 7 : 6}
                     className="py-3 px-3 text-right text-xs uppercase font-bold text-slate-600 dark:text-slate-400"
-                  >
-                    WASH 10% (Total Waste):
-                  </td>
-                  <td className="py-3 px-3 text-right font-mono text-xs text-indigo-600 dark:text-indigo-400 font-black bg-indigo-100/50 dark:bg-indigo-950/40">
-                    {totals.wash10Pct.toFixed(3)}
-                  </td>
-                  {mode === "cad-response" && <td></td>}
+                  ></td>
                 </tr>
               </tfoot>
             </table>
@@ -1581,11 +2004,10 @@ export function FabricConsumptionCadForm({
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
                 placeholder="e.g. ONE BODY ONE WAY CUTTING."
-                className={`w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold uppercase ${
-                  mode === "view"
-                    ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                    : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500"
-                }`}
+                className={`w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold uppercase ${mode === "view"
+                  ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500"
+                  }`}
               />
             </div>
           </div>
@@ -1695,9 +2117,8 @@ export function FabricConsumptionCadForm({
                 </div>
               ) : (
                 <label
-                  className={`border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/10 transition-all ${
-                    mode === "view" ? "opacity-60 pointer-events-none" : ""
-                  }`}
+                  className={`border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/10 transition-all ${mode === "view" ? "opacity-60 pointer-events-none" : ""
+                    }`}
                 >
                   <input
                     type="file"
@@ -1743,7 +2164,11 @@ export function FabricConsumptionCadForm({
                 <div className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col items-center p-2">
                   <div
                     className="relative w-full h-48 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center cursor-pointer"
-                    onClick={() => setPreviewZoomImage({ url: gmtImage.dataUrl, title: `GMT Image — ${gmtImage.name}` })}
+                    onClick={() => {
+                      if (gmtImage) {
+                        setPreviewZoomImage({ url: gmtImage.dataUrl, title: `GMT Image — ${gmtImage.name}` });
+                      }
+                    }}
                   >
                     <img
                       src={gmtImage.dataUrl}
@@ -1764,9 +2189,8 @@ export function FabricConsumptionCadForm({
                 </div>
               ) : (
                 <label
-                  className={`border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/10 transition-all ${
-                    mode === "view" ? "opacity-60 pointer-events-none" : ""
-                  }`}
+                  className={`border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/10 transition-all ${mode === "view" ? "opacity-60 pointer-events-none" : ""
+                    }`}
                 >
                   <input
                     type="file"
@@ -1800,7 +2224,7 @@ export function FabricConsumptionCadForm({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-full flex items-center justify-between px-3 py-2 text-white border-b border-white/10">
-              <span className="text-xs font-bold truncate">{previewZoomImage.title}</span>
+              <span className="text-xs font-bold truncate">{previewZoomImage.title || "Image Zoom"}</span>
               <button
                 type="button"
                 onClick={() => setPreviewZoomImage(null)}
@@ -1812,13 +2236,120 @@ export function FabricConsumptionCadForm({
             <div className="p-2 overflow-auto max-h-[80vh] flex items-center justify-center">
               <img
                 src={previewZoomImage.url}
-                alt={previewZoomImage.title}
+                alt={previewZoomImage.title || "Zoomed Image"}
                 className="max-w-full max-h-[75vh] object-contain rounded-lg"
               />
             </div>
           </div>
         </div>
       )}
+
+      {/* ── SECTION 5: REVISION & WORKFLOW HISTORY TIMELINE ────────── */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-4 bg-purple-600 rounded-full inline-block" />
+            <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
+              <History className="size-4 text-purple-600" />
+              <span>5. Revision & Workflow History Timeline</span>
+            </h2>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200">
+              Active: Rev {version}
+            </span>
+            {amendmentCount > 0 && (
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200">
+                {amendmentCount} Amendment Cycle(s)
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Revision Snapshots Cards */}
+        {versions.length > 0 ? (
+          <div className="space-y-3">
+            <h3 className="text-[11px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400">
+              Historical Revision Snapshots
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {versions.map((ver) => (
+                <div
+                  key={ver.version}
+                  className={`p-3.5 rounded-xl border transition-all ${selectedVersionView === ver.version
+                    ? "border-purple-500 bg-purple-50/50 dark:bg-purple-950/30 ring-2 ring-purple-400"
+                    : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:border-purple-300"
+                    }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-0.5 rounded-md text-xs font-black bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200">
+                      Revision {ver.version}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedVersionView(
+                          selectedVersionView === ver.version ? "current" : ver.version
+                        )
+                      }
+                      className="text-[11px] font-bold text-purple-600 hover:text-purple-800 cursor-pointer flex items-center gap-1"
+                    >
+                      <Eye className="size-3" />
+                      {selectedVersionView === ver.version ? "Viewing" : "Inspect Snapshot"}
+                    </button>
+                  </div>
+                  <div className="mt-2 text-xs space-y-1">
+                    <p className="text-slate-700 dark:text-slate-300 text-[11px]">
+                      <strong>Amended:</strong> {ver.amendedDate || "Archived"} by {ver.amendedBy || "Merchant"}
+                    </p>
+                    <p className="text-slate-600 dark:text-slate-400 text-[11px] italic line-clamp-2">
+                      "{ver.amendmentReason || "Revision requested."}"
+                    </p>
+                    <div className="pt-2 mt-2 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
+                      <span>Consumption: <strong>{ver.totalFinishKg?.toFixed(3) || "0.000"} Kg</strong></span>
+                      <span>Docs: <strong>{ver.attachments?.length || 0}</strong></span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-400">
+            Initial submission (Rev 1). No previous amendment cycles recorded.
+          </div>
+        )}
+
+        {/* Workflow History Audit Trail */}
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+          <h3 className="text-[11px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2">
+            Detailed Workflow Audit Trail
+          </h3>
+          <div className="space-y-2 max-h-48 overflow-y-auto">
+            {(history || []).map((h, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-xs"
+              >
+                <div className="font-mono text-[10px] text-slate-400 whitespace-nowrap mt-0.5">
+                  {h.timestamp}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-slate-800 dark:text-slate-200">{h.action}</span>
+                    <span className="text-[11px] text-slate-400">by {h.user}</span>
+                  </div>
+                  {h.notes && (
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 truncate">
+                      {h.notes}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* ── Attachment Modal (PI Entry Form design) ────────────────── */}
       <MMFabricConsumptionAttachmentModal
@@ -1828,12 +2359,88 @@ export function FabricConsumptionCadForm({
         buyerName={buyer}
         styleName={styleOrder}
         attachments={attachments}
+        currentVersion={version}
         onAddAttachment={handleAddAttachment}
+        onReplaceAttachment={handleReplaceAttachment}
         onDeleteAttachment={handleDeleteAttachment}
         currentUser={getLoggedInUser()}
         currentRole={mode === "cad-response" ? "CAD" : "Merchant"}
         readOnly={mode === "view" && status === "CAD Submitted" && false}
       />
+
+      {/* ── Request Amendment Modal Dialog ────────────────────────── */}
+      {showAmendmentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300">
+                  <RotateCcw className="size-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    Request CAD Consumption Amendment
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Initiating Revision Cycle Rev {version + 1}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAmendmentModal(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3.5 text-xs">
+              <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/60 space-y-1">
+                <div className="flex items-center justify-between text-purple-900 dark:text-purple-200 font-bold">
+                  <span>Current Version: Rev {version}</span>
+                  <span className="text-indigo-600 dark:text-indigo-400">Target Version: Rev {version + 1}</span>
+                </div>
+                <p className="text-[11px] text-purple-700 dark:text-purple-300">
+                  All current data, calculations, and attached documents of Rev {version} will be preserved in the revision ledger. You will be able to update specifications, replace tech packs/patterns, and resubmit to CAD.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Amendment Reason / Revision Scope <span className="text-rose-500">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={amendmentReasonInput}
+                  onChange={(e) => setAmendmentReasonInput(e.target.value)}
+                  placeholder="e.g. Buyer updated size breakdown; revised tech pack attached; adjusted marker length requirement..."
+                  className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium focus:ring-2 focus:ring-purple-500"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowAmendmentModal(false)}
+                className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold hover:bg-slate-100 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmAmendment}
+                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
+              >
+                <Check className="size-3.5" />
+                <span>Confirm & Begin Amendment (Rev {version + 1})</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Add New Body Part to Catalog Dialog Modal ──────────────── */}
       {showAddBodyPartModal && (
@@ -1908,38 +2515,46 @@ export function FabricConsumptionCadForm({
           </div>
         </div>
       )}
-
+      ``
       {/* ── FABRIC CONSUMPTION DEDICATED PREVIEW REPORT MODAL ── */}
-      <FabricConsumptionPreviewModal
-        isOpen={showPreviewReportModal}
-        onClose={() => setShowPreviewReportModal(false)}
-        data={{
-          requestNo,
-          requestDate,
-          jobId: recordId ? MMRepository.getFabricConsumptionCadById(recordId)?.jobId || `JOB-2026-${recordId.slice(-4)}` : "JOB-2026-0842",
-          buyer,
-          styleOrder,
-          efficiency,
-          sizeRange,
-          fabrication,
-          season,
-          merchandiser,
-          requestRemarks,
-          submittedDate,
-          cadAssignedTo,
-          cadResponseDate,
-          cadSubmittedBy,
-          status,
-          cadResponseStatus,
-          notes,
-          comments,
-          attachments,
-          gmtImage: gmtImage || undefined,
-          cadImages: cadImages.length > 0 ? cadImages : undefined,
-          rows,
-          totals,
-        }}
-      />
+      {(() => {
+        const snap = activeSnapshot;
+        const currentJobId = recordId
+          ? (MMRepository.getFabricConsumptionCadById(recordId)?.jobId || `JOB-2026-${recordId.slice(-4)}`)
+          : "JOB-2026-0842";
+        return (
+          <FabricConsumptionPreviewModal
+            isOpen={showPreviewReportModal}
+            onClose={() => setShowPreviewReportModal(false)}
+            data={{
+              requestNo: snap ? `${requestNo} (Rev ${snap.version})` : requestNo,
+              requestDate,
+              jobId: currentJobId,
+              buyer: (snap ? snap.buyer : buyer) || buyer,
+              styleOrder: (snap ? snap.styleOrder : styleOrder) || styleOrder,
+              efficiency: (snap ? snap.efficiency : efficiency) || efficiency,
+              sizeRange: (snap ? snap.sizeRange : sizeRange) || sizeRange,
+              fabrication: (snap ? snap.fabrication : fabrication) || fabrication,
+              season: snap?.season || season,
+              merchandiser,
+              requestRemarks: snap?.requestRemarks || requestRemarks,
+              submittedDate: snap ? snap.submittedDate : submittedDate,
+              cadAssignedTo,
+              cadResponseDate: snap ? snap.cadResponseDate : cadResponseDate,
+              cadSubmittedBy: snap ? snap.cadSubmittedBy : cadSubmittedBy,
+              status,
+              cadResponseStatus,
+              notes: snap?.notes || notes,
+              comments: snap?.comments || comments,
+              attachments: snap?.attachments || attachments,
+              gmtImage: snap?.gmtImage || (gmtImage || undefined),
+              cadImages: snap?.cadImages || (cadImages.length > 0 ? cadImages : undefined),
+              rows: snap ? snap.rows : rows,
+              totals,
+            }}
+          />
+        );
+      })()}
     </div>
   );
 }

@@ -3,7 +3,8 @@
 // LocalStorage Keys: cripton_stock_loan_*
 // Completely isolated from Stock Transfers
 
-import { getStoredData, setStoredData } from "./procurement-master-data";
+import { getStoredData, setStoredData, DEFAULT_ITEMS } from "./procurement-master-data";
+import { INITIAL_STOCK_BALANCE_DATA } from "./reports-mock-data";
 
 // ---------------------------------------------------------------------------
 // 1. Stock Loan Requisition
@@ -105,6 +106,12 @@ export interface StockLoanIssueItem {
   loanQty: number;
   unitPrice: number;
   totalValue: number;
+  // Valuation Snapshot (Issue-time Inventory Average Cost / Weighted Average Cost)
+  issueAvgCostRate?: number;
+  totalLoanValue?: number;
+  hasValidValuation?: boolean;
+  valuationSource?: string;
+  valuationSnapshotDate?: string;
   batchAllocations?: LoanIssueBatchAllocation[];
   locationAllocations?: LoanIssueLocationAllocation[];
   remarks?: string;
@@ -123,6 +130,8 @@ export interface StockLoanIssue {
   taggedRequisitionId?: string;
   loanRequisitionNumber?: string; // alias
   loanRequisitionId?: string; // alias
+  borrowerName?: string; // Borrower / Employee
+  department?: string; // Department
   fromCompany: string;
   fromStore: string;
   toCompany: string;
@@ -140,6 +149,11 @@ export interface StockLoanIssue {
   totalLoanQty: number;
   totalValue: number;
   totalLoanValue?: number; // alias
+  // Hybrid Loan Settlement Summary Fields
+  totalPhysicalReturnValue?: number;
+  totalMonetaryRecovery?: number;
+  outstandingBalance?: number;
+  settlementStatus?: "Pending" | "Partially Settled" | "Fully Settled" | "Pending Inspection";
   items: StockLoanIssueItem[];
   createdAt: string;
   updatedAt: string;
@@ -769,5 +783,558 @@ export const MASTER_COMPANIES: MasterCompany[] = [
     status: "Active",
   },
 ];
+
+// ===========================================================================
+// 6. HYBRID LOAN SETTLEMENT: PHYSICAL RETURN & MONETARY RECOVERY
+// ===========================================================================
+
+export type StockLoanReturnCondition = "Good" | "Damaged" | "Non-Usable";
+
+export interface StockLoanReturnItem {
+  id: string;
+  loanItemId?: string;
+  sl: number;
+  itemCode: string;
+  itemName: string;
+  specification: string;
+  brand: string;
+  origin: string;
+  uom: string;
+  originalIssuedQty: number;
+  previouslyReturnedQty: number;
+  remainingIssuedQty: number; // originalIssuedQty - previouslyReturnedQty
+  issueAvgCostRate: number; // Frozen issue-time rate snapshot
+  returnQty: number; // Entered physical return quantity
+  returnQuantity?: number; // alias
+  returnValue: number; // returnQty × issueAvgCostRate
+  totalReturnValue?: number; // alias
+  condition: StockLoanReturnCondition; // "Good" | "Damaged" | "Non-Usable"
+  isAcceptedForStock: boolean; // Only "Good" items increase inventory stock
+  store?: string;
+  location?: string;
+  batch?: string;
+  batchAllocations?: LoanIssueBatchAllocation[];
+  locationAllocations?: LoanIssueLocationAllocation[];
+  remarks?: string;
+}
+
+export interface StockLoanReturn {
+  id: string;
+  returnId: string; // e.g. LRET-2026-0001
+  returnDate: string;
+  loanIssueId: string; // e.g. LI-2026-0001
+  loanIssueReferenceId?: string;
+  loanIssueDate: string;
+  borrowerName: string;
+  department: string;
+  issuingCompany: string; // Lending company
+  issuingStore: string; // Lending store
+  receivingCompany: string; // Company returning/receiving back
+  receivingStore: string; // Receiving store where items are stored
+  receivedBy: string;
+  returnChallanNo?: string;
+  remarks?: string;
+  status: "Draft" | "Confirmed" | "Pending Inspection";
+  totalItems: number;
+  totalReturnQty: number;
+  totalReturnQuantity?: number; // alias
+  acceptedReturnValue: number;
+  totalReturnValue?: number; // alias for acceptedReturnValue
+  originalLoanValue: number;
+  previousPhysicalReturnValue: number;
+  currentPhysicalReturnValue: number;
+  totalPhysicalReturnValue: number;
+  previousMonetaryRecovery: number;
+  remainingLoanValue: number;
+  items: StockLoanReturnItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type StockLoanRecoveryPaymentMethod = "Cash" | "Bank" | "Cheque" | "Other";
+
+export interface StockLoanRecovery {
+  id: string;
+  recoveryId: string; // e.g. LREC-2026-0001
+  recoveryDate: string;
+  loanIssueId: string; // e.g. LI-2026-0001
+  loanIssueReferenceId?: string;
+  loanIssueDate?: string;
+  borrowerName: string;
+  department: string;
+  issuingCompany: string;
+  receivingCompany: string;
+  originalLoanValue: number;
+  totalPhysicalReturnValue?: number;
+  previousMonetaryRecovery?: number;
+  outstandingBeforeRecovery: number;
+  receiveAmount: number;
+  outstandingAfterRecovery: number;
+  paymentMethod: StockLoanRecoveryPaymentMethod;
+  paymentReference?: string; // Money Receipt / Voucher / Cheque No
+  bankName?: string;
+  bankBranch?: string;
+  accountNumber?: string;
+  bankAccountNo?: string; // alias
+  chequeNo?: string;
+  chequeDate?: string;
+  transactionReference?: string;
+  receiveDate?: string;
+  receivedBy: string;
+  status: "Draft" | "Confirmed";
+  settlementStatusAfter?: "Fully Settled" | "Partially Settled";
+  remarks?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LoanSettlementSummary {
+  loanIssueId: string;
+  loanId: string;
+  issueDate: string;
+  borrowerName: string;
+  department: string;
+  issuingCompany: string;
+  issuingStore: string;
+  store?: string; // convenient alias for issuingStore
+  receivingCompany: string;
+  receivingStore: string;
+  originalLoanValue: number;
+  totalPhysicalReturnValue: number;
+  totalMonetaryRecovery: number;
+  outstandingBalance: number;
+  settlementStatus: "Pending" | "Partially Settled" | "Fully Settled" | "Pending Inspection";
+  returnTransactions: StockLoanReturn[];
+  returns?: StockLoanReturn[]; // alias for returnTransactions
+  returnTransactionsCount?: number;
+  recoveryTransactions: StockLoanRecovery[];
+  recoveries?: StockLoanRecovery[]; // alias for recoveryTransactions
+  recoveryTransactionsCount?: number;
+  itemsSummary: Array<{
+    itemCode: string;
+    itemName: string;
+    specification: string;
+    uom: string;
+    issuedQty: number;
+    issueAvgCostRate: number;
+    totalIssuedValue: number;
+    returnedQty: number;
+    acceptedReturnValue: number;
+    remainingQty: number;
+    remainingValue: number;
+    hasInspectionPending?: boolean;
+  }>;
+}
+
+// ---------------------------------------------------------------------------
+// VALUATION SNAPSHOT HELPER (INVENTORY AVERAGE COST / WEIGHTED AVERAGE COST)
+// ---------------------------------------------------------------------------
+
+export interface ItemValuationLookupResult {
+  rate: number;
+  isAvailable: boolean;
+  source: string;
+  valuationMethod: "Weighted Average Cost" | "Average Cost";
+  asOfDate: string;
+}
+
+/**
+ * Retrieves the current Inventory Average Cost / Weighted Average Cost.
+ * Required by Section 4.2 & 4.3:
+ * - If stock valuation is unavailable (<= 0), isAvailable will be false.
+ * - This rate is snapshotted onto the Loan Issue item and preserved.
+ */
+export function getInventoryItemValuation(
+  itemCode: string,
+  store?: string,
+  company?: string
+): ItemValuationLookupResult {
+  const asOfDate = new Date().toISOString().slice(0, 10);
+  const cleanCode = itemCode.trim().toLowerCase();
+
+  // 1. Check active stock balance / ledger (Average Cost / Weighted Average Cost)
+  const stockBalances = getStoredData("cripton_stock_balance_data", INITIAL_STOCK_BALANCE_DATA);
+  const matchedBalance = stockBalances.find((s) => {
+    const codeMatch = s.itemCode.trim().toLowerCase() === cleanCode;
+    if (!codeMatch) return false;
+    if (store && store !== "All" && s.store.trim().toLowerCase() !== store.trim().toLowerCase()) {
+      return false;
+    }
+    if (company && company !== "All" && s.company.trim().toLowerCase() !== company.trim().toLowerCase()) {
+      return false;
+    }
+    return true;
+  }) || stockBalances.find((s) => s.itemCode.trim().toLowerCase() === cleanCode);
+
+  if (matchedBalance && Number(matchedBalance.unitCost) > 0) {
+    return {
+      rate: Number(matchedBalance.unitCost),
+      isAvailable: true,
+      source: `Inventory Average Cost (${matchedBalance.store})`,
+      valuationMethod: "Weighted Average Cost",
+      asOfDate,
+    };
+  }
+
+  // 2. Check Item Master standard cost as catalog valuation benchmark
+  const catalog = getStoredData("proc_items_v2", DEFAULT_ITEMS);
+  const matchedCat = catalog.find((c) => c.itemCode.trim().toLowerCase() === cleanCode);
+
+  if (matchedCat && Number(matchedCat.standardCost) > 0) {
+    return {
+      rate: Number(matchedCat.standardCost),
+      isAvailable: true,
+      source: "Item Master Standard Cost",
+      valuationMethod: "Average Cost",
+      asOfDate,
+    };
+  }
+
+  // Fallback: If item is in demo SEED_LOAN_ISSUES, retrieve its original established rate
+  for (const sli of SEED_LOAN_ISSUES) {
+    const it = sli.items.find((i) => i.itemCode.trim().toLowerCase() === cleanCode);
+    if (it && (it.issueAvgCostRate || it.unitPrice)) {
+      return {
+        rate: it.issueAvgCostRate || it.unitPrice,
+        isAvailable: true,
+        source: "Historical Stock Loan Valuation Ledger",
+        valuationMethod: "Weighted Average Cost",
+        asOfDate,
+      };
+    }
+  }
+
+  // If no valid positive rate is found, report as unavailable (blocks issue per Requirement 4.3)
+  return {
+    rate: 0,
+    isAvailable: false,
+    source: "Valuation Rate Unavailable",
+    valuationMethod: "Weighted Average Cost",
+    asOfDate,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// SEED DATA FOR HYBRID LOAN RETURNS & RECOVERIES
+// ---------------------------------------------------------------------------
+
+export const SEED_LOAN_RETURNS: StockLoanReturn[] = [
+  {
+    id: "lret-seed-001",
+    returnId: "LRET-2026-0001",
+    returnDate: "2026-10-28",
+    loanIssueId: "LI-2026-0001",
+    loanIssueReferenceId: "sli-seed-001",
+    loanIssueDate: "2026-10-20",
+    borrowerName: "Tahmid Afsar Shapno (Store Manager)",
+    department: "Central Inventory & Materials Supply",
+    issuingCompany: "Pakiza Apparels Ltd.",
+    issuingStore: "Finishing Store - Norshingdi",
+    receivingCompany: "Pakiza Knit Composite Ltd.",
+    receivingStore: "Finishing Store - Norshingdi",
+    receivedBy: "Kazi Moniruzzaman (Store Officer)",
+    remarks: "First physical repayment return batch against Loan Issue #LI-2026-0001.",
+    status: "Confirmed",
+    totalItems: 2,
+    totalReturnQty: 60,
+    acceptedReturnValue: 75000,
+    originalLoanValue: 185000,
+    previousPhysicalReturnValue: 0,
+    currentPhysicalReturnValue: 75000,
+    totalPhysicalReturnValue: 75000,
+    previousMonetaryRecovery: 0,
+    remainingLoanValue: 110000,
+    items: [
+      {
+        id: "lret-it-1",
+        loanItemId: "li-row-1",
+        sl: 1,
+        itemCode: "ITM-CHM-001",
+        itemName: "Reactive Blue Dye D-200",
+        specification: "Standard textile reactive dye grade A",
+        brand: "Dystar",
+        origin: "Germany",
+        uom: "KG",
+        originalIssuedQty: 100,
+        previouslyReturnedQty: 0,
+        remainingIssuedQty: 100,
+        issueAvgCostRate: 1250,
+        returnQty: 60,
+        returnValue: 75000,
+        condition: "Good",
+        isAcceptedForStock: true,
+        store: "Finishing Store - Norshingdi",
+        location: "Rack C-02",
+        batch: "BAT-CHM-2601",
+        remarks: "Sealed containers accepted into store",
+      },
+      {
+        id: "lret-it-2",
+        loanItemId: "li-row-2",
+        sl: 2,
+        itemCode: "ITM-CHM-002",
+        itemName: "Sodium Hydrosulphite 88%",
+        specification: "Reducing agent textile grade powder",
+        brand: "BASF",
+        origin: "Germany",
+        uom: "KG",
+        originalIssuedQty: 50,
+        previouslyReturnedQty: 0,
+        remainingIssuedQty: 50,
+        issueAvgCostRate: 1200,
+        returnQty: 0,
+        returnValue: 0,
+        condition: "Good",
+        isAcceptedForStock: false,
+        store: "Finishing Store - Norshingdi",
+        remarks: "To be returned or settled via monetary recovery",
+      },
+    ],
+    createdAt: "2026-10-28T10:30:00Z",
+    updatedAt: "2026-10-28T10:30:00Z",
+  },
+];
+
+export const SEED_LOAN_RECOVERIES: StockLoanRecovery[] = [
+  {
+    id: "lrec-seed-001",
+    recoveryId: "LREC-2026-0001",
+    recoveryDate: "2026-11-05",
+    loanIssueId: "LI-2026-0001",
+    loanIssueReferenceId: "sli-seed-001",
+    loanIssueDate: "2026-10-20",
+    borrowerName: "Tahmid Afsar Shapno (Store Manager)",
+    department: "Central Inventory & Materials Supply",
+    issuingCompany: "Pakiza Apparels Ltd.",
+    receivingCompany: "Pakiza Knit Composite Ltd.",
+    originalLoanValue: 185000,
+    totalPhysicalReturnValue: 75000,
+    previousMonetaryRecovery: 0,
+    outstandingBeforeRecovery: 110000,
+    receiveAmount: 50000,
+    outstandingAfterRecovery: 60000,
+    paymentMethod: "Bank",
+    paymentReference: "MR-PKCL-2026-8801",
+    bankName: "Standard Chartered Bank",
+    bankBranch: "Gulshan-2 Branch",
+    accountNumber: "01-8849201-01",
+    transactionReference: "TXN-SCB-992011",
+    receiveDate: "2026-11-05",
+    receivedBy: "Md. Aminul Islam (Finance Officer)",
+    status: "Confirmed",
+    settlementStatusAfter: "Partially Settled",
+    remarks: "Partial monetary settlement for remaining Sodium Hydrosulphite and reactive dye.",
+    createdAt: "2026-11-05T14:15:00Z",
+    updatedAt: "2026-11-05T14:15:00Z",
+  },
+];
+
+// ---------------------------------------------------------------------------
+// HYBRID SETTLEMENT STORAGE & CALCULATION METHODS
+// ---------------------------------------------------------------------------
+
+export function getStoredStockLoanReturns(): StockLoanReturn[] {
+  return getStoredData("cripton_stock_loan_returns", SEED_LOAN_RETURNS);
+}
+
+export function saveStoredStockLoanReturns(data: StockLoanReturn[]): void {
+  setStoredData("cripton_stock_loan_returns", data);
+}
+
+export function saveStockLoanReturn(record: StockLoanReturn): void {
+  const current = getStoredStockLoanReturns();
+  const idx = current.findIndex((r) => r.id === record.id || r.returnId === record.returnId);
+  if (idx >= 0) {
+    current[idx] = { ...record, updatedAt: new Date().toISOString() };
+  } else {
+    current.unshift({ ...record, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+  }
+  saveStoredStockLoanReturns(current);
+  syncLoanIssueSettlement(record.loanIssueId);
+}
+
+export function getStoredStockLoanRecoveries(): StockLoanRecovery[] {
+  return getStoredData("cripton_stock_loan_recoveries", SEED_LOAN_RECOVERIES);
+}
+
+export function saveStoredStockLoanRecoveries(data: StockLoanRecovery[]): void {
+  setStoredData("cripton_stock_loan_recoveries", data);
+}
+
+export function saveStockLoanRecovery(record: StockLoanRecovery): void {
+  const current = getStoredStockLoanRecoveries();
+  const idx = current.findIndex((r) => r.id === record.id || r.recoveryId === record.recoveryId);
+  if (idx >= 0) {
+    current[idx] = { ...record, updatedAt: new Date().toISOString() };
+  } else {
+    current.unshift({ ...record, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+  }
+  saveStoredStockLoanRecoveries(current);
+  syncLoanIssueSettlement(record.loanIssueId);
+}
+
+/**
+ * Centralized, authoritative calculation of Hybrid Loan Settlement.
+ * Mandatory Formula:
+ * Outstanding Balance = Original Loan Value - Accepted Physical Return Value - Total Monetary Recovery
+ */
+export function calculateLoanSettlementSummary(loanIssueId: string): LoanSettlementSummary | null {
+  const loans = getStoredStockLoanIssues();
+  const targetLoan = loans.find((l) => l.loanIssueId === loanIssueId || l.id === loanIssueId);
+  if (!targetLoan) return null;
+
+  const allReturns = getStoredStockLoanReturns().filter(
+    (r) => (r.loanIssueId === targetLoan.loanIssueId || r.loanIssueId === targetLoan.id) && r.status !== "Draft"
+  );
+  const allRecoveries = getStoredStockLoanRecoveries().filter(
+    (rc) => (rc.loanIssueId === targetLoan.loanIssueId || rc.loanIssueId === targetLoan.id) && rc.status !== "Draft"
+  );
+
+  // Original Loan Value: Calculated strictly from loanQty × issueAvgCostRate (frozen issue-time rate)
+  const originalLoanValue = targetLoan.items.reduce((sum, it) => {
+    const rate = it.issueAvgCostRate || it.unitPrice || 0;
+    return sum + (Number(it.loanQty) || 0) * rate;
+  }, 0);
+
+  // Physical Return Totals: Sum of accepted physical returns (Good condition)
+  let totalPhysicalReturnValue = 0;
+  let hasInspectionPending = false;
+
+  const itemReturnMap: Record<string, { returnedQty: number; acceptedValue: number; hasInspection: boolean }> = {};
+
+  allReturns.forEach((ret) => {
+    ret.items.forEach((rit) => {
+      if (!itemReturnMap[rit.itemCode]) {
+        itemReturnMap[rit.itemCode] = { returnedQty: 0, acceptedValue: 0, hasInspection: false };
+      }
+      const isAccepted = rit.condition === "Good" && rit.isAcceptedForStock;
+      if (rit.condition === "Damaged" || rit.condition === "Non-Usable") {
+        hasInspectionPending = true;
+        itemReturnMap[rit.itemCode].hasInspection = true;
+      }
+      if (isAccepted) {
+        itemReturnMap[rit.itemCode].returnedQty += rit.returnQty;
+        itemReturnMap[rit.itemCode].acceptedValue += rit.returnValue;
+        totalPhysicalReturnValue += rit.returnValue;
+      }
+    });
+  });
+
+  // Monetary Recovery Totals: Sum of confirmed monetary recoveries
+  const totalMonetaryRecovery = allRecoveries.reduce((sum, rc) => sum + (Number(rc.receiveAmount) || 0), 0);
+
+  // Authoritative Outstanding Balance:
+  const outstandingBalance = Math.max(0, originalLoanValue - totalPhysicalReturnValue - totalMonetaryRecovery);
+
+  // Settlement Status determination
+  let settlementStatus: "Pending" | "Partially Settled" | "Fully Settled" | "Pending Inspection" = "Pending";
+  if (outstandingBalance <= 0 && (totalPhysicalReturnValue > 0 || totalMonetaryRecovery > 0)) {
+    settlementStatus = "Fully Settled";
+  } else if (hasInspectionPending) {
+    settlementStatus = "Pending Inspection";
+  } else if (totalPhysicalReturnValue > 0 || totalMonetaryRecovery > 0) {
+    settlementStatus = "Partially Settled";
+  }
+
+  const itemsSummary = targetLoan.items.map((it) => {
+    const rate = it.issueAvgCostRate || it.unitPrice || 0;
+    const totalIssuedValue = (Number(it.loanQty) || 0) * rate;
+    const retInfo = itemReturnMap[it.itemCode] || { returnedQty: 0, acceptedValue: 0, hasInspection: false };
+    const remainingQty = Math.max(0, (Number(it.loanQty) || 0) - retInfo.returnedQty);
+    const remainingValue = remainingQty * rate;
+
+    return {
+      itemCode: it.itemCode,
+      itemName: it.itemName,
+      specification: it.specification || "-",
+      uom: it.uom,
+      issuedQty: Number(it.loanQty) || 0,
+      issueAvgCostRate: rate,
+      totalIssuedValue,
+      returnedQty: retInfo.returnedQty,
+      acceptedReturnValue: retInfo.acceptedValue,
+      remainingQty,
+      remainingValue,
+      hasInspectionPending: retInfo.hasInspection,
+    };
+  });
+
+  return {
+    loanIssueId: targetLoan.loanIssueId,
+    loanId: targetLoan.id,
+    issueDate: targetLoan.issueDate || targetLoan.loanDate || "",
+    borrowerName: targetLoan.borrowerName || targetLoan.requestedBy || "Store Manager",
+    department: targetLoan.department || "Central Inventory & Materials Supply",
+    issuingCompany: targetLoan.fromCompany,
+    issuingStore: targetLoan.fromStore,
+    store: targetLoan.fromStore,
+    receivingCompany: targetLoan.toCompany,
+    receivingStore: targetLoan.toStore,
+    originalLoanValue,
+    totalPhysicalReturnValue,
+    totalMonetaryRecovery,
+    outstandingBalance,
+    settlementStatus,
+    returnTransactions: allReturns,
+    returns: allReturns,
+    returnTransactionsCount: allReturns.length,
+    recoveryTransactions: allRecoveries,
+    recoveries: allRecoveries,
+    recoveryTransactionsCount: allRecoveries.length,
+    itemsSummary,
+  };
+}
+
+/**
+ * Synchronizes the settlement fields onto the target StockLoanIssue record
+ */
+export function syncLoanIssueSettlement(loanIssueId: string): void {
+  const summary = calculateLoanSettlementSummary(loanIssueId);
+  if (!summary) return;
+
+  const currentLoans = getStoredStockLoanIssues();
+  const idx = currentLoans.findIndex((l) => l.loanIssueId === loanIssueId || l.id === loanIssueId);
+  if (idx >= 0) {
+    currentLoans[idx] = {
+      ...currentLoans[idx],
+      totalPhysicalReturnValue: summary.totalPhysicalReturnValue,
+      totalMonetaryRecovery: summary.totalMonetaryRecovery,
+      outstandingBalance: summary.outstandingBalance,
+      settlementStatus: summary.settlementStatus,
+      updatedAt: new Date().toISOString(),
+    };
+    saveStoredStockLoanIssues(currentLoans);
+  }
+}
+
+/**
+ * Returns a list of consolidated hybrid loan settlements across all Loan Issues
+ */
+export function getHybridLoanSettlementList(): LoanSettlementSummary[] {
+  const loans = getStoredStockLoanIssues();
+  const list: LoanSettlementSummary[] = [];
+
+  loans.forEach((l) => {
+    const summary = calculateLoanSettlementSummary(l.loanIssueId || l.id);
+    if (summary) {
+      list.push(summary);
+    }
+  });
+
+  return list;
+}
+
+/**
+ * Resets only the Hybrid Stock Loan Settlement demo data (Section 13 requirement)
+ * Without touching unrelated ERP modules
+ */
+export function resetStockLoanSettlementDemoData(): void {
+  saveStoredStockLoanReturns(SEED_LOAN_RETURNS);
+  saveStoredStockLoanRecoveries(SEED_LOAN_RECOVERIES);
+  SEED_LOAN_ISSUES.forEach((sli) => {
+    syncLoanIssueSettlement(sli.loanIssueId);
+  });
+}
+
 
 

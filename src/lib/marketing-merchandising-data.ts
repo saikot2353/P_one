@@ -127,6 +127,7 @@ export interface MMPreCostPO {
   poQuantity: number;
   rate: number;
   value: number;
+  deliveryDate?: string;
   remarks?: string;
   colorBreakdown?: MMPreCostPOColorRow[];
 }
@@ -234,6 +235,10 @@ export interface MMPreCosting {
   preCostNo?: string;
   preCostDate?: string;
   contractNo?: string;
+  scLcNo?: string;
+  salesContractNo?: string;
+  linkedOrderId?: string;
+  linkedOrderNo?: string;
   ourRef?: string;
   acHolder?: string;
   buyer?: string;
@@ -458,6 +463,8 @@ export interface MMMainOrder {
   instructionDetail?: string;
   fabricRequirementDetails?: string;
   accessoriesRequirementDetails?: string;
+  scLcNo?: string;
+  salesContractNo?: string;
 
   deliveryLots?: MMDeliveryLotRow[];
   poDetails?: MMPODetailRow[];
@@ -1215,20 +1222,20 @@ export interface MMAccessoriesEstimationRow {
   amount: number;
   nomineeStatus: string; // "Nominated" | "Non Nominee" | "Buyer Nominee"
   supplier: string;
-  
+
   // Size Spec Configuration (Size D modal)
   sizeFactType?: "SAME AS GMT SIZE" | "SINGLE SIZE";
   singleSizeSpec?: string;
   sizeRows?: MMAccessoriesSizeSpecRow[];
-  
+
   // Color Configuration (Color D modal)
   colorType?: "DTM" | "Contrast" | "Single Color";
   singleColorName?: string;
   colorMappings?: MMAccessoriesColorMappingRow[];
-  
+
   // PO Allocation Details (PO D modal)
   poAllocations?: MMAccessoriesPOAllocation[];
-  
+
   // Booking column
   bookingRef?: string;
   bookingStatus?: "Not Booked" | "Pending" | "Partially Booked" | "Booked";
@@ -1243,19 +1250,19 @@ export interface MMAccessoriesEstimationRecord {
   buyerRef?: string;
   style: string;
   orderDate?: string;
-  
+
   // Group B: Item and Quantity Information
   itemName?: string;
   packingType?: string;
   quantity: number;
   unit?: string;
-  
+
   // Group C: Commercial Information
   payTerm?: string;
   rate?: number;
   place?: string;
   note?: string;
-  
+
   // Group D: Booking and PI Information
   bookingNo?: string;
   bookingDate?: string;
@@ -1263,15 +1270,15 @@ export interface MMAccessoriesEstimationRecord {
   piDate?: string;
   bblcNo?: string;
   bblcDate?: string;
-  
+
   // Search fields
   findQtn?: string;
   findBudget?: string;
   findRef?: string;
-  
+
   // Footer remarks
   budgetAccDesc?: string;
-  
+
   // Accessories rows
   accessoriesRows: MMAccessoriesEstimationRow[];
   savedAt: string;
@@ -1448,6 +1455,17 @@ export interface MMYarnBookingTagRecord {
   job?: string;
   yarnCount?: string;
   price?: number;
+  allocations?: any[];
+  procurementRequestId?: string;
+  procurementRequestNo?: string;
+  stockAllocatedQtyKg?: number;
+  procurementRequiredQtyKg?: number;
+  totalRequiredQtyKg?: number;
+  totalAllocatedQtyKg?: number;
+  remainingRequiredQtyKg?: number;
+  allocationStatus?: string;
+  procurementStatus?: string;
+  updatedAt?: string;
 }
 
 export interface MMBlockYarnStatusRecord {
@@ -1495,7 +1513,7 @@ export interface MMPIAdditionalCharge {
 export interface MMPIAllocatedBooking {
   bookingId: string;
   bookingNo: string;
-  bookingType: "Fabric" | "Accessories";
+  bookingType: "Fabric" | "Accessories" | "Block Booking";
   orderNo: string;
   styleNo: string;
   allocatedAmount: number;
@@ -2209,6 +2227,8 @@ export const INITIAL_MM_ORDERS: MMMainOrder[] = [
     instructionDetail: "Ensure strict color fastness to washing (Grade 4 minimum). Needle detector certificate required for export packing.",
     fabricRequirementDetails: "Single Jersey 100% Combed Cotton 160 GSM (7,344 Kgs) — Approved Ha-Meem Mills Lot #H-992",
     accessoriesRequirementDetails: "Engraved 4-hole chalk buttons (93,600 pcs), Woven main label & satin care label (46,800 sets)",
+    scLcNo: "SC-HM-2026-081",
+    salesContractNo: "SC-HM-2026-081",
 
     // Delivery Lots Table
     deliveryLots: [
@@ -2237,6 +2257,7 @@ export const INITIAL_MM_ORDERS: MMMainOrder[] = [
         v: "V1",
         s: "FOB",
         size: "S-L",
+        scLcNo: "SC-HM-2026-081",
         breakdown: {
           poId: "po-row-001-1",
           poNumber: "PO-HM-99881-A",
@@ -2298,6 +2319,7 @@ export const INITIAL_MM_ORDERS: MMMainOrder[] = [
         v: "V1",
         s: "FOB",
         size: "S-L",
+        scLcNo: "LC-HM-2026-902",
         breakdown: {
           poId: "po-row-001-2",
           poNumber: "PO-HM-99881-B",
@@ -2425,6 +2447,8 @@ export const INITIAL_MM_ORDERS: MMMainOrder[] = [
     instructionDetail: "Zara standard metal shank button and YKK brass zipper mandatory. Certificate of origin and EUR.1 movement certificate required.",
     fabricRequirementDetails: "Cotton Stretch Twill 98% Cotton 2% Spandex 240 GSM (13,056 Yds) — Square Textiles",
     accessoriesRequirementDetails: "YKK Antique Brass #4 Zipper (32,640 Pcs), Genuine Leather Back Patch (32,640 Pcs)",
+    scLcNo: "LC-IND-2026-4401",
+    salesContractNo: "LC-IND-2026-4401",
 
     // Delivery Lots Table
     deliveryLots: [
@@ -2453,6 +2477,7 @@ export const INITIAL_MM_ORDERS: MMMainOrder[] = [
         v: "V1",
         s: "FOB",
         size: "30-34",
+        scLcNo: "LC-IND-2026-4401",
         breakdown: {
           poId: "po-row-002-1",
           poNumber: "PO-ZR-44021-ES",
@@ -5358,6 +5383,179 @@ export const INITIAL_MM_BLOCK_YARN_BOOKINGS: MMAccessoriesBooking[] = [
 ];
 
 // ============================================================================
+// Initial Master Data for Block Fabric Bookings (Advance Mill Fabric Allocation Pool)
+// ============================================================================
+export const INITIAL_MM_BLOCK_FABRIC_BOOKINGS: MMAccessoriesBooking[] = [
+  {
+    id: "bfb-2026-0001",
+    bookingNo: "BFB-2026-0001",
+    ourRef: "JOB-FAB-2026-001",
+    bookingDate: "2026-10-16",
+    deliveryDate: "2026-12-15",
+    supplierId: "sup-005",
+    supplierName: "Pakiza Knitting & Dyeing Ltd",
+    bookingDesc: "Advance Block Fabric Booking - Q4 2026 Single Jersey & Rib",
+    payMode: "At Sight LC",
+    deliveryMode: "By Covered Van",
+    deliveryPlace: "Factory Mill Store (Gazipur)",
+    bookType: "Block Fabric Booking",
+    currency: "USD",
+    conversionRate: 1.0,
+    paymentTerms: "At Sight LC",
+    status: "Approved",
+    piReference: "PI-PK-2026-0442",
+    totalBookedQty: 25000,
+    totalBookedAmount: 127000,
+    totalPreCostAmount: 127000,
+    totalSavingAmount: 0,
+    overallSavingPct: 0,
+    createdBy: "Senior Merchandiser (Tanvir Ahmed)",
+    createdDate: "2026-10-16",
+    items: [
+      {
+        bookingItemId: "bfb-item-001",
+        estimationItemId: "fab-001",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "fab-001",
+        itemDescription: "100% Cotton Single Jersey 160 GSM",
+        specification: "100% Combed Cotton Single Jersey Finished",
+        sizeOrDimension: "160 GSM, 72\" Open Dia",
+        color: "Solid / Optical White",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 15,
+        requiredQty: 15000,
+        bookedQty: 15000,
+        bookedRate: 4.8,
+        totalAmount: 72000,
+        preCostRate: 4.8,
+        preCostAmount: 72000,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+      {
+        bookingItemId: "bfb-item-002",
+        estimationItemId: "fab-002",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "fab-002",
+        itemDescription: "95% Cotton 5% Spandex Single Jersey 190 GSM",
+        specification: "Cotton Lycra Single Jersey Soft Wash Finished",
+        sizeOrDimension: "190 GSM, 68\" Open Dia",
+        color: "Solid / Navy Blue",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 10,
+        requiredQty: 10000,
+        bookedQty: 10000,
+        bookedRate: 5.5,
+        totalAmount: 55000,
+        preCostRate: 5.5,
+        preCostAmount: 55000,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+    ],
+    createdAt: "2026-10-16T09:30:00.000Z",
+    updatedAt: "2026-10-16T09:30:00.000Z",
+  },
+  {
+    id: "bfb-2026-0002",
+    bookingNo: "BFB-2026-0002",
+    ourRef: "JOB-FAB-2026-002",
+    bookingDate: "2026-10-25",
+    deliveryDate: "2026-12-30",
+    supplierId: "sup-006",
+    supplierName: "Envoy Textiles Ltd",
+    bookingDesc: "Advance Block Fabric Booking - Rib & French Terry Pool",
+    payMode: "60 Days Deferred LC",
+    deliveryMode: "By Covered Van",
+    deliveryPlace: "Factory Mill Store (Gazipur)",
+    bookType: "Block Fabric Booking",
+    currency: "USD",
+    conversionRate: 1.0,
+    paymentTerms: "60 Days Deferred LC",
+    status: "Approved",
+    totalBookedQty: 20000,
+    totalBookedAmount: 100400,
+    totalPreCostAmount: 100400,
+    totalSavingAmount: 0,
+    overallSavingPct: 0,
+    createdBy: "Senior Merchandiser (Tanvir Ahmed)",
+    createdDate: "2026-10-25",
+    items: [
+      {
+        bookingItemId: "bfb-item-003",
+        estimationItemId: "fab-003",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "fab-003",
+        itemDescription: "100% Cotton 2x2 Rib 220 GSM",
+        specification: "100% Combed Cotton 2x2 Rib",
+        sizeOrDimension: "220 GSM, 45\" Tubular",
+        color: "Solid / Black",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 8,
+        requiredQty: 8000,
+        bookedQty: 8000,
+        bookedRate: 5.2,
+        totalAmount: 41600,
+        preCostRate: 5.2,
+        preCostAmount: 41600,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+      {
+        bookingItemId: "bfb-item-004",
+        estimationItemId: "fab-004",
+        orderId: "",
+        orderNo: "",
+        styleNo: "",
+        poNumber: "",
+        preCostItemId: "fab-004",
+        itemDescription: "60% Cotton 40% Polyester French Terry 260 GSM",
+        specification: "CVC French Terry Brushed",
+        sizeOrDimension: "260 GSM, 72\" Open Dia",
+        color: "Grey Melange",
+        unit: "KG",
+        marketUnit: "TON (Metric Ton)",
+        conversionFactor: 1000,
+        marketQty: 12,
+        requiredQty: 12000,
+        bookedQty: 12000,
+        bookedRate: 4.9,
+        totalAmount: 58800,
+        preCostRate: 4.9,
+        preCostAmount: 58800,
+        initialSavingAmount: 0,
+        initialSavingPct: 0,
+        isOverBudget: false,
+        isSavingTargetMissed: false,
+      },
+    ],
+    createdAt: "2026-10-25T11:00:00.000Z",
+    updatedAt: "2026-10-25T11:00:00.000Z",
+  },
+];
+
+// ============================================================================
 // LocalStorage Persistence Service & Repository
 // ============================================================================
 
@@ -5386,6 +5584,7 @@ const STORAGE_KEYS = {
   ORDER_ENTRY_UI_STATE: "cripton_mm_order_entry_ui_state_v1",
   ORDER_ENTRY_DRAFT: "cripton_mm_order_entry_draft_v1",
   MANUAL_BOOKINGS: "cripton_mm_manual_bookings_v1",
+  BLOCK_FABRIC_BOOKINGS: "cripton_mm_block_fabric_bookings_v1",
   YARN_BOOKING_TAGS: "cripton_mm_yarn_booking_tags_v1",
   BLOCK_YARN_STATUS: "cripton_mm_block_yarn_status_v1",
 };
@@ -5578,7 +5777,7 @@ export class MMRepository {
       if (typeof window !== "undefined") {
         try {
           localStorage.removeItem(STORAGE_KEYS.ORDER_ENTRY_DRAFT);
-        } catch {}
+        } catch { }
       }
     } else {
       this.set(STORAGE_KEYS.ORDER_ENTRY_DRAFT, draft);
@@ -5670,7 +5869,7 @@ export class MMRepository {
           const isTargetItem = line.fabricEstimationItemId
             ? row.id === line.fabricEstimationItemId
             : ((line.fabricCode && (row.code === line.fabricCode || row.fabricNo === line.fabricCode)) &&
-               (!line.fabricEstimationId || line.fabricEstimationId === est.id));
+              (!line.fabricEstimationId || line.fabricEstimationId === est.id));
           if (isTargetItem) {
             row.bookingRef = booking.bookingNo;
             hasChanges = true;
@@ -5716,6 +5915,16 @@ export class MMRepository {
     if (!list || list.length === 0) {
       this.set(STORAGE_KEYS.MANUAL_BOOKINGS, INITIAL_MM_BLOCK_YARN_BOOKINGS);
       return INITIAL_MM_BLOCK_YARN_BOOKINGS;
+    }
+    return list;
+  }
+
+  // 7.1.1 Block Fabric Bookings (Dedicated Independent Storage)
+  static getBlockFabricBookings(): MMAccessoriesBooking[] {
+    const list = this.get<MMAccessoriesBooking[]>(STORAGE_KEYS.BLOCK_FABRIC_BOOKINGS, []);
+    if (!list || list.length === 0) {
+      this.set(STORAGE_KEYS.BLOCK_FABRIC_BOOKINGS, INITIAL_MM_BLOCK_FABRIC_BOOKINGS);
+      return INITIAL_MM_BLOCK_FABRIC_BOOKINGS;
     }
     return list;
   }
@@ -5830,7 +6039,7 @@ export class MMRepository {
             });
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     return Array.from(tagsMap.values());
@@ -5956,18 +6165,18 @@ export class MMRepository {
           Array.isArray(booking.items) && booking.items.length > 0
             ? booking.items
             : [
-                {
-                  bookingItemId: "item-0",
-                  itemDescription: booking.bookingDesc || "Yarn Item",
-                  bookedQty: booking.totalBookedQty || 0,
-                  bookedRate: 0,
-                  unit: "KG",
-                  marketUnit: "TON (Metric Ton)",
-                  marketQty: (booking.totalBookedQty || 0) / 1000,
-                  specification: "",
-                  sizeOrDimension: "",
-                } as any,
-              ];
+              {
+                bookingItemId: "item-0",
+                itemDescription: booking.bookingDesc || "Yarn Item",
+                bookedQty: booking.totalBookedQty || 0,
+                bookedRate: 0,
+                unit: "KG",
+                marketUnit: "TON (Metric Ton)",
+                marketQty: (booking.totalBookedQty || 0) / 1000,
+                specification: "",
+                sizeOrDimension: "",
+              } as any,
+            ];
 
         items.forEach((item, itemIdx) => {
           if (!item) return;
@@ -6238,6 +6447,131 @@ export class MMRepository {
     return true;
   }
 
+  // 7.1.2 Block Fabric Bookings Operations
+  static getBlockFabricBookingById(id: string): MMAccessoriesBooking | undefined {
+    const list = this.getBlockFabricBookings();
+    return list.find((b) => b.id === id || b.bookingNo === id);
+  }
+
+  static saveBlockFabricBooking(booking: MMAccessoriesBooking): void {
+    const list = this.getBlockFabricBookings();
+    const idx = list.findIndex((b) => b.id === booking.id || b.bookingNo === booking.bookingNo);
+    if (idx >= 0) {
+      list[idx] = booking;
+    } else {
+      list.unshift(booking);
+    }
+    this.set(STORAGE_KEYS.BLOCK_FABRIC_BOOKINGS, list);
+  }
+
+  static deleteBlockFabricBooking(id: string): boolean {
+    const list = this.getBlockFabricBookings();
+    const filtered = list.filter((b) => b.id !== id && b.bookingNo !== id);
+    if (filtered.length !== list.length) {
+      this.set(STORAGE_KEYS.BLOCK_FABRIC_BOOKINGS, filtered);
+      return true;
+    }
+    return false;
+  }
+
+  static submitBlockFabricBooking(bookingId: string, user: string = "Tanvir Ahmed"): boolean {
+    const list = this.getBlockFabricBookings();
+    const booking = list.find((b) => b.id === bookingId || b.bookingNo === bookingId);
+    if (!booking) return false;
+    const prevStatus = booking.status || "Draft";
+    booking.status = "Pending";
+    booking.submittedBy = user;
+    booking.submittedDate = new Date().toISOString();
+    booking.updatedAt = new Date().toISOString();
+    if (!booking.approvalHistory) booking.approvalHistory = [];
+    booking.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: booking.id,
+      bookingNo: booking.bookingNo,
+      action: "Submitted",
+      previousStatus: prevStatus,
+      newStatus: "Pending",
+      performedBy: user,
+      timestamp: new Date().toISOString(),
+      comment: "Submitted for authorization",
+    });
+    this.set(STORAGE_KEYS.BLOCK_FABRIC_BOOKINGS, list);
+    return true;
+  }
+
+  static approveBlockFabricBooking(bookingId: string, approver: string = "Authorized Approver", comment?: string): boolean {
+    const list = this.getBlockFabricBookings();
+    const booking = list.find((b) => b.id === bookingId || b.bookingNo === bookingId);
+    if (!booking) return false;
+    const prevStatus = booking.status || "Pending";
+    booking.status = "Approved";
+    booking.approvedBy = approver;
+    booking.approvalDate = new Date().toISOString();
+    booking.updatedAt = new Date().toISOString();
+    if (!booking.approvalHistory) booking.approvalHistory = [];
+    booking.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: booking.id,
+      bookingNo: booking.bookingNo,
+      action: "Approved",
+      previousStatus: prevStatus,
+      newStatus: "Approved",
+      performedBy: approver,
+      timestamp: new Date().toISOString(),
+      comment: comment || "Block Fabric Booking officially approved",
+    });
+    this.set(STORAGE_KEYS.BLOCK_FABRIC_BOOKINGS, list);
+    return true;
+  }
+
+  static rejectBlockFabricBooking(bookingId: string, approver: string = "Authorized Approver", reason: string): boolean {
+    const list = this.getBlockFabricBookings();
+    const booking = list.find((b) => b.id === bookingId || b.bookingNo === bookingId);
+    if (!booking) return false;
+    const prevStatus = booking.status || "Pending";
+    booking.status = "Rejected";
+    booking.rejectionReason = reason;
+    booking.updatedAt = new Date().toISOString();
+    if (!booking.approvalHistory) booking.approvalHistory = [];
+    booking.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: booking.id,
+      bookingNo: booking.bookingNo,
+      action: "Rejected",
+      previousStatus: prevStatus,
+      newStatus: "Rejected",
+      performedBy: approver,
+      timestamp: new Date().toISOString(),
+      comment: reason,
+    });
+    this.set(STORAGE_KEYS.BLOCK_FABRIC_BOOKINGS, list);
+    return true;
+  }
+
+  static returnBlockFabricBooking(bookingId: string, approver: string = "Authorized Approver", comment: string): boolean {
+    const list = this.getBlockFabricBookings();
+    const booking = list.find((b) => b.id === bookingId || b.bookingNo === bookingId);
+    if (!booking) return false;
+    const prevStatus = booking.status || "Pending";
+    booking.status = "Returned";
+    booking.returnReason = comment;
+    booking.updatedAt = new Date().toISOString();
+    if (!booking.approvalHistory) booking.approvalHistory = [];
+    booking.approvalHistory.push({
+      id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      bookingId: booking.id,
+      bookingNo: booking.bookingNo,
+      action: "Returned",
+      previousStatus: prevStatus,
+      newStatus: "Returned",
+      performedBy: approver,
+      timestamp: new Date().toISOString(),
+      comment: comment,
+    });
+    this.set(STORAGE_KEYS.BLOCK_FABRIC_BOOKINGS, list);
+    return true;
+  }
+
   // Fabric Booking Approval Workflow
   static submitFabricBooking(bookingId: string, user: string = "Tanvir Ahmed"): boolean {
     const list = this.getFabricBookings();
@@ -6468,10 +6802,10 @@ export class MMRepository {
     const count = list.length + 1;
     const prefix = supplierName
       ? supplierName
-          .split(" ")
-          .map((w) => w[0]?.toUpperCase() || "")
-          .join("")
-          .slice(0, 3)
+        .split(" ")
+        .map((w) => w[0]?.toUpperCase() || "")
+        .join("")
+        .slice(0, 3)
       : "PK";
     const year = new Date().getFullYear();
     return `PI-${prefix}-${year}-${String(count).padStart(4, "0")}`;
@@ -7205,7 +7539,7 @@ export class MMRepository {
     const item = list[index];
     if (item.status === "Approved") return false;
     const now = new Date().toISOString().replace("T", " ").substring(0, 16);
-    
+
     // If approving an amendment, deactivate previous versions in this file group
     const rootRef = item.parentFileId || item.fileRefNo;
     list.forEach((r) => {
@@ -8042,7 +8376,13 @@ export const INITIAL_MM_PRE_COST_ATTACHMENTS: MMPreCostAttachmentRecord[] = [
 
 export type MMCadCalculationMode = "Auto" | "Manual";
 export type MMCadDiaMake = "OPEN" | "TUBE";
-export type MMCadRequestStatus = "Draft" | "Pending CAD" | "In Progress" | "CAD Submitted" | "Closed";
+export type MMCadRequestStatus =
+  | "Draft"
+  | "Pending CAD"
+  | "In Progress"
+  | "CAD Submitted"
+  | "Closed"
+  | "Amendment Requested";
 export type MMCadResponseStatus = "Not Received" | "In Progress" | "Received";
 
 export interface MMCadItemRow {
@@ -8058,11 +8398,41 @@ export interface MMCadItemRow {
   finishKgConsumption: number; // Auto: (markerLength * diaFinish * fabricGsm / law / markerQty) * condumption
   waste10Consumption: number; // Formula: finishKgConsumption * 1.1
   diaMake: MMCadDiaMake; // "OPEN" | "TUBE"
+  wash10?: string | number;
+  wash10Pct?: string | number;
+  finishYardsMeter?: string | number;
+  finishYdsMeter?: string | number;
   law: number; // Default: 1550000
   condumption: number; // 12 for DZ, 1 for PCS (Default: 12)
   cuttableFinish: number; // Default: 2
   consumptionRatio: number; // Formula: row finishKgConsumption / totalFinishKg * 100
   remarks?: string;
+}
+
+export interface MMFabricConsumptionCadVersion {
+  version: number;
+  amendmentReason?: string;
+  amendedBy?: string;
+  amendedDate?: string;
+  submittedDate?: string;
+  cadResponseDate?: string;
+  cadSubmittedBy?: string;
+  buyer: string;
+  styleOrder: string;
+  efficiency: string;
+  sizeRange: string;
+  fabrication: string;
+  season?: string;
+  requestRemarks?: string;
+  rows: MMCadItemRow[];
+  totalFinishKg: number;
+  totalWaste10Kg: number;
+  wash10Pct: number;
+  notes?: string;
+  comments?: string;
+  attachments?: MMFabricConsumptionAttachment[];
+  gmtImage?: { id: string; name: string; dataUrl: string; size?: string } | string;
+  cadImages?: Array<{ id: string; name: string; dataUrl: string; size?: string }>;
 }
 
 export interface MMFabricConsumptionAttachment {
@@ -8095,6 +8465,14 @@ export interface MMFabricConsumptionCadRecord {
   merchandiser: string;
   requestRemarks?: string;
   submittedDate?: string;
+
+  // Versioning and Amendments
+  version?: number;
+  amendmentCount?: number;
+  amendmentReason?: string;
+  amendedDate?: string;
+  amendedBy?: string;
+  versions?: MMFabricConsumptionCadVersion[];
 
   // CAD Response
   cadAssignedTo?: string;
@@ -8198,6 +8576,10 @@ export function calculateCadRow(
     finishKgConsumption,
     waste10Consumption,
     diaMake: row.diaMake || "OPEN",
+    wash10: row.wash10 ?? row.wash10Pct ?? "",
+    wash10Pct: row.wash10Pct ?? row.wash10 ?? "",
+    finishYardsMeter: row.finishYardsMeter ?? row.finishYdsMeter ?? "",
+    finishYdsMeter: row.finishYdsMeter ?? row.finishYardsMeter ?? "",
     law,
     condumption,
     cuttableFinish,

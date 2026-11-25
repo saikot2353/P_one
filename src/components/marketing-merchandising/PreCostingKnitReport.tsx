@@ -33,6 +33,27 @@ interface PreCostingKnitReportProps {
   onEdit?: (record: PreCostingRecord) => void;
 }
 
+export function renderReportRate(currentRate: number, masterRate?: number, unit: string = "/kg") {
+  const currentFormatted = `$${Number(currentRate || 0).toFixed(2)}${unit}`;
+  const isModified =
+    masterRate !== undefined &&
+    masterRate !== null &&
+    !isNaN(Number(masterRate)) &&
+    Math.abs(Number(currentRate || 0) - Number(masterRate)) > 0.0001;
+
+  if (!isModified) {
+    return <span className="font-mono">{currentFormatted}</span>;
+  }
+
+  const masterFormatted = `$${Number(masterRate).toFixed(2)}${unit}`;
+  return (
+    <span className="inline-flex items-center gap-1 font-mono">
+      <span className="font-bold text-slate-900 dark:text-slate-100">{currentFormatted}</span>
+      <span className="text-slate-400 font-normal text-[10px]">({masterFormatted})</span>
+    </span>
+  );
+}
+
 export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitReportProps) {
   const reportRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +67,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
           onClick={onBack}
           className="mt-4 px-4 py-2 bg-teal-600 text-white rounded-xl text-xs font-bold hover:bg-teal-700 cursor-pointer"
         >
-          Back to Pre Costing Register
+          Back to Pre Costing Register (Knit)
         </button>
       </div>
     );
@@ -74,7 +95,10 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
     0
   );
   const totalKnittingCost = fabricItems.reduce((s, f) => s + (Number(f.knittingCost) || 0), 0);
-  const totalDyeingCost = fabricItems.reduce((s, f) => s + (Number(f.dyeingCost) || 0), 0);
+  const totalDyeingCost = fabricItems.reduce(
+    (s, f) => s + (Number(f.dyeingCost) || 0) + (Number(f.ydCost) || 0) + (Number(f.aopCost) || 0),
+    0
+  );
   const totalFinishingCost = 0; // Standard knit composite includes finishing in dyeing rate
 
   // Accessories Normalization & Extraction
@@ -196,8 +220,35 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
     : [];
   const totalEmbellishmentCost = embellishmentItems.reduce((s, e) => s + (Number(e.amount) || 0), 0);
 
+  // Overheads & Commercial Cost (Commission, Financial, Sampling, Commercial)
+  const commPct = Number((record as any).commissionPct) || 0;
+  const commVal =
+    (record as any).commissionValue !== undefined && (record as any).commissionValue !== null
+      ? Number((record as any).commissionValue)
+      : Number(((totalOrderValue * commPct) / 100).toFixed(2));
+
+  const finPct = Number((record as any).financialPct) || 0;
+  const finVal =
+    (record as any).financialValue !== undefined && (record as any).financialValue !== null
+      ? Number((record as any).financialValue)
+      : Number(((totalOrderValue * finPct) / 100).toFixed(2));
+
+  const sampPct = Number((record as any).samplingPct) || 0;
+  const sampVal =
+    (record as any).samplingValue !== undefined && (record as any).samplingValue !== null
+      ? Number((record as any).samplingValue)
+      : Number(((totalOrderValue * sampPct) / 100).toFixed(2));
+
+  const commlPct = Number((record as any).commercialPct) || 0;
+  const commlVal =
+    (record as any).commercialValue !== undefined && (record as any).commercialValue !== null
+      ? Number((record as any).commercialValue)
+      : Number(((totalOrderValue * commlPct) / 100).toFixed(2));
+
+  const totalOverheadCost = Number((commVal + finVal + sampVal + commlVal).toFixed(2));
+
   // Grand Totals (Reconciled with Entry Form)
-  const grandTotalCost = totalFabricCost + totalAccessoriesCost + totalEmbellishmentCost + totalOthersCost;
+  const grandTotalCost = totalFabricCost + totalAccessoriesCost + totalEmbellishmentCost + totalOthersCost + totalOverheadCost;
   const costPerPc = totalOrderQtyPcs > 0 ? grandTotalCost / totalOrderQtyPcs : 0;
   const costPerDz = costPerPc * 12;
   const profitOrLoss = totalOrderValue - grandTotalCost;
@@ -226,37 +277,80 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
   const consumptionUnit = record.consumptionUnit || "DZ";
 
   // Cost Breakdown / Cost Sharing (DZ-Based)
+  // Exact sequence:
+  // 1. Fabrication & Yarn
+  // 2. Trims & Accessories
+  // 3. Embellishment (Print/Embroidery/Wash)
+  // 4. CM (DZ)
+  // 5. Commission
+  // 6. Financial
+  // 7. Sampling
+  // 8. Commercial
+  // 9. Others Cost
   const cmTotalValue = totalOrderQtyDz > 0 ? Number((cmPerDz * totalOrderQtyDz).toFixed(2)) : 0;
   const costSharingItemsRaw = [
     {
       name: "Fabrication & Yarn",
       rateDz: totalOrderQtyDz > 0 ? totalFabricCost / totalOrderQtyDz : 0,
+      rateDisplay: `$${(totalOrderQtyDz > 0 ? totalFabricCost / totalOrderQtyDz : 0).toFixed(2)}`,
       value: totalFabricCost,
       color: "bg-indigo-500",
     },
     {
       name: "Trims & Accessories",
       rateDz: totalOrderQtyDz > 0 ? totalAccessoriesCost / totalOrderQtyDz : 0,
+      rateDisplay: `$${(totalOrderQtyDz > 0 ? totalAccessoriesCost / totalOrderQtyDz : 0).toFixed(2)}`,
       value: totalAccessoriesCost,
       color: "bg-teal-500",
     },
     {
       name: "Embellishment (Print/Embroidery/Wash)",
       rateDz: totalOrderQtyDz > 0 ? totalEmbellishmentCost / totalOrderQtyDz : 0,
+      rateDisplay: `$${(totalOrderQtyDz > 0 ? totalEmbellishmentCost / totalOrderQtyDz : 0).toFixed(2)}`,
       value: totalEmbellishmentCost,
       color: "bg-purple-500",
     },
     {
-      name: "Others Cost",
-      rateDz: totalOrderQtyDz > 0 ? totalOthersCost / totalOrderQtyDz : 0,
-      value: totalOthersCost,
-      color: "bg-amber-500",
-    },
-    {
       name: "CM (DZ)",
       rateDz: cmPerDz,
+      rateDisplay: `$${cmPerDz.toFixed(2)}`,
       value: cmTotalValue,
       color: "bg-indigo-600",
+    },
+    {
+      name: "Commission",
+      rateDz: totalOrderQtyDz > 0 ? commVal / totalOrderQtyDz : 0,
+      rateDisplay: `${commPct.toFixed(2)}%`,
+      value: commVal,
+      color: "bg-amber-600",
+    },
+    {
+      name: "Financial",
+      rateDz: totalOrderQtyDz > 0 ? finVal / totalOrderQtyDz : 0,
+      rateDisplay: `${finPct.toFixed(2)}%`,
+      value: finVal,
+      color: "bg-emerald-600",
+    },
+    {
+      name: "Sampling",
+      rateDz: totalOrderQtyDz > 0 ? sampVal / totalOrderQtyDz : 0,
+      rateDisplay: `${sampPct.toFixed(2)}%`,
+      value: sampVal,
+      color: "bg-cyan-600",
+    },
+    {
+      name: "Commercial",
+      rateDz: totalOrderQtyDz > 0 ? commlVal / totalOrderQtyDz : 0,
+      rateDisplay: `${commlPct.toFixed(2)}%`,
+      value: commlVal,
+      color: "bg-rose-600",
+    },
+    {
+      name: "Others Cost",
+      rateDz: totalOrderQtyDz > 0 ? totalOthersCost / totalOrderQtyDz : 0,
+      rateDisplay: `$${(totalOrderQtyDz > 0 ? totalOthersCost / totalOrderQtyDz : 0).toFixed(2)}`,
+      value: totalOthersCost,
+      color: "bg-slate-500",
     },
   ];
 
@@ -268,6 +362,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
     return {
       particulars: item.name,
       rateDz: item.rateDz,
+      rateDisplay: item.rateDisplay,
       sharePct,
       value: item.value,
       color: item.color,
@@ -422,6 +517,17 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Order Confirm Date</span>
                   <span className="font-bold text-slate-800 font-mono block">{record.preCostDate}</span>
                 </div>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Sales Contract / LC</span>
+                  <span className="font-bold text-slate-900 font-mono block">
+                    {record.scLcNo || record.contractNo || "—"}
+                  </span>
+                  {(record.linkedOrderNo || record.orderNo) && (
+                    <span className="text-[10px] text-teal-700 font-medium block">
+                      Order: {record.linkedOrderNo || record.orderNo}
+                    </span>
+                  )}
+                </div>
 
                 <div>
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Season</span>
@@ -462,6 +568,28 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                     {record.amendmentReason || "Initial Pre-Costing Creation"}
                   </span>
                 </div>
+
+                {/* Overheads & Commercial Cost Terms */}
+                <div className="col-span-2 sm:col-span-4 pt-2.5 border-t border-slate-200">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-amber-50/70 p-2.5 rounded-lg border border-amber-200">
+                    <div>
+                      <span className="text-[10px] font-bold text-amber-900 uppercase block">Commission ({commPct.toFixed(2)}%)</span>
+                      <span className="font-mono font-black text-slate-900 block">${commVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-amber-900 uppercase block">Financial ({finPct.toFixed(2)}%)</span>
+                      <span className="font-mono font-black text-slate-900 block">${finVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-amber-900 uppercase block">Sampling ({sampPct.toFixed(2)}%)</span>
+                      <span className="font-mono font-black text-slate-900 block">${sampVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-amber-900 uppercase block">Commercial ({commlPct.toFixed(2)}%)</span>
+                      <span className="font-mono font-black text-slate-900 block">${commlVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -485,13 +613,14 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                       <th className="py-2 px-3 text-right">Order Qty (Pcs)</th>
                       <th className="py-2 px-3 text-right">FOB ($/Pc)</th>
                       <th className="py-2 px-3 text-right">Total Value ($)</th>
+                      <th className="py-2 px-3">Delivery Date</th>
                       <th className="py-2 px-3">Remarks</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
                     {poRows.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="py-3 px-3 text-center text-slate-400">
+                        <td colSpan={7} className="py-3 px-3 text-center text-slate-400">
                           No PO lines entered. Using consolidated order quantity.
                         </td>
                       </tr>
@@ -509,6 +638,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                           <td className="py-1.5 px-3 text-right font-mono font-black text-slate-900">
                             ${(Number(po.value) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
+                          <td className="py-1.5 px-3 font-mono text-slate-700">{po.deliveryDate || "—"}</td>
                           <td className="py-1.5 px-3 text-[11px] text-slate-500">{po.remarks || "—"}</td>
                         </tr>
                       ))
@@ -528,7 +658,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                       <td className="py-2 px-3 text-right font-mono text-indigo-700 text-sm">
                         ${totalOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
-                      <td />
+                      <td colSpan={2} />
                     </tr>
                   </tfoot>
                 </table>
@@ -568,8 +698,9 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                       </tr>
                     ) : (
                       fabricItems.map((f, idx) => {
+                        const rowDyeCost = (Number(f.dyeingCost) || 0) + (Number(f.ydCost) || 0) + (Number(f.aopCost) || 0);
                         const totalProcessCost =
-                          (Number(f.knittingCost) || 0) + (Number(f.dyeingCost) || 0) + totalFinishingCost;
+                          (Number(f.knittingCost) || 0) + rowDyeCost + totalFinishingCost;
                         return (
                           <tr key={f.id || idx} className="hover:bg-slate-50">
                             <td className="py-2 px-2.5 font-bold text-slate-900 font-mono text-[11px]">
@@ -588,7 +719,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                               ${(Number(f.knittingCost) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
                             <td className="py-2 px-2.5 text-right font-mono text-slate-700">
-                              ${(Number(f.dyeingCost) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              ${rowDyeCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
                             <td className="py-2 px-2.5 text-right font-mono text-slate-400">
                               $0.00
@@ -683,7 +814,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                               {(Number(y.finalQtyKg) || 0).toLocaleString()} kg
                             </td>
                             <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                              ${(Number(y.ratePerKg) || 0).toFixed(2)}/kg
+                              {renderReportRate(Number(y.ratePerKg) || 0, y.masterRatePerKg, "/kg")}
                             </td>
                             <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
                               ${(Number(y.yarnCost) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -722,7 +853,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                           {(Number(f.requiredYarnKg) || 0).toLocaleString()} kg
                         </td>
                         <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                          ${(Number(f.knittingRate) || 0).toFixed(2)}/kg
+                          {renderReportRate(Number(f.knittingRate) || 0, f.masterKnittingRate, "/kg")}
                         </td>
                         <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
                           ${(Number(f.knittingCost) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -738,42 +869,110 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                       </td>
                     </tr>
 
-                    {/* 3. Category: Dyeing Process */}
+                    {/* 3. Category: Dyeing & Fabric Processing */}
                     <tr className="bg-slate-50/90 font-black text-slate-800 text-[11px] border-t border-slate-300">
                       <td colSpan={6} className="py-1.5 px-3 uppercase text-indigo-800 tracking-wider">
-                        3. Dyeing Process
+                        3. Dyeing & Fabric Processing
                       </td>
                     </tr>
-                    {fabricItems.map((f, idx) => (
-                      <tr key={`dye-${idx}`} className="hover:bg-slate-50 text-[11.5px]">
-                        <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
-                          Dyeing — {f.head}
-                        </td>
-                        <td className="py-1.5 px-3">
-                          <span className="font-semibold text-slate-900 block">
-                            {f.item} Dyeing
-                          </span>
-                          <span className="text-[10px] text-slate-500 font-mono">
-                            Shade: {f.colorShade} • Method: {f.dyeingMethod} • Loss: {f.dyeingProcessLossPct}%
-                          </span>
-                        </td>
-                        <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                          {f.consumptionKgDz} kg/{consumptionUnit.toLowerCase()}
-                        </td>
-                        <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
-                          {(Number(f.requiredGreigeQty) || 0).toLocaleString()} kg
-                        </td>
-                        <td className="py-1.5 px-2 text-right font-mono text-slate-700">
-                          ${(Number(f.dyeingRate) || 0).toFixed(2)}/kg
-                        </td>
-                        <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
-                          ${(Number(f.dyeingCost) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </td>
-                      </tr>
-                    ))}
+                    {fabricItems.map((f, idx) => {
+                      const isYD = f.colorType === "Y/D" || Number(f.ydCost) > 0 || Number(f.ydRate) > 0;
+                      const isAOP = f.colorType === "AOP" || Number(f.aopCost) > 0 || Number(f.aopRate) > 0;
+
+                      return (
+                        <React.Fragment key={`dye-proc-${idx}`}>
+                          {/* Standard or Solid Dyeing Process */}
+                          {(!isYD || (Number(f.dyeingCost) || 0) > 0) && (
+                            <tr className="hover:bg-slate-50 text-[11.5px]">
+                              <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
+                                Dyeing — {f.head}
+                              </td>
+                              <td className="py-1.5 px-3">
+                                <span className="font-semibold text-slate-900 block">
+                                  {f.item} Dyeing
+                                </span>
+                                <span className="text-[10px] text-slate-500 font-mono">
+                                  Shade: {f.colorShade} • Method: {f.dyeingMethod} • Loss: {f.dyeingProcessLossPct}%
+                                </span>
+                              </td>
+                              <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                                {f.consumptionKgDz} kg/{consumptionUnit.toLowerCase()}
+                              </td>
+                              <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
+                                {(Number(f.requiredGreigeQty) || 0).toLocaleString()} kg
+                              </td>
+                              <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                                {renderReportRate(Number(f.dyeingRate) || 0, f.masterDyeingRate, "/kg")}
+                              </td>
+                              <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
+                                ${(Number(f.dyeingCost) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </td>
+                            </tr>
+                          )}
+
+                          {/* Yarn Dyeing (Y/D) Process */}
+                          {isYD && (
+                            <tr className="hover:bg-slate-50 text-[11.5px]">
+                              <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
+                                Y/D — {f.head}
+                              </td>
+                              <td className="py-1.5 px-3">
+                                <span className="font-semibold text-slate-900 block">
+                                  {f.item} Yarn Dyeing (Y/D)
+                                </span>
+                                <span className="text-[10px] text-slate-500 font-mono">
+                                  Type: {f.ydType || "Feeder Stripe"} • Shade: {f.colorShade} • Method: {f.dyeingMethod} • Loss: {f.ydProcessLossPct}%
+                                </span>
+                              </td>
+                              <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                                {f.consumptionKgDz} kg/{consumptionUnit.toLowerCase()}
+                              </td>
+                              <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
+                                {(Number(f.requiredDyedYarnKg) || 0).toLocaleString()} kg
+                              </td>
+                              <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                                {renderReportRate(Number(f.ydRate) || 0, f.masterYdRate, "/kg")}
+                              </td>
+                              <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
+                                ${(Number(f.ydCost) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </td>
+                            </tr>
+                          )}
+
+                          {/* AOP Printing Process */}
+                          {isAOP && (
+                            <tr className="hover:bg-slate-50 text-[11.5px]">
+                              <td className="py-1.5 px-3 text-slate-500 font-mono text-[10px]">
+                                AOP — {f.head}
+                              </td>
+                              <td className="py-1.5 px-3">
+                                <span className="font-semibold text-slate-900 block">
+                                  {f.item} AOP Printing
+                                </span>
+                                <span className="text-[10px] text-slate-500 font-mono">
+                                  Type: {f.aopType || "Reactive"} • Loss: {f.aopProcessLossPct}%
+                                </span>
+                              </td>
+                              <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                                {f.consumptionKgDz} kg/{consumptionUnit.toLowerCase()}
+                              </td>
+                              <td className="py-1.5 px-2 text-right font-mono font-semibold text-slate-800">
+                                {(Number(f.requiredDyedQty) || 0).toLocaleString()} kg
+                              </td>
+                              <td className="py-1.5 px-2 text-right font-mono text-slate-700">
+                                {renderReportRate(Number(f.aopRate) || 0, f.masterAopRate, "/kg")}
+                              </td>
+                              <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-900">
+                                ${(Number(f.aopCost) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
                     <tr className="bg-indigo-50/50 font-bold text-indigo-900 text-xs">
                       <td colSpan={5} className="py-1.5 px-3 text-right uppercase text-[10px]">
-                        Sub Total — Dyeing Process:
+                        Sub Total — Dyeing & Finishing Process:
                       </td>
                       <td className="py-1.5 px-3 text-right font-mono font-black text-indigo-900">
                         ${totalDyeingCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -1227,7 +1426,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                   <thead className="bg-slate-50 border-b border-slate-200 text-[9.5px] uppercase font-bold text-slate-500">
                     <tr>
                       <th className="py-1.5 px-2">Particulars</th>
-                      <th className="py-1.5 px-2 text-right">Rate/Dz</th>
+                      <th className="py-1.5 px-2 text-right">Rate (%) / Dz</th>
                       <th className="py-1.5 px-2 text-right">Share (%)</th>
                       <th className="py-1.5 px-2 text-right">Value ($)</th>
                     </tr>
@@ -1239,7 +1438,7 @@ export function PreCostingKnitReport({ record, onBack, onEdit }: PreCostingKnitR
                           {head.particulars}
                         </td>
                         <td className="py-1.5 px-2 text-right font-mono font-bold text-slate-900">
-                          ${head.rateDz.toFixed(2)}
+                          {head.rateDisplay || `$${head.rateDz.toFixed(2)}`}
                         </td>
                         <td className="py-1.5 px-2 text-right font-mono font-bold text-indigo-700">
                           {head.sharePct.toFixed(1)}%
