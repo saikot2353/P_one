@@ -230,6 +230,8 @@ function getGridColSpanClass(span: WidgetColSpan): string {
   switch (span) {
     case 12:
       return "col-span-12";
+    case 8:
+      return "col-span-12 lg:col-span-8";
     case 6:
       return "col-span-12 lg:col-span-6";
     case 4:

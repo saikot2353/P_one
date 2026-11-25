@@ -6,7 +6,7 @@ export type DashboardModule =
   | "accounts"
   | "procurement";
 
-export type WidgetColSpan = 1 | 2 | 3 | 4 | 6 | 12;
+export type WidgetColSpan = 1 | 2 | 3 | 4 | 6 | 8 | 12;
 
 export interface WidgetSettings {
   scope?: "personal" | "area" | "managed_depts" | "team" | "department" | "company"; // Self, Area, Department (multi-select), All Company
@@ -103,6 +103,48 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
       { id: "ot_active", label: "Active on OT", defaultEnabled: false },
       { id: "new_joiners", label: "New Joiners (MTD)", defaultEnabled: false },
       { id: "early_leave", label: "Early Departure", defaultEnabled: false },
+      { id: "worker", label: "Worker", defaultEnabled: false },
+      { id: "staff", label: "Staff", defaultEnabled: false },
+      { id: "staff_present", label: "Staff Present", defaultEnabled: false },
+      { id: "worker_present", label: "Worker Present", defaultEnabled: false },
+      { id: "worker_absent", label: "Worker Absent", defaultEnabled: false },
+      { id: "staff_absent", label: "Staff Absent", defaultEnabled: false },
+      { id: "holiday", label: "Holiday", defaultEnabled: false },
+      { id: "late_worker", label: "Late Worker", defaultEnabled: false },
+      { id: "late_staff", label: "Late Staff", defaultEnabled: false },
+      { id: "leave_worker", label: "Worker on Leave", defaultEnabled: false },
+      { id: "leave_staff", label: "Staff on Leave", defaultEnabled: false },
+      { id: "uninformed_absent", label: "Uninformed Absent", defaultEnabled: false },
+      { id: "weekend_duty", label: "Weekend Duty", defaultEnabled: false },
+    ],
+  },
+  {
+    id: "hr_workforce_info",
+    name: "Workforce Information",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Metric Cards",
+    description: "Total Man Power, Worker, Staff, Resign, Lefty, ML, Others, and demographic/status breakdown.",
+    iconName: "Users",
+    defaultColSpan: 12,
+    minColSpan: 6,
+    badge: "Workforce Info",
+    supportedScopes: ["personal", "area", "department", "company"],
+    availableChips: [
+      { id: "total_manpower", label: "Total Man Power", defaultEnabled: true },
+      { id: "worker", label: "Worker", defaultEnabled: true },
+      { id: "staff", label: "Staff", defaultEnabled: true },
+      { id: "resign", label: "Resign", defaultEnabled: true },
+      { id: "lefty", label: "Lefty", defaultEnabled: true },
+      { id: "ml", label: "ML", defaultEnabled: true },
+      { id: "others", label: "Others", defaultEnabled: true },
+      { id: "new_joining", label: "New Joining", defaultEnabled: false },
+      { id: "male", label: "Male", defaultEnabled: false },
+      { id: "female", label: "Female", defaultEnabled: false },
+      { id: "confirmed", label: "Confirmed", defaultEnabled: false },
+      { id: "probation", label: "Probation", defaultEnabled: false },
+      { id: "terminated", label: "Terminated", defaultEnabled: false },
+      { id: "retired", label: "Retired", defaultEnabled: false },
     ],
   },
   {
@@ -208,6 +250,10 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
       { id: "absent", label: "Absent", defaultEnabled: true },
       { id: "late", label: "Late Entry", defaultEnabled: true },
       { id: "leave", label: "On Leave", defaultEnabled: true },
+      { id: "holiday", label: "Holiday", defaultEnabled: false },
+      { id: "early_leave", label: "Early Departure", defaultEnabled: false },
+      { id: "ml", label: "ML (Maternity Leave)", defaultEnabled: false },
+      { id: "weekend_duty", label: "Weekend Duty", defaultEnabled: false },
     ],
   },
   {
@@ -263,6 +309,195 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
     iconName: "CalendarX",
     defaultColSpan: 6,
     supportedScopes: ["personal", "managed_depts", "department", "company"],
+  },
+  {
+    id: "hr_requisitions_summary",
+    name: "Requisitions & Messages Summary",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Metric Cards",
+    description: "Total Requisitions, Pending Requisitions, Unread Messages, and Approved Requisitions.",
+    iconName: "FileText",
+    defaultColSpan: 4,
+    minColSpan: 3,
+    badge: "Requisitions",
+    supportedScopes: ["personal", "area", "department"],
+    availableChips: [
+      { id: "total_req", label: "Total Requisitions", defaultEnabled: true },
+      { id: "pending_req", label: "Pending Requisitions", defaultEnabled: true },
+      { id: "unread_msg", label: "Unread Messages", defaultEnabled: true },
+      { id: "my_req_pending", label: "My Requisition Pending", defaultEnabled: true },
+      { id: "my_app_pending", label: "My Approval Pending", defaultEnabled: true },
+      { id: "approved_req", label: "Approved Requisitions", defaultEnabled: false },
+    ],
+  },
+  {
+    id: "hr_ontime_vs_late_chart",
+    name: "On-Time vs Late Entry Trend",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "6-month On-Time vs Late arrival comparison chart.",
+    iconName: "Clock",
+    defaultColSpan: 4,
+    minColSpan: 3,
+    badge: "Punctuality",
+    supportedScopes: ["personal", "area", "department"],
+    availableChips: [
+      { id: "ontime", label: "On-Time", defaultEnabled: true },
+      { id: "late", label: "Late", defaultEnabled: true },
+    ],
+  },
+  {
+    id: "hr_leave_balance_card",
+    name: "Leave Balance Overview",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Progress & Gauges",
+    description: "Casual Leave, Sick Leave, Earned Leave, and Maternity/Paternity balances.",
+    iconName: "CalendarCheck",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "Leave Balance",
+    supportedScopes: ["personal", "area", "department"],
+    availableChips: [
+      { id: "casual", label: "Casual Leave", defaultEnabled: true },
+      { id: "sick", label: "Sick Leave", defaultEnabled: true },
+      { id: "earned", label: "Earned Leave", defaultEnabled: true },
+      { id: "maternity", label: "Maternity", defaultEnabled: true },
+      { id: "compoff", label: "Comp Off", defaultEnabled: true },
+      { id: "lwp", label: "Without Pay", defaultEnabled: true },
+    ],
+  },
+  {
+    id: "hr_notice_board",
+    name: "Notice Board & Circulars",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Feed & Queue",
+    description: "Company holiday notices, performance review announcements, and HR policies.",
+    iconName: "FileText",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "Circulars",
+    availableChips: [
+      { id: "holiday", label: "Holiday Notice", defaultEnabled: true },
+      { id: "meeting", label: "Performance Review", defaultEnabled: true },
+      { id: "policy", label: "Policy Update", defaultEnabled: true },
+    ],
+  },
+  {
+    id: "hr_messages_feed",
+    name: "Recent Messages & Team Inbox",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Feed & Queue",
+    description: "Recent team messages from HR Desk, Floor Chief, and Payroll Team.",
+    iconName: "Users",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "Team Inbox",
+    availableChips: [
+      { id: "hr_desk", label: "HR Desk", defaultEnabled: true },
+      { id: "floor_chief", label: "Floor Chief", defaultEnabled: true },
+      { id: "payroll", label: "Payroll Team", defaultEnabled: true },
+    ],
+  },
+  {
+    id: "hr_upcoming_events",
+    name: "Upcoming Events & Birthdays",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Feed & Queue",
+    description: "Upcoming team birthdays, public holidays, and work anniversaries.",
+    iconName: "CalendarDays",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "Events",
+    availableChips: [
+      { id: "birthdays", label: "Birthdays", defaultEnabled: true },
+      { id: "anniversaries", label: "Work Anniversaries", defaultEnabled: true },
+      { id: "interviews", label: "Interviews", defaultEnabled: true },
+      { id: "holidays", label: "Meetings & Holidays", defaultEnabled: true },
+    ],
+  },
+  {
+    id: "hr_team_members",
+    name: "My Team Members",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Feed & Queue",
+    description: "Colleague & team directory cards with online status, employee ID, phone, and quick email action.",
+    iconName: "Users",
+    defaultColSpan: 12,
+    minColSpan: 6,
+    badge: "Team Directory",
+    supportedScopes: ["personal", "area", "department"],
+    availableChips: [
+      { id: "sr_exec", label: "Sr. Executive", defaultEnabled: true },
+      { id: "exec", label: "Executive", defaultEnabled: true },
+      { id: "jr_exec", label: "Jr. Executive", defaultEnabled: true },
+      { id: "managers", label: "Managers & Leads", defaultEnabled: true },
+    ],
+  },
+  {
+    id: "hr_manpower_budget_vs_onboard",
+    name: "Manpower Budget vs Actual On Board",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "Budgeted manpower headcount vs actual on-board strength, vacancy gap, and fill rate across departments.",
+    iconName: "Users",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "MP Budget",
+    supportedScopes: ["area", "department"],
+    availableChips: [
+      { id: "budget_mp", label: "Budgeted MP", defaultEnabled: true },
+      { id: "onboard_mp", label: "Actual On-Board", defaultEnabled: true },
+      { id: "vacancy", label: "Vacancy / Gap", defaultEnabled: true },
+      { id: "fill_rate", label: "Fill Rate %", defaultEnabled: true },
+    ],
+  },
+  {
+    id: "hr_separation_turnover",
+    name: "Separation & Turnover",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "Monthly employee separation & turnover rate split by Resign, Lefty, Terminated, and Retired.",
+    iconName: "TrendingUp",
+    defaultColSpan: 6,
+    minColSpan: 4,
+    badge: "Turnover",
+    supportedScopes: ["area", "department"],
+    availableChips: [
+      { id: "total_sep", label: "Total Separation", defaultEnabled: true },
+      { id: "turnover_rate", label: "Turnover Rate %", defaultEnabled: true },
+      { id: "resign", label: "Resign", defaultEnabled: true },
+      { id: "lefty", label: "Lefty", defaultEnabled: true },
+      { id: "terminated", label: "Terminated", defaultEnabled: false },
+      { id: "retired", label: "Retired", defaultEnabled: false },
+    ],
+  },
+  {
+    id: "hr_increment_yearly",
+    name: "Increment Yearly",
+    module: "hris",
+    moduleLabel: "HRIS & Workforce",
+    category: "Chart & Analytics",
+    description: "Month-by-month yearly salary increment payout (Taka) chart across Jan–Dec with incremented headcount.",
+    iconName: "Banknote",
+    defaultColSpan: 12,
+    minColSpan: 6,
+    badge: "Yearly Increment",
+    supportedScopes: ["personal", "area", "department"],
+    availableChips: [
+      { id: "total_inc_amt", label: "Total Yearly Increment", defaultEnabled: true },
+      { id: "inc_employees", label: "Incremented Staff", defaultEnabled: true },
+      { id: "avg_inc_pct", label: "Avg Increment %", defaultEnabled: true },
+      { id: "peak_month", label: "Peak Month", defaultEnabled: true },
+    ],
   },
   {
     id: "hr_recruitment_pipeline",
@@ -473,6 +708,133 @@ export const DASHBOARD_COMPONENTS_CATALOG: DashboardComponentDefinition[] = [
 
 export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
   {
+    id: "tpl_final_hris",
+    title: "Final HRIS",
+    description: "Complete HRIS dashboard with Workforce Presence & Attendance Stats, Workforce Information, OT comparisons, Manpower Breakdown, Attendance/Late pies, Trends, Leave Queue, and Monthly/Yearly Talent Acquisition.",
+    category: "Departmental",
+    modules: ["hris"],
+    isDefault: true,
+    isActiveMain: false,
+    layoutColumns: 12,
+    createdAt: "2026-11-25",
+    updatedAt: "2026-11-25",
+    widgets: [
+      // #1 (100%)
+      {
+        id: "w_fhris_2",
+        componentId: "hr_workforce_info",
+        colSpan: 12,
+        settings: {
+          scope: "area",
+          enabledChips: ["total_manpower", "worker", "staff", "resign", "lefty"],
+        },
+      },
+
+      // #2 (67%) + #3 (33%)
+      { id: "w_fhris_5", componentId: "hr_total_manpower_chart", colSpan: 8 },
+      {
+        id: "w_fhris_13",
+        componentId: "hr_requisitions_summary",
+        colSpan: 4,
+        settings: {
+          scope: "area",
+          enabledChips: ["total_req", "pending_req", "unread_msg", "my_req_pending", "my_app_pending"],
+        },
+      },
+
+      // #4 (50%) + #5 (50%)
+      { id: "w_fhris_19", componentId: "hr_manpower_budget_vs_onboard", colSpan: 6 },
+      {
+        id: "w_fhris_20",
+        componentId: "hr_separation_turnover",
+        colSpan: 6,
+        settings: {
+          scope: "area",
+          enabledChips: ["total_sep", "turnover_rate", "resign", "lefty"],
+        },
+      },
+
+      // #6 (100%)
+      { id: "w_fhris_4", componentId: "hr_ot_budget_comparison", colSpan: 12 },
+
+      // #7 (50%) + #8 (50%)
+      { id: "w_fhris_3", componentId: "hr_ot_requisition_vs_consumption", colSpan: 6 },
+      { id: "w_fhris_8", componentId: "hr_ot_bar_chart", colSpan: 6 },
+
+      // #9 (100%)
+      {
+        id: "w_fhris_1",
+        componentId: "hr_quick_stats",
+        colSpan: 12,
+        settings: {
+          scope: "area",
+          enabledChips: [
+            "total_workforce",
+            "worker_present",
+            "worker_absent",
+            "staff_present",
+            "staff_absent",
+          ],
+        },
+      },
+
+      // #10 (33%) + #11 (33%) + #12 (33%)
+      {
+        id: "w_fhris_6",
+        componentId: "hr_attendance_pie",
+        colSpan: 4,
+        settings: {
+          scope: "area",
+          enabledChips: ["present", "absent", "late", "leave"],
+        },
+      },
+      { id: "w_fhris_14", componentId: "hr_ontime_vs_late_chart", colSpan: 4 },
+      { id: "w_fhris_7", componentId: "hr_late_absent_pie", colSpan: 4 },
+
+      // #13 (50%) + #14 (50%)
+      { id: "w_fhris_11", componentId: "hr_recruitment_pipeline", colSpan: 6 },
+      { id: "w_fhris_9", componentId: "hr_headcount_trend", colSpan: 6 },
+
+      // #15 (50%) + #16 (50%)
+      {
+        id: "w_fhris_12",
+        componentId: "acc_payroll_payout",
+        customTitle: "Yearly Payroll Disbursement & Salary",
+        colSpan: 6,
+        settings: { scope: "area", period: "year" },
+      },
+      { id: "w_fhris_21", componentId: "hr_increment_yearly", colSpan: 6 },
+
+      // #17 (50%) + #18 (50%)
+      { id: "w_fhris_15", componentId: "hr_leave_balance_card", colSpan: 6 },
+      { id: "w_fhris_18", componentId: "hr_upcoming_events", colSpan: 6 },
+
+      // #19 (50%) + #20 (50%)
+      { id: "w_fhris_16", componentId: "hr_notice_board", colSpan: 6 },
+      { id: "w_fhris_17", componentId: "hr_messages_feed", colSpan: 6 },
+
+      // #21 (100%)
+      { id: "w_fhris_22", componentId: "hr_team_members", colSpan: 12 },
+    ],
+  },
+  {
+    id: "tpl_all",
+    title: "All",
+    description: "Complete unified dashboard with every widget across HRIS, Merchandising, Inventory, Accounts, and Procurement.",
+    category: "Executive",
+    modules: ["hris", "merchandising", "inventory", "accounts", "procurement"],
+    isDefault: true,
+    isActiveMain: false,
+    layoutColumns: 12,
+    createdAt: "2026-11-25",
+    updatedAt: "2026-11-25",
+    widgets: DASHBOARD_COMPONENTS_CATALOG.map((comp, idx) => ({
+      id: `w_all_${idx + 1}`,
+      componentId: comp.id,
+      colSpan: comp.defaultColSpan,
+    })),
+  },
+  {
     id: "tpl_universal_exec",
     title: "Executive Universal Command Suite",
     description: "All-in-one corporate command center spanning HR workforce, Garment Merchandising orders, Inventory stock, and Payroll finance.",
@@ -583,8 +945,8 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
   },
 ];
 
-const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v5";
-const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v5";
+const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v18";
+const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v18";
 
 export function loadDashboardTemplates(): DashboardTemplate[] {
   if (typeof window === "undefined") return DEFAULT_DASHBOARD_TEMPLATES;

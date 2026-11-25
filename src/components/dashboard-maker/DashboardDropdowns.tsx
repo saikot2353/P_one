@@ -13,6 +13,9 @@ import {
   CheckSquare,
   Square,
   Sparkles,
+  GripVertical,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { WidgetColSpan, DashboardChipDefinition } from "./dashboard-maker-types";
 
@@ -112,21 +115,19 @@ export const ScopeDropdown: React.FC<ScopeDropdownProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   useOutsideClick(containerRef, () => setIsOpen(false));
 
-  const scope = value || "company";
+  const scope = !value || value === "company" ? "area" : value;
   const isDeptMode = scope === "department" || scope === "managed_depts";
 
   const getTriggerLabel = () => {
     if (scope === "personal") return "Self";
-    if (scope === "area") return areas.length > 1 ? `Area (${areas.length})` : areas[0]?.split(" ")[0] || "Area";
     if (isDeptMode) return departments.length > 0 ? `Dept (${departments.length})` : "Department";
-    return "All Company";
+    return "Area";
   };
 
   const getTriggerCls = () => {
     if (scope === "personal") return "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300";
-    if (scope === "area") return "border-indigo-500/30 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300";
     if (isDeptMode) return "border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300";
-    return "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+    return "border-indigo-500/30 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300";
   };
 
   const toggleArea = (area: string) => {
@@ -179,9 +180,8 @@ export const ScopeDropdown: React.FC<ScopeDropdownProps> = ({
                 onChange("personal");
                 setIsOpen(false);
               }}
-              className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${
-                scope === "personal" ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
-              }`}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${scope === "personal" ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
+                }`}
             >
               <span>Self</span>
               {scope === "personal" && <Check className="size-3.5" />}
@@ -190,64 +190,24 @@ export const ScopeDropdown: React.FC<ScopeDropdownProps> = ({
 
           <button
             type="button"
-            onClick={() => onChange("area", { areas })}
-            className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${
-              scope === "area" ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
-            }`}
+            onClick={() => {
+              onChange("area");
+              setIsOpen(false);
+            }}
+            className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${scope === "area" ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
+              }`}
           >
             <span>Area</span>
             {scope === "area" && <Check className="size-3.5" />}
           </button>
-
-          {scope === "area" && (
-            <div className="pl-2 pr-1 py-1 space-y-0.5 border-l-2 border-primary/30 ml-2">
-              {AREA_OPTIONS.map((area) => {
-                const checked = areas.includes(area);
-                return (
-                  <button
-                    key={area}
-                    type="button"
-                    onClick={() => toggleArea(area)}
-                    className="w-full text-left px-2 py-1 rounded text-[11px] flex items-center justify-between hover:bg-muted cursor-pointer text-foreground"
-                  >
-                    <span className="truncate">{area}</span>
-                    <span
-                      className={`size-3.5 rounded border flex items-center justify-center shrink-0 ${
-                        checked ? "bg-primary border-primary text-primary-foreground" : "border-border"
-                      }`}
-                    >
-                      {checked && <Check className="size-2.5 stroke-[3]" />}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {supportedScopes.includes("company") && (
-            <button
-              type="button"
-              onClick={() => {
-                onChange("company");
-                setIsOpen(false);
-              }}
-              className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${
-                scope === "company" ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
-              }`}
-            >
-              <span>All Company</span>
-              {scope === "company" && <Check className="size-3.5" />}
-            </button>
-          )}
 
           {(supportedScopes.includes("department") || supportedScopes.includes("managed_depts")) && (
             <>
               <button
                 type="button"
                 onClick={() => onChange("department", { departments })}
-                className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${
-                  isDeptMode ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
-                }`}
+                className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${isDeptMode ? "bg-primary text-primary-foreground font-semibold" : "hover:bg-muted text-foreground"
+                  }`}
               >
                 <span>Department</span>
                 {isDeptMode && <Check className="size-3.5" />}
@@ -274,9 +234,8 @@ export const ScopeDropdown: React.FC<ScopeDropdownProps> = ({
                         >
                           <span className="truncate">{dept}</span>
                           <span
-                            className={`size-3.5 rounded border flex items-center justify-center shrink-0 ${
-                              checked ? "bg-primary border-primary text-primary-foreground" : "border-border"
-                            }`}
+                            className={`size-3.5 rounded border flex items-center justify-center shrink-0 ${checked ? "bg-primary border-primary text-primary-foreground" : "border-border"
+                              }`}
                           >
                             {checked && <Check className="size-2.5 stroke-[3]" />}
                           </span>
@@ -365,11 +324,10 @@ export const BuyerMultiSelectDropdown: React.FC<BuyerMultiSelectDropdownProps> =
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`h-6 px-2 rounded-md border text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all shadow-2xs select-none ${
-          !isAllSelected
-            ? "border-teal-500/50 bg-teal-500/20 text-teal-800 dark:text-teal-200 hover:bg-teal-500/30 font-black"
-            : "border-teal-500/35 bg-teal-500/10 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20"
-        }`}
+        className={`h-6 px-2 rounded-md border text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all shadow-2xs select-none ${!isAllSelected
+          ? "border-teal-500/50 bg-teal-500/20 text-teal-800 dark:text-teal-200 hover:bg-teal-500/30 font-black"
+          : "border-teal-500/35 bg-teal-500/10 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20"
+          }`}
         title={`Filter by Buyer (${isAllSelected ? "All" : selectedBuyers.join(", ")})`}
       >
         <Store className="size-3 text-teal-600" />
@@ -424,11 +382,10 @@ export const BuyerMultiSelectDropdown: React.FC<BuyerMultiSelectDropdownProps> =
               <button
                 type="button"
                 onClick={handleSelectAll}
-                className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors ${
-                  isAllSelected
-                    ? "bg-teal-500/20 text-teal-700 dark:text-teal-300"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
+                className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors ${isAllSelected
+                  ? "bg-teal-500/20 text-teal-700 dark:text-teal-300"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
               >
                 ✓ Select All (Show All)
               </button>
@@ -455,11 +412,10 @@ export const BuyerMultiSelectDropdown: React.FC<BuyerMultiSelectDropdownProps> =
                   <div
                     key={buyer.id}
                     onClick={() => handleToggleBuyer(buyer.id)}
-                    className={`px-2 py-1.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all select-none ${
-                      isChecked
-                        ? "bg-teal-500/10 border-teal-500/40 text-foreground font-bold shadow-2xs"
-                        : "bg-background border-border/50 hover:border-teal-300 text-muted-foreground hover:text-foreground"
-                    }`}
+                    className={`px-2 py-1.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all select-none ${isChecked
+                      ? "bg-teal-500/10 border-teal-500/40 text-foreground font-bold shadow-2xs"
+                      : "bg-background border-border/50 hover:border-teal-300 text-muted-foreground hover:text-foreground"
+                      }`}
                   >
                     <div className="min-w-0 pr-2">
                       <div className="text-xs truncate flex items-center gap-1.5">
@@ -474,11 +430,10 @@ export const BuyerMultiSelectDropdown: React.FC<BuyerMultiSelectDropdownProps> =
                     </div>
 
                     <div
-                      className={`size-4 rounded-md border flex items-center justify-center shrink-0 transition-all ${
-                        isChecked
-                          ? "bg-teal-600 border-teal-600 text-white"
-                          : "border-border/80 bg-background"
-                      }`}
+                      className={`size-4 rounded-md border flex items-center justify-center shrink-0 transition-all ${isChecked
+                        ? "bg-teal-600 border-teal-600 text-white"
+                        : "border-border/80 bg-background"
+                        }`}
                     >
                       {isChecked && <Check className="size-3 stroke-[3]" />}
                     </div>
@@ -559,11 +514,10 @@ export const WarehouseDropdown: React.FC<WarehouseDropdownProps> = ({
                     onChange(w.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-2.5 py-2 rounded-xl flex items-center justify-between cursor-pointer transition-all ${
-                    isSelected
-                      ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold"
-                      : "hover:bg-muted/70 text-foreground"
-                  }`}
+                  className={`w-full text-left px-2.5 py-2 rounded-xl flex items-center justify-between cursor-pointer transition-all ${isSelected
+                    ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold"
+                    : "hover:bg-muted/70 text-foreground"
+                    }`}
                 >
                   <div className="min-w-0 pr-2">
                     <div className="text-xs font-bold leading-tight truncate">{w.name}</div>
@@ -628,11 +582,10 @@ export const WidthDropdown: React.FC<WidthDropdownProps> = ({
                     onChange(s.val);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-2.5 py-1.5 rounded-xl flex items-center justify-between cursor-pointer transition-all ${
-                    isSelected
-                      ? "bg-primary/10 text-primary font-bold"
-                      : "hover:bg-muted/70 text-foreground"
-                  }`}
+                  className={`w-full text-left px-2.5 py-1.5 rounded-xl flex items-center justify-between cursor-pointer transition-all ${isSelected
+                    ? "bg-primary/10 text-primary font-bold"
+                    : "hover:bg-muted/70 text-foreground"
+                    }`}
                 >
                   <div>
                     <span className="text-xs font-bold block">{s.label}</span>
@@ -664,30 +617,54 @@ export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
   onChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   useOutsideClick(containerRef, () => setIsOpen(false));
 
   const toggleChip = (id: string) => {
     if (enabledChips.includes(id)) {
-      // Keep at least 1 chip visible
       if (enabledChips.length <= 1) return;
       onChange(enabledChips.filter((c) => c !== id));
     } else {
-      // Maintain catalog order
-      const next = availableChips
-        .map((c) => c.id)
-        .filter((cid) => cid === id || enabledChips.includes(cid));
-      onChange(next);
+      onChange([...enabledChips, id]);
     }
   };
 
+  const moveChip = (id: string, dir: -1 | 1) => {
+    const idx = enabledChips.indexOf(id);
+    if (idx === -1) return;
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= enabledChips.length) return;
+    const next = [...enabledChips];
+    const [moved] = next.splice(idx, 1);
+    next.splice(targetIdx, 0, moved);
+    onChange(next);
+  };
+
+  const handleDropChip = (targetId: string) => {
+    if (!draggedId || draggedId === targetId) return;
+    const fromIdx = enabledChips.indexOf(draggedId);
+    const toIdx = enabledChips.indexOf(targetId);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const next = [...enabledChips];
+    const [moved] = next.splice(fromIdx, 1);
+    next.splice(toIdx, 0, moved);
+    onChange(next);
+    setDraggedId(null);
+  };
+
   const handleSelectAll = () => {
-    onChange(availableChips.map((c) => c.id));
+    const missing = availableChips.map((c) => c.id).filter((id) => !enabledChips.includes(id));
+    onChange([...enabledChips, ...missing]);
   };
 
   const handleResetDefault = () => {
     onChange(availableChips.filter((c) => c.defaultEnabled !== false).map((c) => c.id));
   };
+
+  const chipMap = new Map(availableChips.map((c) => [c.id, c]));
+  const activeChipDefs = enabledChips.map((id) => chipMap.get(id)).filter((c): c is DashboardChipDefinition => !!c);
+  const inactiveChipDefs = availableChips.filter((c) => !enabledChips.includes(c.id));
 
   return (
     <div ref={containerRef} className="relative inline-block text-left">
@@ -695,7 +672,7 @@ export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className="h-6 px-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all shadow-2xs select-none"
-        title="Add or remove metric chips inside this card"
+        title="Add, remove, or reorder metric chips"
       >
         <Layers className="size-2.5 text-indigo-600 dark:text-indigo-400" />
         <span>
@@ -705,10 +682,10 @@ export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1.5 w-60 rounded-2xl bg-popover/98 backdrop-blur-md border border-border/80 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1.5">
+        <div className="absolute right-0 top-full mt-1.5 w-68 rounded-2xl bg-popover/98 backdrop-blur-md border border-border/80 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1.5">
           <div className="flex items-center justify-between px-1.5 pb-1.5 border-b border-border/50">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
-              Visible Chips ({enabledChips.length})
+              Chips ({enabledChips.length})
             </span>
             <div className="flex items-center gap-1 text-[10px]">
               <button
@@ -728,37 +705,71 @@ export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
             </div>
           </div>
 
-          <div className="max-h-56 overflow-y-auto space-y-1">
-            {availableChips.map((chip) => {
-              const isChecked = enabledChips.includes(chip.id);
-              const isOnlyOne = isChecked && enabledChips.length <= 1;
+          <div className="max-h-64 overflow-y-auto space-y-1">
+            {activeChipDefs.map((chip, idx) => {
+              const isOnlyOne = activeChipDefs.length <= 1;
               return (
-                <button
+                <div
                   key={chip.id}
-                  type="button"
-                  disabled={isOnlyOne}
-                  onClick={() => toggleChip(chip.id)}
-                  className={`w-full text-left px-2.5 py-1.5 rounded-xl border flex items-center justify-between transition-all ${
-                    isOnlyOne ? "opacity-70 cursor-not-allowed" : "cursor-pointer"
-                  } ${
-                    isChecked
-                      ? "bg-indigo-500/10 border-indigo-500/40 text-foreground font-semibold"
-                      : "bg-background border-border/50 hover:border-indigo-300 text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <span className="text-xs truncate pr-2">{chip.label}</span>
-                  <span
-                    className={`size-4 rounded-md border flex items-center justify-center shrink-0 transition-all ${
-                      isChecked
-                        ? "bg-indigo-600 border-indigo-600 text-white"
-                        : "border-border/80 bg-background"
+                  draggable
+                  onDragStart={() => setDraggedId(chip.id)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handleDropChip(chip.id)}
+                  onDragEnd={() => setDraggedId(null)}
+                  className={`px-2 py-1.5 rounded-xl border flex items-center justify-between gap-1.5 bg-indigo-500/10 border-indigo-500/40 text-foreground transition-all ${draggedId === chip.id ? "opacity-50" : ""
                     }`}
-                  >
-                    {isChecked && <Check className="size-3 stroke-[3]" />}
-                  </span>
-                </button>
+                >
+                  <div className="flex items-center gap-1.5 min-w-0 flex-1 cursor-grab active:cursor-grabbing">
+                    <GripVertical className="size-3 text-indigo-500/70 shrink-0" />
+                    <span className="text-xs font-semibold truncate">{chip.label}</span>
+                  </div>
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onClick={() => moveChip(chip.id, -1)}
+                      className="size-5 rounded hover:bg-indigo-500/20 disabled:opacity-25 flex items-center justify-center cursor-pointer"
+                      title="Move up"
+                    >
+                      <ArrowUp className="size-3" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={idx === activeChipDefs.length - 1}
+                      onClick={() => moveChip(chip.id, 1)}
+                      className="size-5 rounded hover:bg-indigo-500/20 disabled:opacity-25 flex items-center justify-center cursor-pointer"
+                      title="Move down"
+                    >
+                      <ArrowDown className="size-3" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isOnlyOne}
+                      onClick={() => toggleChip(chip.id)}
+                      className={`size-5 rounded flex items-center justify-center ${isOnlyOne
+                        ? "opacity-40 cursor-not-allowed"
+                        : "hover:bg-rose-500/20 text-rose-600 cursor-pointer"
+                        }`}
+                      title="Remove chip"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                </div>
               );
             })}
+
+            {inactiveChipDefs.map((chip) => (
+              <button
+                key={chip.id}
+                type="button"
+                onClick={() => toggleChip(chip.id)}
+                className="w-full text-left px-2.5 py-1.5 rounded-xl border border-border/50 bg-background hover:border-indigo-300 text-muted-foreground hover:text-foreground flex items-center justify-between cursor-pointer transition-all"
+              >
+                <span className="text-xs truncate pr-2">{chip.label}</span>
+                <span className="text-[10px] font-bold text-primary shrink-0">+ Add</span>
+              </button>
+            ))}
           </div>
         </div>
       )}
