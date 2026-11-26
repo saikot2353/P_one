@@ -67,6 +67,7 @@ interface PendingRecurringRow {
   company: string;
   area: string;
   amount: number;
+  isDisbursed: boolean;
   schedule: RecurringZakatSchedule;
 }
 
@@ -157,7 +158,7 @@ function buildPendingInstallments(
   const rows: PendingRecurringRow[] = [];
 
   schedules.forEach((sched) => {
-    if (sched.status === "Completed" || sched.status === "Paused" || sched.isUpfrontFullYearPaid) {
+    if (sched.status === "Paused") {
       return;
     }
 
@@ -174,15 +175,19 @@ function buildPendingInstallments(
       }
     });
 
-    const anchorDate = sched.nextDueDate || sched.startDate || "2026-11-01";
-    const remainingSlots = Math.max(1, totalInstallments - (sched.installmentsGenerated || 0));
-    const maxPreview = Math.min(remainingSlots, 6);
+    const anchorDate = sched.startDate || sched.nextDueDate || "2026-10-01";
+    const generatedCount = sched.installmentsGenerated || 0;
+    const maxSlots = Math.min(totalInstallments, 12);
 
-    for (let i = 0; i < maxPreview; i++) {
+    for (let i = 0; i < maxSlots; i++) {
       const dueDate =
         i === 0 ? anchorDate : addMonthsToDate(anchorDate, i * stepMonths, sched.disbursementDayOfMonth);
       const dueYm = dueDate.slice(0, 7);
-      if (disbursedMonths.has(dueYm)) continue;
+      const isDisbursed =
+        disbursedMonths.has(dueYm) ||
+        Boolean(sched.isUpfrontFullYearPaid) ||
+        sched.status === "Completed" ||
+        i < generatedCount;
 
       const [dueYear, dueMonth] = dueYm.split("-");
       const monthNum = parseInt(dueMonth, 10);
@@ -197,7 +202,7 @@ function buildPendingInstallments(
         dueYear,
         dueMonth,
         dueMonthLabel: `${monthShort} ${dueYear}`,
-        installmentNumber: (sched.installmentsGenerated || 0) + i + 1,
+        installmentNumber: i + 1,
         installmentTotal: totalInstallments,
         beneficiaryName: sched.beneficiaryName,
         beneficiaryPhone: sched.beneficiaryPhone,
@@ -219,6 +224,7 @@ function buildPendingInstallments(
         company,
         area,
         amount: sched.monthlyAmount,
+        isDisbursed,
         schedule: sched,
       });
     }
@@ -237,6 +243,7 @@ function PendingRecurringZakatPage() {
   const [filterArea, setFilterArea] = useState<string>("ALL");
   const [filterYear, setFilterYear] = useState<string>("2026");
   const [filterMonth, setFilterMonth] = useState<string>("11");
+  const [filterStatus, setFilterStatus] = useState<"NOT_DISBURSED" | "DISBURSED" | "ALL">("NOT_DISBURSED");
 
   // Selection & feedback
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
@@ -284,6 +291,8 @@ function PendingRecurringZakatPage() {
       if (filterArea !== "ALL" && row.area !== filterArea) return false;
       if (filterYear !== "ALL" && row.dueYear !== filterYear) return false;
       if (row.dueMonth !== filterMonth) return false;
+      if (filterStatus === "NOT_DISBURSED" && row.isDisbursed) return false;
+      if (filterStatus === "DISBURSED" && !row.isDisbursed) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -306,11 +315,16 @@ function PendingRecurringZakatPage() {
 
       return true;
     });
-  }, [allPendingRows, filterCompany, filterArea, filterYear, filterMonth, searchQuery]);
+  }, [allPendingRows, filterCompany, filterArea, filterYear, filterMonth, filterStatus, searchQuery]);
+
+  const selectableRows = useMemo(
+    () => filteredRows.filter((r) => !r.isDisbursed),
+    [filteredRows]
+  );
 
   const selectedRows = useMemo(
-    () => filteredRows.filter((r) => selectedKeys.includes(r.rowKey)),
-    [filteredRows, selectedKeys]
+    () => selectableRows.filter((r) => selectedKeys.includes(r.rowKey)),
+    [selectableRows, selectedKeys]
   );
 
   const selectedTotalAmount = useMemo(
@@ -319,15 +333,15 @@ function PendingRecurringZakatPage() {
   );
 
   const allVisibleSelected =
-    filteredRows.length > 0 && filteredRows.every((r) => selectedKeys.includes(r.rowKey));
+    selectableRows.length > 0 && selectableRows.every((r) => selectedKeys.includes(r.rowKey));
 
   const toggleSelectAll = () => {
     if (allVisibleSelected) {
-      const visibleSet = new Set(filteredRows.map((r) => r.rowKey));
+      const visibleSet = new Set(selectableRows.map((r) => r.rowKey));
       setSelectedKeys((prev) => prev.filter((k) => !visibleSet.has(k)));
     } else {
       const next = new Set(selectedKeys);
-      filteredRows.forEach((r) => next.add(r.rowKey));
+      selectableRows.forEach((r) => next.add(r.rowKey));
       setSelectedKeys(Array.from(next));
     }
   };
@@ -426,6 +440,7 @@ function PendingRecurringZakatPage() {
     setFilterArea("ALL");
     setFilterYear("2026");
     setFilterMonth("11");
+    setFilterStatus("NOT_DISBURSED");
   };
 
   return (
@@ -515,7 +530,7 @@ function PendingRecurringZakatPage() {
               <Filter className="size-3.5 text-emerald-600" />
               <span>Filter Pending Recurring Zakat</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2.5">
               <div className="lg:col-span-2 relative">
                 <Search className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -564,17 +579,27 @@ function PendingRecurringZakatPage() {
                 <option value="2025">Year: 2025</option>
               </select>
 
+              <select
+                value={filterMonth}
+                onChange={(e) => setFilterMonth(e.target.value)}
+                className="h-9 px-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/30 text-xs font-bold text-emerald-800 dark:text-emerald-200 outline-none focus:border-emerald-500"
+              >
+                {MONTH_OPTIONS.map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+
               <div className="flex items-center gap-2">
                 <select
-                  value={filterMonth}
-                  onChange={(e) => setFilterMonth(e.target.value)}
-                  className="flex-1 h-9 px-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/30 text-xs font-bold text-emerald-800 dark:text-emerald-200 outline-none focus:border-emerald-500"
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value as "NOT_DISBURSED" | "DISBURSED" | "ALL")}
+                  className="flex-1 h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-xs font-semibold outline-none focus:border-emerald-500"
                 >
-                  {MONTH_OPTIONS.map((m) => (
-                    <option key={m.value} value={m.value}>
-                      {m.label}
-                    </option>
-                  ))}
+                  <option value="NOT_DISBURSED">Not Disbursed</option>
+                  <option value="DISBURSED">Disbursed</option>
+                  <option value="ALL">All Status</option>
                 </select>
                 <button
                   type="button"
@@ -651,11 +676,15 @@ function PendingRecurringZakatPage() {
                       return (
                         <tr
                           key={row.rowKey}
-                          onClick={() => toggleRow(row.rowKey)}
-                          className={`transition-colors cursor-pointer ${
-                            isChecked
-                              ? "bg-emerald-50/60 dark:bg-emerald-950/25"
-                              : "hover:bg-slate-50 dark:hover:bg-slate-800/40"
+                          onClick={() => {
+                            if (!row.isDisbursed) toggleRow(row.rowKey);
+                          }}
+                          className={`transition-colors ${
+                            row.isDisbursed
+                              ? "bg-emerald-50/20 dark:bg-emerald-950/10"
+                              : isChecked
+                              ? "bg-emerald-50/60 dark:bg-emerald-950/25 cursor-pointer"
+                              : "hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer"
                           }`}
                         >
                           <td
@@ -664,10 +693,11 @@ function PendingRecurringZakatPage() {
                           >
                             <input
                               type="checkbox"
-                              checked={isChecked}
+                              disabled={row.isDisbursed}
+                              checked={!row.isDisbursed && isChecked}
                               onChange={() => toggleRow(row.rowKey)}
                               aria-label={`Select ${row.title} (${row.dueMonthLabel})`}
-                              className="size-4 rounded border-slate-300 accent-emerald-600 cursor-pointer"
+                              className="size-4 rounded border-slate-300 accent-emerald-600 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                             />
                           </td>
                           <td className="py-3 px-3">
@@ -725,21 +755,33 @@ function PendingRecurringZakatPage() {
                             </span>
                           </td>
                           <td className="py-3 px-3 text-center whitespace-nowrap">
-                            <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 font-bold text-[10.5px]">
-                              Pending
-                            </span>
+                            {row.isDisbursed ? (
+                              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 font-bold text-[10.5px]">
+                                Disbursed
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 font-bold text-[10.5px]">
+                                Not Disbursed
+                              </span>
+                            )}
                           </td>
                           <td
                             className="py-3 px-4 text-right whitespace-nowrap"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <button
-                              type="button"
-                              onClick={() => handleDisburseSelected([row])}
-                              className="px-2.5 py-1 rounded-lg bg-emerald-600/10 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold text-[11px] transition-colors cursor-pointer"
-                            >
-                              Disburse
-                            </button>
+                            {row.isDisbursed ? (
+                              <span className="text-[11px] font-bold text-emerald-600 inline-flex items-center gap-1">
+                                <CheckCircle2 className="size-3.5" /> Disbursed
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleDisburseSelected([row])}
+                                className="px-2.5 py-1 rounded-lg bg-emerald-600/10 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold text-[11px] transition-colors cursor-pointer"
+                              >
+                                Disburse
+                              </button>
+                            )}
                           </td>
                         </tr>
                       );
