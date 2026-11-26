@@ -32,6 +32,7 @@ import {
   Banknote,
   CheckCircle,
   Blocks,
+  Layers,
   ArrowLeft,
   MessageSquare,
   BookUser,
@@ -76,6 +77,7 @@ export interface NavItem {
 export const nav: NavItem[] = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard },
   { label: "Dashboard Maker", to: "/dashboard-maker", icon: Sparkles },
+  { label: "Widget Maker", to: "/widget-maker", icon: Layers },
   { label: "Messenger", to: "/messenger", icon: MessageSquare },
   { label: "Phonebook", to: "/phonebook", icon: BookUser },
   {
@@ -109,6 +111,7 @@ export const nav: NavItem[] = [
       { label: "Payroll Configuration", to: "/payroll-configure" },
       { label: "Salary Sheet Configuration", to: "/salary-sheet-configuration" },
       { label: "Dashboard Maker", to: "/dashboard-maker" },
+      { label: "Widget Maker", to: "/widget-maker" },
       { label: "Education & Training", to: "/configure-education" },
       { label: "Leave & Policies", to: "/configure-policies" },
       { label: "Maternity Configuration", to: "/maternity-configuration" },

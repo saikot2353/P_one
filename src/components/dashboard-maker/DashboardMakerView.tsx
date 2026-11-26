@@ -59,6 +59,7 @@ import {
   DashboardWidgetConfig,
   DashboardComponentDefinition,
   DASHBOARD_COMPONENTS_CATALOG,
+  getFullComponentCatalog,
   getEffectiveEnabledChips,
   loadDashboardTemplates,
   saveDashboardTemplates,
@@ -73,7 +74,8 @@ import { DashboardWidgetRenderer } from "./DashboardWidgetRenderer";
 const FINAL_HRIS_COMPONENT_IDS = new Set(
   (DEFAULT_DASHBOARD_TEMPLATES.find((t) => t.id === "tpl_final_hris")?.widgets || []).map((w) => w.componentId)
 );
-const LIBRARY_COMPONENTS_CATALOG = DASHBOARD_COMPONENTS_CATALOG.filter((c) => FINAL_HRIS_COMPONENT_IDS.has(c.id));
+const getLibraryComponentsCatalog = () =>
+  getFullComponentCatalog().filter((c) => FINAL_HRIS_COMPONENT_IDS.has(c.id) || c.isCustom);
 
 const DEPARTMENTS_LIST = [
   { id: "Sewing Floor", name: "Sewing Floor (সুইং ফ্লোর)", count: "680 Operators" },
@@ -142,7 +144,7 @@ export const DashboardMakerView: React.FC = () => {
 
   const configuringDef = useMemo(() => {
     if (!configuringWidget) return null;
-    return DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === configuringWidget.componentId) || null;
+    return getFullComponentCatalog().find((c) => c.id === configuringWidget.componentId) || null;
   }, [configuringWidget]);
 
   useEffect(() => {
@@ -157,7 +159,7 @@ export const DashboardMakerView: React.FC = () => {
     if (!editingTemplate) return;
     let modified = false;
     const healed = editingTemplate.widgets.map((w) => {
-      const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === w.componentId);
+      const def = getFullComponentCatalog().find((c) => c.id === w.componentId);
       const minSpan = def?.minColSpan || 3;
       if (w.colSpan < minSpan) {
         modified = true;
@@ -276,7 +278,7 @@ export const DashboardMakerView: React.FC = () => {
     // Infer modules from selected widgets
     const usedModules = new Set<DashboardTemplate["modules"][number]>();
     editingTemplate.widgets.forEach((w) => {
-      const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === w.componentId);
+      const def = getFullComponentCatalog().find((c) => c.id === w.componentId);
       if (def?.module) {
         usedModules.add(def.module);
       }
@@ -326,7 +328,7 @@ export const DashboardMakerView: React.FC = () => {
   // Add Component from Library (Click or Drop)
   const addComponentAtPosition = (componentId: string, insertIndex?: number) => {
     if (!editingTemplate) return;
-    const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === componentId);
+    const def = getFullComponentCatalog().find((c) => c.id === componentId);
     const newWidget: DashboardWidgetConfig = {
       id: "w_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6),
       componentId,
@@ -548,9 +550,10 @@ export const DashboardMakerView: React.FC = () => {
     });
   }, [templates, searchQuery, categoryFilter]);
 
-  // Filtered Component Catalog for Side Drawer (scoped to Final HRIS 22 components)
+  // Filtered Component Catalog for Side Drawer (scoped to Final HRIS + Custom Widgets)
+  const libraryCatalog = useMemo(() => getLibraryComponentsCatalog(), [templates]);
   const filteredCatalog = useMemo(() => {
-    return LIBRARY_COMPONENTS_CATALOG.filter((c) => {
+    return libraryCatalog.filter((c) => {
       const matchSearch =
         c.name.toLowerCase().includes(componentSearch.toLowerCase()) ||
         c.description.toLowerCase().includes(componentSearch.toLowerCase()) ||
@@ -558,11 +561,11 @@ export const DashboardMakerView: React.FC = () => {
       const matchModule = componentModuleFilter === "all" || c.module === componentModuleFilter;
       return matchSearch && matchModule;
     });
-  }, [componentSearch, componentModuleFilter]);
+  }, [libraryCatalog, componentSearch, componentModuleFilter]);
 
   const activeDraggedDef =
     draggedItem?.type === "new_component"
-      ? DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === draggedItem.componentId)
+      ? getFullComponentCatalog().find((c) => c.id === draggedItem.componentId)
       : null;
 
   return (
@@ -641,7 +644,7 @@ export const DashboardMakerView: React.FC = () => {
                   Modular Components
                 </span>
                 <span className="text-xl font-black font-mono text-foreground mt-0.5 block">
-                  {LIBRARY_COMPONENTS_CATALOG.length} Final HRIS Widgets
+                  {libraryCatalog.length} Final HRIS Widgets
                 </span>
               </div>
               <div className="p-3 rounded-xl bg-background/80 border border-border/50">
@@ -1096,7 +1099,7 @@ export const DashboardMakerView: React.FC = () => {
                 ) : (
                   <div className="grid grid-cols-12 gap-3.5 lg:gap-4.5">
                     {editingTemplate.widgets.map((widget, idx) => {
-                      const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === widget.componentId);
+                      const def = getFullComponentCatalog().find((c) => c.id === widget.componentId);
                       const minSpan = def?.minColSpan || 3;
                       const effectiveColSpan = Math.max(widget.colSpan, minSpan) as WidgetColSpan;
                       const colSpanClass = getColSpanClass(effectiveColSpan, canvasDevice);
@@ -1138,13 +1141,12 @@ export const DashboardMakerView: React.FC = () => {
 
                             {/* Editable Widget Wrapper */}
                             <div
-                              className={`h-full rounded-2xl border bg-card overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between ${
-                                isBeingDragged
-                                  ? "border-dashed border-2 border-blue-500 ring-4 ring-blue-500/10"
-                                  : activeEdge
+                              className={`h-full rounded-2xl border bg-card overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between ${isBeingDragged
+                                ? "border-dashed border-2 border-blue-500 ring-4 ring-blue-500/10"
+                                : activeEdge
                                   ? "border-blue-500 ring-2 ring-blue-500/20"
                                   : "border-border/80"
-                              }`}
+                                }`}
                             >
                               {/* Prominent Drag Header Bar (entire header draggable left/right/up/down) */}
                               <div
