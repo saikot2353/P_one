@@ -19,6 +19,7 @@ import {
   Truck,
   RotateCcw,
   Sparkles,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -405,6 +406,21 @@ export function DirectMRRListPage() {
                             title="Preview Report"
                           >
                             <Printer className="size-3.5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate({
+                                to: "/inv-receive-direct",
+                                search: { mode: "edit", id: r.id } as any,
+                              })
+                            }
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold text-xs cursor-pointer transition-colors"
+                            title="Edit Direct MRR in Edit Mode"
+                          >
+                            <Pencil className="size-3.5" />
+                            <span>Edit</span>
                           </button>
 
                           <button

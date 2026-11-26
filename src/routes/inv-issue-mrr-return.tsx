@@ -83,6 +83,7 @@ export function SupplierReturnPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const isViewMode = search.mode === "view";
+  const isEditMode = search.mode === "edit";
 
   const purchaseOrders = useMemo(() => getStoredPurchaseOrders(), []);
   const materialReceipts = useMemo(() => getStoredMaterialReceipts(), []);
@@ -91,7 +92,7 @@ export function SupplierReturnPage() {
   );
 
   const targetReturn = useMemo(() => {
-    if (!isViewMode) return null;
+    if (!isViewMode && !isEditMode) return null;
     return (
       returnsList.find(
         (r) =>
@@ -102,7 +103,7 @@ export function SupplierReturnPage() {
       returnsList[0] ||
       null
     );
-  }, [returnsList, isViewMode, search.id, search.returnNo]);
+  }, [returnsList, isViewMode, isEditMode, search.id, search.returnNo]);
 
   // Return Header Information
   const [returnNumber] = useState(
@@ -406,8 +407,10 @@ export function SupplierReturnPage() {
     return {
       reportType: "supplier-return",
       title: "Material Issue — Supplier Return",
+      documentNumber: returnNumber,
       documentNo: returnNumber,
       documentDate: returnDate,
+      hideDocHeaderInfo: true,
       department,
       status: "Approved",
       metadata: [
@@ -427,8 +430,8 @@ export function SupplierReturnPage() {
       ],
       tableHeaders: [
         "SL",
-        "Item Code & Name",
-        "Specifications / Brand",
+        "Item Description & Spec",
+        "Brand / Origin",
         "UOM",
         "Returned Qty",
         "Unit Price (৳)",
@@ -437,8 +440,13 @@ export function SupplierReturnPage() {
       ],
       tableRows: returnItems.map((i, idx) => [
         String(idx + 1),
-        `${i.itemCode} - ${i.itemName}`,
-        `${i.specification || "-"} / Brand: ${i.brand} / Origin: ${i.origin}`,
+        <div>
+          <div className="font-bold text-slate-900">{i.itemName}</div>
+          {i.specification && (
+            <div className="text-[10px] text-slate-500 font-mono">{i.specification}</div>
+          )}
+        </div>,
+        `${i.brand || "Pakiza Standard"} / ${i.origin || "Local"}`,
         i.uom,
         String(i.currentReturnQty),
         i.unitPrice.toLocaleString("en-BD", { minimumFractionDigits: 2 }),
@@ -508,13 +516,32 @@ export function SupplierReturnPage() {
       items: updatedReturnItems.filter((i) => i.currentReturnQty > 0),
     };
 
-    const updated = [newReturn, ...returnsList];
+    let updated: SupplierReturn[];
+    if (isEditMode && targetReturn) {
+      const updatedReturn: SupplierReturn = {
+        ...targetReturn,
+        department,
+        poNumber: selectedPoNumber,
+        mrrNumber: flattenedMrrItems[0]?.mrrNumber || targetReturn.mrrNumber,
+        mrrDate: flattenedMrrItems[0]?.mrrDate || targetReturn.mrrDate,
+        storeName: receivingStore,
+        returnRemarks,
+        totalReturnedQty,
+        totalReturnValue,
+        items: updatedReturnItems.filter((i) => i.currentReturnQty > 0),
+      };
+      updated = returnsList.map((r) => (r.id === targetReturn.id ? updatedReturn : r));
+    } else {
+      updated = [newReturn, ...returnsList];
+    }
     setReturnsList(updated);
     setStoredSupplierReturns(updated);
     setReturnItems(updatedReturnItems);
 
     toast.success(
-      `Supplier Return "${returnNumber}" posted! Stock successfully deducted by ${totalReturnedQty} units in ${receivingStore}.`
+      isEditMode
+        ? `Supplier Return "${returnNumber}" updated successfully!`
+        : `Supplier Return "${returnNumber}" posted! Stock successfully deducted by ${totalReturnedQty} units in ${receivingStore}.`
     );
     navigate({ to: "/inv-supplier-return-list" });
   };
@@ -901,7 +928,7 @@ export function SupplierReturnPage() {
                   onClick={handleSubmitReturn}
                   className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/20 transition-all cursor-pointer"
                 >
-                  <CheckCircle2 className="size-4" /> Post Supplier Return
+                  <CheckCircle2 className="size-4" /> {isEditMode ? "Save Changes" : "Post Supplier Return"}
                 </button>
               ) : (
                 <span className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-muted text-muted-foreground border border-border">

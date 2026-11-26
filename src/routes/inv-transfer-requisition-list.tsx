@@ -145,6 +145,7 @@ function TransferRequisitionListPage() {
       documentNumber: reportTarget.requisitionNumber,
       documentNo: reportTarget.requisitionNumber,
       documentDate: reportTarget.requisitionDate,
+      hideDocHeaderInfo: true,
       department: "Central Inventory & Materials Supply",
       status: reportTarget.status,
       metadata: [
@@ -158,24 +159,23 @@ function TransferRequisitionListPage() {
         { label: "Requested By", value: reportTarget.requestedBy },
         { label: "Status", value: reportTarget.status },
       ],
-      tableHeaders: ["SL", "Item Description", "Specification", "UOM", "Requested Qty", "Est. Unit Price (৳)", "Est. Total Value (৳)", "Remarks"],
+      tableHeaders: ["SL", "Item Name and Specification", "Brand / Origin", "UOM", "Requested Qty", "Remarks"],
       tableRows: reportTarget.items.map((it, idx) => [
         idx + 1,
         <div key={idx}>
           <div className="font-bold text-slate-900">{it.itemName}</div>
-          <div className="text-[10px] text-slate-500 font-mono">{it.itemCode}</div>
+          <div className="text-[10px] text-slate-500">
+            {it.specification ? `${it.specification} • ${it.itemCode}` : it.itemCode}
+          </div>
         </div>,
-        it.specification || "-",
+        `${it.brand || "Standard"} / ${it.origin || "Local"}`,
         it.uom,
         it.requiredQty.toLocaleString(),
-        `৳ ${it.estimatedUnitPrice.toLocaleString()}`,
-        `৳ ${it.totalEstimatedValue.toLocaleString()}`,
         it.remarks || "-",
       ]),
       summaryCards: [
         { label: "Total Items", value: String(reportTarget.items.length) },
-        { label: "Total Requested Qty", value: `${reportTarget.totalRequiredQty.toLocaleString()} units` },
-        { label: "Total Est. Value", value: `৳ ${reportTarget.totalEstimatedValue.toLocaleString()}`, isBold: true, isHighlight: true },
+        { label: "Total Requested Qty", value: `${reportTarget.totalRequiredQty.toLocaleString()} units`, isBold: true, isHighlight: true },
       ],
       signatures: [
         { role: "Requisitioner", name: reportTarget.requestedBy, designation: "Store Officer" },

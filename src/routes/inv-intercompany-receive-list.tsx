@@ -145,9 +145,11 @@ function InterCompanyReceiveListPage() {
       reportTitle: "INTER-COMPANY GOODS RECEIPT NOTE (IC-GRN)",
       reportNumber: reportTargetReceive.receiveId,
       reportDate: reportTargetReceive.receiveDate,
+      hideDocHeaderInfo: true,
       statusBadge: reportTargetReceive.status,
       metaFields: [
-        { label: "Receive ID", value: reportTargetReceive.receiveId },
+        { label: "Receive ID", value: reportTargetReceive.receiveId, highlight: true },
+        { label: "Receive Date", value: reportTargetReceive.receiveDate },
         { label: "Transfer Ref ID", value: reportTargetReceive.transferReferenceId },
         { label: "Transfer Date", value: reportTargetReceive.transferDate },
         { label: "Dispatch Date", value: reportTargetReceive.dispatchDate },
@@ -157,8 +159,8 @@ function InterCompanyReceiveListPage() {
       ],
       tableHeaders: [
         "SL",
-        "ITEM CODE",
-        "DESCRIPTION",
+        "Item & Specification",
+        "Brand / Origin",
         "UOM",
         "DISPATCHED",
         "RECEIVED",
@@ -167,8 +169,13 @@ function InterCompanyReceiveListPage() {
       ],
       tableRows: reportTargetReceive.items.map((it, idx) => [
         String(idx + 1),
-        it.itemCode,
-        it.itemName,
+        <div>
+          <div className="font-bold text-slate-900">{it.itemName}</div>
+          <div className="text-[10px] text-slate-500 font-medium">
+            {it.specification ? `${it.specification} • ${it.itemCode}` : it.itemCode}
+          </div>
+        </div>,
+        `${it.brand || "Standard"} / ${it.origin || "Local"}`,
         it.uom,
         String(it.dispatchedQty),
         String(it.receivedQty),

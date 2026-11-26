@@ -383,6 +383,7 @@ function TransferRequisitionFormPage() {
       documentNumber: requisitionNumber,
       documentNo: requisitionNumber,
       documentDate: requisitionDate,
+      hideDocHeaderInfo: true,
       department: "Central Inventory & Materials Supply",
       status: existingReq?.status || "Approval Pending",
       metadata: [
@@ -395,24 +396,23 @@ function TransferRequisitionFormPage() {
         { label: "Requested From Store", value: requestedFromStore },
         { label: "Requested By", value: requestedBy },
       ],
-      tableHeaders: ["SL", "Item Description", "Specification", "UOM", "Requested Qty", "Est. Unit Price (৳)", "Total Est. Value (৳)", "Remarks"],
+      tableHeaders: ["SL", "Item Name and Specification", "Brand / Origin", "UOM", "Requested Qty", "Remarks"],
       tableRows: items.map((it, idx) => [
         idx + 1,
         <div key={idx}>
           <div className="font-bold text-slate-900">{it.itemName}</div>
-          <div className="text-[10px] text-slate-500 font-mono">{it.itemCode}</div>
+          <div className="text-[10px] text-slate-500">
+            {it.specification ? `${it.specification} • ${it.itemCode}` : it.itemCode}
+          </div>
         </div>,
-        it.specification || "-",
+        `${it.brand || "Standard"} / ${it.origin || "Local"}`,
         it.uom,
         it.requiredQty.toLocaleString(),
-        `৳ ${it.estimatedUnitPrice.toLocaleString()}`,
-        `৳ ${it.totalEstimatedValue.toLocaleString()}`,
         it.remarks || "-",
       ]),
       summaryCards: [
         { label: "Total Items", value: String(items.length) },
-        { label: "Total Requested Qty", value: `${totalRequiredQty.toLocaleString()} units` },
-        { label: "Total Est. Value", value: `৳ ${totalEstimatedValue.toLocaleString()}`, isBold: true, isHighlight: true },
+        { label: "Total Requested Qty", value: `${totalRequiredQty.toLocaleString()} units`, isBold: true, isHighlight: true },
       ],
       signatures: [
         { role: "Requisitioner", name: requestedBy, designation: "Store Officer" },

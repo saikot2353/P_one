@@ -366,6 +366,7 @@ export function MaterialReceiveMRRPage() {
       title: isWO ? "WORK ORDER SERVICE RECEIVE REPORT (MRR)" : "MATERIAL RECEIVE REPORT (MRR)",
       documentNumber: receiveNumber,
       documentDate: receiveDate,
+      hideDocHeaderInfo: true,
       hideLogo: true,
       metadata: [
         { label: "MRR Number", value: receiveNumber, highlight: true },
@@ -391,9 +392,10 @@ export function MaterialReceiveMRRPage() {
             "Service Description & Scope",
             "UOM",
             "Ordered Qty",
-            "Service Receive Qty",
-            "Total Received",
-            "Payable Value",
+            "Receive QTY",
+            "Remaining QTY",
+            "Accepted",
+            "Rejected",
           ]
         : [
             "SL",
@@ -401,21 +403,17 @@ export function MaterialReceiveMRRPage() {
             "Brand / Origin",
             "UOM",
             "Ordered Qty",
-            "Regular Qty",
-            "FOC Qty",
-            "Total Received",
+            "Receive QTY",
+            "Remaining QTY",
             "Accepted",
             "Rejected",
-            "Payable Value",
           ],
       tableRows: mrrItems.map((item, idx) => {
-        const foc = Number(item.focQty) || 0;
         const reg = Number(item.currentReceiveQty) || 0;
-        const totalLineReceived = reg + foc;
-        const payableVal = (reg * (item.unitPrice || 0)).toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
+        const remaining =
+          typeof item.remainingQty === "number"
+            ? item.remainingQty
+            : Math.max(0, (item.orderedQty || 0) - (item.previouslyReceivedQty || 0) - reg);
 
         if (isWO) {
           return [
@@ -429,8 +427,9 @@ export function MaterialReceiveMRRPage() {
             item.uom,
             item.orderedQty,
             reg,
-            totalLineReceived,
-            `৳ ${payableVal}`,
+            remaining,
+            item.acceptedQty ?? reg,
+            item.rejectedQty ?? 0,
           ];
         }
 
@@ -444,46 +443,17 @@ export function MaterialReceiveMRRPage() {
           item.uom,
           item.orderedQty,
           reg,
-          foc > 0 ? (
-            <span className="font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-              +{foc} (FOC)
-            </span>
-          ) : (
-            "—"
-          ),
-          totalLineReceived,
-          item.acceptedQty ?? totalLineReceived,
+          remaining,
+          item.acceptedQty ?? reg,
           item.rejectedQty ?? 0,
-          `৳ ${payableVal}`,
         ];
       }),
-      summaryCards: isWO
-        ? [
-            {
-              label: "Total Service Received Qty",
-              value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0), 0),
-            },
-            {
-              label: "Total Payable Value",
-              value: `৳ ${mrrItems
-                .reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0) * (Number(i.unitPrice) || 0), 0)
-                .toLocaleString()}`,
-            },
-          ]
-        : [
-            { label: "Regular Received Qty", value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0), 0) },
-            { label: "FOC (Free of Cost) Qty", value: mrrItems.reduce((acc, i) => acc + (Number(i.focQty) || 0), 0) },
-            {
-              label: "Total Physical Received Qty",
-              value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0) + (Number(i.focQty) || 0), 0),
-            },
-            {
-              label: "Payable Value (Excl. FOC)",
-              value: `৳ ${mrrItems
-                .reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0) * (Number(i.unitPrice) || 0), 0)
-                .toLocaleString()}`,
-            },
-          ],
+      summaryCards: [
+        {
+          label: "Received Qty",
+          value: mrrItems.reduce((acc, i) => acc + (Number(i.currentReceiveQty) || 0), 0),
+        },
+      ],
       signatures: [
         { role: isWO ? "Contract Supervisor" : "Store Officer", name: receivedBy, designation: "Received By" },
         { role: isWO ? "Site Engineer" : "QA Inspector", name: "Md. Rafiqul Islam", designation: "Inspected & Verified" },

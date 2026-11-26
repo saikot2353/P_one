@@ -578,14 +578,20 @@ function MaterialRequisitionPage() {
   const [previewReportOpen, setPreviewReportOpen] = useState(false);
   const previewReportData: StandardReportData = useMemo(() => {
     return {
+      reportType: "material-requisition",
+      hideDocHeaderInfo: true,
       hideLogo: true,
       companyName: organization,
       companyAddress: "Gorat, Ashulia, Savar, Dhaka, Bangladesh",
       reportTitle: "MATERIAL REQUISITION NOTE",
       reportNumber: mrNumber,
+      documentNumber: mrNumber,
+      documentNo: mrNumber,
       reportDate: requisitionDate,
+      documentDate: requisitionDate,
       statusBadge: currentMR?.status || "Draft",
       metaFields: [
+        { label: "Requisition No", value: mrNumber, highlight: true },
         { label: "Requisition Date", value: requisitionDate },
         { label: "Required Date", value: requiredDate },
         { label: "Requested By", value: requestedBy },
@@ -598,6 +604,8 @@ function MaterialRequisitionPage() {
         "ITEM CODE",
         "ITEM DESCRIPTION",
         "SPECIFICATION",
+        "BRAND",
+        "ORIGIN",
         "UOM",
         "REQ QTY",
         "APP QTY",
@@ -607,6 +615,8 @@ function MaterialRequisitionPage() {
         it.itemCode,
         it.itemName,
         it.specification || "-",
+        it.brand || "Pakiza Standard",
+        it.origin || "Local",
         it.uom,
         String(it.requestedQuantity),
         String(it.approvedQuantity ?? it.requestedQuantity),

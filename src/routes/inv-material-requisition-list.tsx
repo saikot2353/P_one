@@ -268,14 +268,20 @@ function MaterialRequisitionListPage() {
       };
     }
     return {
+      reportType: "material-requisition",
+      hideDocHeaderInfo: true,
       hideLogo: true,
       companyName: reportTarget.organization || "Pakiza Knit Composite Ltd",
       companyAddress: "Gorat, Ashulia, Savar, Dhaka, Bangladesh",
       reportTitle: "MATERIAL REQUISITION NOTE",
       reportNumber: reportTarget.mrNumber,
+      documentNumber: reportTarget.mrNumber,
+      documentNo: reportTarget.mrNumber,
       reportDate: reportTarget.requisitionDate,
+      documentDate: reportTarget.requisitionDate,
       statusBadge: reportTarget.status,
       metaFields: [
+        { label: "Requisition No", value: reportTarget.mrNumber, highlight: true },
         { label: "Requisition Date", value: reportTarget.requisitionDate },
         { label: "Required Date", value: reportTarget.requiredDate },
         { label: "Requested By", value: reportTarget.requestedBy },
@@ -288,6 +294,8 @@ function MaterialRequisitionListPage() {
         "ITEM CODE",
         "ITEM DESCRIPTION",
         "SPECIFICATION",
+        "BRAND",
+        "ORIGIN",
         "UOM",
         "REQ QTY",
         "APP QTY",
@@ -297,6 +305,8 @@ function MaterialRequisitionListPage() {
         it.itemCode,
         it.itemName,
         it.specification || "-",
+        it.brand || "Pakiza Standard",
+        it.origin || "Local",
         it.uom,
         String(it.requestedQuantity),
         String(it.approvedQuantity ?? it.requestedQuantity),

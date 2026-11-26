@@ -748,6 +748,7 @@ function InterCompanyTransferFormPage() {
       metaFields: [
         { label: "Transfer ID", value: transferId },
         { label: "Transfer Date", value: transferDate },
+        { label: "Transfer Type", value: transferType === "Inter-Company" ? "Multi-Company Transfer" : "Intra-Company Transfer", highlight: true },
         { label: "From Company", value: fromCompany },
         { label: "From Store", value: fromStore },
         { label: "To Company", value: toCompany },
@@ -755,20 +756,32 @@ function InterCompanyTransferFormPage() {
         { label: "Transfer Reason", value: transferReason },
         { label: "Requested By", value: requestedBy },
       ],
-      tableHeaders: ["SL", "ITEM CODE", "ITEM DESCRIPTION", "UOM", "TRANSFER QTY", "UNIT PRICE (৳)", "TOTAL (৳)"],
+      tableHeaders: [
+        "SL",
+        "ITEM DESCRIPTION & SPECIFICATION",
+        "Brand / Origin",
+        "UOM",
+        ...(transferType === "Inter-Company" ? ["TR Req. QTY"] : []),
+        "TRANSFER QTY",
+      ],
       tableRows: items.map((it, idx) => [
         String(idx + 1),
-        it.itemCode,
-        it.itemName,
+        <div>
+          <div className="font-bold text-slate-900">{it.itemName}</div>
+          <div className="text-[10px] text-slate-500 font-medium">
+            {it.specification ? `${it.specification} • ${it.itemCode}` : it.itemCode}
+          </div>
+        </div>,
+        `${it.brand || "Standard"} / ${it.origin || "Local"}`,
         it.uom,
-        String(it.transferQty),
-        String(it.unitPrice),
-        String(it.totalValue.toLocaleString()),
+        ...(transferType === "Inter-Company"
+          ? [it.trRequisitionQty != null ? String(it.trRequisitionQty.toLocaleString()) : "-"]
+          : []),
+        String(it.transferQty.toLocaleString()),
       ]),
       summaryCards: [
         { label: "Total Items", value: String(items.length) },
-        { label: "Total Transfer Qty", value: `${totalTransferQty} units` },
-        { label: "Total Transfer Value", value: `৳ ${totalTransferValue.toLocaleString()}` },
+        { label: "Total Transfer Qty", value: `${totalTransferQty.toLocaleString()} units`, isBold: true, isHighlight: true },
       ],
       notes: [
         "Inter-company transfer will deduct stock upon dispatch confirmation.",
@@ -787,11 +800,11 @@ function InterCompanyTransferFormPage() {
     toStore,
     transferId,
     transferDate,
+    transferType,
     transferReason,
     requestedBy,
     items,
     totalTransferQty,
-    totalTransferValue,
     isViewMode,
     existingTransfer,
   ]);

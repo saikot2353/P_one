@@ -195,6 +195,7 @@ function InterCompanyTransferListPage() {
       metaFields: [
         { label: "Transfer ID", value: reportTargetTransfer.transferId },
         { label: "Transfer Date", value: reportTargetTransfer.transferDate },
+        { label: "Transfer Type", value: reportTargetTransfer.transferType === "Inter-Company" ? "Multi-Company Transfer" : "Intra-Company Transfer", highlight: true },
         { label: "From Company", value: reportTargetTransfer.fromCompany },
         { label: "From Warehouse Store", value: reportTargetTransfer.fromStore },
         { label: "To Destination Company", value: reportTargetTransfer.toCompany },
@@ -202,20 +203,32 @@ function InterCompanyTransferListPage() {
         { label: "Transfer Reason", value: reportTargetTransfer.transferReason },
         { label: "Requested / Dispatched By", value: reportTargetTransfer.requestedBy },
       ],
-      tableHeaders: ["SL", "ITEM CODE", "ITEM DESCRIPTION", "UOM", "TRANSFER QTY", "UNIT PRICE (৳)", "TOTAL (৳)"],
+      tableHeaders: [
+        "SL",
+        "ITEM DESCRIPTION & SPECIFICATION",
+        "Brand / Origin",
+        "UOM",
+        ...(reportTargetTransfer.transferType === "Inter-Company" ? ["TR Req. QTY"] : []),
+        "TRANSFER QTY",
+      ],
       tableRows: reportTargetTransfer.items.map((it, idx) => [
         String(idx + 1),
-        it.itemCode,
-        it.itemName,
+        <div>
+          <div className="font-bold text-slate-900">{it.itemName}</div>
+          <div className="text-[10px] text-slate-500 font-medium">
+            {it.specification ? `${it.specification} • ${it.itemCode}` : it.itemCode}
+          </div>
+        </div>,
+        `${it.brand || "Standard"} / ${it.origin || "Local"}`,
         it.uom,
-        String(it.transferQty),
-        String(it.unitPrice),
-        String(it.totalValue.toLocaleString()),
+        ...(reportTargetTransfer.transferType === "Inter-Company"
+          ? [it.trRequisitionQty != null ? String(it.trRequisitionQty.toLocaleString()) : "-"]
+          : []),
+        String(it.transferQty.toLocaleString()),
       ]),
       summaryCards: [
         { label: "Total Items", value: String(reportTargetTransfer.totalItems) },
-        { label: "Total Transfer Qty", value: `${reportTargetTransfer.totalTransferQty} units` },
-        { label: "Total Transfer Value", value: `৳ ${reportTargetTransfer.totalTransferValue.toLocaleString()}` },
+        { label: "Total Transfer Qty", value: `${reportTargetTransfer.totalTransferQty.toLocaleString()} units`, isBold: true, isHighlight: true },
       ],
       notes: [
         `Inter-company stock transfer issued from ${reportTargetTransfer.fromStore}.`,

@@ -42,6 +42,7 @@ import {
   getStoredMaterialReceipts,
   setStoredMaterialReceipts,
   getStoredDirectMRRs,
+  setStoredDirectMRRs,
   DirectMRRRecord,
   ItemWarrantyDetail,
 } from "@/lib/procurement-order-inventory-data";
@@ -102,6 +103,7 @@ export function DirectMRRPage() {
   const navigate = useNavigate();
   const searchParams = Route.useSearch();
   const isViewMode = searchParams.mode === "view";
+  const isEditMode = searchParams.mode === "edit";
 
   const [materialReceipts, setMaterialReceipts] = useState<MaterialReceive[]>(() =>
     getStoredMaterialReceipts()
@@ -116,7 +118,7 @@ export function DirectMRRPage() {
 
   // 1. Receive Header Information
   const [mrrNumber] = useState(
-    () => loadedDirectMRR?.directMrrNumber || `DMRR-2026-000${Math.floor(10 + Math.random() * 90)}`
+    () => loadedDirectMRR?.mrrNumber || loadedDirectMRR?.directMrrNumber || `DMRR-2026-000${Math.floor(10 + Math.random() * 90)}`
   );
   const [mrrDate, setMrrDate] = useState(() => loadedDirectMRR?.mrrDate || new Date().toISOString().slice(0, 10));
   const [receiveSource] = useState<ReceiveSource>("Direct MRR");
@@ -179,55 +181,79 @@ export function DirectMRRPage() {
   }, []);
 
   // Direct MRR Line Items
-  const [items, setItems] = useState<DirectMRRRow[]>([
-    {
-      id: "dm-1",
-      sl: 1,
-      itemCode: "ITM-YRN-30-1",
-      itemName: "100% Combed Cotton Yarn Ne 30/1",
-      specification: "100% Combed Cotton, Ne 30/1 ring spun, Auto coned",
-      brand: "Groz-Beckert",
-      origin: "Bangladesh",
-      uom: "KG",
-      receiveQuantity: 500,
-      unitPrice: 420,
-      estimatedValue: 210000,
-      batchNumber: "BAT-YRN-2026-DIR",
-      expiryDate: "",
-      location: "Rack A1 - Raw Cotton Pallet",
-      acceptedQuantity: 500,
-      rejectedQuantity: 0,
-      remarks: "Direct urgent delivery for production line #4",
-    },
-    {
-      id: "dm-2",
-      sl: 2,
-      itemCode: "ITM-IT-LAT-5440",
-      itemName: "Dell Latitude 5440 Core i7 Business Laptop",
-      specification: "13th Gen Intel Core i7-1370P, 16GB DDR5, 512GB NVMe SSD, 14 FHD IPS",
-      brand: "Dell Technologies",
-      origin: "Malaysia",
-      uom: "PCS",
-      receiveQuantity: 2,
-      unitPrice: 125000,
-      estimatedValue: 250000,
-      batchNumber: "",
-      expiryDate: "",
-      location: "Shelf B - Laptop Storage Units",
-      acceptedQuantity: 2,
-      rejectedQuantity: 0,
-      remarks: "Replacement unit for Head Office",
-      warranties: [
-        {
-          id: "warr-dm-1",
-          warrantyType: "Standard Manufacturer Warranty",
-          startDate: "2026-09-01",
-          endDate: "2029-08-31",
-          remarks: "3-Year ProSupport Plus on-site next business day warranty",
-        },
-      ],
-    },
-  ]);
+  const [items, setItems] = useState<DirectMRRRow[]>(() => {
+    if (loadedDirectMRR?.items && loadedDirectMRR.items.length > 0) {
+      return loadedDirectMRR.items.map((it: any, idx: number) => ({
+        id: it.id || `dm-${idx + 1}`,
+        sl: it.sl || idx + 1,
+        itemCode: it.itemCode,
+        itemName: it.itemName,
+        specification: it.specification || "",
+        brand: it.brand || "Pakiza Standard",
+        origin: it.origin || "Local",
+        uom: it.uom || "PCS",
+        receiveQuantity: it.receiveQuantity ?? 1,
+        unitPrice: it.unitPrice ?? 0,
+        estimatedValue: it.estimatedValue ?? ((it.receiveQuantity || 0) * (it.unitPrice || 0)),
+        batchNumber: it.batchNumber || "",
+        expiryDate: it.expiryDate || "",
+        location: it.location || "",
+        acceptedQuantity: it.acceptedQuantity ?? it.receiveQuantity ?? 1,
+        rejectedQuantity: it.rejectedQuantity ?? 0,
+        remarks: it.remarks || "",
+        warranties: it.warranties || [],
+      }));
+    }
+    return [
+      {
+        id: "dm-1",
+        sl: 1,
+        itemCode: "ITM-YRN-30-1",
+        itemName: "100% Combed Cotton Yarn Ne 30/1",
+        specification: "100% Combed Cotton, Ne 30/1 ring spun, Auto coned",
+        brand: "Groz-Beckert",
+        origin: "Bangladesh",
+        uom: "KG",
+        receiveQuantity: 500,
+        unitPrice: 420,
+        estimatedValue: 210000,
+        batchNumber: "BAT-YRN-2026-DIR",
+        expiryDate: "",
+        location: "Rack A1 - Raw Cotton Pallet",
+        acceptedQuantity: 500,
+        rejectedQuantity: 0,
+        remarks: "Direct urgent delivery for production line #4",
+      },
+      {
+        id: "dm-2",
+        sl: 2,
+        itemCode: "ITM-IT-LAT-5440",
+        itemName: "Dell Latitude 5440 Core i7 Business Laptop",
+        specification: "13th Gen Intel Core i7-1370P, 16GB DDR5, 512GB NVMe SSD, 14 FHD IPS",
+        brand: "Dell Technologies",
+        origin: "Malaysia",
+        uom: "PCS",
+        receiveQuantity: 2,
+        unitPrice: 125000,
+        estimatedValue: 250000,
+        batchNumber: "",
+        expiryDate: "",
+        location: "Shelf B - Laptop Storage Units",
+        acceptedQuantity: 2,
+        rejectedQuantity: 0,
+        remarks: "Replacement unit for Head Office",
+        warranties: [
+          {
+            id: "warr-dm-1",
+            warrantyType: "Standard Manufacturer Warranty",
+            startDate: "2026-09-01",
+            endDate: "2029-08-31",
+            remarks: "3-Year ProSupport Plus on-site next business day warranty",
+          },
+        ],
+      },
+    ];
+  });
 
   // Location and Batch modals state
   const [itemLocations, setItemLocations] = useState<Record<string, LocationEntry[]>>({});
@@ -603,14 +629,74 @@ export function DirectMRRPage() {
       })),
     };
 
-    const updated = [newRecord, ...materialReceipts];
+    // Update Direct MRR Record in stored list
+    const directRecord: DirectMRRRecord = {
+      id: loadedDirectMRR?.id || `dmrr-${Date.now()}`,
+      mrrNumber,
+      directMrrNumber: mrrNumber,
+      mrrDate,
+      supplierId: selectedSupplier.id,
+      supplier: selectedSupplier.vendorName,
+      supplierName: selectedSupplier.vendorName,
+      supplierCode: selectedSupplier.vendorCode,
+      warehouseStore: selectedStoreConfig.storeName,
+      warehouse: selectedStoreConfig.storeName,
+      storeName: selectedStoreConfig.storeName,
+      department,
+      challanNo,
+      challanDate,
+      vehicleNumber,
+      remarks,
+      totalItems: items.length,
+      totalQuantity: totalReceivedQty,
+      totalAmount: totalEstimatedValue,
+      status: "Approved",
+      createdBy: receivedBy,
+      createdDate: loadedDirectMRR?.createdDate || mrrDate,
+      items: items.map((i) => ({
+        id: i.id,
+        sl: i.sl,
+        itemCode: i.itemCode,
+        itemName: i.itemName,
+        specification: i.specification,
+        brand: i.brand,
+        origin: i.origin,
+        uom: i.uom,
+        receiveQuantity: i.receiveQuantity,
+        unitPrice: i.unitPrice,
+        estimatedValue: i.estimatedValue,
+        batchNumber: i.batchNumber,
+        location: i.location,
+        acceptedQuantity: i.acceptedQuantity,
+        rejectedQuantity: i.rejectedQuantity,
+        remarks: i.remarks,
+        warranties: i.warranties,
+      })),
+      attachments: loadedDirectMRR?.attachments || [],
+    };
+
+    let updatedDirectList: DirectMRRRecord[];
+    if (isEditMode && loadedDirectMRR) {
+      updatedDirectList = directMRRs.map((r) =>
+        r.id === loadedDirectMRR.id || r.mrrNumber === loadedDirectMRR.mrrNumber || r.directMrrNumber === loadedDirectMRR.directMrrNumber
+          ? directRecord
+          : r
+      );
+    } else {
+      updatedDirectList = [directRecord, ...directMRRs];
+    }
+    setStoredDirectMRRs(updatedDirectList);
+
+    const updated = [newRecord, ...materialReceipts.filter(m => m.receiveNumber !== mrrNumber)];
     setMaterialReceipts(updated);
     setStoredMaterialReceipts(updated);
 
     toast.success(
-      `Direct MRR "${mrrNumber}" created! Inventory in ${selectedStoreConfig.storeName} increased by ${totalAcceptedQty} accepted units.`
+      isEditMode
+        ? `Direct MRR "${mrrNumber}" updated successfully!`
+        : `Direct MRR "${mrrNumber}" created! Inventory in ${selectedStoreConfig.storeName} increased by ${totalAcceptedQty} accepted units.`
     );
-    navigate({ to: "/inv-receive-mrr" });
+    navigate({ to: "/inv-direct-mrr-list" });
   };
 
   return (
@@ -1032,7 +1118,7 @@ export function DirectMRRPage() {
                     onClick={handleSubmitDirectMRR}
                     className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all cursor-pointer"
                   >
-                    <CheckCircle2 className="size-4" /> Save Direct MRR
+                    <CheckCircle2 className="size-4" /> {isEditMode ? "Update Direct MRR" : "Save Direct MRR"}
                   </button>
                 </>
               )}

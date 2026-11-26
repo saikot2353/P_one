@@ -78,12 +78,83 @@ export function StandardPreviewReportModal({
   const docNo = activeData.documentNumber || activeData.documentNo || activeData.reportNumber || "DOC-PREVIEW";
   const docDate = activeData.documentDate || activeData.reportDate || new Date().toISOString().slice(0, 10);
   const rawMetadataList = activeData.metadata || activeData.metaFields || [];
-  const metadataList =
+  let metadataList =
     activeData.reportType === "supplier-bill"
       ? rawMetadataList.filter((m) => !m.label.toLowerCase().includes("payment due date"))
       : rawMetadataList;
 
   const isMonthlyBudget = activeData.reportType === "monthly-budget-requisition";
+  const isMaterialRequisition =
+    docTitle === "MATERIAL REQUISITION NOTE" ||
+    docTitle === "MATERIAL REQUISITION APPROVAL NOTE" ||
+    activeData.reportType === "material-requisition";
+
+  const isStoreIssueSlip =
+    docTitle === "STORE MATERIAL ISSUE SLIP" ||
+    docTitle === "STORE DIRECT MATERIAL ISSUE SLIP" ||
+    docTitle.toLowerCase().includes("material issue slip") ||
+    activeData.reportType === "store-issue";
+
+  const isMRRReport =
+    activeData.reportType === "mrr" ||
+    docTitle === "MATERIAL RECEIVE REPORT (MRR)" ||
+    docTitle === "WORK ORDER SERVICE RECEIVE REPORT (MRR)" ||
+    docTitle.toLowerCase().includes("material receive report");
+
+  const isSupplierReturn =
+    activeData.reportType === "supplier-return" ||
+    docTitle === "Material Issue — Supplier Return" ||
+    docTitle.toLowerCase().includes("supplier return");
+
+  const isTransferRequisition =
+    activeData.reportType === "transfer-requisition" ||
+    docTitle === "STOCK TRANSFER REQUISITION DOSSIER" ||
+    docTitle.toLowerCase().includes("stock transfer requisition");
+
+  const isICGRNReport =
+    activeData.reportType === "ic-grn" ||
+    docTitle === "INTER-COMPANY GOODS RECEIPT NOTE (IC-GRN)" ||
+    docTitle.toLowerCase().includes("inter-company goods receipt note") ||
+    docTitle.toLowerCase().includes("ic-grn");
+
+  const isLandscape = activeData.orientation === "landscape" || isStoreIssueSlip;
+
+  if (
+    isMaterialRequisition &&
+    !metadataList.some((m) => m.label.toLowerCase().includes("requisition no"))
+  ) {
+    const reqDateIdx = metadataList.findIndex((m) =>
+      m.label.toLowerCase().includes("requisition date")
+    );
+    const insertIdx = reqDateIdx !== -1 ? reqDateIdx : 0;
+    metadataList = [
+      ...metadataList.slice(0, insertIdx),
+      { label: "Requisition No", value: docNo, highlight: true },
+      ...metadataList.slice(insertIdx),
+    ];
+  }
+
+  if (isStoreIssueSlip) {
+    const hasIssueNo = metadataList.some((m) => m.label.toLowerCase() === "issue no");
+    const hasIssueDate = metadataList.some((m) => m.label.toLowerCase() === "issue date");
+
+    if (!hasIssueNo || !hasIssueDate) {
+      const issueTypeIdx = metadataList.findIndex((m) =>
+        m.label.toLowerCase().includes("issue type")
+      );
+      const insertIdx = issueTypeIdx !== -1 ? issueTypeIdx : 0;
+      const fieldsToAdd = [];
+      if (!hasIssueNo) fieldsToAdd.push({ label: "Issue No", value: docNo, highlight: true });
+      if (!hasIssueDate) fieldsToAdd.push({ label: "Issue Date", value: docDate });
+
+      metadataList = [
+        ...metadataList.slice(0, insertIdx),
+        ...fieldsToAdd,
+        ...metadataList.slice(insertIdx),
+      ];
+    }
+  }
+
   const isInventoryReport =
     (typeof window !== "undefined" && window.location.pathname.includes("/inv-")) ||
     (typeof activeData.reportType === "string" && (
@@ -108,10 +179,17 @@ export function StandardPreviewReportModal({
     activeData.reportType === "comparative-statement" ||
     activeData.reportType === "mrr" ||
     docTitle === "STORE MATERIAL ISSUE SLIP" ||
+    docTitle === "STORE DIRECT MATERIAL ISSUE SLIP" ||
     docTitle === "MATERIAL RECEIVE REPORT (MRR)";
   const shouldHideDocHeaderInfo =
     activeData.hideDocHeaderInfo ||
     isMonthlyBudget ||
+    isMaterialRequisition ||
+    isStoreIssueSlip ||
+    isMRRReport ||
+    isSupplierReturn ||
+    isTransferRequisition ||
+    isICGRNReport ||
     activeData.reportType === "purchase-requisition" ||
     activeData.reportType === "supplier-bill";
 
@@ -221,6 +299,22 @@ export function StandardPreviewReportModal({
     );
   }
 
+  if (isMRRReport) {
+    summaryList = summaryList
+      .filter(
+        (s) =>
+          !s.label.toLowerCase().includes("foc") &&
+          !s.label.toLowerCase().includes("total physical received") &&
+          !s.label.toLowerCase().includes("payable value")
+      )
+      .map((s) => {
+        if (s.label.toLowerCase().includes("regular received qty")) {
+          return { ...s, label: "Received Qty" };
+        }
+        return s;
+      });
+  }
+
   // If supplier-bill, ensure Total Amount card reflects sum of line totals
   if (activeData.reportType === "supplier-bill") {
     let lineTotalSum = 0;
@@ -286,7 +380,8 @@ export function StandardPreviewReportModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className={`bg-white dark:bg-card border border-border rounded-2xl shadow-2xl w-full ${activeData.orientation === "landscape" ? "max-w-6xl" : "max-w-5xl"} flex flex-col max-h-[92vh] overflow-hidden text-slate-900`}>
+      <style>{`@media print { @page { size: ${isLandscape ? "landscape" : "portrait"}; } }`}</style>
+      <div className={`bg-white dark:bg-card border border-border rounded-2xl shadow-2xl w-full ${isLandscape ? "max-w-6xl" : "max-w-5xl"} flex flex-col max-h-[92vh] overflow-hidden text-slate-900`}>
         {/* Top Control Bar (Hidden on print) */}
         <div className="p-3.5 sm:px-6 border-b border-border flex justify-between items-center bg-slate-100 dark:bg-slate-900 print:hidden shrink-0">
           <div className="flex items-center gap-2">

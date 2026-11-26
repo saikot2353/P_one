@@ -406,9 +406,11 @@ function InterCompanyReceiveFormPage() {
       reportTitle: "INTER-COMPANY GOODS RECEIPT NOTE (IC-GRN)",
       reportNumber: receiveId,
       reportDate: receiveDate,
+      hideDocHeaderInfo: true,
       statusBadge: "Verified & Accepted",
       metaFields: [
-        { label: "Receive ID", value: receiveId },
+        { label: "Receive ID", value: receiveId, highlight: true },
+        { label: "Receive Date", value: receiveDate },
         { label: "Transfer Ref ID", value: activeTransfer?.transferId || "-" },
         { label: "Transfer Date", value: activeTransfer?.transferDate || "-" },
         { label: "Dispatched From", value: `${activeTransfer?.fromCompany} (${activeTransfer?.fromStore})` },
@@ -417,8 +419,8 @@ function InterCompanyReceiveFormPage() {
       ],
       tableHeaders: [
         "SL",
-        "ITEM CODE",
-        "DESCRIPTION",
+        "Item & Specification",
+        "Brand / Origin",
         "UOM",
         "DISPATCHED",
         "RECEIVED",
@@ -427,8 +429,13 @@ function InterCompanyReceiveFormPage() {
       ],
       tableRows: receiveItems.map((it, idx) => [
         String(idx + 1),
-        it.itemCode,
-        it.itemName,
+        <div>
+          <div className="font-bold text-slate-900">{it.itemName}</div>
+          <div className="text-[10px] text-slate-500 font-medium">
+            {it.specification ? `${it.specification} • ${it.itemCode}` : it.itemCode}
+          </div>
+        </div>,
+        `${it.brand || "Standard"} / ${it.origin || "Local"}`,
         it.uom,
         String(it.dispatchedQty),
         String(it.receivedQty),

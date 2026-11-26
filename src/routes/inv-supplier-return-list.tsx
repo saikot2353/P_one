@@ -16,6 +16,7 @@ import {
   Truck,
   Layers,
   ArrowRight,
+  Pencil,
 } from "lucide-react";
 import {
   SupplierReturn,
@@ -280,19 +281,34 @@ export function SupplierReturnListPage() {
                         {ret.storeName}
                       </td>
                       <td className="py-2.5 px-3 text-center">
-                        <button
-                          type="button"
-                          title="View Supplier Return Details"
-                          onClick={() =>
-                            navigate({
-                              to: "/inv-issue-mrr-return",
-                              search: { mode: "view", id: ret.id, returnNo: ret.returnNumber },
-                            })
-                          }
-                          className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-colors cursor-pointer inline-flex items-center justify-center"
-                        >
-                          <Eye className="size-3.5" />
-                        </button>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            type="button"
+                            title="Edit Supplier Return"
+                            onClick={() =>
+                              navigate({
+                                to: "/inv-issue-mrr-return",
+                                search: { mode: "edit", id: ret.id, returnNo: ret.returnNumber },
+                              })
+                            }
+                            className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-amber-600 hover:border-amber-500/40 hover:bg-amber-500/5 transition-colors cursor-pointer inline-flex items-center justify-center"
+                          >
+                            <Pencil className="size-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            title="View Supplier Return Details"
+                            onClick={() =>
+                              navigate({
+                                to: "/inv-issue-mrr-return",
+                                search: { mode: "view", id: ret.id, returnNo: ret.returnNumber },
+                              })
+                            }
+                            className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-colors cursor-pointer inline-flex items-center justify-center"
+                          >
+                            <Eye className="size-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
