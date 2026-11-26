@@ -361,6 +361,7 @@ export const nav: NavItem[] = [
     icon: HeartHandshake,
     subitems: [
       { label: "Zakat and Financial Aid", to: "/zakat-and-financial-aid" },
+      { label: "Pending Recurring Zakat", to: "/pending-recurring-zakat" },
       { label: "Asset Master Data", to: "/zakat-asset-master" },
       { label: "Zakat Executive Report", to: "/zakat-executive-report" },
       { label: "Financial Aid Report", to: "/financial-aid-report" },
