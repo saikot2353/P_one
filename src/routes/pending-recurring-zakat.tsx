@@ -108,7 +108,6 @@ function resolveScheduleCompanyAndArea(sched: RecurringZakatSchedule): { company
 }
 
 const MONTH_OPTIONS = [
-  { value: "ALL", label: "All Months" },
   { value: "01", label: "January" },
   { value: "02", label: "February" },
   { value: "03", label: "March" },
@@ -237,7 +236,7 @@ function PendingRecurringZakatPage() {
   const [filterCompany, setFilterCompany] = useState<string>("ALL");
   const [filterArea, setFilterArea] = useState<string>("ALL");
   const [filterYear, setFilterYear] = useState<string>("2026");
-  const [filterMonth, setFilterMonth] = useState<string>("ALL");
+  const [filterMonth, setFilterMonth] = useState<string>("11");
 
   // Selection & feedback
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
@@ -284,7 +283,7 @@ function PendingRecurringZakatPage() {
       if (filterCompany !== "ALL" && row.company !== filterCompany) return false;
       if (filterArea !== "ALL" && row.area !== filterArea) return false;
       if (filterYear !== "ALL" && row.dueYear !== filterYear) return false;
-      if (filterMonth !== "ALL" && row.dueMonth !== filterMonth) return false;
+      if (row.dueMonth !== filterMonth) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -426,7 +425,7 @@ function PendingRecurringZakatPage() {
     setFilterCompany("ALL");
     setFilterArea("ALL");
     setFilterYear("2026");
-    setFilterMonth("ALL");
+    setFilterMonth("11");
   };
 
   return (
