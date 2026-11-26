@@ -35,8 +35,9 @@ export interface StandardReportData {
   hideDocHeaderInfo?: boolean;
   hideCompanyHeader?: boolean;
   orientation?: "portrait" | "landscape";
-  metadata?: Array<{ label: string; value: string | React.ReactNode; highlight?: boolean }>;
-  metaFields?: Array<{ label: string; value: string | React.ReactNode; highlight?: boolean }>;
+  remarksLabel?: string;
+  metadata?: Array<{ label: string; value: string | React.ReactNode; highlight?: boolean; colSpan?: number; className?: string }>;
+  metaFields?: Array<{ label: string; value: string | React.ReactNode; highlight?: boolean; colSpan?: number; className?: string }>;
   tableHeaders?: string[];
   tableRows?: Array<Array<string | number | React.ReactNode>>;
   items?: Array<any>;
@@ -76,7 +77,11 @@ export function StandardPreviewReportModal({
   const docTitle = activeData.title || activeData.reportTitle || "TRANSACTION REPORT";
   const docNo = activeData.documentNumber || activeData.documentNo || activeData.reportNumber || "DOC-PREVIEW";
   const docDate = activeData.documentDate || activeData.reportDate || new Date().toISOString().slice(0, 10);
-  const metadataList = activeData.metadata || activeData.metaFields || [];
+  const rawMetadataList = activeData.metadata || activeData.metaFields || [];
+  const metadataList =
+    activeData.reportType === "supplier-bill"
+      ? rawMetadataList.filter((m) => !m.label.toLowerCase().includes("payment due date"))
+      : rawMetadataList;
 
   const isMonthlyBudget = activeData.reportType === "monthly-budget-requisition";
   const isInventoryReport =
@@ -104,7 +109,11 @@ export function StandardPreviewReportModal({
     activeData.reportType === "mrr" ||
     docTitle === "STORE MATERIAL ISSUE SLIP" ||
     docTitle === "MATERIAL RECEIVE REPORT (MRR)";
-  const shouldHideDocHeaderInfo = activeData.hideDocHeaderInfo || isMonthlyBudget;
+  const shouldHideDocHeaderInfo =
+    activeData.hideDocHeaderInfo ||
+    isMonthlyBudget ||
+    activeData.reportType === "purchase-requisition" ||
+    activeData.reportType === "supplier-bill";
 
   // Generate table headers & rows if items are provided directly
   let headers = activeData.tableHeaders || [];
@@ -130,8 +139,40 @@ export function StandardPreviewReportModal({
         ),
         it.brandOrigin || `${it.brand || "Standard"} / ${it.origin || "Local"}`,
         it.uom || "PCS",
-        (it.quantity || it.estimatedQuantity || 0).toLocaleString(),
+        (it.quantity ?? it.requestedQuantity ?? it.requiredQuantity ?? it.estimatedQuantity ?? 0).toLocaleString(),
         it.remarks || it.batchNumber || it.location || "Verified",
+      ]);
+    } else if (activeData.reportType === "supplier-bill") {
+      headers = [
+        "SL",
+        "Item Description & Spec",
+        "Brand / Origin",
+        "UOM",
+        "Billed Qty",
+        "Unit Price",
+        "Discount",
+        "VAT",
+        "TAX",
+        "Total Amount",
+        "Remarks",
+      ];
+      rows = activeData.items.map((it, idx) => [
+        it.sl || idx + 1,
+        React.createElement(
+          "div",
+          null,
+          React.createElement("div", { className: "font-bold text-slate-900" }, it.itemName),
+          React.createElement("div", { className: "text-[9.5px] text-slate-500 font-mono" }, it.itemCode || it.specification)
+        ),
+        it.brandOrigin || `${it.brand || "Standard"} / ${it.origin || "Local"}`,
+        it.uom || "PCS",
+        it.currentBillQty ?? it.quantity ?? 0,
+        `৳ ${(it.unitPrice || 0).toLocaleString()}`,
+        `৳ ${(it.discount || 0).toLocaleString()}`,
+        `৳ ${(it.vatAmount || 0).toLocaleString()}`,
+        `৳ ${(it.taxAmount || 0).toLocaleString()}`,
+        `৳ ${(it.lineAmount || it.totalAmount || 0).toLocaleString()}`,
+        it.remarks || "MRR Verified",
       ]);
     } else {
       headers = [
@@ -154,7 +195,7 @@ export function StandardPreviewReportModal({
         ),
         it.brandOrigin || `${it.brand || "Standard"} / ${it.origin || "Local"}`,
         it.uom || "PCS",
-        it.quantity || it.currentBillQty || it.openingQuantity || it.currentReturnQty || it.orderedQty || 0,
+        it.quantity ?? it.requestedQuantity ?? it.requiredQuantity ?? it.currentBillQty ?? it.openingQuantity ?? it.currentReturnQty ?? it.orderedQty ?? 0,
         `৳ ${(it.unitPrice || it.unitCost || 0).toLocaleString()}`,
         `৳ ${(it.totalAmount || it.lineAmount || it.totalValue || it.lineTotal || 0).toLocaleString()}`,
         it.remarks || it.batchNumber || it.location || "Verified",
@@ -178,6 +219,60 @@ export function StandardPreviewReportModal({
         !s.label.toLowerCase().includes("estimated budget value") &&
         !s.label.toLowerCase().includes("total estimated qty")
     );
+  }
+
+  // If supplier-bill, ensure Total Amount card reflects sum of line totals
+  if (activeData.reportType === "supplier-bill") {
+    let lineTotalSum = 0;
+    if (activeData.items && activeData.items.length > 0) {
+      lineTotalSum = activeData.items.reduce(
+        (sum, it) => sum + (Number(it.lineAmount ?? it.totalAmount) || 0),
+        0
+      );
+    } else if (rows && rows.length > 0) {
+      const totalColIdx = headers.findIndex((h) => {
+        const l = h.toLowerCase();
+        return l.includes("total amount") || l.includes("line total");
+      });
+      if (totalColIdx !== -1) {
+        lineTotalSum = rows.reduce((sum, row) => {
+          const cell = row[totalColIdx];
+          if (typeof cell === "number") return sum + cell;
+          if (typeof cell === "string") {
+            const cleaned = cell.replace(/[^0-9.-]+/g, "");
+            return sum + (Number(cleaned) || 0);
+          }
+          return sum;
+        }, 0);
+      }
+    }
+
+    if (lineTotalSum > 0) {
+      summaryList = summaryList.map((card) => {
+        if (
+          card.label.toLowerCase().includes("net bill amount") ||
+          card.label.toLowerCase().includes("total amount") ||
+          card.label.toLowerCase().includes("net approved amount")
+        ) {
+          return {
+            ...card,
+            label: "Total Amount",
+            value: `৳ ${lineTotalSum.toLocaleString("en-BD", { minimumFractionDigits: 2 })}`,
+            isBold: true,
+            isHighlight: true,
+          };
+        }
+        return card;
+      });
+      if (!summaryList.some((c) => c.label === "Total Amount")) {
+        summaryList.push({
+          label: "Total Amount",
+          value: `৳ ${lineTotalSum.toLocaleString("en-BD", { minimumFractionDigits: 2 })}`,
+          isBold: true,
+          isHighlight: true,
+        });
+      }
+    }
   }
 
   const noteText = activeData.notes || activeData.remarks;
@@ -265,16 +360,26 @@ export function StandardPreviewReportModal({
 
           {/* Metadata Key-Value Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 border border-slate-300 rounded-lg p-3 bg-slate-50/70 text-[11px]">
-            {metadataList.map((item, idx) => (
-              <div key={idx} className="space-y-0.5">
-                <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
-                  {item.label}
-                </span>
-                <span className="font-semibold text-slate-900 font-sans break-words">
-                  {item.value || "—"}
-                </span>
-              </div>
-            ))}
+            {metadataList.map((item, idx) => {
+              const spanClass =
+                item.colSpan === 2
+                  ? "col-span-2 sm:col-span-2"
+                  : item.colSpan === 3
+                  ? "col-span-2 sm:col-span-3"
+                  : item.colSpan === 4
+                  ? "col-span-2 sm:col-span-4"
+                  : "";
+              return (
+                <div key={idx} className={`space-y-0.5 ${spanClass} ${item.className || ""}`}>
+                  <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                    {item.label}
+                  </span>
+                  <span className="font-semibold text-slate-900 font-sans break-words">
+                    {item.value || "—"}
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
           {/* Line Items Table */}
@@ -292,6 +397,8 @@ export function StandardPreviewReportModal({
                         header.toLowerCase().includes("total") ||
                         header.toLowerCase().includes("amount") ||
                         header.toLowerCase().includes("value") ||
+                        header.toLowerCase().includes("discount") ||
+                        header.toLowerCase().includes("tax") ||
                         header.toLowerCase().includes("vat")
                           ? "text-right"
                           : header.toLowerCase() === "sl" || header.toLowerCase() === "uom"
@@ -316,6 +423,8 @@ export function StandardPreviewReportModal({
                         headerName.includes("total") ||
                         headerName.includes("amount") ||
                         headerName.includes("value") ||
+                        headerName.includes("discount") ||
+                        headerName.includes("tax") ||
                         headerName.includes("vat");
                       const isCentered = headerName === "sl" || headerName === "uom";
 
@@ -369,12 +478,20 @@ export function StandardPreviewReportModal({
           )}
 
           {/* Notes / Remarks */}
-          {noteText && (
-            <div className="border border-slate-200 rounded p-2.5 text-[11px] bg-slate-50/40">
-              <strong className="text-slate-800">Remarks / Instructions: </strong>
-              <span className="text-slate-600">{noteText}</span>
-            </div>
-          )}
+          {noteText &&
+            activeData.reportType !== "purchase-requisition" &&
+            !metadataList.some(
+              (m) =>
+                m.label.toLowerCase().includes("purpose") ||
+                m.label.toLowerCase().includes("justification")
+            ) && (
+              <div className="border border-slate-200 rounded p-2.5 text-[11px] bg-slate-50/40">
+                <strong className="text-slate-800">
+                  {activeData.remarksLabel || "Remarks / Instructions"}:{" "}
+                </strong>
+                <span className="text-slate-600">{noteText}</span>
+              </div>
+            )}
 
           {/* Official 4-Tier Signatures Block */}
           <div className="pt-12 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center text-[10px]">

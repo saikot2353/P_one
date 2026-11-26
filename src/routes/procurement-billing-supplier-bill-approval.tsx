@@ -193,11 +193,17 @@ export function SupplierBillApprovalPage() {
       };
     }
 
+    const totalAmountSum = (selectedBill.items || []).reduce(
+      (sum, item) => sum + (Number(item.lineAmount) || 0),
+      0
+    );
+
     return {
       reportType: "supplier-bill",
       title: "Supplier Commercial Bill / Invoice Dossier",
       documentNo: selectedBill.billNumber,
       documentDate: selectedBill.billDate,
+      hideDocHeaderInfo: true,
       department: "Finance & Accounts (Procurement Billing Approval)",
       status: selectedBill.approvalStatus,
       metadata: [
@@ -209,7 +215,6 @@ export function SupplierBillApprovalPage() {
         { label: "PO Reference", value: selectedBill.poNumber },
         { label: "Linked MRR References", value: (selectedBill.mrrNumbers || []).join(", ") },
         { label: "Currency", value: selectedBill.currency || "BDT" },
-        { label: "Payment Due Date", value: selectedBill.paymentDueDate },
       ],
       items: (selectedBill.items || []).map((item, idx) => ({
         sl: idx + 1,
@@ -220,6 +225,9 @@ export function SupplierBillApprovalPage() {
         uom: item.uom,
         quantity: item.currentBillQty,
         unitPrice: item.unitPrice,
+        discount: item.discount || 0,
+        vatAmount: item.vatAmount || 0,
+        taxAmount: item.taxAmount || 0,
         totalAmount: item.lineAmount,
         remarks: `MRR Qty: ${item.mrrReceivedQty} (Prev Billed: ${item.previouslyBilledQty})`,
       })),
@@ -245,8 +253,8 @@ export function SupplierBillApprovalPage() {
           value: `৳ ${selectedBill.adjustment.toLocaleString("en-BD", { minimumFractionDigits: 2 })}`,
         },
         {
-          label: "Net Approved Amount",
-          value: `৳ ${selectedBill.netBillAmount.toLocaleString("en-BD", { minimumFractionDigits: 2 })}`,
+          label: "Total Amount",
+          value: `৳ ${(totalAmountSum || selectedBill.netBillAmount).toLocaleString("en-BD", { minimumFractionDigits: 2 })}`,
           isTotal: true,
         },
       ],

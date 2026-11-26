@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { X, Printer, FileText, ShoppingCart, Briefcase, Building2, Calendar, User, Phone, MapPin } from "lucide-react";
+import { X, Printer, ShoppingCart, Briefcase } from "lucide-react";
 
 export interface PurchaseOrderItemReport {
   itemCode?: string;
@@ -135,54 +135,38 @@ export function PurchaseOrderReportModal({
                 {isPO ? "OFFICIAL PURCHASE ORDER" : "OFFICIAL WORK ORDER"}
               </div>
             </div>
-
-            {isPO && (
-              <div className="text-right text-xs space-y-0.5">
-                <div className="text-sm font-black text-indigo-700 font-mono">{order.orderNumber}</div>
-                <div className="text-slate-600">
-                  Order Date: <strong className="text-slate-900">{order.orderDate}</strong>
-                </div>
-                <div className="text-slate-600">
-                  Payment Terms: <strong className="text-slate-900">{order.paymentMode || "Credit"}</strong>
-                </div>
-                <div className="text-slate-600">
-                  Currency: <strong className="text-slate-900">{order.currency || "BDT"}</strong>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Supplier & Delivery Location Grid */}
           {isPO ? (
-            <div className="grid grid-cols-2 gap-4 border border-slate-200 rounded-xl p-4 bg-slate-50/60 text-xs">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border border-slate-200 rounded-xl p-4 bg-slate-50/60 text-xs">
+              {/* Order Details: PO No, Order Date, Payment Terms, Currency */}
               <div className="space-y-1.5">
                 <div className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                  Vendor / Supplier Information:
+                  Order Details:
                 </div>
-                <div className="text-sm font-bold text-slate-900">{order.supplierName}</div>
-                {order.supplierAddress && (
-                  <div className="text-slate-600 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span>{order.supplierAddress}</span>
-                  </div>
-                )}
-                {order.supplierContact && (
-                  <div className="text-slate-600 flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span>Contact: {order.supplierContact}</span>
-                  </div>
-                )}
-                {order.supplierMobile && (
-                  <div className="text-slate-600 flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span>Mobile: {order.supplierMobile}</span>
-                  </div>
-                )}
+                <div>
+                  <span className="text-slate-500 font-medium">PO No: </span>
+                  <strong className="text-slate-900 font-mono">{order.orderNumber}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Order Date: </span>
+                  <strong className="text-slate-900">{order.orderDate}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Payment Terms: </span>
+                  <strong className="text-slate-900">{order.paymentMode || "Credit 30 Days"}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Currency: </span>
+                  <strong className="text-slate-900">{order.currency || "BDT"}</strong>
+                </div>
               </div>
 
+              {/* Delivery & Issuance Details */}
               <div className="space-y-1.5">
                 <div className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                  Delivery & Issuance Details:
+                  Delivery &amp; Issuance Details:
                 </div>
                 <div>
                   <span className="text-slate-500 font-medium">Delivery Warehouse: </span>
@@ -197,6 +181,10 @@ export function PurchaseOrderReportModal({
                 <div>
                   <span className="text-slate-500 font-medium">Prepared By: </span>
                   <strong className="text-slate-900">{order.prepareBy || "Procurement Officer"}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Vendor / Supplier Name: </span>
+                  <strong className="text-slate-900">{order.supplierName}</strong>
                 </div>
               </div>
             </div>

@@ -160,44 +160,76 @@ function PurchaseRequisitionPage() {
   const previewReportData: StandardReportData = useMemo(() => {
     const active = reportTargetRecord || (pageMode !== "list" ? formData : (selectedRecord || requisitions[0] || {}));
     const currentItems = (reportTargetRecord ? reportTargetRecord.items : (pageMode !== "list" ? formItems : (active.items || []))) || [];
-    const totalVal = active.totalEstimatedAmount || currentItems.reduce((acc, i) => acc + (Number(i.estimatedAmount) || 0), 0);
-    const totalQty = currentItems.reduce((acc, i) => acc + (Number(i.quantity) || 0), 0);
+
+    const getItemQty = (i: any): number => {
+      const q = i?.quantity ?? i?.requestedQuantity ?? i?.requiredQuantity ?? i?.qty;
+      const n = Number(q);
+      return !isNaN(n) && n > 0 ? n : 0;
+    };
+
+    const totalQty =
+      (currentItems.length > 0
+        ? currentItems.reduce((acc, i) => acc + getItemQty(i), 0)
+        : 0) || Number(active.totalItemQuantity) || 0;
+
+    const totalVal =
+      active.totalEstimatedAmount ||
+      currentItems.reduce((acc, i) => {
+        const amt = Number(i.estimatedAmount ?? (i as any).totalEstimatedPrice);
+        if (!isNaN(amt) && amt > 0) return acc + amt;
+        return acc + getItemQty(i) * (Number(i.estimatedUnitPrice) || 0);
+      }, 0);
 
     return {
       reportType: "purchase-requisition",
       title: "Purchase Requisition (PR)",
-      documentNo: active.prNumber || "PR-2026-0001",
+      documentNo: active.prNumber || "PR-2026-000001",
       documentDate: active.prDate || new Date().toISOString().slice(0, 10),
       department: active.department || "Supply Chain & Procurement",
       status: active.status || "Approved",
+      hideDocHeaderInfo: true,
       metadata: [
-        { label: "PR Number", value: active.prNumber || "PR-2026-0001", highlight: true },
+        { label: "PR Number", value: active.prNumber || "PR-2026-000001", highlight: true },
         { label: "Requisition Date", value: active.prDate || "—" },
         { label: "Department", value: active.department || "—" },
-        { label: "Requested By", value: `${active.requestedBy || "Staff"} (${active.designation || "Executive"})` },
-        { label: "Required Date", value: active.requiredDate || "—" },
+        { label: "Requested By", value: `${active.requestedBy || (active as any).requesterName || "Staff"} (${active.designation || (active as any).requesterDesignation || "Executive"})` },
+        { label: "Required Date", value: active.requiredDate || (active as any).requiredByDate || "—" },
         { label: "Priority", value: active.priority || "Normal", highlight: active.priority === "Urgent" },
+        {
+          label: "Purpose / Justification",
+          value: active.purpose || active.justification || active.notes || "Operational procurement requirements.",
+          colSpan: 2,
+        },
       ],
-      items: currentItems.map((item, idx) => ({
-        sl: idx + 1,
-        itemCode: item.itemCode,
-        itemName: item.itemName,
-        specification: item.specification,
-        brandOrigin: item.brandOrigin || "Standard",
-        uom: item.uom,
-        quantity: item.quantity,
-        unitPrice: item.estimatedUnitPrice,
-        totalAmount: item.estimatedAmount,
-        remarks: item.remarks || (item.purpose ? `Purpose: ${item.purpose}` : undefined),
-      })),
+      items: currentItems.map((item, idx) => {
+        const qty = getItemQty(item);
+        const rate = item.estimatedUnitPrice || 0;
+        const amt = item.estimatedAmount ?? (item as any).totalEstimatedPrice ?? (qty * rate);
+        return {
+          sl: idx + 1,
+          itemCode: item.itemCode,
+          itemName: item.itemName,
+          specification: item.specification || (item as any).specifications || "—",
+          brandOrigin: item.brandOrigin || `${item.brand || "Standard"} / ${item.origin || "Local"}`,
+          uom: item.uom,
+          quantity: qty,
+          unitPrice: rate,
+          totalAmount: amt,
+          remarks: item.remarks || (item.purpose ? `Purpose: ${item.purpose}` : undefined),
+        };
+      }),
       financials: [
-        { label: "Total Requisition Qty", value: `${totalQty.toLocaleString()} units` },
+        { label: "Total Requisition Qty", value: `${totalQty.toLocaleString()} units`, isBold: true },
         { label: "Total Items Count", value: `${currentItems.length} lines` },
         { label: "Total Estimated Budget", value: `৳ ${totalVal.toLocaleString("en-BD", { minimumFractionDigits: 2 })}`, isTotal: true },
       ],
-      remarks: active.justification || active.notes || "Official purchase requisition raised for operational procurement requirements.",
+      summaryCards: [
+        { label: "Total Requisition Qty", value: `${totalQty.toLocaleString()} units`, isBold: true },
+        { label: "Total Items Count", value: `${currentItems.length} lines` },
+        { label: "Total Estimated Budget", value: `৳ ${totalVal.toLocaleString("en-BD", { minimumFractionDigits: 2 })}`, isBold: true, isHighlight: true },
+      ],
       signatures: [
-        { role: "Requested By", name: active.requestedBy || "Md. Mahfuzur Rahman", title: active.designation || "Procurement Officer", date: active.prDate },
+        { role: "Requested By", name: active.requestedBy || (active as any).requesterName || "Md. Mahfuzur Rahman", title: active.designation || (active as any).requesterDesignation || "Procurement Officer", date: active.prDate },
         { role: "Department Head", name: "Engr. Zahirul Islam", title: "Head of Department", date: active.prDate },
         { role: "Internal Audit", name: "S. K. Majumder", title: "Manager, Audit & Compliance", date: active.prDate },
         { role: "Managing Director / COO", name: "Rafiqul Islam Pakiza", title: "Director (SCM)", date: active.prDate },
@@ -316,6 +348,9 @@ function PurchaseRequisitionPage() {
         brand: it.brand || "Standard OEM",
         origin: it.origin || "Imported",
         specification: it.specification || (it as any).specifications || "",
+        quantity: it.quantity ?? it.requestedQuantity ?? it.requiredQuantity ?? 1,
+        requestedQuantity: it.requestedQuantity ?? it.quantity ?? it.requiredQuantity ?? 1,
+        requiredQuantity: it.requiredQuantity ?? it.requestedQuantity ?? it.quantity ?? 1,
       }))
     );
     setFormAttachments(record.attachments || []);
@@ -336,6 +371,9 @@ function PurchaseRequisitionPage() {
         brand: it.brand || "Standard OEM",
         origin: it.origin || "Imported",
         specification: it.specification || (it as any).specifications || "",
+        quantity: it.quantity ?? it.requestedQuantity ?? it.requiredQuantity ?? 1,
+        requestedQuantity: it.requestedQuantity ?? it.quantity ?? it.requiredQuantity ?? 1,
+        requiredQuantity: it.requiredQuantity ?? it.requestedQuantity ?? it.quantity ?? 1,
       }))
     );
     setFormAttachments(record.attachments || []);

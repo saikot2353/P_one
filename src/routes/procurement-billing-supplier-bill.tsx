@@ -611,6 +611,16 @@ export function SupplierBillPage() {
     toast.info("Service item removed from bill.");
   };
 
+  // Remove MRR Bill Item from Bill
+  const handleRemoveBillItem = (id: string) => {
+    if (formMode === "view") return;
+    setBillItems((prev) => {
+      const filtered = prev.filter((i) => i.id !== id);
+      return filtered.map((item, idx) => ({ ...item, sl: idx + 1 }));
+    });
+    toast.info("Item removed from bill.");
+  };
+
   // Update Service Item Line in Table
   const handleUpdateServiceItemLine = (
     id: string,
@@ -1159,6 +1169,11 @@ export function SupplierBillPage() {
 
   // Standard Preview Report Data Builder
   const billReportData: StandardReportData = useMemo(() => {
+    const totalAmountSum = billItems.reduce(
+      (sum, item) => sum + (Number(item.lineAmount) || 0),
+      0
+    );
+
     return {
       reportType: "supplier-bill",
       title:
@@ -1172,6 +1187,7 @@ export function SupplierBillPage() {
       documentNumber: billNumber,
       documentNo: billNumber,
       documentDate: billDate,
+      hideDocHeaderInfo: true,
       department: "Finance & Accounts (Procurement Billing)",
       status: currentApprovalStatus,
       metadata: [
@@ -1196,7 +1212,6 @@ export function SupplierBillPage() {
               { label: "Linked MRR References", value: selectedMrrNumbers.join(", ") },
             ]),
         { label: "Currency", value: currency },
-        { label: "Payment Due Date", value: paymentDueDate },
       ],
       tableHeaders: [
         "SL",
@@ -1205,6 +1220,9 @@ export function SupplierBillPage() {
         "UOM",
         "Billed Qty",
         "Unit Price",
+        "Discount",
+        "VAT",
+        "TAX",
         "Total Amount",
         "Remarks",
       ],
@@ -1220,6 +1238,9 @@ export function SupplierBillPage() {
         item.uom,
         item.currentBillQty,
         `৳ ${item.unitPrice.toLocaleString()}`,
+        `৳ ${(item.discount || 0).toLocaleString()}`,
+        `৳ ${(item.vatAmount || 0).toLocaleString()}`,
+        `৳ ${(item.taxAmount || 0).toLocaleString()}`,
         `৳ ${item.lineAmount.toLocaleString()}`,
         billType === "Service Bill Entry"
           ? `Direct Service Bill`
@@ -1233,8 +1254,8 @@ export function SupplierBillPage() {
         { label: "Other Charges", value: `+ ৳ ${summary.otherCharges.toLocaleString()}` },
         { label: "Adjustment", value: `৳ ${summary.adjustment.toLocaleString()}` },
         {
-          label: "Net Bill Amount",
-          value: `৳ ${summary.netBillAmount.toLocaleString()}`,
+          label: "Total Amount",
+          value: `৳ ${totalAmountSum.toLocaleString("en-BD", { minimumFractionDigits: 2 })}`,
           isBold: true,
           isHighlight: true,
         },
@@ -1899,6 +1920,9 @@ export function SupplierBillPage() {
                         <th className="py-2.5 px-3 text-right font-bold">VAT</th>
                         <th className="py-2.5 px-3 text-right font-bold text-amber-600">Tax</th>
                         <th className="py-2.5 px-3 text-right font-bold">Line Total (৳)</th>
+                        {!isReadOnly && (
+                          <th className="py-2.5 px-3 text-center w-12 font-bold">Action</th>
+                        )}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
@@ -2027,11 +2051,23 @@ export function SupplierBillPage() {
                           <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
                             ৳ {item.lineAmount.toLocaleString()}
                           </td>
+                          {!isReadOnly && (
+                            <td className="py-2 px-3 text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveBillItem(item.id)}
+                                className="p-1 text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer rounded hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                                title="Delete line item"
+                              >
+                                <Trash2 className="size-3.5" />
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       ))}
                       {billItems.length === 0 && (
                         <tr>
-                          <td colSpan={12} className="py-8 text-center text-muted-foreground text-xs">
+                          <td colSpan={isReadOnly ? 12 : 13} className="py-8 text-center text-muted-foreground text-xs">
                             No items found for the selected MRRs.
                           </td>
                         </tr>

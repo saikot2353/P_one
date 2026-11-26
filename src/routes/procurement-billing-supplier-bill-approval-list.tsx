@@ -155,11 +155,17 @@ export function SupplierBillApprovalListPage() {
   // Generate Report Data for selected preview bill
   const previewReportData: StandardReportData | null = useMemo(() => {
     if (!previewBill) return null;
+    const totalAmountSum = (previewBill.items || []).reduce(
+      (sum, item) => sum + (Number(item.lineAmount) || 0),
+      0
+    );
+
     return {
       reportType: "supplier-bill",
       title: "Supplier Commercial Bill / Invoice Dossier",
       documentNo: previewBill.billNumber,
       documentDate: previewBill.billDate,
+      hideDocHeaderInfo: true,
       department: "Finance & Accounts (Procurement Billing Approval)",
       status: previewBill.approvalStatus,
       metadata: [
@@ -171,7 +177,6 @@ export function SupplierBillApprovalListPage() {
         { label: "PO Reference", value: previewBill.poNumber },
         { label: "Linked MRR References", value: (previewBill.mrrNumbers || []).join(", ") },
         { label: "Currency", value: previewBill.currency || "BDT" },
-        { label: "Payment Due Date", value: previewBill.paymentDueDate },
       ],
       tableHeaders: [
         "SL",
@@ -180,6 +185,9 @@ export function SupplierBillApprovalListPage() {
         "UOM",
         "Billed Qty",
         "Unit Price",
+        "Discount",
+        "VAT",
+        "TAX",
         "Total Amount",
         "Remarks",
       ],
@@ -190,6 +198,9 @@ export function SupplierBillApprovalListPage() {
         item.uom,
         item.currentBillQty,
         `৳ ${item.unitPrice.toLocaleString()}`,
+        `৳ ${(item.discount || 0).toLocaleString()}`,
+        `৳ ${(item.vatAmount || 0).toLocaleString()}`,
+        `৳ ${(item.taxAmount || 0).toLocaleString()}`,
         `৳ ${item.lineAmount.toLocaleString()}`,
         `MRR Qty: ${item.mrrReceivedQty}`,
       ]),
@@ -200,8 +211,8 @@ export function SupplierBillApprovalListPage() {
         { label: "Other Charges", value: `+ ৳ ${previewBill.otherCharges.toLocaleString()}` },
         { label: "Adjustment", value: `৳ ${previewBill.adjustment.toLocaleString()}` },
         {
-          label: "Net Bill Amount",
-          value: `৳ ${previewBill.netBillAmount.toLocaleString()}`,
+          label: "Total Amount",
+          value: `৳ ${(totalAmountSum || previewBill.netBillAmount).toLocaleString("en-BD", { minimumFractionDigits: 2 })}`,
           isBold: true,
           isHighlight: true,
         },
