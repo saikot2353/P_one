@@ -325,11 +325,21 @@ function renderWidgetContent(
   const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === componentId);
   const enabledChips = getEffectiveEnabledChips(def, settings);
   const isChipVisible = (chipId: string) => enabledChips.length === 0 || enabledChips.includes(chipId);
+  const customLabels = settings?.chipLabels || {};
+  const applyCustomLabel = <T extends { id: string }>(item: T): T => {
+    const custom = customLabels[item.id]?.trim();
+    if (!custom) return item;
+    const patched: any = { ...item };
+    if ("label" in patched) patched.label = custom;
+    if ("title" in patched) patched.title = custom;
+    if ("name" in patched) patched.name = custom;
+    return patched as T;
+  };
   const orderByChips = <T extends { id: string }>(items: T[]): T[] => {
-    if (enabledChips.length === 0) return items;
+    if (enabledChips.length === 0) return items.map(applyCustomLabel);
     const map = new Map(items.map((item) => [item.id, item]));
     const ordered = enabledChips.map((id) => map.get(id)).filter((x): x is T => !!x);
-    return ordered.length > 0 ? ordered : items;
+    return (ordered.length > 0 ? ordered : items).map(applyCustomLabel);
   };
 
   switch (componentId) {
@@ -3143,21 +3153,36 @@ function renderWidgetContent(
       const vacancyMp = Math.max(0, budgetMp - onboardMp);
       const fillRate = ((onboardMp / Math.max(1, budgetMp)) * 100).toFixed(1);
 
+      const avgSalary = 18000;
+      const budgetAmt = budgetMp * avgSalary;
+      const onboardAmt = onboardMp * avgSalary;
+      const vacancyAmt = vacancyMp * avgSalary;
+
+      const formatTakaShort = (amt: number) => {
+        if (amt >= 10000000) return `৳${(amt / 10000000).toFixed(2)} Cr`;
+        if (amt >= 100000) return `৳${(amt / 100000).toFixed(1)} L`;
+        return `৳${amt.toLocaleString()}`;
+      };
+
       const mpChips = orderByChips([
-        { id: "budget_mp", label: "Budgeted MP", value: budgetMp.toLocaleString(), sub: "Approved Headcount", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-foreground" },
-        { id: "onboard_mp", label: "Actual On-Board", value: onboardMp.toLocaleString(), sub: "Active Employees", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-600 dark:text-emerald-400" },
-        { id: "vacancy", label: "Vacancy / Gap", value: vacancyMp.toLocaleString(), sub: "Open Positions", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-600 dark:text-amber-400" },
-        { id: "fill_rate", label: "Fill Rate", value: `${fillRate}%`, sub: "Target ≥95%", cls: "bg-indigo-500/10 border-indigo-500/20", titleCls: "text-indigo-600", valCls: "text-indigo-600 dark:text-indigo-400" },
+        { id: "budget_mp", label: "Budgeted MP", value: formatTakaShort(budgetAmt), sub: `${budgetMp.toLocaleString()} Headcount`, cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-foreground" },
+        { id: "onboard_mp", label: "Actual On-Board", value: formatTakaShort(onboardAmt), sub: `${onboardMp.toLocaleString()} Employees`, cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-600 dark:text-emerald-400" },
+        { id: "vacancy", label: "Vacancy / Gap", value: formatTakaShort(vacancyAmt), sub: `${vacancyMp.toLocaleString()} Open Positions`, cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-600 dark:text-amber-400" },
+        { id: "fill_rate", label: "Fill Rate", value: `${fillRate}%`, sub: `${onboardMp.toLocaleString()} / ${budgetMp.toLocaleString()} MP`, cls: "bg-indigo-500/10 border-indigo-500/20", titleCls: "text-indigo-600", valCls: "text-indigo-600 dark:text-indigo-400" },
       ]);
 
       const mpChartData = [
-        { dept: "Sewing", budget: Math.round(3450 * scale), onboard: Math.round(3287 * scale) },
-        { dept: "QC", budget: Math.round(800 * scale), onboard: Math.round(760 * scale) },
-        { dept: "Finishing", budget: Math.round(680 * scale), onboard: Math.round(639 * scale) },
-        { dept: "Wash", budget: Math.round(660 * scale), onboard: Math.round(638 * scale) },
-        { dept: "Cutting", budget: Math.round(410 * scale), onboard: Math.round(383 * scale) },
-        { dept: "Packing", budget: Math.round(220 * scale), onboard: Math.round(197 * scale) },
-      ];
+        { dept: "Sewing", budgetCount: Math.round(3450 * scale), onboardCount: Math.round(3287 * scale) },
+        { dept: "QC", budgetCount: Math.round(800 * scale), onboardCount: Math.round(760 * scale) },
+        { dept: "Finishing", budgetCount: Math.round(680 * scale), onboardCount: Math.round(639 * scale) },
+        { dept: "Wash", budgetCount: Math.round(660 * scale), onboardCount: Math.round(638 * scale) },
+        { dept: "Cutting", budgetCount: Math.round(410 * scale), onboardCount: Math.round(383 * scale) },
+        { dept: "Packing", budgetCount: Math.round(220 * scale), onboardCount: Math.round(197 * scale) },
+      ].map((d) => ({
+        ...d,
+        budget: Number(((d.budgetCount * avgSalary) / 100000).toFixed(1)),
+        onboard: Number(((d.onboardCount * avgSalary) / 100000).toFixed(1)),
+      }));
 
       return (
         <div className="space-y-3">
@@ -3168,32 +3193,38 @@ function renderWidgetContent(
                   {c.label}
                 </span>
                 <div className={`text-lg sm:text-xl font-black font-mono mt-0.5 ${c.valCls}`}>{c.value}</div>
-                <div className="text-[10px] text-muted-foreground truncate">{c.sub}</div>
+                <div className="text-[10px] font-semibold text-muted-foreground truncate">{c.sub}</div>
               </div>
             ))}
           </div>
 
           <div className="h-44 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={mpChartData} margin={{ top: 10, right: 8, left: -14, bottom: 0 }}>
+              <BarChart data={mpChartData} margin={{ top: 10, right: 8, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
                 <XAxis dataKey="dept" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 9.5 }} />
+                <YAxis tick={{ fontSize: 9.5 }} tickFormatter={(v) => `৳${v}L`} />
                 <Tooltip
                   cursor={{ fill: "rgba(59, 130, 246, 0.06)" }}
+                  formatter={(val: any, name: any, props: any) => {
+                    const cnt = name === "Budgeted Amount" ? props?.payload?.budgetCount : props?.payload?.onboardCount;
+                    return [`৳${val}L (${cnt?.toLocaleString() || 0} MP)`, name];
+                  }}
                   contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
-                 labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
+                  labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                  itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                />
                 <Legend
                   verticalAlign="top"
                   height={22}
                   formatter={(val) => (
                     <span className="text-[10px] font-bold text-muted-foreground">
-                      {val === "budget" ? "Budgeted MP" : "Actual On-Board"}
+                      {val}
                     </span>
                   )}
                 />
-                <Bar dataKey="budget" fill="#3b82f6" radius={[3, 3, 0, 0]} name="budget" />
-                <Bar dataKey="onboard" fill="#10b981" radius={[3, 3, 0, 0]} name="onboard" />
+                <Bar dataKey="budget" fill="#3b82f6" radius={[3, 3, 0, 0]} name="Budgeted Amount" />
+                <Bar dataKey="onboard" fill="#10b981" radius={[3, 3, 0, 0]} name="Actual On-Board" />
               </BarChart>
             </ResponsiveContainer>
           </div>

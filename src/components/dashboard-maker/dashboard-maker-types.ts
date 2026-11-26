@@ -20,6 +20,7 @@ export interface WidgetSettings {
   period?: "today" | "week" | "month" | "year";
   employeeCategory?: "all" | "worker" | "staff" | "management";
   enabledChips?: string[]; // Custom list of visible metric chip IDs for cards supporting chips
+  chipLabels?: Record<string, string>; // Custom renamed labels per chip ID
 }
 
 export interface DashboardChipDefinition {
