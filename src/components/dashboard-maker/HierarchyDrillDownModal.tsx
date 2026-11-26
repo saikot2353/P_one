@@ -48,8 +48,6 @@ interface HierarchyDrillDownModalProps {
 }
 
 const LEVEL_ORDER: HierarchyLevel[] = [
-  "company",
-  "region",
   "department",
   "section",
   "unit",
@@ -431,7 +429,7 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
   ];
 
   const currentLevel: HierarchyLevel = useMemo(() => {
-    if (trail.length === 0) return "company";
+    if (trail.length === 0) return "department";
     const lastLevel = trail[trail.length - 1].level;
     const idx = LEVEL_ORDER.indexOf(lastLevel);
     return LEVEL_ORDER[Math.min(idx + 1, LEVEL_ORDER.length - 1)];
@@ -454,7 +452,7 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
 
   const summary = useMemo(() => {
     if (currentParent) return currentParent;
-    const list = nodes.length > 0 ? nodes : getNodesForLevel("company", null, accessMode, managedDepts);
+    const list = nodes.length > 0 ? nodes : getNodesForLevel("department", null, accessMode, managedDepts);
     return {
       manpower: list.reduce((s, n) => s + n.manpower, 0),
       present: list.reduce((s, n) => s + n.present, 0),
@@ -570,7 +568,7 @@ export const HierarchyDrillDownModal: React.FC<HierarchyDrillDownModalProps> = (
                 trail.length === 0 ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
-              Company
+              Departments
             </button>
 
             {trail.map((step, idx) => (

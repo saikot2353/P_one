@@ -33,6 +33,16 @@ import {
   Timer,
   Crown,
   Maximize2,
+  Megaphone,
+  ArrowRight,
+  Eye,
+  Gift,
+  Calendar,
+  Phone,
+  Mail,
+  AlertCircle,
+  FileCheck,
+  MessageCircle,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -65,6 +75,34 @@ interface WidgetRendererProps {
   onUpdateSettings?: (newSettings: WidgetSettings) => void;
 }
 
+
+const CHART_TOOLTIP_CONTENT_STYLE: React.CSSProperties = {
+  backgroundColor: "#ffffff",
+  borderColor: "#cbd5e1",
+  borderWidth: "1px",
+  borderRadius: "10px",
+  padding: "8px 12px",
+  fontSize: "12px",
+  fontWeight: 600,
+  color: "#0f172a",
+  boxShadow: "0 12px 28px -6px rgba(15, 23, 42, 0.16)",
+};
+
+const CHART_TOOLTIP_LABEL_STYLE: React.CSSProperties = {
+  fontSize: "12px",
+  fontWeight: 800,
+  color: "#0f172a",
+  marginBottom: "4px",
+  borderBottom: "1px solid #f1f5f9",
+  paddingBottom: "3px",
+};
+
+const CHART_TOOLTIP_ITEM_STYLE: React.CSSProperties = {
+  fontSize: "12px",
+  fontWeight: 700,
+  padding: "1px 0",
+};
+
 export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
   widget,
   isCompact = false,
@@ -82,129 +120,123 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
         className="h-full bg-card rounded-2xl border border-border/60 shadow-xs p-4 sm:p-5 flex flex-col justify-between transition-all hover:border-primary/40 hover:shadow-md cursor-pointer group/card"
         title="Click to open Hierarchy Drill-Down (Company → Region → Dept → Section → Unit → Line)"
       >
-      {/* Widget Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-border/40 gap-2 mb-3">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <div className="size-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-            {getWidgetIcon(def?.iconName || "Layers")}
-          </div>
-          <div className="min-w-0 flex-1">
-            <h4 className="text-xs sm:text-sm font-bold text-foreground truncate" title={displayTitle}>
-              {displayTitle}
-            </h4>
-            <div className="flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
-              <span className="font-semibold uppercase tracking-wider text-[9.5px] px-1.5 py-0.2 rounded bg-muted/60 text-muted-foreground/90 shrink-0">
-                {def?.moduleLabel.split(" ")[0] || "Module"}
-              </span>
-              {(widget.colSpan || 12) > 3 && (
-                <>
-                  <span>•</span>
-                  <span className="truncate">{def?.category}</span>
-                </>
-              )}
+        {/* Widget Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-border/40 gap-2 mb-3">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="size-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              {getWidgetIcon(def?.iconName || "Layers")}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h4 className="text-xs sm:text-sm font-bold text-foreground truncate" title={displayTitle}>
+                {displayTitle}
+              </h4>
+              <div className="flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
+                <span className="font-semibold uppercase tracking-wider text-[9.5px] px-1.5 py-0.2 rounded bg-muted/60 text-muted-foreground/90 shrink-0">
+                  {def?.moduleLabel.split(" ")[0] || "Module"}
+                </span>
+                {(widget.colSpan || 12) > 3 && (
+                  <>
+                    <span>•</span>
+                    <span className="truncate">{def?.category}</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Dynamic Scope / Filter Badge (Compact, non-intrusive) */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {settings?.scope === "personal" && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shrink-0">
-              Self
-            </span>
-          )}
-
-          {settings?.scope === "area" && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shrink-0">
-              {(settings.areas?.length || 0) > 1 ? `Area (${settings.areas?.length})` : settings.areas?.[0]?.split(" ")[0] || "Area"}
-            </span>
-          )}
-
-          {(settings?.scope === "managed_depts" || settings?.scope === "department") && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shrink-0">
-              {(() => {
-                const depts = settings.departments || settings.managedDepartments || (settings.department ? [settings.department] : []);
-                return depts.length > 1 ? `Dept (${depts.length})` : depts[0]?.split(" ")[0] || "Dept";
-              })()}
-            </span>
-          )}
-
-          {(!settings?.scope || settings?.scope === "company") && def?.supportedScopes && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">
-              All Company
-            </span>
-          )}
-
-          {/* Dynamic Buyer Badge (Single or Multi-Select) */}
-          {(() => {
-            const activeBuyers =
-              settings?.buyers && settings.buyers.length > 0
-                ? settings.buyers
-                : settings?.buyer && settings.buyer !== "All Buyers"
-                  ? [settings.buyer]
-                  : [];
-            if (activeBuyers.length === 0) return null;
-            const isMulti = activeBuyers.length > 1;
-            const badgeLabel = isMulti
-              ? `${activeBuyers[0].split(" ")[0]} +${activeBuyers.length - 1}`
-              : activeBuyers[0].split(" ")[0];
-            return (
-              <span
-                className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 flex items-center gap-1 shrink-0"
-                title={`Selected Buyers (${activeBuyers.length}): ${activeBuyers.join(", ")}`}
-              >
-                <Store className="size-3 text-teal-600" />
-                {(widget.colSpan || 12) > 3 ? badgeLabel : (isMulti ? `${activeBuyers.length}B` : "")}
+          {/* Dynamic Scope / Filter Badge (Compact, non-intrusive) */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {settings?.scope === "personal" && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shrink-0">
+                Self
               </span>
-            );
-          })()}
+            )}
 
-          {settings?.warehouse && settings.warehouse !== "All Warehouses" && (
-            <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1 shrink-0"
-              title={`Warehouse: ${settings.warehouse}`}
+            {(!settings?.scope || settings?.scope === "area" || settings?.scope === "company") && def?.supportedScopes && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shrink-0">
+                Area
+              </span>
+            )}
+
+            {(settings?.scope === "managed_depts" || settings?.scope === "department") && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shrink-0">
+                {(() => {
+                  const depts = settings.departments || settings.managedDepartments || (settings.department ? [settings.department] : []);
+                  return depts.length > 1 ? `Dept (${depts.length})` : depts[0]?.split(" ")[0] || "Dept";
+                })()}
+              </span>
+            )}
+
+            {/* Dynamic Buyer Badge (Single or Multi-Select) */}
+            {(() => {
+              const activeBuyers =
+                settings?.buyers && settings.buyers.length > 0
+                  ? settings.buyers
+                  : settings?.buyer && settings.buyer !== "All Buyers"
+                    ? [settings.buyer]
+                    : [];
+              if (activeBuyers.length === 0) return null;
+              const isMulti = activeBuyers.length > 1;
+              const badgeLabel = isMulti
+                ? `${activeBuyers[0].split(" ")[0]} +${activeBuyers.length - 1}`
+                : activeBuyers[0].split(" ")[0];
+              return (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 flex items-center gap-1 shrink-0"
+                  title={`Selected Buyers (${activeBuyers.length}): ${activeBuyers.join(", ")}`}
+                >
+                  <Store className="size-3 text-teal-600" />
+                  {(widget.colSpan || 12) > 3 ? badgeLabel : (isMulti ? `${activeBuyers.length}B` : "")}
+                </span>
+              );
+            })()}
+
+            {settings?.warehouse && settings.warehouse !== "All Warehouses" && (
+              <span
+                className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1 shrink-0"
+                title={`Warehouse: ${settings.warehouse}`}
+              >
+                <Package className="size-3" /> {(widget.colSpan || 12) > 3 ? settings.warehouse.split(" ")[0] : ""}
+              </span>
+            )}
+
+            {def?.badge && !def?.supportedScopes && !settings?.scope && !settings?.buyer && !settings?.warehouse && (
+              <span
+                className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 shrink-0"
+                title={def.badge}
+              >
+                {(widget.colSpan || 12) > 3 ? def.badge : "★"}
+              </span>
+            )}
+
+            {/* Drill-Down Indicator Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDrillDownOpen(true);
+              }}
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 hover:bg-primary hover:text-primary-foreground text-primary border border-primary/20 flex items-center gap-1 shrink-0 transition-colors cursor-pointer"
+              title="Drill Down: Company → Region → Department → Section → Unit → Line"
             >
-              <Package className="size-3" /> {(widget.colSpan || 12) > 3 ? settings.warehouse.split(" ")[0] : ""}
-            </span>
-          )}
+              <Maximize2 className="size-2.5" />
+              {(widget.colSpan || 12) > 3 && <span>Drill Down</span>}
+            </button>
+          </div>
+        </div>
 
-          {def?.badge && !def?.supportedScopes && !settings?.scope && !settings?.buyer && !settings?.warehouse && (
-            <span
-              className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 shrink-0"
-              title={def.badge}
-            >
-              {(widget.colSpan || 12) > 3 ? def.badge : "★"}
-            </span>
-          )}
-
-          {/* Drill-Down Indicator Button */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsDrillDownOpen(true);
-            }}
-            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 hover:bg-primary hover:text-primary-foreground text-primary border border-primary/20 flex items-center gap-1 shrink-0 transition-colors cursor-pointer"
-            title="Drill Down: Company → Region → Department → Section → Unit → Line"
-          >
-            <Maximize2 className="size-2.5" />
-            {(widget.colSpan || 12) > 3 && <span>Drill Down</span>}
-          </button>
+        {/* Widget Content Body */}
+        <div className="flex-1 min-h-[140px] flex flex-col justify-center">
+          {renderWidgetContent(widget.componentId, isCompact, settings, widget.colSpan || 12)}
         </div>
       </div>
 
-      {/* Widget Content Body */}
-      <div className="flex-1 min-h-[140px] flex flex-col justify-center">
-        {renderWidgetContent(widget.componentId, isCompact, settings, widget.colSpan || 12)}
-      </div>
-    </div>
-
-    <HierarchyDrillDownModal
-      isOpen={isDrillDownOpen}
-      onClose={() => setIsDrillDownOpen(false)}
-      widget={widget}
-    />
-  </>
+      <HierarchyDrillDownModal
+        isOpen={isDrillDownOpen}
+        onClose={() => setIsDrillDownOpen(false)}
+        widget={widget}
+      />
+    </>
   );
 };
 
@@ -293,6 +325,12 @@ function renderWidgetContent(
   const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === componentId);
   const enabledChips = getEffectiveEnabledChips(def, settings);
   const isChipVisible = (chipId: string) => enabledChips.length === 0 || enabledChips.includes(chipId);
+  const orderByChips = <T extends { id: string }>(items: T[]): T[] => {
+    if (enabledChips.length === 0) return items;
+    const map = new Map(items.map((item) => [item.id, item]));
+    const ordered = enabledChips.map((id) => map.get(id)).filter((x): x is T => !!x);
+    return ordered.length > 0 ? ordered : items;
+  };
 
   switch (componentId) {
     // ----------------------------------------------------
@@ -764,7 +802,164 @@ function renderWidgetContent(
         ];
       }
 
-      const visibleChips = chips.filter((c) => isChipVisible(c.id));
+      const scopeScale =
+        scope === "personal"
+          ? 0.01
+          : scope === "area"
+            ? Math.min(1, Math.max(0.28, (settings?.areas?.length || 1) / 3))
+            : scope === "managed_depts" || scope === "department"
+              ? Math.min(1, Math.max(0.25, (settings?.departments?.length || settings?.managedDepartments?.length || 1) / 6))
+              : 1;
+
+      const extraAttendanceChips: StatChip[] = [
+        {
+          id: "worker",
+          label: "Worker",
+          value: Math.max(1, Math.round(5420 * scopeScale)).toLocaleString(),
+          unit: "Operators",
+          note: "Floor workforce",
+          boxClass: "bg-blue-500/10 border-blue-500/20",
+          labelClass: "text-blue-600 dark:text-blue-400",
+          valueClass: "text-foreground",
+          noteClass: "text-blue-600/80",
+        },
+        {
+          id: "staff",
+          label: "Staff",
+          value: Math.max(1, Math.round(1017 * scopeScale)).toLocaleString(),
+          unit: "Officers",
+          note: "Office & Tech",
+          boxClass: "bg-indigo-500/10 border-indigo-500/20",
+          labelClass: "text-indigo-600 dark:text-indigo-400",
+          valueClass: "text-foreground",
+          noteClass: "text-indigo-600/80",
+        },
+        {
+          id: "staff_present",
+          label: "Staff Present",
+          value: Math.max(1, Math.round(978 * scopeScale)).toLocaleString(),
+          pct: "96.2%",
+          note: "On duty",
+          boxClass: "bg-emerald-500/10 border-emerald-500/20",
+          labelClass: "text-emerald-600 dark:text-emerald-400",
+          valueClass: "text-emerald-700 dark:text-emerald-300",
+          noteClass: "text-emerald-600/80",
+        },
+        {
+          id: "worker_present",
+          label: "Worker Present",
+          value: Math.max(1, Math.round(5180 * scopeScale)).toLocaleString(),
+          pct: "95.6%",
+          note: "Lines active",
+          boxClass: "bg-teal-500/10 border-teal-500/20",
+          labelClass: "text-teal-600 dark:text-teal-400",
+          valueClass: "text-teal-700 dark:text-teal-300",
+          noteClass: "text-teal-600/80",
+        },
+        {
+          id: "worker_absent",
+          label: "Worker Absent",
+          value: Math.max(0, Math.round(240 * scopeScale)).toLocaleString(),
+          pct: "4.4%",
+          note: "Floor absent",
+          boxClass: "bg-rose-500/10 border-rose-500/20",
+          labelClass: "text-rose-600 dark:text-rose-400",
+          valueClass: "text-rose-700 dark:text-rose-300",
+          noteClass: "text-rose-600/80",
+        },
+        {
+          id: "staff_absent",
+          label: "Staff Absent",
+          value: Math.max(0, Math.round(39 * scopeScale)).toLocaleString(),
+          pct: "3.8%",
+          note: "Office absent",
+          boxClass: "bg-red-500/10 border-red-500/20",
+          labelClass: "text-red-600 dark:text-red-400",
+          valueClass: "text-red-700 dark:text-red-300",
+          noteClass: "text-red-600/80",
+        },
+        {
+          id: "holiday",
+          label: "Holiday",
+          value: Math.max(0, Math.round(112 * scopeScale)).toLocaleString(),
+          note: "Rostered off",
+          boxClass: "bg-purple-500/10 border-purple-500/20",
+          labelClass: "text-purple-600 dark:text-purple-400",
+          valueClass: "text-purple-700 dark:text-purple-300",
+          noteClass: "text-purple-600/80",
+        },
+        {
+          id: "late_worker",
+          label: "Late Worker",
+          value: Math.max(0, Math.round(145 * scopeScale)).toLocaleString(),
+          pct: "2.7%",
+          note: "Grace applied",
+          boxClass: "bg-amber-500/10 border-amber-500/20",
+          labelClass: "text-amber-600 dark:text-amber-400",
+          valueClass: "text-amber-700 dark:text-amber-300",
+          noteClass: "text-amber-600/80",
+        },
+        {
+          id: "late_staff",
+          label: "Late Staff",
+          value: Math.max(0, Math.round(28 * scopeScale)).toLocaleString(),
+          pct: "2.8%",
+          note: "After 9:15 AM",
+          boxClass: "bg-orange-500/10 border-orange-500/20",
+          labelClass: "text-orange-600 dark:text-orange-400",
+          valueClass: "text-orange-700 dark:text-orange-300",
+          noteClass: "text-orange-600/80",
+        },
+        {
+          id: "leave_worker",
+          label: "Worker on Leave",
+          value: Math.max(0, Math.round(64 * scopeScale)).toLocaleString(),
+          pct: "1.2%",
+          note: "Approved leave",
+          boxClass: "bg-violet-500/10 border-violet-500/20",
+          labelClass: "text-violet-600 dark:text-violet-400",
+          valueClass: "text-violet-700 dark:text-violet-300",
+          noteClass: "text-violet-600/80",
+        },
+        {
+          id: "leave_staff",
+          label: "Staff on Leave",
+          value: Math.max(0, Math.round(14 * scopeScale)).toLocaleString(),
+          pct: "1.4%",
+          note: "CL / SL / EL",
+          boxClass: "bg-fuchsia-500/10 border-fuchsia-500/20",
+          labelClass: "text-fuchsia-600 dark:text-fuchsia-400",
+          valueClass: "text-fuchsia-700 dark:text-fuchsia-300",
+          noteClass: "text-fuchsia-600/80",
+        },
+        {
+          id: "uninformed_absent",
+          label: "Uninformed Absent",
+          value: Math.max(0, Math.round(118 * scopeScale)).toLocaleString(),
+          pct: "1.8%",
+          note: "No prior notice",
+          boxClass: "bg-rose-500/10 border-rose-500/20",
+          labelClass: "text-rose-600 dark:text-rose-400",
+          valueClass: "text-rose-700 dark:text-rose-300",
+          noteClass: "text-rose-600/80",
+        },
+        {
+          id: "weekend_duty",
+          label: "Weekend Duty",
+          value: Math.max(0, Math.round(86 * scopeScale)).toLocaleString(),
+          note: "Special shift",
+          boxClass: "bg-sky-500/10 border-sky-500/20",
+          labelClass: "text-sky-600 dark:text-sky-400",
+          valueClass: "text-sky-700 dark:text-sky-300",
+          noteClass: "text-sky-600/80",
+        },
+      ];
+
+      extraAttendanceChips.forEach((ec) => {
+        if (!chips.some((c) => c.id === ec.id)) chips.push(ec);
+      });
+
+      const visibleChips = orderByChips(chips);
 
       return (
         <div className={getMetricGridClass(colSpan, visibleChips.length)}>
@@ -781,6 +976,161 @@ function renderWidgetContent(
                 {chip.pct && <span className={`text-[10px] font-bold ${chip.labelClass}`}>{chip.pct}</span>}
               </div>
               <div className={`text-[10px] font-medium mt-1 truncate ${chip.noteClass}`}>{chip.note}</div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    case "hr_workforce_info": {
+      const scopeScale =
+        scope === "personal"
+          ? 0.01
+          : scope === "area"
+            ? Math.min(1, Math.max(0.28, (settings?.areas?.length || 1) / 3))
+            : scope === "managed_depts" || scope === "department"
+              ? Math.min(1, Math.max(0.25, (settings?.departments?.length || settings?.managedDepartments?.length || 1) / 6))
+              : 1;
+
+      const infoChips = [
+        {
+          id: "total_manpower",
+          label: "Total Man Power",
+          value: Math.max(1, Math.round(6437 * scopeScale)).toLocaleString(),
+          sub: "Active Payroll",
+          box: "bg-blue-500/10 border-blue-500/20",
+          titleCls: "text-blue-600 dark:text-blue-400",
+          valCls: "text-foreground",
+        },
+        {
+          id: "worker",
+          label: "Worker",
+          value: Math.max(1, Math.round(5420 * scopeScale)).toLocaleString(),
+          sub: "84.2% of Total",
+          box: "bg-emerald-500/10 border-emerald-500/20",
+          titleCls: "text-emerald-600 dark:text-emerald-400",
+          valCls: "text-emerald-700 dark:text-emerald-300",
+        },
+        {
+          id: "staff",
+          label: "Staff",
+          value: Math.max(1, Math.round(1017 * scopeScale)).toLocaleString(),
+          sub: "15.8% of Total",
+          box: "bg-indigo-500/10 border-indigo-500/20",
+          titleCls: "text-indigo-600 dark:text-indigo-400",
+          valCls: "text-indigo-700 dark:text-indigo-300",
+        },
+        {
+          id: "resign",
+          label: "Resign",
+          value: Math.max(0, Math.round(84 * scopeScale)).toLocaleString(),
+          sub: "Formal Exit (MTD)",
+          box: "bg-amber-500/10 border-amber-500/20",
+          titleCls: "text-amber-600 dark:text-amber-400",
+          valCls: "text-amber-700 dark:text-amber-300",
+        },
+        {
+          id: "lefty",
+          label: "Lefty",
+          value: Math.max(0, Math.round(46 * scopeScale)).toLocaleString(),
+          sub: "Unauthorized Left",
+          box: "bg-rose-500/10 border-rose-500/20",
+          titleCls: "text-rose-600 dark:text-rose-400",
+          valCls: "text-rose-700 dark:text-rose-300",
+        },
+        {
+          id: "ml",
+          label: "ML",
+          value: Math.max(0, Math.round(38 * scopeScale)).toLocaleString(),
+          sub: "Maternity Leave",
+          box: "bg-purple-500/10 border-purple-500/20",
+          titleCls: "text-purple-600 dark:text-purple-400",
+          valCls: "text-purple-700 dark:text-purple-300",
+        },
+        {
+          id: "others",
+          label: "Others",
+          value: Math.max(0, Math.round(22 * scopeScale)).toLocaleString(),
+          sub: "Suspended / Hold",
+          box: "bg-slate-500/10 border-slate-500/20",
+          titleCls: "text-slate-600 dark:text-slate-400",
+          valCls: "text-foreground",
+        },
+        {
+          id: "new_joining",
+          label: "New Joining",
+          value: `+${Math.max(1, Math.round(96 * scopeScale))}`,
+          sub: "This month",
+          box: "bg-teal-500/10 border-teal-500/20",
+          titleCls: "text-teal-600 dark:text-teal-400",
+          valCls: "text-teal-700 dark:text-teal-300",
+        },
+        {
+          id: "male",
+          label: "Male",
+          value: Math.max(1, Math.round(2446 * scopeScale)).toLocaleString(),
+          sub: "38.0% of Total",
+          box: "bg-sky-500/10 border-sky-500/20",
+          titleCls: "text-sky-600 dark:text-sky-400",
+          valCls: "text-sky-700 dark:text-sky-300",
+        },
+        {
+          id: "female",
+          label: "Female",
+          value: Math.max(1, Math.round(3991 * scopeScale)).toLocaleString(),
+          sub: "62.0% of Total",
+          box: "bg-pink-500/10 border-pink-500/20",
+          titleCls: "text-pink-600 dark:text-pink-400",
+          valCls: "text-pink-700 dark:text-pink-300",
+        },
+        {
+          id: "confirmed",
+          label: "Confirmed",
+          value: Math.max(1, Math.round(5790 * scopeScale)).toLocaleString(),
+          sub: "Permanent staff",
+          box: "bg-emerald-500/10 border-emerald-500/20",
+          titleCls: "text-emerald-600 dark:text-emerald-400",
+          valCls: "text-emerald-700 dark:text-emerald-300",
+        },
+        {
+          id: "probation",
+          label: "Probation",
+          value: Math.max(0, Math.round(647 * scopeScale)).toLocaleString(),
+          sub: "Under 3-6m review",
+          box: "bg-cyan-500/10 border-cyan-500/20",
+          titleCls: "text-cyan-600 dark:text-cyan-400",
+          valCls: "text-cyan-700 dark:text-cyan-300",
+        },
+        {
+          id: "terminated",
+          label: "Terminated",
+          value: Math.max(0, Math.round(11 * scopeScale)).toLocaleString(),
+          sub: "Disciplinary",
+          box: "bg-red-500/10 border-red-500/20",
+          titleCls: "text-red-600 dark:text-red-400",
+          valCls: "text-red-700 dark:text-red-300",
+        },
+        {
+          id: "retired",
+          label: "Retired",
+          value: Math.max(0, Math.round(4 * scopeScale)).toLocaleString(),
+          sub: "Superannuation",
+          box: "bg-violet-500/10 border-violet-500/20",
+          titleCls: "text-violet-600 dark:text-violet-400",
+          valCls: "text-violet-700 dark:text-violet-300",
+        },
+      ];
+      const filteredInfoChips = orderByChips(infoChips);
+
+      return (
+        <div className={getMetricGridClass(colSpan, Math.max(1, filteredInfoChips.length))}>
+          {filteredInfoChips.map((c) => (
+            <div key={c.id} className={`p-3 rounded-xl border ${c.box}`}>
+              <span className={`text-[10.5px] font-bold uppercase tracking-wider block truncate ${c.titleCls}`}>
+                {c.label}
+              </span>
+              <div className={`text-xl sm:text-2xl font-black font-mono mt-1 ${c.valCls}`}>{c.value}</div>
+              <div className="text-[10px] text-muted-foreground font-medium mt-1 truncate">{c.sub}</div>
             </div>
           ))}
         </div>
@@ -986,14 +1336,8 @@ function renderWidgetContent(
                       `${val} Hours`,
                       name === "requisition" ? "OT Requisition (Approved)" : "Actual Consumed (Punch)",
                     ]}
-                    contentStyle={{
-                      backgroundColor: "#1e293b",
-                      borderColor: "#334155",
-                      borderRadius: "8px",
-                      fontSize: "11px",
-                      color: "#fff",
-                    }}
-                  />
+                    contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                   labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
                   <Legend
                     verticalAlign="top"
                     height={24}
@@ -1030,13 +1374,13 @@ function renderWidgetContent(
         unutilized: number;
         rate: number;
       }> = [
-        { name: "Sewing L-01", requisition: 2800, utilized: 2680, unutilized: 120, rate: 95.7 },
-        { name: "Sewing L-02", requisition: 2750, utilized: 2620, unutilized: 130, rate: 95.3 },
-        { name: "Sewing L-03", requisition: 2500, utilized: 2450, unutilized: 50, rate: 98.0 },
-        { name: "Sewing L-04", requisition: 2400, utilized: 2210, unutilized: 190, rate: 92.1 },
-        { name: "Cutting Sec", requisition: 2350, utilized: 2210, unutilized: 140, rate: 94.0 },
-        { name: "Finishing", requisition: 2000, utilized: 1750, unutilized: 250, rate: 87.5 },
-      ];
+          { name: "Sewing L-01", requisition: 2800, utilized: 2680, unutilized: 120, rate: 95.7 },
+          { name: "Sewing L-02", requisition: 2750, utilized: 2620, unutilized: 130, rate: 95.3 },
+          { name: "Sewing L-03", requisition: 2500, utilized: 2450, unutilized: 50, rate: 98.0 },
+          { name: "Sewing L-04", requisition: 2400, utilized: 2210, unutilized: 190, rate: 92.1 },
+          { name: "Cutting Sec", requisition: 2350, utilized: 2210, unutilized: 140, rate: 94.0 },
+          { name: "Finishing", requisition: 2000, utilized: 1750, unutilized: 250, rate: 87.5 },
+        ];
 
       if (scope === "personal") {
         reqHours = 20.0;
@@ -1203,13 +1547,12 @@ function renderWidgetContent(
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-semibold text-foreground">{row.name}</span>
                     <span
-                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                        row.rate >= 95
-                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                          : row.rate >= 90
+                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${row.rate >= 95
+                        ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                        : row.rate >= 90
                           ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
                           : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
-                      }`}
+                        }`}
                     >
                       {row.rate.toFixed(1)}% Rate
                     </span>
@@ -1245,17 +1588,11 @@ function renderWidgetContent(
                       name === "requisition"
                         ? "OT Requisition (Approved Budget)"
                         : name === "utilized"
-                        ? "Floor Utilized (Productive Output)"
-                        : "Idle / Unutilized (Saved)",
+                          ? "Floor Utilized (Productive Output)"
+                          : "Idle / Unutilized (Saved)",
                     ]}
-                    contentStyle={{
-                      backgroundColor: "#1e293b",
-                      borderColor: "#334155",
-                      borderRadius: "8px",
-                      fontSize: "11px",
-                      color: "#fff",
-                    }}
-                  />
+                    contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                   labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
                   <Legend
                     verticalAlign="top"
                     height={26}
@@ -1264,8 +1601,8 @@ function renderWidgetContent(
                         {val === "requisition"
                           ? "Requisition (Approved)"
                           : val === "utilized"
-                          ? "Floor Utilized"
-                          : "Idle / Unutilized"}
+                            ? "Floor Utilized"
+                            : "Idle / Unutilized"}
                       </span>
                     )}
                   />
@@ -1364,14 +1701,8 @@ function renderWidgetContent(
                   <Tooltip
                     formatter={(val: any) => [`${Number(val).toLocaleString()} Staff`, "Manpower"]}
                     labelFormatter={(_, payload) => payload?.[0]?.payload?.dept || ""}
-                    contentStyle={{
-                      backgroundColor: "#1e293b",
-                      borderColor: "#ef4444",
-                      borderRadius: "8px",
-                      fontSize: "11px",
-                      color: "#fff",
-                    }}
-                  />
+                    contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                   labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
                   <Bar dataKey="count" radius={[3, 3, 0, 0]} maxBarSize={26}>
                     <LabelList
                       dataKey="count"
@@ -1472,14 +1803,8 @@ function renderWidgetContent(
                 <YAxis tick={{ fontSize: 9.5 }} />
                 <Tooltip
                   formatter={(_, __, item) => [`৳${Number(item?.payload?.displayVal ?? 0).toLocaleString()}`, item?.payload?.name]}
-                  contentStyle={{
-                    backgroundColor: "#1e293b",
-                    borderColor: "#ef4444",
-                    borderRadius: "8px",
-                    fontSize: "11px",
-                    color: "#fff",
-                  }}
-                />
+                  contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                 labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
                 <Bar dataKey="amount" radius={[4, 4, 0, 0]} maxBarSize={42}>
                   <LabelList
                     dataKey="displayVal"
@@ -1534,24 +1859,24 @@ function renderWidgetContent(
       const reqActualData = [
         ...(isChipVisible("mp_summary")
           ? [
-              { name: "Actual MP", value: actualMp, displayVal: actualMp, color: "#16a34a", unit: "MP" },
-              { name: "Requested MP", value: reqMp, displayVal: reqMp, color: "#22c55e", unit: "MP" },
-              { name: "Diff MP", value: Math.abs(diffMp), displayVal: diffMp, color: "#dc2626", unit: "MP" },
-            ]
+            { name: "Actual MP", value: actualMp, displayVal: actualMp, color: "#16a34a", unit: "MP" },
+            { name: "Requested MP", value: reqMp, displayVal: reqMp, color: "#22c55e", unit: "MP" },
+            { name: "Diff MP", value: Math.abs(diffMp), displayVal: diffMp, color: "#dc2626", unit: "MP" },
+          ]
           : []),
         ...(isChipVisible("hr_summary")
           ? [
-              { name: "Actual OT Hr", value: actualHr, displayVal: actualHr, color: "#ea580c", unit: "Hrs" },
-              { name: "Requested OT Hr", value: reqHr, displayVal: reqHr, color: "#f97316", unit: "Hrs" },
-              { name: "Diff OT Hr", value: Math.abs(diffHr), displayVal: diffHr, color: "#dc2626", unit: "Hrs" },
-            ]
+            { name: "Actual OT Hr", value: actualHr, displayVal: actualHr, color: "#ea580c", unit: "Hrs" },
+            { name: "Requested OT Hr", value: reqHr, displayVal: reqHr, color: "#f97316", unit: "Hrs" },
+            { name: "Diff OT Hr", value: Math.abs(diffHr), displayVal: diffHr, color: "#dc2626", unit: "Hrs" },
+          ]
           : []),
         ...(isChipVisible("amt_summary")
           ? [
-              { name: "Actual OT Amt", value: actualAmt, displayVal: actualAmt, color: "#0284c7", unit: "৳" },
-              { name: "Requested OT Amt", value: reqAmt, displayVal: reqAmt, color: "#0ea5e9", unit: "৳" },
-              { name: "Diff OT Amt", value: Math.abs(diffAmt), displayVal: diffAmt, color: "#dc2626", unit: "৳" },
-            ]
+            { name: "Actual OT Amt", value: actualAmt, displayVal: actualAmt, color: "#0284c7", unit: "৳" },
+            { name: "Requested OT Amt", value: reqAmt, displayVal: reqAmt, color: "#0ea5e9", unit: "৳" },
+            { name: "Diff OT Amt", value: Math.abs(diffAmt), displayVal: diffAmt, color: "#dc2626", unit: "৳" },
+          ]
           : []),
       ];
 
@@ -1612,14 +1937,8 @@ function renderWidgetContent(
                     const p = item?.payload;
                     return [`${Number(p?.displayVal ?? 0).toLocaleString()} ${p?.unit || ""}`, p?.name];
                   }}
-                  contentStyle={{
-                    backgroundColor: "#1e293b",
-                    borderColor: "#334155",
-                    borderRadius: "8px",
-                    fontSize: "11px",
-                    color: "#fff",
-                  }}
-                />
+                  contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                 labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
                 <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={36}>
                   <LabelList
                     dataKey="displayVal"
@@ -1647,84 +1966,109 @@ function renderWidgetContent(
       const areasList = settings?.areas || ["Dhaka North / Gazipur"];
       const deptsList = settings?.departments || settings?.managedDepartments || (settings?.department ? [settings.department] : ["Sewing Floor", "Cutting Unit"]);
 
-      let rawPie: Array<{ chipId: string; name: string; value: number; color: string; unit?: string }> = [];
+      let rawPie: Array<{ id: string; name: string; value: number; color: string; unit?: string }> = [];
       let pieSubTitle = "";
+
+      const pieScale =
+        scope === "personal"
+          ? 0.01
+          : scope === "area"
+            ? Math.min(1, Math.max(0.28, areasList.length / 3))
+            : scope === "managed_depts" || scope === "department"
+              ? Math.min(1, Math.max(0.22, deptsList.length / 6))
+              : 1;
 
       if (scope === "personal") {
         rawPie = [
-          { chipId: "present", name: "My Present Days", value: 21, color: "#10b981", unit: "Days" },
-          { chipId: "absent", name: "Weekends / Off", value: 8, color: "#3b82f6", unit: "Days" },
-          { chipId: "leave", name: "Approved Leave", value: 1, color: "#8b5cf6", unit: "Days" },
-          { chipId: "late", name: "Late Entry", value: 1, color: "#f59e0b", unit: "Days" },
-        ];
-      } else if (scope === "area") {
-        const factor = Math.min(1, Math.max(0.28, areasList.length / 3));
-        pieSubTitle = areasList.length > 1 ? `${areasList.length} Areas` : areasList[0];
-        rawPie = [
-          { chipId: "present", name: "Present", value: Math.round(1196 * factor), color: "#10b981" },
-          { chipId: "absent", name: "Absent", value: Math.round(42 * factor), color: "#f43f5e" },
-          { chipId: "late", name: "Late Entry", value: Math.round(73 * factor), color: "#f59e0b" },
-          { chipId: "leave", name: "Leave", value: Math.round(10 * factor), color: "#8b5cf6" },
-        ];
-      } else if (scope === "managed_depts" || scope === "department") {
-        const factor = Math.min(1, Math.max(0.22, deptsList.length / 6));
-        pieSubTitle = deptsList.length > 1 ? `${deptsList.length} Departments` : deptsList[0];
-        rawPie = [
-          { chipId: "present", name: "Present", value: Math.round(1196 * factor), color: "#10b981" },
-          { chipId: "absent", name: "Absent", value: Math.round(42 * factor), color: "#f43f5e" },
-          { chipId: "late", name: "Late Entry", value: Math.round(73 * factor), color: "#f59e0b" },
-          { chipId: "leave", name: "Leave", value: Math.round(10 * factor), color: "#8b5cf6" },
+          { id: "present", name: "My Present Days", value: 21, color: "#10b981", unit: "Days" },
+          { id: "absent", name: "Absent", value: 0, color: "#f43f5e", unit: "Days" },
+          { id: "leave", name: "Approved Leave", value: 1, color: "#8b5cf6", unit: "Days" },
+          { id: "late", name: "Late Entry", value: 1, color: "#f59e0b", unit: "Days" },
+          { id: "holiday", name: "Holiday / Off", value: 8, color: "#3b82f6", unit: "Days" },
+          { id: "early_leave", name: "Early Departure", value: 0, color: "#64748b", unit: "Days" },
+          { id: "ml", name: "ML", value: 0, color: "#ec4899", unit: "Days" },
+          { id: "weekend_duty", name: "Weekend Duty", value: 1, color: "#06b6d4", unit: "Days" },
         ];
       } else {
+        if (scope === "area") {
+          pieSubTitle = areasList.length > 1 ? `${areasList.length} Areas` : areasList[0];
+        } else if (scope === "managed_depts" || scope === "department") {
+          pieSubTitle = deptsList.length > 1 ? `${deptsList.length} Departments` : deptsList[0];
+        }
         rawPie = [
-          { chipId: "present", name: "Present", value: 1196, color: "#10b981" },
-          { chipId: "absent", name: "Absent", value: 42, color: "#f43f5e" },
-          { chipId: "late", name: "Late Entry", value: 73, color: "#f59e0b" },
-          { chipId: "leave", name: "Leave", value: 10, color: "#8b5cf6" },
+          { id: "present", name: "Present", value: Math.round(1196 * pieScale), color: "#10b981" },
+          { id: "absent", name: "Absent", value: Math.round(42 * pieScale), color: "#f43f5e" },
+          { id: "late", name: "Late Entry", value: Math.round(73 * pieScale), color: "#f59e0b" },
+          { id: "leave", name: "On Leave", value: Math.round(10 * pieScale), color: "#8b5cf6" },
+          { id: "holiday", name: "Holiday", value: Math.round(112 * pieScale), color: "#3b82f6" },
+          { id: "early_leave", name: "Early Departure", value: Math.round(16 * pieScale), color: "#64748b" },
+          { id: "ml", name: "ML", value: Math.round(38 * pieScale), color: "#ec4899" },
+          { id: "weekend_duty", name: "Weekend Duty", value: Math.round(48 * pieScale), color: "#06b6d4" },
         ];
       }
 
-      const filteredPie = rawPie.filter((d) => isChipVisible(d.chipId));
-      const pieData = filteredPie.length > 0 ? filteredPie : rawPie;
+      const pieData = orderByChips(rawPie);
+
+      const totalPieVal = pieData.reduce((acc, item) => acc + item.value, 0);
+      const presentEntry = pieData.find((d) => d.id === "present") || pieData[0];
+      const presentPct = totalPieVal > 0 && presentEntry ? Math.round((presentEntry.value / totalPieVal) * 100) : 0;
 
       return (
         <div className={pieLayoutClass}>
-          <div className={pieChartClass}>
+          <div className={`${pieChartClass} relative flex items-center justify-center`}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={pieData}
-                  innerRadius={colSpan <= 3 ? 34 : 42}
-                  outerRadius={colSpan <= 3 ? 54 : 65}
+                  innerRadius={colSpan <= 3 ? 36 : 46}
+                  outerRadius={colSpan <= 3 ? 54 : 66}
                   paddingAngle={4}
                   dataKey="value"
+                  stroke="none"
                 >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${entry.chipId}-${index}`} fill={entry.color} />
+                    <Cell key={`cell-${entry.id}-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip
                   formatter={(val: any, name: any) => [`${val}`, name]}
-                  contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
-                />
+                  contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                 labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
               </PieChart>
             </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-xl font-extrabold text-foreground leading-none">{presentPct}%</span>
+              <span className="text-[8.5px] uppercase tracking-wider font-bold text-muted-foreground mt-0.5">Present</span>
+            </div>
           </div>
           <div className={pieLegendClass}>
             {pieSubTitle && (
               <div className="text-[10.5px] font-bold text-primary mb-1 truncate">{pieSubTitle}</div>
             )}
-            {pieData.map((d) => (
-              <div key={d.chipId} className="flex items-center justify-between p-1.5 rounded-lg bg-muted/20">
-                <div className="flex items-center gap-1.5">
-                  <div className="size-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                  <span className="text-muted-foreground font-medium text-[11px]">{d.name}</span>
+            {pieData.map((d) => {
+              const pct = totalPieVal > 0 ? Math.round((d.value / totalPieVal) * 100) : 0;
+              return (
+                <div
+                  key={d.id}
+                  className="flex items-center justify-between px-2.5 py-1.5 rounded-xl border transition-colors"
+                  style={{
+                    backgroundColor: `${d.color}0d`,
+                    borderColor: `${d.color}22`,
+                  }}
+                >
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                    <span className="text-foreground font-bold text-[10.5px] truncate">{d.name}</span>
+                  </div>
+                  <span className="text-[11px] font-black shrink-0" style={{ color: d.color }}>
+                    {pct}%{" "}
+                    <span className="text-[9px] text-muted-foreground font-medium">
+                      ({d.value.toLocaleString()}{d.unit ? ` ${d.unit}` : ""})
+                    </span>
+                  </span>
                 </div>
-                <span className="font-mono font-bold text-foreground text-[11px]">
-                  {d.value.toLocaleString()}{d.unit ? ` ${d.unit}` : ""}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       );
@@ -1752,7 +2096,7 @@ function renderWidgetContent(
                       <Cell key={`cell-late-self-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_CONTENT_STYLE}  labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -1792,8 +2136,8 @@ function renderWidgetContent(
                   </Pie>
                   <Tooltip
                     formatter={(val: any) => [`${val} staff`, deptTitle]}
-                    contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
-                  />
+                    contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                   labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -1832,8 +2176,8 @@ function renderWidgetContent(
                   </Pie>
                   <Tooltip
                     formatter={(val: any) => [`${val} staff`, deptName]}
-                    contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
-                  />
+                    contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                   labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -1868,7 +2212,7 @@ function renderWidgetContent(
                     <Cell key={`cell-late-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }} />
+                <Tooltip contentStyle={CHART_TOOLTIP_CONTENT_STYLE}  labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -1884,99 +2228,15 @@ function renderWidgetContent(
       );
 
     case "hr_ot_bar_chart": {
-      if (scope === "personal") {
-        const myOtData = [
-          { day: "Sat", hours: 2.5 },
-          { day: "Sun", hours: 2.0 },
-          { day: "Mon", hours: 3.0 },
-          { day: "Tue", hours: 2.0 },
-          { day: "Wed", hours: 3.5 },
-          { day: "Thu", hours: 2.0 },
-          { day: "Fri", hours: 1.5 },
-        ];
-        return (
-          <div className="h-44 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={myOtData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                <XAxis dataKey="day" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip
-                  formatter={(val: any) => [`${val} hrs logged`, "My Overtime"]}
-                  contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
-                />
-                <Bar dataKey="hours" fill="#06b6d4" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        );
-      }
+      const deptsList = settings?.departments || settings?.managedDepartments || (settings?.department ? [settings.department] : ["Sewing Floor", "Cutting Unit"]);
+      const scopeScale =
+        scope === "personal"
+          ? 0.005
+          : scope === "managed_depts" || scope === "department"
+          ? Math.min(1, Math.max(0.25, deptsList.length / 6))
+          : 1;
 
-      if (scope === "managed_depts") {
-        const managed = settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
-        const mOtData = [
-          { day: "Sat", hours: 420, cost: 58000 },
-          { day: "Sun", hours: 480, cost: 66000 },
-          { day: "Mon", hours: 510, cost: 71000 },
-          { day: "Tue", hours: 460, cost: 64000 },
-          { day: "Wed", hours: 530, cost: 74000 },
-          { day: "Thu", hours: 440, cost: 61000 },
-          { day: "Fri", hours: 180, cost: 25000 },
-        ];
-        return (
-          <div className="h-44 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={mOtData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                <XAxis dataKey="day" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip
-                  formatter={(val: any, name: any) => [
-                    name === "hours" ? `${val} hrs` : `৳${val.toLocaleString()}`,
-                    `Head (${managed.map((m) => m.split(" ")[0]).join(" & ")}) OT`,
-                  ]}
-                  contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
-                />
-                <Bar dataKey="hours" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        );
-      }
-
-      if (scope === "department") {
-        const deptName = settings?.department || "Sewing Floor";
-        const deptOtData = [
-          { day: "Sat", hours: 240, cost: 33000 },
-          { day: "Sun", hours: 320, cost: 44000 },
-          { day: "Mon", hours: 310, cost: 42000 },
-          { day: "Tue", hours: 340, cost: 47000 },
-          { day: "Wed", hours: 290, cost: 40000 },
-          { day: "Thu", hours: 350, cost: 49000 },
-          { day: "Fri", hours: 160, cost: 22000 },
-        ];
-        return (
-          <div className="h-44 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={deptOtData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                <XAxis dataKey="day" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip
-                  formatter={(val: any, name: any) => [
-                    name === "hours" ? `${val} hrs` : `৳${val.toLocaleString()}`,
-                    `${deptName} OT`,
-                  ]}
-                  contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
-                />
-                <Bar dataKey="hours" fill="#a855f7" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        );
-      }
-
-      const otData = [
+      const baseOtData = [
         { day: "Sat", hours: 420, cost: 58000 },
         { day: "Sun", hours: 610, cost: 84000 },
         { day: "Mon", hours: 580, cost: 79000 },
@@ -1985,20 +2245,79 @@ function renderWidgetContent(
         { day: "Thu", hours: 680, cost: 95000 },
         { day: "Fri", hours: 320, cost: 44000 },
       ];
+
+      const otData =
+        scope === "personal"
+          ? [
+              { day: "Sat", hours: 2.5, cost: 625, costK: 0.63 },
+              { day: "Sun", hours: 2.0, cost: 500, costK: 0.5 },
+              { day: "Mon", hours: 3.0, cost: 750, costK: 0.75 },
+              { day: "Tue", hours: 2.0, cost: 500, costK: 0.5 },
+              { day: "Wed", hours: 3.5, cost: 875, costK: 0.88 },
+              { day: "Thu", hours: 2.0, cost: 500, costK: 0.5 },
+              { day: "Fri", hours: 1.5, cost: 375, costK: 0.38 },
+            ]
+          : baseOtData.map((d) => {
+              const hrs = Math.round(d.hours * scopeScale);
+              const amt = Math.round(d.cost * scopeScale);
+              return {
+                day: d.day,
+                hours: hrs,
+                cost: amt,
+                costK: Number((amt / 1000).toFixed(1)),
+              };
+            });
+
+      const totalHrs = otData.reduce((s, d) => s + d.hours, 0);
+      const totalCost = otData.reduce((s, d) => s + d.cost, 0);
+
       return (
-        <div className="h-44 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={otData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-              <XAxis dataKey="day" tick={{ fontSize: 10 }} />
-              <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip
-                formatter={(val: any, name: any) => [name === "hours" ? `${val} hrs` : `৳${val.toLocaleString()}`, name === "hours" ? "OT Hours" : "Cost"]}
-                contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }}
-              />
-              <Bar dataKey="hours" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="space-y-2.5">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="p-2 rounded-xl bg-violet-500/10 border border-violet-500/20">
+              <div className="text-[10px] font-bold text-violet-600 uppercase">Total OT Hours</div>
+              <div className="text-base font-black font-mono text-foreground">
+                {totalHrs.toLocaleString()} <span className="text-[10px] font-semibold text-muted-foreground">hrs</span>
+              </div>
+            </div>
+            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <div className="text-[10px] font-bold text-emerald-600 uppercase">Total OT Amount</div>
+              <div className="text-base font-black font-mono text-emerald-600 dark:text-emerald-400">
+                ৳{totalCost.toLocaleString()}
+              </div>
+            </div>
+          </div>
+
+          <div className="h-44 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={otData} margin={{ top: 10, right: 6, left: -16, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="day" tick={{ fontSize: 10 }} />
+                <YAxis yAxisId="left" tick={{ fontSize: 9.5 }} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 9.5 }} tickFormatter={(v) => `৳${v}K`} />
+                <Tooltip
+                  cursor={{ fill: "rgba(99, 102, 241, 0.06)" }}
+                  formatter={(val: any, name: any, item: any) => {
+                    if (name === "hours") return [`${val} hrs`, "OT Hours"];
+                    return [`৳${Number(item?.payload?.cost ?? 0).toLocaleString()}`, "OT Amount"];
+                  }}
+                  contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                  labelStyle={{ color: "#0f172a", fontWeight: 700, marginBottom: "2px" }}
+                 itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
+                <Legend
+                  verticalAlign="top"
+                  height={22}
+                  formatter={(val) => (
+                    <span className="text-[10px] font-bold text-muted-foreground">
+                      {val === "hours" ? "OT Hours" : "OT Amount (৳)"}
+                    </span>
+                  )}
+                />
+                <Bar yAxisId="left" dataKey="hours" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="hours" />
+                <Bar yAxisId="right" dataKey="costK" fill="#10b981" radius={[4, 4, 0, 0]} name="costK" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       );
     }
@@ -2054,7 +2373,7 @@ function renderWidgetContent(
               <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
               <XAxis dataKey="month" tick={{ fontSize: 10 }} />
               <YAxis domain={["dataMin - 100", "dataMax + 50"]} tick={{ fontSize: 10 }} />
-              <Tooltip contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }} />
+              <Tooltip contentStyle={CHART_TOOLTIP_CONTENT_STYLE}  labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
               <Area type="monotone" dataKey="count" stroke={strokeColor} strokeWidth={2.5} fillOpacity={1} fill="url(#hcGrad)" name={trendLabel} />
             </AreaChart>
           </ResponsiveContainer>
@@ -2206,31 +2525,872 @@ function renderWidgetContent(
         </div>
       );
 
-    case "hr_recruitment_pipeline":
+    case "hr_recruitment_pipeline": {
+      const isYearly = settings?.period === "year";
       return (
         <div className={getMetricGridClass(colSpan, 4)}>
           <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-center">
-            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">Openings</span>
-            <span className="text-xl font-mono font-bold text-foreground mt-1 block">18</span>
-            <span className="text-[10px] text-muted-foreground">Requisitions</span>
+            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">
+              {isYearly ? "Yearly Openings" : "Openings"}
+            </span>
+            <span className="text-xl font-mono font-bold text-foreground mt-1 block">
+              {isYearly ? "186" : "18"}
+            </span>
+            <span className="text-[10px] text-muted-foreground">
+              {isYearly ? "FY 2026 Requisitions" : "Requisitions"}
+            </span>
           </div>
           <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-center">
-            <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wider block">Screening</span>
-            <span className="text-xl font-mono font-bold text-foreground mt-1 block">142</span>
-            <span className="text-[10px] text-muted-foreground">CVs In-Review</span>
+            <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wider block">
+              {isYearly ? "Screened (YTD)" : "Screening"}
+            </span>
+            <span className="text-xl font-mono font-bold text-foreground mt-1 block">
+              {isYearly ? "1,480" : "142"}
+            </span>
+            <span className="text-[10px] text-muted-foreground">CVs Reviewed</span>
           </div>
           <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center">
-            <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider block">Interview</span>
-            <span className="text-xl font-mono font-bold text-foreground mt-1 block">24</span>
-            <span className="text-[10px] text-muted-foreground">This Week</span>
+            <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider block">
+              {isYearly ? "Interviewed (YTD)" : "Interview"}
+            </span>
+            <span className="text-xl font-mono font-bold text-foreground mt-1 block">
+              {isYearly ? "340" : "24"}
+            </span>
+            <span className="text-[10px] text-muted-foreground">
+              {isYearly ? "Full Year" : "This Week"}
+            </span>
           </div>
           <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
-            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block">Offered</span>
-            <span className="text-xl font-mono font-bold text-foreground mt-1 block">6</span>
-            <span className="text-[10px] text-muted-foreground">Accepted</span>
+            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block">
+              {isYearly ? "Hired (YTD)" : "Offered"}
+            </span>
+            <span className="text-xl font-mono font-bold text-foreground mt-1 block">
+              {isYearly ? "142" : "6"}
+            </span>
+            <span className="text-[10px] text-muted-foreground">
+              {isYearly ? "94.2% Joined" : "Accepted"}
+            </span>
           </div>
         </div>
       );
+    }
+
+    case "hr_requisitions_summary": {
+      const deptsList = settings?.departments || settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
+      const scale =
+        scope === "personal"
+          ? 0.02
+          : scope === "managed_depts" || scope === "department"
+          ? Math.min(1, Math.max(0.25, deptsList.length / 6))
+          : 1;
+
+      const reqChips = orderByChips([
+        {
+          id: "total_req",
+          label: "Total Requisitions",
+          value: Math.max(1, Math.round(1248 * scale)).toLocaleString(),
+          badge: "+12.5%",
+          badgeCls: "text-emerald-500",
+          valCls: "text-foreground",
+          iconBg: "bg-indigo-500/10 text-indigo-500",
+          icon: <FileCheck size={16} />,
+          href: "/ssp-my-requisition",
+        },
+        {
+          id: "pending_req",
+          label: "Pending Requisitions",
+          value: Math.max(0, Math.round(42 * scale)).toLocaleString(),
+          badge: "+4.2%",
+          badgeCls: "text-rose-500",
+          valCls: "text-amber-500",
+          iconBg: "bg-amber-500/10 text-amber-500",
+          icon: <AlertCircle size={16} />,
+          href: "/pending-approvals",
+        },
+        {
+          id: "unread_msg",
+          label: "Unread Messages",
+          value: scope === "personal" ? "5" : Math.max(1, Math.round(18 * scale)).toString(),
+          badge: "New",
+          badgeCls: "text-muted-foreground",
+          valCls: "text-foreground",
+          iconBg: "bg-blue-500/10 text-blue-500",
+          icon: <MessageCircle size={16} />,
+          pulse: true,
+          href: "/messenger",
+        },
+        {
+          id: "my_req_pending",
+          label: "My Requisition Pending",
+          value: scope === "personal" ? "8" : Math.max(1, Math.round(12 * scale)).toString(),
+          badge: "Awaiting",
+          badgeCls: "text-amber-600",
+          valCls: "text-amber-600 dark:text-amber-400",
+          iconBg: "bg-orange-500/10 text-orange-500",
+          icon: <Clock size={16} />,
+          href: "/ssp-my-requisition",
+        },
+        {
+          id: "my_app_pending",
+          label: "My Approval Pending",
+          value: scope === "personal" ? "14" : Math.max(2, Math.round(19 * scale)).toString(),
+          badge: "Action Needed",
+          badgeCls: "text-indigo-600",
+          valCls: "text-indigo-600 dark:text-indigo-400",
+          iconBg: "bg-purple-500/10 text-purple-500",
+          icon: <CheckCircle2 size={16} />,
+          href: "/pending-approvals",
+        },
+        {
+          id: "approved_req",
+          label: "Approved Requisitions",
+          value: Math.max(1, Math.round(1184 * scale)).toLocaleString(),
+          badge: "94.9%",
+          badgeCls: "text-emerald-600",
+          valCls: "text-emerald-600 dark:text-emerald-400",
+          iconBg: "bg-emerald-500/10 text-emerald-500",
+          icon: <CheckCircle2 size={16} />,
+          href: "/all-approvals",
+        },
+      ]);
+
+      const reqGridCls = colSpan <= 4 ? "grid grid-cols-1 gap-1.5 py-0.5" : getMetricGridClass(colSpan, Math.max(1, reqChips.length));
+
+      return (
+        <div className={reqGridCls}>
+          {reqChips.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => {
+                window.location.href = c.href;
+              }}
+              className="w-full text-left px-3 py-2 rounded-xl border border-border/80 bg-card shadow-2xs flex items-center justify-between gap-2.5 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer group/req"
+            >
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold text-muted-foreground group-hover/req:text-primary uppercase tracking-wider truncate transition-colors">
+                  {c.label}
+                </p>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className={`${colSpan <= 4 ? "text-lg" : "text-2xl"} font-extrabold ${c.valCls}`}>{c.value}</span>
+                  <span className={`text-[9.5px] font-bold ${c.badgeCls}`}>{c.badge}</span>
+                </div>
+              </div>
+              <div className={`w-8 h-8 rounded-lg ${c.iconBg} flex items-center justify-center relative shrink-0`}>
+                {c.icon}
+                {c.pulse && (
+                  <span className="absolute -top-0.5 -right-0.5 size-2 bg-red-500 border border-card rounded-full animate-pulse" />
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    case "hr_ontime_vs_late_chart": {
+      const deptsList = settings?.departments || settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
+      const scale =
+        scope === "personal"
+          ? 0.22
+          : scope === "managed_depts" || scope === "department"
+          ? Math.min(1, Math.max(0.3, deptsList.length / 6))
+          : 1;
+
+      const ontimeData = [
+        { month: "Jan", onTime: Math.round(95 * scale), late: Math.round(12 * scale) },
+        { month: "Feb", onTime: Math.round(98 * scale), late: Math.round(8 * scale) },
+        { month: "Mar", onTime: Math.round(92 * scale), late: Math.round(15 * scale) },
+        { month: "Apr", onTime: Math.round(99 * scale), late: Math.round(5 * scale) },
+        { month: "May", onTime: Math.round(102 * scale), late: Math.round(10 * scale) },
+        { month: "Jun", onTime: Math.round(94 * scale), late: Math.round(14 * scale) },
+      ];
+
+      return (
+        <div className="h-[220px] w-full text-xs">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={ontimeData} margin={{ top: 8, right: 6, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 10 }} dy={6} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 10 }} />
+              <Tooltip
+                cursor={{ fill: "rgba(99, 102, 241, 0.05)" }}
+                contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+               labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
+              {isChipVisible("ontime") && <Bar dataKey="onTime" name="On Time" fill="#10b981" radius={[4, 4, 0, 0]} barSize={12} />}
+              {isChipVisible("late") && <Bar dataKey="late" name="Late" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={12} />}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      );
+    }
+
+    case "hr_leave_balance_card": {
+      const leaveItems = orderByChips([
+        { id: "casual", name: "Casual Leave", left: 7, total: 10, used: 3, pct: 70, bgCls: "bg-blue-500/5 border-blue-500/10", txtCls: "text-blue-600 dark:text-blue-400", ringCls: "text-blue-500" },
+        { id: "sick", name: "Sick Leave", left: 12, total: 14, used: 2, pct: 86, bgCls: "bg-emerald-500/5 border-emerald-500/10", txtCls: "text-emerald-600 dark:text-emerald-400", ringCls: "text-emerald-500" },
+        { id: "earned", name: "Earned Leave", left: 18, total: 18, used: 0, pct: 100, bgCls: "bg-amber-500/5 border-amber-500/10", txtCls: "text-amber-600 dark:text-amber-400", ringCls: "text-amber-500" },
+        { id: "maternity", name: "Maternity", left: 90, total: 90, used: 0, pct: 100, bgCls: "bg-purple-500/5 border-purple-500/10", txtCls: "text-purple-600 dark:text-purple-400", ringCls: "text-purple-500" },
+        { id: "compoff", name: "Comp Off", left: 2, total: 4, used: 2, pct: 50, bgCls: "bg-indigo-500/5 border-indigo-500/10", txtCls: "text-indigo-600 dark:text-indigo-400", ringCls: "text-indigo-500" },
+        { id: "lwp", name: "Without Pay", left: 0, total: 0, used: 5, pct: 0, bgCls: "bg-slate-500/5 border-slate-500/10", txtCls: "text-slate-600 dark:text-slate-400", ringCls: "text-slate-500" },
+      ]);
+      return (
+        <div className="flex flex-col justify-start">
+          <div className="flex items-center justify-between mb-2.5">
+            <p className="text-[10.5px] text-muted-foreground">Scroll horizontally to view all allocations</p>
+            <span className="text-[9.5px] font-bold bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+              {leaveItems.length} Types
+            </span>
+          </div>
+          <div className="flex items-center gap-2.5 overflow-x-auto pb-2">
+            {leaveItems.map((leave) => (
+              <div
+                key={leave.id}
+                className={`p-2.5 rounded-xl border ${leave.bgCls} flex flex-col justify-between items-center text-center w-[125px] min-w-[125px] h-[185px] shrink-0 transition-all duration-200 hover:scale-[1.015] hover:shadow-xs`}
+              >
+                <div className="size-14 flex items-center justify-center relative shrink-0 mt-1">
+                  <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 56 56">
+                    <circle cx="28" cy="28" r="22" stroke="currentColor" strokeWidth="3.5" fill="transparent" className="text-muted-foreground/10" />
+                    <circle
+                      cx="28"
+                      cy="28"
+                      r="22"
+                      stroke="currentColor"
+                      strokeWidth="3.5"
+                      fill="transparent"
+                      strokeDasharray="138.2"
+                      strokeDashoffset={138.2 - (leave.pct / 100) * 138.2}
+                      className={leave.ringCls}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className={`text-[10px] font-extrabold ${leave.txtCls}`}>{leave.pct}%</span>
+                </div>
+                <div className="mt-1 flex-1 flex flex-col justify-center w-full">
+                  <span className={`text-[9.5px] font-black tracking-wider uppercase block ${leave.txtCls} truncate w-full`}>
+                    {leave.name}
+                  </span>
+                  <span className="text-sm font-extrabold text-foreground mt-0.5 block">
+                    {leave.left} <span className="text-[9px] font-normal text-muted-foreground">/ {leave.total}</span>
+                  </span>
+                </div>
+                <div className="mt-1 pt-1.5 border-t border-border/40 w-full flex justify-between text-[8px] font-bold text-muted-foreground">
+                  <span>Left: {leave.left}</span>
+                  <span>Used: {leave.used}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    case "hr_notice_board": {
+      const notices = orderByChips([
+        {
+          id: "holiday",
+          title: "Holiday Notice",
+          category: "HOLIDAY",
+          date: "Aug 16, 2026",
+          circularNo: "PSL/HR/2026/0010",
+          summary: "Pakiza Software Limited issued a holiday notice for an office closure from Wednesday, August 5, 2026, to Saturday.",
+          badgeBg: "bg-rose-500/10 text-rose-600 dark:bg-rose-400/10 dark:text-rose-400",
+        },
+        {
+          id: "meeting",
+          title: "Monthly Performance Review",
+          category: "MEETING",
+          date: "Aug 20, 2026",
+          circularNo: "PSL/HR/2026/0013",
+          summary: "The monthly performance review cycle for August 2026 has been initiated.",
+          badgeBg: "bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400",
+        },
+        {
+          id: "policy",
+          title: "Dress Code Policy Update",
+          category: "POLICY",
+          date: "Aug 18, 2026",
+          circularNo: "PSL/HR/2026/0014",
+          summary: "Updates regarding office dress code policy, effective from September 1, 2026.",
+          badgeBg: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400",
+        },
+      ]);
+      return (
+        <div className="flex flex-col justify-between gap-2.5">
+          <div className="flex items-center justify-between">
+            <p className="text-[10.5px] text-muted-foreground flex items-center gap-1">
+              <Megaphone className="size-3 text-primary" /> Official circulars &amp; announcements
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = "/notice";
+              }}
+              className="text-[10.5px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors cursor-pointer"
+            >
+              View All <ArrowRight size={11} />
+            </button>
+          </div>
+          <div className="space-y-1.5">
+            {notices.map((n) => (
+              <div
+                key={n.id}
+                onClick={() => {
+                  window.location.href = "/notice";
+                }}
+                className="py-1.5 px-2.5 rounded-xl border border-border/40 hover:border-primary/30 bg-muted/10 hover:bg-primary/5 transition-all duration-200 cursor-pointer group/item"
+              >
+                <div className="flex items-center justify-between gap-2 mb-0.5">
+                  <span className={`text-[8px] font-black tracking-wider uppercase px-1.5 py-0.5 rounded ${n.badgeBg}`}>
+                    {n.category}
+                  </span>
+                  <span className="text-[8.5px] font-semibold text-muted-foreground font-mono">{n.date}</span>
+                </div>
+                <h5 className="font-bold text-[11px] text-foreground group-hover/item:text-primary transition-colors leading-tight line-clamp-1">
+                  {n.title}
+                </h5>
+                <p className="text-[9.5px] text-muted-foreground mt-0.5 line-clamp-1 font-medium">{n.summary}</p>
+                <div className="flex items-center justify-between mt-1 pt-1 border-t border-border/20 text-[8.5px] font-bold text-muted-foreground/60">
+                  <span>Ref: {n.circularNo}</span>
+                  <span className="flex items-center gap-0.5 text-primary opacity-0 group-hover/item:opacity-100 transition-opacity">
+                    Read <Eye size={10} />
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = "/notice";
+            }}
+            className="w-full py-1.5 text-xs font-bold rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors text-center shadow-2xs cursor-pointer"
+          >
+            Go to Notice Board
+          </button>
+        </div>
+      );
+    }
+
+    case "hr_messages_feed": {
+      const msgs = orderByChips([
+        {
+          id: "hr_desk",
+          from: "HR Department",
+          time: "10:42 AM",
+          text: "Sarah: Please review the updated policy document.",
+          initials: "HR",
+          avatarBg: "bg-blue-500/10 text-blue-600",
+          unread: true,
+        },
+        {
+          id: "floor_chief",
+          from: "Michael Chen",
+          time: "Yesterday",
+          text: "Are we still on for the 3PM sync?",
+          image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop",
+          statusColor: "bg-emerald-500",
+          unread: false,
+        },
+        {
+          id: "payroll",
+          from: "Alice Smith",
+          time: "Mon",
+          text: "Thanks for sending over the assets!",
+          image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
+          statusColor: "bg-amber-500",
+          unread: false,
+        },
+        {
+          id: "it_support",
+          from: "IT Support",
+          time: "Mon",
+          text: "Ticket #4042 has been marked resolved.",
+          initials: "IT",
+          avatarBg: "bg-purple-500/10 text-purple-600",
+          unread: false,
+        },
+      ]);
+      return (
+        <div className="flex flex-col justify-between gap-2.5">
+          <div className="flex items-center justify-between">
+            <p className="text-[10.5px] text-muted-foreground">Unread and latest conversations</p>
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = "/messenger";
+              }}
+              className="text-[10.5px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors cursor-pointer"
+            >
+              View All <ArrowRight size={11} />
+            </button>
+          </div>
+          <div className="space-y-1.5">
+            {msgs.map((m) => (
+              <div
+                key={m.id}
+                onClick={() => {
+                  window.location.href = "/messenger";
+                }}
+                className="flex items-start gap-2.5 p-1.5 rounded-xl border border-border/40 hover:border-primary/30 bg-muted/10 hover:bg-primary/5 cursor-pointer transition-all duration-200 group/item"
+              >
+                <div className="relative shrink-0">
+                  {m.image ? (
+                    <img
+                      src={m.image}
+                      alt={m.from}
+                      className="w-8 h-8 rounded-full object-cover border-2 border-background shadow-xs"
+                    />
+                  ) : (
+                    <div className={`w-8 h-8 rounded-full ${m.avatarBg} flex items-center justify-center border-2 border-background font-bold text-[10px] shadow-xs`}>
+                      {m.initials}
+                    </div>
+                  )}
+                  {m.unread && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 border border-background rounded-full animate-pulse shadow-xs" />
+                  )}
+                  {m.statusColor && (
+                    <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 ${m.statusColor} border-2 border-background rounded-full shadow-xs`} />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start gap-2">
+                    <h5 className="font-bold text-[11px] text-foreground group-hover/item:text-primary transition-colors truncate">
+                      {m.from}
+                    </h5>
+                    <span className={`text-[8.5px] shrink-0 ${m.unread ? "font-bold text-primary" : "font-semibold text-muted-foreground"}`}>
+                      {m.time}
+                    </span>
+                  </div>
+                  <p className={`text-[10px] mt-0.5 truncate ${m.unread ? "font-bold text-foreground" : "font-medium text-muted-foreground"}`}>
+                    {m.text}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = "/messenger";
+            }}
+            className="w-full py-1.5 text-xs font-bold rounded-lg border border-border bg-primary text-primary-foreground hover:opacity-90 shadow-xs transition-opacity cursor-pointer"
+          >
+            Open Messenger
+          </button>
+        </div>
+      );
+    }
+
+    case "hr_upcoming_events": {
+      const events = orderByChips([
+        {
+          id: "birthdays",
+          title: "Anika's Birthday",
+          date: "Today",
+          cardCls: "border-rose-500/10 bg-rose-500/5",
+          iconBgCls: "bg-rose-500/10 text-rose-500",
+          icon: <Gift size={12} />,
+        },
+        {
+          id: "anniversaries",
+          title: "Jordan Park (5y)",
+          date: "Tomorrow",
+          cardCls: "border-amber-500/10 bg-amber-500/5",
+          iconBgCls: "bg-amber-500/10 text-amber-500",
+          icon: <Briefcase size={12} />,
+        },
+        {
+          id: "interviews",
+          title: "Interview: Sr. PM",
+          date: "Jun 11, 2:00 PM",
+          cardCls: "border-blue-500/10 bg-blue-500/5",
+          iconBgCls: "bg-blue-500/10 text-blue-500",
+          icon: <Users size={12} />,
+        },
+        {
+          id: "holidays",
+          title: "All-hands Meeting",
+          date: "Jun 14, 10:00 AM",
+          cardCls: "border-purple-500/10 bg-purple-500/5",
+          iconBgCls: "bg-purple-500/10 text-purple-500",
+          icon: <Calendar size={12} />,
+        },
+      ]);
+      return (
+        <div className="flex flex-col justify-between gap-3">
+          <div className="flex items-center justify-between">
+            <p className="text-[10.5px] text-muted-foreground">Events &amp; milestones this week</p>
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = "/calendar";
+              }}
+              className="text-[10.5px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors cursor-pointer"
+            >
+              Calendar <ArrowRight size={11} />
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {events.map((ev) => (
+              <div key={ev.id} className={`p-2.5 rounded-xl border ${ev.cardCls} flex items-start gap-2 min-h-[68px]`}>
+                <div className={`mt-0.5 p-1 rounded-lg ${ev.iconBgCls} shrink-0`}>{ev.icon}</div>
+                <div className="min-w-0">
+                  <h5 className="font-bold text-[11px] text-foreground truncate">{ev.title}</h5>
+                  <p className="text-[9.5px] text-muted-foreground font-bold mt-0.5">{ev.date}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = "/calendar";
+            }}
+            className="w-full py-1.5 text-xs font-bold rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors cursor-pointer"
+          >
+            View Full Calendar
+          </button>
+        </div>
+      );
+    }
+
+    case "hr_team_members": {
+      const teamMembers = [
+        { id: "2024049326", group: "sr_exec", name: "Hanif Uddin", role: "Sr. Executive", phone: "01963978074", email: "hanif.inno@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/9caa5b84-6645-47c9-a35f-906ec1002c4d.jpg" },
+        { id: "2026058726", group: "exec", name: "Parvej Mahmud", role: "Executive", phone: "01521205808", email: "parvej.inno@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/b224da2f-32a6-4ab5-b98d-2fa9bddc2faa.jpg" },
+        { id: "2026058686", group: "exec", name: "Md. Abdur Rahaman", role: "Executive", phone: "01531959653", email: "rahaman.inno@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/c32e2945-6433-43f7-835d-fd238617c955.jpg" },
+        { id: "2023043910", group: "managers", name: "Tahmid Afsar", role: "Asst. Manager", phone: "01750021154", email: "tahmid.bd@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg" },
+        { id: "2025054609", group: "jr_exec", name: "Md Mahir Shahriyar", role: "Jr. Executive", phone: "01713060427", email: "", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/b314987a-a621-4906-9a64-2a18104da3e6.jpg" },
+        { id: "2023044078", group: "managers", name: "Md. Anik Islam", role: "Deputy Manager", phone: "01324726844", email: "anik.ba@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/3bc63d43-b2f2-49aa-b0a2-1e7eda819a65.jpg" },
+        { id: "2024049166", group: "sr_exec", name: "MD Maimoon Hossain Shomoy", role: "Sr. Executive", phone: "01796221964", email: "shomoy.inno@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/988bc5ac-552c-48bd-9d6f-cc2329c56d08.jpg" },
+        { id: "2024051510", group: "jr_exec", name: "Md. Sadmanur Islam Shishir", role: "Jr. Executive", phone: "01946432534", email: "shishir.inno@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/e4668770-dddd-4026-b3e6-963fbeedb13a.jpg" },
+        { id: "2025053125", group: "sr_exec", name: "Al Riyad Karim", role: "Sr. Executive", phone: "01732461622", email: "", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/7668c174-80e8-49bf-808f-5b6624c853a0.jpg" },
+        { id: "2025054707", group: "jr_exec", name: "Allama Bakhtiyar Nafis", role: "Jr. Executive", phone: "01724654380", email: "nafis.inno@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/abd4f21d-eb54-4cc6-a197-ca373e4693be.jpg" },
+        { id: "2025054710", group: "jr_exec", name: "Raihan Jami Khan", role: "Jr. Executive", phone: "01786076080", email: "jami.inno@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/93e35c4c-f827-4152-8faa-34ed422a1629.jpg" },
+        { id: "2026059418", group: "jr_exec", name: "Md Robayet Hasan Yeasin", role: "Jr. Executive", phone: "01748570672", email: "yeasin.inno@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/4e73fa2f-e1d4-4b6a-90f8-153d977f9e63.jpg" },
+        { id: "2026059427", group: "jr_exec", name: "Mir Md Moshiu Islam", role: "Jr. Executive", phone: "01898899180", email: "moshiu.inno@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/108e0e41-f8c9-439c-aa94-46a83b263b3a.jpg" },
+        { id: "2026059573", group: "exec", name: "Md. Piyash Hasan", role: "Executive", phone: "01790800372", email: "piyash.inno@pakizasoftware.com", image: "https://bpm.pakizaknit.com/Photo/EmpPicture/0fa2e575-f1e5-4490-9e5b-6b89d039ce10.jpg" },
+        { id: "2026060310", group: "sr_exec", name: "Md. Shahid Hasan", role: "Sr. Executive", phone: "", email: "", image: "https://i.pravatar.cc/150?u=2026060310" },
+      ].filter((m) => isChipVisible(m.group));
+
+      const gridCols =
+        colSpan <= 4
+          ? "grid-cols-1"
+          : colSpan <= 8
+          ? "grid-cols-1 sm:grid-cols-2"
+          : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+
+      return (
+        <div className={`grid ${gridCols} gap-3`}>
+          {teamMembers.map((member) => (
+            <div
+              key={member.id}
+              className="p-3 rounded-xl border border-border/60 bg-card shadow-2xs hover:shadow-sm hover:border-primary/30 transition-all group flex items-center gap-3"
+            >
+              <div className="relative shrink-0">
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-background shadow-2xs"
+                />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-[1.5px] border-background rounded-full" />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-foreground text-[12.5px] truncate group-hover:text-primary transition-colors">
+                  {member.name}
+                </h4>
+                <p className="text-[10px] text-muted-foreground font-medium truncate">
+                  {member.role} <span className="opacity-50 mx-0.5">•</span> {member.id}
+                </p>
+                <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1 truncate">
+                  <Phone size={10} className="text-primary/70 shrink-0" />
+                  {member.phone || "N/A"}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-1 shrink-0">
+                {member.email ? (
+                  <a
+                    href={`mailto:${member.email}`}
+                    title="Send Email"
+                    className="p-1.5 rounded-md bg-muted/50 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors"
+                  >
+                    <Mail size={14} />
+                  </a>
+                ) : (
+                  <div className="p-1.5 rounded-md bg-transparent text-muted-foreground/20 cursor-not-allowed">
+                    <Mail size={14} />
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    case "hr_manpower_budget_vs_onboard": {
+      const deptsList = settings?.departments || settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
+      const scale =
+        scope === "managed_depts" || scope === "department"
+          ? Math.min(1, Math.max(0.25, deptsList.length / 6))
+          : 1;
+
+      const budgetMp = Math.round(6800 * scale);
+      const onboardMp = Math.round(6437 * scale);
+      const vacancyMp = Math.max(0, budgetMp - onboardMp);
+      const fillRate = ((onboardMp / Math.max(1, budgetMp)) * 100).toFixed(1);
+
+      const mpChips = orderByChips([
+        { id: "budget_mp", label: "Budgeted MP", value: budgetMp.toLocaleString(), sub: "Approved Headcount", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-foreground" },
+        { id: "onboard_mp", label: "Actual On-Board", value: onboardMp.toLocaleString(), sub: "Active Employees", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-600 dark:text-emerald-400" },
+        { id: "vacancy", label: "Vacancy / Gap", value: vacancyMp.toLocaleString(), sub: "Open Positions", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-600 dark:text-amber-400" },
+        { id: "fill_rate", label: "Fill Rate", value: `${fillRate}%`, sub: "Target ≥95%", cls: "bg-indigo-500/10 border-indigo-500/20", titleCls: "text-indigo-600", valCls: "text-indigo-600 dark:text-indigo-400" },
+      ]);
+
+      const mpChartData = [
+        { dept: "Sewing", budget: Math.round(3450 * scale), onboard: Math.round(3287 * scale) },
+        { dept: "QC", budget: Math.round(800 * scale), onboard: Math.round(760 * scale) },
+        { dept: "Finishing", budget: Math.round(680 * scale), onboard: Math.round(639 * scale) },
+        { dept: "Wash", budget: Math.round(660 * scale), onboard: Math.round(638 * scale) },
+        { dept: "Cutting", budget: Math.round(410 * scale), onboard: Math.round(383 * scale) },
+        { dept: "Packing", budget: Math.round(220 * scale), onboard: Math.round(197 * scale) },
+      ];
+
+      return (
+        <div className="space-y-3">
+          <div className={getMetricGridClass(colSpan, Math.max(1, mpChips.length))}>
+            {mpChips.map((c) => (
+              <div key={c.id} className={`p-2.5 rounded-xl border ${c.cls}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider block truncate ${c.titleCls}`}>
+                  {c.label}
+                </span>
+                <div className={`text-lg sm:text-xl font-black font-mono mt-0.5 ${c.valCls}`}>{c.value}</div>
+                <div className="text-[10px] text-muted-foreground truncate">{c.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="h-44 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={mpChartData} margin={{ top: 10, right: 8, left: -14, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="dept" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 9.5 }} />
+                <Tooltip
+                  cursor={{ fill: "rgba(59, 130, 246, 0.06)" }}
+                  contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                 labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
+                <Legend
+                  verticalAlign="top"
+                  height={22}
+                  formatter={(val) => (
+                    <span className="text-[10px] font-bold text-muted-foreground">
+                      {val === "budget" ? "Budgeted MP" : "Actual On-Board"}
+                    </span>
+                  )}
+                />
+                <Bar dataKey="budget" fill="#3b82f6" radius={[3, 3, 0, 0]} name="budget" />
+                <Bar dataKey="onboard" fill="#10b981" radius={[3, 3, 0, 0]} name="onboard" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      );
+    }
+
+    case "hr_separation_turnover": {
+      const deptsList = settings?.departments || settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
+      const scale =
+        scope === "managed_depts" || scope === "department"
+          ? Math.min(1, Math.max(0.25, deptsList.length / 6))
+          : 1;
+
+      const resignCnt = Math.max(1, Math.round(84 * scale));
+      const leftyCnt = Math.max(1, Math.round(46 * scale));
+      const termCnt = Math.max(0, Math.round(11 * scale));
+      const retCnt = Math.max(0, Math.round(4 * scale));
+      const totalSep = resignCnt + leftyCnt + termCnt + retCnt;
+
+      const sepChips = orderByChips([
+        { id: "total_sep", label: "Total Separation", value: totalSep.toLocaleString(), sub: "This Month", cls: "bg-rose-500/10 border-rose-500/20", titleCls: "text-rose-600", valCls: "text-rose-600 dark:text-rose-400" },
+        { id: "turnover_rate", label: "Turnover Rate", value: "2.25%", sub: "Target <3.0%", cls: "bg-indigo-500/10 border-indigo-500/20", titleCls: "text-indigo-600", valCls: "text-foreground" },
+        { id: "resign", label: "Resign", value: resignCnt.toLocaleString(), sub: "Formal exit", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-600 dark:text-amber-400" },
+        { id: "lefty", label: "Lefty", value: leftyCnt.toLocaleString(), sub: "Unauthorized", cls: "bg-red-500/10 border-red-500/20", titleCls: "text-red-600", valCls: "text-red-600 dark:text-red-400" },
+        { id: "terminated", label: "Terminated", value: termCnt.toLocaleString(), sub: "Disciplinary", cls: "bg-slate-500/10 border-slate-500/20", titleCls: "text-slate-600", valCls: "text-foreground" },
+        { id: "retired", label: "Retired", value: retCnt.toLocaleString(), sub: "Superannuation", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-purple-600 dark:text-purple-400" },
+      ]);
+
+      const sepTrendData = [
+        { month: "Jun", resign: Math.round(72 * scale), lefty: Math.round(38 * scale) },
+        { month: "Jul", resign: Math.round(88 * scale), lefty: Math.round(49 * scale) },
+        { month: "Aug", resign: Math.round(79 * scale), lefty: Math.round(42 * scale) },
+        { month: "Sep", resign: Math.round(91 * scale), lefty: Math.round(51 * scale) },
+        { month: "Oct", resign: Math.round(76 * scale), lefty: Math.round(40 * scale) },
+        { month: "Nov", resign: resignCnt, lefty: leftyCnt },
+      ];
+
+      return (
+        <div className="space-y-3">
+          <div className={getMetricGridClass(colSpan, Math.max(1, sepChips.length))}>
+            {sepChips.map((c) => (
+              <div key={c.id} className={`p-2.5 rounded-xl border ${c.cls}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider block truncate ${c.titleCls}`}>
+                  {c.label}
+                </span>
+                <div className={`text-lg sm:text-xl font-black font-mono mt-0.5 ${c.valCls}`}>{c.value}</div>
+                <div className="text-[10px] text-muted-foreground truncate">{c.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="h-44 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={sepTrendData} margin={{ top: 10, right: 8, left: -18, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 9.5 }} />
+                <Tooltip
+                  cursor={{ fill: "rgba(244, 63, 94, 0.06)" }}
+                  contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                 labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
+                <Legend
+                  verticalAlign="top"
+                  height={22}
+                  formatter={(val) => (
+                    <span className="text-[10px] font-bold text-muted-foreground">
+                      {val === "resign" ? "Resign" : "Lefty"}
+                    </span>
+                  )}
+                />
+                <Bar dataKey="resign" fill="#f59e0b" radius={[3, 3, 0, 0]} name="resign" />
+                <Bar dataKey="lefty" fill="#f43f5e" radius={[3, 3, 0, 0]} name="lefty" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      );
+    }
+
+    case "hr_increment_yearly": {
+      const deptsList = settings?.departments || settings?.managedDepartments || ["Sewing Floor", "Cutting Unit"];
+      const scale =
+        scope === "personal"
+          ? 0.002
+          : scope === "managed_depts" || scope === "department"
+          ? Math.min(1, Math.max(0.25, deptsList.length / 6))
+          : 1;
+
+      const rawMonths = [
+        { month: "Jan", amt: 840000, staff: 520 },
+        { month: "Feb", amt: 310000, staff: 195 },
+        { month: "Mar", amt: 245000, staff: 150 },
+        { month: "Apr", amt: 420000, staff: 260 },
+        { month: "May", amt: 190000, staff: 120 },
+        { month: "Jun", amt: 280000, staff: 175 },
+        { month: "Jul", amt: 1420000, staff: 890 },
+        { month: "Aug", amt: 360000, staff: 220 },
+        { month: "Sep", amt: 210000, staff: 135 },
+        { month: "Oct", amt: 295000, staff: 185 },
+        { month: "Nov", amt: 165000, staff: 105 },
+        { month: "Dec", amt: 125000, staff: 85 },
+      ].map((m) => {
+        const scaledAmt = Math.round(m.amt * scale);
+        return {
+          month: m.month,
+          amt: scaledAmt,
+          amtLac: Number((scaledAmt / 100000).toFixed(2)),
+          staff: Math.max(1, Math.round(m.staff * scale)),
+        };
+      });
+
+      const totalAmt = rawMonths.reduce((s, m) => s + m.amt, 0);
+      const totalStaff = scope === "personal" ? 1 : rawMonths.reduce((s, m) => s + m.staff, 0);
+      const peak = rawMonths.reduce((best, curr) => (curr.amt > best.amt ? curr : best), rawMonths[0]);
+
+      const incChips = orderByChips([
+        {
+          id: "total_inc_amt",
+          label: "Total Yearly Increment",
+          value: totalAmt >= 100000 ? `৳${(totalAmt / 100000).toFixed(2)} Lac` : `৳${totalAmt.toLocaleString()}`,
+          sub: "FY 2026 Total",
+          cls: "bg-emerald-500/10 border-emerald-500/20",
+          titleCls: "text-emerald-600",
+          valCls: "text-emerald-600 dark:text-emerald-400",
+        },
+        {
+          id: "inc_employees",
+          label: "Incremented Staff",
+          value: totalStaff.toLocaleString(),
+          sub: "Employees covered",
+          cls: "bg-blue-500/10 border-blue-500/20",
+          titleCls: "text-blue-600",
+          valCls: "text-foreground",
+        },
+        {
+          id: "avg_inc_pct",
+          label: "Avg Increment %",
+          value: "8.4%",
+          sub: "Across grades",
+          cls: "bg-indigo-500/10 border-indigo-500/20",
+          titleCls: "text-indigo-600",
+          valCls: "text-indigo-600 dark:text-indigo-400",
+        },
+        {
+          id: "peak_month",
+          label: "Peak Month",
+          value: `${peak.month} (৳${peak.amtLac}L)`,
+          sub: `${peak.staff} staff`,
+          cls: "bg-purple-500/10 border-purple-500/20",
+          titleCls: "text-purple-600",
+          valCls: "text-purple-600 dark:text-purple-400",
+        },
+      ]);
+
+      return (
+        <div className="space-y-3">
+          <div className={getMetricGridClass(colSpan, Math.max(1, incChips.length))}>
+            {incChips.map((c) => (
+              <div key={c.id} className={`p-2.5 rounded-xl border ${c.cls}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider block truncate ${c.titleCls}`}>
+                  {c.label}
+                </span>
+                <div className={`text-lg sm:text-xl font-black font-mono mt-0.5 ${c.valCls}`}>{c.value}</div>
+                <div className="text-[10px] text-muted-foreground truncate">{c.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="h-52 w-full pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={rawMonths} margin={{ top: 18, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 9.5 }} tickFormatter={(v) => `৳${v}L`} />
+                <Tooltip
+                  cursor={{ fill: "rgba(16, 185, 129, 0.06)" }}
+                  formatter={(_, __, item) => {
+                    const p = item?.payload;
+                    return [`৳${Number(p?.amt ?? 0).toLocaleString()} (${p?.staff} staff)`, "Increment Amount"];
+                  }}
+                  contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                 labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
+                <Bar dataKey="amtLac" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={38}>
+                  <LabelList
+                    dataKey="amtLac"
+                    position="top"
+                    formatter={(v: any) => `৳${v}L`}
+                    style={{ fontSize: "9.5px", fontWeight: 700, fill: "#059669" }}
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      );
+    }
 
     // ----------------------------------------------------
     // Merchandising (MM) Components (Dynamic Buyer Filtering)
@@ -2386,7 +3546,7 @@ function renderWidgetContent(
                     <Cell key={b.name} fill={b.color} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(val: any) => [`${val}% Share`, "Volume"]} contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }} />
+                <Tooltip formatter={(val: any) => [`${val}% Share`, "Volume"]} contentStyle={CHART_TOOLTIP_CONTENT_STYLE}  labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -2604,7 +3764,7 @@ function renderWidgetContent(
               <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
               <XAxis dataKey="month" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }} />
+              <Tooltip contentStyle={CHART_TOOLTIP_CONTENT_STYLE}  labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
               <Bar dataKey="receive" fill="#10b981" radius={[3, 3, 0, 0]} name="Received (MRR)" />
               <Bar dataKey="issue" fill="#3b82f6" radius={[3, 3, 0, 0]} name="Issued to Floor" />
             </BarChart>
@@ -2639,56 +3799,107 @@ function renderWidgetContent(
     // Accounts & Finance Components
     // ----------------------------------------------------
     case "acc_payroll_payout": {
+      const isYearly = settings?.period === "year";
       const areasList = settings?.areas || ["Dhaka North / Gazipur"];
       const deptsList = settings?.departments || settings?.managedDepartments || (settings?.department ? [settings.department] : ["Sewing Floor", "Cutting Unit"]);
+
+      const scopeFactor =
+        scope === "personal"
+          ? 0.0012
+          : scope === "area"
+            ? Math.min(1, Math.max(0.3, areasList.length / 3))
+            : scope === "managed_depts" || scope === "department"
+              ? Math.min(1, Math.max(0.25, deptsList.length / 6))
+              : 1;
+      const mult = isYearly ? 12 : 1;
 
       let payChips: Array<{ id: string; label: string; value: string; sub: string; cls: string; titleCls: string; valCls: string }> = [];
 
       if (scope === "personal") {
         payChips = [
-          { id: "gross_payroll", label: "Gross Earnings", value: "৳42,000", sub: "Basic + Allowances", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
-          { id: "ot_payout", label: "OT Allowance", value: "৳4,120", sub: "16.5 hrs approved", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
-          { id: "net_disbursed", label: "My Net Payable", value: "৳38,500", sub: "Bank Asia ***892", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
-          { id: "pending_bank", label: "Deductions", value: "৳3,500", sub: "Tax ৳2K • PF ৳1.5K", cls: "bg-rose-500/10 border-rose-500/20", titleCls: "text-rose-600", valCls: "text-rose-700 dark:text-rose-300" },
-        ];
-      } else if (scope === "area") {
-        const factor = Math.min(1, Math.max(0.3, areasList.length / 3));
-        payChips = [
-          { id: "gross_payroll", label: "Area Wage Bill", value: `৳${(3.28 * factor).toFixed(2)} Cr`, sub: `${areasList.length} Area(s)`, cls: "bg-indigo-500/10 border-indigo-500/20", titleCls: "text-indigo-600", valCls: "text-foreground" },
-          { id: "ot_payout", label: "OT Allowance", value: `৳${(38.4 * factor).toFixed(1)} Lac`, sub: "Overtime payout", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
-          { id: "net_disbursed", label: "Bank Transfer", value: `৳${(2.89 * factor).toFixed(2)} Cr`, sub: "BEFTN / EFT", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
-          { id: "pending_bank", label: "Pending / Cash", value: `৳${(39.2 * factor).toFixed(1)} Lac`, sub: "Floor cash & MFS", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-700 dark:text-amber-300" },
-        ];
-      } else if (scope === "managed_depts" || scope === "department") {
-        const factor = Math.min(1, Math.max(0.25, deptsList.length / 6));
-        const label = deptsList.length > 1 ? `${deptsList.length} Depts` : deptsList[0];
-        payChips = [
-          { id: "gross_payroll", label: `${label} Wage Bill`, value: `৳${(3.28 * factor).toFixed(2)} Cr`, sub: "Selected Depts", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
-          { id: "ot_payout", label: "OT Allowance", value: `৳${(38.4 * factor).toFixed(1)} Lac`, sub: "Approved OT", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
-          { id: "net_disbursed", label: "Bank Transfer", value: `৳${(2.89 * factor).toFixed(2)} Cr`, sub: "88% of wage bill", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
-          { id: "pending_bank", label: "Cash / MFS", value: `৳${(39.2 * factor).toFixed(1)} Lac`, sub: "Floor worker cash", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-700 dark:text-amber-300" },
+          { id: "gross_payroll", label: isYearly ? "Yearly Earnings" : "Gross Earnings", value: `৳${(42000 * mult).toLocaleString()}`, sub: isYearly ? "FY 2026 Total" : "Basic + Allowances", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
+          { id: "ot_payout", label: isYearly ? "Yearly OT" : "OT Allowance", value: `৳${(4120 * mult).toLocaleString()}`, sub: isYearly ? "Annual OT" : "16.5 hrs approved", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
+          { id: "net_disbursed", label: isYearly ? "Yearly Net" : "My Net Payable", value: `৳${(38500 * mult).toLocaleString()}`, sub: "Bank Asia ***892", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
+          { id: "pending_bank", label: "Deductions", value: `৳${(3500 * mult).toLocaleString()}`, sub: "Tax & PF", cls: "bg-rose-500/10 border-rose-500/20", titleCls: "text-rose-600", valCls: "text-rose-700 dark:text-rose-300" },
         ];
       } else {
+        const prefix =
+          scope === "area"
+            ? `${areasList.length} Area(s)`
+            : scope === "managed_depts" || scope === "department"
+              ? deptsList.length > 1 ? `${deptsList.length} Depts` : deptsList[0]
+              : isYearly ? "FY 2026" : "Nov 2026";
         payChips = [
-          { id: "gross_payroll", label: "Net Payroll Payable", value: "৳3.28 Cr", sub: "For Month: Nov 2026", cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
-          { id: "ot_payout", label: "OT Allowance", value: "৳38.4 Lac", sub: "Approved OT payout", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
-          { id: "net_disbursed", label: "Bank Transfer (88%)", value: "৳2.89 Cr", sub: "BEFTN / EFT Routing", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
-          { id: "pending_bank", label: "Pending / Cash (12%)", value: "৳39.2 Lac", sub: "Floor worker cash", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-700 dark:text-amber-300" },
+          { id: "gross_payroll", label: isYearly ? "Yearly Payroll" : "Net Payroll Payable", value: `৳${(3.28 * scopeFactor * mult).toFixed(2)} Cr`, sub: prefix, cls: "bg-purple-500/10 border-purple-500/20", titleCls: "text-purple-600", valCls: "text-foreground" },
+          { id: "ot_payout", label: isYearly ? "Yearly OT Payout" : "OT Allowance", value: isYearly ? `৳${(4.61 * scopeFactor).toFixed(2)} Cr` : `৳${(38.4 * scopeFactor).toFixed(1)} Lac`, sub: "Approved OT", cls: "bg-blue-500/10 border-blue-500/20", titleCls: "text-blue-600", valCls: "text-blue-700 dark:text-blue-300" },
+          { id: "net_disbursed", label: "Bank Transfer (88%)", value: `৳${(2.89 * scopeFactor * mult).toFixed(2)} Cr`, sub: "BEFTN / EFT", cls: "bg-emerald-500/10 border-emerald-500/20", titleCls: "text-emerald-600", valCls: "text-emerald-700 dark:text-emerald-300" },
+          { id: "pending_bank", label: "Cash / MFS (12%)", value: isYearly ? `৳${(4.68 * scopeFactor).toFixed(2)} Cr` : `৳${(39.2 * scopeFactor).toFixed(1)} Lac`, sub: "Floor cash & MFS", cls: "bg-amber-500/10 border-amber-500/20", titleCls: "text-amber-600", valCls: "text-amber-700 dark:text-amber-300" },
         ];
       }
 
-      const visiblePayChips = payChips.filter((c) => isChipVisible(c.id));
+      const yearlyPayrollChart = [
+        { month: "Jan", salary: 312, ot: 34 },
+        { month: "Feb", salary: 308, ot: 31 },
+        { month: "Mar", salary: 325, ot: 39 },
+        { month: "Apr", salary: 342, ot: 44 },
+        { month: "May", salary: 318, ot: 35 },
+        { month: "Jun", salary: 356, ot: 48 },
+        { month: "Jul", salary: 322, ot: 36 },
+        { month: "Aug", salary: 326, ot: 38 },
+        { month: "Sep", salary: 330, ot: 41 },
+        { month: "Oct", salary: 334, ot: 40 },
+        { month: "Nov", salary: 328, ot: 38 },
+        { month: "Dec", salary: 335, ot: 37 },
+      ].map((m) => ({
+        month: m.month,
+        salary: Number((m.salary * scopeFactor).toFixed(1)),
+        ot: Number((m.ot * scopeFactor).toFixed(1)),
+      }));
+
+      const visiblePayChips = orderByChips(payChips);
       return (
-        <div className={getMetricGridClass(colSpan, Math.max(1, visiblePayChips.length))}>
-          {visiblePayChips.map((c) => (
-            <div key={c.id} className={`p-3 rounded-xl border ${c.cls}`}>
-              <span className={`text-[10.5px] font-bold uppercase tracking-wider block truncate ${c.titleCls}`}>
-                {c.label}
-              </span>
-              <span className={`text-xl font-black font-mono mt-1 block ${c.valCls}`}>{c.value}</span>
-              <span className="text-[10px] text-muted-foreground">{c.sub}</span>
+        <div className="space-y-3">
+          <div className={getMetricGridClass(colSpan, Math.max(1, visiblePayChips.length))}>
+            {visiblePayChips.map((c) => (
+              <div key={c.id} className={`p-3 rounded-xl border ${c.cls}`}>
+                <span className={`text-[10.5px] font-bold uppercase tracking-wider block truncate ${c.titleCls}`}>
+                  {c.label}
+                </span>
+                <span className={`text-xl font-black font-mono mt-1 block ${c.valCls}`}>{c.value}</span>
+                <span className="text-[10px] text-muted-foreground">{c.sub}</span>
+              </div>
+            ))}
+          </div>
+
+          {isYearly && (
+            <div className="h-48 w-full pt-1">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={yearlyPayrollChart} margin={{ top: 10, right: 10, left: -12, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 9.5 }} />
+                  <YAxis tick={{ fontSize: 9.5 }} tickFormatter={(v) => `৳${v}L`} />
+                  <Tooltip
+                    formatter={(val: any, name: any) => [
+                      `৳${val} Lac`,
+                      name === "salary" ? "Net Salary Payout" : "OT Allowance",
+                    ]}
+                    contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                   labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
+                  <Legend
+                    verticalAlign="top"
+                    height={24}
+                    formatter={(val) => (
+                      <span className="text-[10px] font-bold text-muted-foreground">
+                        {val === "salary" ? "Net Salary (Lac)" : "OT Allowance (Lac)"}
+                      </span>
+                    )}
+                  />
+                  <Bar dataKey="salary" fill="#6366f1" radius={[3, 3, 0, 0]} name="salary" />
+                  <Bar dataKey="ot" fill="#10b981" radius={[3, 3, 0, 0]} name="ot" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-          ))}
+          )}
         </div>
       );
     }
@@ -2708,7 +3919,7 @@ function renderWidgetContent(
               <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
               <XAxis type="number" tick={{ fontSize: 9 }} tickFormatter={(v) => `৳${(v / 100000).toFixed(0)}L`} />
               <YAxis dataKey="dept" type="category" tick={{ fontSize: 9.5 }} />
-              <Tooltip formatter={(v: any) => [`৳${v.toLocaleString()}`, "Payroll Cost"]} contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px", fontSize: "11px" }} />
+              <Tooltip formatter={(v: any) => [`৳${v.toLocaleString()}`, "Payroll Cost"]} contentStyle={CHART_TOOLTIP_CONTENT_STYLE}  labelStyle={CHART_TOOLTIP_LABEL_STYLE} itemStyle={CHART_TOOLTIP_ITEM_STYLE}/>
               <Bar dataKey="cost" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>

@@ -70,6 +70,11 @@ import {
 } from "./dashboard-maker-types";
 import { DashboardWidgetRenderer } from "./DashboardWidgetRenderer";
 
+const FINAL_HRIS_COMPONENT_IDS = new Set(
+  (DEFAULT_DASHBOARD_TEMPLATES.find((t) => t.id === "tpl_final_hris")?.widgets || []).map((w) => w.componentId)
+);
+const LIBRARY_COMPONENTS_CATALOG = DASHBOARD_COMPONENTS_CATALOG.filter((c) => FINAL_HRIS_COMPONENT_IDS.has(c.id));
+
 const DEPARTMENTS_LIST = [
   { id: "Sewing Floor", name: "Sewing Floor (সুইং ফ্লোর)", count: "680 Operators" },
   { id: "Cutting Unit", name: "Cutting Unit (কাটিং সেকশন)", count: "140 Staff" },
@@ -122,6 +127,7 @@ export const DashboardMakerView: React.FC = () => {
   // Drag and Drop States
   const [draggedItem, setDraggedItem] = useState<DragItemData | null>(null);
   const [hoveredDropIndex, setHoveredDropIndex] = useState<number | null>(null);
+  const [dropEdge, setDropEdge] = useState<{ index: number; edge: "left" | "right" | "top" | "bottom" } | null>(null);
 
   // Widget Configuration Modal State
   const [configuringWidgetId, setConfiguringWidgetId] = useState<string | null>(null);
@@ -359,19 +365,21 @@ export const DashboardMakerView: React.FC = () => {
     showToast("Widget duplicated in canvas");
   };
 
-  // Reorder existing widget within canvas
-  const moveWidgetToPosition = (fromIndex: number, toIndex: number) => {
-    if (!editingTemplate || fromIndex === toIndex) return;
+  // Reorder existing widget within canvas (insertBefore/After slot index)
+  const moveWidgetToPosition = (fromIndex: number, insertIndex: number) => {
+    if (!editingTemplate) return;
     const currentWidgets = [...editingTemplate.widgets];
     const [moved] = currentWidgets.splice(fromIndex, 1);
-    const targetIdx = toIndex > fromIndex ? toIndex - 1 : toIndex;
-    currentWidgets.splice(targetIdx, 0, moved);
+    const targetIdx = insertIndex > fromIndex ? insertIndex - 1 : insertIndex;
+    const boundedIdx = Math.max(0, Math.min(targetIdx, currentWidgets.length));
+    if (boundedIdx === fromIndex) return;
+    currentWidgets.splice(boundedIdx, 0, moved);
 
     setEditingTemplate({
       ...editingTemplate,
       widgets: currentWidgets,
     });
-    showToast(`Moved widget to position #${targetIdx + 1}`);
+    showToast(`Moved widget to position #${boundedIdx + 1}`);
   };
 
   // Remove Widget from Canvas
@@ -452,19 +460,61 @@ export const DashboardMakerView: React.FC = () => {
     e.dataTransfer.effectAllowed = "move";
   };
 
+  const onDragEndExisting = () => {
+    setDraggedItem(null);
+    setHoveredDropIndex(null);
+    setDropEdge(null);
+  };
+
+  const onDragOverWidget = (e: React.DragEvent, targetIndex: number, colSpan: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "move";
+
+    if (draggedItem?.type === "existing_widget" && draggedItem.fromIndex === targetIndex) {
+      if (dropEdge !== null) setDropEdge(null);
+      if (hoveredDropIndex !== null) setHoveredDropIndex(null);
+      return;
+    }
+
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    let edge: "left" | "right" | "top" | "bottom";
+    let insertIdx: number;
+
+    if (colSpan >= 12) {
+      const isTop = e.clientY < rect.top + rect.height / 2;
+      edge = isTop ? "top" : "bottom";
+      insertIdx = isTop ? targetIndex : targetIndex + 1;
+    } else {
+      const isLeft = e.clientX < rect.left + rect.width / 2;
+      edge = isLeft ? "left" : "right";
+      insertIdx = isLeft ? targetIndex : targetIndex + 1;
+    }
+
+    if (!dropEdge || dropEdge.index !== targetIndex || dropEdge.edge !== edge) {
+      setDropEdge({ index: targetIndex, edge });
+    }
+    if (hoveredDropIndex !== insertIdx) {
+      setHoveredDropIndex(insertIdx);
+    }
+  };
+
   const onDragOverSlot = (e: React.DragEvent, targetIndex: number) => {
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = "move";
+    if (dropEdge !== null) setDropEdge(null);
     if (hoveredDropIndex !== targetIndex) {
       setHoveredDropIndex(targetIndex);
     }
   };
 
-  const onDropSlot = (e: React.DragEvent, targetIndex: number) => {
+  const onDropSlot = (e: React.DragEvent, fallbackIndex: number) => {
     e.preventDefault();
     e.stopPropagation();
+    const insertIndex = hoveredDropIndex ?? fallbackIndex;
     setHoveredDropIndex(null);
+    setDropEdge(null);
 
     let data: DragItemData | null = draggedItem;
     if (!data) {
@@ -479,9 +529,9 @@ export const DashboardMakerView: React.FC = () => {
     if (!data) return;
 
     if (data.type === "new_component") {
-      addComponentAtPosition(data.componentId, targetIndex);
+      addComponentAtPosition(data.componentId, insertIndex);
     } else if (data.type === "existing_widget") {
-      moveWidgetToPosition(data.fromIndex, targetIndex);
+      moveWidgetToPosition(data.fromIndex, insertIndex);
     }
 
     setDraggedItem(null);
@@ -498,9 +548,9 @@ export const DashboardMakerView: React.FC = () => {
     });
   }, [templates, searchQuery, categoryFilter]);
 
-  // Filtered Component Catalog for Side Drawer
+  // Filtered Component Catalog for Side Drawer (scoped to Final HRIS 22 components)
   const filteredCatalog = useMemo(() => {
-    return DASHBOARD_COMPONENTS_CATALOG.filter((c) => {
+    return LIBRARY_COMPONENTS_CATALOG.filter((c) => {
       const matchSearch =
         c.name.toLowerCase().includes(componentSearch.toLowerCase()) ||
         c.description.toLowerCase().includes(componentSearch.toLowerCase()) ||
@@ -591,7 +641,7 @@ export const DashboardMakerView: React.FC = () => {
                   Modular Components
                 </span>
                 <span className="text-xl font-black font-mono text-foreground mt-0.5 block">
-                  {DASHBOARD_COMPONENTS_CATALOG.length} across 5 Modules
+                  {LIBRARY_COMPONENTS_CATALOG.length} Final HRIS Widgets
                 </span>
               </div>
               <div className="p-3 rounded-xl bg-background/80 border border-border/50">
@@ -886,7 +936,7 @@ export const DashboardMakerView: React.FC = () => {
                       Component Library ({filteredCatalog.length})
                     </h3>
                     <p className="text-[10.5px] text-muted-foreground">
-                      Drag cards directly into the canvas or click <strong>+</strong>
+                      Click any card or <strong>+</strong> to add to canvas
                     </p>
                   </div>
                 </div>
@@ -896,10 +946,7 @@ export const DashboardMakerView: React.FC = () => {
                   {[
                     { id: "all", label: "All" },
                     { id: "hris", label: "HRIS" },
-                    { id: "merchandising", label: "MM" },
-                    { id: "inventory", label: "Inv" },
                     { id: "accounts", label: "Accounts" },
-                    { id: "procurement", label: "Proc" },
                   ].map((mod) => (
                     <button
                       key={mod.id}
@@ -927,32 +974,22 @@ export const DashboardMakerView: React.FC = () => {
                   />
                 </div>
 
-                {/* Draggable Component Cards List */}
+                {/* Component Cards List */}
                 <div className="flex-1 overflow-y-auto space-y-2 pr-1">
                   {filteredCatalog.map((comp) => {
                     const isAdded = editingTemplate.widgets.some((w) => w.componentId === comp.id);
-                    const isBeingDragged =
-                      draggedItem?.type === "new_component" && draggedItem.componentId === comp.id;
 
                     return (
                       <div
                         key={comp.id}
-                        draggable={true}
-                        onDragStart={(e) => onDragStartNew(e, comp.id)}
-                        className={`group p-2.5 rounded-xl border transition-all text-xs flex items-center justify-between gap-2 cursor-grab active:cursor-grabbing hover:shadow-sm select-none ${isBeingDragged
-                          ? "opacity-50 ring-2 ring-blue-500 bg-blue-500/10 border-blue-500"
-                          : isAdded
-                            ? "border-emerald-500/40 bg-emerald-500/5 hover:border-emerald-500/70"
-                            : "border-border/60 bg-background hover:border-blue-400 hover:bg-blue-50/25 dark:hover:bg-blue-950/25"
+                        onClick={() => addComponentAtPosition(comp.id)}
+                        className={`group p-2.5 rounded-xl border transition-all text-xs flex items-center justify-between gap-2 cursor-pointer hover:shadow-sm select-none ${isAdded
+                          ? "border-emerald-500/40 bg-emerald-500/5 hover:border-emerald-500/70"
+                          : "border-border/60 bg-background hover:border-blue-400 hover:bg-blue-50/25 dark:hover:bg-blue-950/25"
                           }`}
-                        title="Drag this card into the dashboard view, or click +"
+                        title="Click to add this card to the dashboard"
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          {/* Visible Drag Handle Indicator */}
-                          <div className="size-6 rounded-md bg-muted/50 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors text-muted-foreground">
-                            <GripVertical className="size-3.5" />
-                          </div>
-
                           <div className="min-w-0">
                             <div className="flex items-center gap-1 flex-wrap">
                               <span className="text-[9px] font-bold uppercase tracking-wider px-1 py-0.2 rounded bg-muted text-muted-foreground">
@@ -986,7 +1023,10 @@ export const DashboardMakerView: React.FC = () => {
                         <div className="flex items-center gap-1 shrink-0">
                           <button
                             type="button"
-                            onClick={() => addComponentAtPosition(comp.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addComponentAtPosition(comp.id);
+                            }}
                             className={`size-6 rounded-md flex items-center justify-center transition-all cursor-pointer ${isAdded
                               ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white"
                               : "bg-primary/10 text-primary hover:bg-primary hover:text-white"
@@ -999,18 +1039,6 @@ export const DashboardMakerView: React.FC = () => {
                       </div>
                     );
                   })}
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-[11px] text-blue-800 dark:text-blue-200 space-y-1">
-                  <div className="font-bold flex items-center gap-1.5">
-                    <GripVertical className="size-3.5 text-blue-600 shrink-0" />
-                    How Drag & Drop Works:
-                  </div>
-                  <p className="text-[10px] text-blue-700/80 dark:text-blue-300/80 leading-relaxed">
-                    1. Click and hold any card above.<br />
-                    2. Drag it over the dashboard view on the right.<br />
-                    3. Release inside any highlighted drop zone!
-                  </p>
                 </div>
               </div>
             )}
@@ -1067,27 +1095,6 @@ export const DashboardMakerView: React.FC = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-12 gap-3.5 lg:gap-4.5">
-                    {/* Top Drop Slot before the first widget (visible when dragging) */}
-                    {draggedItem && (
-                      <div
-                        onDragOver={(e) => onDragOverSlot(e, 0)}
-                        onDrop={(e) => onDropSlot(e, 0)}
-                        className={`col-span-12 transition-all duration-200 rounded-xl flex items-center justify-center border-2 border-dashed cursor-pointer ${hoveredDropIndex === 0
-                          ? "h-20 bg-blue-600 text-white border-blue-600 shadow-xl scale-[1.01]"
-                          : "h-14 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/60 hover:border-blue-600 animate-pulse"
-                          }`}
-                      >
-                        <div className="flex items-center gap-2 font-bold text-xs">
-                          <Plus className="size-4 animate-bounce" />
-                          <span>
-                            {hoveredDropIndex === 0
-                              ? "✨ Release here to place at the very top (Position #1)"
-                              : "📥 Drop here to place at the top (Position #1)"}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
                     {editingTemplate.widgets.map((widget, idx) => {
                       const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === widget.componentId);
                       const minSpan = def?.minColSpan || 3;
@@ -1095,36 +1102,61 @@ export const DashboardMakerView: React.FC = () => {
                       const colSpanClass = getColSpanClass(effectiveColSpan, canvasDevice);
                       const isBeingDragged =
                         draggedItem?.type === "existing_widget" && draggedItem.widgetId === widget.id;
-                      const isHoveredSlot = hoveredDropIndex === idx + 1;
 
                       const availableSpans = [
                         { label: "25%", val: 3 as WidgetColSpan },
                         { label: "33%", val: 4 as WidgetColSpan },
                         { label: "50%", val: 6 as WidgetColSpan },
+                        { label: "67%", val: 8 as WidgetColSpan },
                         { label: "100%", val: 12 as WidgetColSpan },
                       ].filter((s) => s.val >= minSpan);
+
+                      const activeEdge = dropEdge?.index === idx ? dropEdge.edge : null;
 
                       return (
                         <React.Fragment key={widget.id}>
                           {/* The Widget Box */}
                           <div
-                            className={`${colSpanClass} relative group transition-all duration-200 ${isBeingDragged ? "opacity-30 scale-95" : ""
+                            className={`${colSpanClass} relative group transition-all duration-200 ${isBeingDragged ? "opacity-40 scale-[0.98]" : ""
                               }`}
-                            onDragOver={(e) => onDragOverSlot(e, idx)}
+                            onDragOver={(e) => onDragOverWidget(e, idx, effectiveColSpan)}
                             onDrop={(e) => onDropSlot(e, idx)}
                           >
+                            {/* Edge Drop Indicator Line (shows exact side where card will land without jumping) */}
+                            {activeEdge === "left" && (
+                              <div className="pointer-events-none absolute -left-2 top-1 bottom-1 w-1.5 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.8)] z-30" />
+                            )}
+                            {activeEdge === "right" && (
+                              <div className="pointer-events-none absolute -right-2 top-1 bottom-1 w-1.5 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.8)] z-30" />
+                            )}
+                            {activeEdge === "top" && (
+                              <div className="pointer-events-none absolute -top-2 left-1 right-1 h-1.5 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.8)] z-30" />
+                            )}
+                            {activeEdge === "bottom" && (
+                              <div className="pointer-events-none absolute -bottom-2 left-1 right-1 h-1.5 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.8)] z-30" />
+                            )}
+
                             {/* Editable Widget Wrapper */}
-                            <div className="h-full rounded-2xl border border-border/80 bg-card overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
-                              {/* Prominent Drag Header Bar with Clear Drag Cue */}
-                              <div className="bg-muted/50 border-b border-border/60 px-2.5 py-1.5 sm:px-3 sm:py-2 flex items-center justify-between gap-1.5 sm:gap-2 text-xs">
+                            <div
+                              className={`h-full rounded-2xl border bg-card overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between ${
+                                isBeingDragged
+                                  ? "border-dashed border-2 border-blue-500 ring-4 ring-blue-500/10"
+                                  : activeEdge
+                                  ? "border-blue-500 ring-2 ring-blue-500/20"
+                                  : "border-border/80"
+                              }`}
+                            >
+                              {/* Prominent Drag Header Bar (entire header draggable left/right/up/down) */}
+                              <div
+                                draggable={true}
+                                onDragStart={(e) => onDragStartExisting(e, widget.id, idx)}
+                                onDragEnd={onDragEndExisting}
+                                className="bg-muted/50 border-b border-border/60 px-2.5 py-1.5 sm:px-3 sm:py-2 flex items-center justify-between gap-1.5 sm:gap-2 text-xs cursor-grab active:cursor-grabbing select-none"
+                                title="Grab header and drag left, right, up, or down to reorder"
+                              >
                                 {/* Drag Handle & Title */}
                                 <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-                                  <div
-                                    draggable={true}
-                                    onDragStart={(e) => onDragStartExisting(e, widget.id, idx)}
-                                    className="cursor-grab active:cursor-grabbing px-1.5 py-0.5 rounded-md bg-background hover:bg-blue-600 hover:text-white border border-border/60 text-muted-foreground transition-all flex items-center gap-1 font-bold text-[10px] shadow-2xs select-none shrink-0"
-                                    title="Click and drag to reorder on canvas"
-                                  >
+                                  <div className="px-1.5 py-0.5 rounded-md bg-background group-hover:bg-blue-600 group-hover:text-white border border-border/60 text-muted-foreground transition-all flex items-center gap-1 font-bold text-[10px] shadow-2xs shrink-0">
                                     <GripVertical className="size-3" />
                                     <span>#{idx + 1}</span>
                                   </div>
@@ -1133,13 +1165,21 @@ export const DashboardMakerView: React.FC = () => {
                                     type="text"
                                     value={widget.customTitle || def?.name}
                                     onChange={(e) => handleWidgetTitleChange(widget.id, e.target.value)}
-                                    className="font-bold text-xs text-foreground bg-transparent border-b border-transparent hover:border-border focus:border-primary outline-none truncate w-full min-w-[70px]"
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    draggable={false}
+                                    onDragStart={(e) => e.preventDefault()}
+                                    className="font-bold text-xs text-foreground bg-transparent border-b border-transparent hover:border-border focus:border-primary outline-none truncate w-full min-w-[70px] cursor-text"
                                     title="Click to rename widget title"
                                   />
                                 </div>
 
                                 {/* Width Pills, Dynamic Filters & Actions */}
-                                <div className="flex items-center gap-1.5 shrink-0">
+                                <div
+                                  className="flex items-center gap-1.5 shrink-0"
+                                  onMouseDown={(e) => e.stopPropagation()}
+                                  draggable={false}
+                                  onDragStart={(e) => e.preventDefault()}
+                                >
                                   {/* Professional Scope Switcher Dropdown (visible if colSpan >= 4) */}
                                   {def?.supportedScopes && effectiveColSpan >= 4 && (
                                     <ScopeDropdown
@@ -1286,27 +1326,6 @@ export const DashboardMakerView: React.FC = () => {
                               </div>
                             </div>
                           </div>
-
-                          {/* Dedicated Drop Slot between widgets (expands prominently during drag) */}
-                          {draggedItem && (
-                            <div
-                              onDragOver={(e) => onDragOverSlot(e, idx + 1)}
-                              onDrop={(e) => onDropSlot(e, idx + 1)}
-                              className={`col-span-12 transition-all duration-200 rounded-xl flex items-center justify-center border-2 border-dashed cursor-pointer ${isHoveredSlot
-                                ? "h-20 bg-blue-600 text-white border-blue-600 shadow-xl scale-[1.01]"
-                                : "h-14 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/60 hover:border-blue-600 animate-pulse"
-                                }`}
-                            >
-                              <div className="flex items-center gap-2 font-bold text-xs">
-                                <Plus className="size-4 animate-bounce" />
-                                <span>
-                                  {isHoveredSlot
-                                    ? `✨ Release here to place between #${idx + 1} and #${idx + 2}`
-                                    : `📥 Drop here to insert at Position #${idx + 2}`}
-                                </span>
-                              </div>
-                            </div>
-                          )}
                         </React.Fragment>
                       );
                     })}
@@ -1366,10 +1385,10 @@ export const DashboardMakerView: React.FC = () => {
               {configuringDef.supportedScopes && (
                 <div className="space-y-3">
                   <label className="text-xs font-bold text-foreground block">Data Scope</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     {[
-                      { id: "personal" as const, label: "Self", visible: configuringDef.supportedScopes.includes("personal") },
                       { id: "area" as const, label: "Area", visible: true },
+                      { id: "personal" as const, label: "Self", visible: configuringDef.supportedScopes.includes("personal") },
                       {
                         id: "department" as const,
                         label: "Department",
@@ -1377,11 +1396,11 @@ export const DashboardMakerView: React.FC = () => {
                           configuringDef.supportedScopes.includes("department") ||
                           configuringDef.supportedScopes.includes("managed_depts"),
                       },
-                      { id: "company" as const, label: "All Company", visible: configuringDef.supportedScopes.includes("company") },
                     ]
                       .filter((s) => s.visible)
                       .map((item) => {
-                        const curScope = configuringWidget.settings?.scope || "company";
+                        const rawScope = configuringWidget.settings?.scope;
+                        const curScope = !rawScope || rawScope === "company" ? "area" : rawScope;
                         const isActive =
                           item.id === "department"
                             ? curScope === "department" || curScope === "managed_depts"
@@ -1401,39 +1420,6 @@ export const DashboardMakerView: React.FC = () => {
                         );
                       })}
                   </div>
-
-                  {/* Multi-select Areas */}
-                  {configuringWidget.settings?.scope === "area" && (
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {AREA_OPTIONS.map((area) => {
-                        const current = configuringWidget.settings?.areas || ["Dhaka North / Gazipur"];
-                        const checked = current.includes(area);
-                        return (
-                          <button
-                            key={area}
-                            type="button"
-                            onClick={() => {
-                              let next: string[];
-                              if (checked) {
-                                if (current.length <= 1) return;
-                                next = current.filter((a) => a !== area);
-                              } else {
-                                next = [...current, area];
-                              }
-                              handleUpdateWidgetScope(configuringWidget.id, "area", { areas: next });
-                            }}
-                            className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${checked
-                              ? "bg-indigo-600 text-white border-indigo-600"
-                              : "bg-background text-muted-foreground border-border hover:text-foreground"
-                              }`}
-                          >
-                            {checked && <Check className="size-3" />}
-                            <span>{area}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
 
                   {/* Multi-select Departments */}
                   {(configuringWidget.settings?.scope === "department" ||
@@ -1666,12 +1652,14 @@ export const DashboardMakerView: React.FC = () => {
                     <div className="flex items-center gap-2 text-[11px]">
                       <button
                         type="button"
-                        onClick={() =>
+                        onClick={() => {
+                          const cur = getEffectiveEnabledChips(configuringDef, configuringWidget.settings);
+                          const missing = configuringDef.availableChips!.map((c) => c.id).filter((id) => !cur.includes(id));
                           handleUpdateWidgetSettings(configuringWidget.id, {
                             ...(configuringWidget.settings || {}),
-                            enabledChips: configuringDef.availableChips!.map((c) => c.id),
-                          })
-                        }
+                            enabledChips: [...cur, ...missing],
+                          });
+                        }}
                         className="font-semibold text-primary hover:underline cursor-pointer"
                       >
                         Add All
@@ -1692,43 +1680,95 @@ export const DashboardMakerView: React.FC = () => {
                       </button>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {configuringDef.availableChips.map((chip) => {
-                      const activeChips = getEffectiveEnabledChips(configuringDef, configuringWidget.settings);
-                      const isActive = activeChips.includes(chip.id);
-                      const isLastOne = isActive && activeChips.length <= 1;
-                      return (
-                        <button
-                          key={chip.id}
-                          type="button"
-                          disabled={isLastOne}
-                          onClick={() => {
-                            let next: string[];
-                            if (isActive) {
-                              if (activeChips.length <= 1) return;
-                              next = activeChips.filter((id) => id !== chip.id);
-                            } else {
-                              next = configuringDef.availableChips!
-                                .map((c) => c.id)
-                                .filter((id) => id === chip.id || activeChips.includes(id));
-                            }
-                            handleUpdateWidgetSettings(configuringWidget.id, {
-                              ...(configuringWidget.settings || {}),
-                              enabledChips: next,
-                            });
-                          }}
-                          className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${isLastOne ? "opacity-75 cursor-not-allowed" : "cursor-pointer"
-                            } ${isActive
-                              ? "bg-indigo-600 text-white border-indigo-600 shadow-xs"
-                              : "bg-background text-muted-foreground border-border hover:border-indigo-400 hover:text-foreground"
-                            }`}
-                        >
-                          {isActive ? <Check className="size-3.5" /> : <Plus className="size-3.5" />}
-                          <span>{chip.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  {(() => {
+                    const activeChips = getEffectiveEnabledChips(configuringDef, configuringWidget.settings);
+                    const chipMap = new Map(configuringDef.availableChips!.map((c) => [c.id, c]));
+                    const activeDefs = activeChips.map((id) => chipMap.get(id)).filter(Boolean) as NonNullable<typeof configuringDef.availableChips>;
+                    const inactiveDefs = configuringDef.availableChips!.filter((c) => !activeChips.includes(c.id));
+
+                    const moveChip = (idx: number, dir: -1 | 1) => {
+                      const target = idx + dir;
+                      if (target < 0 || target >= activeChips.length) return;
+                      const next = [...activeChips];
+                      const [moved] = next.splice(idx, 1);
+                      next.splice(target, 0, moved);
+                      handleUpdateWidgetSettings(configuringWidget.id, {
+                        ...(configuringWidget.settings || {}),
+                        enabledChips: next,
+                      });
+                    };
+
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex flex-wrap gap-1.5">
+                          {activeDefs.map((chip, idx) => {
+                            const isLastOne = activeChips.length <= 1;
+                            return (
+                              <div
+                                key={chip.id}
+                                className="px-2 py-1 rounded-lg bg-indigo-600 text-white text-xs font-semibold flex items-center gap-1 shadow-xs"
+                              >
+                                <button
+                                  type="button"
+                                  disabled={idx === 0}
+                                  onClick={() => moveChip(idx, -1)}
+                                  className="hover:bg-white/20 disabled:opacity-30 rounded p-0.5 cursor-pointer"
+                                  title="Move left"
+                                >
+                                  <ChevronLeft className="size-3" />
+                                </button>
+                                <span>{chip.label}</span>
+                                <button
+                                  type="button"
+                                  disabled={idx === activeDefs.length - 1}
+                                  onClick={() => moveChip(idx, 1)}
+                                  className="hover:bg-white/20 disabled:opacity-30 rounded p-0.5 cursor-pointer"
+                                  title="Move right"
+                                >
+                                  <ChevronRight className="size-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={isLastOne}
+                                  onClick={() => {
+                                    if (isLastOne) return;
+                                    handleUpdateWidgetSettings(configuringWidget.id, {
+                                      ...(configuringWidget.settings || {}),
+                                      enabledChips: activeChips.filter((id) => id !== chip.id),
+                                    });
+                                  }}
+                                  className={`hover:bg-white/20 rounded p-0.5 ${isLastOne ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}`}
+                                  title="Remove chip"
+                                >
+                                  <X className="size-3" />
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {inactiveDefs.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 pt-1 border-t border-indigo-500/15">
+                            {inactiveDefs.map((chip) => (
+                              <button
+                                key={chip.id}
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateWidgetSettings(configuringWidget.id, {
+                                    ...(configuringWidget.settings || {}),
+                                    enabledChips: [...activeChips, chip.id],
+                                  })
+                                }
+                                className="px-2.5 py-1 rounded-lg border border-border bg-background hover:border-indigo-400 text-muted-foreground hover:text-foreground text-xs font-medium flex items-center gap-1 cursor-pointer transition-colors"
+                              >
+                                <Plus className="size-3" />
+                                <span>{chip.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
@@ -1819,6 +1859,7 @@ export const DashboardMakerView: React.FC = () => {
                       { label: "25%", val: 3 as WidgetColSpan },
                       { label: "33%", val: 4 as WidgetColSpan },
                       { label: "50%", val: 6 as WidgetColSpan },
+                      { label: "67%", val: 8 as WidgetColSpan },
                       { label: "100%", val: 12 as WidgetColSpan },
                     ]
                       .filter((w) => !configuringDef?.minColSpan || w.val >= configuringDef.minColSpan)
@@ -1871,6 +1912,8 @@ function getColSpanClass(span: WidgetColSpan, device: "desktop" | "tablet" | "mo
   switch (span) {
     case 12:
       return "col-span-12";
+    case 8:
+      return "col-span-12 lg:col-span-8";
     case 6:
       return "col-span-12 lg:col-span-6";
     case 4:
