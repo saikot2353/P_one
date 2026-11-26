@@ -16,6 +16,8 @@ import {
   GripVertical,
   ArrowUp,
   ArrowDown,
+  Pencil,
+  RotateCcw,
 } from "lucide-react";
 import { WidgetColSpan, DashboardChipDefinition } from "./dashboard-maker-types";
 
@@ -608,18 +610,58 @@ export const WidthDropdown: React.FC<WidthDropdownProps> = ({
 interface ChipsDropdownProps {
   availableChips: DashboardChipDefinition[];
   enabledChips: string[];
+  chipLabels?: Record<string, string>;
   onChange: (newEnabledChips: string[]) => void;
+  onChangeChipLabels?: (nextLabels: Record<string, string>) => void;
 }
 
 export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
   availableChips,
   enabledChips,
+  chipLabels,
   onChange,
+  onChangeChipLabels,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [editingChipId, setEditingChipId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
-  useOutsideClick(containerRef, () => setIsOpen(false));
+  useOutsideClick(containerRef, () => {
+    setIsOpen(false);
+    setEditingChipId(null);
+  });
+
+  const getLabel = (chip: DashboardChipDefinition) => chipLabels?.[chip.id]?.trim() || chip.label;
+  const hasCustomLabels = !!chipLabels && Object.values(chipLabels).some((v) => v && v.trim().length > 0);
+
+  const startRename = (chip: DashboardChipDefinition) => {
+    setEditingChipId(chip.id);
+    setEditingText(getLabel(chip));
+  };
+
+  const commitRename = (chip: DashboardChipDefinition) => {
+    if (!onChangeChipLabels) {
+      setEditingChipId(null);
+      return;
+    }
+    const trimmed = editingText.trim();
+    const next = { ...(chipLabels || {}) };
+    if (!trimmed || trimmed === chip.label) {
+      delete next[chip.id];
+    } else {
+      next[chip.id] = trimmed;
+    }
+    onChangeChipLabels(next);
+    setEditingChipId(null);
+  };
+
+  const resetSingleLabel = (chipId: string) => {
+    if (!onChangeChipLabels || !chipLabels) return;
+    const next = { ...chipLabels };
+    delete next[chipId];
+    onChangeChipLabels(next);
+  };
 
   const toggleChip = (id: string) => {
     if (enabledChips.includes(id)) {
@@ -660,6 +702,8 @@ export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
 
   const handleResetDefault = () => {
     onChange(availableChips.filter((c) => c.defaultEnabled !== false).map((c) => c.id));
+    onChangeChipLabels?.({});
+    setEditingChipId(null);
   };
 
   const chipMap = new Map(availableChips.map((c) => [c.id, c]));
@@ -682,7 +726,7 @@ export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1.5 w-68 rounded-2xl bg-popover/98 backdrop-blur-md border border-border/80 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1.5">
+        <div className="absolute right-0 top-full mt-1.5 w-76 rounded-2xl bg-popover/98 backdrop-blur-md border border-border/80 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1.5">
           <div className="flex items-center justify-between px-1.5 pb-1.5 border-b border-border/50">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
               Chips ({enabledChips.length})
@@ -695,11 +739,23 @@ export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
               >
                 All
               </button>
+              {hasCustomLabels && onChangeChipLabels && (
+                <button
+                  type="button"
+                  onClick={() => onChangeChipLabels({})}
+                  className="px-1.5 py-0.5 rounded hover:bg-muted font-semibold text-amber-600 cursor-pointer"
+                  title="Reset all renamed chip labels to default"
+                >
+                  Reset Names
+                </button>
+              )}
               <button
                 type="button"
                 onClick={handleResetDefault}
-                className="px-1.5 py-0.5 rounded hover:bg-muted font-medium text-muted-foreground hover:text-foreground cursor-pointer"
+                className="px-1.5 py-0.5 rounded hover:bg-muted font-medium text-muted-foreground hover:text-foreground cursor-pointer flex items-center gap-0.5"
+                title="Reset chips & labels to default"
               >
+                <RotateCcw className="size-2.5" />
                 Default
               </button>
             </div>
@@ -708,10 +764,13 @@ export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
           <div className="max-h-64 overflow-y-auto space-y-1">
             {activeChipDefs.map((chip, idx) => {
               const isOnlyOne = activeChipDefs.length <= 1;
+              const isEditing = editingChipId === chip.id;
+              const isRenamed = !!chipLabels?.[chip.id]?.trim() && chipLabels[chip.id].trim() !== chip.label;
+
               return (
                 <div
                   key={chip.id}
-                  draggable
+                  draggable={!isEditing}
                   onDragStart={() => setDraggedId(chip.id)}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => handleDropChip(chip.id)}
@@ -719,42 +778,99 @@ export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
                   className={`px-2 py-1.5 rounded-xl border flex items-center justify-between gap-1.5 bg-indigo-500/10 border-indigo-500/40 text-foreground transition-all ${draggedId === chip.id ? "opacity-50" : ""
                     }`}
                 >
-                  <div className="flex items-center gap-1.5 min-w-0 flex-1 cursor-grab active:cursor-grabbing">
-                    <GripVertical className="size-3 text-indigo-500/70 shrink-0" />
-                    <span className="text-xs font-semibold truncate">{chip.label}</span>
-                  </div>
-                  <div className="flex items-center gap-0.5 shrink-0">
-                    <button
-                      type="button"
-                      disabled={idx === 0}
-                      onClick={() => moveChip(chip.id, -1)}
-                      className="size-5 rounded hover:bg-indigo-500/20 disabled:opacity-25 flex items-center justify-center cursor-pointer"
-                      title="Move up"
-                    >
-                      <ArrowUp className="size-3" />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={idx === activeChipDefs.length - 1}
-                      onClick={() => moveChip(chip.id, 1)}
-                      className="size-5 rounded hover:bg-indigo-500/20 disabled:opacity-25 flex items-center justify-center cursor-pointer"
-                      title="Move down"
-                    >
-                      <ArrowDown className="size-3" />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={isOnlyOne}
-                      onClick={() => toggleChip(chip.id)}
-                      className={`size-5 rounded flex items-center justify-center ${isOnlyOne
-                        ? "opacity-40 cursor-not-allowed"
-                        : "hover:bg-rose-500/20 text-rose-600 cursor-pointer"
-                        }`}
-                      title="Remove chip"
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </div>
+                  {isEditing ? (
+                    <div className="flex items-center gap-1 flex-1 min-w-0">
+                      <input
+                        type="text"
+                        autoFocus
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") commitRename(chip);
+                          if (e.key === "Escape") setEditingChipId(null);
+                        }}
+                        placeholder={chip.label}
+                        className="flex-1 min-w-0 h-6 px-2 rounded-md border border-indigo-400 bg-background text-xs font-semibold outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => commitRename(chip)}
+                        className="size-6 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shrink-0 cursor-pointer"
+                        title="Save name"
+                      >
+                        <Check className="size-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingChipId(null)}
+                        className="size-6 rounded-md hover:bg-muted text-muted-foreground flex items-center justify-center shrink-0 cursor-pointer"
+                        title="Cancel"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-1.5 min-w-0 flex-1 cursor-grab active:cursor-grabbing">
+                        <GripVertical className="size-3 text-indigo-500/70 shrink-0" />
+                        <span className="text-xs font-semibold truncate" title={isRenamed ? `Default: ${chip.label}` : chip.label}>
+                          {getLabel(chip)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        {onChangeChipLabels && (
+                          <button
+                            type="button"
+                            onClick={() => startRename(chip)}
+                            className="size-5 rounded hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 flex items-center justify-center cursor-pointer"
+                            title="Rename chip"
+                          >
+                            <Pencil className="size-2.5" />
+                          </button>
+                        )}
+                        {isRenamed && onChangeChipLabels && (
+                          <button
+                            type="button"
+                            onClick={() => resetSingleLabel(chip.id)}
+                            className="size-5 rounded hover:bg-amber-500/20 text-amber-600 flex items-center justify-center cursor-pointer"
+                            title={`Reset to "${chip.label}"`}
+                          >
+                            <RotateCcw className="size-2.5" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          disabled={idx === 0}
+                          onClick={() => moveChip(chip.id, -1)}
+                          className="size-5 rounded hover:bg-indigo-500/20 disabled:opacity-25 flex items-center justify-center cursor-pointer"
+                          title="Move up"
+                        >
+                          <ArrowUp className="size-3" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={idx === activeChipDefs.length - 1}
+                          onClick={() => moveChip(chip.id, 1)}
+                          className="size-5 rounded hover:bg-indigo-500/20 disabled:opacity-25 flex items-center justify-center cursor-pointer"
+                          title="Move down"
+                        >
+                          <ArrowDown className="size-3" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isOnlyOne}
+                          onClick={() => toggleChip(chip.id)}
+                          className={`size-5 rounded flex items-center justify-center ${isOnlyOne
+                            ? "opacity-40 cursor-not-allowed"
+                            : "hover:bg-rose-500/20 text-rose-600 cursor-pointer"
+                            }`}
+                          title="Remove chip"
+                        >
+                          <X className="size-3" />
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               );
             })}
@@ -766,7 +882,7 @@ export const ChipsDropdown: React.FC<ChipsDropdownProps> = ({
                 onClick={() => toggleChip(chip.id)}
                 className="w-full text-left px-2.5 py-1.5 rounded-xl border border-border/50 bg-background hover:border-indigo-300 text-muted-foreground hover:text-foreground flex items-center justify-between cursor-pointer transition-all"
               >
-                <span className="text-xs truncate pr-2">{chip.label}</span>
+                <span className="text-xs truncate pr-2">{getLabel(chip)}</span>
                 <span className="text-[10px] font-bold text-primary shrink-0">+ Add</span>
               </button>
             ))}

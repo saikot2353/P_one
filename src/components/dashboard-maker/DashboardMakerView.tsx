@@ -1237,15 +1237,22 @@ export const DashboardMakerView: React.FC = () => {
                                     />
                                   )}
 
-                                  {/* Metric Chips Customizer (Add / Remove Chips) */}
+                                  {/* Metric Chips Customizer (Add / Remove / Rename / Reset Chips) */}
                                   {def?.availableChips && def.availableChips.length > 0 && (
                                     <ChipsDropdown
                                       availableChips={def.availableChips}
                                       enabledChips={getEffectiveEnabledChips(def, widget.settings)}
+                                      chipLabels={widget.settings?.chipLabels}
                                       onChange={(chips) =>
                                         handleUpdateWidgetSettings(widget.id, {
                                           ...(widget.settings || {}),
                                           enabledChips: chips,
+                                        })
+                                      }
+                                      onChangeChipLabels={(labels) =>
+                                        handleUpdateWidgetSettings(widget.id, {
+                                          ...(widget.settings || {}),
+                                          chipLabels: labels,
                                         })
                                       }
                                     />

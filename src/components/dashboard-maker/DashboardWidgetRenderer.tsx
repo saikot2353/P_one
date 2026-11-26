@@ -325,11 +325,21 @@ function renderWidgetContent(
   const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === componentId);
   const enabledChips = getEffectiveEnabledChips(def, settings);
   const isChipVisible = (chipId: string) => enabledChips.length === 0 || enabledChips.includes(chipId);
+  const customLabels = settings?.chipLabels || {};
+  const applyCustomLabel = <T extends { id: string }>(item: T): T => {
+    const custom = customLabels[item.id]?.trim();
+    if (!custom) return item;
+    const patched: any = { ...item };
+    if ("label" in patched) patched.label = custom;
+    if ("title" in patched) patched.title = custom;
+    if ("name" in patched) patched.name = custom;
+    return patched as T;
+  };
   const orderByChips = <T extends { id: string }>(items: T[]): T[] => {
-    if (enabledChips.length === 0) return items;
+    if (enabledChips.length === 0) return items.map(applyCustomLabel);
     const map = new Map(items.map((item) => [item.id, item]));
     const ordered = enabledChips.map((id) => map.get(id)).filter((x): x is T => !!x);
-    return ordered.length > 0 ? ordered : items;
+    return (ordered.length > 0 ? ordered : items).map(applyCustomLabel);
   };
 
   switch (componentId) {
