@@ -29,6 +29,48 @@ export interface DashboardChipDefinition {
   defaultEnabled?: boolean;
 }
 
+export type CustomWidgetVisualType = "kpi_cards" | "bar_chart" | "area_chart" | "pie_chart";
+
+export type CustomWidgetChipColor = "blue" | "emerald" | "amber" | "rose" | "purple" | "indigo" | "teal";
+
+export type CustomWidgetAggregation = "SUM" | "COUNT" | "AVG" | "MAX" | "MIN";
+
+export interface CustomWidgetChipItem {
+  id: string;
+  label: string;
+  value: string;
+  sub?: string;
+  color: CustomWidgetChipColor;
+  dbColumn?: string;
+  aggregation?: CustomWidgetAggregation;
+}
+
+export interface CustomWidgetChartPoint {
+  label: string;
+  value: number;
+  secondaryValue?: number;
+  color?: string;
+}
+
+export interface CustomWidgetSpec {
+  visualType: CustomWidgetVisualType;
+  dataSource: string;
+  dbTable?: string;
+  groupByColumn?: string;
+  primaryColumn?: string;
+  primaryAggregation?: CustomWidgetAggregation;
+  secondaryColumn?: string;
+  secondaryAggregation?: CustomWidgetAggregation;
+  valuePrefix?: string;
+  valueSuffix?: string;
+  primarySeriesLabel?: string;
+  secondarySeriesLabel?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  chips: CustomWidgetChipItem[];
+  chartPoints: CustomWidgetChartPoint[];
+}
+
 export interface DashboardComponentDefinition {
   id: string;
   name: string;
@@ -44,6 +86,8 @@ export interface DashboardComponentDefinition {
   hasBuyerFilter?: boolean;
   hasWarehouseFilter?: boolean;
   availableChips?: DashboardChipDefinition[];
+  isCustom?: boolean;
+  customSpec?: CustomWidgetSpec;
 }
 
 export function getEffectiveEnabledChips(
@@ -948,6 +992,32 @@ export const DEFAULT_DASHBOARD_TEMPLATES: DashboardTemplate[] = [
 
 const STORAGE_KEY_TEMPLATES = "cripton_dashboard_templates_v18";
 const STORAGE_KEY_ACTIVE_ID = "cripton_active_dashboard_template_id_v18";
+const STORAGE_KEY_CUSTOM_WIDGETS = "cripton_custom_widgets_v1";
+
+export function loadCustomWidgets(): DashboardComponentDefinition[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_CUSTOM_WIDGETS);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomWidgets(widgets: DashboardComponentDefinition[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY_CUSTOM_WIDGETS, JSON.stringify(widgets));
+  } catch (err) {
+    console.error("Failed to save custom widgets", err);
+  }
+}
+
+export function getFullComponentCatalog(): DashboardComponentDefinition[] {
+  return [...DASHBOARD_COMPONENTS_CATALOG, ...loadCustomWidgets()];
+}
 
 export function loadDashboardTemplates(): DashboardTemplate[] {
   if (typeof window === "undefined") return DEFAULT_DASHBOARD_TEMPLATES;

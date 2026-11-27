@@ -62,7 +62,9 @@ import {
 } from "recharts";
 import {
   DashboardWidgetConfig,
+  DashboardComponentDefinition,
   DASHBOARD_COMPONENTS_CATALOG,
+  getFullComponentCatalog,
   getEffectiveEnabledChips,
   WidgetSettings,
   WidgetColSpan,
@@ -73,6 +75,7 @@ interface WidgetRendererProps {
   widget: DashboardWidgetConfig;
   isCompact?: boolean;
   onUpdateSettings?: (newSettings: WidgetSettings) => void;
+  overrideDef?: DashboardComponentDefinition;
 }
 
 
@@ -107,9 +110,10 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
   widget,
   isCompact = false,
   onUpdateSettings,
+  overrideDef,
 }) => {
   const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
-  const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === widget.componentId);
+  const def = overrideDef || getFullComponentCatalog().find((c) => c.id === widget.componentId);
   const displayTitle = widget.customTitle || def?.name || "Dashboard Widget";
   const settings = widget.settings;
 
@@ -227,7 +231,7 @@ export const DashboardWidgetRenderer: React.FC<WidgetRendererProps> = ({
 
         {/* Widget Content Body */}
         <div className="flex-1 min-h-[140px] flex flex-col justify-center">
-          {renderWidgetContent(widget.componentId, isCompact, settings, widget.colSpan || 12)}
+          {renderWidgetContent(widget.componentId, isCompact, settings, widget.colSpan || 12, def)}
         </div>
       </div>
 
@@ -319,10 +323,11 @@ function renderWidgetContent(
   componentId: string,
   isCompact: boolean,
   settings?: WidgetSettings,
-  colSpan: WidgetColSpan = 12
+  colSpan: WidgetColSpan = 12,
+  overrideDef?: DashboardComponentDefinition
 ) {
   const scope = settings?.scope || "company";
-  const def = DASHBOARD_COMPONENTS_CATALOG.find((c) => c.id === componentId);
+  const def = overrideDef || getFullComponentCatalog().find((c) => c.id === componentId);
   const enabledChips = getEffectiveEnabledChips(def, settings);
   const isChipVisible = (chipId: string) => enabledChips.length === 0 || enabledChips.includes(chipId);
   const customLabels = settings?.chipLabels || {};
@@ -4022,11 +4027,216 @@ function renderWidgetContent(
         </div>
       );
 
-    default:
+    default: {
+      const spec = def?.customSpec;
+      if (!spec) {
+        return (
+          <div className="p-6 text-center text-xs text-muted-foreground">
+            Widget content for {componentId} is ready.
+          </div>
+        );
+      }
+
+      const colorStyles: Record<string, { box: string; title: string; val: string }> = {
+        blue: { box: "bg-blue-500/10 border-blue-500/20", title: "text-blue-600 dark:text-blue-400", val: "text-foreground" },
+        emerald: { box: "bg-emerald-500/10 border-emerald-500/20", title: "text-emerald-600 dark:text-emerald-400", val: "text-emerald-600 dark:text-emerald-400" },
+        amber: { box: "bg-amber-500/10 border-amber-500/20", title: "text-amber-600 dark:text-amber-400", val: "text-amber-600 dark:text-amber-400" },
+        rose: { box: "bg-rose-500/10 border-rose-500/20", title: "text-rose-600 dark:text-rose-400", val: "text-rose-600 dark:text-rose-400" },
+        purple: { box: "bg-purple-500/10 border-purple-500/20", title: "text-purple-600 dark:text-purple-400", val: "text-purple-600 dark:text-purple-400" },
+        indigo: { box: "bg-indigo-500/10 border-indigo-500/20", title: "text-indigo-600 dark:text-indigo-400", val: "text-indigo-600 dark:text-indigo-400" },
+        teal: { box: "bg-teal-500/10 border-teal-500/20", title: "text-teal-600 dark:text-teal-400", val: "text-teal-600 dark:text-teal-400" },
+      };
+
+      const customChips = orderByChips(
+        (spec.chips || []).map((c) => ({
+          ...c,
+          style: colorStyles[c.color] || colorStyles.blue,
+        }))
+      );
+
+      const prefix = spec.valuePrefix || "";
+      const suffix = spec.valueSuffix || "";
+      const primaryColor = spec.primaryColor || "#3b82f6";
+      const secondaryColor = spec.secondaryColor || "#10b981";
+      const hasSecondary = (spec.chartPoints || []).some((p) => typeof p.secondaryValue === "number");
+
+      if (spec.visualType === "kpi_cards") {
+        return (
+          <div className={getMetricGridClass(colSpan, Math.max(1, customChips.length))}>
+            {customChips.map((c) => (
+              <div key={c.id} className={`p-3 rounded-xl border ${c.style.box}`}>
+                <span className={`text-[10.5px] font-bold uppercase tracking-wider block truncate ${c.style.title}`}>
+                  {c.label}
+                </span>
+                <div className={`text-xl sm:text-2xl font-black font-mono mt-1 ${c.style.val}`}>
+                  {c.value}
+                </div>
+                {c.sub && (
+                  <div className="text-[10px] text-muted-foreground font-medium mt-1 truncate">{c.sub}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      }
+
+      if (spec.visualType === "pie_chart") {
+        const pieData = (spec.chartPoints || []).map((pt, idx) => ({
+          id: `pt_${idx}`,
+          name: pt.label,
+          value: pt.value,
+          color: pt.color || ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"][idx % 6],
+        }));
+        const total = pieData.reduce((s, d) => s + d.value, 0);
+        const topPct = total > 0 && pieData[0] ? Math.round((pieData[0].value / total) * 100) : 0;
+
+        return (
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="w-full sm:w-1/2 h-44 relative flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={pieData} innerRadius={42} outerRadius={64} paddingAngle={4} dataKey="value" stroke="none">
+                    {pieData.map((entry) => (
+                      <Cell key={entry.id} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(val: any, name: any) => [`${prefix}${val}${suffix}`, name]}
+                    contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                    labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                    itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-xl font-extrabold text-foreground leading-none">{topPct}%</span>
+                <span className="text-[8.5px] uppercase tracking-wider font-bold text-muted-foreground mt-0.5">
+                  {pieData[0]?.name || "Share"}
+                </span>
+              </div>
+            </div>
+            <div className="w-full sm:w-1/2 space-y-1.5 text-xs">
+              {pieData.map((d) => {
+                const pct = total > 0 ? Math.round((d.value / total) * 100) : 0;
+                return (
+                  <div
+                    key={d.id}
+                    className="flex items-center justify-between px-2.5 py-1.5 rounded-xl border"
+                    style={{ backgroundColor: `${d.color}0d`, borderColor: `${d.color}22` }}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                      <span className="text-foreground font-bold text-[10.5px] truncate">{d.name}</span>
+                    </div>
+                    <span className="text-[11px] font-black shrink-0" style={{ color: d.color }}>
+                      {pct}% <span className="text-[9px] text-muted-foreground font-medium">({prefix}{d.value.toLocaleString()}{suffix})</span>
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+
+      if (spec.visualType === "area_chart") {
+        return (
+          <div className="space-y-3">
+            {customChips.length > 0 && (
+              <div className={getMetricGridClass(colSpan, customChips.length)}>
+                {customChips.map((c) => (
+                  <div key={c.id} className={`p-2.5 rounded-xl border ${c.style.box}`}>
+                    <span className={`text-[10px] font-bold uppercase tracking-wider block truncate ${c.style.title}`}>
+                      {c.label}
+                    </span>
+                    <div className={`text-lg font-black font-mono mt-0.5 ${c.style.val}`}>{c.value}</div>
+                    {c.sub && <div className="text-[9.5px] text-muted-foreground truncate">{c.sub}</div>}
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="h-44 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={spec.chartPoints} margin={{ top: 10, right: 10, left: -12, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                  <XAxis dataKey="label" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${prefix}${v}${suffix}`} />
+                  <Tooltip
+                    formatter={(val: any, name: any) => [`${prefix}${Number(val).toLocaleString()}${suffix}`, name]}
+                    contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                    labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                    itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="value"
+                    name={spec.primarySeriesLabel || "Value"}
+                    stroke={primaryColor}
+                    fill={primaryColor}
+                    fillOpacity={0.18}
+                    strokeWidth={2}
+                  />
+                  {hasSecondary && (
+                    <Area
+                      type="monotone"
+                      dataKey="secondaryValue"
+                      name={spec.secondarySeriesLabel || "Target"}
+                      stroke={secondaryColor}
+                      fill={secondaryColor}
+                      fillOpacity={0.12}
+                      strokeWidth={2}
+                    />
+                  )}
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        );
+      }
+
+      // Default: bar_chart (+ optional KPI chips)
       return (
-        <div className="p-6 text-center text-xs text-muted-foreground">
-          Widget content for {componentId} is ready.
+        <div className="space-y-3">
+          {customChips.length > 0 && (
+            <div className={getMetricGridClass(colSpan, customChips.length)}>
+              {customChips.map((c) => (
+                <div key={c.id} className={`p-2.5 rounded-xl border ${c.style.box}`}>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider block truncate ${c.style.title}`}>
+                    {c.label}
+                  </span>
+                  <div className={`text-lg font-black font-mono mt-0.5 ${c.style.val}`}>{c.value}</div>
+                  {c.sub && <div className="text-[9.5px] text-muted-foreground truncate">{c.sub}</div>}
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="h-48 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={spec.chartPoints} margin={{ top: 16, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${prefix}${v}${suffix}`} />
+                <Tooltip
+                  cursor={{ fill: "rgba(59, 130, 246, 0.06)" }}
+                  formatter={(val: any, name: any) => [`${prefix}${Number(val).toLocaleString()}${suffix}`, name]}
+                  contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
+                  labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                  itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                />
+                <Bar dataKey="value" name={spec.primarySeriesLabel || "Value"} fill={primaryColor} radius={[4, 4, 0, 0]} />
+                {hasSecondary && (
+                  <Bar
+                    dataKey="secondaryValue"
+                    name={spec.secondarySeriesLabel || "Secondary"}
+                    fill={secondaryColor}
+                    radius={[4, 4, 0, 0]}
+                  />
+                )}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       );
+    }
   }
 }
