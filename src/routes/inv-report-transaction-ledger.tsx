@@ -332,25 +332,6 @@ export function ItemTransactionLedgerPage() {
             </div>
           </div>
 
-          {/* Quick Metrics (Transaction Types Tracked KPI card removed) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="p-3.5 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[11px] font-medium text-muted-foreground">Ledger Transactions</span>
-              <p className="text-lg font-bold mt-1 text-foreground">{filteredRows.length} Entries</p>
-              <span className="text-[10px] text-muted-foreground">In active date range</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 shadow-xs">
-              <span className="text-[11px] font-medium text-emerald-600">Total Inflow (Receipts)</span>
-              <p className="text-lg font-bold mt-1 text-emerald-600 font-mono">+{totalIn.toLocaleString()}</p>
-              <span className="text-[10px] text-muted-foreground">Stock increases</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-rose-500/20 bg-rose-500/5 shadow-xs">
-              <span className="text-[11px] font-medium text-rose-600">Total Outflow (Issues)</span>
-              <p className="text-lg font-bold mt-1 text-rose-600 font-mono">-{totalOut.toLocaleString()}</p>
-              <span className="text-[10px] text-muted-foreground">Stock deductions</span>
-            </div>
-          </div>
-
           {/* Dynamic Filter Section */}
           <div className="p-4 rounded-xl border border-border/70 bg-card/60 backdrop-blur-xs space-y-3 shadow-xs">
             <div className="flex items-center justify-between pb-2 border-b border-border/50">
@@ -508,13 +489,12 @@ export function ItemTransactionLedgerPage() {
                     <th className="py-2.5 px-3 text-right">In Qty</th>
                     <th className="py-2.5 px-3 text-right">Out Qty</th>
                     <th className="py-2.5 px-3 text-right font-bold text-primary">Balance</th>
-                    <th className="py-2.5 px-3 text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {filteredRows.length === 0 ? (
                     <tr>
-                      <td colSpan={11} className="py-8 text-center text-muted-foreground">
+                      <td colSpan={10} className="py-8 text-center text-muted-foreground">
                         No transactions found matching the filter parameters.
                       </td>
                     </tr>
@@ -561,18 +541,6 @@ export function ItemTransactionLedgerPage() {
                         <td className="py-2 px-3 text-right font-mono font-black text-primary text-sm">
                           {row.balance.toLocaleString()}
                         </td>
-                        <td className="py-2 px-3 text-center">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedTxModal(row);
-                            }}
-                            className="p-1 rounded-md hover:bg-muted text-primary cursor-pointer transition"
-                            title="View Transaction Details"
-                          >
-                            <Eye className="size-3.5" />
-                          </button>
-                        </td>
                       </tr>
                     ))
                   )}
@@ -591,9 +559,6 @@ export function ItemTransactionLedgerPage() {
                       </td>
                       <td className="py-3 px-3 text-right font-mono text-sm text-primary font-black">
                         {(filteredRows[filteredRows.length - 1]?.balance ?? 0).toLocaleString()}
-                      </td>
-                      <td className="py-3 px-3 text-center text-[10px] text-muted-foreground font-normal">
-                        {filteredRows.length} Entries
                       </td>
                     </tr>
                   </tfoot>

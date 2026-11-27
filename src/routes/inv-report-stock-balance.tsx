@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import {
   INITIAL_STOCK_BALANCE_DATA,
   StockBalanceRow,
+  INITIAL_LEDGER_DATA,
 } from "@/lib/reports-mock-data";
 import { formatAmount, getActiveCurrencyConfig } from "@/lib/currency-format-utils";
 import { exportToCSV, exportToExcel } from "@/lib/report-export-utils";
@@ -98,7 +99,12 @@ export function StockBalanceRegisterPage() {
     }
     return "All";
   });
-  const [asOfDate, setAsOfDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [fromDate, setFilterFromDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 90);
+    return d.toISOString().slice(0, 10);
+  });
+  const [toDate, setFilterToDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [searchQuery, setSearchQuery] = useState("");
 
   // Modals
@@ -136,8 +142,8 @@ export function StockBalanceRegisterPage() {
     []
   );
 
-  // Filtered dataset
-  const filteredRows = useMemo(() => {
+  // Filtered dataset with dynamic Opening, In QTY, Out QTY, and Current Stock calculation
+  const computedRows = useMemo(() => {
     return INITIAL_STOCK_BALANCE_DATA.filter((row) => {
       if (filterCompany !== "All" && row.company !== filterCompany) return false;
       if (filterStore !== "All" && row.store !== filterStore) return false;
@@ -161,7 +167,6 @@ export function StockBalanceRegisterPage() {
         const q = filterOrigin.toLowerCase().trim();
         if (!row.origin.toLowerCase().includes(q)) return false;
       }
-      if (filterStockStatus !== "All" && row.stockStatus !== filterStockStatus) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -174,6 +179,55 @@ export function StockBalanceRegisterPage() {
       }
 
       return true;
+    }).map((row) => {
+      // Find matching ledger transactions for this item
+      const itemTx = INITIAL_LEDGER_DATA.filter((tx) => tx.itemCode === row.itemCode);
+
+      // 1. Opening Stock: closing stock balance before selected From Date
+      // If transactions exist before fromDate, net them against row.availableQty baseline, or compute from opening baseline
+      let openingStock = row.availableQty;
+      const txBefore = itemTx.filter((t) => fromDate && t.date < fromDate);
+      const txDuring = itemTx.filter(
+        (t) => (!fromDate || t.date >= fromDate) && (!toDate || t.date <= toDate)
+      );
+
+      // In QTY: total quantity of all stock receipts within selected From Date and To Date
+      let inQty = txDuring.reduce((sum, t) => sum + (t.inQty || 0), 0);
+
+      // Out QTY: total quantity of all stock issues within selected From Date and To Date
+      let outQty = txDuring.reduce((sum, t) => sum + (t.outQty || 0), 0);
+
+      if (txDuring.length > 0) {
+        // When item has ledger entries, opening stock is the balance right before fromDate
+        if (txBefore.length > 0) {
+          // Sort by date ascending
+          const sortedBefore = [...txBefore].sort((a, b) => a.date.localeCompare(b.date));
+          openingStock = sortedBefore[sortedBefore.length - 1].balance;
+        } else {
+          // If no transactions before fromDate, take first transaction's previous balance
+          const sortedDuring = [...txDuring].sort((a, b) => a.date.localeCompare(b.date));
+          const firstTx = sortedDuring[0];
+          openingStock = Math.max(0, firstTx.balance - firstTx.inQty + firstTx.outQty);
+        }
+      } else {
+        // Fallback realistic proportional values for demo items without ledger rows
+        openingStock = row.availableQty;
+        inQty = Math.round(row.inTransitQty || 0);
+        outQty = Math.round(row.damagedQty || 0);
+      }
+
+      // Current Stock: Opening Stock + In QTY - Out QTY
+      const currentStock = openingStock + inQty - outQty;
+      const stockVal = Math.round(currentStock * row.unitCost);
+
+      return {
+        ...row,
+        openingStock,
+        inQty,
+        outQty,
+        currentStock,
+        stockValue: stockVal,
+      };
     });
   }, [
     filterCompany,
@@ -183,21 +237,34 @@ export function StockBalanceRegisterPage() {
     filterItemCategory,
     filterBrand,
     filterOrigin,
-    filterStockStatus,
+    fromDate,
+    toDate,
     searchQuery,
   ]);
 
-  // KPI Calculations
-  const kpis = useMemo(() => {
-    const totalItems = filteredRows.length;
-    const totalQty = filteredRows.reduce((s, r) => s + r.totalQty, 0);
-    const totalVal = filteredRows.reduce((s, r) => s + r.stockValue, 0);
-    const lowStock = filteredRows.filter((r) => r.stockStatus === "Low Stock").length;
-    const outOfStock = filteredRows.filter((r) => r.stockStatus === "Out of Stock" || r.availableQty <= 0).length;
-    const inTransit = filteredRows.reduce((s, r) => s + r.inTransitQty, 0);
+  const filteredRows = computedRows;
 
-    return { totalItems, totalQty, totalVal, lowStock, outOfStock, inTransit };
-  }, [filteredRows]);
+  // Aggregate sums
+  const totalOpeningStock = useMemo(
+    () => filteredRows.reduce((s, r) => s + r.openingStock, 0),
+    [filteredRows]
+  );
+  const totalInQty = useMemo(
+    () => filteredRows.reduce((s, r) => s + r.inQty, 0),
+    [filteredRows]
+  );
+  const totalOutQty = useMemo(
+    () => filteredRows.reduce((s, r) => s + r.outQty, 0),
+    [filteredRows]
+  );
+  const totalCurrentStock = useMemo(
+    () => filteredRows.reduce((s, r) => s + r.currentStock, 0),
+    [filteredRows]
+  );
+  const totalValuation = useMemo(
+    () => filteredRows.reduce((s, r) => s + r.stockValue, 0),
+    [filteredRows]
+  );
 
   const handleResetFilters = () => {
     setFilterCompany("All");
@@ -211,7 +278,10 @@ export function StockBalanceRegisterPage() {
     setFilterLocation("");
     setFilterStockStatus("All");
     setSearchQuery("");
-    setAsOfDate(new Date().toISOString().slice(0, 10));
+    const d = new Date();
+    d.setDate(d.getDate() - 90);
+    setFilterFromDate(d.toISOString().slice(0, 10));
+    setFilterToDate(new Date().toISOString().slice(0, 10));
     toast.info("Filters reset to default");
   };
 
@@ -224,15 +294,12 @@ export function StockBalanceRegisterPage() {
       "Origin",
       "UOM",
       "Store",
-      "Available Qty",
-      "Reserved Qty",
-      "In-Transit Qty",
-      "Damaged Qty",
-      "Total Qty",
+      "Opening Stock",
+      "In QTY",
+      "Out QTY",
+      "Current Stock",
       "Unit Cost",
       "Stock Value",
-      "Tracking Mode",
-      "Status",
     ];
 
     const rows = filteredRows.map((r) => [
@@ -243,18 +310,15 @@ export function StockBalanceRegisterPage() {
       r.origin,
       r.uom,
       r.store,
-      r.availableQty,
-      r.reservedQty,
-      r.inTransitQty,
-      r.damagedQty,
-      r.totalQty,
+      r.openingStock,
+      r.inQty,
+      r.outQty,
+      r.currentStock,
       formatAmount(r.unitCost),
       formatAmount(r.stockValue),
-      r.trackingType === "Batch" ? "B (Batch)" : "L (Location)",
-      r.stockStatus,
     ]);
 
-    exportToCSV(`Stock_Balance_Register_As_Of_${asOfDate}.csv`, headers, rows);
+    exportToCSV(`Stock_Balance_Register_${fromDate}_to_${toDate}.csv`, headers, rows);
     toast.success("CSV export downloaded successfully!");
   };
 
@@ -267,15 +331,12 @@ export function StockBalanceRegisterPage() {
       "Origin",
       "UOM",
       "Store",
-      "Available Qty",
-      "Reserved Qty",
-      "In-Transit Qty",
-      "Damaged Qty",
-      "Total Qty",
+      "Opening Stock",
+      "In QTY",
+      "Out QTY",
+      "Current Stock",
       "Unit Cost",
       "Stock Value",
-      "Tracking Mode",
-      "Status",
     ];
 
     const rows = filteredRows.map((r) => [
@@ -286,25 +347,25 @@ export function StockBalanceRegisterPage() {
       r.origin,
       r.uom,
       r.store,
-      r.availableQty,
-      r.reservedQty,
-      r.inTransitQty,
-      r.damagedQty,
-      r.totalQty,
+      r.openingStock,
+      r.inQty,
+      r.outQty,
+      r.currentStock,
       formatAmount(r.unitCost),
       formatAmount(r.stockValue),
-      r.trackingType === "Batch" ? "B (Batch)" : "L (Location)",
-      r.stockStatus,
     ]);
 
     const subtotals = [
-      { label: "Overall Total Stock Quantity", value: kpis.totalQty.toLocaleString() },
-      { label: "Overall Total Stock Valuation", value: formatAmount(kpis.totalVal, undefined, true) },
+      { label: "Overall Total Opening Stock", value: totalOpeningStock.toLocaleString() },
+      { label: "Overall Total In QTY", value: totalInQty.toLocaleString() },
+      { label: "Overall Total Out QTY", value: totalOutQty.toLocaleString() },
+      { label: "Overall Total Current Stock", value: totalCurrentStock.toLocaleString() },
+      { label: "Overall Total Stock Valuation", value: formatAmount(totalValuation, undefined, true) },
     ];
 
     exportToExcel(
-      `Stock_Balance_Register_As_Of_${asOfDate}.xls`,
-      `Stock Balance Register (As of ${asOfDate})`,
+      `Stock_Balance_Register_${fromDate}_to_${toDate}.xls`,
+      `Stock Balance Register (${fromDate} to ${toDate})`,
       headers,
       rows,
       subtotals
@@ -319,11 +380,12 @@ export function StockBalanceRegisterPage() {
       "Item Description",
       "UOM",
       "Store",
-      "Avail Qty",
-      "Total Qty",
+      "Opening Stock",
+      "In QTY",
+      "Out QTY",
+      "Current Stock",
       "Unit Cost",
       "Stock Value",
-      "Status",
     ];
 
     const tableRows = filteredRows.map((r, idx) => [
@@ -332,33 +394,36 @@ export function StockBalanceRegisterPage() {
       `${r.itemName} (${r.specification || "-"})`,
       r.uom,
       r.store,
-      r.availableQty,
-      r.totalQty,
+      r.openingStock.toLocaleString(),
+      r.inQty.toLocaleString(),
+      r.outQty.toLocaleString(),
+      r.currentStock.toLocaleString(),
       formatAmount(r.unitCost),
       formatAmount(r.stockValue),
-      r.stockStatus,
     ]);
 
     setPdfReportData({
       reportTitle: "STOCK BALANCE REGISTER",
-      documentNumber: `STK-BAL-${asOfDate}`,
-      reportDate: asOfDate,
+      documentNumber: `STK-BAL-${fromDate}-${toDate}`,
+      reportDate: `${fromDate} to ${toDate}`,
       companyName: filterCompany !== "All" ? filterCompany : "Pakiza Group of Industries",
       department: "Central Inventory & Materials Management",
       metadata: [
-        { label: "As of Date", value: asOfDate },
+        { label: "Date Range", value: `${fromDate} to ${toDate}`, highlight: true },
         { label: "Store Filter", value: filterStore },
         { label: "Total Stock Items", value: filteredRows.length },
-        { label: "In-Transit Volume", value: kpis.inTransit },
       ],
       tableHeaders,
       tableRows,
       financials: [
-        { label: "Total Items", value: kpis.totalItems },
-        { label: "Total Stock Qty", value: kpis.totalQty.toLocaleString() },
+        { label: "Total Items", value: filteredRows.length },
+        { label: "Total Opening Stock", value: totalOpeningStock.toLocaleString() },
+        { label: "Total In QTY", value: totalInQty.toLocaleString() },
+        { label: "Total Out QTY", value: totalOutQty.toLocaleString() },
+        { label: "Total Current Stock", value: totalCurrentStock.toLocaleString() },
         {
           label: "Total Inventory Value",
-          value: formatAmount(kpis.totalVal, undefined, true),
+          value: formatAmount(totalValuation, undefined, true),
           isTotal: true,
           highlight: true,
         },
@@ -419,43 +484,6 @@ export function StockBalanceRegisterPage() {
                 <Printer className="size-3.5" />
                 <span>PDF / Print</span>
               </button>
-            </div>
-          </div>
-
-          {/* KPI Cards (Low Stock removed) */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
-            <div className="p-3 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[10.5px] font-medium text-muted-foreground">Total Items</span>
-              <p className="text-base font-bold mt-1 text-foreground">{kpis.totalItems} SKUs</p>
-              <span className="text-[10px] text-muted-foreground">Catalog products</span>
-            </div>
-            <div className="p-3 rounded-xl border border-border/70 bg-card shadow-xs">
-              <span className="text-[10.5px] font-medium text-muted-foreground">Total Stock Qty</span>
-              <p className="text-base font-bold mt-1 text-foreground font-mono">
-                {kpis.totalQty.toLocaleString()}
-              </p>
-              <span className="text-[10px] text-emerald-600 font-medium">On-hand volume</span>
-            </div>
-            <div className="p-3 rounded-xl border border-primary/20 bg-primary/5 shadow-xs">
-              <span className="text-[10.5px] font-medium text-primary">Total Stock Value</span>
-              <p className="text-base font-bold mt-1 text-primary font-mono">
-                {formatAmount(kpis.totalVal, undefined, true)}
-              </p>
-              <span className="text-[10px] text-muted-foreground">{currencyCfg.format}</span>
-            </div>
-            <div className="p-3 rounded-xl border border-rose-500/20 bg-rose-500/5 shadow-xs">
-              <span className="text-[10.5px] font-medium text-rose-600 dark:text-rose-400">Out of Stock</span>
-              <p className="text-base font-bold mt-1 text-rose-600 dark:text-rose-400 font-mono">
-                {kpis.outOfStock}
-              </p>
-              <span className="text-[10px] text-muted-foreground">Zero available balance</span>
-            </div>
-            <div className="p-3 rounded-xl border border-blue-500/20 bg-blue-500/5 shadow-xs">
-              <span className="text-[10.5px] font-medium text-blue-600 dark:text-blue-400">In-Transit Stock</span>
-              <p className="text-base font-bold mt-1 text-blue-600 dark:text-blue-400 font-mono">
-                {kpis.inTransit.toLocaleString()}
-              </p>
-              <span className="text-[10px] text-muted-foreground">Dispatched between stores</span>
             </div>
           </div>
 
@@ -595,33 +623,30 @@ export function StockBalanceRegisterPage() {
                 </datalist>
               </div>
 
-              {/* Stock Status */}
+              {/* From Date */}
               <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Stock Status</label>
-                <select
-                  value={filterStockStatus}
-                  onChange={(e) => setFilterStockStatus(e.target.value)}
-                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
-                >
-                  <option value="All">All Statuses</option>
-                  <option value="Out of Stock">Out of Stock</option>
-                  <option value="In-Transit">In-Transit</option>
-                </select>
-              </div>
-
-              {/* As of Date */}
-              <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">As of Date</label>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">From Date</label>
                 <input
                   type="date"
-                  value={asOfDate}
-                  onChange={(e) => setAsOfDate(e.target.value)}
+                  value={fromDate}
+                  onChange={(e) => setFilterFromDate(e.target.value)}
+                  className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
+                />
+              </div>
+
+              {/* To Date */}
+              <div>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">To Date</label>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setFilterToDate(e.target.value)}
                   className="w-full mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
                 />
               </div>
 
               {/* Quick Search */}
-              <div>
+              <div className="sm:col-span-2 lg:col-span-3">
                 <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Search Item</label>
                 <div className="relative mt-1">
                   <input
@@ -640,10 +665,9 @@ export function StockBalanceRegisterPage() {
           {/* Main Stock Table */}
           <div className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-xs">
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-              <table className="w-full text-xs text-left border-collapse min-w-[1550px]">
+              <table className="w-full text-xs text-left border-collapse min-w-[1400px]">
                 <thead className="bg-muted/80 text-muted-foreground font-semibold uppercase text-[10.5px] sticky top-0 z-10 backdrop-blur-xs border-b border-border">
                   <tr>
-                    <th className="py-2.5 px-3">Tracking</th>
                     <th className="py-2.5 px-3">Item Code</th>
                     <th className="py-2.5 px-3">Item Name</th>
                     <th className="py-2.5 px-3">Specification</th>
@@ -651,43 +675,23 @@ export function StockBalanceRegisterPage() {
                     <th className="py-2.5 px-3">Origin</th>
                     <th className="py-2.5 px-3">UOM</th>
                     <th className="py-2.5 px-3">Store</th>
-                    <th className="py-2.5 px-3 text-right">Available Qty</th>
-                    <th className="py-2.5 px-3 text-right">In-Transit Qty</th>
-                    <th className="py-2.5 px-3 text-right">Damaged Qty</th>
-                    <th className="py-2.5 px-3 text-right">Total Qty</th>
+                    <th className="py-2.5 px-3 text-right">Opening Stock</th>
+                    <th className="py-2.5 px-3 text-right">In QTY</th>
+                    <th className="py-2.5 px-3 text-right">Out QTY</th>
+                    <th className="py-2.5 px-3 text-right">Current Stock</th>
                     <th className="py-2.5 px-3 text-right">Stock Value</th>
-                    <th className="py-2.5 px-3 text-center">Status</th>
-                    <th className="py-2.5 px-3 text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {filteredRows.length === 0 ? (
                     <tr>
-                      <td colSpan={15} className="py-8 text-center text-muted-foreground">
+                      <td colSpan={12} className="py-8 text-center text-muted-foreground">
                         No stock balance records found for the active criteria.
                       </td>
                     </tr>
                   ) : (
                     filteredRows.map((row) => (
                       <tr key={row.id} className="hover:bg-muted/40 transition">
-                        <td className="py-2 px-3">
-                          {/* Strict single badge requirement: B = Batch, L = Location */}
-                          {row.trackingType === "Batch" ? (
-                            <span
-                              className="px-2 py-0.5 rounded text-[10px] font-black bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20"
-                              title="Batch Tracked Item"
-                            >
-                              B
-                            </span>
-                          ) : (
-                            <span
-                              className="px-2 py-0.5 rounded text-[10px] font-black bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
-                              title="Location Tracked Item"
-                            >
-                              L
-                            </span>
-                          )}
-                        </td>
                         <td className="py-2 px-3 font-mono text-[11px] font-bold text-primary whitespace-nowrap">
                           {row.itemCode}
                         </td>
@@ -703,44 +707,20 @@ export function StockBalanceRegisterPage() {
                         <td className="py-2 px-3 text-foreground font-medium whitespace-nowrap">
                           {row.store}
                         </td>
-                        <td className="py-2 px-3 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                          {row.availableQty.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-3 text-right font-mono text-blue-600 dark:text-blue-400">
-                          {row.inTransitQty.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-3 text-right font-mono text-rose-500">
-                          {row.damagedQty.toLocaleString()}
-                        </td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-foreground">
-                          {row.totalQty.toLocaleString()}
+                          {row.openingStock.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                          {row.inQty > 0 ? `+${row.inQty.toLocaleString()}` : "0"}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono text-rose-500 font-semibold">
+                          {row.outQty > 0 ? `-${row.outQty.toLocaleString()}` : "0"}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono font-black text-foreground">
+                          {row.currentStock.toLocaleString()}
                         </td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-primary">
                           {formatAmount(row.stockValue)}
-                        </td>
-                        <td className="py-2 px-3 text-center whitespace-nowrap">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              row.stockStatus === "Normal"
-                                ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
-                                : row.stockStatus === "Low Stock"
-                                ? "bg-amber-500/10 text-amber-600 border border-amber-500/20"
-                                : row.stockStatus === "In-Transit"
-                                ? "bg-blue-500/10 text-blue-600 border border-blue-500/20"
-                                : "bg-rose-500/10 text-rose-600 border border-rose-500/20"
-                            }`}
-                          >
-                            {row.stockStatus}
-                          </span>
-                        </td>
-                        <td className="py-2 px-3 text-center">
-                          <button
-                            onClick={() => setSelectedItemModal(row)}
-                            className="p-1 rounded-md hover:bg-muted text-primary cursor-pointer transition"
-                            title="View Item Stock Details"
-                          >
-                            <Eye className="size-3.5" />
-                          </button>
                         </td>
                       </tr>
                     ))
@@ -750,26 +730,23 @@ export function StockBalanceRegisterPage() {
                 {filteredRows.length > 0 && (
                   <tfoot className="bg-primary/10 text-foreground font-black border-t-2 border-primary/30">
                     <tr>
-                      <td colSpan={8} className="py-3 px-3 text-right text-xs uppercase tracking-wider text-primary">
+                      <td colSpan={7} className="py-3 px-3 text-right text-xs uppercase tracking-wider text-primary">
                         TOTAL REGISTER BALANCE:
                       </td>
+                      <td className="py-3 px-3 text-right font-mono text-xs font-bold text-foreground">
+                        {totalOpeningStock.toLocaleString()}
+                      </td>
                       <td className="py-3 px-3 text-right font-mono text-xs font-bold text-emerald-600">
-                        {filteredRows.reduce((s, r) => s + r.availableQty, 0).toLocaleString()}
+                        +{totalInQty.toLocaleString()}
                       </td>
-                      <td className="py-3 px-3 text-right font-mono text-xs text-blue-600">
-                        {kpis.inTransit.toLocaleString()}
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono text-xs text-rose-500">
-                        {filteredRows.reduce((s, r) => s + r.damagedQty, 0).toLocaleString()}
+                      <td className="py-3 px-3 text-right font-mono text-xs font-bold text-rose-500">
+                        -{totalOutQty.toLocaleString()}
                       </td>
                       <td className="py-3 px-3 text-right font-mono text-xs font-black text-foreground">
-                        {kpis.totalQty.toLocaleString()}
+                        {totalCurrentStock.toLocaleString()}
                       </td>
                       <td className="py-3 px-3 text-right font-mono text-sm font-black text-primary">
-                        {formatAmount(kpis.totalVal, undefined, true)}
-                      </td>
-                      <td colSpan={2} className="py-3 px-3 text-center text-[10px] text-muted-foreground">
-                        {filteredRows.length} Items Listed
+                        {formatAmount(totalValuation, undefined, true)}
                       </td>
                     </tr>
                   </tfoot>
@@ -780,7 +757,7 @@ export function StockBalanceRegisterPage() {
             {/* Bottom Info Bar */}
             <div className="flex items-center justify-between px-4 py-2.5 bg-muted/30 border-t border-border text-xs text-muted-foreground">
               <div>
-                Report Position As of: <span className="font-bold text-foreground">{asOfDate}</span> | {filteredRows.length} items evaluated.
+                Period Range: <span className="font-bold text-foreground">{fromDate}</span> to <span className="font-bold text-foreground">{toDate}</span> | {filteredRows.length} items evaluated.
               </div>
               <div className="text-[11px] font-mono">
                 Currency: <span className="font-bold text-foreground">{currencyCfg.currencyCode}</span> ({currencyCfg.symbol}) | Format: <span className="font-bold text-foreground">{currencyCfg.format}</span>
