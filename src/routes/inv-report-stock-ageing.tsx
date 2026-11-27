@@ -408,16 +408,16 @@ export function StockAgeingReportPage() {
     <div className="flex h-screen bg-white font-sans text-slate-800 overflow-hidden">
       <InventorySidebar />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <InventoryTopbar />
 
-        <main className="flex-1 overflow-y-auto px-4 lg:px-7 py-5 space-y-4 bg-white">
+        <main className="flex-1 overflow-y-auto px-4 lg:px-7 py-5 space-y-4">
           {/* Header & Export Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 bg-white">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/60">
             <div>
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                <h1 className="text-xl font-bold tracking-tight text-foreground">
                   Stock Ageing Report
                 </h1>
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">

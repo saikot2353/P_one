@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useId, useMemo } from 'react';
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
+import { InventorySidebar } from "@/components/dashboard/InventorySidebar";
+import { InventoryTopbar } from "@/components/dashboard/InventoryTopbar";
 import {
   DollarSign,
   ArrowLeft,
@@ -245,7 +247,14 @@ export default function LoanRecoveryPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="flex h-screen bg-slate-50/50 font-sans text-slate-900 overflow-hidden">
+      <InventorySidebar />
+
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <InventoryTopbar />
+
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-6">
+          <div className="w-full max-w-[1550px] mx-auto space-y-6">
       {/* Top Header & Breadcrumbs */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
         <div className="flex items-center gap-3">
@@ -957,6 +966,9 @@ export default function LoanRecoveryPage() {
           </div>
         </div>
       )}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

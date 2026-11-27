@@ -271,6 +271,7 @@ export function MaterialReceiveListPage() {
         <InventoryTopbar />
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-6">
+          <div className="w-full max-w-[1550px] mx-auto space-y-6">
           {returnTo && (
             <div className="bg-gradient-to-r from-teal-50 via-emerald-50 to-teal-50 border border-teal-200 text-teal-950 px-4 py-3 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
               <div className="flex items-center gap-3">
@@ -669,6 +670,7 @@ export function MaterialReceiveListPage() {
                 </tbody>
               </table>
             </div>
+          </div>
           </div>
         </main>
       </div>

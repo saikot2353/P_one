@@ -236,7 +236,7 @@ function StockAdjustmentListPage() {
       <main className="flex-1 min-w-0 flex flex-col relative pb-20">
         <InventoryTopbar />
 
-        <div className="p-4 sm:p-6 lg:p-7 space-y-6 w-full max-w-[1600px] mx-auto">
+        <div className="p-4 sm:p-6 lg:p-7 space-y-6 w-full max-w-[1550px] mx-auto">
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
             <div className="flex items-center gap-3">

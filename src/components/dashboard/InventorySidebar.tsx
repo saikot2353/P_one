@@ -546,9 +546,6 @@ export function InventorySidebar() {
         onScroll={handleScroll}
         className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none"
       >
-        <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">
-          Workspace
-        </div>
         {filteredNav.map((item) => {
           const Icon = item.icon;
 
@@ -593,14 +590,19 @@ export function InventorySidebar() {
                       : "text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                   ].join(" ")}
                 >
-                  <Icon className="size-3.5 transition-transform duration-300 group-hover:scale-110 group-hover:text-sidebar-primary" />
-                  <span className="truncate" title={item.label}>{item.label}</span>
+                  <Icon
+                    className={[
+                      "size-3.5 shrink-0 transition-colors duration-300 group-hover:scale-110 group-hover:text-sidebar-primary",
+                      isParentActive ? "text-success font-black" : "text-sidebar-foreground/60",
+                    ].join(" ")}
+                  />
+                  <span className="flex-1 truncate" title={item.label}>{item.label}</span>
                   {isPlaceholder ? (
                     <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
                       Soon
                     </span>
                   ) : isParentActive ? (
-                    <span className="ml-auto size-1.5 rounded-full bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)] animate-pulse" />
+                    <span className="ml-auto size-1.5 rounded-full bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)] animate-pulse shrink-0" />
                   ) : null}
                 </Link>
               </div>
@@ -624,26 +626,26 @@ export function InventorySidebar() {
               >
                 <Icon
                   className={[
-                    "size-3.5 transition-colors duration-300 group-hover:scale-110 group-hover:text-sidebar-primary",
+                    "size-3.5 shrink-0 transition-colors duration-300 group-hover:scale-110 group-hover:text-sidebar-primary",
                     isParentActive ? "text-success font-black" : "text-sidebar-foreground/60",
                   ].join(" ")}
                 />
                 <span className="flex-1 truncate" title={item.label}>{item.label}</span>
                 {item.count !== undefined && item.count > 0 && (
-                  <span className="bg-amber-500/10 text-amber-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md mr-1 leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
+                  <span className="bg-amber-500/10 text-amber-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md mr-1 leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20 shrink-0">
                     {item.count}
                   </span>
                 )}
                 {isOpen ? (
-                  <ChevronDown className="size-3.5 text-sidebar-foreground/45 transition-transform duration-300 rotate-180" />
+                  <ChevronDown className="size-3.5 shrink-0 text-sidebar-foreground/45 transition-transform duration-300 rotate-180" />
                 ) : (
-                  <ChevronRight className="size-3.5 text-sidebar-foreground/45 transition-transform duration-300" />
+                  <ChevronRight className="size-3.5 shrink-0 text-sidebar-foreground/45 transition-transform duration-300" />
                 )}
               </button>
               <div
                 className={[
                   "overflow-hidden transition-all duration-300 space-y-0.5 pl-3.5 bg-sidebar-accent/25 rounded-xl",
-                  isOpen ? "max-h-[600px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
+                  isOpen ? "max-h-[1500px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
                 ].join(" ")}
               >
                 {item.subitems.map((sub) => {

@@ -99,6 +99,7 @@ export function SupplierReturnListPage() {
         <InventoryTopbar />
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-6">
+          <div className="w-full max-w-[1550px] mx-auto space-y-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-4">
             <div>
@@ -322,6 +323,7 @@ export function SupplierReturnListPage() {
                 </tbody>
               </table>
             </div>
+          </div>
           </div>
         </main>
       </div>
