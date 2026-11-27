@@ -62,7 +62,12 @@ export function ItemStockRegisterPage() {
   const [filterStore, setFilterStore] = useState("All");
   const [filterLocation, setFilterLocation] = useState("");
   const [filterBatch, setFilterBatch] = useState("");
-  const [filterDate, setFilterDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [filterFromDate, setFilterFromDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 90);
+    return d.toISOString().slice(0, 10);
+  });
+  const [filterToDate, setFilterToDate] = useState(() => new Date().toISOString().slice(0, 10));
 
   // Item Search Modal
   const [isItemSearchModalOpen, setIsItemSearchModalOpen] = useState(false);
@@ -211,11 +216,16 @@ export function ItemStockRegisterPage() {
     });
   }, [rawBreakdown, filterStore, filterLocation, filterBatch]);
 
-  // Drilldown transactions for the selected batch
+  // Drilldown transactions for the selected batch filtered by From/To date
   const drilldownTransactions = useMemo(() => {
     if (!selectedDrilldownBatch) return [];
-    return INITIAL_LEDGER_DATA.filter((l) => l.itemCode === activeItem.itemCode);
-  }, [selectedDrilldownBatch, activeItem]);
+    return INITIAL_LEDGER_DATA.filter((l) => {
+      if (l.itemCode !== activeItem.itemCode) return false;
+      if (filterFromDate && l.date < filterFromDate) return false;
+      if (filterToDate && l.date > filterToDate) return false;
+      return true;
+    });
+  }, [selectedDrilldownBatch, activeItem, filterFromDate, filterToDate]);
 
   const handleExportCSV = () => {
     const headers = ["Store", "Location", "Batch", "Opening", "In Qty", "Out Qty", "Balance"];
@@ -229,7 +239,11 @@ export function ItemStockRegisterPage() {
       r.balance,
     ]);
 
-    exportToCSV(`Item_Stock_Register_${activeItem.itemCode}_${filterDate}.csv`, headers, rows);
+    exportToCSV(
+      `Item_Stock_Register_${activeItem.itemCode}_${filterFromDate}_to_${filterToDate}.csv`,
+      headers,
+      rows
+    );
     toast.success("CSV export downloaded successfully!");
   };
 
@@ -251,8 +265,8 @@ export function ItemStockRegisterPage() {
     ];
 
     exportToExcel(
-      `Item_Stock_Register_${activeItem.itemCode}_${filterDate}.xls`,
-      `Item Stock Register: ${activeItem.itemName} (${activeItem.itemCode})`,
+      `Item_Stock_Register_${activeItem.itemCode}_${filterFromDate}_to_${filterToDate}.xls`,
+      `Item Stock Register: ${activeItem.itemName} (${activeItem.itemCode}) [${filterFromDate} to ${filterToDate}]`,
       headers,
       rows,
       subtotals
@@ -275,10 +289,11 @@ export function ItemStockRegisterPage() {
     setPdfReportData({
       reportTitle: `ITEM STOCK REGISTER — ${activeItem.itemCode}`,
       documentNumber: `ITEM-STK-${activeItem.itemCode}`,
-      reportDate: filterDate,
+      reportDate: `${filterFromDate} to ${filterToDate}`,
       companyName: activeItem.company,
       department: "Central Inventory Management",
       metadata: [
+        { label: "Date Range", value: `${filterFromDate} to ${filterToDate}`, highlight: true },
         { label: "Item Name", value: activeItem.itemName },
         { label: "Specification", value: activeItem.specification },
         { label: "UOM", value: activeItem.uom },
@@ -500,11 +515,21 @@ export function ItemStockRegisterPage() {
               </div>
 
               <div>
-                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">As of Date</label>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">From Date</label>
                 <input
                   type="date"
-                  value={filterDate}
-                  onChange={(e) => setFilterDate(e.target.value)}
+                  value={filterFromDate}
+                  onChange={(e) => setFilterFromDate(e.target.value)}
+                  className="w-36 mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10.5px] font-bold text-muted-foreground uppercase">To Date</label>
+                <input
+                  type="date"
+                  value={filterToDate}
+                  onChange={(e) => setFilterToDate(e.target.value)}
                   className="w-36 mt-1 h-8 px-2 rounded-lg border border-border/80 bg-background text-xs font-medium focus:border-primary outline-none"
                 />
               </div>
@@ -515,6 +540,10 @@ export function ItemStockRegisterPage() {
                 setFilterStore("All");
                 setFilterLocation("");
                 setFilterBatch("");
+                const d = new Date();
+                d.setDate(d.getDate() - 90);
+                setFilterFromDate(d.toISOString().slice(0, 10));
+                setFilterToDate(new Date().toISOString().slice(0, 10));
               }}
               className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer pt-3"
             >

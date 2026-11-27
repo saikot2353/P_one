@@ -386,6 +386,10 @@ export const nav: NavItem[] = [
         to: "/inv-report-stock-valuation",
       },
       {
+        label: "Stock Ageing Report",
+        to: "/inv-report-stock-ageing",
+      },
+      {
         label: "Month-wise Material Receive",
         to: "/inv-report-monthly-receive",
       },
